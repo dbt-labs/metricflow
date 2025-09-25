@@ -42,7 +42,7 @@ class SemanticManifestLookup:
         graph_builder = SemanticGraphBuilder(manifest_object_lookup=manifest_object_lookup)
         semantic_graph = graph_builder.build()
 
-        linkable_spec_resolver = SemanticGraphGroupByItemSetResolver(
+        group_by_item_set_resolver = SemanticGraphGroupByItemSetResolver(
             manifest_object_lookup=manifest_object_lookup,
             semantic_graph=semantic_graph,
             path_finder=pathfinder,
@@ -52,7 +52,7 @@ class SemanticManifestLookup:
             semantic_manifest=semantic_manifest,
             semantic_model_lookup=self._semantic_model_lookup,
             custom_granularities=self.custom_granularities,
-            linkable_spec_resolver=linkable_spec_resolver,
+            group_by_item_set_resolver=group_by_item_set_resolver,
         )
 
     @property

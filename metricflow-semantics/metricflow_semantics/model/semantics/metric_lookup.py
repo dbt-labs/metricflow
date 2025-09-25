@@ -35,7 +35,7 @@ class MetricLookup:
         semantic_manifest: SemanticManifest,
         semantic_model_lookup: SemanticModelLookup,
         custom_granularities: Dict[str, ExpandedTimeGranularity],
-        linkable_spec_resolver: GroupByItemSetResolver,
+        group_by_item_set_resolver: GroupByItemSetResolver,
     ) -> None:
         """Initializer.
 
@@ -50,7 +50,7 @@ class MetricLookup:
         for metric in semantic_manifest.metrics:
             self._add_metric(metric)
 
-        self._linkable_spec_resolver = linkable_spec_resolver
+        self._group_by_item_set_resolver = group_by_item_set_resolver
 
         # Cache for `get_min_queryable_time_granularity()`
         self._metric_reference_to_min_metric_time_grain: Dict[MetricReference, TimeGranularity] = {}
@@ -92,7 +92,7 @@ class MetricLookup:
             if result is not None:
                 return result
 
-            result = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
+            result = self._group_by_item_set_resolver.get_linkable_element_set_for_measure(
                 measure_reference, element_filter
             )
             self._linkable_elements_including_group_by_metrics_cache.set(cache_key, result)
@@ -106,7 +106,7 @@ class MetricLookup:
         if result is not None:
             return result.filter(element_filter)
 
-        result = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
+        result = self._group_by_item_set_resolver.get_linkable_element_set_for_measure(
             measure_reference, element_filter_without_element_names
         )
         self._linkable_element_set_for_measure_cache[cache_key] = result
@@ -130,7 +130,7 @@ class MetricLookup:
         if result is not None:
             return result
 
-        result = self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(element_set_filter)
+        result = self._group_by_item_set_resolver.get_linkable_elements_for_distinct_values_query(element_set_filter)
         self._linkable_elements_for_no_metrics_query_cache.set(cache_key, result)
         return result
 
@@ -143,7 +143,7 @@ class MetricLookup:
         if result is not None:
             return result
 
-        result = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
+        result = self._group_by_item_set_resolver.get_linkable_elements_for_metrics(
             metric_references=metric_references, element_filter=element_set_filter
         )
         self._linkable_elements_for_metrics_cache.set(cache_key, result)
