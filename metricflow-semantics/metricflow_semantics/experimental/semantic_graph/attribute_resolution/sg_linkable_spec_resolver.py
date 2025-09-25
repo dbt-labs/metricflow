@@ -79,8 +79,10 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         self._result_cache_for_common_set: ResultCache[_CommonSetCacheKey, BaseGroupByItemSet] = ResultCache()
 
     @override
-    def get_set_for_distinct_values_query(self, element_filter: GroupByItemSetFilter) -> BaseGroupByItemSet:
-        cache_key = (element_filter,)
+    def get_set_for_distinct_values_query(
+        self, set_filter: Optional[GroupByItemSetFilter] = None
+    ) -> BaseGroupByItemSet:
+        cache_key = (set_filter,)
         cache_result = self._result_cache_for_distinct_values.get(cache_key)
         if cache_result:
             return cache_result.value
@@ -88,17 +90,15 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         for local_model_node in self._local_model_nodes:
             source_nodes = FrozenOrderedSet((local_model_node,))
             local_model_trie = self._simple_resolver_limit_one_model.resolve_trie(
-                source_nodes, element_filter
+                source_nodes, set_filter
             ).dunder_name_trie
             group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(
-                source_nodes, element_filter
+                source_nodes, set_filter
             ).dunder_name_trie
             tries_to_union.append(local_model_trie)
             tries_to_union.append(group_by_metric_trie)
 
-        metric_time_trie = self._simple_resolver.resolve_trie(
-            self._metric_time_node_set, element_filter
-        ).dunder_name_trie
+        metric_time_trie = self._simple_resolver.resolve_trie(self._metric_time_node_set, set_filter).dunder_name_trie
 
         # Since `TimeEntitySubgraphGenerator` could add time grain nodes that are finer than the grain of time spine,
         # filter those out.
