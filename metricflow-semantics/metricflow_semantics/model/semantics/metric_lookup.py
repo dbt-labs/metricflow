@@ -66,10 +66,10 @@ class MetricLookup:
         ] = {}
 
     def get_group_by_items_for_distinct_values_query(
-        self, element_set_filter: GroupByItemSetFilter = GroupByItemSetFilter()
+        self, set_filter: GroupByItemSetFilter = GroupByItemSetFilter()
     ) -> BaseGroupByItemSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
-        return self._group_by_item_set_resolver.get_set_for_distinct_values_query(element_set_filter)
+        return self._group_by_item_set_resolver.get_set_for_distinct_values_query(set_filter)
 
     def get_common_group_by_items(
         self,
