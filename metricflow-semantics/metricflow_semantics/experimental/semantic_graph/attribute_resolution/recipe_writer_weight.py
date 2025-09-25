@@ -202,7 +202,7 @@ class AttributeRecipeWriterWeightFunction(
         next_node: SemanticGraphNode,
         steps: AnyLengthTuple[AttributeRecipeStep],
     ) -> bool:
-        property_deny_set = element_filter.without_any_of
+        property_deny_set = element_filter.any_properties_denylist
         if property_deny_set and any(
             element_property in property_deny_set
             for element_property in itertools.chain.from_iterable(
@@ -211,7 +211,7 @@ class AttributeRecipeWriterWeightFunction(
         ):
             return True
 
-        name_element_allow_set = element_filter.element_names
+        name_element_allow_set = element_filter.element_name_allowlist
         # Generally, element name should be checked at the attribute node, but it can be done at time dimension nodes
         # as they are an entity node that adds an element name. This can speed up traversal by pruning edges.
         if (

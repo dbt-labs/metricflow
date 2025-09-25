@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 DEFAULT_COMMON_SET_FILTER: Final[GroupByItemSetFilter] = GroupByItemSetFilter(
-    without_any_of=frozenset((GroupByItemProperty.METRIC,))
+    any_properties_denylist=frozenset((GroupByItemProperty.METRIC,))
 )
 
 
@@ -78,7 +78,7 @@ class MetricLookup:
         set_filter: GroupByItemSetFilter = DEFAULT_COMMON_SET_FILTER,
     ) -> BaseGroupByItemSet:
         """Gets the set of the valid group-by items common to all inputs."""
-        if set_filter.element_names is None:
+        if set_filter.element_name_allowlist is None:
             return self._group_by_item_set_resolver.get_common_set(
                 measure_references=measure_references,
                 metric_references=metric_references,
@@ -87,7 +87,7 @@ class MetricLookup:
 
         # If the filter specifies element names, make the call to the resolver without element names to get better
         # cache hit rates.
-        filter_without_element_name_condition = set_filter.without_element_names()
+        filter_without_element_name_condition = set_filter.without_element_name_allowlist()
 
         result_superset = self._group_by_item_set_resolver.get_common_set(
             measure_references=measure_references,
@@ -99,7 +99,7 @@ class MetricLookup:
             annotated_specs=tuple(
                 annotated_spec
                 for annotated_spec in result_superset.annotated_specs
-                if annotated_spec.element_name in set_filter.element_names
+                if annotated_spec.element_name in set_filter.element_name_allowlist
             )
         )
 

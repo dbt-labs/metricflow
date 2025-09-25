@@ -165,9 +165,9 @@ class EntityLinkPattern(SpecPattern):
             or len(self.parameter_set.metric_subquery_entity_links) == 0
         ):
             return GroupByItemSetFilter(
-                element_names=element_names, without_any_of=frozenset({GroupByItemProperty.METRIC})
+                element_name_allowlist=element_names, any_properties_denylist=frozenset({GroupByItemProperty.METRIC})
             )
 
         return GroupByItemSetFilter(
-            element_names=element_names,
+            element_name_allowlist=element_names,
         )

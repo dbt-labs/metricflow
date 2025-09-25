@@ -63,14 +63,16 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
     ):
         # Group-by metrics should not be called for metrics, so skip them for smaller snapshots.
         metric_references = tuple(MetricReference(metric_name) for metric_name in metric_names)
-        set_filter = GroupByItemSetFilter(without_any_of=frozenset((GroupByItemProperty.METRIC,)))
+        set_filter = GroupByItemSetFilter(any_properties_denylist=frozenset((GroupByItemProperty.METRIC,)))
         complete_set = sg_resolver.get_common_set(metric_references=metric_references, set_filter=set_filter)
         description_to_set[str(metric_names)] = complete_set
         sg_tester.check_set_filtering(
             complete_set=complete_set,
             filtered_set_callable=lambda _filter: sg_resolver.get_common_set(
                 metric_references=metric_references,
-                set_filter=_filter.copy(without_any_of=_filter.without_any_of.union((GroupByItemProperty.METRIC,))),
+                set_filter=_filter.copy(
+                    any_properties_denylist=_filter.any_properties_denylist.union((GroupByItemProperty.METRIC,))
+                ),
             ),
         )
 

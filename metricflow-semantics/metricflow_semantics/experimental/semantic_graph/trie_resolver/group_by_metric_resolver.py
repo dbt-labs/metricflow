@@ -131,7 +131,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
         metric_names_allow_set: Optional[Set[str]] = None
 
         if element_filter is not None:
-            metric_names_allow_set = element_filter.element_names
+            metric_names_allow_set = element_filter.element_name_allowlist
             # Group-by metrics always have these properties, so return an empty set if the filter doesn't allow them.
             if not element_filter.allow(
                 element_name=None, element_properties=(GroupByItemProperty.METRIC, GroupByItemProperty.JOINED)
