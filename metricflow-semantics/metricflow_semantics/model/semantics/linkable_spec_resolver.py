@@ -28,7 +28,7 @@ class GroupByItemSetResolver(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_linkable_elements_for_distinct_values_query(
+    def get_set_for_distinct_values_query(
         self,
         element_filter: GroupByItemSetFilter,
     ) -> BaseGroupByItemSet:

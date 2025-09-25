@@ -124,9 +124,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         )
 
     @override
-    def get_linkable_elements_for_distinct_values_query(
-        self, element_filter: GroupByItemSetFilter
-    ) -> BaseGroupByItemSet:
+    def get_set_for_distinct_values_query(self, element_filter: GroupByItemSetFilter) -> BaseGroupByItemSet:
         cache_key = (element_filter,)
         cache_result = self._result_cache_for_distinct_values.get(cache_key)
         if cache_result:
