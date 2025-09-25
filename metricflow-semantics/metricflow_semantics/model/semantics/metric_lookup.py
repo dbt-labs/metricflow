@@ -129,7 +129,7 @@ class MetricLookup:
         )
         return result.filter(element_filter)
 
-    def linkable_elements_for_no_metrics_query(
+    def get_group_by_items_for_distinct_values_query(
         self, element_set_filter: GroupByItemSetFilter = GroupByItemSetFilter()
     ) -> BaseGroupByItemSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""

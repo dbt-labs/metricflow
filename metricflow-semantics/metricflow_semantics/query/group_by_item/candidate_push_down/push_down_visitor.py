@@ -464,7 +464,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
             # This is a case for distinct dimension values from semantic models.
             candidate_group_by_items = (
-                self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_no_metrics_query()
+                self._semantic_manifest_lookup.metric_lookup.get_group_by_items_for_distinct_values_query()
             )
             logger.debug(LazyFormat("Retrieved candidates", candidate_group_by_items=candidate_group_by_items))
             candidates_after_filtering = candidate_group_by_items.filter_by_spec_patterns(self._source_spec_patterns)
