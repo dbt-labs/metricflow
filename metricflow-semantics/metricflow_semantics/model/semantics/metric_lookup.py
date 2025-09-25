@@ -130,7 +130,7 @@ class MetricLookup:
         if result is not None:
             return result
 
-        result = self._group_by_item_set_resolver.get_linkable_elements_for_distinct_values_query(element_set_filter)
+        result = self._group_by_item_set_resolver.get_set_for_distinct_values_query(element_set_filter)
         self._group_by_items_for_no_metrics_query_cache.set(cache_key, result)
         return result
 
