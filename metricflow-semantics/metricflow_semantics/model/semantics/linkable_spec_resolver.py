@@ -21,7 +21,7 @@ class GroupByItemSetResolver(ABC):
     @abstractmethod
     def get_set_for_distinct_values_query(
         self,
-        element_filter: GroupByItemSetFilter,
+        set_filter: Optional[GroupByItemSetFilter] = None,
     ) -> BaseGroupByItemSet:
         """Returns queryable items for a distinct group-by-item values query.
 
