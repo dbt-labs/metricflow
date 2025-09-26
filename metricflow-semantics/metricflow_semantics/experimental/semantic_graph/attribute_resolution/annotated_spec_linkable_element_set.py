@@ -104,12 +104,12 @@ class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
 
     @override
     def filter(self, element_filter: GroupByItemSetFilter) -> GroupByItemSet:
-        allow_element_name_set = element_filter.element_name_allowlist
-        deny_property_set = element_filter.any_properties_denylist
+        element_name_allowlist = element_filter.element_name_allowlist
+        any_properties_denylist = element_filter.any_properties_denylist
 
         new_specs: list[AnnotatedSpec] = []
         for annotated_spec in self.annotated_specs:
-            if allow_element_name_set is not None and annotated_spec.element_name not in allow_element_name_set:
+            if element_name_allowlist is not None and annotated_spec.element_name not in element_name_allowlist:
                 continue
 
             property_set = annotated_spec.property_set
@@ -117,7 +117,7 @@ class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
             if not element_filter.any_properties_allowlist.intersection(annotated_spec.property_set):
                 continue
 
-            if deny_property_set and len(deny_property_set.intersection(property_set)) > 0:
+            if any_properties_denylist and len(any_properties_denylist.intersection(property_set)) > 0:
                 continue
 
             new_specs.append(annotated_spec)

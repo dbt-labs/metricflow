@@ -63,7 +63,7 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
     ):
         # Group-by metrics should not be called for metrics, so skip them for smaller snapshots.
         metric_references = tuple(MetricReference(metric_name) for metric_name in metric_names)
-        set_filter = GroupByItemSetFilter(any_properties_denylist=frozenset((GroupByItemProperty.METRIC,)))
+        set_filter = GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.METRIC,))
         complete_set = sg_resolver.get_common_set(metric_references=metric_references, set_filter=set_filter)
         description_to_set[str(metric_names)] = complete_set
         sg_tester.check_set_filtering(
@@ -82,13 +82,17 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
 def test_set_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
     """Check the attribute set for a distinct-values query / no-metric query."""
     sg_tester.assert_attribute_set_snapshot_equal(
-        {"Distinct-Values Query": sg_tester.sg_resolver.get_set_for_distinct_values_query(GroupByItemSetFilter())}
+        {
+            "Distinct-Values Query": sg_tester.sg_resolver.get_set_for_distinct_values_query(
+                GroupByItemSetFilter.create()
+            )
+        }
     )
 
 
 def test_set_filtering_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
     """Check filtering of the set for a distinct values query."""
-    complete_set = sg_tester.sg_resolver.get_set_for_distinct_values_query(GroupByItemSetFilter())
+    complete_set = sg_tester.sg_resolver.get_set_for_distinct_values_query(GroupByItemSetFilter.create())
     sg_tester.check_set_filtering(
         complete_set=complete_set,
         filtered_set_callable=lambda set_filter: sg_tester.sg_resolver.get_set_for_distinct_values_query(set_filter),

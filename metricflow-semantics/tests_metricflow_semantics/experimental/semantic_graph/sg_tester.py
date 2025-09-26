@@ -115,17 +115,17 @@ class SemanticGraphTester:
         set generation.
         """
         for element_property in GroupByItemProperty:
-            allow_if_any_property_filter = GroupByItemSetFilter(any_properties_allowlist=frozenset((element_property,)))
-            filtered_set = filtered_set_callable(allow_if_any_property_filter)
+            any_properties_allowlist_filter = GroupByItemSetFilter.create(any_properties_allowlist=(element_property,))
+            filtered_set = filtered_set_callable(any_properties_allowlist_filter)
             # The resolver uses the filter to limit graph traversal, so this is not the same logic.
-            expected_items = set(complete_set.filter(allow_if_any_property_filter).annotated_specs)
+            expected_items = set(complete_set.filter(any_properties_allowlist_filter).annotated_specs)
             actual_items = set(filtered_set.annotated_specs)
 
             assert expected_items == actual_items
 
-            deny_if_any_property_filter = GroupByItemSetFilter(any_properties_denylist=frozenset((element_property,)))
-            filtered_set = filtered_set_callable(deny_if_any_property_filter)
-            expected_items = set(complete_set.filter(deny_if_any_property_filter).annotated_specs)
+            any_properties_denylist_filter = GroupByItemSetFilter.create(any_properties_denylist=(element_property,))
+            filtered_set = filtered_set_callable(any_properties_denylist_filter)
+            expected_items = set(complete_set.filter(any_properties_denylist_filter).annotated_specs)
             actual_items = set(filtered_set.annotated_specs)
 
             assert expected_items == actual_items

@@ -57,7 +57,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         )
 
         self._query_includes_metric_time = not self._resolve_group_by_item_result.linkable_element_set.filter(
-            GroupByItemSetFilter(any_properties_allowlist=frozenset({GroupByItemProperty.METRIC_TIME}))
+            GroupByItemSetFilter.create(any_properties_allowlist=(GroupByItemProperty.METRIC_TIME,))
         ).is_empty
 
     def _query_includes_agg_time_dimension_of_metric(self, metric_reference: MetricReference) -> bool:

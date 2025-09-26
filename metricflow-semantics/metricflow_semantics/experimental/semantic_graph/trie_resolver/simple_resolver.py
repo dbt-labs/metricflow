@@ -119,7 +119,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             source_nodes=source_nodes, collected_labels=find_descendants_result.labels_collected_during_traversal
         ):
             if element_filter is None:
-                element_filter = GroupByItemSetFilter()
+                element_filter = GroupByItemSetFilter.create()
             element_filter = element_filter.copy(
                 any_properties_denylist=element_filter.any_properties_denylist.union((GroupByItemProperty.DATE_PART,))
             )

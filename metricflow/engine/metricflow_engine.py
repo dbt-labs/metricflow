@@ -689,8 +689,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            set_filter=GroupByItemSetFilter(
-                any_properties_denylist=frozenset(without_any_property),
+            set_filter=GroupByItemSetFilter.create(
+                any_properties_denylist=without_any_property,
             ),
         )
         return self._filter_simple_linkable_dimensions(group_by_item_set=group_by_item_set)
@@ -791,8 +791,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            set_filter=GroupByItemSetFilter(
-                any_properties_allowlist=frozenset(ENTITY_WITH_ANY_PROPERTIES),
+            set_filter=GroupByItemSetFilter.create(
+                any_properties_allowlist=ENTITY_WITH_ANY_PROPERTIES,
             ),
         )
 
@@ -932,8 +932,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 without_any_of = without_any_of - {GroupByItemProperty.DERIVED_TIME_GRANULARITY}
             group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                set_filter=GroupByItemSetFilter(
-                    any_properties_denylist=frozenset(without_any_of),
+                set_filter=GroupByItemSetFilter.create(
+                    any_properties_denylist=without_any_of,
                 ),
             )
             group_bys: Sequence = self._filter_linkable_entities(
