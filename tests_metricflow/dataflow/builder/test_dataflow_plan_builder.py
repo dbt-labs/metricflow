@@ -1346,11 +1346,11 @@ def test_all_available_metric_filters(
     query_parser = mf_engine_test_fixture.query_parser
     dataflow_plan_builder = mf_engine_test_fixture.dataflow_plan_builder
     metric_lookup = mf_engine_test_fixture.semantic_manifest_lookup.metric_lookup
-    bookings_linkable_element_set = metric_lookup.linkable_elements_for_measure(
-        measure_reference=MeasureReference("bookings"),
-        element_filter=GroupByItemSetFilter(with_any_of=frozenset((GroupByItemProperty.METRIC,))),
+    bookings_group_by_item_set = metric_lookup.get_common_group_by_items(
+        measure_references=(MeasureReference("bookings"),),
+        set_filter=GroupByItemSetFilter(with_any_of=frozenset((GroupByItemProperty.METRIC,))),
     )
-    for group_by_metric_spec in group_specs_by_type(bookings_linkable_element_set.specs).group_by_metric_specs:
+    for group_by_metric_spec in group_specs_by_type(bookings_group_by_item_set.specs).group_by_metric_specs:
         entity_spec = group_by_metric_spec.metric_subquery_entity_spec
         query_spec = query_parser.parse_and_validate_query(
             metric_names=("bookings",),

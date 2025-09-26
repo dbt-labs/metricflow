@@ -687,7 +687,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     ) -> List[Dimension]:
         self._check_metric_names(metric_names)
 
-        group_by_item_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+        group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
             set_filter=GroupByItemSetFilter(
                 without_any_of=frozenset(without_any_property),
@@ -789,7 +789,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return sorted(set(dimensions), key=sort_dimensions)
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
-        group_by_item_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+        group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
             set_filter=GroupByItemSetFilter(
                 with_any_of=frozenset(ENTITY_WITH_ANY_PROPERTIES),
@@ -928,7 +928,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             without_any_of = SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES - ENTITY_WITH_ANY_PROPERTIES
             if include_derived_time_granularities:
                 without_any_of = without_any_of - {GroupByItemProperty.DERIVED_TIME_GRANULARITY}
-            group_by_item_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
+            group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
                 set_filter=GroupByItemSetFilter(
                     without_any_of=frozenset(without_any_of),
