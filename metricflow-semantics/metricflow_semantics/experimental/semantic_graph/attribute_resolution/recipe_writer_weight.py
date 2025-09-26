@@ -202,9 +202,9 @@ class AttributeRecipeWriterWeightFunction(
         next_node: SemanticGraphNode,
         steps: AnyLengthTuple[AttributeRecipeStep],
     ) -> bool:
-        property_deny_set = element_filter.any_properties_denylist
-        if property_deny_set and any(
-            element_property in property_deny_set
+        any_properties_denylist = element_filter.any_properties_denylist
+        if any_properties_denylist and any(
+            element_property in any_properties_denylist
             for element_property in itertools.chain.from_iterable(
                 step.add_properties for step in steps if step.add_properties
             )

@@ -30,4 +30,4 @@ class SpecPattern(ABC):
 
         i.e. the filter can produce a superset of the elements that will match.
         """
-        return GroupByItemSetFilter()
+        return GroupByItemSetFilter.create()
