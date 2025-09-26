@@ -59,7 +59,7 @@ class DimensionPattern(EntityLinkPattern):
     @override
     def element_pre_filter(self) -> GroupByItemSetFilter:
         return super().element_pre_filter.merge(
-            GroupByItemSetFilter(any_properties_denylist=frozenset({GroupByItemProperty.METRIC}))
+            GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.METRIC,))
         )
 
 
@@ -120,7 +120,7 @@ class TimeDimensionPattern(EntityLinkPattern):
     @override
     def element_pre_filter(self) -> GroupByItemSetFilter:
         return super().element_pre_filter.merge(
-            GroupByItemSetFilter(any_properties_denylist=frozenset({GroupByItemProperty.METRIC}))
+            GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.METRIC,))
         )
 
 
@@ -153,7 +153,7 @@ class EntityPattern(EntityLinkPattern):
     @property
     @override
     def element_pre_filter(self) -> GroupByItemSetFilter:
-        return GroupByItemSetFilter(any_properties_denylist=frozenset({GroupByItemProperty.METRIC}))
+        return GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.METRIC,))
 
 
 @dataclass(frozen=True)

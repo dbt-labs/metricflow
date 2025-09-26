@@ -70,10 +70,10 @@ class GroupByItemSetFilter(Mergeable):
 
     def without_element_name_allowlist(self) -> GroupByItemSetFilter:
         """Return this filter without the `element_name_allowlist` filter set."""
-        return GroupByItemSetFilter(
+        return GroupByItemSetFilter.create(
             element_name_allowlist=None,
             any_properties_denylist=self.any_properties_denylist,
-            any_properties_allowlist=self.any_properties_denylist,
+            any_properties_allowlist=self.any_properties_allowlist,
         )
 
     def allow(self, element_name: Optional[str], element_properties: Optional[Iterable[GroupByItemProperty]]) -> bool:
