@@ -10,7 +10,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
     RecipeWriterPathfinder,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
-    SemanticGraphLinkableSpecResolver,
+    SemanticGraphGroupByItemSetResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
@@ -18,9 +18,9 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.specs.spec_set import group_spec_by_type
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.test_helpers.table_helpers import PaddedTextTableBuilder
@@ -46,7 +46,7 @@ class SemanticGraphTester:
         )
 
     @property
-    def sg_resolver(self) -> SemanticGraphLinkableSpecResolver:  # noqa: D102
+    def sg_resolver(self) -> SemanticGraphGroupByItemSetResolver:  # noqa: D102
         return self._fixture.sg_resolver
 
     @property
@@ -59,7 +59,7 @@ class SemanticGraphTester:
 
     @staticmethod
     def assert_linkable_element_sets_equal(  # noqa: D102
-        left_set: BaseLinkableElementSet, right_set: BaseLinkableElementSet, log_result_table: bool
+        left_set: BaseGroupByItemSet, right_set: BaseGroupByItemSet, log_result_table: bool
     ) -> None:
         left_rows = SemanticGraphTester._convert_linkable_element_set_to_rows(left_set)
         right_rows = SemanticGraphTester._convert_linkable_element_set_to_rows(right_set)
@@ -83,7 +83,7 @@ class SemanticGraphTester:
 
     def assert_attribute_set_snapshot_equal(  # noqa: D102
         self,
-        description_to_set: Mapping[str, BaseLinkableElementSet],
+        description_to_set: Mapping[str, BaseGroupByItemSet],
         expectation_description: Optional[str] = None,
     ) -> None:
         lines = []
@@ -103,16 +103,16 @@ class SemanticGraphTester:
 
     def check_set_filtering(
         self,
-        complete_set: BaseLinkableElementSet,
-        filtered_set_callable: Callable[[LinkableElementFilter], BaseLinkableElementSet],
+        complete_set: BaseGroupByItemSet,
+        filtered_set_callable: Callable[[GroupByItemSetFilter], BaseGroupByItemSet],
     ) -> None:
         """Given the set containing all items, check that the given callable returns correctly filtered results.
 
-        This calls `BaseLinkableElementSet.filter()` so the callable should have differences in logic for filtered
+        This calls `BaseGroupByItemSet.filter()` so the callable should have differences in logic for filtered
         set generation.
         """
-        for element_property in LinkableElementProperty:
-            with_any_of_filter = LinkableElementFilter(with_any_of=frozenset((element_property,)))
+        for element_property in GroupByItemProperty:
+            with_any_of_filter = GroupByItemSetFilter(with_any_of=frozenset((element_property,)))
             filtered_set = filtered_set_callable(with_any_of_filter)
             # The resolver uses the filter to limit graph traversal, so this is not the same logic.
             expected_items = set(complete_set.filter(with_any_of_filter).annotated_specs)
@@ -120,7 +120,7 @@ class SemanticGraphTester:
 
             assert expected_items == actual_items
 
-            without_any_of_filter = LinkableElementFilter(without_any_of=frozenset((element_property,)))
+            without_any_of_filter = GroupByItemSetFilter(without_any_of=frozenset((element_property,)))
             filtered_set = filtered_set_callable(without_any_of_filter)
             expected_items = set(complete_set.filter(without_any_of_filter).annotated_specs)
             actual_items = set(filtered_set.annotated_specs)
@@ -129,7 +129,7 @@ class SemanticGraphTester:
 
     @staticmethod
     def _convert_linkable_element_set_to_rows(
-        linkable_element_set: BaseLinkableElementSet,
+        linkable_element_set: BaseGroupByItemSet,
     ) -> list[dict[str, str]]:
         rows: list[dict[str, str]] = []
 

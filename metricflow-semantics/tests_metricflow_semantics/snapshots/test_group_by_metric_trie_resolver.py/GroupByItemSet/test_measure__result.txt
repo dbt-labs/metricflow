@@ -1,7 +1,7 @@
 test_name: test_measure
 test_filename: test_group_by_metric_trie_resolver.py
 ---
-AnnotatedSpecLinkableElementSet(
+GroupByItemSet(
   annotated_specs=(
     AnnotatedSpec(
       element_type=METRIC,

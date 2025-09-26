@@ -6,7 +6,7 @@ GroupByItemResolution(
     element_name='metric_time',
     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
   ),
-  linkable_element_set=AnnotatedSpecLinkableElementSet(
+  linkable_element_set=GroupByItemSet(
     annotated_specs=(
       AnnotatedSpec(
         element_type=TIME_DIMENSION,

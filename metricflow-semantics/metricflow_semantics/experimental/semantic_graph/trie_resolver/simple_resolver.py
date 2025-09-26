@@ -36,8 +36,8 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_
 )
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
 
     @override
     def resolve_trie(
-        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[LinkableElementFilter]
+        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[GroupByItemSetFilter]
     ) -> TrieResolutionResult:
         execution_timer = ExecutionTimer()
         traversal_stat_differ = TraversalProfileDiffer(self._path_finder)
@@ -86,7 +86,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
     def _resolve_trie_for_source_nodes(
         self,
         source_nodes: OrderedSet[SemanticGraphNode],
-        element_filter: Optional[LinkableElementFilter],
+        element_filter: Optional[GroupByItemSetFilter],
     ) -> DunderNameTrie:
         """Resolve the available group-by items for the given source nodes.
 
@@ -119,9 +119,9 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             source_nodes=source_nodes, collected_labels=find_descendants_result.labels_collected_during_traversal
         ):
             if element_filter is None:
-                element_filter = LinkableElementFilter()
+                element_filter = GroupByItemSetFilter()
             element_filter = element_filter.copy(
-                without_any_of=element_filter.without_any_of.union((LinkableElementProperty.DATE_PART,))
+                without_any_of=element_filter.without_any_of.union((GroupByItemProperty.DATE_PART,))
             )
 
         result_intersection_source_nodes = tuple(find_descendants_result.reachable_target_nodes)
@@ -157,7 +157,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
     def _resolve_trie_from_node(
         self,
         source_node: SemanticGraphNode,
-        element_filter: Optional[LinkableElementFilter],
+        element_filter: Optional[GroupByItemSetFilter],
     ) -> DunderNameTrie:
         source_node_labels = source_node.labels
         if self._local_model_label in source_node_labels or self._metric_time_label in source_node_labels:
@@ -227,7 +227,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
     def _resolve_trie_from_initial_path(
         self,
         initial_path: AttributeRecipeWriterPath,
-        element_filter: Optional[LinkableElementFilter],
+        element_filter: Optional[GroupByItemSetFilter],
     ) -> DunderNameTrie:
         """Resolve the available group-by items using the given initial path."""
         cache_key = TrieCacheKey(key_nodes=tuple(initial_path.nodes), element_filter=element_filter)

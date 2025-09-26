@@ -14,7 +14,7 @@ from metricflow_semantics.experimental.metricflow_exception import MetricflowInt
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
@@ -41,16 +41,16 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.group_by_met
 )
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
-from metricflow_semantics.model.semantics.linkable_spec_resolver import LinkableSpecResolver
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
+from metricflow_semantics.model.semantics.linkable_spec_resolver import GroupByItemSetResolver
 
 logger = logging.getLogger(__name__)
 
 
-class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
-    """An implementation of `LinkableSpecResolver` using the semantic graph."""
+class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
+    """An implementation of `GroupByItemSetResolver` using the semantic graph."""
 
     def __init__(  # noqa: D107
         self,
@@ -70,21 +70,21 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         )
 
         self._result_cache_for_measure: ResultCache[
-            tuple[MeasureReference, Optional[LinkableElementFilter]], BaseLinkableElementSet
+            tuple[MeasureReference, Optional[GroupByItemSetFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
         self._result_cache_for_metrics: ResultCache[
-            tuple[FrozenOrderedSet[MetricReference], Optional[LinkableElementFilter]], BaseLinkableElementSet
+            tuple[FrozenOrderedSet[MetricReference], Optional[GroupByItemSetFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
         self._result_cache_for_distinct_values: ResultCache[
-            tuple[Optional[LinkableElementFilter]], BaseLinkableElementSet
+            tuple[Optional[GroupByItemSetFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
     @override
     def get_linkable_element_set_for_measure(
-        self, measure_reference: MeasureReference, element_filter: Optional[LinkableElementFilter] = None
-    ) -> BaseLinkableElementSet:
+        self, measure_reference: MeasureReference, element_filter: Optional[GroupByItemSetFilter] = None
+    ) -> BaseGroupByItemSet:
         cache_key = (measure_reference, element_filter)
         cached_result = self._result_cache_for_measure.get(cache_key)
         if cached_result:
@@ -113,13 +113,13 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         ).dunder_name_trie
 
         return self._result_cache_for_measure.set_and_get(
-            cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(simple_trie, group_by_metric_trie)
+            cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         )
 
     @override
     def get_linkable_elements_for_distinct_values_query(
-        self, element_filter: LinkableElementFilter
-    ) -> BaseLinkableElementSet:
+        self, element_filter: GroupByItemSetFilter
+    ) -> BaseGroupByItemSet:
         cache_key = (element_filter,)
         cache_result = self._result_cache_for_distinct_values.get(cache_key)
         if cache_result:
@@ -165,17 +165,17 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         result_trie = MutableDunderNameTrie.union_merge_common(tries_to_union)
 
         return self._result_cache_for_distinct_values.set_and_get(
-            cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(result_trie)
+            cache_key, GroupByItemSet.create_from_trie(result_trie)
         )
 
     @override
     def get_linkable_elements_for_metrics(
         self,
         metric_references: Sequence[MetricReference],
-        element_filter: Optional[LinkableElementFilter] = None,
-    ) -> BaseLinkableElementSet:
+        element_filter: Optional[GroupByItemSetFilter] = None,
+    ) -> BaseGroupByItemSet:
         if len(metric_references) == 0:
-            return AnnotatedSpecLinkableElementSet()
+            return GroupByItemSet()
 
         cache_key = (FrozenOrderedSet(sorted(metric_references)), element_filter)
         cache_result = self._result_cache_for_metrics.get(cache_key)
@@ -185,9 +185,9 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
         all_metric_nodes: MutableOrderedSet[SemanticGraphNode] = MutableOrderedSet()
 
         # Handling old behavior - you can't use this method to get group-by metrics.
-        without_any_of_set = frozenset((LinkableElementProperty.METRIC,))
-        if element_filter is None or element_filter == LinkableElementFilter():
-            element_filter = LinkableElementFilter(without_any_of=without_any_of_set)
+        without_any_of_set = frozenset((GroupByItemProperty.METRIC,))
+        if element_filter is None or element_filter == GroupByItemSetFilter():
+            element_filter = GroupByItemSetFilter(without_any_of=without_any_of_set)
         else:
             element_filter = element_filter.copy(without_any_of=element_filter.without_any_of.union(without_any_of_set))
 
@@ -211,5 +211,5 @@ class SemanticGraphLinkableSpecResolver(LinkableSpecResolver):
             all_metric_nodes, element_filter
         ).dunder_name_trie
         return self._result_cache_for_metrics.set_and_get(
-            cache_key, AnnotatedSpecLinkableElementSet.create_from_trie(simple_trie, group_by_metric_trie)
+            cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         )

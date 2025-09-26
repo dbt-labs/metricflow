@@ -26,12 +26,12 @@ from metricflow_semantics.experimental.metricflow_exception import MetricflowInt
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
-from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.protocols.query_parameter import (
@@ -80,14 +80,14 @@ logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)
 _telemetry_reporter.add_python_log_handler()
 
-SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES: Set[LinkableElementProperty] = {
-    LinkableElementProperty.ENTITY,
-    LinkableElementProperty.DERIVED_TIME_GRANULARITY,
-    LinkableElementProperty.DATE_PART,
-    LinkableElementProperty.LOCAL_LINKED,
-    LinkableElementProperty.METRIC,
+SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES: Set[GroupByItemProperty] = {
+    GroupByItemProperty.ENTITY,
+    GroupByItemProperty.DERIVED_TIME_GRANULARITY,
+    GroupByItemProperty.DATE_PART,
+    GroupByItemProperty.LOCAL_LINKED,
+    GroupByItemProperty.METRIC,
 }
-ENTITY_WITH_ANY_PROPERTIES: Set[LinkableElementProperty] = {LinkableElementProperty.ENTITY}
+ENTITY_WITH_ANY_PROPERTIES: Set[GroupByItemProperty] = {GroupByItemProperty.ENTITY}
 
 SearchableElementGeneric = TypeVar("SearchableElementGeneric", bound=SearchableElement)
 
@@ -271,7 +271,7 @@ class AbstractMetricFlowEngine(ABC):
     def simple_dimensions_for_metrics(
         self,
         metric_names: List[str],
-        without_any_property: Sequence[LinkableElementProperty],
+        without_any_property: Sequence[GroupByItemProperty],
     ) -> List[Dimension]:
         """Retrieves a list of all common dimensions for metric_names.
 
@@ -683,19 +683,19 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def simple_dimensions_for_metrics(  # noqa: D102
         self,
         metric_names: List[str],
-        without_any_property: Sequence[LinkableElementProperty] = tuple(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES),
+        without_any_property: Sequence[GroupByItemProperty] = tuple(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES),
     ) -> List[Dimension]:
         self._check_metric_names(metric_names)
 
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            element_set_filter=LinkableElementFilter(
+            element_set_filter=GroupByItemSetFilter(
                 without_any_of=frozenset(without_any_property),
             ),
         )
         return self._filter_simple_linkable_dimensions(linkable_element_set=linkable_element_set)
 
-    def _filter_simple_linkable_dimensions(self, linkable_element_set: BaseLinkableElementSet) -> List[Dimension]:
+    def _filter_simple_linkable_dimensions(self, linkable_element_set: BaseGroupByItemSet) -> List[Dimension]:
         dimensions: List[Dimension] = []
 
         for annotated_spec in linkable_element_set.annotated_specs:
@@ -703,9 +703,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             element_type = annotated_spec.element_type
             if element_type is LinkableElementType.TIME_DIMENSION:
                 # Simple dimensions shouldn't show date part items.
-                if LinkableElementProperty.DATE_PART in properties:
+                if GroupByItemProperty.DATE_PART in properties:
                     continue
-                if LinkableElementProperty.METRIC_TIME in properties:
+                if GroupByItemProperty.METRIC_TIME in properties:
                     dimensions.append(self._build_metric_time_dimension(time_grain=annotated_spec.time_grain))
                 else:
                     dimensions.extend(self._create_dimension_from_spec(annotated_spec))
@@ -791,7 +791,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-            element_set_filter=LinkableElementFilter(
+            element_set_filter=GroupByItemSetFilter(
                 with_any_of=frozenset(ENTITY_WITH_ANY_PROPERTIES),
             ),
         )
@@ -799,7 +799,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         entities = self._filter_linkable_entities(linkable_element_set=linkable_element_set)
         return sorted(set(entities), key=lambda x: x.default_search_and_sort_attribute)
 
-    def _filter_linkable_entities(self, linkable_element_set: BaseLinkableElementSet) -> List[Entity]:
+    def _filter_linkable_entities(self, linkable_element_set: BaseGroupByItemSet) -> List[Entity]:
         entities: List[Entity] = []
 
         for annotated_spec in linkable_element_set.annotated_specs:
@@ -927,10 +927,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if metric_names:
             without_any_of = SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES - ENTITY_WITH_ANY_PROPERTIES
             if include_derived_time_granularities:
-                without_any_of = without_any_of - {LinkableElementProperty.DERIVED_TIME_GRANULARITY}
+                without_any_of = without_any_of - {GroupByItemProperty.DERIVED_TIME_GRANULARITY}
             linkable_element_set = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_metrics(
                 metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
-                element_set_filter=LinkableElementFilter(
+                element_set_filter=GroupByItemSetFilter(
                     without_any_of=frozenset(without_any_of),
                 ),
             )

@@ -40,7 +40,7 @@ docstring:
                     <!--   WhereFilterSpec(                                                -->
                     <!--     where_sql="listing__country_latest = 'us'",                   -->
                     <!--     bind_parameters=SqlBindParameterSet(),                        -->
-                    <!--     element_set=AnnotatedSpecLinkableElementSet(                  -->
+                    <!--     element_set=GroupByItemSet(                                   -->
                     <!--       annotated_specs=(                                           -->
                     <!--         AnnotatedSpec(                                            -->
                     <!--           element_type=DIMENSION,                                 -->

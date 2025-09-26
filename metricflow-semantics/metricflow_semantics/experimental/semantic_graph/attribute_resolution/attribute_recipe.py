@@ -16,7 +16,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -32,7 +32,7 @@ class AttributeRecipe:
 
     indexed_dunder_name: IndexedDunderName = ()
     joined_model_ids: AnyLengthTuple[SemanticModelId] = ()
-    element_properties: FrozenOrderedSet[LinkableElementProperty] = FrozenOrderedSet()
+    element_properties: FrozenOrderedSet[GroupByItemProperty] = FrozenOrderedSet()
     entity_link_names: AnyLengthTuple[str] = ()
 
     element_type: Optional[LinkableElementType] = None
@@ -150,8 +150,8 @@ class AttributeRecipe:
             result = result.push_step(update)
         return result
 
-    def resolve_complete_properties(self) -> OrderedSet[LinkableElementProperty]:
-        """Resolve the complete set of `LinkableElementProperty` for this recipe.
+    def resolve_complete_properties(self) -> OrderedSet[GroupByItemProperty]:
+        """Resolve the complete set of `GroupByItemProperty` for this recipe.
 
         While many properties were set by recipe steps during traversal, some need to be resolved at the end as it
         is easier / faster to determine at the end.
@@ -166,18 +166,18 @@ class AttributeRecipe:
         model_ids = self.joined_model_ids
         model_id_count = len(model_ids)
         if model_id_count == 0:
-            if LinkableElementProperty.METRIC_TIME not in properties:
+            if GroupByItemProperty.METRIC_TIME not in properties:
                 raise ValueError(LazyFormat("Recipe is missing context on accessed semantic models", recipe=self))
         elif model_id_count == 1:
-            if element_type is not LinkableElementType.METRIC and LinkableElementProperty.METRIC_TIME not in properties:
-                properties.add(LinkableElementProperty.LOCAL)
+            if element_type is not LinkableElementType.METRIC and GroupByItemProperty.METRIC_TIME not in properties:
+                properties.add(GroupByItemProperty.LOCAL)
         elif model_id_count == 2:
-            properties.add(LinkableElementProperty.JOINED)
+            properties.add(GroupByItemProperty.JOINED)
         elif model_id_count >= 3:
             properties.update(
                 (
-                    LinkableElementProperty.JOINED,
-                    LinkableElementProperty.MULTI_HOP,
+                    GroupByItemProperty.JOINED,
+                    GroupByItemProperty.MULTI_HOP,
                 )
             )
         else:
@@ -196,7 +196,7 @@ class AttributeRecipe:
                     )
                 )
             if recipe_time_grain is not None and source_time_grain is not recipe_time_grain.base_granularity:
-                properties.add(LinkableElementProperty.DERIVED_TIME_GRANULARITY)
+                properties.add(GroupByItemProperty.DERIVED_TIME_GRANULARITY)
 
         return properties
 

@@ -6,7 +6,7 @@ import pytest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
@@ -227,21 +227,21 @@ def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(),
+                element_set=GroupByItemSet(),
             ),
         ),
         metric_level_filter_specs=(
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(),
+                element_set=GroupByItemSet(),
             ),
         ),
         query_level_filter_specs=(
             WhereFilterSpec(
                 where_sql="query is true",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(),
+                element_set=GroupByItemSet(),
             ),
         ),
     )
@@ -252,17 +252,17 @@ def test_where_filter_spec_set_all_specs(where_filter_spec_set: WhereFilterSpecS
         WhereFilterSpec(
             where_sql="measure is true",
             bind_parameters=SqlBindParameterSet(),
-            element_set=AnnotatedSpecLinkableElementSet(),
+            element_set=GroupByItemSet(),
         ),
         WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameterSet(),
-            element_set=AnnotatedSpecLinkableElementSet(),
+            element_set=GroupByItemSet(),
         ),
         WhereFilterSpec(
             where_sql="query is true",
             bind_parameters=SqlBindParameterSet(),
-            element_set=AnnotatedSpecLinkableElementSet(),
+            element_set=GroupByItemSet(),
         ),
     }
 
@@ -272,12 +272,12 @@ def test_where_filter_spec_set_post_aggregation_specs(where_filter_spec_set: Whe
         WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameterSet(),
-            element_set=AnnotatedSpecLinkableElementSet(),
+            element_set=GroupByItemSet(),
         ),
         WhereFilterSpec(
             where_sql="query is true",
             bind_parameters=SqlBindParameterSet(),
-            element_set=AnnotatedSpecLinkableElementSet(),
+            element_set=GroupByItemSet(),
         ),
     }
 
@@ -288,7 +288,7 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(),
+                element_set=GroupByItemSet(),
             ),
         ),
     )
@@ -297,7 +297,7 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(),
+                element_set=GroupByItemSet(),
             ),
         ),
     )
@@ -307,14 +307,14 @@ def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) 
             WhereFilterSpec(
                 where_sql="measure is true",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(),
+                element_set=GroupByItemSet(),
             ),
         ),
         metric_level_filter_specs=(
             WhereFilterSpec(
                 where_sql="metric is true",
                 bind_parameters=SqlBindParameterSet(),
-                element_set=AnnotatedSpecLinkableElementSet(),
+                element_set=GroupByItemSet(),
             ),
         ),
     )

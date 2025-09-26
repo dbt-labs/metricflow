@@ -26,8 +26,8 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
 from metricflow_semantics.experimental.semantic_graph.sg_exceptions import SemanticGraphTraversalError
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 
@@ -49,7 +49,7 @@ class AttributeRecipeWriterWeightFunction(
     * Repeated semantic models in a join.
     * Querying a time dimension at a time grain that's smaller than the one configured in the semantic model.
 
-    In addition, this can be initialized with a `LinkableElementFilter` to handle filtering of results as required by
+    In addition, this can be initialized with a `GroupByItemSetFilter` to handle filtering of results as required by
     the MF engine API.
 
     As the methods in this class are called repeatedly in a relatively tight loop during resolution, the performance of
@@ -57,7 +57,7 @@ class AttributeRecipeWriterWeightFunction(
     """
 
     def __init__(  # noqa: D107
-        self, element_filter: Optional[LinkableElementFilter] = None, max_path_model_count: Optional[int] = None
+        self, element_filter: Optional[GroupByItemSetFilter] = None, max_path_model_count: Optional[int] = None
     ) -> None:
         """Initializer.
 
@@ -198,7 +198,7 @@ class AttributeRecipeWriterWeightFunction(
 
     def _filter_denies_edge(
         self,
-        element_filter: LinkableElementFilter,
+        element_filter: GroupByItemSetFilter,
         next_node: SemanticGraphNode,
         steps: AnyLengthTuple[AttributeRecipeStep],
     ) -> bool:
@@ -230,7 +230,7 @@ class AttributeRecipeWriterWeightFunction(
 
     def _filter_denies_recipe(
         self,
-        element_filter: LinkableElementFilter,
+        element_filter: GroupByItemSetFilter,
         next_recipe: AttributeRecipe,
     ) -> bool:
         """Check if the element filter denies the recipe associated with the path.
@@ -314,7 +314,7 @@ class AttributeRecipeWriterWeightFunction(
             next_recipe_element_type is LinkableElementType.TIME_DIMENSION
             or next_recipe_element_type is LinkableElementType.DIMENSION
         ):
-            if LinkableElementProperty.METRIC_TIME in next_recipe.element_properties:
+            if GroupByItemProperty.METRIC_TIME in next_recipe.element_properties:
                 min_entity_link_length = 0
 
         elif next_recipe_element_type is LinkableElementType.METRIC:

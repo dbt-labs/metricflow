@@ -11,14 +11,14 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visitor import (
     PushDownResult,
@@ -54,7 +54,7 @@ class GroupByItemResolution(SemanticModelDerivation):
 
     # If the spec is None, then the pattern couldn't be resolved
     spec: Optional[LinkableInstanceSpec]
-    linkable_element_set: BaseLinkableElementSet
+    linkable_element_set: BaseGroupByItemSet
     issue_set: MetricFlowQueryResolutionIssueSet
 
     @property
@@ -112,7 +112,7 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set,
             )
 
@@ -134,7 +134,7 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set.add_issue(
                     AmbiguousGroupByItemIssue.from_parameters(
                         candidate_set=push_down_result.candidate_set,
@@ -192,14 +192,14 @@ class GroupByItemResolver:
         if push_down_result.candidate_set.num_candidates == 0:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set,
             )
 
         if push_down_result.candidate_set.num_candidates > 1:
             return GroupByItemResolution(
                 spec=None,
-                linkable_element_set=AnnotatedSpecLinkableElementSet(),
+                linkable_element_set=GroupByItemSet(),
                 issue_set=push_down_result.issue_set.add_issue(
                     AmbiguousGroupByItemIssue.from_parameters(
                         candidate_set=push_down_result.candidate_set,

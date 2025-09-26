@@ -8,7 +8,7 @@ from metricflow_semantics.experimental.dsi.manifest_object_lookup import Manifes
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
@@ -38,5 +38,5 @@ def test_measure(  # noqa: D103
     assert_object_snapshot_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,
-        obj=AnnotatedSpecLinkableElementSet.create_from_trie(result.dunder_name_trie),
+        obj=GroupByItemSet.create_from_trie(result.dunder_name_trie),
     )

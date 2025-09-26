@@ -10,39 +10,39 @@ docstring:
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec =                                          -->
-            <!--   MetricSpec(                                          -->
-            <!--     element_name='bookings',                           -->
-            <!--     filter_spec_set=WhereFilterSpecSet(                -->
-            <!--       query_level_filter_specs=(                       -->
-            <!--         WhereFilterSpec(                               -->
-            <!--           where_sql="listing__country_latest = 'us'",  -->
-            <!--           bind_parameters=SqlBindParameterSet(),       -->
-            <!--           element_set=AnnotatedSpecLinkableElementSet( -->
-            <!--             annotated_specs=(                          -->
-            <!--               AnnotatedSpec(                           -->
-            <!--                 element_type=DIMENSION,                -->
-            <!--                 element_name='country_latest',         -->
-            <!--                 entity_link_names=(                    -->
-            <!--                   'listing',                           -->
-            <!--                 ),                                     -->
-            <!--                 element_properties=(                   -->
-            <!--                   JOINED,                              -->
-            <!--                 ),                                     -->
-            <!--                 origin_semantic_model_names=(          -->
-            <!--                   'listings_latest',                   -->
-            <!--                 ),                                     -->
-            <!--                 derived_from_semantic_model_names=(    -->
-            <!--                   'bookings_source',                   -->
-            <!--                   'listings_latest',                   -->
-            <!--                 ),                                     -->
-            <!--               ),                                       -->
-            <!--             ),                                         -->
-            <!--           ),                                           -->
-            <!--         ),                                             -->
-            <!--       ),                                               -->
-            <!--     ),                                                 -->
-            <!--   )                                                    -->
+            <!-- metric_spec =                                         -->
+            <!--   MetricSpec(                                         -->
+            <!--     element_name='bookings',                          -->
+            <!--     filter_spec_set=WhereFilterSpecSet(               -->
+            <!--       query_level_filter_specs=(                      -->
+            <!--         WhereFilterSpec(                              -->
+            <!--           where_sql="listing__country_latest = 'us'", -->
+            <!--           bind_parameters=SqlBindParameterSet(),      -->
+            <!--           element_set=GroupByItemSet(                 -->
+            <!--             annotated_specs=(                         -->
+            <!--               AnnotatedSpec(                          -->
+            <!--                 element_type=DIMENSION,               -->
+            <!--                 element_name='country_latest',        -->
+            <!--                 entity_link_names=(                   -->
+            <!--                   'listing',                          -->
+            <!--                 ),                                    -->
+            <!--                 element_properties=(                  -->
+            <!--                   JOINED,                             -->
+            <!--                 ),                                    -->
+            <!--                 origin_semantic_model_names=(         -->
+            <!--                   'listings_latest',                  -->
+            <!--                 ),                                    -->
+            <!--                 derived_from_semantic_model_names=(   -->
+            <!--                   'bookings_source',                  -->
+            <!--                   'listings_latest',                  -->
+            <!--                 ),                                    -->
+            <!--               ),                                      -->
+            <!--             ),                                        -->
+            <!--           ),                                          -->
+            <!--         ),                                            -->
+            <!--       ),                                              -->
+            <!--     ),                                                -->
+            <!--   )                                                   -->
             <AggregateMeasuresNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_0') -->
@@ -63,7 +63,7 @@ docstring:
                         <!--   WhereFilterSpec(                                          -->
                         <!--     where_sql="listing__country_latest = 'us'",             -->
                         <!--     bind_parameters=SqlBindParameterSet(),                  -->
-                        <!--     element_set=AnnotatedSpecLinkableElementSet(            -->
+                        <!--     element_set=GroupByItemSet(                             -->
                         <!--       annotated_specs=(                                     -->
                         <!--         AnnotatedSpec(                                      -->
                         <!--           element_type=DIMENSION,                           -->

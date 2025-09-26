@@ -67,7 +67,7 @@ docstring:
                             <!--   WhereFilterSpec(                                          -->
                             <!--     where_sql='booking__is_instant',                        -->
                             <!--     bind_parameters=SqlBindParameterSet(),                  -->
-                            <!--     element_set=AnnotatedSpecLinkableElementSet(            -->
+                            <!--     element_set=GroupByItemSet(                             -->
                             <!--       annotated_specs=(                                     -->
                             <!--         AnnotatedSpec(                                      -->
                             <!--           element_type=DIMENSION,                           -->

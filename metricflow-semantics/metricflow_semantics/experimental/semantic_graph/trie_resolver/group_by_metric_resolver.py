@@ -52,8 +52,8 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.entity_key_r
 )
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 
 logger = logging.getLogger(__name__)
@@ -92,15 +92,15 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
         self._metric_time_node = MetricTimeNode.get_instance()
 
         self._group_by_metric_element_properties = (
-            LinkableElementProperty.JOINED,
-            LinkableElementProperty.METRIC,
+            GroupByItemProperty.JOINED,
+            GroupByItemProperty.METRIC,
         )
 
         self._verbose_debug_logs = False
 
     @override
     def resolve_trie(
-        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[LinkableElementFilter]
+        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[GroupByItemSetFilter]
     ) -> TrieResolutionResult:
         execution_timer = ExecutionTimer()
         pathfinder_profile_differ = TraversalProfileDiffer(self._path_finder)
@@ -134,7 +134,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
     def _resolve_trie(
         self,
         source_nodes: OrderedSet[SemanticGraphNode],
-        element_filter: Optional[LinkableElementFilter],
+        element_filter: Optional[GroupByItemSetFilter],
     ) -> DunderNameTrie:
         trie_to_update = MutableDunderNameTrie()
 
@@ -145,7 +145,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
             metric_names_allow_set = element_filter.element_names
             # Group-by metrics always have these properties, so return an empty set if the filter doesn't allow them.
             if not element_filter.allow(
-                element_name=None, element_properties=(LinkableElementProperty.METRIC, LinkableElementProperty.JOINED)
+                element_name=None, element_properties=(GroupByItemProperty.METRIC, GroupByItemProperty.JOINED)
             ):
                 logger.debug(
                     LazyFormat(

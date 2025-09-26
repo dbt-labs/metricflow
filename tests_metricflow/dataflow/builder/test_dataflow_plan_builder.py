@@ -13,8 +13,8 @@ from dbt_semantic_interfaces.references import EntityReference, MeasureReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -1348,7 +1348,7 @@ def test_all_available_metric_filters(
     metric_lookup = mf_engine_test_fixture.semantic_manifest_lookup.metric_lookup
     bookings_linkable_element_set = metric_lookup.linkable_elements_for_measure(
         measure_reference=MeasureReference("bookings"),
-        element_filter=LinkableElementFilter(with_any_of=frozenset((LinkableElementProperty.METRIC,))),
+        element_filter=GroupByItemSetFilter(with_any_of=frozenset((GroupByItemProperty.METRIC,))),
     )
     for group_by_metric_spec in group_specs_by_type(bookings_linkable_element_set.specs).group_by_metric_specs:
         entity_spec = group_by_metric_spec.metric_subquery_entity_spec

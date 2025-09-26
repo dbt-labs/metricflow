@@ -25,13 +25,13 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
-from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 def create_spec_lookup(
     call_parameter_set: CallParameterSet,
     resolved_spec: LinkableInstanceSpec,
-    resolved_linkable_element_set: BaseLinkableElementSet,
+    resolved_linkable_element_set: BaseGroupByItemSet,
     semantic_manifest_lookup: SemanticManifestLookup,
 ) -> FilterSpecResolutionLookUp:
     """Create a FilterSpecResolutionLookUp where the call_parameter_set maps to resolved_spec."""
@@ -74,7 +74,7 @@ def create_spec_lookup(
                 ),
                 filter_location_path=MetricFlowQueryResolutionPath.empty_instance(),
                 where_filter_intersection=create_where_filter_intersection("Dimension('dummy__dimension')"),
-                resolved_linkable_element_set=resolved_linkable_element_set,
+                resolved_group_by_item_set=resolved_linkable_element_set,
                 issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),
                 spec_pattern=ObjectBuilderNamingScheme().spec_pattern(
                     "Dimension('dummy__dimension')",
@@ -104,7 +104,7 @@ def test_dimension_in_filter(  # noqa: D103
                 dimension_reference=DimensionReference("country_latest"),
             ),
             resolved_spec=DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
-            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+            resolved_linkable_element_set=GroupByItemSet.create(
                 AnnotatedSpec.create(
                     element_type=LinkableElementType.DIMENSION,
                     element_name="country_latest",
@@ -154,7 +154,7 @@ def test_dimension_in_filter_with_grain(  # noqa: D103
                 entity_links=(EntityReference("listing"),),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.WEEK),
             ),
-            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+            resolved_linkable_element_set=GroupByItemSet.create(
                 AnnotatedSpec.create(
                     element_type=LinkableElementType.TIME_DIMENSION,
                     element_name="created_at",
@@ -210,7 +210,7 @@ def test_time_dimension_in_filter(  # noqa: D103
                 entity_links=(EntityReference("listing"),),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
-            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+            resolved_linkable_element_set=GroupByItemSet.create(
                 AnnotatedSpec.create(
                     element_type=LinkableElementType.TIME_DIMENSION,
                     element_name="created_at",
@@ -266,7 +266,7 @@ def test_time_dimension_with_grain_in_name(  # noqa: D103
                 entity_links=(EntityReference("listing"),),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
-            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+            resolved_linkable_element_set=GroupByItemSet.create(
                 AnnotatedSpec.create(
                     element_type=LinkableElementType.TIME_DIMENSION,
                     element_name="created_at",
@@ -322,7 +322,7 @@ def test_date_part_in_filter(  # noqa: D103
                 entity_links=(),
                 date_part=DatePart.YEAR,
             ),
-            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+            resolved_linkable_element_set=GroupByItemSet.create(
                 AnnotatedSpec.create(
                     element_type=LinkableElementType.TIME_DIMENSION,
                     element_name="metric_time",
@@ -382,7 +382,7 @@ def resolved_spec_lookup(
                 where_filter_intersection=create_where_filter_intersection(
                     "TimeDimension('metric_time', 'week', 'year')"
                 ),
-                resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                resolved_group_by_item_set=GroupByItemSet.create(
                     AnnotatedSpec.create(
                         element_type=LinkableElementType.TIME_DIMENSION,
                         element_name="metric_time",
@@ -459,7 +459,7 @@ def test_entity_in_filter(  # noqa: D103
                 entity_reference=EntityReference("user"),
             ),
             resolved_spec=EntitySpec(element_name="user", entity_links=(EntityReference("listing"),)),
-            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+            resolved_linkable_element_set=GroupByItemSet.create(
                 AnnotatedSpec.create(
                     element_type=LinkableElementType.ENTITY,
                     element_name="user",
@@ -505,7 +505,7 @@ def test_metric_in_filter(  # noqa: D103
                 metric_reference=MetricReference("bookings"),
             ),
             resolved_spec=group_by_metric_spec,
-            resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+            resolved_linkable_element_set=GroupByItemSet.create(
                 AnnotatedSpec.create(
                     element_type=LinkableElementType.METRIC,
                     element_name="bookings",
@@ -513,7 +513,7 @@ def test_metric_in_filter(  # noqa: D103
                     time_grain=None,
                     date_part=None,
                     metric_subquery_entity_links=(EntityReference("listing"),),
-                    properties=frozenset({LinkableElementProperty.METRIC, LinkableElementProperty.JOINED}),
+                    properties=frozenset({GroupByItemProperty.METRIC, GroupByItemProperty.JOINED}),
                     origin_model_ids=[SemanticModelId.get_instance("listings_latest")],
                     derived_from_semantic_models=[SemanticModelReference("bookings")],
                 ),
@@ -554,7 +554,7 @@ def test_dimension_time_dimension_parity(  # noqa: D103
                         ),
                         filter_location_path=MetricFlowQueryResolutionPath(()),
                         where_filter_intersection=PydanticWhereFilterIntersection(where_filters=[where_filter]),
-                        resolved_linkable_element_set=AnnotatedSpecLinkableElementSet.create(
+                        resolved_group_by_item_set=GroupByItemSet.create(
                             AnnotatedSpec.create(
                                 element_type=LinkableElementType.TIME_DIMENSION,
                                 element_name=METRIC_TIME_ELEMENT_NAME,

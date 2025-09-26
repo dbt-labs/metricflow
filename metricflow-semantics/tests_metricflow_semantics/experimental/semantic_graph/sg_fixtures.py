@@ -12,7 +12,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
     RecipeWriterPathfinder,
 )
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
-    SemanticGraphLinkableSpecResolver,
+    SemanticGraphGroupByItemSetResolver,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
@@ -40,15 +40,15 @@ class SemanticGraphTestFixture:
         builder = SemanticGraphBuilder(manifest_object_lookup=self.manifest_object_lookup)
         return builder.build()
 
-    def create_sg_resolver(self) -> SemanticGraphLinkableSpecResolver:  # noqa: D102
-        return SemanticGraphLinkableSpecResolver(
+    def create_sg_resolver(self) -> SemanticGraphGroupByItemSetResolver:  # noqa: D102
+        return SemanticGraphGroupByItemSetResolver(
             manifest_object_lookup=self.manifest_object_lookup,
             semantic_graph=self.semantic_graph,
             path_finder=self.pathfinder,
         )
 
     @cached_property
-    def sg_resolver(self) -> SemanticGraphLinkableSpecResolver:  # noqa: D102
+    def sg_resolver(self) -> SemanticGraphGroupByItemSetResolver:  # noqa: D102
         return self.create_sg_resolver()
 
     @cached_property

@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from more_itertools import is_sorted
 from typing_extensions import override
 
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_set import group_specs_by_type
@@ -156,7 +156,7 @@ class EntityLinkPattern(SpecPattern):
 
     @property
     @override
-    def element_pre_filter(self) -> LinkableElementFilter:
+    def element_pre_filter(self) -> GroupByItemSetFilter:
         element_names: Optional[FrozenSet[str]] = None
         if ParameterSetField.ELEMENT_NAME in self.parameter_set.fields_to_compare:
             element_names = frozenset({self.parameter_set.element_name}) if self.parameter_set.element_name else None
@@ -164,10 +164,10 @@ class EntityLinkPattern(SpecPattern):
             self.parameter_set.metric_subquery_entity_links is None
             or len(self.parameter_set.metric_subquery_entity_links) == 0
         ):
-            return LinkableElementFilter(
-                element_names=element_names, without_any_of=frozenset({LinkableElementProperty.METRIC})
+            return GroupByItemSetFilter(
+                element_names=element_names, without_any_of=frozenset({GroupByItemProperty.METRIC})
             )
 
-        return LinkableElementFilter(
+        return GroupByItemSetFilter(
             element_names=element_names,
         )

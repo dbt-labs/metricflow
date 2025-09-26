@@ -18,7 +18,7 @@ from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_spec_by_type
@@ -296,7 +296,7 @@ def assert_plan_snapshot_text_equal(
 
 
 def _convert_linkable_element_set_to_rows(
-    linkable_element_set: BaseLinkableElementSet,
+    linkable_element_set: BaseGroupByItemSet,
 ) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for annotated_spec in sorted(
@@ -335,7 +335,7 @@ def _convert_linkable_element_set_to_rows(
 def assert_linkable_element_set_snapshot_equal(  # noqa: D103
     request: FixtureRequest,
     snapshot_configuration: SnapshotConfiguration,
-    linkable_element_set: BaseLinkableElementSet,
+    linkable_element_set: BaseGroupByItemSet,
     set_id: str = "result",
     expectation_description: Optional[str] = None,
 ) -> None:

@@ -35,7 +35,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
 from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterNameFactory
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphNode
 from metricflow_semantics.experimental.singleton import Singleton
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 
 logger = logging.getLogger(__name__)
@@ -256,7 +256,7 @@ class MetricTimeNode(SemanticGraphNode, Singleton):
     def recipe_step_to_append(self) -> AttributeRecipeStep:
         return AttributeRecipeStep(
             add_dunder_name_element=METRIC_TIME_ELEMENT_NAME,
-            add_properties=(LinkableElementProperty.METRIC_TIME,),
+            add_properties=(GroupByItemProperty.METRIC_TIME,),
             set_element_type=LinkableElementType.TIME_DIMENSION,
         )
 

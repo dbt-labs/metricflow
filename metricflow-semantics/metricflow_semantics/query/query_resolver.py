@@ -10,14 +10,14 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    AnnotatedSpecLinkableElementSet,
+    GroupByItemSet,
 )
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
     WhereFilterPatternFactory,
@@ -123,7 +123,7 @@ class ResolveGroupByItemsResult:
     resolution_dag: GroupByItemResolutionDag
     group_by_item_specs: Tuple[LinkableInstanceSpec, ...]
     input_to_issue_set_mapping: InputToIssueSetMapping
-    linkable_element_set: BaseLinkableElementSet
+    linkable_element_set: BaseGroupByItemSet
 
 
 @dataclass(frozen=True)
@@ -276,7 +276,7 @@ class MetricFlowQueryResolver:
 
         input_to_issue_set_mapping_items: List[InputToIssueSetMappingItem] = []
         group_by_item_specs: List[LinkableInstanceSpec] = []
-        linkable_element_sets: List[BaseLinkableElementSet] = []
+        linkable_element_sets: List[BaseGroupByItemSet] = []
 
         for group_by_item_input in group_by_item_inputs:
             resolution = MetricFlowQueryResolver._resolve_group_by_item_input(
@@ -291,9 +291,9 @@ class MetricFlowQueryResolver:
                 group_by_item_specs.append(resolution.spec)
                 linkable_element_sets.append(resolution.linkable_element_set)
 
-        linkable_element_set: BaseLinkableElementSet
+        linkable_element_set: BaseGroupByItemSet
         if len(linkable_element_sets) == 0:
-            linkable_element_set = AnnotatedSpecLinkableElementSet()
+            linkable_element_set = GroupByItemSet()
         else:
             linkable_element_set = linkable_element_sets[0].union(*linkable_element_sets[1:])
 
@@ -632,7 +632,7 @@ class MetricFlowQueryResolver:
         model_reference_set = set(resolve_group_by_item_result.linkable_element_set.derived_from_semantic_models)
         for filter_spec_resolution in filter_spec_lookup.spec_resolutions:
             model_reference_set.update(
-                set(filter_spec_resolution.resolved_linkable_element_set.derived_from_semantic_models)
+                set(filter_spec_resolution.resolved_group_by_item_set.derived_from_semantic_models)
             )
 
         # Collect all semantic models referenced by the query.
@@ -641,7 +641,7 @@ class MetricFlowQueryResolver:
         )
         semantic_models_in_filters = set(
             itertools.chain.from_iterable(
-                filter_spec_resolution.resolved_linkable_element_set.derived_from_semantic_models
+                filter_spec_resolution.resolved_group_by_item_set.derived_from_semantic_models
                 for filter_spec_resolution in filter_spec_lookup.spec_resolutions
             )
         )

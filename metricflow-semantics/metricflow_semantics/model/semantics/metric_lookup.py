@@ -14,11 +14,11 @@ from metricflow_semantics.collection_helpers.lru_cache import LruCache
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseLinkableElementSet
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
-    LinkableSpecResolver,
+    GroupByItemSetResolver,
 )
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -35,7 +35,7 @@ class MetricLookup:
         semantic_manifest: SemanticManifest,
         semantic_model_lookup: SemanticModelLookup,
         custom_granularities: Dict[str, ExpandedTimeGranularity],
-        linkable_spec_resolver: LinkableSpecResolver,
+        group_by_item_set_resolver: GroupByItemSetResolver,
     ) -> None:
         """Initializer.
 
@@ -50,7 +50,7 @@ class MetricLookup:
         for metric in semantic_manifest.metrics:
             self._add_metric(metric)
 
-        self._linkable_spec_resolver = linkable_spec_resolver
+        self._group_by_item_set_resolver = group_by_item_set_resolver
 
         # Cache for `get_min_queryable_time_granularity()`
         self._metric_reference_to_min_metric_time_grain: Dict[MetricReference, TimeGranularity] = {}
@@ -62,39 +62,37 @@ class MetricLookup:
 
         # Cache for `linkable_elements_for_measure()`.
         self._linkable_element_set_for_measure_cache: Dict[
-            Tuple[MeasureReference, LinkableElementFilter], BaseLinkableElementSet
+            Tuple[MeasureReference, GroupByItemSetFilter], BaseGroupByItemSet
         ] = {}
 
         self._linkable_elements_including_group_by_metrics_cache = LruCache[
-            Tuple[MeasureReference, LinkableElementFilter], BaseLinkableElementSet
+            Tuple[MeasureReference, GroupByItemSetFilter], BaseGroupByItemSet
         ](128)
-        self._linkable_elements_for_no_metrics_query_cache = LruCache[LinkableElementFilter, BaseLinkableElementSet](
-            128
-        )
+        self._linkable_elements_for_no_metrics_query_cache = LruCache[GroupByItemSetFilter, BaseGroupByItemSet](128)
         self._linkable_elements_for_metrics_cache = LruCache[
-            Tuple[Sequence[MetricReference], LinkableElementFilter], BaseLinkableElementSet
+            Tuple[Sequence[MetricReference], GroupByItemSetFilter], BaseGroupByItemSet
         ](128)
 
     def linkable_elements_for_measure(
         self,
         measure_reference: MeasureReference,
-        element_filter: LinkableElementFilter = LinkableElementFilter(),
-    ) -> BaseLinkableElementSet:
+        element_filter: GroupByItemSetFilter = GroupByItemSetFilter(),
+    ) -> BaseGroupByItemSet:
         """Return the set of linkable elements reachable from a given measure."""
         start_time = time.perf_counter()
 
         # Cache the result when group-by-metrics are selected in an LRU cache as there can be many of them and may
         # significantly increase memory usage.
         if (
-            LinkableElementProperty.METRIC in element_filter.with_any_of
-            and LinkableElementProperty.METRIC not in element_filter.without_any_of
+            GroupByItemProperty.METRIC in element_filter.with_any_of
+            and GroupByItemProperty.METRIC not in element_filter.without_any_of
         ):
             cache_key = (measure_reference, element_filter)
             result = self._linkable_elements_including_group_by_metrics_cache.get(cache_key)
             if result is not None:
                 return result
 
-            result = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
+            result = self._group_by_item_set_resolver.get_linkable_element_set_for_measure(
                 measure_reference, element_filter
             )
             self._linkable_elements_including_group_by_metrics_cache.set(cache_key, result)
@@ -108,7 +106,7 @@ class MetricLookup:
         if result is not None:
             return result.filter(element_filter)
 
-        result = self._linkable_spec_resolver.get_linkable_element_set_for_measure(
+        result = self._group_by_item_set_resolver.get_linkable_element_set_for_measure(
             measure_reference, element_filter_without_element_names
         )
         self._linkable_element_set_for_measure_cache[cache_key] = result
@@ -124,28 +122,28 @@ class MetricLookup:
         return result.filter(element_filter)
 
     def linkable_elements_for_no_metrics_query(
-        self, element_set_filter: LinkableElementFilter = LinkableElementFilter()
-    ) -> BaseLinkableElementSet:
+        self, element_set_filter: GroupByItemSetFilter = GroupByItemSetFilter()
+    ) -> BaseGroupByItemSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
         cache_key = element_set_filter
         result = self._linkable_elements_for_no_metrics_query_cache.get(cache_key)
         if result is not None:
             return result
 
-        result = self._linkable_spec_resolver.get_linkable_elements_for_distinct_values_query(element_set_filter)
+        result = self._group_by_item_set_resolver.get_linkable_elements_for_distinct_values_query(element_set_filter)
         self._linkable_elements_for_no_metrics_query_cache.set(cache_key, result)
         return result
 
     def linkable_elements_for_metrics(
-        self, metric_references: Sequence[MetricReference], element_set_filter: LinkableElementFilter
-    ) -> BaseLinkableElementSet:
+        self, metric_references: Sequence[MetricReference], element_set_filter: GroupByItemSetFilter
+    ) -> BaseGroupByItemSet:
         """Retrieve the matching set of linkable elements common to all metrics requested (intersection)."""
         cache_key = (metric_references, element_set_filter)
         result = self._linkable_elements_for_metrics_cache.get(cache_key)
         if result is not None:
             return result
 
-        result = self._linkable_spec_resolver.get_linkable_elements_for_metrics(
+        result = self._group_by_item_set_resolver.get_linkable_elements_for_metrics(
             metric_references=metric_references, element_filter=element_set_filter
         )
         self._linkable_elements_for_metrics_cache.set(cache_key, result)

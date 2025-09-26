@@ -39,7 +39,7 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_
 )
 from metricflow_semantics.helpers.time_helpers import PrettyDuration
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.element_filter import LinkableElementFilter
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ class DunderNameTrieResolver(ABC):
 
     @abstractmethod
     def resolve_trie(
-        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[LinkableElementFilter]
+        self, source_nodes: OrderedSet[SemanticGraphNode], element_filter: Optional[GroupByItemSetFilter]
     ) -> TrieResolutionResult:
         """Resolve the trie that represents the available group-by items when querying those nodes together.
 
@@ -90,7 +90,7 @@ class TrieCacheKey:
     """A key object to use for caching results."""
 
     key_nodes: AnyLengthTuple[SemanticGraphNode]
-    element_filter: Optional[LinkableElementFilter]
+    element_filter: Optional[GroupByItemSetFilter]
 
 
 @dataclass

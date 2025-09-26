@@ -14,7 +14,7 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_element import HasDisplayedProperty
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.model.linkable_element_property import LinkableElementProperty
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -41,7 +41,7 @@ class AttributeRecipeStep(HasDisplayedProperty, Comparable):
     add_dunder_name_element: Optional[str] = None
     # Adds a property that describes that attribute. For example, the metric-time entity node would add the
     # `METRIC_TIME` property.
-    add_properties: Optional[AnyLengthTuple[LinkableElementProperty]] = None
+    add_properties: Optional[AnyLengthTuple[GroupByItemProperty]] = None
     add_model_join: Optional[SemanticModelId] = None
     add_entity_link: Optional[str] = None
 
