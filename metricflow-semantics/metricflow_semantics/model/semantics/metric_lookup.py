@@ -177,7 +177,7 @@ class MetricLookup:
         if metric_reference in self._metrics:
             raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
         for measure_reference in metric.measure_references:
-            if measure_reference not in self._semantic_model_lookup.measure_references:
+            if measure_reference not in self._semantic_model_lookup.measure_lookup.measure_references:
                 raise NonExistentMeasureError(
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )

@@ -3,12 +3,11 @@ from __future__ import annotations
 import logging
 import textwrap
 from collections import OrderedDict
-from typing import Sequence
 
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
 from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from dbt_semantic_interfaces.protocols import SemanticManifest, SemanticModel
+from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -61,13 +60,14 @@ def _create_data_sets(
 
     # Use ordered dict and sort by name to get consistency when running tests.
     data_sets = OrderedDict()
-    semantic_models: Sequence[SemanticModel] = semantic_manifest_lookup.semantic_manifest.semantic_models
-    semantic_models = sorted(semantic_models, key=lambda x: x.name)
+    converter = SemanticModelToDataSetConverter(
+        column_association_resolver=DunderColumnAssociationResolver(),
+        manifest_lookup=semantic_manifest_lookup,
+    )
 
-    converter = SemanticModelToDataSetConverter(column_association_resolver=DunderColumnAssociationResolver())
-
-    for semantic_model in semantic_models:
-        data_sets[semantic_model.name] = converter.create_sql_source_data_set(semantic_model)
+    model_lookup = semantic_manifest_lookup.semantic_model_lookup
+    for model_reference, semantic_model in model_lookup.model_reference_to_model.items():
+        data_sets[semantic_model.name] = converter.create_sql_source_data_set(model_reference)
 
     return data_sets
 

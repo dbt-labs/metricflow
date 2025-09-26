@@ -64,7 +64,7 @@ class SourceNodeBuilder:
         semantic_manifest_lookup: SemanticManifestLookup,
     ) -> None:
         self._semantic_manifest_lookup = semantic_manifest_lookup
-        data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
+        data_set_converter = SemanticModelToDataSetConverter(column_association_resolver, semantic_manifest_lookup)
         self.time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(
             semantic_manifest_lookup.semantic_manifest
         )
@@ -90,10 +90,9 @@ class SourceNodeBuilder:
         for data_set in data_sets:
             read_node = ReadSqlSourceNode.create(data_set)
             group_by_item_source_nodes.append(read_node)
-            agg_time_dim_to_measures_grouper = (
-                self._semantic_manifest_lookup.semantic_model_lookup.get_aggregation_time_dimensions_with_measures(
-                    data_set.semantic_model_reference
-                )
+            measure_lookup = self._semantic_manifest_lookup.semantic_model_lookup.measure_lookup
+            agg_time_dim_to_measures_grouper = measure_lookup.get_aggregation_time_dimensions_with_measures(
+                data_set.semantic_model_reference
             )
 
             # Dimension sources may not have any measures -> no aggregation time dimensions.

@@ -31,12 +31,12 @@ def test_view_sql_generated_at_a_node(
     simple_semantic_manifest_lookup: SemanticManifestLookup,
 ) -> None:
     """Example that shows how to view generated SQL for nodes in a dataflow plan."""
-    bookings_semantic_model = simple_semantic_manifest_lookup.semantic_model_lookup.get_by_reference(
-        SemanticModelReference(semantic_model_name="bookings_source")
-    )
-    assert bookings_semantic_model
+    bookings_source_reference = SemanticModelReference(semantic_model_name="bookings_source")
     column_association_resolver = DunderColumnAssociationResolver()
-    to_data_set_converter = SemanticModelToDataSetConverter(column_association_resolver)
+    to_data_set_converter = SemanticModelToDataSetConverter(
+        column_association_resolver=column_association_resolver,
+        manifest_lookup=simple_semantic_manifest_lookup,
+    )
 
     to_sql_plan_converter = DataflowToSqlPlanConverter(
         column_association_resolver=DunderColumnAssociationResolver(),
@@ -49,7 +49,7 @@ def test_view_sql_generated_at_a_node(
     )
 
     # Show SQL and spec set at a source node.
-    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_semantic_model)
+    bookings_source_data_set = to_data_set_converter.create_sql_source_data_set(bookings_source_reference)
     read_source_node = ReadSqlSourceNode.create(bookings_source_data_set)
     conversion_result = to_sql_plan_converter.convert_to_sql_plan(
         sql_engine_type=sql_client.sql_engine_type,

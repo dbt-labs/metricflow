@@ -4,12 +4,10 @@ from typing import Dict, Mapping, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import Dimension
-from dbt_semantic_interfaces.protocols.measure import Measure
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     EntityReference,
     LinkableElementReference,
-    MeasureReference,
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
@@ -61,17 +59,6 @@ class SemanticModelHelper:
                 possible_entity_links.add(entity.reference)
 
         return sorted(possible_entity_links, key=lambda entity_reference: entity_reference.element_name)
-
-    @staticmethod
-    def get_measure_from_semantic_model(semantic_model: SemanticModel, measure_reference: MeasureReference) -> Measure:
-        """Get measure from semantic model."""
-        for measure in semantic_model.measures:
-            if measure.reference == measure_reference:
-                return measure
-
-        raise ValueError(
-            f"No measure with name ({measure_reference.element_name}) in semantic_model with name ({semantic_model.name})"
-        )
 
     @staticmethod
     def get_dimension_from_semantic_model(
