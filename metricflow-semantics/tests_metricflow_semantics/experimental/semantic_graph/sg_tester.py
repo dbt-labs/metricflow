@@ -76,7 +76,10 @@ class SemanticGraphTester:
     ) -> None:
         sg_resolver = self.sg_resolver
         description_to_set = {
-            str(measure_name): sg_resolver.get_linkable_element_set_for_measure(MeasureReference(measure_name))
+            str(measure_name): sg_resolver.get_common_set(
+                measure_references=(MeasureReference(measure_name),),
+                set_filter=None,
+            )
             for measure_name in measure_names
         }
         self.assert_attribute_set_snapshot_equal(description_to_set, expectation_description)

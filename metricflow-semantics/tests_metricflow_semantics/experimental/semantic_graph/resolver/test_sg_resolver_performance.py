@@ -11,6 +11,8 @@ from metricflow_semantics.experimental.test_helpers.benchmark_helpers import (
     OneSecondFunction,
     PerformanceBenchmark,
 )
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from typing_extensions import override
 
@@ -57,7 +59,9 @@ def test_resolver_query_time(high_complexity_manifest_sg_fixture: SemanticGraphT
 
         @override
         def run(self) -> None:
-            self._resolver.get_linkable_elements_for_metrics(metric_references)
+            # Replicate the behavior of get_linkable_elements_for_metrics which filters out METRIC properties
+            base_filter = GroupByItemSetFilter(without_any_of=frozenset((GroupByItemProperty.METRIC,)))
+            self._resolver.get_common_set(metric_references=metric_references, set_filter=base_filter)
 
     PerformanceBenchmark.assert_function_performance(
         left_function_class=OneSecondFunction,

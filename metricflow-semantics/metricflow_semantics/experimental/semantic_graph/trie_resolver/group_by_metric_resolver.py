@@ -24,8 +24,6 @@ from metricflow_semantics.experimental.semantic_graph.model_id import SemanticMo
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import MetricTimeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     BaseMetricLabel,
-    ConfiguredEntityLabel,
-    JoinedModelLabel,
     LocalModelLabel,
     MeasureLabel,
     MetricLabel,
@@ -73,17 +71,8 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
     ) -> None:
         super().__init__(semantic_graph=semantic_graph, path_finder=path_finder)
         self._local_model_nodes = semantic_graph.nodes_with_labels(self._local_model_label)
-        self._key_attribute_nodes = semantic_graph.nodes_with_labels(self._entity_key_attribute_label)
-        self._node_allow_set = self._local_model_nodes.union(
-            self._key_attribute_nodes,
-            self._semantic_graph.nodes_with_labels(
-                JoinedModelLabel.get_instance(),
-                ConfiguredEntityLabel.get_instance(),
-            ),
-        )
         self._metric_nodes = semantic_graph.nodes_with_labels(MetricLabel.get_instance())
-        self._measure_nodes = semantic_graph.nodes_with_labels(MeasureLabel.get_instance())
-        self._base_metric_nodes = semantic_graph.nodes_with_labels(BaseMetricLabel.get_instance())
+
         self._nodes_in_path_from_metric_nodes_to_local_model_nodes = semantic_graph.nodes_with_labels(
             MetricLabel.get_instance(),
             MeasureLabel.get_instance(),
@@ -160,7 +149,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
             graph=self._semantic_graph,
             source_nodes=source_nodes,
             target_nodes=self._local_model_nodes,
-            node_allow_set=self._node_allow_set,
+            node_allow_set=self._nodes_in_path_from_metric_nodes_to_local_model_nodes,
             deny_labels={self._deny_visible_attributes_label},
         )
         reachable_local_model_nodes = tuple(find_descendants_result.reachable_target_nodes)

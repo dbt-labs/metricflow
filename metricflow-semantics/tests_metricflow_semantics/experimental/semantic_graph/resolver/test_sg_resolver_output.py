@@ -6,6 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -38,11 +39,11 @@ def test_set_filtering_for_measure(sg_tester: SemanticGraphTester) -> None:
     """Check filtering of the set for a measure."""
     measure_reference = MeasureReference("bookings")
     sg_resolver = sg_tester.sg_resolver
-    complete_set = sg_resolver.get_linkable_element_set_for_measure(measure_reference)
+    complete_set = sg_resolver.get_common_set(measure_references=(measure_reference,))
     sg_tester.check_set_filtering(
         complete_set=complete_set,
-        filtered_set_callable=lambda set_filter: sg_resolver.get_linkable_element_set_for_measure(
-            measure_reference, set_filter
+        filtered_set_callable=lambda set_filter: sg_resolver.get_common_set(
+            measure_references=(measure_reference,), set_filter=set_filter
         ),
     )
 
@@ -60,13 +61,16 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
         ("bookings", "views"),
         ("trailing_2_months_revenue",),
     ):
-        metric_references = [MetricReference(metric_name) for metric_name in metric_names]
-        complete_set = sg_resolver.get_linkable_elements_for_metrics(metric_references)
+        # Group-by metrics should not be called for metrics, so skip them for smaller snapshots.
+        metric_references = tuple(MetricReference(metric_name) for metric_name in metric_names)
+        set_filter = GroupByItemSetFilter(without_any_of=frozenset((GroupByItemProperty.METRIC,)))
+        complete_set = sg_resolver.get_common_set(metric_references=metric_references, set_filter=set_filter)
         description_to_set[str(metric_names)] = complete_set
         sg_tester.check_set_filtering(
             complete_set=complete_set,
-            filtered_set_callable=lambda set_filter: sg_resolver.get_linkable_elements_for_metrics(
-                metric_references, set_filter
+            filtered_set_callable=lambda _filter: sg_resolver.get_common_set(
+                metric_references=metric_references,
+                set_filter=_filter.copy(without_any_of=_filter.without_any_of.union((GroupByItemProperty.METRIC,))),
             ),
         )
 
@@ -76,20 +80,14 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
 def test_set_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
     """Check the attribute set for a distinct-values query / no-metric query."""
     sg_tester.assert_attribute_set_snapshot_equal(
-        {
-            "Distinct-Values Query": sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(
-                GroupByItemSetFilter()
-            )
-        }
+        {"Distinct-Values Query": sg_tester.sg_resolver.get_set_for_distinct_values_query(GroupByItemSetFilter())}
     )
 
 
 def test_set_filtering_for_distinct_values_query(sg_tester: SemanticGraphTester) -> None:
     """Check filtering of the set for a distinct values query."""
-    complete_set = sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(GroupByItemSetFilter())
+    complete_set = sg_tester.sg_resolver.get_set_for_distinct_values_query(GroupByItemSetFilter())
     sg_tester.check_set_filtering(
         complete_set=complete_set,
-        filtered_set_callable=lambda set_filter: sg_tester.sg_resolver.get_linkable_elements_for_distinct_values_query(
-            set_filter
-        ),
+        filtered_set_callable=lambda set_filter: sg_tester.sg_resolver.get_set_for_distinct_values_query(set_filter),
     )
