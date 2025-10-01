@@ -579,7 +579,7 @@ class SemanticModelToDataSetConverter:
             sql_select_node=SqlSelectStatementNode.create(
                 description=time_spine_source.data_set_description,
                 select_columns=tuple(select_columns),
-                from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
+                from_source=SqlTableNode.create(sql_table=time_spine_source.sql_table),
                 from_source_alias=from_source_alias,
             ),
         )

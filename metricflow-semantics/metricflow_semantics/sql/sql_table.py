@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
+from dbt_semantic_interfaces.protocols.node_relation import NodeRelation
+
 
 class SqlTableType(Enum):  # noqa: D101
     TABLE = "table"
@@ -35,6 +37,11 @@ class SqlTable:
             f"Invalid input for a SQL table, expected form '<schema>.<table>' or '<db>.<schema>.<table>' "
             f"but got: {sql_str}"
         )
+
+    @staticmethod
+    def from_node_relation(node_relation: NodeRelation) -> SqlTable:
+        """Create a SQL table from a node relation."""
+        return SqlTable.from_string(node_relation.relation_name)
 
     @property
     def sql(self) -> str:
