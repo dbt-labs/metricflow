@@ -1,0 +1,6 @@
+kind: Fixes
+body: Use node_relation to render time spine table with proper quoting.
+time: 2025-10-01T15:34:36.737372-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1875"
