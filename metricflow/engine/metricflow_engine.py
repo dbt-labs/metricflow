@@ -14,7 +14,6 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
-    MeasureReference,
     MetricReference,
     SemanticModelElementReference,
 )
@@ -61,7 +60,7 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPla
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
-from metricflow.engine.models import Dimension, Entity, Measure, Metric, SavedQuery, SearchableElement
+from metricflow.engine.models import Dimension, Entity, Metric, SavedQuery, SearchableElement
 from metricflow.engine.time_source import ServerTimeSource
 from metricflow.execution.convert_to_execution_plan import ConvertToExecutionPlanResult
 from metricflow.execution.dataflow_to_execution import (
@@ -616,33 +615,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D102
         with log_block_runtime("explain"):
             return self._create_execution_plan(mf_request)
-
-    def get_measures_for_metrics(self, metric_names: List[str]) -> List[Measure]:  # noqa: D102
-        metrics = self._semantic_manifest_lookup.metric_lookup.get_metrics(
-            metric_references=[MetricReference(element_name=metric_name) for metric_name in metric_names]
-        )
-        semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
-
-        measures = set()
-        for metric in metrics:
-            for input_measure in metric.input_measures:
-                measure_reference = MeasureReference(element_name=input_measure.name)
-                # populate new obj
-                measure = semantic_model_lookup.measure_lookup.get_measure(measure_reference=measure_reference)
-                measures.add(
-                    Measure(
-                        name=measure.name,
-                        agg=measure.agg,
-                        agg_time_dimension=semantic_model_lookup.measure_lookup.get_properties(
-                            measure_reference=measure_reference
-                        ).agg_time_dimension_reference.element_name,
-                        description=measure.description,
-                        expr=measure.expr,
-                        agg_params=measure.agg_params,
-                        config=measure.config,
-                    )
-                )
-        return list(measures)
 
     def _build_metric_time_dimension(self, time_grain: Optional[ExpandedTimeGranularity]) -> Dimension:
         metric_time_name = DataSet.metric_time_dimension_name()
