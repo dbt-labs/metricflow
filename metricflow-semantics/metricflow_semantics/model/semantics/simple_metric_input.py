@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @fast_frozen_dataclass()
-class PartialMetricAggregation:
+class SimpleMetricInputAggregation:
     """Indirection class used for measure -> simple metric migration."""
 
     percentile: Optional[float] = None
@@ -21,7 +21,7 @@ class PartialMetricAggregation:
 
 
 @fast_frozen_dataclass()
-class PartialMetricNonAdditiveDimension:
+class SimpleMetricInputNonAdditiveDimension:
     """Indirection class used for measure -> simple metric migration."""
 
     name: str
@@ -30,12 +30,19 @@ class PartialMetricNonAdditiveDimension:
 
 
 @fast_frozen_dataclass()
-class PartialMetric:
+class SimpleMetricInput:
     """Indirection class used for measure -> simple metric migration."""
 
     name: str
     agg: AggregationType
     expr: Optional[str] = None
-    agg_params: Optional[PartialMetricAggregation] = None
-    non_additive_dimension: Optional[PartialMetricNonAdditiveDimension] = None
+    agg_params: Optional[SimpleMetricInputAggregation] = None
+    non_additive_dimension: Optional[SimpleMetricInputNonAdditiveDimension] = None
     agg_time_dimension: Optional[str] = None
+
+
+@fast_frozen_dataclass()
+class SimpleMetricInputReference:
+    """Indirection class used for measure -> simple metric migration."""
+
+    element_name: str
