@@ -47,13 +47,13 @@ def check_time_spine_source(
         simple_semantic_manifest_lookup.semantic_manifest
     )[TimeGranularity.DAY]
     assert (
-        time_spine_source.schema_name == mf_test_configuration.mf_source_schema
+        time_spine_source.sql_table.schema_name == mf_test_configuration.mf_source_schema
     ), "The time spine source table should be in the source schema"
 
     time_spine_snapshot_candidates = tuple(
         snapshot
         for snapshot in source_table_snapshot_repository.table_snapshots
-        if snapshot.table_name == time_spine_source.table_name
+        if snapshot.table_name == time_spine_source.sql_table.table_name
     )
 
     assert len(time_spine_snapshot_candidates) == 1, (

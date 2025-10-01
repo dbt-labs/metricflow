@@ -24,7 +24,7 @@ def test_date_spine_date_range(  # noqa: D103
             SELECT
                 MIN({time_spine_source.base_column})
                 , MAX({time_spine_source.base_column})
-            FROM {time_spine_source.spine_table.sql}
+            FROM {time_spine_source.sql_table.sql}
             """,
         )
     )

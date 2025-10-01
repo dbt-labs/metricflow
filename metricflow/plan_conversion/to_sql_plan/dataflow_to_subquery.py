@@ -277,7 +277,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     TimeDimensionInstance(
                         defined_from=(
                             SemanticModelElementReference(
-                                semantic_model_name=time_spine_source.table_name, element_name=spec.element_name
+                                semantic_model_name=time_spine_source.sql_table.table_name,
+                                element_name=spec.element_name,
                             ),
                         ),
                         associated_columns=(self._column_association_resolver.resolve_spec(spec),),
@@ -299,7 +300,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         inner_sql_select_node = SqlSelectStatementNode.create(
             description=time_spine_source.data_set_description,
             select_columns=select_columns,
-            from_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
+            from_source=SqlTableNode.create(sql_table=time_spine_source.sql_table),
             from_source_alias=time_spine_table_alias,
             group_bys=select_columns if apply_group_by_in_inner_select_node else (),
             where=(
@@ -1321,13 +1322,13 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         parent_join_column_name = self._column_association_resolver.resolve_spec(
             node.join_on_time_dimension_spec
         ).column_name
-        time_spine_jon_column_name = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
+        time_spine_join_column_name = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
             time_granularity_name=node.join_on_time_dimension_spec.time_granularity_name, date_part=None
         ).associated_column.column_name
         join_description = SqlPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
             time_spine_alias=time_spine_alias,
-            time_spine_column_name=time_spine_jon_column_name,
+            time_spine_column_name=time_spine_join_column_name,
             parent_column_name=parent_join_column_name,
             parent_sql_select_node=parent_data_set.checked_sql_select_node,
             parent_alias=parent_alias,
@@ -1511,7 +1512,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
         join_description = SqlJoinDescription(
-            right_source=SqlTableNode.create(sql_table=time_spine_source.spine_table),
+            right_source=SqlTableNode.create(sql_table=time_spine_source.sql_table),
             right_source_alias=time_spine_alias,
             on_condition=SqlComparisonExpression.create(
                 left_expr=parent_column.expr,
