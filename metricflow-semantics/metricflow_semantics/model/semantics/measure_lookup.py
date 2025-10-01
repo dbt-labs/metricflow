@@ -23,6 +23,11 @@ from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTup
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
+from metricflow_semantics.model.semantics.simple_metric_input import (
+    SimpleMetricInput,
+    SimpleMetricInputAggregation,
+    SimpleMetricInputNonAdditiveDimension,
+)
 from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.measure_spec import MeasureSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
@@ -196,7 +201,7 @@ class MeasureLookup:
 
         return property_set
 
-    def get_measure(self, measure_reference: MeasureReference) -> Measure:
+    def get_measure(self, measure_reference: MeasureReference) -> SimpleMetricInput:
         """Return the measure object with the given reference."""
         measure = self._measure_reference_to_measure.get(measure_reference)
         if measure is None:
@@ -208,7 +213,30 @@ class MeasureLookup:
                 )
             )
 
-        return measure
+        simple_metric_input_non_additive_dimension: Optional[SimpleMetricInputNonAdditiveDimension] = None
+        measure_non_additive_dimension = measure.non_additive_dimension
+        if measure_non_additive_dimension is not None:
+            simple_metric_input_non_additive_dimension = SimpleMetricInputNonAdditiveDimension(
+                name=measure_non_additive_dimension.name,
+                window_choice=measure_non_additive_dimension.window_choice,
+                window_groupings=tuple(measure_non_additive_dimension.window_groupings),
+            )
+
+        simple_metric_agg_params: Optional[SimpleMetricInputAggregation] = None
+        measure_agg_params = measure.agg_params
+        if measure_agg_params is not None:
+            simple_metric_agg_params = SimpleMetricInputAggregation(
+                percentile=measure_agg_params.percentile,
+                use_discrete_percentile=measure_agg_params.use_discrete_percentile,
+                use_approximate_percentile=measure_agg_params.use_approximate_percentile,
+            )
+        return SimpleMetricInput(
+            name=measure.name,
+            agg=measure.agg,
+            expr=measure.expr,
+            agg_params=simple_metric_agg_params,
+            non_additive_dimension=simple_metric_input_non_additive_dimension,
+        )
 
     @cached_property
     def measure_references(self) -> Sequence[MeasureReference]:
