@@ -36,10 +36,10 @@ class SemanticGraphTester:
     def __init__(self, fixture: SemanticGraphTestFixture) -> None:  # noqa: D107
         self._fixture = fixture
         self._measure_references = tuple(
-            measure.reference
-            for lookup in fixture.manifest_object_lookup.measure_containing_model_lookups
-            for measures in lookup.aggregation_configuration_to_measures.values()
-            for measure in measures
+            MeasureReference(element_name=simple_metric_input.name)
+            for lookup in fixture.manifest_object_lookup.simple_metric_model_lookups
+            for simple_metric_inputs in lookup.aggregation_configuration_to_simple_metric_inputs.values()
+            for simple_metric_input in simple_metric_inputs
         )
         self._metric_references = tuple(
             MetricReference(metric.name) for metric in fixture.manifest_object_lookup.get_metrics()

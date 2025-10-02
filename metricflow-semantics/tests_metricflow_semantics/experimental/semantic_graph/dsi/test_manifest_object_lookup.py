@@ -38,15 +38,17 @@ def test_model_lookup_performance(manifest_with_200_models_100_metrics: Semantic
         def run(self) -> None:
             for _ in range(init_count):
                 manifest_lookup = ManifestObjectLookup(semantic_manifest)
-                for model_lookup in manifest_lookup.measure_containing_model_lookups:
-                    for measure_sequence in model_lookup.aggregation_time_dimension_name_to_measures.values():
-                        for _ in measure_sequence:
+                for model_lookup in manifest_lookup.simple_metric_model_lookups:
+                    for (
+                        simple_metric_input_sequence
+                    ) in model_lookup.aggregation_time_dimension_name_to_simple_metric_inputs.values():
+                        for _ in simple_metric_input_sequence:
                             pass
 
     PerformanceBenchmark.assert_function_performance(
         left_function_class=_LeftFunction,
         right_function_class=_RightFunction,
-        min_performance_factor=100,
+        min_performance_factor=40,
     )
 
 

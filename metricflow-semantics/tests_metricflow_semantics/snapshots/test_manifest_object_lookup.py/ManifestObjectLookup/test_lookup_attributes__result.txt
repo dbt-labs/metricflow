@@ -5,15 +5,15 @@ docstring:
 ---
 ManifestObjectLookup(
   model_object_lookups=(
-    MeasureContainingModelObjectLookup(
+    SimpleMetricInputModelObjectLookup(
       model_id=bookings_source,
       time_dimension_name_to_grain={'booking_time': QUARTER},
       entity_lookup=EntityLookup(
         entity_name_to_type={'booking': PRIMARY, 'listing': FOREIGN},
         entity_type_to_names={PRIMARY: {'booking'}, FOREIGN: {'listing'}},
       ),
-      aggregation_configuration_to_measures={
-        MeasureAggregationConfiguration(
+      aggregation_configuration_to_simple_metric_inputs={
+        SimpleMetricAggregationConfiguration(
           time_dimension_name='booking_time',
           time_grain=QUARTER,
         ): ['booking_count'],
