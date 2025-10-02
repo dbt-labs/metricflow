@@ -174,10 +174,13 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
 
-            items_available_for_measure = self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_measure(
-                measure_reference=node.measure_reference,
-                element_filter=GroupByItemSetFilter.merge_iterable(
-                    spec_pattern.element_pre_filter for spec_pattern in self._source_spec_patterns
+            group_by_items_for_measure = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
+                measure_references=(node.measure_reference,),
+                # The filter should allow everything, except for the ones blocked by the spec patterns.
+                set_filter=GroupByItemSetFilter().merge(
+                    GroupByItemSetFilter.merge_iterable(
+                        spec_pattern.element_pre_filter for spec_pattern in self._source_spec_patterns
+                    ),
                 ),
             )
 
@@ -198,7 +201,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             else:
                 assert_values_exhausted(metric.type)
 
-            matching_items = items_available_for_measure.filter_by_spec_patterns(
+            matching_items = group_by_items_for_measure.filter_by_spec_patterns(
                 patterns_to_apply + self._source_spec_patterns
             )
 
@@ -461,7 +464,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
             # This is a case for distinct dimension values from semantic models.
             candidate_group_by_items = (
-                self._semantic_manifest_lookup.metric_lookup.linkable_elements_for_no_metrics_query()
+                self._semantic_manifest_lookup.metric_lookup.get_group_by_items_for_distinct_values_query()
             )
             logger.debug(LazyFormat("Retrieved candidates", candidate_group_by_items=candidate_group_by_items))
             candidates_after_filtering = candidate_group_by_items.filter_by_spec_patterns(self._source_spec_patterns)

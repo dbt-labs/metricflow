@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Consolidate measure / metric methods of `MetricLookup`
+time: 2025-10-02T13:15:22.654918-07:00
+custom:
+  Author: plypaul
+  Issue: "1872"
