@@ -8,10 +8,10 @@ from dbt_semantic_interfaces.references import ElementReference, MeasureReferenc
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
+from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
@@ -163,9 +163,10 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         for label in node_labels:
             matching_nodes = self._semantic_graph.nodes_with_labels(label)
             if len(matching_nodes) != 1:
-                raise MetricflowInternalError(
+                raise InvalidQueryException(
                     LazyFormat(
-                        "Did not find exactly 1 node in the semantic graph for the given label",
+                        "The given name is not valid. Please check that it matches one specified in the manifest.",
+                        element_name=mf_first_item(label_to_references[label]).element_name,
                         label=label,
                         associated_references=label_to_references.get(label),
                         matching_nodes=matching_nodes,

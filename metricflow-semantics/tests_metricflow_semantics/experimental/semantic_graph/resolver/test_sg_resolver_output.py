@@ -6,10 +6,12 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 
 from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
 from tests_metricflow_semantics.experimental.semantic_graph.sg_tester import SemanticGraphTester
@@ -90,4 +92,18 @@ def test_set_filtering_for_distinct_values_query(sg_tester: SemanticGraphTester)
     sg_tester.check_set_filtering(
         complete_set=complete_set,
         filtered_set_callable=lambda set_filter: sg_tester.sg_resolver.get_set_for_distinct_values_query(set_filter),
+    )
+
+
+def test_invalid_metric(
+    request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, sg_tester: SemanticGraphTester
+) -> None:
+    """Check the exception associated with an invalid metric name."""
+    with pytest.raises(InvalidQueryException) as exc_info:
+        sg_tester.sg_resolver.get_common_set(metric_references=(MetricReference("invalid_metric"),))
+
+    assert_str_snapshot_equal(
+        request=request,
+        snapshot_configuration=mf_test_configuration,
+        snapshot_str=str(exc_info.value),
     )
