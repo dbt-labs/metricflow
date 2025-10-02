@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Consolidate measure-related operations into `MeasureLookup`
+time: 2025-10-02T12:35:42.003889-07:00
+custom:
+  Author: plypaul
+  Issue: "1868"
