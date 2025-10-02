@@ -13,7 +13,7 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, T
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_flatten
-from metricflow_semantics.experimental.dsi.measure_model_object_lookup import MeasureContainingModelObjectLookup
+from metricflow_semantics.experimental.dsi.measure_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
@@ -21,6 +21,7 @@ from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, Muta
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
@@ -57,17 +58,17 @@ class ManifestObjectLookup(AttributePrettyFormattable):
         return self._semantic_manifest.semantic_models
 
     @cached_property
-    def measure_containing_model_lookups(self) -> AnyLengthTuple[MeasureContainingModelObjectLookup]:
-        """Returns lookups corresponding to semantic models that contain measures."""
+    def simple_metric_model_lookups(self) -> AnyLengthTuple[SimpleMetricModelObjectLookup]:
+        """Returns lookups corresponding to semantic models that are associated with simple metrics."""
         return tuple(
-            MeasureContainingModelObjectLookup(semantic_model, self._semantic_manifest.metrics)
+            SimpleMetricModelObjectLookup(semantic_model, self._semantic_manifest.metrics)
             for semantic_model in self.semantic_models
             if len(semantic_model.measures) > 0
         )
 
     @cached_property
-    def measure_exclusive_model_lookups(self) -> AnyLengthTuple[ModelObjectLookup]:
-        """Returns lookups corresponding to semantic models that do not contain measures."""
+    def simple_metric_exclusive_model_lookups(self) -> AnyLengthTuple[ModelObjectLookup]:
+        """Returns lookups corresponding to semantic models that are not associated with simple metrics."""
         return tuple(
             ModelObjectLookup(semantic_model, self._semantic_manifest.metrics)
             for semantic_model in self.semantic_models
@@ -77,11 +78,20 @@ class ManifestObjectLookup(AttributePrettyFormattable):
     @cached_property
     def model_object_lookups(self) -> AnyLengthTuple[ModelObjectLookup]:
         """Return lookups for all semantic models."""
-        return self.measure_containing_model_lookups + self.measure_exclusive_model_lookups
+        return self.simple_metric_model_lookups + self.simple_metric_exclusive_model_lookups
 
     @cached_property
     def model_id_to_lookup(self) -> Mapping[SemanticModelId, ModelObjectLookup]:  # noqa: D102
         return {lookup.model_id: lookup for lookup in self.model_object_lookups}
+
+    @cached_property
+    def simple_metric_name_to_input(self) -> Mapping[str, SimpleMetricInput]:  # noqa: D102
+        return {
+            simple_metric_input.name: simple_metric_input
+            for lookup in self.simple_metric_model_lookups
+            for simple_metric_inputs in lookup.aggregation_configuration_to_simple_metric_inputs.values()
+            for simple_metric_input in simple_metric_inputs
+        }
 
     @cached_property
     def entity_name_to_model_lookups(self) -> Mapping[str, OrderedSet[ModelObjectLookup]]:
