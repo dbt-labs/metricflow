@@ -5,7 +5,7 @@ from collections import defaultdict
 from functools import cached_property
 from typing import Mapping, Sequence
 
-from dbt_semantic_interfaces.protocols import Measure, SemanticModel
+from dbt_semantic_interfaces.protocols import Measure, Metric, SemanticModel
 from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 from typing_extensions import override
 
@@ -33,7 +33,7 @@ class MeasureContainingModelObjectLookup(ModelObjectLookup):
     A separate lookup class helps to break out the lookup classes and provide better typing (fewer `None` cases).
     """
 
-    def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D107
+    def __init__(self, semantic_model: SemanticModel, metrics: Sequence[Metric]) -> None:  # noqa: D107
         if len(semantic_model.measures) == 0:
             raise MetricflowInternalError(
                 LazyFormat(
@@ -42,7 +42,7 @@ class MeasureContainingModelObjectLookup(ModelObjectLookup):
                 )
             )
 
-        super().__init__(semantic_model)
+        super().__init__(semantic_model, metrics)
 
     @cached_property
     def aggregation_time_dimension_name_to_measures(self) -> Mapping[str, Sequence[Measure]]:
