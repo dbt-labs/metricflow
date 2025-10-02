@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Remove `LinkableElementSet`
+time: 2025-10-02T12:34:07.522688-07:00
+custom:
+  Author: plypaul
+  Issue: "1866"

@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add test for group-by items using the cyclic manifest
+time: 2025-10-02T12:30:44.181205-07:00
+custom:
+  Author: plypaul
+  Issue: "1869"

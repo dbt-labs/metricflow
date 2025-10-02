@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Sequence
-from typing import Optional
+from collections import defaultdict
+from typing import Iterable, Optional
 
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import ElementReference, MeasureReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
+from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
@@ -41,10 +43,11 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.group_by_met
 )
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
-from metricflow_semantics.model.semantics.linkable_spec_resolver import GroupByItemSetResolver
+from metricflow_semantics.model.semantics.linkable_spec_resolver import (
+    GroupByItemSetResolver,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,57 +72,14 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
             (self._semantic_graph.node_with_label(MetricTimeLabel.get_instance()),)
         )
 
-        self._result_cache_for_measure: ResultCache[
-            tuple[MeasureReference, Optional[GroupByItemSetFilter]], BaseGroupByItemSet
-        ] = ResultCache()
-
-        self._result_cache_for_metrics: ResultCache[
-            tuple[FrozenOrderedSet[MetricReference], Optional[GroupByItemSetFilter]], BaseGroupByItemSet
-        ] = ResultCache()
-
         self._result_cache_for_distinct_values: ResultCache[
             tuple[Optional[GroupByItemSetFilter]], BaseGroupByItemSet
         ] = ResultCache()
 
-    @override
-    def get_linkable_element_set_for_measure(
-        self, measure_reference: MeasureReference, element_filter: Optional[GroupByItemSetFilter] = None
-    ) -> BaseGroupByItemSet:
-        cache_key = (measure_reference, element_filter)
-        cached_result = self._result_cache_for_measure.get(cache_key)
-        if cached_result:
-            return cached_result.value
-
-        matching_measure_nodes = self._semantic_graph.nodes_with_labels(
-            MeasureLabel.get_instance(measure_name=measure_reference.element_name)
-        )
-        if len(matching_measure_nodes) != 1:
-            raise MetricflowInternalError(
-                LazyFormat(
-                    "Did not find exactly 1 node in the semantic graph for the given measure",
-                    measure_reference=measure_reference,
-                    matching_measure_nodes=matching_measure_nodes,
-                    measure_nodes=lambda: self._semantic_graph.nodes_with_labels(MeasureLabel.get_instance()),
-                    graph_nodes=self._semantic_graph.nodes,
-                )
-            )
-
-        measure_node = mf_first_item(matching_measure_nodes)
-        source_nodes = FrozenOrderedSet((measure_node,))
-
-        simple_trie = self._simple_resolver.resolve_trie(source_nodes, element_filter).dunder_name_trie
-        group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(
-            source_nodes, element_filter
-        ).dunder_name_trie
-
-        return self._result_cache_for_measure.set_and_get(
-            cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
-        )
+        self._result_cache_for_common_set: ResultCache[_CommonSetCacheKey, BaseGroupByItemSet] = ResultCache()
 
     @override
-    def get_linkable_elements_for_distinct_values_query(
-        self, element_filter: GroupByItemSetFilter
-    ) -> BaseGroupByItemSet:
+    def get_set_for_distinct_values_query(self, element_filter: GroupByItemSetFilter) -> BaseGroupByItemSet:
         cache_key = (element_filter,)
         cache_result = self._result_cache_for_distinct_values.get(cache_key)
         if cache_result:
@@ -169,47 +129,61 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         )
 
     @override
-    def get_linkable_elements_for_metrics(
+    def get_common_set(
         self,
-        metric_references: Sequence[MetricReference],
-        element_filter: Optional[GroupByItemSetFilter] = None,
+        measure_references: Iterable[MeasureReference] = (),
+        metric_references: Iterable[MetricReference] = (),
+        set_filter: Optional[GroupByItemSetFilter] = None,
     ) -> BaseGroupByItemSet:
-        if len(metric_references) == 0:
+        label_to_references: defaultdict[MetricflowGraphLabel, set[ElementReference]] = defaultdict(set)
+        for measure_reference in measure_references:
+            label_to_references[MeasureLabel.get_instance(measure_reference.element_name)].add(measure_reference)
+        for metric_reference in metric_references:
+            label_to_references[MetricLabel.get_instance(metric_reference.element_name)].add(metric_reference)
+
+        # Sanity check.
+        for label, references in label_to_references.items():
+            assert len(references) == 1, LazyFormat(
+                "Different references map to the same label.",
+                references=references,
+                label=label,
+            )
+
+        if len(label_to_references) == 0:
             return GroupByItemSet()
 
-        cache_key = (FrozenOrderedSet(sorted(metric_references)), element_filter)
-        cache_result = self._result_cache_for_metrics.get(cache_key)
-        if cache_result:
-            return cache_result.value
+        node_labels: FrozenOrderedSet[MetricflowGraphLabel] = FrozenOrderedSet(sorted(label_to_references))
+        cache_key = _CommonSetCacheKey(node_labels=node_labels, set_filter=set_filter)
+        cached_result = self._result_cache_for_common_set.get(cache_key)
+        if cached_result:
+            return cached_result.value
 
-        all_metric_nodes: MutableOrderedSet[SemanticGraphNode] = MutableOrderedSet()
+        source_nodes: MutableOrderedSet[SemanticGraphNode] = MutableOrderedSet()
 
-        # Handling old behavior - you can't use this method to get group-by metrics.
-        without_any_of_set = frozenset((GroupByItemProperty.METRIC,))
-        if element_filter is None or element_filter == GroupByItemSetFilter():
-            element_filter = GroupByItemSetFilter(without_any_of=without_any_of_set)
-        else:
-            element_filter = element_filter.copy(without_any_of=element_filter.without_any_of.union(without_any_of_set))
-
-        for metric_reference in metric_references:
-            matching_metric_nodes = self._semantic_graph.nodes_with_labels(
-                MetricLabel.get_instance(metric_reference.element_name)
-            )
-            if len(matching_metric_nodes) != 1:
+        for label in node_labels:
+            matching_nodes = self._semantic_graph.nodes_with_labels(label)
+            if len(matching_nodes) != 1:
                 raise MetricflowInternalError(
                     LazyFormat(
-                        "Did not find exactly 1 node in the semantic graph for the given metric",
-                        metric_reference=metric_reference,
-                        matching_metric_nodes=matching_metric_nodes,
-                        metric_nodes=self._semantic_graph.nodes_with_labels(MetricLabel.get_instance()),
+                        "Did not find exactly 1 node in the semantic graph for the given label",
+                        label=label,
+                        associated_references=label_to_references.get(label),
+                        matching_nodes=matching_nodes,
+                        measure_nodes=lambda: self._semantic_graph.nodes_with_labels(MeasureLabel.get_instance()),
+                        metric_nodes=lambda: self._semantic_graph.nodes_with_labels(MetricLabel.get_instance()),
                     )
                 )
-            all_metric_nodes.add(mf_first_item(matching_metric_nodes))
 
-        simple_trie = self._simple_resolver.resolve_trie(all_metric_nodes, element_filter).dunder_name_trie
-        group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(
-            all_metric_nodes, element_filter
-        ).dunder_name_trie
-        return self._result_cache_for_metrics.set_and_get(
+            source_nodes.add(mf_first_item(matching_nodes))
+
+        simple_trie = self._simple_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
+        group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
+        return self._result_cache_for_common_set.set_and_get(
             cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         )
+
+
+@fast_frozen_dataclass()
+class _CommonSetCacheKey:
+    node_labels: FrozenOrderedSet[MetricflowGraphLabel]
+    set_filter: Optional[GroupByItemSetFilter]
