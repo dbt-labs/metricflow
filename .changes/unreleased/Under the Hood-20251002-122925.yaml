@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Consolidate measure / metric methods of `GroupByItemSetResolver`
+time: 2025-10-02T12:29:25.789492-07:00
+custom:
+  Author: plypaul
+  Issue: "1871"
