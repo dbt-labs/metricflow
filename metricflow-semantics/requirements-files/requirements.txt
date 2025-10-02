@@ -3,7 +3,7 @@
 # which depends on a specific commit of DSI.
 # bumping to 0.9.3 will cause test failures, so pinning to dev2 until fixed
 # dbt-semantic-interfaces==0.9.3.dev2
-dbt-semantic-interfaces @ git+https://github.com/dbt-labs/dbt-semantic-interfaces.git@bf33f74
+dbt-semantic-interfaces @ git+https://github.com/dbt-labs/dbt-semantic-interfaces.git@74670d2
 # dbt-semantic-interfaces @ file:///Users/patricky/git/dbt-semantic-interfaces
 graphviz>=0.18.2, <0.21
 python-dateutil>=2.9.0, <2.10.0
