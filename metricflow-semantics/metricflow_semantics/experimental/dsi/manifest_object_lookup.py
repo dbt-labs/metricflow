@@ -60,7 +60,7 @@ class ManifestObjectLookup(AttributePrettyFormattable):
     def measure_containing_model_lookups(self) -> AnyLengthTuple[MeasureContainingModelObjectLookup]:
         """Returns lookups corresponding to semantic models that contain measures."""
         return tuple(
-            MeasureContainingModelObjectLookup(semantic_model)
+            MeasureContainingModelObjectLookup(semantic_model, self._semantic_manifest.metrics)
             for semantic_model in self.semantic_models
             if len(semantic_model.measures) > 0
         )
@@ -69,7 +69,7 @@ class ManifestObjectLookup(AttributePrettyFormattable):
     def measure_exclusive_model_lookups(self) -> AnyLengthTuple[ModelObjectLookup]:
         """Returns lookups corresponding to semantic models that do not contain measures."""
         return tuple(
-            ModelObjectLookup(semantic_model)
+            ModelObjectLookup(semantic_model, self._semantic_manifest.metrics)
             for semantic_model in self.semantic_models
             if len(semantic_model.measures) == 0
         )
