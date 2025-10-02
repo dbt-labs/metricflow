@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Dict, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Mapping, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.measure import (
@@ -26,7 +26,7 @@ from metricflow_semantics.model.semantics.semantic_model_helper import SemanticM
 from metricflow_semantics.model.semantics.simple_metric_input import (
     SimpleMetricInput,
     SimpleMetricInputAggregation,
-    SimpleMetricInputNonAdditiveDimension,
+    SimpleMetricInputNonAdditiveDimension, SimpleMetricInputReference,
 )
 from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.measure_spec import MeasureSpec
@@ -64,10 +64,11 @@ class MeasureLookup:
         metrics: Sequence[Metric],
         custom_granularities: Mapping[str, ExpandedTimeGranularity],
     ) -> None:
-        self._measure_reference_to_property_set: Dict[MeasureReference, MeasureRelationshipPropertySet] = {}
-        self._measure_reference_to_measure: Dict[MeasureReference, Measure] = {}
-        self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
-        self._model_reference_to_measures: dict[SemanticModelReference, AnyLengthTuple[Measure]] = {}
+        
+        self._reference_to_property_set: Dict[MeasureReference, MeasureRelationshipPropertySet] = {}
+        self._reference_to_simple_metric_input: Dict[MeasureReference, Measure] = {}
+        self._reference_to_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
+        self._model_reference_to_simple_metric_inputs: dict[SemanticModelReference, AnyLengthTuple[Measure]] = {}
         self._model_reference_to_aggregation_time_dimensions: dict[
             SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
         ] = {}
@@ -98,11 +99,11 @@ class MeasureLookup:
             else:
                 assert_values_exhausted(metric_type)
 
-        collected_measure_reference_to_measure: dict[MeasureReference, Measure] = {}
+        reference_to_simple_metric_inputs: dict[SimpleMetricInputReference, SimpleMetricInput] = {}
 
         for semantic_model in semantic_models:
             semantic_model_reference = semantic_model.reference
-            self._model_reference_to_measures[semantic_model_reference] = tuple(semantic_model.measures)
+            self._model_reference_to_simple_metric_inputs[semantic_model_reference] = tuple(semantic_model.measures)
             self._model_reference_to_aggregation_time_dimensions[semantic_model_reference] = ElementGrouper[
                 TimeDimensionReference, MeasureSpec
             ]()
@@ -111,7 +112,7 @@ class MeasureLookup:
             # If there are duplicate names, the ones from `metrics` take precedence.
             for measure in model_reference_to_additional_measures[semantic_model_reference]:
                 measure_reference_to_measure[measure.reference] = measure
-            collected_measure_reference_to_measure.update(measure_reference_to_measure)
+            reference_to_simple_metric_inputs.update(measure_reference_to_measure)
 
             primary_entity = SemanticModelHelper.resolved_primary_entity(semantic_model)
             time_dimension_reference_to_grain = SemanticModelHelper.get_time_dimension_grains(semantic_model)
@@ -124,7 +125,7 @@ class MeasureLookup:
                         window_choice=measure.non_additive_dimension.window_choice,
                         window_groupings=tuple(measure.non_additive_dimension.window_groupings),
                     )
-                    self._measure_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
+                    self._reference_to_non_additive_dimension_specs[measure.reference] = non_additive_dimension_spec
 
                 agg_time_dimension_reference = semantic_model.checked_agg_time_dimension_for_measure(measure_reference)
                 agg_time_granularity = time_dimension_reference_to_grain.get(agg_time_dimension_reference)
@@ -132,7 +133,7 @@ class MeasureLookup:
                     raise ValueError(
                         f"Could not find the defined grain of the aggregation time dimension for {measure=}"
                     )
-                self._measure_reference_to_property_set[measure.reference] = MeasureRelationshipPropertySet(
+                self._reference_to_property_set[measure.reference] = MeasureRelationshipPropertySet(
                     model_reference=semantic_model_reference,
                     model_primary_entity=primary_entity,
                     agg_time_dimension_reference=semantic_model.checked_agg_time_dimension_for_measure(
@@ -179,37 +180,37 @@ class MeasureLookup:
                     value=MeasureConverter.convert_to_measure_spec(measure=measure),
                 )
 
-        self._measure_reference_to_measure = {
-            measure_reference: collected_measure_reference_to_measure[measure_reference]
+        self._reference_to_simple_metric_input = {
+            measure_reference: reference_to_simple_metric_inputs[measure_reference]
             for measure_reference in sorted(
-                collected_measure_reference_to_measure.keys(),
+                reference_to_simple_metric_inputs.keys(),
                 key=lambda ref: ref.element_name,
             )
         }
 
     def get_properties(self, measure_reference: MeasureReference) -> MeasureRelationshipPropertySet:
         """Return properties of the measure as it relates to other elements in the semantic model."""
-        property_set = self._measure_reference_to_property_set.get(measure_reference)
+        property_set = self._reference_to_property_set.get(measure_reference)
         if property_set is None:
             raise ValueError(
                 LazyFormat(
                     "Unable to get properties as the given measure reference is unknown",
                     measure_reference=measure_reference,
-                    known_measures=list(self._measure_reference_to_property_set.keys()),
+                    known_measures=list(self._reference_to_property_set.keys()),
                 )
             )
 
         return property_set
 
-    def get_measure(self, measure_reference: MeasureReference) -> SimpleMetricInput:
+    def get_simple_metric_input(self, reference: Union[MeasureReference, SimpleMetricInputReference]) -> SimpleMetricInput:
         """Return the measure object with the given reference."""
-        measure = self._measure_reference_to_measure.get(measure_reference)
+        measure = self._reference_to_simple_metric_input.get(reference)
         if measure is None:
             raise ValueError(
                 LazyFormat(
                     "Unable to get the measure as the given reference is unknown",
-                    measure_reference=measure_reference,
-                    known_measures=self._measure_reference_to_property_set.keys(),
+                    measure_reference=reference,
+                    known_measures=self._reference_to_property_set.keys(),
                 )
             )
 
@@ -241,7 +242,7 @@ class MeasureLookup:
     @cached_property
     def measure_references(self) -> Sequence[MeasureReference]:
         """Return all measure references from the collection of semantic models."""
-        return tuple(self._measure_reference_to_measure.keys())
+        return tuple(self._reference_to_simple_metric_input.keys())
 
     @cached_property
     def non_additive_dimension_specs_by_measure(self) -> Mapping[MeasureReference, NonAdditiveDimensionSpec]:
@@ -249,18 +250,18 @@ class MeasureLookup:
 
         This includes all measures with non-additive dimension parameters, if any, from the collection of semantic models.
         """
-        return self._measure_non_additive_dimension_specs
+        return self._reference_to_non_additive_dimension_specs
 
     def get_measures_by_model(self, model_reference: SemanticModelReference) -> Sequence[Measure]:  # noqa: D102
         try:
-            return self._model_reference_to_measures[model_reference]
+            return self._model_reference_to_simple_metric_inputs[model_reference]
         except KeyError:
             raise KeyError(
                 LazyFormat(
                     "Unable to get measures as the given model is not known",
                     model_name=model_reference.semantic_model_name,
                     known_model_names=[
-                        model_reference.semantic_model_name for model_reference in self._model_reference_to_measures
+                        model_reference.semantic_model_name for model_reference in self._model_reference_to_simple_metric_inputs
                     ],
                 )
             )
@@ -277,7 +278,7 @@ class MeasureLookup:
                     "Can't get aggregation time dimensions as the given model is not known",
                     model_name=semantic_model_reference.semantic_model_name,
                     known_model_names=[
-                        model_reference.semantic_model_name for model_reference in self._model_reference_to_measures
+                        model_reference.semantic_model_name for model_reference in self._model_reference_to_simple_metric_inputs
                     ],
                 )
             )

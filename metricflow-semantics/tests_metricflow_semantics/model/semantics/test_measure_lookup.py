@@ -19,7 +19,7 @@ def test_get_measure(extended_date_manifest: PydanticSemanticManifest, measure_l
     """Test that all measures in the manifest can be retrieved."""
     for semantic_model in extended_date_manifest.semantic_models:
         for measure in semantic_model.measures:
-            assert measure == measure_lookup.get_measure(measure.reference)
+            assert measure == measure_lookup.get_simple_metric_input(measure.reference)
 
 
 def test_measure_properties(
