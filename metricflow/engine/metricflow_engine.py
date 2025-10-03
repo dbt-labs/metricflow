@@ -841,6 +841,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         metric_lookup = self._semantic_manifest_lookup.metric_lookup
         metrics: List[Metric] = []
         for pydantic_metric in metric_lookup.get_metrics(metric_lookup.metric_references):
+            if pydantic_metric.type_params.is_private:
+                continue
             semantic_models = []
             for measure in pydantic_metric.input_measures:
                 semantic_model_reference = (
