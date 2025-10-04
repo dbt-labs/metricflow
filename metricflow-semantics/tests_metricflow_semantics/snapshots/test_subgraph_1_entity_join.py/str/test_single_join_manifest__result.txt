@@ -18,7 +18,6 @@ dot_notation:
   		label=bookings_source
   		"JoinedModel(bookings_source)"
   		"LocalModel(bookings_source)"
-  		"Measure(booking_count)"
   	}
   	subgraph cluster_listings_source {
   		label=listings_source
@@ -29,12 +28,16 @@ dot_notation:
   		label=time_dimension
   		MetricTime
   	}
+  	subgraph cluster_metric {
+  		label=metric
+  		"SimpleMetric(bookings)"
+  	}
   	"bookings_source.booking" -> "JoinedModel(bookings_source)"
   	"listings_source.listing" -> "JoinedModel(listings_source)"
   	"LocalModel(bookings_source)" -> "bookings_source.booking"
   	"LocalModel(listings_source)" -> "listings_source.listing"
-  	"Measure(booking_count)" -> "LocalModel(bookings_source)"
-  	"Measure(booking_count)" -> MetricTime
+  	"SimpleMetric(bookings)" -> "LocalModel(bookings_source)"
+  	"SimpleMetric(bookings)" -> MetricTime
   	"JoinedModel(bookings_source)" -> "listings_source.listing"
   	"LocalModel(bookings_source)" -> "listings_source.listing"
   }
@@ -48,16 +51,16 @@ pretty_format:
       JoinedModel(listings_source),
       LocalModel(bookings_source),
       LocalModel(listings_source),
-      Measure(booking_count),
       MetricTime,
+      SimpleMetric(bookings),
     },
     edges={
       EntityRelationshipEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
       EntityRelationshipEdge(tail_node=listings_source.listing, head_node=JoinedModel(listings_source)),
       EntityRelationshipEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
       EntityRelationshipEdge(tail_node=LocalModel(listings_source), head_node=listings_source.listing),
-      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=LocalModel(bookings_source)),
-      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=SimpleMetric(bookings), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=SimpleMetric(bookings), head_node=MetricTime),
       JoinToModelEdge(tail_node=JoinedModel(bookings_source), head_node=listings_source.listing),
       JoinToModelEdge(tail_node=LocalModel(bookings_source), head_node=listings_source.listing),
     },

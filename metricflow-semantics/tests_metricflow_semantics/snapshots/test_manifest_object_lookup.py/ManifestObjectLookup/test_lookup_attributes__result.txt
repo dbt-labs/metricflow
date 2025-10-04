@@ -16,7 +16,7 @@ ManifestObjectLookup(
         SimpleMetricAggregationConfiguration(
           time_dimension_name='booking_time',
           time_grain=QUARTER,
-        ): ['booking_count'],
+        ): ['bookings'],
       },
     ),
     ModelObjectLookup(

@@ -1,7 +1,7 @@
-test_name: test_set_for_measures
+test_name: test_complete_set_for_simple_metrics
 test_filename: test_sg_resolver_output.py
 docstring:
-  Check the set for a few measures.
+  Check the complete set for a few simple metrics.
 ---
 bookings:
   ┌──────────────────────────────────────────────────────────────────────────────────┬────────────────────────────────┬──────────────────┬─────────────────────────────────────────────┬───────────────────────────────────────────────────┐
@@ -523,10 +523,12 @@ account_balance:
   │ metric_time__week                                                          │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ accounts_source                                                │
   │ metric_time__year                                                          │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ accounts_source                                                │
   │ user                                                                       │                                │ ENTITY           │ ENTITY,LOCAL                           │ accounts_source                                                │
+  │ user__account__user__account_balance                                       │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__current_account_balance_by_user                       │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__regional_starting_balance_ratios                      │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__total_account_balance_first_day                       │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__total_account_balance_first_day_of_month              │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
+  │ user__account_balance                                                      │ user                           │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__active_listings                                                      │ user                           │ METRIC           │ JOINED,METRIC                          │ accounts_source,listings_latest                                │
   │ user__archived_at__alien_day                                               │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,JOINED        │ accounts_source,users_ds_source                                │
   │ user__archived_at__day                                                     │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,JOINED        │ accounts_source,users_ds_source                                │
@@ -726,12 +728,6 @@ account_balance:
   │ user__verification__user__identity_verifications                           │ verification,user              │ METRIC           │ JOINED,METRIC                          │ accounts_source,id_verifications                               │
   │ user__view__user__views                                                    │ view,user                      │ METRIC           │ JOINED,METRIC                          │ accounts_source,views_source                                   │
   │ user__views                                                                │ user                           │ METRIC           │ JOINED,METRIC                          │ accounts_source,views_source                                   │
-  │ user__visit__user__visit_buy_conversion_rate                               │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,buys_source,visits_source                      │
-  │ user__visit__user__visit_buy_conversion_rate_7days                         │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,buys_source,visits_source                      │
-  │ user__visit__user__visit_buy_conversion_rate_7days_fill_nulls_with_0       │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,buys_source,visits_source                      │
-  │ user__visit__user__visit_buy_conversion_rate_by_session                    │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,buys_source,visits_source                      │
-  │ user__visit__user__visit_buy_conversion_rate_with_monthly_conversion       │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,buys_source,visits_source                      │
-  │ user__visit__user__visit_buy_conversions                                   │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,buys_source,visits_source                      │
   │ user__visit__user__visits                                                  │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,visits_source                                  │
   │ user__visit__user__visits_fill_nulls_with_0_join_to_timespine              │ visit,user                     │ METRIC           │ JOINED,METRIC                          │ accounts_source,visits_source                                  │
   │ user__visit_buy_conversion_rate                                            │ user                           │ METRIC           │ JOINED,METRIC                          │ accounts_source,buys_source,visits_source                      │
