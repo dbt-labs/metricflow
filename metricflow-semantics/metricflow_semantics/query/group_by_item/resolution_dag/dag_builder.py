@@ -12,10 +12,10 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-    MeasureGroupByItemSourceNode,
+    SimpleMetricGroupByItemSourceNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    MetricGroupByItemResolutionNode,
+    ComplexMetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
     NoMetricsGroupByItemSourceNode,
@@ -37,7 +37,7 @@ class GroupByItemResolutionDagBuilder:
         self,
         metric_reference: MetricReference,
         metric_input_location: Optional[InputMetricDefinitionLocation],
-    ) -> MetricGroupByItemResolutionNode:
+    ) -> ComplexMetricGroupByItemResolutionNode:
         """Builds a DAG component that represents the resolution flow for a metric."""
         metric = self._manifest_lookup.metric_lookup.get_metric(metric_reference)
 
@@ -57,19 +57,19 @@ class GroupByItemResolutionDagBuilder:
                 )
 
             source_candidates_for_measure_nodes = tuple(
-                MeasureGroupByItemSourceNode.create(
+                SimpleMetricGroupByItemSourceNode.create(
                     measure_reference=measure_reference,
                     child_metric_reference=metric_reference,
                 )
                 for measure_reference in measure_references_for_metric
             )
-            return MetricGroupByItemResolutionNode.create(
+            return ComplexMetricGroupByItemResolutionNode.create(
                 metric_reference=metric_reference,
                 metric_input_location=metric_input_location,
                 parent_nodes=source_candidates_for_measure_nodes,
             )
         # For a derived metric, the parents are other metrics.
-        return MetricGroupByItemResolutionNode.create(
+        return ComplexMetricGroupByItemResolutionNode.create(
             metric_reference=metric_reference,
             metric_input_location=metric_input_location,
             parent_nodes=tuple(

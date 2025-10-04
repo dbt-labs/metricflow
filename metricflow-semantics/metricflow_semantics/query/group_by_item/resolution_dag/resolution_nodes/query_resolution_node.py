@@ -17,7 +17,7 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    MetricGroupByItemResolutionNode,
+    ComplexMetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
     NoMetricsGroupByItemSourceNode,
@@ -35,13 +35,13 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
         where_filter_intersection: The intersection of where filters.
     """
 
-    parent_nodes: Tuple[Union[MetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode], ...]
+    parent_nodes: Tuple[Union[ComplexMetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode], ...]
     metrics_in_query: Tuple[MetricReference, ...]
     where_filter_intersection: WhereFilterIntersection
 
     @staticmethod
     def create(  # noqa: D102
-        parent_nodes: Sequence[Union[MetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode]],
+        parent_nodes: Sequence[Union[ComplexMetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode]],
         metrics_in_query: Sequence[MetricReference],
         where_filter_intersection: WhereFilterIntersection,
     ) -> QueryGroupByItemResolutionNode:

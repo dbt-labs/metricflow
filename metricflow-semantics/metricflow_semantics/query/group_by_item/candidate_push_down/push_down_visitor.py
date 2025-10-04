@@ -28,10 +28,10 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-    MeasureGroupByItemSourceNode,
+    SimpleMetricGroupByItemSourceNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    MetricGroupByItemResolutionNode,
+    ComplexMetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
     NoMetricsGroupByItemSourceNode,
@@ -169,7 +169,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         self._group_by_item_resolver_for_query = group_by_item_resolver
 
     @override
-    def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> PushDownResult:
+    def visit_simple_metric_node(self, node: SimpleMetricGroupByItemSourceNode) -> PushDownResult:
         """Push the group-by-item specs that are available to the measure and match the source patterns to the child."""
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.debug(LazyFormat(lambda: f"Handling {node.ui_description}"))
@@ -314,7 +314,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         )
 
     @override
-    def visit_metric_node(self, node: MetricGroupByItemResolutionNode) -> PushDownResult:
+    def visit_complex_metric_node(self, node: ComplexMetricGroupByItemResolutionNode) -> PushDownResult:
         """At the metric node, intersect candidates from the parents and pass them to the children.
 
         This node can represent a metric that prevents querying by some types of group-by items. To model that

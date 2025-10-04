@@ -14,7 +14,7 @@ from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamin
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    MetricGroupByItemResolutionNode,
+    ComplexMetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY, MTD_SPEC_MONTH, MTD_SPEC_YEAR
@@ -138,7 +138,7 @@ def test_missing_parent_for_metric(
     or measures). However, in the event of a validation gap upstream, we sometimes encounter inscrutable errors
     caused by missing parent nodes for these input types, so we add a more informative error and test for it here.
     """
-    metric_node = MetricGroupByItemResolutionNode.create(
+    metric_node = ComplexMetricGroupByItemResolutionNode.create(
         metric_reference=MetricReference(element_name="bad_metric"), metric_input_location=None, parent_nodes=tuple()
     )
     resolution_dag = GroupByItemResolutionDag(sink_node=metric_node)

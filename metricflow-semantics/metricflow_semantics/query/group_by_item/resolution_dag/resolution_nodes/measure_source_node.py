@@ -17,7 +17,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)
-class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
+class SimpleMetricGroupByItemSourceNode(GroupByItemResolutionNode):
     """Outputs group-by-items for a measure.
 
     Attributes:
@@ -36,8 +36,8 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
     def create(  # noqa: D102
         measure_reference: MeasureReference,
         child_metric_reference: MetricReference,
-    ) -> MeasureGroupByItemSourceNode:
-        return MeasureGroupByItemSourceNode(
+    ) -> SimpleMetricGroupByItemSourceNode:
+        return SimpleMetricGroupByItemSourceNode(
             parent_nodes=(),
             measure_reference=measure_reference,
             child_metric_reference=child_metric_reference,
@@ -45,7 +45,7 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
 
     @override
     def accept(self, visitor: GroupByItemResolutionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
-        return visitor.visit_measure_node(self)
+        return visitor.visit_simple_metric_node(self)
 
     @property
     @override
@@ -78,4 +78,4 @@ class MeasureGroupByItemSourceNode(GroupByItemResolutionNode):
 
     @override
     def _self_set(self) -> GroupByItemResolutionNodeSet:
-        return GroupByItemResolutionNodeSet(measure_nodes=(self,))
+        return GroupByItemResolutionNodeSet(simple_metric_nodes=(self,))
