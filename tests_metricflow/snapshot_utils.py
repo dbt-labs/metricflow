@@ -123,8 +123,8 @@ def assert_sql_snapshot_equal(
 def assert_str_snapshot_equal(  # type: ignore[misc]
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    snapshot_id: str,
     snapshot_str: str,
+    snapshot_id: str = "result",
     snapshot_file_extension: str = ".txt",
     sql_engine: Optional[SqlEngine] = None,
     expectation_description: Optional[str] = None,
