@@ -245,6 +245,15 @@ metric:
       name: bookings
     denominator:
       name: booking_value
+
+---
+metric:
+  name: "account_balance"
+  description: "account_balance"
+  type: simple
+  type_params:
+    measure: account_balance
+
 ---
 metric:
   name: "total_account_balance_first_day"
