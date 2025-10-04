@@ -15,13 +15,13 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-    MeasureGroupByItemSourceNode,
+    SimpleMetricGroupByItemSourceNode,
 )
 from metricflow_semantics.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)
-class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
+class ComplexMetricGroupByItemResolutionNode(GroupByItemResolutionNode):
     """Outputs group-by-items relevant to a metric based on the input group-by-items.
 
     Attributes:
@@ -32,15 +32,15 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
 
     metric_reference: MetricReference
     metric_input_location: Optional[InputMetricDefinitionLocation]
-    parent_nodes: Tuple[Union[MeasureGroupByItemSourceNode, MetricGroupByItemResolutionNode], ...]
+    parent_nodes: Tuple[Union[SimpleMetricGroupByItemSourceNode, ComplexMetricGroupByItemResolutionNode], ...]
 
     @staticmethod
     def create(  # noqa: D102
         metric_reference: MetricReference,
         metric_input_location: Optional[InputMetricDefinitionLocation],
-        parent_nodes: Sequence[Union[MeasureGroupByItemSourceNode, MetricGroupByItemResolutionNode]],
-    ) -> MetricGroupByItemResolutionNode:
-        return MetricGroupByItemResolutionNode(
+        parent_nodes: Sequence[Union[SimpleMetricGroupByItemSourceNode, ComplexMetricGroupByItemResolutionNode]],
+    ) -> ComplexMetricGroupByItemResolutionNode:
+        return ComplexMetricGroupByItemResolutionNode(
             metric_reference=metric_reference,
             metric_input_location=metric_input_location,
             parent_nodes=tuple(parent_nodes),
@@ -48,7 +48,7 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
 
     @override
     def accept(self, visitor: GroupByItemResolutionNodeVisitor[VisitorOutputT]) -> VisitorOutputT:
-        return visitor.visit_metric_node(self)
+        return visitor.visit_complex_metric_node(self)
 
     @property
     @override
@@ -82,4 +82,4 @@ class MetricGroupByItemResolutionNode(GroupByItemResolutionNode):
 
     @override
     def _self_set(self) -> GroupByItemResolutionNodeSet:
-        return GroupByItemResolutionNodeSet(metric_nodes=(self,))
+        return GroupByItemResolutionNodeSet(complex_metric_nodes=(self,))

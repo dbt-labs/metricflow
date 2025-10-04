@@ -6,13 +6,13 @@ from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, MetricFlowDag
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    MetricGroupByItemResolutionNode,
+    ComplexMetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
     QueryGroupByItemResolutionNode,
 )
 
-ResolutionDagSinkNode = Union[QueryGroupByItemResolutionNode, MetricGroupByItemResolutionNode]
+ResolutionDagSinkNode = Union[QueryGroupByItemResolutionNode, ComplexMetricGroupByItemResolutionNode]
 
 
 class GroupByItemResolutionDag(MetricFlowDag[GroupByItemResolutionNode]):

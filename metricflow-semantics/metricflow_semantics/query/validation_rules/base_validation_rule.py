@@ -32,7 +32,7 @@ class PostResolutionQueryValidationRule(ABC):
         self._resolve_metric_result = resolve_metric_result
 
     @abstractmethod
-    def validate_measure_in_resolution_dag(
+    def validate_simple_metric_in_resolution_dag(
         self,
         measure_reference: MeasureReference,
         resolution_path: MetricFlowQueryResolutionPath,
@@ -44,7 +44,7 @@ class PostResolutionQueryValidationRule(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def validate_metric_in_resolution_dag(
+    def validate_complex_metric_in_resolution_dag(
         self,
         metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,

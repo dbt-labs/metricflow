@@ -698,11 +698,11 @@ class MetricFlowQueryResolver:
         measure_references: Set[MeasureReference] = set()
 
         # Collect measures for metrics through the associated measure nodes.
-        for measure_node in resolution_dag_node_set.measure_nodes:
+        for measure_node in resolution_dag_node_set.simple_metric_nodes:
             measure_references.add(measure_node.measure_reference)
 
         # For conversion metrics, get the measures through the metric since those measures aren't in the DAG.
-        for metric_node in resolution_dag_node_set.metric_nodes:
+        for metric_node in resolution_dag_node_set.complex_metric_nodes:
             metric = self._manifest_lookup.metric_lookup.get_metric(metric_node.metric_reference)
             conversion_type_params = metric.type_params.conversion_type_params
             if conversion_type_params is None:

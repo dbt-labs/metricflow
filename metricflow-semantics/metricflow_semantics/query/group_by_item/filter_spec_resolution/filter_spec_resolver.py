@@ -34,10 +34,10 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-    MeasureGroupByItemSourceNode,
+    SimpleMetricGroupByItemSourceNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    MetricGroupByItemResolutionNode,
+    ComplexMetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
     NoMetricsGroupByItemSourceNode,
@@ -218,13 +218,13 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         return patterns_in_filter
 
     @override
-    def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
+    def visit_simple_metric_node(self, node: SimpleMetricGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
         """No filters are defined in measures, so this is a no-op."""
         with self._path_from_start_node_tracker.track_node_visit(node):
             return FilterSpecResolutionLookUp.empty_instance()
 
     @override
-    def visit_metric_node(self, node: MetricGroupByItemResolutionNode) -> FilterSpecResolutionLookUp:
+    def visit_complex_metric_node(self, node: ComplexMetricGroupByItemResolutionNode) -> FilterSpecResolutionLookUp:
         """Resolve specs for filters in a metric definition."""
         with self._path_from_start_node_tracker.track_node_visit(node) as resolution_path:
             results_to_merge: List[FilterSpecResolutionLookUp] = []
@@ -271,7 +271,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             return FilterSpecResolutionLookUp.empty_instance()
 
     def _get_where_filters_at_metric_node(
-        self, metric_node: MetricGroupByItemResolutionNode
+        self, metric_node: ComplexMetricGroupByItemResolutionNode
     ) -> Dict[WhereFilterLocation, Set[WhereFilter]]:
         """Return the filters used with a metric in the manifest.
 

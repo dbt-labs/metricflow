@@ -125,7 +125,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         )
 
     @override
-    def validate_metric_in_resolution_dag(
+    def validate_complex_metric_in_resolution_dag(
         self,
         metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
@@ -169,7 +169,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         return MetricFlowQueryResolutionIssueSet.empty_instance()
 
     @override
-    def validate_measure_in_resolution_dag(
+    def validate_simple_metric_in_resolution_dag(
         self,
         measure_reference: MeasureReference,
         resolution_path: MetricFlowQueryResolutionPath,
