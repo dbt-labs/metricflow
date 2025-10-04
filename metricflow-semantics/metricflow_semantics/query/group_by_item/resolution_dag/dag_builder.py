@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Sequence, Tuple
+from typing import Optional, Sequence, Union
 
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
-from dbt_semantic_interfaces.type_enums import MetricType
+from dbt_semantic_interfaces.references import MetricReference
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
@@ -37,51 +37,32 @@ class GroupByItemResolutionDagBuilder:
         self,
         metric_reference: MetricReference,
         metric_input_location: Optional[InputMetricDefinitionLocation],
-    ) -> ComplexMetricGroupByItemResolutionNode:
+    ) -> Union[SimpleMetricGroupByItemSourceNode, ComplexMetricGroupByItemResolutionNode]:
         """Builds a DAG component that represents the resolution flow for a metric."""
         metric = self._manifest_lookup.metric_lookup.get_metric(metric_reference)
 
-        # For a base metric, the parents are measure nodes
-        if len(metric.input_metrics) == 0:
-            measure_references_for_metric: Tuple[MeasureReference, ...]
-            if metric.type is MetricType.CONVERSION:
-                conversion_type_params = metric.type_params.conversion_type_params
-                assert (
-                    conversion_type_params
-                ), "A conversion metric should have type_params.conversion_type_params defined."
-                assert conversion_type_params.base_measure is not None, "A conversion metric must have a base measure."
-                measure_references_for_metric = (conversion_type_params.base_measure.measure_reference,)
-            else:
-                measure_references_for_metric = tuple(
-                    input_measure.measure_reference for input_measure in metric.input_measures
-                )
+        metric_inputs = MetricLookup.metric_inputs(metric, include_conversion_metric_input=False)
 
-            source_candidates_for_measure_nodes = tuple(
-                SimpleMetricGroupByItemSourceNode.create(
-                    measure_reference=measure_reference,
-                    child_metric_reference=metric_reference,
+        if len(metric_inputs) == 0:
+            return SimpleMetricGroupByItemSourceNode.create(metric_reference, metric_input_location)
+
+        parent_nodes: list[Union[SimpleMetricGroupByItemSourceNode, ComplexMetricGroupByItemResolutionNode]] = []
+        for i, metric_input in enumerate(metric_inputs):
+            metric_input_reference = MetricReference(metric_input.name)
+            parent_nodes.append(
+                self._build_dag_component_for_metric(
+                    metric_reference=metric_input_reference,
+                    metric_input_location=InputMetricDefinitionLocation(
+                        metric_reference,
+                        input_metric_list_index=i,
+                    ),
                 )
-                for measure_reference in measure_references_for_metric
             )
-            return ComplexMetricGroupByItemResolutionNode.create(
-                metric_reference=metric_reference,
-                metric_input_location=metric_input_location,
-                parent_nodes=source_candidates_for_measure_nodes,
-            )
-        # For a derived metric, the parents are other metrics.
+
         return ComplexMetricGroupByItemResolutionNode.create(
             metric_reference=metric_reference,
             metric_input_location=metric_input_location,
-            parent_nodes=tuple(
-                self._build_dag_component_for_metric(
-                    metric_reference=metric_input.as_reference,
-                    metric_input_location=InputMetricDefinitionLocation(
-                        derived_metric_reference=metric_reference,
-                        input_metric_list_index=metric_input_index,
-                    ),
-                )
-                for metric_input_index, metric_input in enumerate(metric.input_metrics)
-            ),
+            parent_nodes=tuple(parent_nodes),
         )
 
     def _build_dag_component_for_query(

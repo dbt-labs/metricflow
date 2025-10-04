@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeSet,
@@ -18,15 +19,15 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 @dataclass(frozen=True)
 class SimpleMetricGroupByItemSourceNode(GroupByItemResolutionNode):
-    """Outputs group-by-items for a measure.
+    """Outputs group-by-items for a simple metric.
 
     Attributes:
-        measure_reference: Get the group-by items for this measure.
-        child_metric_reference: The metric that uses this measure.
+        metric_reference: Get the group-by items for this simple metric.
+        metric_input_location: Optional[InputMetricDefinitionLocation]
     """
 
-    measure_reference: MeasureReference
-    child_metric_reference: MetricReference
+    metric_reference: MetricReference
+    metric_input_location: Optional[InputMetricDefinitionLocation]
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
@@ -34,13 +35,12 @@ class SimpleMetricGroupByItemSourceNode(GroupByItemResolutionNode):
 
     @staticmethod
     def create(  # noqa: D102
-        measure_reference: MeasureReference,
-        child_metric_reference: MetricReference,
+        simple_metric_reference: MetricReference, metric_input_location: Optional[InputMetricDefinitionLocation]
     ) -> SimpleMetricGroupByItemSourceNode:
         return SimpleMetricGroupByItemSourceNode(
             parent_nodes=(),
-            measure_reference=measure_reference,
-            child_metric_reference=child_metric_reference,
+            metric_reference=simple_metric_reference,
+            metric_input_location=metric_input_location,
         )
 
     @override
@@ -50,7 +50,7 @@ class SimpleMetricGroupByItemSourceNode(GroupByItemResolutionNode):
     @property
     @override
     def description(self) -> str:
-        return "Output group-by-items available for this measure."
+        return "Output group-by-items available for this simple metric."
 
     @classmethod
     @override
@@ -62,19 +62,15 @@ class SimpleMetricGroupByItemSourceNode(GroupByItemResolutionNode):
     def displayed_properties(self) -> Sequence[DisplayedProperty]:
         return tuple(super().displayed_properties) + (
             DisplayedProperty(
-                key="measure_reference",
-                value=str(self.measure_reference),
-            ),
-            DisplayedProperty(
-                key="child_metric_reference",
-                value=str(self.child_metric_reference),
+                key="metric_reference",
+                value=str(self.metric_reference),
             ),
         )
 
     @property
     @override
     def ui_description(self) -> str:
-        return f"Measure({repr(self.measure_reference.element_name)})"
+        return f"SimpleMetric({repr(self.metric_reference.element_name)})"
 
     @override
     def _self_set(self) -> GroupByItemResolutionNodeSet:

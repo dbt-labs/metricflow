@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Sequence, Tuple, Union
+from typing import List, Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
@@ -16,12 +16,6 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNodeSet,
     GroupByItemResolutionNodeVisitor,
 )
-from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    ComplexMetricGroupByItemResolutionNode,
-)
-from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
-    NoMetricsGroupByItemSourceNode,
-)
 from metricflow_semantics.visitor import VisitorOutputT
 
 
@@ -35,13 +29,13 @@ class QueryGroupByItemResolutionNode(GroupByItemResolutionNode):
         where_filter_intersection: The intersection of where filters.
     """
 
-    parent_nodes: Tuple[Union[ComplexMetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode], ...]
+    parent_nodes: Tuple[GroupByItemResolutionNode, ...]
     metrics_in_query: Tuple[MetricReference, ...]
     where_filter_intersection: WhereFilterIntersection
 
     @staticmethod
     def create(  # noqa: D102
-        parent_nodes: Sequence[Union[ComplexMetricGroupByItemResolutionNode, NoMetricsGroupByItemSourceNode]],
+        parent_nodes: Sequence[GroupByItemResolutionNode],
         metrics_in_query: Sequence[MetricReference],
         where_filter_intersection: WhereFilterIntersection,
     ) -> QueryGroupByItemResolutionNode:

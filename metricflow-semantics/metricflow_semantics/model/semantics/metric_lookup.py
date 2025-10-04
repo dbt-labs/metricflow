@@ -127,7 +127,7 @@ class MetricLookup:
         return self._metrics[metric_reference]
 
     @staticmethod
-    def metric_inputs(metric: Metric) -> Sequence[MetricInput]:
+    def metric_inputs(metric: Metric, include_conversion_metric_input: bool) -> Sequence[MetricInput]:
         """Returns the metric inputs for the given metric."""
         metric_type = metric.type
         metric_inputs: list[MetricInput] = []
@@ -190,12 +190,15 @@ class MetricLookup:
                 )
             metric_inputs.append(base_metric)
 
-            conversion_metric = conversion_type_params.conversion_metric
-            if conversion_metric is None:
-                raise InvalidManifestException(
-                    LazyFormat("Expected `conversion_metric` to be set for a conversion metric", complex_metric=metric)
-                )
-            metric_inputs.append(conversion_metric)
+            if include_conversion_metric_input:
+                conversion_metric = conversion_type_params.conversion_metric
+                if conversion_metric is None:
+                    raise InvalidManifestException(
+                        LazyFormat(
+                            "Expected `conversion_metric` to be set for a conversion metric", complex_metric=metric
+                        )
+                    )
+                metric_inputs.append(conversion_metric)
 
         elif metric_type is MetricType.DERIVED:
             metrics = metric.type_params.metrics

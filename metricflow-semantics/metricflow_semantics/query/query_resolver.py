@@ -7,8 +7,9 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
@@ -695,11 +696,11 @@ class MetricFlowQueryResolver:
         """Return the semantic model references for the measures used in the query."""
         resolution_dag_node_set = resolution_dag.sink_node.inclusive_ancestors()
 
-        measure_references: Set[MeasureReference] = set()
+        simple_metric_references: Set[MetricReference] = set()
 
         # Collect measures for metrics through the associated measure nodes.
-        for measure_node in resolution_dag_node_set.simple_metric_nodes:
-            measure_references.add(measure_node.measure_reference)
+        for simple_metric_node in resolution_dag_node_set.simple_metric_nodes:
+            simple_metric_references.add(simple_metric_node.metric_reference)
 
         # For conversion metrics, get the measures through the metric since those measures aren't in the DAG.
         for metric_node in resolution_dag_node_set.complex_metric_nodes:
@@ -709,18 +710,21 @@ class MetricFlowQueryResolver:
                 continue
 
             # The base measure should be in a DAG, but just in case.
-            assert conversion_type_params.base_measure is not None, "A conversion metric must have a base measure."
+            assert conversion_type_params.base_metric is not None, "A conversion metric must have a base metric."
             assert (
-                conversion_type_params.conversion_measure is not None
+                conversion_type_params.conversion_metric is not None
             ), "A conversion metric must have a conversion measure."
-            measure_references.add(conversion_type_params.base_measure.measure_reference)
-            measure_references.add(conversion_type_params.conversion_measure.measure_reference)
+            simple_metric_references.add(MetricReference(conversion_type_params.base_metric.name))
+            simple_metric_references.add(MetricReference(conversion_type_params.conversion_metric.name))
 
         model_references: Set[SemanticModelReference] = set()
-        for measure_reference in measure_references:
-            measure_semantic_model = self._manifest_lookup.semantic_model_lookup.measure_lookup.get_properties(
-                measure_reference
-            ).model_reference
-            model_references.add(measure_semantic_model)
+        for simple_metric_reference in simple_metric_references:
+            metric = self._manifest_lookup.metric_lookup.get_metric(simple_metric_reference)
+            metric_aggregation_params = metric.type_params.metric_aggregation_params
+            if metric_aggregation_params is None:
+                raise InvalidManifestException(
+                    LazyFormat("Metric does not have `metric_aggregation_params` set", metric=metric)
+                )
+            model_references.add(SemanticModelReference(metric_aggregation_params.semantic_model))
 
         return model_references

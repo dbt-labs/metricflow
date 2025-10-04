@@ -25,7 +25,8 @@ from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visi
     _PushDownGroupByItemCandidatesVisitor,
 )
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
-from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag, ResolutionDagSinkNode
+from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
+from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.group_by_item_resolver.ambiguous_group_by_item import AmbiguousGroupByItemIssue
 from metricflow_semantics.query.issues.issues_base import (
@@ -155,7 +156,7 @@ class GroupByItemResolver:
         self,
         input_str: str,
         spec_pattern: SpecPattern,
-        resolution_node: ResolutionDagSinkNode,
+        resolution_node: GroupByItemResolutionNode,
         filter_location: WhereFilterLocation,
     ) -> GroupByItemResolution:
         """Returns the spec that matches the spec_pattern associated with the filter in the given node.
@@ -218,7 +219,7 @@ class GroupByItemResolver:
 
     def resolve_available_items(
         self,
-        resolution_node: Optional[ResolutionDagSinkNode] = None,
+        resolution_node: Optional[GroupByItemResolutionNode] = None,
         source_spec_patterns: Sequence[SpecPattern] = (),
     ) -> AvailableGroupByItemsResolution:
         """Return all available group-by-items at a given node.

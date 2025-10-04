@@ -74,9 +74,9 @@ class ComplexMetricGroupByItemResolutionNode(GroupByItemResolutionNode):
     @override
     def ui_description(self) -> str:
         if self.metric_input_location is None:
-            return f"Metric({repr(self.metric_reference.element_name)})"
+            return f"ComplexMetric({repr(self.metric_reference.element_name)})"
         return (
-            f"Metric({repr(self.metric_reference.element_name)}, "
+            f"ComplexMetric({repr(self.metric_reference.element_name)}, "
             f"input_metric_index={self.metric_input_location.input_metric_list_index})"
         )
 

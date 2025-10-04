@@ -1,18 +1,8 @@
 from __future__ import annotations
 
-from typing import Union
-
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, MetricFlowDag
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
-from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    ComplexMetricGroupByItemResolutionNode,
-)
-from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
-    QueryGroupByItemResolutionNode,
-)
-
-ResolutionDagSinkNode = Union[QueryGroupByItemResolutionNode, ComplexMetricGroupByItemResolutionNode]
 
 
 class GroupByItemResolutionDag(MetricFlowDag[GroupByItemResolutionNode]):
@@ -28,7 +18,7 @@ class GroupByItemResolutionDag(MetricFlowDag[GroupByItemResolutionNode]):
     realize limitations appropriate to that node.
     """
 
-    def __init__(self, sink_node: ResolutionDagSinkNode) -> None:  # noqa: D107
+    def __init__(self, sink_node: GroupByItemResolutionNode) -> None:  # noqa: D107
         super().__init__(
             dag_id=DagId.from_id_prefix(StaticIdPrefix.GROUP_BY_ITEM_RESOLUTION_DAG),
             sink_nodes=[sink_node],
@@ -36,5 +26,5 @@ class GroupByItemResolutionDag(MetricFlowDag[GroupByItemResolutionNode]):
         self._sink_node = sink_node
 
     @property
-    def sink_node(self) -> ResolutionDagSinkNode:  # noqa: D102
+    def sink_node(self) -> GroupByItemResolutionNode:  # noqa: D102
         return self._sink_node
