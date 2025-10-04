@@ -5,7 +5,7 @@ import logging
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.semantic_graph.builder.entity_join_subgraph import EntityJoinSubgraphGenerator
-from metricflow_semantics.experimental.semantic_graph.builder.measure_subgraph import MeasureSubgraphGenerator
+from metricflow_semantics.experimental.semantic_graph.builder.measure_subgraph import SimpleMetricSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
     TimeDimensionSubgraphGenerator,
 )
@@ -30,7 +30,7 @@ def test_minimal_manifest(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         semantic_manifest=sg_00_minimal_manifest,
         subgraph_generators=[
-            MeasureSubgraphGenerator,
+            SimpleMetricSubgraphGenerator,
             EntityJoinSubgraphGenerator,
             TimeDimensionSubgraphGenerator,
         ],

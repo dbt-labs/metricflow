@@ -369,13 +369,10 @@ class _MetricNameToEntityKeyTrieGenerator:
         self._metric_node_to_entity_key_trie = {}
 
         local_model_nodes = current_graph.nodes_with_labels(LocalModelLabel.get_instance())
-        measure_nodes = current_graph.nodes_with_labels(MeasureLabel.get_instance())
-
         allowed_nodes_for_walking_from_metrics_to_models: MutableOrderedSet[SemanticGraphNode] = MutableOrderedSet(
             local_model_nodes
         )
         allowed_nodes_for_walking_from_metrics_to_models.update(self._metric_nodes_in_current_graph)
-        allowed_nodes_for_walking_from_metrics_to_models.update(measure_nodes)
 
         if self._verbose_debug_logs:
             logger.debug(

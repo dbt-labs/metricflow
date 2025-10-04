@@ -14,8 +14,8 @@ from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator
 from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
+    BaseMetricNode,
     LocalModelNode,
-    MeasureNode,
     MetricTimeNode,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
@@ -25,21 +25,21 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
 logger = logging.getLogger(__name__)
 
 
-class MeasureSubgraphGenerator(SemanticSubgraphGenerator):
-    """Generate the subgraph that relates measures to other entities.
+class SimpleMetricSubgraphGenerator(SemanticSubgraphGenerator):
+    """Generate the subgraph that relates simple metrics to other entities.
 
-    For each measure, this adds the following edges:
+    For each simple metric, this adds the following edges:
 
-    * MeasureNode -> LocalModelNode (corresponding to the semantic model where the measure is defined)
-    * MeasureNode -> MetricTimeNode (edge describes aggregation time grain)
+    * SimpleMetricNode -> LocalModelNode (corresponding to the semantic model where the simple metric is defined)
+    * SimpleMetricNode -> MetricTimeNode (edge describes aggregation time grain)
     """
 
     @override
     def add_edges_for_manifest(self, edge_list: list[SemanticGraphEdge]) -> None:
         for measure_lookup in self._manifest_object_lookup.simple_metric_model_lookups:
-            self._add_edges_for_measure_model(measure_lookup, edge_list)
+            self._add_edges_for_simple_metric_model(measure_lookup, edge_list)
 
-    def _add_edges_for_measure_model(
+    def _add_edges_for_simple_metric_model(
         self, lookup: SimpleMetricModelObjectLookup, edge_list: list[SemanticGraphEdge]
     ) -> None:
         model_id = SemanticModelId.get_instance(model_name=lookup.semantic_model.name)
@@ -53,16 +53,13 @@ class MeasureSubgraphGenerator(SemanticSubgraphGenerator):
         ) in lookup.aggregation_configuration_to_simple_metric_inputs.items():
             # For all simple metric inputs:
             for simple_metric_input in simple_metric_inputs:
-                measure_name = simple_metric_input.name
+                simple_metric_name = simple_metric_input.name
 
-                measure_node = MeasureNode.get_instance(
-                    measure_name=measure_name,
-                    source_model_id=model_id,
-                )
+                simple_metric_node = BaseMetricNode.get_instance(simple_metric_name)
                 # Add an edge from the measure node to the metric-time node.
                 edge_list.append(
                     EntityRelationshipEdge.create(
-                        tail_node=measure_node,
+                        tail_node=simple_metric_node,
                         head_node=metric_time_node,
                         recipe_update=AttributeRecipeStep(
                             set_source_time_grain=aggregation_configuration.time_grain,
@@ -73,7 +70,7 @@ class MeasureSubgraphGenerator(SemanticSubgraphGenerator):
                 # Add an edge from the measure node to the model node.
                 edge_list.append(
                     EntityRelationshipEdge.create(
-                        tail_node=measure_node,
+                        tail_node=simple_metric_node,
                         head_node=local_model_node,
                     )
                 )
