@@ -14,9 +14,9 @@ from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator
 from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import EntityRelationshipEdge
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
-    BaseMetricNode,
     LocalModelNode,
     MetricTimeNode,
+    SimpleMetricNode,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
@@ -55,7 +55,7 @@ class SimpleMetricSubgraphGenerator(SemanticSubgraphGenerator):
             for simple_metric_input in simple_metric_inputs:
                 simple_metric_name = simple_metric_input.name
 
-                simple_metric_node = BaseMetricNode.get_instance(simple_metric_name)
+                simple_metric_node = SimpleMetricNode.get_instance(simple_metric_name)
                 # Add an edge from the measure node to the metric-time node.
                 edge_list.append(
                     EntityRelationshipEdge.create(

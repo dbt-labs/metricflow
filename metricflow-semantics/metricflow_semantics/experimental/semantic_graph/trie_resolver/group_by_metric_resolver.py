@@ -24,10 +24,10 @@ from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import MetricNode, MetricTimeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
-    BaseMetricLabel,
     LocalModelLabel,
     MeasureLabel,
     MetricLabel,
+    SimpleMetricLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
@@ -270,8 +270,8 @@ class _MetricNameToEntityKeyTrieGenerator:
         typed_collection = SemanticGraphNodeTypedCollection()
         for metric_node in node_labeled_as_metric_nodes:
             metric_node.add_to_typed_collection(typed_collection)
-        metric_nodes: AnyLengthTuple[MetricNode] = tuple(typed_collection.base_metric_nodes) + tuple(
-            typed_collection.derived_metric_nodes
+        metric_nodes: AnyLengthTuple[MetricNode] = tuple(typed_collection.simple_metric_nodes) + tuple(
+            typed_collection.complex_metric_nodes
         )
         assert len(node_labeled_as_metric_nodes) == len(metric_nodes)
         self._metric_nodes_in_current_graph = metric_nodes
@@ -346,7 +346,7 @@ class _MetricNameToEntityKeyTrieGenerator:
         current_graph = self._current_graph
         path_finder = self._path_finder
 
-        base_metric_label = BaseMetricLabel.get_instance()
+        base_metric_label = SimpleMetricLabel.get_instance()
         base_metric_nodes = current_graph.nodes_with_labels(base_metric_label)
 
         if len(base_metric_nodes) == 0:

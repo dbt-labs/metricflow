@@ -21,14 +21,14 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attri
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
-    BaseMetricLabel,
+    ComplexMetricLabel,
     ConfiguredEntityLabel,
-    DerivedMetricLabel,
     JoinedModelLabel,
     LocalModelLabel,
     MeasureLabel,
     MetricLabel,
     MetricTimeLabel,
+    SimpleMetricLabel,
     TimeClusterLabel,
     TimeDimensionLabel,
 )
@@ -346,56 +346,57 @@ class MetricNode(SemanticGraphNode, ABC):
 
 
 @fast_frozen_dataclass(order=False)
-class BaseMetricNode(MetricNode, Singleton):
-    """Represents a metric without successors to other metric nodes.
-
-    All non-derived metrics are represented by this node.
-    """
+class SimpleMetricNode(MetricNode, Singleton):
+    """Represents a simple metric."""
 
     @classmethod
-    def get_instance(cls, metric_name: str) -> BaseMetricNode:  # noqa: D102
+    def get_instance(cls, metric_name: str) -> SimpleMetricNode:  # noqa: D102
         return cls._get_instance(metric_name=metric_name)
 
     @cached_property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor(
-            node_name=f"BaseMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
+            node_name=f"SimpleMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
         )
 
     @cached_property
     @override
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
-        return super(BaseMetricNode, self).labels.union((BaseMetricLabel.get_instance(),))
+        return super(SimpleMetricNode, self).labels.union((SimpleMetricLabel.get_instance(),))
 
     @override
     def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
-        typed_collection.base_metric_nodes.add(self)
+        typed_collection.simple_metric_nodes.add(self)
 
 
 @fast_frozen_dataclass(order=False)
-class DerivedMetricNode(MetricNode, Singleton):
-    """Represents derived metrics."""
+class ComplexMetricNode(MetricNode, Singleton):
+    """Represents metrics that are defined from other metrics.
+
+    With the replacement of measures by simple metrics, metric types like ratio, cumulative, and conversion are like
+    derived metrics. To avoid confusion with the `derived` metric type, the `complex` prefix is used.
+    """
 
     @classmethod
-    def get_instance(cls, metric_name: str) -> DerivedMetricNode:  # noqa: D102
+    def get_instance(cls, metric_name: str) -> ComplexMetricNode:  # noqa: D102
         return cls._get_instance(metric_name=metric_name)
 
     @cached_property
     @override
     def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
         return MetricflowGraphNodeDescriptor(
-            node_name=f"DerivedMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
+            node_name=f"ComplexMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
         )
 
     @cached_property
     @override
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
-        return super(DerivedMetricNode, self).labels.union((DerivedMetricLabel.get_instance(),))
+        return super(ComplexMetricNode, self).labels.union((ComplexMetricLabel.get_instance(),))
 
     @override
     def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
-        typed_collection.derived_metric_nodes.add(self)
+        typed_collection.complex_metric_nodes.add(self)
 
 
 @fast_frozen_dataclass(order=False)

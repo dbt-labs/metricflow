@@ -26,9 +26,9 @@ from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
 )
 from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import MetricDefinitionEdge
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
-    BaseMetricNode,
-    DerivedMetricNode,
+    ComplexMetricNode,
     MetricNode,
+    SimpleMetricNode,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
@@ -183,7 +183,7 @@ class ComplexMetricSubgraphGenerator(SemanticSubgraphGenerator):
                 )
             )
 
-        complex_metric_node = DerivedMetricNode.get_instance(complex_metric.name)
+        complex_metric_node = ComplexMetricNode.get_instance(complex_metric.name)
         additional_edge_labels = self._empty_edge_labels
 
         for input_metric in input_metrics:
@@ -236,7 +236,7 @@ class ComplexMetricSubgraphGenerator(SemanticSubgraphGenerator):
 
         if metric_type is MetricType.SIMPLE:
             metric_name = metric.name
-            metric_name_to_node[metric_name] = BaseMetricNode.get_instance(metric_name)
+            metric_name_to_node[metric_name] = SimpleMetricNode.get_instance(metric_name)
         elif (
             metric_type is MetricType.RATIO
             or metric_type is MetricType.CUMULATIVE

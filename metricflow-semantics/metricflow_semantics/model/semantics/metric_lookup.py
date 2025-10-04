@@ -186,18 +186,14 @@ class MetricLookup:
             base_metric = conversion_type_params.base_metric
             if base_metric is None:
                 raise InvalidManifestException(
-                    LazyFormat(
-                        "Expected `base_metric` to be set for a conversion metric", complex_metric=metric
-                    )
+                    LazyFormat("Expected `base_metric` to be set for a conversion metric", complex_metric=metric)
                 )
             metric_inputs.append(base_metric)
 
             conversion_metric = conversion_type_params.conversion_metric
             if conversion_metric is None:
                 raise InvalidManifestException(
-                    LazyFormat(
-                        "Expected `conversion_metric` to be set for a conversion metric", complex_metric=metric
-                    )
+                    LazyFormat("Expected `conversion_metric` to be set for a conversion metric", complex_metric=metric)
                 )
             metric_inputs.append(conversion_metric)
 
