@@ -16,9 +16,9 @@ from metricflow_semantics.experimental.semantic_graph.builder.entity_key_subgrap
     EntityKeySubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.measure_subgraph import (
-    MeasureSubgraphGenerator,
+    SimpleMetricSubgraphGenerator,
 )
-from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import MetricSubgraphGenerator
+from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import ComplexMetricSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import SemanticSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.time_dimension_subgraph import (
     TimeDimensionSubgraphGenerator,
@@ -41,10 +41,10 @@ class SemanticGraphBuilder:
         CategoricalDimensionSubgraphGenerator,
         EntityKeySubgraphGenerator,
         EntityJoinSubgraphGenerator,
-        MeasureSubgraphGenerator,
+        SimpleMetricSubgraphGenerator,
         TimeDimensionSubgraphGenerator,
         TimeEntitySubgraphGenerator,
-        MetricSubgraphGenerator,
+        ComplexMetricSubgraphGenerator,
     )
 
     @override

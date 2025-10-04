@@ -28,7 +28,6 @@ from metricflow_semantics.experimental.semantic_graph.edges.sg_edges import Metr
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
     BaseMetricNode,
     DerivedMetricNode,
-    MeasureNode,
     MetricNode,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
@@ -36,6 +35,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphNode,
 )
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 
 logger = logging.getLogger(__name__)
 
@@ -43,17 +43,17 @@ logger = logging.getLogger(__name__)
 class _SpecialCase(Enum):
     """Enumerates the special cases that affect the available group-by items for a metric."""
 
-    CONVERSION_MEASURE = "conversion_measure"
+    CONVERSION_INPUT_METRIC = "conversion_input_metric"
     CUMULATIVE_METRIC = "cumulative_metric"
     CUMULATIVE_METRIC_WITH_WINDOW_OR_GRAIN_TO_DATE = "cumulative_metric_with_window_or_grain_to_date"
     TIME_OFFSET_DERIVED_METRIC = "time_offset_derived_metric"
 
 
-class MetricSubgraphGenerator(SemanticSubgraphGenerator):
-    """Generates the subgraph that models the relationship between metrics.
+class ComplexMetricSubgraphGenerator(SemanticSubgraphGenerator):
+    """Generates the subgraph that models the relationship between complex metrics.
 
-    * The successors of base-metric nodes are measure nodes.
-    * The successors of derived-metric nodes are other metric nodes (base or derived).
+    * The successors of simple-metric nodes are metric time nodes / local-model nodes.
+    * The successors of complex-metric nodes are other metric nodes (complex or simple).
     """
 
     @override
@@ -76,7 +76,7 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
         # Maps the special cases to the labels that should be associated with the edge that connects a metric node
         # to successor nodes.
         self._special_case_to_successor_edge_label = {
-            _SpecialCase.CONVERSION_MEASURE: FrozenOrderedSet((DenyVisibleAttributesLabel.get_instance(),)),
+            _SpecialCase.CONVERSION_INPUT_METRIC: FrozenOrderedSet((DenyVisibleAttributesLabel.get_instance(),)),
             _SpecialCase.CUMULATIVE_METRIC: common_cumulative_metric_labels,
             _SpecialCase.CUMULATIVE_METRIC_WITH_WINDOW_OR_GRAIN_TO_DATE: common_cumulative_metric_labels.union(
                 (DenyEntityKeyQueryResolutionLabel.get_instance(),)
@@ -95,110 +95,95 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
                 edge_list=edge_list,
             )
 
-    def _add_edges_for_base_metric(
+    def _add_edges_for_complex_metric(
         self,
-        base_metric: Metric,
+        complex_metric: Metric,
         metric_name_to_node: dict[str, SemanticGraphNode],
         edge_list: list[SemanticGraphEdge],
     ) -> None:
-        """Adds the edges from a base-metric node to the measure nodes."""
-        if len(base_metric.input_metrics) > 0:
-            raise RuntimeError(
-                LazyFormat("This method should have been called with metrics that do not have any input metrics.")
-            )
+        """Adds the edges from a derived-metric node to the nodes associated with the input metrics."""
+        metric_type = complex_metric.type
 
-        input_measures = base_metric.input_measures
-        if len(input_measures) == 0:
-            raise InvalidManifestException(
-                LazyFormat(
-                    "The given base metric does not have any input measures.",
-                    base_metric=base_metric,
-                )
-            )
-
-        measure_name_to_labels_for_metric_to_measure_edge: dict[str, FrozenOrderedSet[MetricflowGraphLabel]] = {}
+        input_metric_name_to_labels_for_metric_to_input_metric_edge: dict[
+            str, FrozenOrderedSet[MetricflowGraphLabel]
+        ] = {}
         recipe_step = self._empty_recipe_step
-        metric_type = base_metric.type
-        if metric_type is MetricType.SIMPLE or metric_type is MetricType.RATIO or metric_type is MetricType.DERIVED:
+
+        input_metrics = MetricLookup.metric_inputs(complex_metric)
+        if metric_type is MetricType.SIMPLE:
             pass
         elif metric_type is MetricType.CUMULATIVE:
+            cumulative_type_params = complex_metric.type_params.cumulative_type_params
+            if cumulative_type_params is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `cumulative_type_params` to be set for a cumulative metric",
+                        complex_metric=complex_metric,
+                    )
+                )
+
             # Cumulative metrics impose special restrictions on the group-by items available, so label those edges
             # appropriately.
+
             recipe_step = AttributeRecipeStep(set_deny_date_part=True)
-            if base_metric.type_params.cumulative_type_params and (
-                base_metric.type_params.cumulative_type_params.window is not None
-                or base_metric.type_params.cumulative_type_params.grain_to_date is not None
-            ):
+            if cumulative_type_params.window is not None or cumulative_type_params.grain_to_date is not None:
                 edge_labels = self._special_case_to_successor_edge_label[
                     _SpecialCase.CUMULATIVE_METRIC_WITH_WINDOW_OR_GRAIN_TO_DATE
                 ]
             else:
                 edge_labels = self._special_case_to_successor_edge_label[_SpecialCase.CUMULATIVE_METRIC]
 
-            for measure in base_metric.input_measures:
-                measure_name_to_labels_for_metric_to_measure_edge[measure.name] = edge_labels
-        elif metric_type is MetricType.CONVERSION:
-            # Label the edge for conversion measures as conversion measures need to be handled as a special case when
-            # resolving the associated group-by items.
-            conversion_type_params = base_metric.type_params.conversion_type_params
-            if conversion_type_params is not None:
-                assert (
-                    conversion_type_params.conversion_measure is not None
-                ), "A conversion metric must have a conversion measure."
-                conversion_measure_name = conversion_type_params.conversion_measure.name
-                measure_name_to_labels_for_metric_to_measure_edge[
-                    conversion_measure_name
-                ] = self._special_case_to_successor_edge_label[_SpecialCase.CONVERSION_MEASURE]
-            else:
+            input_metric_for_cumulative_metric = cumulative_type_params.metric
+            if input_metric_for_cumulative_metric is None:
                 raise InvalidManifestException(
                     LazyFormat(
-                        "A conversion metric is missing type parameters",
-                        base_metric=base_metric,
+                        "Expected `metric` to be set for a cumulative metric",
+                        complex_metric=complex_metric,
                     )
                 )
+
+            input_metric_name_to_labels_for_metric_to_input_metric_edge[
+                input_metric_for_cumulative_metric.name
+            ] = edge_labels
+        elif metric_type is MetricType.RATIO:
+            pass
+        elif metric_type is MetricType.CONVERSION:
+            conversion_type_params = complex_metric.type_params.conversion_type_params
+            if conversion_type_params is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `conversion_type_params` to be set for a conversion metric",
+                        complex_metric=complex_metric,
+                    )
+                )
+
+            conversion_metric = conversion_type_params.conversion_metric
+            if conversion_metric is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `conversion_metric` to be set for a conversion metric", complex_metric=complex_metric
+                    )
+                )
+
+            input_metric_name_to_labels_for_metric_to_input_metric_edge[
+                conversion_metric.name
+            ] = self._special_case_to_successor_edge_label[_SpecialCase.CONVERSION_INPUT_METRIC]
+
+        elif metric_type is MetricType.DERIVED:
+            pass
         else:
             assert_values_exhausted(metric_type)
-
-        base_metric_node = BaseMetricNode.get_instance(base_metric.name)
-
-        for measure in base_metric.input_measures:
-            measure_name = measure.name
-            source_model_id = self._manifest_object_lookup.get_model_id_for_measure(measure_name)
-
-            head_node = MeasureNode.get_instance(
-                measure_name=measure_name,
-                source_model_id=source_model_id,
-            )
-
-            edge_list.append(
-                MetricDefinitionEdge.create(
-                    tail_node=base_metric_node,
-                    head_node=head_node,
-                    additional_labels=measure_name_to_labels_for_metric_to_measure_edge.get(measure_name),
-                    recipe_step=recipe_step,
-                )
-            )
-
-        metric_name_to_node[base_metric.name] = base_metric_node
-
-    def _add_edges_for_derived_metric(
-        self,
-        derived_metric: Metric,
-        metric_name_to_node: dict[str, SemanticGraphNode],
-        edge_list: list[SemanticGraphEdge],
-    ) -> None:
-        """Adds the edges from a derived-metric node to the nodes associated with the input metrics."""
-        input_metrics = derived_metric.input_metrics
 
         if len(input_metrics) == 0:
             raise RuntimeError(
                 LazyFormat(
                     "This method should have been called with a metric that has input metrics",
+                    complex_metric=complex_metric,
                     parent_input_metrics=input_metrics,
                 )
             )
 
-        derived_metric_node = DerivedMetricNode.get_instance(derived_metric.name)
+        complex_metric_node = DerivedMetricNode.get_instance(complex_metric.name)
         additional_edge_labels = self._empty_edge_labels
 
         for input_metric in input_metrics:
@@ -221,11 +206,18 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
             input_metric_node = metric_name_to_node[input_metric_name]
 
             edge_to_add = MetricDefinitionEdge.create(
-                tail_node=derived_metric_node, head_node=input_metric_node, additional_labels=additional_edge_labels
+                tail_node=complex_metric_node,
+                head_node=input_metric_node,
+                additional_labels=additional_edge_labels.union(
+                    FrozenOrderedSet(
+                        input_metric_name_to_labels_for_metric_to_input_metric_edge.get(input_metric.name) or ()
+                    )
+                ),
+                recipe_step=recipe_step,
             )
 
             edge_list.append(edge_to_add)
-        metric_name_to_node[derived_metric.name] = derived_metric_node
+        metric_name_to_node[complex_metric.name] = complex_metric_node
 
     def _add_edges_for_any_metric(
         self,
@@ -233,16 +225,28 @@ class MetricSubgraphGenerator(SemanticSubgraphGenerator):
         metric_name_to_node: dict[str, SemanticGraphNode],
         edge_list: list[SemanticGraphEdge],
     ) -> None:
-        """Adds edges for any type of metric."""
-        if len(metric.input_metrics) > 0:
-            self._add_edges_for_derived_metric(
-                derived_metric=metric,
+        """Adds edges for any type of metric.
+
+        Args:
+            metric: Add edges for this metric.
+            metric_name_to_node: dict to update when a metric node is added.
+            edge_list:  list to update when an edge is added.
+        """
+        metric_type = metric.type
+
+        if metric_type is MetricType.SIMPLE:
+            metric_name = metric.name
+            metric_name_to_node[metric_name] = BaseMetricNode.get_instance(metric_name)
+        elif (
+            metric_type is MetricType.RATIO
+            or metric_type is MetricType.CUMULATIVE
+            or metric_type is MetricType.CONVERSION
+            or metric_type is MetricType.DERIVED
+        ):
+            self._add_edges_for_complex_metric(
+                complex_metric=metric,
                 metric_name_to_node=metric_name_to_node,
                 edge_list=edge_list,
             )
         else:
-            self._add_edges_for_base_metric(
-                base_metric=metric,
-                metric_name_to_node=metric_name_to_node,
-                edge_list=edge_list,
-            )
+            assert_values_exhausted(metric_type)
