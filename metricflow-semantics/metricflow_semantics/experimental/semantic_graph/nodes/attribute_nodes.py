@@ -25,6 +25,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
 )
 from metricflow_semantics.experimental.semantic_graph.sg_constant import ClusterNameFactory
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphNode
+from metricflow_semantics.experimental.semantic_graph.sg_node_grouping import SemanticGraphNodeTypedCollection
 from metricflow_semantics.experimental.singleton import Singleton
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -117,6 +118,19 @@ class TimeAttributeNode(AttributeNode, Singleton):
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return super(TimeAttributeNode, self).labels.union((TimeClusterLabel.get_instance(),))
 
+    @cached_property
+    @override
+    def recipe_step_to_append(self) -> AttributeRecipeStep:
+        return AttributeRecipeStep(
+            add_dunder_name_element=self.attribute_name,
+            add_properties=tuple(self.element_property_additions),
+            set_element_type=LinkableElementType.TIME_DIMENSION,
+        )
+
+    @override
+    def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
+        typed_collection.time_attribute_nodes.add(self)
+
 
 @fast_frozen_dataclass(order=False)
 class KeyAttributeNode(AttributeNode, Singleton):
@@ -156,6 +170,10 @@ class KeyAttributeNode(AttributeNode, Singleton):
     def labels(self) -> OrderedSet[MetricflowGraphLabel]:
         return super(KeyAttributeNode, self).labels.union((KeyAttributeLabel.get_instance(),))
 
+    @override
+    def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
+        typed_collection.key_attribute_nodes.add(self)
+
 
 @fast_frozen_dataclass(order=False)
 class CategoricalDimensionAttributeNode(AttributeNode, Singleton):
@@ -179,3 +197,7 @@ class CategoricalDimensionAttributeNode(AttributeNode, Singleton):
             add_dunder_name_element=self.attribute_name,
             set_element_type=LinkableElementType.DIMENSION,
         )
+
+    @override
+    def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
+        typed_collection.categorical_dimension_attribute_nodes.add(self)

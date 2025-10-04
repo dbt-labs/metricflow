@@ -8,6 +8,7 @@ from typing import Mapping, Optional
 
 from typing_extensions import override
 
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.mf_graph.path_finding.traversal_profile_differ import TraversalProfileDiffer
@@ -21,7 +22,7 @@ from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
     DenyVisibleAttributesLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import MetricTimeNode
+from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import MetricNode, MetricTimeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     BaseMetricLabel,
     LocalModelLabel,
@@ -33,6 +34,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
     SemanticGraphNode,
 )
+from metricflow_semantics.experimental.semantic_graph.sg_node_grouping import SemanticGraphNodeTypedCollection
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_descriptor import (
     DunderNameDescriptor,
     EntityKeyQueryForGroupByMetric,
@@ -264,7 +266,14 @@ class _MetricNameToEntityKeyTrieGenerator:
         self._current_graph = semantic_graph
         self._path_finder = path_finder
         self._metric_node_to_entity_key_trie: dict[SemanticGraphNode, MutableDunderNameTrie] = {}
-        metric_nodes = semantic_graph.nodes_with_labels(MetricLabel.get_instance())
+        node_labeled_as_metric_nodes = semantic_graph.nodes_with_labels(MetricLabel.get_instance())
+        typed_collection = SemanticGraphNodeTypedCollection()
+        for metric_node in node_labeled_as_metric_nodes:
+            metric_node.add_to_typed_collection(typed_collection)
+        metric_nodes: AnyLengthTuple[MetricNode] = tuple(typed_collection.base_metric_nodes) + tuple(
+            typed_collection.derived_metric_nodes
+        )
+        assert len(node_labeled_as_metric_nodes) == len(metric_nodes)
         self._metric_nodes_in_current_graph = metric_nodes
         self._verbose_debug_logs = False
         self._model_node_to_entity_key_trie = model_node_to_entity_key_trie
@@ -460,15 +469,6 @@ class _MetricNameToEntityKeyTrieGenerator:
 
         for metric_node in self._metric_nodes_in_current_graph:
             entity_key_trie = self._get_entity_key_trie_for_metric_node(metric_node)
-            metric_name = metric_node.dunder_name_element
-            if metric_name is None:
-                raise RuntimeError(
-                    LazyFormat(
-                        "Expected a metric node to have a name",
-                        metric_node=metric_node,
-                    )
-                )
-
-            metric_name_to_entity_key_trie[metric_name] = entity_key_trie
+            metric_name_to_entity_key_trie[metric_node.metric_name] = entity_key_trie
 
         return metric_name_to_entity_key_trie
