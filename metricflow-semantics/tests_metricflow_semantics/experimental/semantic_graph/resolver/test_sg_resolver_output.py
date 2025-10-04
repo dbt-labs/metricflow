@@ -5,7 +5,7 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
@@ -29,21 +29,22 @@ def sg_tester(  # noqa: D103
     return SemanticGraphTester(fixture)
 
 
-def test_set_for_measures(sg_tester: SemanticGraphTester) -> None:
-    """Check the set for a few measures."""
+def test_complete_set_for_simple_metrics(sg_tester: SemanticGraphTester) -> None:
+    """Check the complete set for a few simple metrics."""
     cases = ("bookings", "account_balance")
-    sg_tester.assert_attribute_set_snapshot_equal_for_a_measure(cases)
+    sg_tester.assert_attribute_set_snapshot_equal_for_simple_metrics(cases)
 
 
-def test_set_filtering_for_measure(sg_tester: SemanticGraphTester) -> None:
+def test_set_filtering_for_simple_metric(sg_tester: SemanticGraphTester) -> None:
     """Check filtering of the set for a measure."""
-    measure_reference = MeasureReference("bookings")
+    metric_reference = MetricReference("bookings")
+    metric_references = (metric_reference,)
     sg_resolver = sg_tester.sg_resolver
-    complete_set = sg_resolver.get_common_set(measure_references=(measure_reference,))
+    complete_set = sg_resolver.get_common_set(metric_references=metric_references)
     sg_tester.check_set_filtering(
         complete_set=complete_set,
         filtered_set_callable=lambda set_filter: sg_resolver.get_common_set(
-            measure_references=(measure_reference,), set_filter=set_filter
+            metric_references=metric_references, set_filter=set_filter
         ),
     )
 

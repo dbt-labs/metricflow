@@ -17,7 +17,10 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
     AttributeRecipeWriterWeightFunction,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import GroupByAttributeLabel, MeasureLabel
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
+    GroupByAttributeLabel,
+    MetricLabel,
+)
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
@@ -36,19 +39,10 @@ def test_recipe_writer_path(
     semantic_graph = SemanticGraphBuilder(ManifestObjectLookup(sg_02_single_join_manifest)).build()
     path_finder: RecipeWriterPathfinder = MetricflowPathfinder()
 
-    # Find all valid paths from the `booking_count` measure to any group-by attribute node.
-    source_node = semantic_graph.node_with_label(MeasureLabel.get_instance("booking_count"))
+    # Find all valid paths from the `bookings` simple metric to any group-by attribute node.
+    source_node = semantic_graph.node_with_label(MetricLabel.get_instance("bookings"))
     target_nodes = semantic_graph.nodes_with_labels(GroupByAttributeLabel.get_instance())
 
-    # found_paths = tuple(
-    #     path_finder.find_paths_dfs(
-    #         graph=semantic_graph,
-    #         initial_path=AttributeRecipeWriterPath.create(source_node),
-    #         target_nodes=target_nodes,
-    #         weight_function=AttributeRecipeWriterWeightFunction(),
-    #         max_path_weight=2,
-    #     )
-    # )
     found_paths: list[AttributeRecipeWriterPath] = []
     for path in path_finder.find_paths_dfs(
         graph=semantic_graph,
