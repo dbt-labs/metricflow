@@ -1,4 +1,4 @@
-test_name: test_measure
+test_name: test_simple_metric
 test_filename: test_simple_trie_resolver.py
 ---
 [

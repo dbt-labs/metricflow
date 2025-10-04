@@ -2,7 +2,7 @@ test_name: test_metrics
 test_filename: test_simple_trie_resolver.py
 ---
 {
-  {BaseMetric(bookings)}: [
+  {SimpleMetric(bookings)}: [
     'booking',
     'booking__booking_time__custom_year',
     'booking__booking_time__extract_quarter',
@@ -15,7 +15,7 @@ test_filename: test_simple_trie_resolver.py
     'metric_time__quarter',
     'metric_time__year',
   ],
-  {BaseMetric(views)}: [
+  {SimpleMetric(views)}: [
     'booking',
     'booking__booking_time__custom_year',
     'booking__booking_time__extract_quarter',
@@ -35,7 +35,7 @@ test_filename: test_simple_trie_resolver.py
     'view__view_time__quarter',
     'view__view_time__year',
   ],
-  {BaseMetric(bookings), BaseMetric(views)}: [
+  {SimpleMetric(bookings), SimpleMetric(views)}: [
     'booking',
     'booking__booking_time__custom_year',
     'booking__booking_time__extract_quarter',
@@ -48,7 +48,7 @@ test_filename: test_simple_trie_resolver.py
     'metric_time__quarter',
     'metric_time__year',
   ],
-  {DerivedMetric(bookings_per_view)}: [
+  {ComplexMetric(bookings_per_view)}: [
     'booking',
     'booking__booking_time__custom_year',
     'booking__booking_time__extract_quarter',
