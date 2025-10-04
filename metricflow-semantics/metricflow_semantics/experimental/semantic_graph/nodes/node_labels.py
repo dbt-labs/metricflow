@@ -84,20 +84,20 @@ class MetricLabel(MetricflowGraphLabel, Singleton):
 
 
 @fast_frozen_dataclass(order=False)
-class BaseMetricLabel(MetricflowGraphLabel, Singleton):
-    """Label for nodes that represent a non-derived metric."""
+class SimpleMetricLabel(MetricflowGraphLabel, Singleton):
+    """Label for nodes that represent a simple metric."""
 
     @classmethod
-    def get_instance(cls) -> BaseMetricLabel:  # noqa: D102
+    def get_instance(cls) -> SimpleMetricLabel:  # noqa: D102
         return cls._get_instance()
 
 
 @fast_frozen_dataclass(order=False)
-class DerivedMetricLabel(MetricflowGraphLabel, Singleton):
-    """Label for nodes that represent a derived metric."""
+class ComplexMetricLabel(MetricflowGraphLabel, Singleton):
+    """Label for nodes that represent a complex metric."""
 
     @classmethod
-    def get_instance(cls) -> DerivedMetricLabel:  # noqa: D102
+    def get_instance(cls) -> ComplexMetricLabel:  # noqa: D102
         return cls._get_instance()
 
 

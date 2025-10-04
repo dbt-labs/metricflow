@@ -28,8 +28,7 @@ def test_derived_metric_manifest(  # noqa: D103
         subgraph_generators=[ComplexMetricSubgraphGenerator],
         expectation_description=mf_dedent(
             """
-            The graph should show a derived-metric node that has edges to base-metric nodes, and base-metric nodes that
-            have edges to measure nodes.
+            The graph should show a complex-metric node that has edges to simple-metric nodes.
             """
         ),
     )
