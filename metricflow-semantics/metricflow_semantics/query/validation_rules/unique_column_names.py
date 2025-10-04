@@ -4,7 +4,7 @@ import logging
 from typing import List, Sequence, Set
 
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -56,7 +56,7 @@ class UniqueOutputColumnValidationRule(PostResolutionQueryValidationRule):
     @override
     def validate_simple_metric_in_resolution_dag(
         self,
-        measure_reference: MeasureReference,
+        metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()

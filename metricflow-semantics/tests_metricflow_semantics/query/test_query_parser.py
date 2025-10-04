@@ -495,7 +495,7 @@ def test_date_part_parsing(
         )
 
     # Can't query date part for cumulative metrics
-    with pytest.raises(InvalidQueryException, match="does not match any of the available"):
+    with pytest.raises(InvalidQueryException, match="does not allow"):
         query_parser.parse_and_validate_query(
             metric_names=["revenue_cumulative"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.YEAR),),

@@ -71,7 +71,7 @@ class _PostResolutionQueryValidationVisitor(GroupByItemResolutionNodeVisitor[Met
             for validation_rule in self._validation_rules:
                 issue_sets_to_merge.append(
                     validation_rule.validate_simple_metric_in_resolution_dag(
-                        measure_reference=node.measure_reference,
+                        metric_reference=node.metric_reference,
                         resolution_path=current_traversal_path,
                     )
                 )

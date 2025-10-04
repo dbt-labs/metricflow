@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Sequence
 
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MetricReference
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -34,12 +34,12 @@ class PostResolutionQueryValidationRule(ABC):
     @abstractmethod
     def validate_simple_metric_in_resolution_dag(
         self,
-        measure_reference: MeasureReference,
+        metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
-        """Given a measure that exists in a resolution DAG, check that the query is valid.
+        """Given a simple metric that exists in a resolution DAG, check that the query is valid.
 
-        This is called for each measure of a base metric as the resolution DAG is traversed.
+        This is called for each simple metric of a complex metric as the resolution DAG is traversed.
         """
         raise NotImplementedError
 
@@ -49,9 +49,9 @@ class PostResolutionQueryValidationRule(ABC):
         metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
-        """Given a metric that exists in a resolution DAG, check that the query is valid.
+        """Given a complex metric that exists in a resolution DAG, check that the query is valid.
 
-        This is called for each metric as the resolution DAG is traversed.
+        This is called for each complex metric as the resolution DAG is traversed.
         """
         raise NotImplementedError
 

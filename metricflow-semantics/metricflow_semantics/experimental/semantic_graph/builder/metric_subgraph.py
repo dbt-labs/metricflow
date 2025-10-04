@@ -109,7 +109,7 @@ class ComplexMetricSubgraphGenerator(SemanticSubgraphGenerator):
         ] = {}
         recipe_step = self._empty_recipe_step
 
-        input_metrics = MetricLookup.metric_inputs(complex_metric)
+        input_metrics = MetricLookup.metric_inputs(complex_metric, include_conversion_metric_input=True)
         if metric_type is MetricType.SIMPLE:
             pass
         elif metric_type is MetricType.CUMULATIVE:

@@ -6,7 +6,6 @@ from typing import List, Sequence
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import Metric, WhereFilterIntersection
 from dbt_semantic_interfaces.references import (
-    MeasureReference,
     MetricReference,
 )
 from dbt_semantic_interfaces.type_enums import MetricType
@@ -171,7 +170,7 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
     @override
     def validate_simple_metric_in_resolution_dag(
         self,
-        measure_reference: MeasureReference,
+        metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()
