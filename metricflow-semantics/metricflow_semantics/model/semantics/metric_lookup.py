@@ -4,16 +4,19 @@ import logging
 from typing import Dict, Final, Iterable, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.protocols import MetricInput
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
@@ -122,6 +125,93 @@ class MetricLookup:
         if metric_reference not in self._metrics:
             raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
         return self._metrics[metric_reference]
+
+    @staticmethod
+    def metric_inputs(metric: Metric) -> Sequence[MetricInput]:
+        """Returns the metric inputs for the given metric."""
+        metric_type = metric.type
+        metric_inputs: list[MetricInput] = []
+
+        if metric_type is MetricType.SIMPLE:
+            pass
+        elif metric_type is MetricType.CUMULATIVE:
+            cumulative_type_params = metric.type_params.cumulative_type_params
+            if cumulative_type_params is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `cumulative_type_params` to be set for a cumulative metric",
+                        complex_metric=metric,
+                    )
+                )
+
+            input_metric_for_cumulative_metric = cumulative_type_params.metric
+            if input_metric_for_cumulative_metric is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `metric` to be set for a cumulative metric",
+                        complex_metric=metric,
+                    )
+                )
+
+            metric_inputs.append(input_metric_for_cumulative_metric)
+        elif metric_type is MetricType.RATIO:
+            numerator = metric.type_params.numerator
+            if numerator is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `numerator` to be set for a ratio metric",
+                        complex_metric=metric,
+                    )
+                )
+            metric_inputs.append(numerator)
+
+            denominator = metric.type_params.denominator
+            if denominator is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `denominator` to be set for a ratio metric",
+                        complex_metric=metric,
+                    )
+                )
+            metric_inputs.append(denominator)
+        elif metric_type is MetricType.CONVERSION:
+            conversion_type_params = metric.type_params.conversion_type_params
+            if conversion_type_params is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `conversion_type_params` to be set for a conversion metric",
+                        complex_metric=metric,
+                    )
+                )
+            base_metric = conversion_type_params.base_metric
+            if base_metric is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `base_metric` to be set for a conversion metric", complex_metric=metric
+                    )
+                )
+            metric_inputs.append(base_metric)
+
+            conversion_metric = conversion_type_params.conversion_metric
+            if conversion_metric is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Expected `conversion_metric` to be set for a conversion metric", complex_metric=metric
+                    )
+                )
+            metric_inputs.append(conversion_metric)
+
+        elif metric_type is MetricType.DERIVED:
+            metrics = metric.type_params.metrics
+            if not metrics:
+                raise InvalidManifestException(
+                    LazyFormat("Expected `metrics` to be set for a derived metric", derived_metric=metric)
+                )
+            metric_inputs.extend(metrics)
+        else:
+            assert_values_exhausted(metric_type)
+
+        return metric_inputs
 
     def _add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures."""
