@@ -9,7 +9,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import EntityReference, MeasureReference
+from dbt_semantic_interfaces.references import EntityReference, MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
@@ -1347,7 +1347,7 @@ def test_all_available_metric_filters(
     dataflow_plan_builder = mf_engine_test_fixture.dataflow_plan_builder
     metric_lookup = mf_engine_test_fixture.semantic_manifest_lookup.metric_lookup
     bookings_group_by_item_set = metric_lookup.get_common_group_by_items(
-        measure_references=(MeasureReference("bookings"),),
+        metric_references=(MetricReference("bookings"),),
         set_filter=GroupByItemSetFilter.create(any_properties_allowlist=(GroupByItemProperty.METRIC,)),
     )
     for group_by_metric_spec in group_specs_by_type(bookings_group_by_item_set.specs).group_by_metric_specs:
