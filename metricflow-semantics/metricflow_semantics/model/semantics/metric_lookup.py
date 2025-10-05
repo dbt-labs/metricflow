@@ -10,7 +10,13 @@ from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
+from metricflow_semantics.errors.error_classes import (
+    DuplicateMetricError,
+    MetricNotFoundError,
+    NonExistentMeasureError,
+    UnknownMetricError,
+)
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
@@ -44,6 +50,7 @@ class MetricLookup:
         semantic_model_lookup: SemanticModelLookup,
         custom_granularities: Dict[str, ExpandedTimeGranularity],
         group_by_item_set_resolver: GroupByItemSetResolver,
+        manifest_object_lookup: ManifestObjectLookup,
     ) -> None:
         """Initializer.
 
@@ -54,6 +61,7 @@ class MetricLookup:
         self._metrics: Dict[MetricReference, Metric] = {}
         self._semantic_model_lookup = semantic_model_lookup
         self._custom_granularities = custom_granularities
+        self._manifest_object_lookup = manifest_object_lookup
 
         for metric in semantic_manifest.metrics:
             self._add_metric(metric)
@@ -310,11 +318,39 @@ class MetricLookup:
 
     def _get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         metric = self.get_metric(metric_reference)
-        agg_time_dimension_grains = set()
-        for input_measure in metric.input_measures:
-            measure_properties = self._semantic_model_lookup.measure_lookup.get_properties(
-                input_measure.measure_reference
-            )
-            agg_time_dimension_grains.add(measure_properties.agg_time_granularity)
+        metric_type = metric.type
 
-        return max(agg_time_dimension_grains, key=lambda time_granularity: time_granularity.to_int())
+        agg_time_dimension_grains: set[TimeGranularity] = set()
+
+        if metric_type is MetricType.SIMPLE:
+            metric_name = metric_reference.element_name
+            simple_metric_input = self._manifest_object_lookup.simple_metric_name_to_input.get(metric_name)
+            if simple_metric_input is None:
+                raise UnknownMetricError((metric_name,))
+            agg_time_dimension_grains.add(simple_metric_input.agg_time_dimension_grain)
+        elif (
+            metric_type is MetricType.CONVERSION
+            or metric_type is MetricType.DERIVED
+            or metric_type is MetricType.RATIO
+            or metric_type is MetricType.CUMULATIVE
+        ):
+            metric_inputs = MetricLookup.metric_inputs(metric, include_conversion_metric_input=True)
+            if not metric_inputs:
+                raise InvalidManifestException(
+                    LazyFormat("Expected `metrics` to be non-empty for a non-simple metric", metric=metric)
+                )
+            agg_time_dimension_grains.update(
+                (
+                    self.get_min_queryable_time_granularity(MetricReference(metric_input.name))
+                    for metric_input in metric_inputs
+                )
+            )
+        else:
+            assert_values_exhausted(metric_type)
+
+        if len(agg_time_dimension_grains) == 0:
+            raise RuntimeError(
+                LazyFormat("Unable to resolve an aggregation-time-dimension grain for the given metric", metric=metric)
+            )
+
+        return max(agg_time_dimension_grains, key=lambda time_grain: time_grain.to_int())
