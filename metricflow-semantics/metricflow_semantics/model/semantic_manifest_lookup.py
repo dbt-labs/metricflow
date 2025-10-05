@@ -53,6 +53,7 @@ class SemanticManifestLookup:
             semantic_model_lookup=self._semantic_model_lookup,
             custom_granularities=self.custom_granularities,
             group_by_item_set_resolver=group_by_item_set_resolver,
+            manifest_object_lookup=manifest_object_lookup,
         )
 
     @property
