@@ -12,7 +12,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -124,8 +124,8 @@ def test_merge_spec_set() -> None:  # noqa: D103
 def spec_set() -> InstanceSpecSet:  # noqa: D103
     return InstanceSpecSet(
         metric_specs=(MetricSpec(element_name="bookings"),),
-        measure_specs=(
-            MeasureSpec(
+        simple_metric_input_specs=(
+            SimpleMetricInputSpec(
                 element_name="bookings",
             ),
         ),
@@ -176,7 +176,7 @@ def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D1
 def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D103
     assert set(spec_set.all_specs) == {
         MetricSpec(element_name="bookings"),
-        MeasureSpec(
+        SimpleMetricInputSpec(
             element_name="bookings",
         ),
         DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),
@@ -223,13 +223,6 @@ def test_linkless_entity() -> None:
 @pytest.fixture
 def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
     return WhereFilterSpecSet(
-        measure_level_filter_specs=(
-            WhereFilterSpec(
-                where_sql="measure is true",
-                bind_parameters=SqlBindParameterSet(),
-                element_set=GroupByItemSet(),
-            ),
-        ),
         metric_level_filter_specs=(
             WhereFilterSpec(
                 where_sql="metric is true",
@@ -250,26 +243,6 @@ def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
 def test_where_filter_spec_set_all_specs(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
     assert set(where_filter_spec_set.all_filter_specs) == {
         WhereFilterSpec(
-            where_sql="measure is true",
-            bind_parameters=SqlBindParameterSet(),
-            element_set=GroupByItemSet(),
-        ),
-        WhereFilterSpec(
-            where_sql="metric is true",
-            bind_parameters=SqlBindParameterSet(),
-            element_set=GroupByItemSet(),
-        ),
-        WhereFilterSpec(
-            where_sql="query is true",
-            bind_parameters=SqlBindParameterSet(),
-            element_set=GroupByItemSet(),
-        ),
-    }
-
-
-def test_where_filter_spec_set_post_aggregation_specs(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
-    assert set(where_filter_spec_set.after_measure_aggregation_filter_specs) == {
-        WhereFilterSpec(
             where_sql="metric is true",
             bind_parameters=SqlBindParameterSet(),
             element_set=GroupByItemSet(),
@@ -283,38 +256,22 @@ def test_where_filter_spec_set_post_aggregation_specs(where_filter_spec_set: Whe
 
 
 def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
-    spec_set1 = WhereFilterSpecSet(
-        measure_level_filter_specs=(
-            WhereFilterSpec(
-                where_sql="measure is true",
-                bind_parameters=SqlBindParameterSet(),
-                element_set=GroupByItemSet(),
-            ),
-        ),
+    metric_level_filter = WhereFilterSpec(
+        where_sql="metric is true",
+        bind_parameters=SqlBindParameterSet(),
+        element_set=GroupByItemSet(),
     )
-    spec_set2 = WhereFilterSpecSet(
-        metric_level_filter_specs=(
-            WhereFilterSpec(
-                where_sql="metric is true",
-                bind_parameters=SqlBindParameterSet(),
-                element_set=GroupByItemSet(),
-            ),
-        ),
+    query_level_filter = WhereFilterSpec(
+        where_sql="query is true",
+        bind_parameters=SqlBindParameterSet(),
+        element_set=GroupByItemSet(),
     )
 
+    spec_set1 = WhereFilterSpecSet(
+        metric_level_filter_specs=(metric_level_filter,),
+    )
+    spec_set2 = WhereFilterSpecSet(query_level_filter_specs=(query_level_filter,))
+
     assert spec_set1.merge(spec_set2) == WhereFilterSpecSet(
-        measure_level_filter_specs=(
-            WhereFilterSpec(
-                where_sql="measure is true",
-                bind_parameters=SqlBindParameterSet(),
-                element_set=GroupByItemSet(),
-            ),
-        ),
-        metric_level_filter_specs=(
-            WhereFilterSpec(
-                where_sql="metric is true",
-                bind_parameters=SqlBindParameterSet(),
-                element_set=GroupByItemSet(),
-            ),
-        ),
+        metric_level_filter_specs=(metric_level_filter,), query_level_filter_specs=(query_level_filter,)
     )

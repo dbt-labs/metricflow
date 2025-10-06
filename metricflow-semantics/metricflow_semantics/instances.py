@@ -16,7 +16,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
@@ -101,16 +101,16 @@ class SemanticModelElementInstance(SerializableDataclass):  # noqa: D101
 
 
 @dataclass(frozen=True)
-class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  # noqa: D101
+class MeasureInstance(MdoInstance[SimpleMetricInputSpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
-    spec: MeasureSpec
+    spec: SimpleMetricInputSpec
     aggregation_state: AggregationState
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_measure_instance(self)
 
     def with_new_spec(
-        self, new_spec: MeasureSpec, column_association_resolver: ColumnAssociationResolver
+        self, new_spec: SimpleMetricInputSpec, column_association_resolver: ColumnAssociationResolver
     ) -> MeasureInstance:
         """Returns a new instance with the spec replaced."""
         return MeasureInstance(
@@ -367,7 +367,7 @@ class InstanceSet(SerializableDataclass):
     @property
     def spec_set(self) -> InstanceSpecSet:  # noqa: D102
         return InstanceSpecSet(
-            measure_specs=tuple(x.spec for x in self.measure_instances),
+            simple_metric_input_specs=tuple(x.spec for x in self.measure_instances),
             dimension_specs=tuple(x.spec for x in self.dimension_instances),
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
             entity_specs=tuple(x.spec for x in self.entity_instances),

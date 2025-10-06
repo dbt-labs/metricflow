@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Sequence, Tuple
+from typing import List, Tuple
 
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, MeasureInstance
-from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression, SqlFunctionExpression
 
+from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping
 from metricflow.plan_conversion.instance_set_transforms.select_columns import CreateSelectColumnsForInstances
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
@@ -37,13 +38,13 @@ class CreateAggregatedMeasuresTransform(InstanceSetTransform[CreateAggregatedMea
         self,
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
-        semantic_model_lookup: SemanticModelLookup,
-        metric_input_measure_specs: Sequence[MetricInputMeasureSpec],
+        manifest_object_lookup: ManifestObjectLookup,
+        alias_mapping: InstanceAliasMapping,
     ) -> None:
         self._table_alias = table_alias
         self._column_resolver = column_resolver
-        self._semantic_model_lookup = semantic_model_lookup
-        self.metric_input_measure_specs = metric_input_measure_specs
+        self._manifest_object_lookup = manifest_object_lookup
+        self._alias_mapping = alias_mapping
         self._create_select_column_transform = CreateSelectColumnsForInstances(
             table_alias=table_alias,
             column_resolver=column_resolver,
@@ -53,15 +54,9 @@ class CreateAggregatedMeasuresTransform(InstanceSetTransform[CreateAggregatedMea
         self, measure_instances: Tuple[MeasureInstance, ...]
     ) -> SelectColumnSet:
         output_columns: List[SqlSelectColumn] = []
-        aliased_input_specs = [spec for spec in self.metric_input_measure_specs if spec.alias]
         for instance in measure_instances:
-            matches = [spec for spec in aliased_input_specs if spec.measure_spec == instance.spec]
-            if matches:
-                aliased_spec = matches[0]
-                aliased_input_specs.remove(aliased_spec)
-                output_measure_spec = aliased_spec.post_aggregation_spec
-            else:
-                output_measure_spec = instance.spec
+            spec = instance.spec
+            output_measure_spec = self._alias_mapping.aliased_spec(spec) or spec
 
             output_columns.append(
                 self._make_sql_column_expression_to_aggregate_measure(
@@ -72,7 +67,7 @@ class CreateAggregatedMeasuresTransform(InstanceSetTransform[CreateAggregatedMea
         return SelectColumnSet.create(measure_columns=output_columns)
 
     def _make_sql_column_expression_to_aggregate_measure(
-        self, measure_instance: MeasureInstance, output_measure_spec: MeasureSpec
+        self, measure_instance: MeasureInstance, output_measure_spec: SimpleMetricInputSpec
     ) -> SqlSelectColumn:
         """Convert one measure instance into a SQL column."""
         # Get the column name of the measure in the table that we're reading from
@@ -80,17 +75,18 @@ class CreateAggregatedMeasuresTransform(InstanceSetTransform[CreateAggregatedMea
 
         # Create an expression that will aggregate the given measure.
         # Figure out the aggregation function for the measure.
-        measure = self._semantic_model_lookup.measure_lookup.get_measure(measure_instance.spec.reference)
-        aggregation_type = measure.agg
+        simple_metric_input = self._manifest_object_lookup.simple_metric_name_to_input[
+            measure_instance.spec.element_name
+        ]
 
         expression_to_get_measure = SqlColumnReferenceExpression.create(
             SqlColumnReference(self._table_alias, column_name_in_table)
         )
 
         expression_to_aggregate_measure = SqlFunctionExpression.build_expression_from_aggregation_type(
-            aggregation_type=aggregation_type,
+            aggregation_type=simple_metric_input.agg,
             sql_column_expression=expression_to_get_measure,
-            agg_params=measure.agg_params,
+            agg_params=simple_metric_input.agg_params,
         )
 
         # Get the output column name from the measure/alias

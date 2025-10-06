@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import Iterable, Optional, Sequence
+from typing import Optional
 
 from dbt_semantic_interfaces.protocols import (
     MeasureAggregationParameters,
@@ -15,7 +15,6 @@ from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 logger = logging.getLogger(__name__)
 
@@ -85,13 +84,3 @@ class SimpleMetricInput:
     @cached_property
     def metric_reference(self) -> MetricReference:  # noqa: D102
         return MetricReference(self.name)
-
-    def match_agg_time_dimension_name(
-        self, time_dimension_specs: Iterable[TimeDimensionSpec]
-    ) -> Sequence[TimeDimensionSpec]:
-        """Return only the time dimension specs that have the same aggregation time dimension name as this input."""
-        return tuple(
-            time_dimension_spec
-            for time_dimension_spec in time_dimension_specs
-            if time_dimension_spec.element_name == self.agg_time_dimension_name
-        )

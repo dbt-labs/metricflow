@@ -11,7 +11,7 @@ class ToElementNameSet(InstanceSpecSetTransform[Set[str]]):
     def transform(self, spec_set: InstanceSpecSet) -> Set[str]:  # noqa: D102
         return (
             {x.element_name for x in spec_set.metric_specs}
-            .union({x.element_name for x in spec_set.measure_specs})
+            .union({x.element_name for x in spec_set.simple_metric_input_specs})
             .union({x.element_name for x in spec_set.dimension_specs})
             .union({x.element_name for x in spec_set.time_dimension_specs})
             .union({x.element_name for x in spec_set.entity_specs})

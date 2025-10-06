@@ -7,7 +7,6 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
 from dbt_semantic_interfaces.protocols.entity import Entity
-from dbt_semantic_interfaces.protocols.measure import Measure
 from dbt_semantic_interfaces.references import (
     EntityReference,
     SemanticModelElementReference,
@@ -18,6 +17,8 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
+from metricflow_semantics.experimental.dsi.measure_model_object_lookup import SimpleMetricModelObjectLookup
+from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.instances import (
     DimensionInstance,
     EntityInstance,
@@ -28,10 +29,11 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
-from metricflow_semantics.model.spec_converters import MeasureConverter
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
@@ -84,6 +86,7 @@ class SemanticModelToDataSetConverter:
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._manifest_lookup = manifest_lookup
+        self._manifest_object_lookup = manifest_lookup.manifest_object_lookup
 
     def _create_dimension_instance(
         self,
@@ -188,39 +191,84 @@ class SemanticModelToDataSetConverter:
             )
         )
 
-    def _convert_measures(
+    # def _convert_measures(
+    #     self,
+    #     semantic_model_name: str,
+    #     measures: Sequence[Measure],
+    #     table_alias: str,
+    # ) -> Tuple[Sequence[MeasureInstance], Sequence[SqlSelectColumn]]:
+    #     # Convert all elements to instances
+    #     measure_instances = []
+    #     select_columns = []
+    #     for measure in measures or []:
+    #         measure_spec = MeasureConverter.convert_to_measure_spec(measure=measure)
+    #         measure_instance = MeasureInstance(
+    #             associated_columns=(self._column_association_resolver.resolve_spec(measure_spec),),
+    #             spec=measure_spec,
+    #             defined_from=(
+    #                 SemanticModelElementReference(
+    #                     semantic_model_name=semantic_model_name,
+    #                     element_name=measure.reference.element_name,
+    #                 ),
+    #             ),
+    #             aggregation_state=AggregationState.NON_AGGREGATED,
+    #         )
+    #         measure_instances.append(measure_instance)
+    #         select_columns.append(
+    #             SqlSelectColumn(
+    #                 expr=SemanticModelToDataSetConverter._make_element_sql_expr(
+    #                     table_alias=table_alias,
+    #                     element_name=measure.reference.element_name,
+    #                     element_expr=measure.expr,
+    #                 ),
+    #                 column_alias=measure_instance.associated_column.column_name,
+    #             )
+    #         )
+    #
+    #     return measure_instances, select_columns
+
+    def _convert_simple_metric_inputs(
         self,
-        semantic_model_name: str,
-        measures: Sequence[Measure],
+        model_lookup: SimpleMetricModelObjectLookup,
         table_alias: str,
     ) -> Tuple[Sequence[MeasureInstance], Sequence[SqlSelectColumn]]:
         # Convert all elements to instances
         measure_instances = []
         select_columns = []
-        for measure in measures or []:
-            measure_spec = MeasureConverter.convert_to_measure_spec(measure=measure)
-            measure_instance = MeasureInstance(
-                associated_columns=(self._column_association_resolver.resolve_spec(measure_spec),),
-                spec=measure_spec,
-                defined_from=(
-                    SemanticModelElementReference(
-                        semantic_model_name=semantic_model_name,
-                        element_name=measure.reference.element_name,
+        for (
+            aggregation_configuration,
+            simple_metric_inputs,
+        ) in model_lookup.aggregation_configuration_to_simple_metric_inputs.items():
+            for simple_metric_input in simple_metric_inputs:
+                measure_spec = SimpleMetricInputSpec(
+                    element_name=simple_metric_input.name,
+                    non_additive_dimension_spec=NonAdditiveDimensionSpec.create_from_simple_metric_input(
+                        simple_metric_input
                     ),
-                ),
-                aggregation_state=AggregationState.NON_AGGREGATED,
-            )
-            measure_instances.append(measure_instance)
-            select_columns.append(
-                SqlSelectColumn(
-                    expr=SemanticModelToDataSetConverter._make_element_sql_expr(
-                        table_alias=table_alias,
-                        element_name=measure.reference.element_name,
-                        element_expr=measure.expr,
-                    ),
-                    column_alias=measure_instance.associated_column.column_name,
+                    fill_nulls_with=None,
                 )
-            )
+                measure_instance = MeasureInstance(
+                    associated_columns=(self._column_association_resolver.resolve_spec(measure_spec),),
+                    spec=measure_spec,
+                    defined_from=(
+                        SemanticModelElementReference(
+                            semantic_model_name=model_lookup.model_id.model_name,
+                            element_name=simple_metric_input.name,
+                        ),
+                    ),
+                    aggregation_state=AggregationState.NON_AGGREGATED,
+                )
+                measure_instances.append(measure_instance)
+                select_columns.append(
+                    SqlSelectColumn(
+                        expr=SemanticModelToDataSetConverter._make_element_sql_expr(
+                            table_alias=table_alias,
+                            element_name=simple_metric_input.name,
+                            element_expr=simple_metric_input.expr,
+                        ),
+                        column_alias=measure_instance.associated_column.column_name,
+                    )
+                )
 
         return measure_instances, select_columns
 
@@ -431,12 +479,13 @@ class SemanticModelToDataSetConverter:
         model_name = model_reference.semantic_model_name
         from_source_alias = SequentialIdGenerator.create_next_id(DynamicIdPrefix(prefix=f"{model_name}_src")).str_value
         # Handle measures
-        measure_lookup = self._manifest_lookup.semantic_model_lookup.measure_lookup
-        measures = measure_lookup.get_measures_by_model(model_reference)
-        if len(measures) > 0:
-            measure_instances, select_columns = self._convert_measures(
-                semantic_model_name=model_name,
-                measures=measures,
+        model_lookup = self._manifest_object_lookup.model_id_to_simple_metric_model_lookup.get(
+            SemanticModelId.get_instance(model_reference.semantic_model_name)
+        )
+
+        if model_lookup is not None:
+            measure_instances, select_columns = self._convert_simple_metric_inputs(
+                model_lookup=model_lookup,
                 table_alias=from_source_alias,
             )
             all_measure_instances.extend(measure_instances)

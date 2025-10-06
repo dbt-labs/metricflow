@@ -15,7 +15,7 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
@@ -57,7 +57,7 @@ def test_no_parent_node_data_set(
                             semantic_model_name="fct_bookings_semantic_model", element_name="bookings"
                         ),
                     ),
-                    spec=MeasureSpec(
+                    spec=SimpleMetricInputSpec(
                         element_name="bookings",
                     ),
                     aggregation_state=AggregationState.NON_AGGREGATED,

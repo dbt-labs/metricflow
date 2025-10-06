@@ -134,6 +134,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: Optional[GroupByItemSetFilter] = None,
+        limit_one_model: bool = False,
     ) -> BaseGroupByItemSet:
         label_to_references: defaultdict[MetricflowGraphLabel, set[ElementReference]] = defaultdict(set)
         for measure_reference in measure_references:
@@ -153,7 +154,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
             return GroupByItemSet()
 
         node_labels: FrozenOrderedSet[MetricflowGraphLabel] = FrozenOrderedSet(sorted(label_to_references))
-        cache_key = _CommonSetCacheKey(node_labels=node_labels, set_filter=set_filter)
+        cache_key = _CommonSetCacheKey(node_labels=node_labels, set_filter=set_filter, limit_one_model=limit_one_model)
         cached_result = self._result_cache_for_common_set.get(cache_key)
         if cached_result:
             return cached_result.value
@@ -176,8 +177,15 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
             source_nodes.add(mf_first_item(matching_nodes))
 
+        if limit_one_model:
+            simple_trie = self._simple_resolver_limit_one_model.resolve_trie(source_nodes, set_filter).dunder_name_trie
+            return self._result_cache_for_common_set.set_and_get(
+                cache_key, GroupByItemSet.create_from_trie(simple_trie)
+            )
+
         simple_trie = self._simple_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
         group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
+
         return self._result_cache_for_common_set.set_and_get(
             cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         )
@@ -187,3 +195,4 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 class _CommonSetCacheKey:
     node_labels: FrozenOrderedSet[MetricflowGraphLabel]
     set_filter: Optional[GroupByItemSetFilter]
+    limit_one_model: bool

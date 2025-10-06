@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from functools import cached_property
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
@@ -38,12 +39,12 @@ class SemanticManifestLookup:
         )
 
         pathfinder = MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
-        manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
-        graph_builder = SemanticGraphBuilder(manifest_object_lookup=manifest_object_lookup)
+        self._manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
+        graph_builder = SemanticGraphBuilder(manifest_object_lookup=self._manifest_object_lookup)
         semantic_graph = graph_builder.build()
 
         group_by_item_set_resolver = SemanticGraphGroupByItemSetResolver(
-            manifest_object_lookup=manifest_object_lookup,
+            manifest_object_lookup=self._manifest_object_lookup,
             semantic_graph=semantic_graph,
             path_finder=pathfinder,
         )
@@ -53,7 +54,7 @@ class SemanticManifestLookup:
             semantic_model_lookup=self._semantic_model_lookup,
             custom_granularities=self.custom_granularities,
             group_by_item_set_resolver=group_by_item_set_resolver,
-            manifest_object_lookup=manifest_object_lookup,
+            manifest_object_lookup=self._manifest_object_lookup,
         )
 
     @property
@@ -67,3 +68,7 @@ class SemanticManifestLookup:
     @property
     def metric_lookup(self) -> MetricLookup:  # noqa: D102
         return self._metric_lookup
+
+    @cached_property
+    def manifest_object_lookup(self) -> ManifestObjectLookup:  # noqa: D102
+        return self._manifest_object_lookup
