@@ -119,9 +119,9 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             source_nodes=source_nodes, collected_labels=find_descendants_result.labels_collected_during_traversal
         ):
             if element_filter is None:
-                element_filter = GroupByItemSetFilter()
+                element_filter = GroupByItemSetFilter.create()
             element_filter = element_filter.copy(
-                without_any_of=element_filter.without_any_of.union((GroupByItemProperty.DATE_PART,))
+                any_properties_denylist=element_filter.any_properties_denylist.union((GroupByItemProperty.DATE_PART,))
             )
 
         result_intersection_source_nodes = tuple(find_descendants_result.reachable_target_nodes)

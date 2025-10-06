@@ -177,7 +177,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             group_by_items_for_measure = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
                 measure_references=(node.measure_reference,),
                 # The filter should allow everything, except for the ones blocked by the spec patterns.
-                set_filter=GroupByItemSetFilter().merge(
+                set_filter=GroupByItemSetFilter.create().merge(
                     GroupByItemSetFilter.merge_iterable(
                         spec_pattern.element_pre_filter for spec_pattern in self._source_spec_patterns
                     ),

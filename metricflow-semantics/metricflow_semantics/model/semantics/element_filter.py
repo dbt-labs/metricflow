@@ -14,50 +14,66 @@ class GroupByItemSetFilter(Mergeable):
     """Describes a way to filter the items in a `BaseGroupByItemSet`."""
 
     # A `None` value for element names means no filtering on element names.
-    element_names: Optional[FrozenSet[str]] = None
-    with_any_of: FrozenSet[GroupByItemProperty] = GroupByItemProperty.all_properties()
-    without_any_of: FrozenSet[GroupByItemProperty] = frozenset()
-    without_all_of: FrozenSet[GroupByItemProperty] = frozenset()
+    element_name_allowlist: Optional[FrozenSet[str]] = None
+    any_properties_allowlist: FrozenSet[GroupByItemProperty] = GroupByItemProperty.all_properties()
+    any_properties_denylist: FrozenSet[GroupByItemProperty] = frozenset()
+
+    @staticmethod
+    def create(  # noqa: D102
+        element_name_allowlist: Optional[Iterable[str]] = None,
+        any_properties_allowlist: Iterable[GroupByItemProperty] = GroupByItemProperty.all_properties(),
+        any_properties_denylist: Iterable[GroupByItemProperty] = frozenset(),
+    ) -> GroupByItemSetFilter:
+        return GroupByItemSetFilter(
+            element_name_allowlist=frozenset(element_name_allowlist) if element_name_allowlist is not None else None,
+            any_properties_allowlist=frozenset(any_properties_allowlist),
+            any_properties_denylist=frozenset(any_properties_denylist),
+        )
 
     def copy(
         self,
-        element_names: Optional[FrozenSet[str]] = None,
-        with_any_of: Optional[FrozenSet[GroupByItemProperty]] = None,
-        without_any_of: Optional[FrozenSet[GroupByItemProperty]] = None,
-        without_all_of: Optional[FrozenSet[GroupByItemProperty]] = None,
+        element_name_allowlist: Optional[FrozenSet[str]] = None,
+        any_properties_allowlist: Optional[FrozenSet[GroupByItemProperty]] = None,
+        any_properties_denylist: Optional[FrozenSet[GroupByItemProperty]] = None,
     ) -> GroupByItemSetFilter:
         """Create a copy of this with the given non-None fields replaced."""
         return GroupByItemSetFilter(
-            element_names=element_names if element_names is not None else self.element_names,
-            with_any_of=with_any_of if with_any_of is not None else self.with_any_of,
-            without_any_of=without_any_of if without_any_of is not None else self.without_any_of,
-            without_all_of=without_all_of if without_all_of is not None else self.without_all_of,
+            element_name_allowlist=element_name_allowlist
+            if element_name_allowlist is not None
+            else self.element_name_allowlist,
+            any_properties_allowlist=any_properties_allowlist
+            if any_properties_allowlist is not None
+            else self.any_properties_allowlist,
+            any_properties_denylist=any_properties_denylist
+            if any_properties_denylist is not None
+            else self.any_properties_denylist,
         )
 
     @override
     def merge(self: Self, other: GroupByItemSetFilter) -> GroupByItemSetFilter:
-        if self.element_names is None and other.element_names is None:
+        if self.element_name_allowlist is None and other.element_name_allowlist is None:
             element_names = None
         else:
-            element_names = (self.element_names or frozenset()).union(other.element_names or frozenset())
+            element_names = (self.element_name_allowlist or frozenset()).union(
+                other.element_name_allowlist or frozenset()
+            )
         return GroupByItemSetFilter(
-            element_names=element_names,
-            with_any_of=self.with_any_of.union(other.with_any_of),
-            without_any_of=self.without_any_of.union(other.without_any_of),
-            without_all_of=self.without_all_of.union(other.without_all_of),
+            element_name_allowlist=element_names,
+            any_properties_allowlist=self.any_properties_allowlist.union(other.any_properties_allowlist),
+            any_properties_denylist=self.any_properties_denylist.union(other.any_properties_denylist),
         )
 
     @classmethod
     @override
     def empty_instance(cls) -> GroupByItemSetFilter:
-        return GroupByItemSetFilter()
+        return GroupByItemSetFilter.create()
 
-    def without_element_names(self) -> GroupByItemSetFilter:
-        """Return this filter without the `element_names` filter set."""
-        return GroupByItemSetFilter(
-            with_any_of=self.with_any_of,
-            without_any_of=self.without_any_of,
-            without_all_of=self.without_all_of,
+    def without_element_name_allowlist(self) -> GroupByItemSetFilter:
+        """Return this filter without the `element_name_allowlist` filter set."""
+        return GroupByItemSetFilter.create(
+            element_name_allowlist=None,
+            any_properties_denylist=self.any_properties_denylist,
+            any_properties_allowlist=self.any_properties_allowlist,
         )
 
     def allow(self, element_name: Optional[str], element_properties: Optional[Iterable[GroupByItemProperty]]) -> bool:
@@ -66,22 +82,15 @@ class GroupByItemSetFilter(Mergeable):
         `None` can be specified in cases of incomplete context.
         """
         if element_name is not None:
-            allowed_element_name_set = self.element_names
+            allowed_element_name_set = self.element_name_allowlist
             if allowed_element_name_set is not None and element_name not in allowed_element_name_set:
                 return False
 
         if element_properties is not None:
-            if len(self.with_any_of.intersection(element_properties)) == 0:
+            if len(self.any_properties_allowlist.intersection(element_properties)) == 0:
                 return False
-            denied_property_set = self.without_any_of
+            denied_property_set = self.any_properties_denylist
             if denied_property_set and len(denied_property_set.intersection(element_properties)) > 0:
                 return False
-            denied_full_match_property_set = self.without_all_of
-            if denied_full_match_property_set:
-                denied_full_match_property_set_length = len(denied_full_match_property_set)
-                if denied_full_match_property_set_length > 0 and denied_full_match_property_set_length == len(
-                    denied_full_match_property_set.intersection(element_properties)
-                ):
-                    return False
 
         return True

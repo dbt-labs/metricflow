@@ -115,17 +115,17 @@ class SemanticGraphTester:
         set generation.
         """
         for element_property in GroupByItemProperty:
-            with_any_of_filter = GroupByItemSetFilter(with_any_of=frozenset((element_property,)))
-            filtered_set = filtered_set_callable(with_any_of_filter)
+            any_properties_allowlist_filter = GroupByItemSetFilter.create(any_properties_allowlist=(element_property,))
+            filtered_set = filtered_set_callable(any_properties_allowlist_filter)
             # The resolver uses the filter to limit graph traversal, so this is not the same logic.
-            expected_items = set(complete_set.filter(with_any_of_filter).annotated_specs)
+            expected_items = set(complete_set.filter(any_properties_allowlist_filter).annotated_specs)
             actual_items = set(filtered_set.annotated_specs)
 
             assert expected_items == actual_items
 
-            without_any_of_filter = GroupByItemSetFilter(without_any_of=frozenset((element_property,)))
-            filtered_set = filtered_set_callable(without_any_of_filter)
-            expected_items = set(complete_set.filter(without_any_of_filter).annotated_specs)
+            any_properties_denylist_filter = GroupByItemSetFilter.create(any_properties_denylist=(element_property,))
+            filtered_set = filtered_set_callable(any_properties_denylist_filter)
+            expected_items = set(complete_set.filter(any_properties_denylist_filter).annotated_specs)
             actual_items = set(filtered_set.annotated_specs)
 
             assert expected_items == actual_items
