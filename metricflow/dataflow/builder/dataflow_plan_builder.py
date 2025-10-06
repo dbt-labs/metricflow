@@ -409,7 +409,7 @@ class DataflowPlanBuilder:
             metric_reference=metric_spec.reference,
             conversion_type_params=conversion_type_params,
             filter_spec_factory=filter_spec_factory,
-            descendent_filter_spec_set=metric_spec.filter_spec_set,
+            descendant_filter_spec_set=metric_spec.filter_spec_set,
             queried_linkable_specs=queried_linkable_specs,
         )
         # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
@@ -512,7 +512,7 @@ class DataflowPlanBuilder:
                 ),
                 cumulative_grain_to_date=cumulative_grain_to_date,
             ),
-            descendent_filter_spec_set=metric_spec.filter_spec_set,
+            descendant_filter_spec_set=metric_spec.filter_spec_set,
         )
 
         aggregated_measures_node = self.build_aggregated_measure(
@@ -564,7 +564,7 @@ class DataflowPlanBuilder:
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
             cumulative_description=None,
-            descendent_filter_spec_set=metric_spec.filter_spec_set,
+            descendant_filter_spec_set=metric_spec.filter_spec_set,
         )
 
         aggregated_measures_node = self.build_aggregated_measure(
@@ -1308,7 +1308,7 @@ class DataflowPlanBuilder:
         metric_reference: MetricReference,
         conversion_type_params: ConversionTypeParams,
         filter_spec_factory: WhereSpecFactory,
-        descendent_filter_spec_set: WhereFilterSpecSet,
+        descendant_filter_spec_set: WhereFilterSpecSet,
         queried_linkable_specs: LinkableSpecSet,
     ) -> Tuple[MetricInputMeasureSpec, MetricInputMeasureSpec]:
         """Return [base_measure_input, conversion_measure_input] for computing a conversion metric."""
@@ -1327,7 +1327,7 @@ class DataflowPlanBuilder:
                 metric=metric,
                 input_measure=input_measure,
                 queried_linkable_specs=queried_linkable_specs,
-                descendent_filter_spec_set=descendent_filter_spec_set,
+                descendant_filter_spec_set=descendant_filter_spec_set,
                 include_filters=include_filters,
             )
             # Filters should only be applied to base measures.
@@ -1344,7 +1344,7 @@ class DataflowPlanBuilder:
         filter_spec_factory: WhereSpecFactory,
         metric: Metric,
         input_measure: MetricInputMeasure,
-        descendent_filter_spec_set: WhereFilterSpecSet,
+        descendant_filter_spec_set: WhereFilterSpecSet,
         queried_linkable_specs: LinkableSpecSet,
         include_filters: bool = True,
         child_metric_offset_window: Optional[MetricTimeWindow] = None,
@@ -1354,7 +1354,7 @@ class DataflowPlanBuilder:
         """Return the input measure spec required to compute the base metric.
 
         "child" refers to the derived metric that uses the metric specified by metric_reference in the definition.
-        descendent_filter_specs includes all filter specs required to compute the metric in the query. This includes the
+        descendant_filter_specs includes all filter specs required to compute the metric in the query. This includes the
         filters in the query and any filter in the definition of metrics in between.
         """
         filter_spec_set: WhereFilterSpecSet = WhereFilterSpecSet()
@@ -1363,7 +1363,7 @@ class DataflowPlanBuilder:
                 filter_spec_factory=filter_spec_factory,
                 metric=metric,
                 input_measure=input_measure,
-                descendent_filter_spec_set=descendent_filter_spec_set,
+                descendant_filter_spec_set=descendant_filter_spec_set,
             )
 
         measure_spec = MeasureSpec(
@@ -1453,7 +1453,7 @@ class DataflowPlanBuilder:
         filter_spec_factory: WhereSpecFactory,
         metric: Metric,
         input_measure: MetricInputMeasure,
-        descendent_filter_spec_set: WhereFilterSpecSet,
+        descendant_filter_spec_set: WhereFilterSpecSet,
     ) -> WhereFilterSpecSet:
         metric_reference = MetricReference(element_name=metric.name)
         filter_location = WhereFilterLocation.for_metric(metric_reference)
@@ -1470,7 +1470,7 @@ class DataflowPlanBuilder:
                 )
             ),
         )
-        return filter_spec_set.merge(descendent_filter_spec_set)
+        return filter_spec_set.merge(descendant_filter_spec_set)
 
     def _build_input_metric_specs_for_derived_metric(
         self,
