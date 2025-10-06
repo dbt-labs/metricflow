@@ -458,6 +458,12 @@ class DataflowPlanBuilder:
         predicate_pushdown_state: PredicatePushdownState,
         for_group_by_source_node: bool = False,
     ) -> DataflowPlanNode:
+        metric_reference = metric_spec.reference
+        metric = self._metric_lookup.get_metric(metric_reference)
+        if metric.type is not MetricType.CUMULATIVE:
+            raise RuntimeError(
+                LazyFormat("This method should have been called with a cumulative metric", metric=metric)
+            )
         min_metric_time_spec = self._get_minimum_metric_time_spec_for_metric(metric_spec.reference)
         min_granularity = min_metric_time_spec.time_granularity
 
@@ -470,56 +476,16 @@ class DataflowPlanBuilder:
                 query_includes_agg_time_dimension_with_min_granularity = True
                 break
 
-        if query_includes_agg_time_dimension_with_min_granularity or len(queried_agg_time_dimensions) == 0:
-            return self._build_base_metric_output_node(
-                metric_spec=metric_spec,
-                queried_linkable_specs=queried_linkable_specs,
-                filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_state=predicate_pushdown_state,
-                for_group_by_source_node=for_group_by_source_node,
-            )
-
         # If a cumulative metric is queried without its minimum granularity, it will need to be aggregated twice:
         # once as a normal metric, and again using a window function to narrow down to one row per granularity period.
         # In this case, add metric time at the default granularity to the linkable specs. It will be used in the order by
         # clause of the window function and later excluded from the output selections.
-        include_linkable_specs = queried_linkable_specs.add_specs(time_dimension_specs=(min_metric_time_spec,))
-        compute_metrics_node = self._build_base_metric_output_node(
-            metric_spec=metric_spec,
-            queried_linkable_specs=include_linkable_specs,
-            filter_spec_factory=filter_spec_factory,
-            predicate_pushdown_state=predicate_pushdown_state,
-            for_group_by_source_node=for_group_by_source_node,
+        requires_window_reaggregation = not (
+            query_includes_agg_time_dimension_with_min_granularity or len(queried_agg_time_dimensions) == 0
         )
-        return WindowReaggregationNode.create(
-            parent_node=compute_metrics_node,
-            metric_spec=metric_spec,
-            order_by_spec=min_metric_time_spec,
-            partition_by_specs=queried_linkable_specs.as_tuple,
-        )
-
-    def _build_base_metric_output_node(
-        self,
-        metric_spec: MetricSpec,
-        queried_linkable_specs: LinkableSpecSet,
-        filter_spec_factory: WhereSpecFactory,
-        predicate_pushdown_state: PredicatePushdownState,
-        for_group_by_source_node: bool = False,
-    ) -> ComputeMetricsNode:
-        """Builds a node to compute a metric that is not defined from other metrics."""
-        metric_reference = metric_spec.reference
-        metric = self._metric_lookup.get_metric(metric_reference)
-        if metric.type is MetricType.SIMPLE or metric.type is MetricType.CUMULATIVE:
-            pass
-        elif (
-            metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED or metric.type is MetricType.CONVERSION
-        ):
-            raise ValueError(f"This should only be called for base metrics (simple or cumulative). Got: {metric.type}")
-        else:
-            assert_values_exhausted(metric.type)
-        assert (
-            len(metric.input_measures) == 1
-        ), f"A base metric should not have multiple measures. Got {metric.input_measures}"
+        required_linkable_specs = queried_linkable_specs
+        if requires_window_reaggregation:
+            required_linkable_specs = queried_linkable_specs.add_specs(time_dimension_specs=(min_metric_time_spec,))
 
         cumulative_grain_to_date: Optional[TimeGranularity] = None
         if (
@@ -535,29 +501,70 @@ class DataflowPlanBuilder:
             filter_spec_factory=filter_spec_factory,
             metric=metric,
             input_measure=metric.input_measures[0],
-            queried_linkable_specs=queried_linkable_specs,
+            queried_linkable_specs=required_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
-            cumulative_description=(
-                CumulativeMeasureDescription(
-                    cumulative_window=(
-                        metric.type_params.cumulative_type_params.window
-                        if metric.type_params.cumulative_type_params
-                        else None
-                    ),
-                    cumulative_grain_to_date=cumulative_grain_to_date,
-                )
-                if metric.type is MetricType.CUMULATIVE
-                else None
+            cumulative_description=CumulativeMeasureDescription(
+                cumulative_window=(
+                    metric.type_params.cumulative_type_params.window
+                    if metric.type_params.cumulative_type_params
+                    else None
+                ),
+                cumulative_grain_to_date=cumulative_grain_to_date,
             ),
             descendent_filter_spec_set=metric_spec.filter_spec_set,
         )
-        logger.debug(
-            LazyFormat(
-                lambda: f"For\n{mf_indent(mf_pformat(metric_spec))}"
-                f"\nneeded measure is:"
-                f"\n{mf_indent(mf_pformat(metric_input_measure_spec))}"
+
+        aggregated_measures_node = self.build_aggregated_measure(
+            metric_input_measure_spec=metric_input_measure_spec,
+            queried_linkable_specs=required_linkable_specs,
+            predicate_pushdown_state=predicate_pushdown_state,
+        )
+
+        compute_metrics_node = self.build_computed_metrics_node(
+            metric_spec=metric_spec,
+            aggregated_measures_node=aggregated_measures_node,
+            for_group_by_source_node=for_group_by_source_node,
+            aggregated_to_elements=set(required_linkable_specs.as_tuple),
+        )
+
+        if requires_window_reaggregation:
+            return WindowReaggregationNode.create(
+                parent_node=compute_metrics_node,
+                metric_spec=metric_spec,
+                order_by_spec=min_metric_time_spec,
+                partition_by_specs=queried_linkable_specs.as_tuple,
             )
+
+        return compute_metrics_node
+
+    def _build_simple_metric_output_node(
+        self,
+        metric_spec: MetricSpec,
+        queried_linkable_specs: LinkableSpecSet,
+        filter_spec_factory: WhereSpecFactory,
+        predicate_pushdown_state: PredicatePushdownState,
+        for_group_by_source_node: bool = False,
+    ) -> ComputeMetricsNode:
+        """Builds a node to compute a metric that is not defined from other metrics."""
+        metric_reference = metric_spec.reference
+        metric = self._metric_lookup.get_metric(metric_reference)
+        if metric.type is not MetricType.SIMPLE:
+            raise RuntimeError(LazyFormat("This method should have been called with a simple metric", metric=metric))
+
+        assert (
+            len(metric.input_measures) == 1
+        ), f"A base metric should not have multiple measures. Got {metric.input_measures}"
+
+        metric_input_measure_spec = self._build_input_measure_spec(
+            filter_spec_factory=filter_spec_factory,
+            metric=metric,
+            input_measure=metric.input_measures[0],
+            queried_linkable_specs=queried_linkable_specs,
+            child_metric_offset_window=metric_spec.offset_window,
+            child_metric_offset_to_grain=metric_spec.offset_to_grain,
+            cumulative_description=None,
+            descendent_filter_spec_set=metric_spec.filter_spec_set,
         )
 
         aggregated_measures_node = self.build_aggregated_measure(
@@ -565,6 +572,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
         )
+
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_measures_node=aggregated_measures_node,
@@ -588,8 +596,7 @@ class DataflowPlanBuilder:
         )
         logger.debug(
             LazyFormat(
-                lambda: f"For {metric.type} metric: {metric_spec}, needed metrics are:\n"
-                f"{mf_pformat(metric_input_specs)}"
+                "Building derived metric output node", metric_spec=metric_spec, metric_input_specs=metric_input_specs
             )
         )
 
@@ -697,7 +704,7 @@ class DataflowPlanBuilder:
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
         if metric.type is MetricType.SIMPLE:
-            return self._build_base_metric_output_node(
+            return self._build_simple_metric_output_node(
                 metric_spec=metric_spec,
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
