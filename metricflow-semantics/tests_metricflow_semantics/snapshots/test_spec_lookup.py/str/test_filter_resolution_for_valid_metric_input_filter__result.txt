@@ -56,8 +56,8 @@ FilterSpecResolutionLookUp(
       filter_location_path=MetricFlowQueryResolutionPath(
         resolution_path_nodes=(
           QueryGroupByItemResolutionNode(node_id=qr_0),
-          MetricGroupByItemResolutionNode(node_id=mtr_3),
-          MetricGroupByItemResolutionNode(node_id=mtr_2),
+          ComplexMetricGroupByItemResolutionNode(node_id=mtr_1),
+          ComplexMetricGroupByItemResolutionNode(node_id=mtr_0),
         ),
       ),
       object_builder_str="TimeDimension('metric_time')",

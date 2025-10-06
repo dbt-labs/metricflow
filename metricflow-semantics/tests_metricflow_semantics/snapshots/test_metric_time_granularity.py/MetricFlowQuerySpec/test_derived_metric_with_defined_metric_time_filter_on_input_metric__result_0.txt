@@ -73,8 +73,8 @@ MetricFlowQuerySpec(
         filter_location_path=MetricFlowQueryResolutionPath(
           resolution_path_nodes=(
             QueryGroupByItemResolutionNode(node_id=qr_1),
-            MetricGroupByItemResolutionNode(node_id=mtr_1),
-            MetricGroupByItemResolutionNode(node_id=mtr_0),
+            ComplexMetricGroupByItemResolutionNode(node_id=mtr_0),
+            SimpleMetricGroupByItemSourceNode(node_id=msr_0),
           ),
         ),
         object_builder_str="TimeDimension('metric_time')",
@@ -141,8 +141,8 @@ MetricFlowQuerySpec(
         filter_location_path=MetricFlowQueryResolutionPath(
           resolution_path_nodes=(
             QueryGroupByItemResolutionNode(node_id=qr_1),
-            MetricGroupByItemResolutionNode(node_id=mtr_1),
-            MetricGroupByItemResolutionNode(node_id=mtr_0),
+            ComplexMetricGroupByItemResolutionNode(node_id=mtr_0),
+            SimpleMetricGroupByItemSourceNode(node_id=msr_0),
           ),
         ),
         object_builder_str="TimeDimension('metric_time')",

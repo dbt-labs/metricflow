@@ -9,27 +9,15 @@ docstring:
         <!-- node_id = NodeId(id_str='qr_3') -->
         <!-- metrics_in_query = ['monthly_metric_0', 'yearly_metric_0'] -->
         <!-- where_filter = ["{{ TimeDimension('metric_time') }} > '2020-01-01'"] -->
-        <MetricGroupByItemResolutionNode>
-            <!-- description = 'Output group-by-items available for this metric.' -->
-            <!-- node_id = NodeId(id_str='mtr_3') -->
+        <SimpleMetricGroupByItemSourceNode>
+            <!-- description = 'Output group-by-items available for this simple metric.' -->
+            <!-- node_id = NodeId(id_str='msr_3') -->
             <!-- metric_reference = "MetricReference(element_name='monthly_metric_0')" -->
-            <MeasureGroupByItemSourceNode>
-                <!-- description = 'Output group-by-items available for this measure.' -->
-                <!-- node_id = NodeId(id_str='msr_3') -->
-                <!-- measure_reference = "MeasureReference(element_name='monthly_measure_0')" -->
-                <!-- child_metric_reference = "MetricReference(element_name='monthly_metric_0')" -->
-            </MeasureGroupByItemSourceNode>
-        </MetricGroupByItemResolutionNode>
-        <MetricGroupByItemResolutionNode>
-            <!-- description = 'Output group-by-items available for this metric.' -->
-            <!-- node_id = NodeId(id_str='mtr_4') -->
+        </SimpleMetricGroupByItemSourceNode>
+        <SimpleMetricGroupByItemSourceNode>
+            <!-- description = 'Output group-by-items available for this simple metric.' -->
+            <!-- node_id = NodeId(id_str='msr_4') -->
             <!-- metric_reference = "MetricReference(element_name='yearly_metric_0')" -->
-            <MeasureGroupByItemSourceNode>
-                <!-- description = 'Output group-by-items available for this measure.' -->
-                <!-- node_id = NodeId(id_str='msr_4') -->
-                <!-- measure_reference = "MeasureReference(element_name='yearly_measure_0')" -->
-                <!-- child_metric_reference = "MetricReference(element_name='yearly_metric_0')" -->
-            </MeasureGroupByItemSourceNode>
-        </MetricGroupByItemResolutionNode>
+        </SimpleMetricGroupByItemSourceNode>
     </QueryGroupByItemResolutionNode>
 </GroupByItemResolutionDag>
