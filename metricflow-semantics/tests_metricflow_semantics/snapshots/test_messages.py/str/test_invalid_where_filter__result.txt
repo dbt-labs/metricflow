@@ -9,7 +9,7 @@ Error #1:
   Message:
 
     The given input does not match any of the available group-by-items for
-    Measure('bookings'). Common issues are:
+    SimpleMetric('bookings'). Common issues are:
 
       * Incorrect names.
       * No valid join paths exist from the measure to the group-by-item.
@@ -40,5 +40,4 @@ Error #1:
   Issue Location:
 
     [Resolve Query(['bookings'])]
-      -> [Resolve Metric('bookings')]
-        -> [Resolve Measure('bookings')]
+      -> [Resolve SimpleMetric('bookings')]

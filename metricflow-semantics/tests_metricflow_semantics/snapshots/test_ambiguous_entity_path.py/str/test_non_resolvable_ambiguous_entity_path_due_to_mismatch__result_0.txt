@@ -12,13 +12,13 @@ Error #1:
 
     Query(['entity_0_metric', 'entity_1_metric']) is built from:
 
-      Metric('entity_0_metric'), Metric('entity_1_metric').
+      SimpleMetric('entity_0_metric'), SimpleMetric('entity_1_metric').
 
     However, the given input does not match to a common item that is available to those parents:
 
       {
-        "Matching items for: Metric('entity_0_metric')": ['entity_0__country'],
-        "Matching items for: Metric('entity_1_metric')": [
+        "Matching items for: SimpleMetric('entity_0_metric')": ['entity_0__country'],
+        "Matching items for: SimpleMetric('entity_1_metric')": [
           'entity_1__entity_0__country',
         ],
       }

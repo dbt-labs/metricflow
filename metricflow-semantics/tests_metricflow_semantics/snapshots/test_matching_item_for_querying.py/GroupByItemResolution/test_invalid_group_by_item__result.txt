@@ -10,8 +10,7 @@ GroupByItemResolution(
         query_resolution_path=MetricFlowQueryResolutionPath(
           resolution_path_nodes=(
             QueryGroupByItemResolutionNode(node_id=qr_3),
-            MetricGroupByItemResolutionNode(node_id=mtr_3),
-            MeasureGroupByItemSourceNode(node_id=msr_3),
+            SimpleMetricGroupByItemSourceNode(node_id=msr_3),
           ),
         ),
       ),
@@ -20,8 +19,7 @@ GroupByItemResolution(
         query_resolution_path=MetricFlowQueryResolutionPath(
           resolution_path_nodes=(
             QueryGroupByItemResolutionNode(node_id=qr_3),
-            MetricGroupByItemResolutionNode(node_id=mtr_4),
-            MeasureGroupByItemSourceNode(node_id=msr_4),
+            SimpleMetricGroupByItemSourceNode(node_id=msr_4),
           ),
         ),
       ),

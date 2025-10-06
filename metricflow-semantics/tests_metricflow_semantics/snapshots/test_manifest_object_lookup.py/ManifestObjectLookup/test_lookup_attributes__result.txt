@@ -5,7 +5,7 @@ docstring:
 ---
 ManifestObjectLookup(
   model_object_lookups=(
-    SimpleMetricInputModelObjectLookup(
+    SimpleMetricModelObjectLookup(
       model_id=bookings_source,
       time_dimension_name_to_grain={'booking_time': QUARTER},
       entity_lookup=EntityLookup(
