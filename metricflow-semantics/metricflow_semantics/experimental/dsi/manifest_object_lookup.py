@@ -7,16 +7,17 @@ from functools import cached_property
 from typing import Iterable, Mapping, Optional, Sequence
 
 from dbt_semantic_interfaces.protocols import Metric, SemanticManifest, SemanticModel
-from dbt_semantic_interfaces.type_enums import TimeGranularity
+from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from more_itertools import peekable
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, T
+from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, Pair, T
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_flatten
 from metricflow_semantics.experimental.dsi.measure_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
+from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
@@ -58,21 +59,42 @@ class ManifestObjectLookup(AttributePrettyFormattable):
         return self._semantic_manifest.semantic_models
 
     @cached_property
+    def _semantic_model_and_simple_metrics_pairs(self) -> Sequence[Pair[SemanticModel, Sequence[Metric]]]:
+        model_name_to_simple_metrics: defaultdict[str, list[Metric]] = defaultdict(list)
+
+        for metric in self._semantic_manifest.metrics:
+            metric_type = metric.type
+            if metric_type is MetricType.SIMPLE:
+                metric_aggregation_params = metric.type_params.metric_aggregation_params
+                if metric_aggregation_params is None:
+                    raise MetricflowInternalError(
+                        LazyFormat("A simple metric is missing `metric_aggregation_params`", metric=metric)
+                    )
+                model_name_to_simple_metrics[metric_aggregation_params.semantic_model].append(metric)
+
+        semantic_model_and_simple_metrics_pairs: list[Pair[SemanticModel, Sequence[Metric]]] = []
+        for semantic_model in self._semantic_manifest.semantic_models:
+            semantic_model_and_simple_metrics_pairs.append(
+                (semantic_model, model_name_to_simple_metrics.get(semantic_model.name) or ())
+            )
+        return semantic_model_and_simple_metrics_pairs
+
+    @cached_property
     def simple_metric_model_lookups(self) -> AnyLengthTuple[SimpleMetricModelObjectLookup]:
         """Returns lookups corresponding to semantic models that are associated with simple metrics."""
         return tuple(
-            SimpleMetricModelObjectLookup(semantic_model, self._semantic_manifest.metrics)
-            for semantic_model in self.semantic_models
-            if len(semantic_model.measures) > 0
+            SimpleMetricModelObjectLookup(semantic_model, simple_metrics=simple_metrics)
+            for semantic_model, simple_metrics in self._semantic_model_and_simple_metrics_pairs
+            if len(simple_metrics) > 0
         )
 
     @cached_property
     def simple_metric_exclusive_model_lookups(self) -> AnyLengthTuple[ModelObjectLookup]:
         """Returns lookups corresponding to semantic models that are not associated with simple metrics."""
         return tuple(
-            ModelObjectLookup(semantic_model, self._semantic_manifest.metrics)
-            for semantic_model in self.semantic_models
-            if len(semantic_model.measures) == 0
+            ModelObjectLookup(semantic_model)
+            for semantic_model, simple_metrics in self._semantic_model_and_simple_metrics_pairs
+            if len(simple_metrics) == 0
         )
 
     @cached_property

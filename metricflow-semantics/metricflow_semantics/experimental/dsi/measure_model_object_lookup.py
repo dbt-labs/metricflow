@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from functools import cached_property
-from typing import Iterable, Mapping, Sequence
+from typing import Iterable, Mapping, Optional, Sequence
 
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import Metric, SemanticModel
@@ -38,31 +38,42 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
     A separate lookup class helps to break out the lookup classes and provide better typing (fewer `None` cases).
     """
 
-    def __init__(self, semantic_model: SemanticModel, metrics: Sequence[Metric]) -> None:  # noqa: D107
-        if len(semantic_model.measures) == 0:
+    def __init__(  # noqa: D107
+        self, semantic_model: SemanticModel, simple_metrics: Optional[Sequence[Metric]] = None
+    ) -> None:
+        super().__init__(semantic_model)
+        model_name = semantic_model.name
+        # Sanity checks.
+        if not simple_metrics:
             raise MetricflowInternalError(
                 LazyFormat(
-                    "This should have been created with a semantic model containing measures",
-                    semantic_model=semantic_model,
+                    "Can't initialize with empty `simple_metrics`",
+                    simple_metrics=simple_metrics,
                 )
             )
-
-        super().__init__(semantic_model, metrics)
+        for metric in simple_metrics:
+            if metric.type is not MetricType.SIMPLE:
+                raise MetricflowInternalError(
+                    LazyFormat("Can't initialize with a metric that is not a simple metric", metric=metric)
+                )
+            metric_aggregation_params = metric.type_params.metric_aggregation_params
+            if metric_aggregation_params is None or metric_aggregation_params.semantic_model != model_name:
+                raise MetricflowInternalError(
+                    LazyFormat(
+                        "Can't initialize with a metric that is not associated with this semantic model",
+                        metric=metric,
+                        model_name=model_name,
+                    )
+                )
+        self._simple_metrics = simple_metrics
 
     @cached_property
     def _simple_metric_inputs_from_metrics(self) -> Sequence[SimpleMetricInput]:
         simple_metric_inputs: list[SimpleMetricInput] = []
-        for metric in self._metrics:
-            metric_aggregation_params = metric.type_params.metric_aggregation_params
-
-            if (
-                metric.type is not MetricType.SIMPLE
-                or metric_aggregation_params is None
-                or metric_aggregation_params.semantic_model != self.semantic_model.name
-            ):
-                continue
-
+        for metric in self._simple_metrics:
             metric_type_params = metric.type_params
+            metric_aggregation_params = metric.type_params.metric_aggregation_params
+            assert metric_aggregation_params is not None, "`metric_aggregation_params` should be set for all metrics"
 
             agg_time_dimension_name = metric_aggregation_params.agg_time_dimension or (
                 self._semantic_model.defaults.agg_time_dimension if self._semantic_model.defaults is not None else None
