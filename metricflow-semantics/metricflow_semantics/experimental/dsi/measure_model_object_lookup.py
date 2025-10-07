@@ -115,7 +115,7 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
 
     @cached_property
     def aggregation_time_dimension_name_to_simple_metric_inputs(self) -> Mapping[str, Iterable[SimpleMetricInput]]:
-        """Mapping from the name of the aggregation to the `SimpleMetricInput` for this model."""
+        """Mapping from the name of the aggregation time dimension to the `SimpleMetricInputs` for this model."""
         current_aggregation_time_dimension_name_to_simple_metric_inputs: dict[
             str, list[SimpleMetricInput]
         ] = defaultdict(list)
@@ -131,7 +131,7 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
     def aggregation_configuration_to_simple_metric_inputs(
         self,
     ) -> Mapping[SimpleMetricAggregationConfiguration, Iterable[SimpleMetricInput]]:
-        """Mapping from the aggregation configuration to the `SimpleMetricInput` objects for this model."""
+        """Mapping from the aggregation configuration to the `SimpleMetricInputs` for this model."""
         current_aggregation_configuration_to_simple_metric_inputs: defaultdict[
             SimpleMetricAggregationConfiguration, list[SimpleMetricInput]
         ] = defaultdict(list)

@@ -36,8 +36,8 @@ class SimpleMetricSubgraphGenerator(SemanticSubgraphGenerator):
 
     @override
     def add_edges_for_manifest(self, edge_list: list[SemanticGraphEdge]) -> None:
-        for measure_lookup in self._manifest_object_lookup.simple_metric_model_lookups:
-            self._add_edges_for_simple_metric_model(measure_lookup, edge_list)
+        for lookup in self._manifest_object_lookup.simple_metric_model_lookups:
+            self._add_edges_for_simple_metric_model(lookup, edge_list)
 
     def _add_edges_for_simple_metric_model(
         self, lookup: SimpleMetricModelObjectLookup, edge_list: list[SemanticGraphEdge]
