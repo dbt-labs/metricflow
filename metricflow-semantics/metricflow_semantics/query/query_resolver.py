@@ -4,17 +4,19 @@ import itertools
 import logging
 import time
 from collections import defaultdict
+from collections.abc import Set
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
+from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
+from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
@@ -319,7 +321,7 @@ class MetricFlowQueryResolver:
         # The pattern needs to be used because there are cases where the order-by-item is specified in a different way
         # from the group-by-item, so an equality comparison won't work.
         for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
-            matching_specs: Set[InstanceSpec] = set()
+            matching_specs: set[InstanceSpec] = set()
             for possible_input in resolver_input_for_order_by.possible_inputs:
                 spec_pattern = possible_input.spec_pattern
                 matching_specs.update(spec_pattern.match(metric_specs))
@@ -646,10 +648,10 @@ class MetricFlowQueryResolver:
                 for filter_spec_resolution in filter_spec_lookup.spec_resolutions
             )
         )
-        measure_semantic_models = self._get_models_for_measures(resolution_dag)
+        simple_metric_semantic_models = self._get_models_for_simple_metrics(resolution_dag)
 
         queried_semantic_models = set.union(
-            semantic_models_in_group_by_items, semantic_models_in_filters, measure_semantic_models
+            semantic_models_in_group_by_items, semantic_models_in_filters, simple_metric_semantic_models
         )
         queried_semantic_models -= {SemanticModelDerivation.VIRTUAL_SEMANTIC_MODEL_REFERENCE}
 
@@ -659,15 +661,13 @@ class MetricFlowQueryResolver:
         }
 
         # There are no known cases where this should happen, but adding this check just in case there's a bug where
-        # a measure alias is used incorrectly.
+        # a metric alias is used incorrectly.
         if len(models_not_in_manifest) > 0:
             logger.error(
                 LazyFormat(
-                    lambda: mf_pformat_dict(
-                        "Semantic references that aren't in the manifest were found in the set used in "
-                        "a query. This is a bug, and to avoid potential issues, they will be filtered out.",
-                        {"models_not_in_manifest": models_not_in_manifest},
-                    )
+                    "Semantic references that aren't in the manifest were found in the set used in"
+                    " a query. This is a bug, and to avoid potential issues, they will be filtered out.",
+                    models_not_in_manifest=models_not_in_manifest,
                 )
             )
         queried_semantic_models -= models_not_in_manifest
@@ -692,32 +692,33 @@ class MetricFlowQueryResolver:
             queried_semantic_models=sorted_semantic_model_references(queried_semantic_models),
         )
 
-    def _get_models_for_measures(self, resolution_dag: GroupByItemResolutionDag) -> Set[SemanticModelReference]:
-        """Return the semantic model references for the measures used in the query."""
+    def _get_models_for_simple_metrics(self, resolution_dag: GroupByItemResolutionDag) -> Set[SemanticModelReference]:
+        """Return the semantic model references for all simple metrics used in the query."""
         resolution_dag_node_set = resolution_dag.sink_node.inclusive_ancestors()
 
-        simple_metric_references: Set[MetricReference] = set()
+        simple_metric_references: MutableOrderedSet[MetricReference] = MutableOrderedSet()
 
-        # Collect measures for metrics through the associated measure nodes.
+        # Collect simple metrics.
         for simple_metric_node in resolution_dag_node_set.simple_metric_nodes:
             simple_metric_references.add(simple_metric_node.metric_reference)
 
-        # For conversion metrics, get the measures through the metric since those measures aren't in the DAG.
+        # For conversion metrics, get the input conversion metric through the metric since those
+        # aren't in the DAG.
         for metric_node in resolution_dag_node_set.complex_metric_nodes:
             metric = self._manifest_lookup.metric_lookup.get_metric(metric_node.metric_reference)
             conversion_type_params = metric.type_params.conversion_type_params
             if conversion_type_params is None:
                 continue
 
-            # The base measure should be in a DAG, but just in case.
             assert conversion_type_params.base_metric is not None, "A conversion metric must have a base metric."
             assert (
                 conversion_type_params.conversion_metric is not None
-            ), "A conversion metric must have a conversion measure."
+            ), "A conversion metric must have an input conversion metric."
+            # The input base metric should be in the DAG, but just in case.
             simple_metric_references.add(MetricReference(conversion_type_params.base_metric.name))
             simple_metric_references.add(MetricReference(conversion_type_params.conversion_metric.name))
 
-        model_references: Set[SemanticModelReference] = set()
+        model_references: MutableOrderedSet[SemanticModelReference] = MutableOrderedSet()
         for simple_metric_reference in simple_metric_references:
             metric = self._manifest_lookup.metric_lookup.get_metric(simple_metric_reference)
             metric_aggregation_params = metric.type_params.metric_aggregation_params
