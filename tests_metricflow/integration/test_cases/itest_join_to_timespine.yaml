@@ -38,4 +38,4 @@ integration_test:
       ON
         t.ds = b.metric_time__day
     ) c
-    WHERE booking__is_instant AND {{ render_time_constraint("metric_time__day", start_time="2020-01-01") }}
+    WHERE {{ render_time_constraint("metric_time__day", start_time="2020-01-01") }}
