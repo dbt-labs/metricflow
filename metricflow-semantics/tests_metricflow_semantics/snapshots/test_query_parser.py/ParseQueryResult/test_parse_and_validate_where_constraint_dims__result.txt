@@ -91,6 +91,7 @@ ParseQueryResult(
                 ),
               ),
             ),
+            include_time_dimensions=True,
           ),
           filter_location_path=MetricFlowQueryResolutionPath(
             resolution_path_nodes=(
