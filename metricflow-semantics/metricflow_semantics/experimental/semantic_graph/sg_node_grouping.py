@@ -4,6 +4,7 @@ import dataclasses
 import logging
 import typing
 from dataclasses import dataclass
+from typing import Iterable
 
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 
@@ -24,6 +25,7 @@ if typing.TYPE_CHECKING:
         TimeDimensionNode,
         TimeNode,
     )
+    from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphNode
 
 logger = logging.getLogger(__name__)
 
@@ -65,3 +67,10 @@ class SemanticGraphNodeTypedCollection:
     categorical_dimension_attribute_nodes: MutableOrderedSet[CategoricalDimensionAttributeNode] = dataclasses.field(
         default_factory=lambda: MutableOrderedSet()
     )
+
+    @staticmethod
+    def create(nodes: Iterable[SemanticGraphNode]) -> SemanticGraphNodeTypedCollection:  # noqa: D102
+        node_collection = SemanticGraphNodeTypedCollection()
+        for node in nodes:
+            node.add_to_typed_collection(node_collection)
+        return node_collection
