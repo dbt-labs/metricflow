@@ -3,10 +3,9 @@ from __future__ import annotations
 import logging
 from collections.abc import Mapping
 from functools import cached_property
-from typing import Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols import Metric, SemanticModel
+from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 from typing_extensions import override
 
@@ -23,9 +22,8 @@ logger = logging.getLogger(__name__)
 class ModelObjectLookup(AttributePrettyFormattable):
     """Similar to `ManifestObjectLookup` but for objects in a `SemanticModel`."""
 
-    def __init__(self, semantic_model: SemanticModel, metrics: Sequence[Metric]) -> None:  # noqa: D107
+    def __init__(self, semantic_model: SemanticModel) -> None:  # noqa: D107
         self._semantic_model = semantic_model
-        self._metrics = metrics
 
     @cached_property
     def semantic_model(self) -> SemanticModel:  # noqa: D102
