@@ -32,15 +32,20 @@ class DimensionPattern(EntityLinkPattern):
     Analogous pattern for Dimension() in the object builder naming scheme.
     """
 
+    include_time_dimensions: bool = True
+
     @override
     def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
-        filtered_specs: Sequence[LinkableInstanceSpec] = spec_set.dimension_specs + spec_set.time_dimension_specs
+        filtered_specs: Tuple[LinkableInstanceSpec, ...] = spec_set.dimension_specs
+        if self.include_time_dimensions:
+            filtered_specs += spec_set.time_dimension_specs
         return super().match(filtered_specs)
 
     @staticmethod
     def from_call_parameter_set(  # noqa: D102
         dimension_call_parameter_set: DimensionCallParameterSet,
+        include_time_dimensions: bool = True,
     ) -> DimensionPattern:
         return DimensionPattern(
             parameter_set=SpecPatternParameterSet.from_parameters(
@@ -52,7 +57,8 @@ class DimensionPattern(EntityLinkPattern):
                 element_name=dimension_call_parameter_set.dimension_reference.element_name,
                 entity_links=dimension_call_parameter_set.entity_path,
                 descending=dimension_call_parameter_set.descending,
-            )
+            ),
+            include_time_dimensions=include_time_dimensions,
         )
 
     @property
