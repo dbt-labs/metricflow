@@ -4,7 +4,6 @@ docstring:
   Test listing all metrics.
 ---
 [
-  'account_balance',
   'active_listings',
   'approximate_continuous_booking_value_p99',
   'approximate_discrete_booking_value_p99',
