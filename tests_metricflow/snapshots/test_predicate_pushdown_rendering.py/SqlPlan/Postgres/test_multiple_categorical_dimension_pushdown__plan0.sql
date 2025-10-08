@@ -92,8 +92,10 @@ FROM (
           , subq_4.listing__capacity_latest
           , subq_4.user__home_state_latest
           , subq_4.listings
-          , subq_4.largest_listing
+          , subq_4.lux_listings
           , subq_4.smallest_listing
+          , subq_4.largest_listing
+          , subq_4.active_listings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -163,8 +165,10 @@ FROM (
             , subq_1.listing__is_lux_latest AS listing__is_lux_latest
             , subq_1.listing__capacity_latest AS listing__capacity_latest
             , subq_1.listings AS listings
-            , subq_1.largest_listing AS largest_listing
+            , subq_1.lux_listings AS lux_listings
             , subq_1.smallest_listing AS smallest_listing
+            , subq_1.largest_listing AS largest_listing
+            , subq_1.active_listings AS active_listings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -233,14 +237,18 @@ FROM (
               , subq_0.listing__is_lux_latest
               , subq_0.listing__capacity_latest
               , subq_0.listings
-              , subq_0.largest_listing
+              , subq_0.lux_listings
               , subq_0.smallest_listing
+              , subq_0.largest_listing
+              , subq_0.active_listings
             FROM (
               -- Read Elements From Semantic Model 'listings_latest'
               SELECT
                 1 AS listings
-                , listings_latest_src_28000.capacity AS largest_listing
+                , 1 AS lux_listings
                 , listings_latest_src_28000.capacity AS smallest_listing
+                , listings_latest_src_28000.capacity AS largest_listing
+                , 1 AS active_listings
                 , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
                 , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
                 , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month

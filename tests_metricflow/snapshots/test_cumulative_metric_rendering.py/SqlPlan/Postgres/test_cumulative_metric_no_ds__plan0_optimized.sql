@@ -6,8 +6,9 @@ sql_engine: Postgres
 ---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements: ['txn_revenue']
+-- Pass Only Elements: ['revenue']
 -- Aggregate Measures
+-- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

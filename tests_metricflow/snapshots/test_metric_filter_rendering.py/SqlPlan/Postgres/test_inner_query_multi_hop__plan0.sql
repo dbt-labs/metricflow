@@ -738,11 +738,11 @@ FROM (
                               , subq_15.country
                               , subq_15.customer_id__country
                               , subq_15.customer_third_hop_id__country
-                              , subq_15.customers_with_other_data
+                              , subq_15.paraguayan_customers
                             FROM (
                               -- Read Elements From Semantic Model 'customer_other_data'
                               SELECT
-                                1 AS customers_with_other_data
+                                1 AS paraguayan_customers
                                 , customer_other_data_src_22000.country
                                 , DATE_TRUNC('day', customer_other_data_src_22000.acquired_ds) AS acquired_ds__day
                                 , DATE_TRUNC('week', customer_other_data_src_22000.acquired_ds) AS acquired_ds__week

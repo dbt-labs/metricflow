@@ -72,7 +72,7 @@ FROM (
     SELECT
       time_spine_src_28006.ds AS metric_time__day
       , subq_40.listing__country_latest AS listing__country_latest
-      , subq_40.bookings AS bookings_2_weeks_ago
+      , subq_40.bookings_2_weeks_ago AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Constrain Output with WHERE
@@ -81,7 +81,7 @@ FROM (
       SELECT
         metric_time__day
         , listing__country_latest
-        , SUM(bookings) AS bookings
+        , SUM(bookings) AS bookings_2_weeks_ago
       FROM (
         -- Join Standard Outputs
         SELECT

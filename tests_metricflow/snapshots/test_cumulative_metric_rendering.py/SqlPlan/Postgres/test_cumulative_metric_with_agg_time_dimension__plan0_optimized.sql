@@ -5,21 +5,22 @@ docstring:
 sql_engine: Postgres
 ---
 -- Join Self Over Time Range
--- Pass Only Elements: ['txn_revenue', 'revenue_instance__ds__day']
+-- Pass Only Elements: ['revenue', 'revenue_instance__ds__day']
 -- Aggregate Measures
+-- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_11.ds AS revenue_instance__ds__day
+  subq_12.ds AS revenue_instance__ds__day
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
-FROM ***************************.mf_time_spine subq_11
+FROM ***************************.mf_time_spine subq_12
 INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_11.ds
+    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
   ) AND (
-    DATE_TRUNC('day', revenue_src_28000.created_at) > subq_11.ds - MAKE_INTERVAL(months => 2)
+    DATE_TRUNC('day', revenue_src_28000.created_at) > subq_12.ds - MAKE_INTERVAL(months => 2)
   )
 GROUP BY
-  subq_11.ds
+  subq_12.ds

@@ -39,7 +39,7 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , subq_22.bookings AS bookings_2_weeks_ago
+      , subq_22.bookings_2_weeks_ago AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
@@ -47,7 +47,7 @@ FROM (
       -- Aggregate Measures
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(bookings) AS bookings_2_weeks_ago
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
