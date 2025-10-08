@@ -15,9 +15,8 @@ from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_
 from metricflow_semantics.test_helpers.synthetic_manifest.dimension_semantic_model_generator import (
     DimensionSemanticModelGenerator,
 )
-from metricflow_semantics.test_helpers.synthetic_manifest.measure_generator import MeasureGenerator
 from metricflow_semantics.test_helpers.synthetic_manifest.measure_semantic_model_generator import (
-    MeasureSemanticModelGenerator,
+    SimpleMetricSemanticModelGenerator,
 )
 from metricflow_semantics.test_helpers.synthetic_manifest.metric_generator import MetricGenerator
 from metricflow_semantics.test_helpers.synthetic_manifest.saved_query_generator import SavedQueryGenerator
@@ -27,15 +26,13 @@ from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_par
 
 
 class SyntheticManifestGenerator:
-    """Generates a synthetic semantic manifest that can be used for performance testing."""
+    """Generates a synthetic semantic manifest that can be used for performance profiling."""
 
     def __init__(self, parameter_set: SyntheticManifestParameterSet) -> None:  # noqa: D107
         self._parameter_set = parameter_set
-        self._measure_generator = MeasureGenerator(parameter_set)
         self._categorical_dimension_generator = CategoricalDimensionGenerator(parameter_set)
-        self._measure_semantic_model_generator = MeasureSemanticModelGenerator(
+        self._simple_metric_semantic_model_generator = SimpleMetricSemanticModelGenerator(
             parameter_set=parameter_set,
-            measure_generator=self._measure_generator,
         )
         self._dimension_semantic_model_generator = DimensionSemanticModelGenerator(
             parameter_set=parameter_set,
@@ -43,7 +40,7 @@ class SyntheticManifestGenerator:
         )
         self._metric_generator = MetricGenerator(
             parameter_set=parameter_set,
-            measure_generator=self._measure_generator,
+            semantic_model_generator=self._simple_metric_semantic_model_generator,
         )
         self._saved_query_generator = SavedQueryGenerator(
             parameter_set=parameter_set,
@@ -55,12 +52,12 @@ class SyntheticManifestGenerator:
         """Generate a manifest using the given parameters."""
         semantic_models: List[PydanticSemanticModel] = []
 
-        semantic_models.extend(self._measure_semantic_model_generator.generate_semantic_models())
+        semantic_models.extend(self._simple_metric_semantic_model_generator.generate_semantic_models())
         semantic_models.extend(self._dimension_semantic_model_generator.generate_semantic_models())
 
         return PydanticSemanticManifest(
             semantic_models=semantic_models,
-            metrics=self._metric_generator.generate_metrics(),
+            metrics=list(self._metric_generator.generate_metrics()),
             project_configuration=PydanticProjectConfiguration(
                 time_spines=[
                     PydanticTimeSpine(
