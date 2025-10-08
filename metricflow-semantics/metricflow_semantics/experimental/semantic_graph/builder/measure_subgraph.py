@@ -51,7 +51,7 @@ class SimpleMetricSubgraphGenerator(SemanticSubgraphGenerator):
             aggregation_configuration,
             simple_metric_inputs,
         ) in lookup.aggregation_configuration_to_simple_metric_inputs.items():
-            # For all simple metric inputs:
+            # For all simple-metric inputs:
             for simple_metric_input in simple_metric_inputs:
                 simple_metric_name = simple_metric_input.name
 

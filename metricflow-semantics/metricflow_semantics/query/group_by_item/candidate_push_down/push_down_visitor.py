@@ -46,7 +46,7 @@ from metricflow_semantics.query.issues.group_by_item_resolver.invalid_use_of_dat
 )
 from metricflow_semantics.query.issues.group_by_item_resolver.no_common_items import NoCommonItemsInParents
 from metricflow_semantics.query.issues.group_by_item_resolver.no_matching_items_for_measure import (
-    NoMatchingItemsForMeasure,
+    NoMatchingItemsForSimpleMetric,
 )
 from metricflow_semantics.query.issues.group_by_item_resolver.no_matching_items_for_no_metrics_query import (
     NoMatchingItemsForNoMetricsQuery,
@@ -221,7 +221,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 return PushDownResult(
                     candidate_set=GroupByItemCandidateSet.empty_instance(),
                     issue_set=MetricFlowQueryResolutionIssueSet.from_issue(
-                        NoMatchingItemsForMeasure.from_parameters(
+                        NoMatchingItemsForSimpleMetric.create(
                             parent_issues=(),
                             query_resolution_path=current_traversal_path,
                             input_suggestions=input_suggestions,
@@ -231,7 +231,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
-                    measure_paths=(current_traversal_path,),
+                    simple_metric_input_paths=(current_traversal_path,),
                     linkable_element_set=matching_items,
                     path_from_leaf_node=current_traversal_path,
                 ),
@@ -411,7 +411,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
                     linkable_element_set=matching_items,
-                    measure_paths=merged_result_from_parents.candidate_set.measure_paths,
+                    simple_metric_input_paths=merged_result_from_parents.candidate_set.simple_metric_input_paths,
                     path_from_leaf_node=current_traversal_path,
                 ),
                 issue_set=MetricFlowQueryResolutionIssueSet.merge_iterable(issue_sets_to_merge),
@@ -467,7 +467,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
             return PushDownResult(
                 candidate_set=GroupByItemCandidateSet(
                     linkable_element_set=candidates_after_filtering,
-                    measure_paths=(current_traversal_path,),
+                    simple_metric_input_paths=(current_traversal_path,),
                     path_from_leaf_node=current_traversal_path,
                 ),
                 issue_set=MetricFlowQueryResolutionIssueSet.empty_instance(),

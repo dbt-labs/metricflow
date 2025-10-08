@@ -48,10 +48,6 @@ class MetricNotFoundError(SemanticException, KeyError):  # noqa: D101
     pass
 
 
-class NonExistentMeasureError(SemanticException):  # noqa: D101
-    pass
-
-
 class InvalidSemanticModelError(SemanticException):  # noqa: D101
     pass
 

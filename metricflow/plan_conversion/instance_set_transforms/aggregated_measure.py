@@ -85,7 +85,7 @@ class CreateAggregatedSimpleMetricInputsTransform(InstanceSetTransform[CreateAgg
             agg_params=simple_metric_input.agg_params,
         )
 
-        # Get the output column name for the simple metric input.
+        # Get the output column name for the simple-metric input.
 
         aggregated_column_association = self._column_resolver.resolve_spec(output_spec)
         aggregated_column_name = aggregated_column_association.column_name
