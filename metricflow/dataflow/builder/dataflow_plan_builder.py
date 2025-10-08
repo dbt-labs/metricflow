@@ -289,9 +289,6 @@ class DataflowPlanBuilder:
         )
         base_spec = SimpleMetricInputSpec(
             element_name=base_simple_metric_recipe.simple_metric_input.name,
-            non_additive_dimension_spec=NonAdditiveDimensionSpec.create_from_simple_metric_input(
-                base_simple_metric_recipe.simple_metric_input
-            ),
         )
         base_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
@@ -307,9 +304,6 @@ class DataflowPlanBuilder:
         )
         conversion_spec = SimpleMetricInputSpec(
             element_name=conversion_simple_metric_recipe.simple_metric_input.name,
-            non_additive_dimension_spec=NonAdditiveDimensionSpec.create_from_simple_metric_input(
-                conversion_simple_metric_recipe.simple_metric_input
-            ),
         )
         conversion_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
@@ -1773,7 +1767,6 @@ class DataflowPlanBuilder:
         simple_metric_input = simple_metric_recipe.simple_metric_input
         simple_metric_input_spec = SimpleMetricInputSpec(
             element_name=simple_metric_input.name,
-            non_additive_dimension_spec=NonAdditiveDimensionSpec.create_from_simple_metric_input(simple_metric_input),
         )
         spec_properties = SimpleMetricInputSpecProperties.create_from_simple_metric_inputs((simple_metric_input,))
 

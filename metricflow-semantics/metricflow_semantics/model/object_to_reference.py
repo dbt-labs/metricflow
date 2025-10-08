@@ -2,13 +2,11 @@ from __future__ import annotations
 
 from dbt_semantic_interfaces.protocols.dimension import Dimension
 from dbt_semantic_interfaces.protocols.entity import Entity
-from dbt_semantic_interfaces.protocols.measure import Measure
 from dbt_semantic_interfaces.protocols.metric import Metric
 from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
-    MeasureReference,
     MetricReference,
     SemanticModelReference,
 )
@@ -27,10 +25,6 @@ class ObjectToReference:
     @staticmethod
     def from_semantic_model(semantic_model: SemanticModel) -> SemanticModelReference:  # noqa: D102
         return SemanticModelReference(semantic_model_name=semantic_model.name)
-
-    @staticmethod
-    def from_measure(measure: Measure) -> MeasureReference:  # noqa: D102
-        return MeasureReference(element_name=measure.name)
 
     @staticmethod
     def from_entity(entity: Entity) -> EntityReference:  # noqa: D102

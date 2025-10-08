@@ -10,7 +10,6 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
-from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.visitor import VisitorOutputT
@@ -19,7 +18,6 @@ from metricflow_semantics.visitor import VisitorOutputT
 @dataclass(frozen=True)
 class SimpleMetricInputSpec(InstanceSpec):  # noqa: D101
     element_name: str
-    non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec] = None
     fill_nulls_with: Optional[int] = None
 
     @property

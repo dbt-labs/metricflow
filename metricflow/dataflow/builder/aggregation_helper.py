@@ -55,7 +55,6 @@ class InstanceAliasMapping(Mergeable, SerializableDataclass):
             return None
         return SimpleMetricInputSpec(
             element_name=alias,
-            non_additive_dimension_spec=spec.non_additive_dimension_spec,
             fill_nulls_with=spec.fill_nulls_with,
         )
 
@@ -134,7 +133,6 @@ class NullFillValueMapping(Mergeable, SerializableDataclass):
             return None
         return SimpleMetricInputSpec(
             element_name=spec.element_name,
-            non_additive_dimension_spec=spec.non_additive_dimension_spec,
             fill_nulls_with=null_fill_value,
         )
 
