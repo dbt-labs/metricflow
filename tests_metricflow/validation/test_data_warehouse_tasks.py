@@ -8,12 +8,19 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.implementations.elements.entity import PydanticEntity
 from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasure
+from dbt_semantic_interfaces.implementations.metric import (
+    PydanticMetric,
+    PydanticMetricAggregationParams,
+    PydanticMetricTypeParams,
+)
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
+from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
@@ -193,40 +200,70 @@ def test_validate_entities(  # noqa: D103
     assert len(issues.all_issues) == 2
 
 
-def test_build_measure_tasks(  # noqa: D103
+def test_build_simple_metric_input_tasks(  # noqa: D103
     data_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
 ) -> None:
-    tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
+    tasks = DataWarehouseTaskBuilder.gen_simple_metric_tasks(
         manifest=data_warehouse_validation_model,
         sql_client=sql_client,
     )
     assert len(tasks) == 1  # on semantic model query with all measures
     assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
 
-    tasks = DataWarehouseTaskBuilder.gen_measure_tasks(
+    tasks = DataWarehouseTaskBuilder.gen_simple_metric_tasks(
         manifest=data_warehouse_validation_model, sql_client=sql_client, semantic_model_filters=[]
     )
     assert len(tasks) == 0
 
 
-def test_validate_measures(  # noqa: D103
+def test_validate_simple_metrics(  # noqa: D103
     dw_backed_warehouse_validation_model: PydanticSemanticManifest,
     sql_client: SqlClient,
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
-    model = deepcopy(dw_backed_warehouse_validation_model)
+    semantic_manifest = deepcopy(dw_backed_warehouse_validation_model)
 
     dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
 
-    issues = dw_validator.validate_measures(model)
+    issues = dw_validator.validate_simple_metrics(semantic_manifest)
     assert len(issues.all_issues) == 0
 
-    measures = list(model.semantic_models[0].measures)
-    measures.append(PydanticMeasure(name="doesnt_exist", agg=AggregationType.SUM, agg_time_dimension="ds"))
-    model.semantic_models[0].measures = measures
+    metrics = semantic_manifest.metrics
+    model = mf_first_item(semantic_manifest.semantic_models)
+    metrics.append(
+        PydanticMetric(
+            name="doesnt_exist",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(
+                measure=None,
+                numerator=None,
+                denominator=None,
+                expr=None,
+                window=None,
+                grain_to_date=None,
+                metrics=None,
+                conversion_type_params=None,
+                cumulative_type_params=None,
+                input_measures=[],
+                metric_aggregation_params=PydanticMetricAggregationParams(
+                    semantic_model=model.name,
+                    agg=AggregationType.SUM,
+                    agg_params=None,
+                    agg_time_dimension=None,
+                    non_additive_dimension=None,
+                ),
+                join_to_timespine=False,
+                fill_nulls_with=None,
+            ),
+            filter=None,
+            metadata=None,
+            config=None,
+        )
+    )
 
-    issues = dw_validator.validate_measures(model)
+    issues = dw_validator.validate_simple_metrics(semantic_manifest)
     # One issue is created for the short circuit query failure, and another is
     # created for the subtask checking the specific measure
     assert len(issues.all_issues) == 2
