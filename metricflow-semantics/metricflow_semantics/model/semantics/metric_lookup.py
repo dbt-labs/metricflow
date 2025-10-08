@@ -131,7 +131,7 @@ class MetricLookup:
         measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: GroupByItemSetFilter = DEFAULT_COMMON_SET_FILTER,
-        limit_one_model: bool = False,
+        joins_disallowed: bool = False,
     ) -> BaseGroupByItemSet:
         """Gets the set of the valid group-by items common to all inputs."""
         if set_filter.element_name_allowlist is None:
@@ -139,7 +139,7 @@ class MetricLookup:
                 measure_references=measure_references,
                 metric_references=metric_references,
                 set_filter=set_filter,
-                joins_disallowed=limit_one_model,
+                joins_disallowed=joins_disallowed,
             )
 
         # If the filter specifies element names, make the call to the resolver without element names to get better
@@ -150,6 +150,7 @@ class MetricLookup:
             measure_references=measure_references,
             metric_references=metric_references,
             set_filter=filter_without_element_name_condition,
+            joins_disallowed=joins_disallowed,
         )
 
         return GroupByItemSet(
@@ -300,7 +301,7 @@ class MetricLookup:
                 set_filter=GroupByItemSetFilter.create(
                     element_name_allowlist=(simple_metric_input.agg_time_dimension_name, METRIC_TIME_ELEMENT_NAME)
                 ),
-                limit_one_model=True,
+                joins_disallowed=True,
             )
             spec_set = group_specs_by_type(group_by_item_set.specs)
             intersection_result = MutableOrderedSet(spec_set.time_dimension_specs)
