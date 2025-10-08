@@ -17,7 +17,7 @@ from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDi
 
 @dataclass(frozen=True)
 class SimpleMetricInputSpecProperties:
-    """Input dataclass for grouping properties of a sequence of MeasureSpecs."""
+    """Input dataclass for grouping properties of a sequence of `SimpleMetricInputSpec`s."""
 
     simple_metric_input_specs: Sequence[SimpleMetricInputSpec]
     semantic_model_name: str

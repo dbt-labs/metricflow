@@ -105,17 +105,17 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     AddGroupByMetric,
     AddMetadata,
     AddMetrics,
-    AliasAggregatedMeasures,
+    AliasAggregatedSimpleMetricInputs,
     ChangeAssociatedColumns,
-    ChangeMeasureAggregationState,
+    ChangeSimpleMetricInputAggregationState,
     ConvertToMetadata,
     CreateSelectColumnForCombineOutputNode,
     CreateSqlColumnReferencesForInstances,
     FilterElements,
     FilterLinkableInstancesWithLeadingLink,
-    RemoveMeasures,
     RemoveMetrics,
-    UpdateMeasureFillNullsWith,
+    RemoveSimpleMetricInputTransform,
+    UpdateSimpleMetricInputFillNullsWith,
 )
 from metricflow.plan_conversion.instance_set_transforms.select_columns import (
     CreateSelectColumnsForInstances,
@@ -419,7 +419,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             # TODO: is this filter doing anything? seems like no?
             FilterElements(include_specs=from_data_set.instance_set.spec_set)
         ).transform(
-            ChangeMeasureAggregationState(
+            ChangeSimpleMetricInputAggregationState(
                 {
                     AggregationState.NON_AGGREGATED: AggregationState.NON_AGGREGATED,
                     AggregationState.COMPLETE: AggregationState.PARTIAL,
@@ -497,7 +497,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_aggregate_simple_metric_inputs_node(self, node: AggregateSimpleMetricInputsNode) -> SqlDataSet:
-        """Generates the query that realizes the behavior of AggregateSimpleMetricInputsNode.
+        """Generates the query that realizes the behavior of `AggregateSimpleMetricInputsNode`.
 
         This will produce a query that aggregates all measures from a given input semantic model per the
         measure spec
@@ -514,7 +514,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Get the data from the parent, and change measure instances to the aggregated state.
         from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         aggregated_instance_set = from_data_set.instance_set.transform(
-            ChangeMeasureAggregationState(
+            ChangeSimpleMetricInputAggregationState(
                 {
                     AggregationState.NON_AGGREGATED: AggregationState.COMPLETE,
                     AggregationState.COMPLETE: AggregationState.COMPLETE,
@@ -527,9 +527,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ChangeAssociatedColumns(self._column_association_resolver)
         )
 
-        # Add fill null property to corresponding measure spec
+        # Add fill null property to corresponding simple-metric input spec
         aggregated_instance_set = aggregated_instance_set.transform(
-            UpdateMeasureFillNullsWith(null_fill_value_mapping=node.null_fill_value_mapping)
+            UpdateSimpleMetricInputFillNullsWith(null_fill_value_mapping=node.null_fill_value_mapping)
         )
         from_data_set_alias = self._next_unique_table_alias()
 
@@ -549,8 +549,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         if len(node.alias_mapping.element_name_to_alias) > 0:
             # This is a little silly, but we need to update the column instance set with the new aliases
             # There are a number of refactoring options - simplest is to consolidate this with
-            # ChangeMeasureAggregationState, assuming there are no ordering dependencies up above
-            aggregated_instance_set = aggregated_instance_set.transform(AliasAggregatedMeasures(node.alias_mapping))
+            # `ChangeSimpleMetricInputAggregationState`, assuming there are no ordering dependencies up above
+            aggregated_instance_set = aggregated_instance_set.transform(
+                AliasAggregatedSimpleMetricInputs(node.alias_mapping)
+            )
             # and make sure we follow the resolver format for any newly aliased measures....
             aggregated_instance_set = aggregated_instance_set.transform(
                 ChangeAssociatedColumns(self._column_association_resolver)
@@ -576,7 +578,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # TODO: Check that all measures for the metrics are in the input instance set
         # The desired output instance set has no measures, so create a copy with those removed.
-        output_instance_set: InstanceSet = from_data_set.instance_set.transform(RemoveMeasures())
+        output_instance_set: InstanceSet = from_data_set.instance_set.transform(RemoveSimpleMetricInputTransform())
 
         # Also, the output columns should always follow the resolver format.
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
@@ -1733,7 +1735,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         conversion_data_set_output_instance_set = conversion_data_set.instance_set.transform(
-            FilterElements(include_specs=InstanceSpecSet(simple_metric_input_specs=(node.conversion_measure_spec,)))
+            FilterElements(
+                include_specs=InstanceSpecSet(simple_metric_input_specs=(node.conversion_input_metric_spec,))
+            )
         )
 
         # Deduplicate the fanout results

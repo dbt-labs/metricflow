@@ -28,15 +28,15 @@ class SimpleMetricInputAggregation:
     use_approximate_percentile: bool = False
 
     @staticmethod
-    def create_from_measure_aggregation(  # noqa: D102
-        measure_aggregation: Optional[MeasureAggregationParameters],
+    def create_from_pydantic(  # noqa: D102
+        aggregation: Optional[MeasureAggregationParameters],
     ) -> Optional[SimpleMetricInputAggregation]:
-        if measure_aggregation is None:
+        if aggregation is None:
             return None
         return SimpleMetricInputAggregation(
-            percentile=measure_aggregation.percentile,
-            use_discrete_percentile=measure_aggregation.use_discrete_percentile,
-            use_approximate_percentile=measure_aggregation.use_approximate_percentile,
+            percentile=aggregation.percentile,
+            use_discrete_percentile=aggregation.use_discrete_percentile,
+            use_approximate_percentile=aggregation.use_approximate_percentile,
         )
 
 

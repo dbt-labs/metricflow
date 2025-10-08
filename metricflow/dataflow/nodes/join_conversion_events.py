@@ -25,7 +25,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
         base_node: node containing dataset for computing base events.
         base_time_dimension_spec: time dimension for the base events to compute against.
         conversion_node: node containing dataset to join base node for computing conversion events.
-        conversion_measure_spec: expose this measure in the resulting dataset for aggregation.
+        conversion_input_metric_spec: expose this measure in the resulting dataset for aggregation.
         conversion_time_dimension_spec: time dimension for the conversion events to compute against.
         unique_identifier_keys: columns to uniquely identify each conversion event.
         entity_spec: the specific entity in which the conversion is happening for.
@@ -37,7 +37,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
     base_node: DataflowPlanNode
     base_time_dimension_spec: TimeDimensionSpec
     conversion_node: DataflowPlanNode
-    conversion_measure_spec: SimpleMetricInputSpec
+    conversion_input_metric_spec: SimpleMetricInputSpec
     conversion_time_dimension_spec: TimeDimensionSpec
     unique_identifier_keys: Tuple[InstanceSpec, ...]
     entity_spec: EntitySpec
@@ -61,7 +61,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
             base_node=base_node,
             base_time_dimension_spec=base_time_dimension_spec,
             conversion_node=conversion_node,
-            conversion_measure_spec=conversion_simple_metric_input_spec,
+            conversion_input_metric_spec=conversion_simple_metric_input_spec,
             conversion_time_dimension_spec=conversion_time_dimension_spec,
             unique_identifier_keys=tuple(unique_identifier_keys),
             entity_spec=entity_spec,
@@ -102,7 +102,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
             isinstance(other_node, self.__class__)
             and other_node.base_time_dimension_spec == self.base_time_dimension_spec
             and other_node.conversion_time_dimension_spec == self.conversion_time_dimension_spec
-            and other_node.conversion_measure_spec == self.conversion_measure_spec
+            and other_node.conversion_input_metric_spec == self.conversion_input_metric_spec
             and other_node.unique_identifier_keys == self.unique_identifier_keys
             and other_node.entity_spec == self.entity_spec
             and other_node.window == self.window
@@ -116,7 +116,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
             base_node=new_parent_nodes[0],
             base_time_dimension_spec=self.base_time_dimension_spec,
             conversion_node=new_parent_nodes[1],
-            conversion_measure_spec=self.conversion_measure_spec,
+            conversion_input_metric_spec=self.conversion_input_metric_spec,
             conversion_time_dimension_spec=self.conversion_time_dimension_spec,
             unique_identifier_keys=self.unique_identifier_keys,
             entity_spec=self.entity_spec,

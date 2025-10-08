@@ -96,9 +96,7 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
                 name=metric.name,
                 agg=metric_aggregation_params.agg,
                 expr=metric_type_params.expr or metric.name,
-                agg_params=SimpleMetricInputAggregation.create_from_measure_aggregation(
-                    metric_aggregation_params.agg_params
-                ),
+                agg_params=SimpleMetricInputAggregation.create_from_pydantic(metric_aggregation_params.agg_params),
                 join_to_timespine=metric.type_params.join_to_timespine,
                 fill_nulls_with=metric.type_params.fill_nulls_with,
                 non_additive_dimension=SimpleMetricInputNonAdditiveDimension.create_from_non_additive_dimension(

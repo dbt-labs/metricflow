@@ -19,7 +19,7 @@ from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator
     SemanticSubgraphGenerator,
 )
 from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
-    CumulativeMeasureLabel,
+    CumulativeMetricLabel,
     DenyDatePartLabel,
     DenyEntityKeyQueryResolutionLabel,
     DenyVisibleAttributesLabel,
@@ -68,7 +68,7 @@ class ComplexMetricSubgraphGenerator(SemanticSubgraphGenerator):
 
         common_cumulative_metric_labels = FrozenOrderedSet(
             (
-                CumulativeMeasureLabel.get_instance(),
+                CumulativeMetricLabel.get_instance(),
                 DenyDatePartLabel.get_instance(),
             )
         )

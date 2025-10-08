@@ -49,7 +49,7 @@ class AggregateSimpleMetricInputsNode(DataflowPlanNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
-        return StaticIdPrefix.DATAFLOW_NODE_AGGREGATE_MEASURES_ID_PREFIX
+        return StaticIdPrefix.DATAFLOW_NODE_AGGREGATE_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_aggregate_simple_metric_inputs_node(self)

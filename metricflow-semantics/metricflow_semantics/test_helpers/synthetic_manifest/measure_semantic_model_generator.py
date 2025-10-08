@@ -31,7 +31,7 @@ class SimpleMetricSemanticModelGenerator:
         for semantic_model_index in range(self._parameter_set.simple_metric_semantic_model_count):
             entities = [
                 PydanticEntity(
-                    name=self._get_primary_entity_name_for_measure_semantic_model(semantic_model_index),
+                    name=self._get_primary_entity_name(semantic_model_index),
                     type=EntityType.PRIMARY,
                     description=None,
                     role=None,
@@ -81,5 +81,5 @@ class SimpleMetricSemanticModelGenerator:
     def get_semantic_model_name(self, semantic_model_index: int) -> str:  # noqa: D102
         return f"simple_metric_model_{semantic_model_index:03}"
 
-    def _get_primary_entity_name_for_measure_semantic_model(self, semantic_model_index: int) -> str:
+    def _get_primary_entity_name(self, semantic_model_index: int) -> str:
         return f"simple_metric_model_{semantic_model_index:03}_primary_entity"

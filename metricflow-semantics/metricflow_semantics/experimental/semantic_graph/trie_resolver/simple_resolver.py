@@ -309,6 +309,6 @@ class SimpleTrieResolver(DunderNameTrieResolver):
 
         for source_node in source_nodes:
             for successor_edge in self._semantic_graph.edges_with_tail_node(source_node):
-                if self._cumulative_measure_label in successor_edge.labels:
+                if self._cumulative_metric_label in successor_edge.labels:
                     return True
         return False

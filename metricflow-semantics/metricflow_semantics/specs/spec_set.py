@@ -61,10 +61,10 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
             if metric_spec not in metric_specs_deduped:
                 metric_specs_deduped.append(metric_spec)
 
-        measure_specs_deduped = []
-        for measure_spec in self.simple_metric_input_specs:
-            if measure_spec not in measure_specs_deduped:
-                measure_specs_deduped.append(measure_spec)
+        specs_deduped = []
+        for simple_metric_input_specs in self.simple_metric_input_specs:
+            if simple_metric_input_specs not in specs_deduped:
+                specs_deduped.append(simple_metric_input_specs)
 
         dimension_specs_deduped = []
         for dimension_spec in self.dimension_specs:
@@ -88,7 +88,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
 
         return InstanceSpecSet(
             metric_specs=tuple(metric_specs_deduped),
-            simple_metric_input_specs=tuple(measure_specs_deduped),
+            simple_metric_input_specs=tuple(specs_deduped),
             dimension_specs=tuple(dimension_specs_deduped),
             time_dimension_specs=tuple(time_dimension_specs_deduped),
             entity_specs=tuple(entity_specs_deduped),
