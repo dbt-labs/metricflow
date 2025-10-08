@@ -14,7 +14,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_20.metric_time__month AS metric_time__month
-    , subq_16.bookings AS bookings_start_of_month
+    , subq_16.bookings_start_of_month AS bookings_start_of_month
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['metric_time__month']
@@ -38,7 +38,7 @@ FROM (
     -- Aggregate Measures
     SELECT
       metric_time__month
-      , SUM(bookings) AS bookings
+      , SUM(bookings) AS bookings_start_of_month
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'

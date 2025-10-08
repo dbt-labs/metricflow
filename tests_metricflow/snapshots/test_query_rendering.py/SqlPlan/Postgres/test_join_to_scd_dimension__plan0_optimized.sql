@@ -5,26 +5,26 @@ docstring:
 sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings', 'metric_time__day']
+-- Pass Only Elements: ['family_bookings', 'metric_time__day']
 -- Aggregate Measures
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   metric_time__day
-  , SUM(bookings) AS family_bookings
+  , SUM(family_bookings) AS family_bookings
 FROM (
   -- Join Standard Outputs
   SELECT
     listings_src_26000.capacity AS listing__capacity
     , subq_10.metric_time__day AS metric_time__day
-    , subq_10.bookings AS bookings
+    , subq_10.family_bookings AS family_bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
-      , 1 AS bookings
+      , 1 AS family_bookings
     FROM ***************************.fct_bookings bookings_source_src_26000
   ) subq_10
   LEFT OUTER JOIN
