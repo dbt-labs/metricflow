@@ -20,7 +20,7 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_3.metric_time__day
-        , COALESCE(subq_3.bookings, 0) AS bookings_fill_nulls_with_0_without_time_spine
+        , subq_3.bookings AS bookings_fill_nulls_with_0_without_time_spine
       FROM (
         -- Aggregate Measures
         SELECT
