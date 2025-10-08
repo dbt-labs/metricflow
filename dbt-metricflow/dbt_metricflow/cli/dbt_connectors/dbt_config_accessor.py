@@ -12,7 +12,7 @@ from dbt.cli.main import dbtRunner
 from dbt.config.profile import Profile
 from dbt.config.project import Project
 from dbt.config.runtime import load_profile, load_project
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from typing_extensions import Self
@@ -106,7 +106,7 @@ class dbtArtifacts:
     profile: Profile
     project: Project
     adapter: BaseAdapter
-    semantic_manifest: SemanticManifest
+    semantic_manifest: PydanticSemanticManifest
 
     @classmethod
     def load_from_project_metadata(cls: Type[Self], project_metadata: dbtProjectMetadata) -> Self:
@@ -127,7 +127,7 @@ class dbtArtifacts:
         )
 
     @staticmethod
-    def build_semantic_manifest_from_dbt_project_root(project_root: Path) -> SemanticManifest:
+    def build_semantic_manifest_from_dbt_project_root(project_root: Path) -> PydanticSemanticManifest:
         """In the dbt project root, retrieve the manifest path and parse the SemanticManifest."""
         DEFAULT_TARGET_PATH = "target/semantic_manifest.json"
         full_path_to_manifest = Path(project_root, DEFAULT_TARGET_PATH).resolve()
