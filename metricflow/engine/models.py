@@ -14,7 +14,6 @@ from dbt_semantic_interfaces.protocols.dimension import (
 )
 from dbt_semantic_interfaces.protocols.entity import Entity as SemanticManifestEntity
 from dbt_semantic_interfaces.protocols.export import Export
-from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.protocols.metric import (
@@ -30,7 +29,6 @@ from dbt_semantic_interfaces.protocols.saved_query import (
 )
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -184,19 +182,6 @@ class Entity(SearchableElement):
     @property
     def default_search_and_sort_attribute(self) -> str:  # noqa: D102
         return self.name
-
-
-@dataclass(frozen=True)
-class Measure:
-    """Dataclass representation of a Measure."""
-
-    name: str
-    agg: AggregationType
-    agg_time_dimension: str
-    config: Optional[SemanticLayerElementConfig] = None
-    description: Optional[str] = None
-    expr: Optional[str] = None
-    agg_params: Optional[MeasureAggregationParameters] = None
 
 
 @dataclass(frozen=True)
