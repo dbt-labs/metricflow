@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from functools import cached_property
 from typing import Dict, Final, Iterable, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -14,7 +15,6 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import (
     DuplicateMetricError,
     MetricNotFoundError,
-    NonExistentMeasureError,
     UnknownMetricError,
 )
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
@@ -31,10 +31,8 @@ from metricflow_semantics.model.semantics.linkable_element_set_base import BaseG
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     GroupByItemSetResolver,
 )
-from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +48,6 @@ class MetricLookup:
     def __init__(
         self,
         semantic_manifest: SemanticManifest,
-        semantic_model_lookup: SemanticModelLookup,
-        custom_granularities: Dict[str, ExpandedTimeGranularity],
         group_by_item_set_resolver: GroupByItemSetResolver,
         manifest_object_lookup: ManifestObjectLookup,
     ) -> None:
@@ -59,15 +55,20 @@ class MetricLookup:
 
         Args:
             semantic_manifest: used to fetch and load the metrics and initialize the linkable spec resolver
-            semantic_model_lookup: provides access to semantic model metadata for various lookup operations
         """
         self._metrics: Dict[MetricReference, Metric] = {}
-        self._semantic_model_lookup = semantic_model_lookup
-        self._custom_granularities = custom_granularities
         self._manifest_object_lookup = manifest_object_lookup
 
         for metric in semantic_manifest.metrics:
-            self._add_metric(metric)
+            metric_reference = MetricReference(element_name=metric.name)
+            if metric_reference in self._metrics:
+                raise DuplicateMetricError(
+                    LazyFormat(
+                        "A duplicate metric was found in the manifest",
+                        conflicting_metrics=[self._metrics[metric_reference], metric],
+                    )
+                )
+            self._metrics[metric_reference] = metric
 
         self._group_by_item_set_resolver = group_by_item_set_resolver
 
@@ -156,24 +157,17 @@ class MetricLookup:
         )
 
     def get_metrics(self, metric_references: Iterable[MetricReference]) -> Sequence[Metric]:  # noqa: D102
-        res = []
-        for metric_reference in metric_references:
-            if metric_reference not in self._metrics:
-                raise MetricNotFoundError(
-                    f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered"
-                )
-            res.append(self._metrics[metric_reference])
+        return tuple(self.get_metric(metric_reference) for metric_reference in metric_references)
 
-        return res
-
-    @property
-    def metric_references(self) -> FrozenOrderedSet[MetricReference]:  # noqa: D102
+    @cached_property
+    def metric_references(self) -> OrderedSet[MetricReference]:  # noqa: D102
         return FrozenOrderedSet(sorted(self._metrics.keys()))
 
     def get_metric(self, metric_reference: MetricReference) -> Metric:  # noqa: D102
-        if metric_reference not in self._metrics:
-            raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
-        return self._metrics[metric_reference]
+        metric = self._metrics.get(metric_reference)
+        if metric is None:
+            raise MetricNotFoundError(LazyFormat("The given metric is not known", metric_reference=metric_reference))
+        return metric
 
     @staticmethod
     def metric_inputs(metric: Metric, include_conversion_metric_input: bool) -> Sequence[MetricInput]:
@@ -303,18 +297,6 @@ class MetricLookup:
         return self._result_cache_for_aggregation_time_dimension_specs.set_and_get(
             cache_key, intersection_result.as_frozen()
         )
-
-    def _add_metric(self, metric: Metric) -> None:
-        """Add metric, validating presence of required measures."""
-        metric_reference = MetricReference(element_name=metric.name)
-        if metric_reference in self._metrics:
-            raise DuplicateMetricError(f"Metric `{metric.name}` has already been registered")
-        for measure_reference in metric.measure_references:
-            if measure_reference not in self._semantic_model_lookup.measure_lookup.measure_references:
-                raise NonExistentMeasureError(
-                    f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
-                )
-        self._metrics[metric_reference] = metric
 
     def get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         """The minimum grain that can be queried with this metric.
