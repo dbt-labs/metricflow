@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -22,6 +22,7 @@ from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStepProvider,
 )
+from metricflow_semantics.experimental.semantic_graph.sg_node_grouping import SemanticGraphNodeTypedCollection
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 
@@ -64,6 +65,11 @@ class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeStepProvider, Metric
         metric time entity corresponds to the 'metric_time' dunder-name element.
         """
         return self.recipe_step_to_append.add_dunder_name_element
+
+    @abstractmethod
+    def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
+        """Add this node to the given typed collection."""
+        raise NotImplementedError
 
 
 @fast_frozen_dataclass(order=False)
