@@ -22,7 +22,7 @@ SELECT
 FROM (
   -- Read From CTE For node_id=sma_28019
   -- Pass Only Elements: ['visits']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(visits) AS visits
   FROM sma_28019_cte
@@ -30,7 +30,7 @@ FROM (
 CROSS JOIN (
   -- Find conversions for user within the range of 1 month
   -- Pass Only Elements: ['buys_month']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(buys_month) AS buys_month
   FROM (

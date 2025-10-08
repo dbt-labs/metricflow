@@ -25,7 +25,7 @@ FROM (
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'booking__ds__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__ds__day
@@ -37,7 +37,7 @@ FROM (
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'booking__ds__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS booking__ds__day

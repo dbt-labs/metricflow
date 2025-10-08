@@ -39,7 +39,7 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'user__home_state_latest', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
       , user__home_state_latest
@@ -65,7 +65,7 @@ FROM (
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'user__home_state_latest', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
       , user__home_state_latest

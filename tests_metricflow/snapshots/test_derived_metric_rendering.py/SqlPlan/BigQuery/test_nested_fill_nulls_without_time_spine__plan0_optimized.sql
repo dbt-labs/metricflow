@@ -16,19 +16,19 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0_without_time_spine
+      , COALESCE(bookings_fill_nulls_with_0_without_time_spine, 0) AS bookings_fill_nulls_with_0_without_time_spine
     FROM (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(bookings_fill_nulls_with_0_without_time_spine) AS bookings_fill_nulls_with_0_without_time_spine
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['bookings', 'metric_time__day']
+        -- Pass Only Elements: ['bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
         SELECT
           DATETIME_TRUNC(ds, day) AS metric_time__day
-          , 1 AS bookings
+          , 1 AS bookings_fill_nulls_with_0_without_time_spine
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_9
       GROUP BY

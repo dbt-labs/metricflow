@@ -11,7 +11,7 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['bookings']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS bookings
@@ -21,7 +21,7 @@ CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['listings']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings

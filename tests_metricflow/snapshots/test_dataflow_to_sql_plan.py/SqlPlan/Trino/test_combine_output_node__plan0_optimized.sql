@@ -1,7 +1,7 @@
 test_name: test_combine_output_node
 test_filename: test_dataflow_to_sql_plan.py
 docstring:
-  Tests combining AggregateMeasuresNode.
+  Tests combining AggregateSimpleMetricInputsNode.
 sql_engine: Trino
 ---
 -- Combine Aggregated Outputs
@@ -23,7 +23,7 @@ SELECT
 FROM (
   -- Read From CTE For node_id=rss_28001
   -- Pass Only Elements: ['bookings', 'is_instant']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     is_instant
     , SUM(bookings) AS bookings
@@ -34,7 +34,7 @@ FROM (
 FULL OUTER JOIN (
   -- Read From CTE For node_id=rss_28001
   -- Pass Only Elements: ['instant_bookings', 'bookers', 'is_instant']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     is_instant
     , SUM(instant_bookings) AS instant_bookings

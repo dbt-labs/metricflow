@@ -6,7 +6,7 @@ sql_engine: Redshift
 ---
 -- Join on MIN(ds_month) and [] grouping by None
 -- Pass Only Elements: ['total_account_balance_first_day_of_month']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

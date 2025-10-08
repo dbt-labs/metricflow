@@ -13,7 +13,7 @@ FROM (
   -- Join to Time Spine Dataset
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_30.alien_day AS metric_time__alien_day

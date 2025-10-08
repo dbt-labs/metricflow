@@ -36,7 +36,7 @@ FROM (
       FROM (
         -- Read From CTE For node_id=sma_28009
         -- Pass Only Elements: ['booking_value', 'metric_time__day']
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
           metric_time__day
@@ -57,7 +57,7 @@ FROM (
     FROM (
       -- Read From CTE For node_id=sma_28009
       -- Pass Only Elements: ['booking_value', 'metric_time__day']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         metric_time__day

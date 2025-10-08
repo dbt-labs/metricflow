@@ -5,7 +5,7 @@ sql_engine: Redshift
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['listings', 'metric_time__alien_day', 'listing__ds__month']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

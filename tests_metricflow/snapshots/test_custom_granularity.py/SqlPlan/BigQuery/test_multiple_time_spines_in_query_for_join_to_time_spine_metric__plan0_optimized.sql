@@ -8,7 +8,7 @@ sql_engine: BigQuery
 SELECT
   subq_19.metric_time__alien_day AS metric_time__alien_day
   , subq_19.metric_time__hour AS metric_time__hour
-  , subq_15.archived_users AS subdaily_join_to_time_spine_metric
+  , subq_15.subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
 FROM (
   -- Change Column Aliases
   -- Join to Custom Granularity Dataset
@@ -25,16 +25,16 @@ FROM (
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'archived_at'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['archived_users', 'metric_time__alien_day', 'metric_time__hour']
-  -- Aggregate Measures
+  -- Pass Only Elements: ['subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_12.alien_day AS metric_time__alien_day
     , subq_11.archived_at__hour AS metric_time__hour
-    , SUM(subq_11.archived_users) AS archived_users
+    , SUM(subq_11.subdaily_join_to_time_spine_metric) AS subdaily_join_to_time_spine_metric
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     SELECT
-      1 AS archived_users
+      1 AS subdaily_join_to_time_spine_metric
       , DATETIME_TRUNC(archived_at, hour) AS archived_at__hour
       , DATETIME_TRUNC(archived_at, day) AS archived_at__day
     FROM ***************************.dim_users users_ds_source_src_28000

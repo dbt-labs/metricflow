@@ -5,7 +5,7 @@ sql_engine: Snowflake
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['bookings', 'booking__ds__alien_day']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

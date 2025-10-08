@@ -17,7 +17,7 @@ FROM (
       MAX(subq_3.visits) AS visits
       , MAX(subq_12.buys_month) AS buys_month
     FROM (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         SUM(subq_2.visits) AS visits
       FROM (
@@ -67,12 +67,12 @@ FROM (
             , subq_0.referrer_id
             , subq_0.visit__referrer_id
             , subq_0.visits
-            , subq_0.visitors
+            , subq_0.visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Read Elements From Semantic Model 'visits_source'
             SELECT
               1 AS visits
-              , visits_source_src_28000.user_id AS visitors
+              , 1 AS visits_fill_nulls_with_0_join_to_timespine
               , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
               , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
               , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
@@ -107,7 +107,7 @@ FROM (
       ) subq_2
     ) subq_3
     CROSS JOIN (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         SUM(subq_11.buys_month) AS buys_month
       FROM (
@@ -199,12 +199,12 @@ FROM (
                   , subq_0.referrer_id
                   , subq_0.visit__referrer_id
                   , subq_0.visits
-                  , subq_0.visitors
+                  , subq_0.visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Read Elements From Semantic Model 'visits_source'
                   SELECT
                     1 AS visits
-                    , visits_source_src_28000.user_id AS visitors
+                    , 1 AS visits_fill_nulls_with_0_join_to_timespine
                     , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
                     , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
                     , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
@@ -338,8 +338,9 @@ FROM (
                   -- Read Elements From Semantic Model 'buys_source'
                   SELECT
                     1 AS buys
+                    , 1 AS buys_fill_nulls_with_0
+                    , 1 AS buys_fill_nulls_with_0_join_to_timespine
                     , 1 AS buys_month
-                    , buys_source_src_28000.user_id AS buyers
                     , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS ds__day
                     , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS ds__week
                     , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS ds__month

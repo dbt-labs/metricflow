@@ -17,7 +17,7 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['average_booking_value', 'bookings', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
@@ -53,7 +53,7 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['booking_value', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       DATETIME_TRUNC(ds, day) AS metric_time__day

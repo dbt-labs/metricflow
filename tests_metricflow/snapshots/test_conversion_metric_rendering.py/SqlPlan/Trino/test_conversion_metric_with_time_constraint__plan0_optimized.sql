@@ -31,7 +31,7 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'visit__referrer_id']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       visit__referrer_id
       , SUM(visits) AS visits
@@ -49,7 +49,7 @@ FROM (
   FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
     -- Pass Only Elements: ['buys', 'visit__referrer_id']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       visit__referrer_id
       , SUM(buys) AS buys

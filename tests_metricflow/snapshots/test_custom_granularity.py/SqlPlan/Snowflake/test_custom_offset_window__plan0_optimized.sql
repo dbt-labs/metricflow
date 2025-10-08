@@ -10,7 +10,7 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_26.ds__day__lead AS metric_time__day

@@ -2,7 +2,7 @@ test_name: test_simple_query_with_multiple_date_parts
 test_filename: test_granularity_date_part_rendering.py
 sql_engine: Trino
 ---
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

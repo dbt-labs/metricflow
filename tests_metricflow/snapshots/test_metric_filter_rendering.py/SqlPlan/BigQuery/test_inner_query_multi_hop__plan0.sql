@@ -12,7 +12,7 @@ FROM (
   SELECT
     subq_28.third_hop_count
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       COUNT(DISTINCT subq_27.third_hop_count) AS third_hop_count
     FROM (
@@ -186,7 +186,7 @@ FROM (
                 subq_22.account_id__customer_id__customer_third_hop_id
                 , subq_22.txn_count AS account_id__customer_id__customer_third_hop_id__txn_count
               FROM (
-                -- Aggregate Measures
+                -- Aggregate Inputs for Simple Metrics
                 SELECT
                   subq_21.account_id__customer_id__customer_third_hop_id
                   , SUM(subq_21.txn_count) AS txn_count
@@ -738,11 +738,11 @@ FROM (
                               , subq_15.country
                               , subq_15.customer_id__country
                               , subq_15.customer_third_hop_id__country
-                              , subq_15.customers_with_other_data
+                              , subq_15.paraguayan_customers
                             FROM (
                               -- Read Elements From Semantic Model 'customer_other_data'
                               SELECT
-                                1 AS customers_with_other_data
+                                1 AS paraguayan_customers
                                 , customer_other_data_src_22000.country
                                 , DATETIME_TRUNC(customer_other_data_src_22000.acquired_ds, day) AS acquired_ds__day
                                 , DATETIME_TRUNC(customer_other_data_src_22000.acquired_ds, isoweek) AS acquired_ds__week

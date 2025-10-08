@@ -14,7 +14,7 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28006.ds AS metric_time__day

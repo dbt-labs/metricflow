@@ -6,7 +6,7 @@ sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookers']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 WITH sma_28009_cte AS (
@@ -35,7 +35,7 @@ FROM (
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookers', 'listing']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookers']
     SELECT

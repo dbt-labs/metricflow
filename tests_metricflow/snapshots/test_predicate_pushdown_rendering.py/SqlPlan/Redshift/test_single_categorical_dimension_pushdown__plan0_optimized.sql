@@ -6,7 +6,7 @@ sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'listing__country_latest']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

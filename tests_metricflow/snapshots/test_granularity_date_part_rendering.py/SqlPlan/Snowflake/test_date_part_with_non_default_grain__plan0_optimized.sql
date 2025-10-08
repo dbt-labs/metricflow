@@ -4,7 +4,7 @@ sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['archived_users', 'metric_time__extract_year']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

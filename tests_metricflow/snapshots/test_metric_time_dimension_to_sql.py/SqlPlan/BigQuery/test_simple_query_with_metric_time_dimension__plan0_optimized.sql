@@ -24,7 +24,7 @@ FROM (
   -- Read From CTE For node_id=rss_28020
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['bookings', 'metric_time__day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     ds__day AS metric_time__day
@@ -37,7 +37,7 @@ FULL OUTER JOIN (
   -- Read From CTE For node_id=rss_28020
   -- Metric Time Dimension 'paid_at'
   -- Pass Only Elements: ['booking_payments', 'metric_time__day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     paid_at__day AS metric_time__day

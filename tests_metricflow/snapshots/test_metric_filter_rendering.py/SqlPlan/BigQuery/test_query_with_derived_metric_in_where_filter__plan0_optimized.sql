@@ -6,7 +6,7 @@ sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
@@ -40,7 +40,7 @@ FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements: ['booking_value', 'listing']
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
           listing_id AS listing
@@ -50,7 +50,7 @@ FROM (
           listing
       ) subq_35
       FULL OUTER JOIN (
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
           listing

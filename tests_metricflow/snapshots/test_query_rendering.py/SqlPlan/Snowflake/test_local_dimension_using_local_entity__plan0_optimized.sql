@@ -2,7 +2,7 @@ test_name: test_local_dimension_using_local_entity
 test_filename: test_query_rendering.py
 sql_engine: Snowflake
 ---
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

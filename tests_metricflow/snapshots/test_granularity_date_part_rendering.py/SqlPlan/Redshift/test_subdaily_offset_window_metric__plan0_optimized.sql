@@ -15,7 +15,7 @@ FROM (
     , subq_13.archived_users AS archived_users
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
   INNER JOIN (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__hour
       , SUM(archived_users) AS archived_users

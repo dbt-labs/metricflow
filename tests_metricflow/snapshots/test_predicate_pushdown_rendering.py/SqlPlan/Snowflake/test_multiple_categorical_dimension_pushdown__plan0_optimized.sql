@@ -6,7 +6,7 @@ sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings', 'user__home_state_latest']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

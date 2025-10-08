@@ -26,7 +26,7 @@ FROM (
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__extract_dow
@@ -38,7 +38,7 @@ FROM (
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       CASE WHEN EXTRACT(dow FROM time_spine_src_28006.ds) = 0 THEN EXTRACT(dow FROM time_spine_src_28006.ds) + 7 ELSE EXTRACT(dow FROM time_spine_src_28006.ds) END AS metric_time__extract_dow

@@ -5,23 +5,24 @@ docstring:
 sql_engine: Databricks
 ---
 -- Join Self Over Time Range
--- Pass Only Elements: ['txn_revenue', 'metric_time__day', 'revenue_instance__ds__month']
--- Aggregate Measures
+-- Pass Only Elements: ['revenue', 'metric_time__day', 'revenue_instance__ds__month']
+-- Aggregate Inputs for Simple Metrics
+-- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  DATE_TRUNC('month', subq_11.ds) AS revenue_instance__ds__month
-  , subq_11.ds AS metric_time__day
+  DATE_TRUNC('month', subq_12.ds) AS revenue_instance__ds__month
+  , subq_12.ds AS metric_time__day
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
-FROM ***************************.mf_time_spine subq_11
+FROM ***************************.mf_time_spine subq_12
 INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_11.ds
+    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
   ) AND (
-    DATE_TRUNC('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_11.ds)
+    DATE_TRUNC('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_12.ds)
   )
 GROUP BY
-  DATE_TRUNC('month', subq_11.ds)
-  , subq_11.ds
+  DATE_TRUNC('month', subq_12.ds)
+  , subq_12.ds

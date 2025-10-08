@@ -8,7 +8,7 @@ sql_engine: Trino
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
@@ -16,8 +16,8 @@ SELECT
 FROM (
   -- Join Standard Outputs
   SELECT
-    subq_23.user__revenue_all_time AS user__revenue_all_time
-    , subq_17.listings AS listings
+    subq_26.user__revenue_all_time AS user__revenue_all_time
+    , subq_19.listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -25,12 +25,13 @@ FROM (
       user_id AS user
       , 1 AS listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_17
+  ) subq_19
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['txn_revenue', 'user']
-    -- Aggregate Measures
+    -- Pass Only Elements: ['revenue', 'user']
+    -- Aggregate Inputs for Simple Metrics
+    -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['user', 'user__revenue_all_time']
     SELECT
@@ -39,8 +40,8 @@ FROM (
     FROM ***************************.fct_revenue revenue_src_28000
     GROUP BY
       user_id
-  ) subq_23
+  ) subq_26
   ON
-    subq_17.user = subq_23.user
-) subq_24
+    subq_19.user = subq_26.user
+) subq_27
 WHERE user__revenue_all_time > 1

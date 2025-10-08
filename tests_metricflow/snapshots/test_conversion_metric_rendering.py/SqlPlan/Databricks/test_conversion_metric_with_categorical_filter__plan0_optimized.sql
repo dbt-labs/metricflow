@@ -31,7 +31,7 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
       , visit__referrer_id
@@ -52,7 +52,7 @@ FROM (
   FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
     -- Pass Only Elements: ['buys', 'visit__referrer_id', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
       , visit__referrer_id

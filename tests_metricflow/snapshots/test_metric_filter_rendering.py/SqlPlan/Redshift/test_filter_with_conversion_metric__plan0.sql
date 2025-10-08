@@ -10,7 +10,7 @@ FROM (
   SELECT
     subq_33.listings
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       SUM(subq_32.listings) AS listings
     FROM (
@@ -86,8 +86,10 @@ FROM (
           , subq_30.listing__capacity_latest
           , subq_30.user__visit_buy_conversion_rate
           , subq_30.listings
-          , subq_30.largest_listing
+          , subq_30.lux_listings
           , subq_30.smallest_listing
+          , subq_30.largest_listing
+          , subq_30.active_listings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -157,8 +159,10 @@ FROM (
             , subq_13.listing__is_lux_latest AS listing__is_lux_latest
             , subq_13.listing__capacity_latest AS listing__capacity_latest
             , subq_13.listings AS listings
-            , subq_13.largest_listing AS largest_listing
+            , subq_13.lux_listings AS lux_listings
             , subq_13.smallest_listing AS smallest_listing
+            , subq_13.largest_listing AS largest_listing
+            , subq_13.active_listings AS active_listings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -227,14 +231,18 @@ FROM (
               , subq_12.listing__is_lux_latest
               , subq_12.listing__capacity_latest
               , subq_12.listings
-              , subq_12.largest_listing
+              , subq_12.lux_listings
               , subq_12.smallest_listing
+              , subq_12.largest_listing
+              , subq_12.active_listings
             FROM (
               -- Read Elements From Semantic Model 'listings_latest'
               SELECT
                 1 AS listings
-                , listings_latest_src_28000.capacity AS largest_listing
+                , 1 AS lux_listings
                 , listings_latest_src_28000.capacity AS smallest_listing
+                , listings_latest_src_28000.capacity AS largest_listing
+                , 1 AS active_listings
                 , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
                 , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
                 , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month
@@ -308,7 +316,7 @@ FROM (
                   , MAX(subq_17.visits) AS visits
                   , MAX(subq_26.buys) AS buys
                 FROM (
-                  -- Aggregate Measures
+                  -- Aggregate Inputs for Simple Metrics
                   SELECT
                     subq_16.user
                     , SUM(subq_16.visits) AS visits
@@ -360,12 +368,12 @@ FROM (
                         , subq_14.referrer_id
                         , subq_14.visit__referrer_id
                         , subq_14.visits
-                        , subq_14.visitors
+                        , subq_14.visits_fill_nulls_with_0_join_to_timespine
                       FROM (
                         -- Read Elements From Semantic Model 'visits_source'
                         SELECT
                           1 AS visits
-                          , visits_source_src_28000.user_id AS visitors
+                          , 1 AS visits_fill_nulls_with_0_join_to_timespine
                           , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                           , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                           , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -402,7 +410,7 @@ FROM (
                     subq_16.user
                 ) subq_17
                 FULL OUTER JOIN (
-                  -- Aggregate Measures
+                  -- Aggregate Inputs for Simple Metrics
                   SELECT
                     subq_25.user
                     , SUM(subq_25.buys) AS buys
@@ -496,12 +504,12 @@ FROM (
                               , subq_14.referrer_id
                               , subq_14.visit__referrer_id
                               , subq_14.visits
-                              , subq_14.visitors
+                              , subq_14.visits_fill_nulls_with_0_join_to_timespine
                             FROM (
                               -- Read Elements From Semantic Model 'visits_source'
                               SELECT
                                 1 AS visits
-                                , visits_source_src_28000.user_id AS visitors
+                                , 1 AS visits_fill_nulls_with_0_join_to_timespine
                                 , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                                 , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                                 , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -587,7 +595,8 @@ FROM (
                             , subq_21.buy__user
                             , subq_21.buy__session_id
                             , subq_21.buys
-                            , subq_21.buyers
+                            , subq_21.buys_fill_nulls_with_0
+                            , subq_21.buys_fill_nulls_with_0_join_to_timespine
                             , CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR) AS mf_internal_uuid
                           FROM (
                             -- Metric Time Dimension 'ds'
@@ -642,13 +651,15 @@ FROM (
                               , subq_20.buy__user
                               , subq_20.buy__session_id
                               , subq_20.buys
-                              , subq_20.buyers
+                              , subq_20.buys_fill_nulls_with_0
+                              , subq_20.buys_fill_nulls_with_0_join_to_timespine
                             FROM (
                               -- Read Elements From Semantic Model 'buys_source'
                               SELECT
                                 1 AS buys
+                                , 1 AS buys_fill_nulls_with_0
+                                , 1 AS buys_fill_nulls_with_0_join_to_timespine
                                 , 1 AS buys_month
-                                , buys_source_src_28000.user_id AS buyers
                                 , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                                 , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week
                                 , DATE_TRUNC('month', buys_source_src_28000.ds) AS ds__month

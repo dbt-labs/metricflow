@@ -4,7 +4,7 @@ sql_engine: Snowflake
 ---
 -- Read Elements From Semantic Model 'revenue'
 SELECT
-  revenue_src_28000.revenue AS txn_revenue
+  revenue_src_28000.revenue
   , DATE_TRUNC('day', revenue_src_28000.created_at) AS ds__day
   , DATE_TRUNC('week', revenue_src_28000.created_at) AS ds__week
   , DATE_TRUNC('month', revenue_src_28000.created_at) AS ds__month

@@ -6,8 +6,9 @@ sql_engine: BigQuery
 ---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements: ['txn_revenue']
--- Aggregate Measures
+-- Pass Only Elements: ['revenue']
+-- Aggregate Inputs for Simple Metrics
+-- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

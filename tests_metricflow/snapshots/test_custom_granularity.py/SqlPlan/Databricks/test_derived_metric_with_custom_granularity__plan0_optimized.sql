@@ -11,7 +11,7 @@ FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['booking_value', 'bookers', 'booking__ds__alien_day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_14.alien_day AS booking__ds__alien_day

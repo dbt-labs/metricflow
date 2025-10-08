@@ -11,7 +11,7 @@ SELECT
   , booking_value * 0.05 AS booking_fees
 FROM (
   -- Join Standard Outputs
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     bookings_source_src_28000.listing_id AS listing
     , listings_latest_src_28000.country AS listing__country_latest
