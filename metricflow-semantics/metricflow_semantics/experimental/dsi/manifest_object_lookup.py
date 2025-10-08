@@ -107,6 +107,12 @@ class ManifestObjectLookup(AttributePrettyFormattable):
         return {lookup.model_id: lookup for lookup in self.model_object_lookups}
 
     @cached_property
+    def model_id_to_simple_metric_model_lookup(  # noqa: D102
+        self,
+    ) -> Mapping[SemanticModelId, SimpleMetricModelObjectLookup]:
+        return {lookup.model_id: lookup for lookup in self.simple_metric_model_lookups}
+
+    @cached_property
     def simple_metric_name_to_input(self) -> Mapping[str, SimpleMetricInput]:  # noqa: D102
         return {
             simple_metric_input.name: simple_metric_input
