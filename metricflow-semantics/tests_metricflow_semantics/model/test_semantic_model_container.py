@@ -71,23 +71,15 @@ def test_get_semantic_models_for_entity(semantic_model_lookup: SemanticModelLook
     assert len(linked_semantic_models) == 10
 
 
-def test_get_valid_agg_time_dimensions_for_metric(  # noqa: D103
-    metric_lookup: MetricLookup, semantic_model_lookup: SemanticModelLookup
+def test_get_aggregation_time_dimension_specs(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    metric_lookup: MetricLookup,
+    semantic_model_lookup: SemanticModelLookup,
 ) -> None:
+    result = {}
     for metric_name in ["views", "listings", "bookings_per_view"]:
-        metric_reference = MetricReference(metric_name)
-        metric = metric_lookup.get_metric(metric_reference)
-        metric_agg_time_dims = metric_lookup.get_valid_agg_time_dimensions_for_metric(metric_reference)
-        measure_agg_time_dims = list(
-            {
-                semantic_model_lookup.measure_lookup.get_properties(
-                    measure.measure_reference
-                ).agg_time_dimension_reference
-                for measure in metric.input_measures
-            }
-        )
-        if len(measure_agg_time_dims) == 1:
-            for metric_agg_time_dim in metric_agg_time_dims:
-                assert metric_agg_time_dim.reference == measure_agg_time_dims[0]
-        else:
-            assert len(metric_agg_time_dims) == 0
+        specs = metric_lookup.get_aggregation_time_dimension_specs(MetricReference(metric_name))
+        result[metric_name] = list(spec.qualified_name for spec in specs)
+
+    assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)
