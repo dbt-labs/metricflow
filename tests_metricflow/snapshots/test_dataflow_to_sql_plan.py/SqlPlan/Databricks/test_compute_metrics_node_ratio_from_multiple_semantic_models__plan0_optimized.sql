@@ -29,7 +29,7 @@ FROM (
   FROM (
     -- Join Standard Outputs
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'ds__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       subq_20.ds__day AS ds__day
@@ -55,7 +55,7 @@ FROM (
   FULL OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['views', 'listing__country_latest', 'ds__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       subq_29.ds__day AS ds__day

@@ -12,7 +12,7 @@ FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__alien_day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_14.alien_day AS metric_time__alien_day
@@ -35,7 +35,7 @@ FULL OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['listings', 'metric_time__alien_day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_20.alien_day AS metric_time__alien_day

@@ -16,33 +16,34 @@ FROM (
     , t2mr
   FROM (
     -- Compute Metrics via Expressions
+    -- Compute Metrics via Expressions
     -- Window Function for Metric Re-aggregation
     SELECT
       metric_time__week
-      , AVG(txn_revenue) OVER (PARTITION BY metric_time__week) AS t2mr
+      , AVG(revenue) OVER (PARTITION BY metric_time__week) AS t2mr
     FROM (
       -- Join Self Over Time Range
-      -- Pass Only Elements: ['txn_revenue', 'metric_time__week', 'metric_time__day']
-      -- Aggregate Measures
+      -- Pass Only Elements: ['revenue', 'metric_time__week', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
       SELECT
-        subq_14.ds AS metric_time__day
-        , DATE_TRUNC('week', subq_14.ds) AS metric_time__week
-        , SUM(revenue_src_28000.revenue) AS txn_revenue
-      FROM ***************************.mf_time_spine subq_14
+        subq_15.ds AS metric_time__day
+        , DATE_TRUNC('week', subq_15.ds) AS metric_time__week
+        , SUM(revenue_src_28000.revenue) AS revenue
+      FROM ***************************.mf_time_spine subq_15
       INNER JOIN
         ***************************.fct_revenue revenue_src_28000
       ON
         (
-          DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_14.ds
+          DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_15.ds
         ) AND (
-          DATE_TRUNC('day', revenue_src_28000.created_at) > DATE_ADD('month', -2, subq_14.ds)
+          DATE_TRUNC('day', revenue_src_28000.created_at) > DATE_ADD('month', -2, subq_15.ds)
         )
       GROUP BY
-        subq_14.ds
-        , DATE_TRUNC('week', subq_14.ds)
-    ) subq_17
-  ) subq_19
+        subq_15.ds
+        , DATE_TRUNC('week', subq_15.ds)
+    ) subq_18
+  ) subq_21
   GROUP BY
     metric_time__week
     , t2mr
-) subq_20
+) subq_22

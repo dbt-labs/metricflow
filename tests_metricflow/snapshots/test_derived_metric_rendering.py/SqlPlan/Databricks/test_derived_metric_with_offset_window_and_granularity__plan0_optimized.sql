@@ -26,7 +26,7 @@ FROM (
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'metric_time__quarter']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__quarter
@@ -38,7 +38,7 @@ FROM (
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__quarter']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       DATE_TRUNC('quarter', time_spine_src_28006.ds) AS metric_time__quarter

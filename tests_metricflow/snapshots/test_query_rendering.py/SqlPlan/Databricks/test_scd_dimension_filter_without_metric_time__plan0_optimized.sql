@@ -3,24 +3,24 @@ test_filename: test_query_rendering.py
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings']
--- Aggregate Measures
+-- Pass Only Elements: ['family_bookings']
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(bookings) AS family_bookings
+  SUM(family_bookings) AS family_bookings
 FROM (
   -- Join Standard Outputs
   SELECT
     listings_src_26000.capacity AS listing__capacity
-    , subq_10.bookings AS bookings
+    , subq_10.family_bookings AS family_bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
-      , 1 AS bookings
+      , 1 AS family_bookings
     FROM ***************************.fct_bookings bookings_source_src_26000
   ) subq_10
   LEFT OUTER JOIN

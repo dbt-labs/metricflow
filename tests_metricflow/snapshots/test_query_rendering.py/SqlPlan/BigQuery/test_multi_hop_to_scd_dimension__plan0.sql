@@ -16,7 +16,7 @@ FROM (
     , subq_12.listing__lux_listing__is_confirmed_lux
     , subq_12.bookings
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_11.metric_time__day
       , subq_11.listing__lux_listing__is_confirmed_lux
@@ -121,10 +121,8 @@ FROM (
           , subq_4.is_instant AS is_instant
           , subq_4.booking__is_instant AS booking__is_instant
           , subq_4.bookings AS bookings
-          , subq_4.instant_bookings AS instant_bookings
-          , subq_4.booking_value AS booking_value
-          , subq_4.bookers AS bookers
-          , subq_4.average_booking_value AS average_booking_value
+          , subq_4.family_bookings AS family_bookings
+          , subq_4.potentially_lux_bookings AS potentially_lux_bookings
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
@@ -216,19 +214,14 @@ FROM (
             , subq_3.is_instant
             , subq_3.booking__is_instant
             , subq_3.bookings
-            , subq_3.instant_bookings
-            , subq_3.booking_value
-            , subq_3.bookers
-            , subq_3.average_booking_value
+            , subq_3.family_bookings
+            , subq_3.potentially_lux_bookings
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             SELECT
               1 AS bookings
-              , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-              , bookings_source_src_26000.booking_value
-              , bookings_source_src_26000.guest_id AS bookers
-              , bookings_source_src_26000.booking_value AS average_booking_value
-              , bookings_source_src_26000.booking_value AS booking_payments
+              , 1 AS family_bookings
+              , 1 AS potentially_lux_bookings
               , bookings_source_src_26000.is_instant
               , DATETIME_TRUNC(bookings_source_src_26000.ds, day) AS ds__day
               , DATETIME_TRUNC(bookings_source_src_26000.ds, isoweek) AS ds__week

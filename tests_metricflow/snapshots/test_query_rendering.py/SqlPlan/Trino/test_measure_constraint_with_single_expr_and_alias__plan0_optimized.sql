@@ -10,7 +10,7 @@ SELECT
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'metric_time__day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day

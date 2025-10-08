@@ -12,7 +12,7 @@ FROM (
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
   -- Pass Only Elements: ['bookings']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS bookings
@@ -24,7 +24,7 @@ CROSS JOIN (
   -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
   -- Pass Only Elements: ['listings']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS listings

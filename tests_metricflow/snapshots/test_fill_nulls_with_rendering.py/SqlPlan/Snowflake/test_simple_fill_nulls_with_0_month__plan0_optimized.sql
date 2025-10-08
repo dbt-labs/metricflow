@@ -6,12 +6,12 @@ sql_engine: Snowflake
 -- Write to DataTable
 SELECT
   metric_time__month
-  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+  , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
     subq_15.metric_time__month AS metric_time__month
-    , subq_12.bookings AS bookings
+    , subq_12.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
@@ -23,17 +23,17 @@ FROM (
       DATE_TRUNC('month', ds)
   ) subq_15
   LEFT OUTER JOIN (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__month
-      , SUM(bookings) AS bookings
+      , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__month']
+      -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'metric_time__month']
       SELECT
         DATE_TRUNC('month', ds) AS metric_time__month
-        , 1 AS bookings
+        , 1 AS bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_11
     GROUP BY

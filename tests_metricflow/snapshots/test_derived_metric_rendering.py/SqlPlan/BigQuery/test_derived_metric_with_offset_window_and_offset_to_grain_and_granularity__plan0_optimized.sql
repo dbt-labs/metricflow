@@ -33,7 +33,7 @@ FROM (
   FROM (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__year']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__year AS metric_time__year
@@ -50,7 +50,7 @@ FROM (
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Pass Only Elements: ['bookings', 'metric_time__year']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__year AS metric_time__year

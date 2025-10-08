@@ -4,7 +4,7 @@ sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 WITH sma_28014_cte AS (
@@ -28,7 +28,7 @@ FROM (
   LEFT OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['average_booking_value', 'listing__user']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing__user', 'listing__user__average_booking_value']
     SELECT

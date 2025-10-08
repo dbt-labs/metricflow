@@ -26,29 +26,30 @@ FROM (
     ) AS revenue_mtd
   FROM (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['txn_revenue', 'revenue_instance__ds__quarter', 'revenue_instance__ds__year', 'metric_time__day']
-    -- Aggregate Measures
+    -- Pass Only Elements: ['revenue', 'revenue_instance__ds__quarter', 'revenue_instance__ds__year', 'metric_time__day']
+    -- Aggregate Inputs for Simple Metrics
+    -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(subq_13.ds, quarter) AS revenue_instance__ds__quarter
-      , DATETIME_TRUNC(subq_13.ds, year) AS revenue_instance__ds__year
-      , subq_13.ds AS metric_time__day
+      DATETIME_TRUNC(subq_14.ds, quarter) AS revenue_instance__ds__quarter
+      , DATETIME_TRUNC(subq_14.ds, year) AS revenue_instance__ds__year
+      , subq_14.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
-    FROM ***************************.mf_time_spine subq_13
+    FROM ***************************.mf_time_spine subq_14
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_13.ds
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_14.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) >= DATETIME_TRUNC(subq_13.ds, month)
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) >= DATETIME_TRUNC(subq_14.ds, month)
       )
     GROUP BY
       revenue_instance__ds__quarter
       , revenue_instance__ds__year
       , metric_time__day
-  ) subq_17
-) subq_18
+  ) subq_19
+) subq_20
 GROUP BY
   revenue_instance__ds__quarter
   , revenue_instance__ds__year

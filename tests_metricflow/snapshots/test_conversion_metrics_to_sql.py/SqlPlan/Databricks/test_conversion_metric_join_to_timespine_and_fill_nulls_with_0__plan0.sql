@@ -12,18 +12,18 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_21.metric_time__day
-    , CAST(subq_21.buys AS DOUBLE) / CAST(NULLIF(subq_21.visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
+    , CAST(subq_21.buys_fill_nulls_with_0_join_to_timespine AS DOUBLE) / CAST(NULLIF(subq_21.visits_fill_nulls_with_0_join_to_timespine, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
   FROM (
     -- Combine Aggregated Outputs
     SELECT
       COALESCE(subq_7.metric_time__day, subq_20.metric_time__day) AS metric_time__day
-      , COALESCE(MAX(subq_7.visits), 0) AS visits
-      , COALESCE(MAX(subq_20.buys), 0) AS buys
+      , COALESCE(MAX(subq_7.visits_fill_nulls_with_0_join_to_timespine), 0) AS visits_fill_nulls_with_0_join_to_timespine
+      , COALESCE(MAX(subq_20.buys_fill_nulls_with_0_join_to_timespine), 0) AS buys_fill_nulls_with_0_join_to_timespine
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         subq_6.metric_time__day AS metric_time__day
-        , subq_3.visits AS visits
+        , subq_3.visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
       FROM (
         -- Pass Only Elements: ['metric_time__day']
         SELECT
@@ -63,15 +63,15 @@ FROM (
         ) subq_5
       ) subq_6
       LEFT OUTER JOIN (
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_2.metric_time__day
-          , SUM(subq_2.visits) AS visits
+          , SUM(subq_2.visits_fill_nulls_with_0_join_to_timespine) AS visits_fill_nulls_with_0_join_to_timespine
         FROM (
-          -- Pass Only Elements: ['visits', 'metric_time__day']
+          -- Pass Only Elements: ['visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
           SELECT
             subq_1.metric_time__day
-            , subq_1.visits
+            , subq_1.visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -115,12 +115,12 @@ FROM (
               , subq_0.referrer_id
               , subq_0.visit__referrer_id
               , subq_0.visits
-              , subq_0.visitors
+              , subq_0.visits_fill_nulls_with_0_join_to_timespine
             FROM (
               -- Read Elements From Semantic Model 'visits_source'
               SELECT
                 1 AS visits
-                , visits_source_src_28000.user_id AS visitors
+                , 1 AS visits_fill_nulls_with_0_join_to_timespine
                 , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                 , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                 , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -163,7 +163,7 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         subq_19.metric_time__day AS metric_time__day
-        , subq_16.buys AS buys
+        , subq_16.buys_fill_nulls_with_0_join_to_timespine AS buys_fill_nulls_with_0_join_to_timespine
       FROM (
         -- Pass Only Elements: ['metric_time__day']
         SELECT
@@ -203,33 +203,33 @@ FROM (
         ) subq_18
       ) subq_19
       LEFT OUTER JOIN (
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_15.metric_time__day
-          , SUM(subq_15.buys) AS buys
+          , SUM(subq_15.buys_fill_nulls_with_0_join_to_timespine) AS buys_fill_nulls_with_0_join_to_timespine
         FROM (
-          -- Pass Only Elements: ['buys', 'metric_time__day']
+          -- Pass Only Elements: ['buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
           SELECT
             subq_14.metric_time__day
-            , subq_14.buys
+            , subq_14.buys_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Find conversions for user within the range of 7 day
             SELECT
               subq_13.metric_time__day
               , subq_13.user
-              , subq_13.buys
-              , subq_13.visits
+              , subq_13.buys_fill_nulls_with_0_join_to_timespine
+              , subq_13.visits_fill_nulls_with_0_join_to_timespine
             FROM (
               -- Dedupe the fanout with mf_internal_uuid in the conversion data set
               SELECT DISTINCT
-                FIRST_VALUE(subq_9.visits) OVER (
+                FIRST_VALUE(subq_9.visits_fill_nulls_with_0_join_to_timespine) OVER (
                   PARTITION BY
                     subq_12.user
                     , subq_12.metric_time__day
                     , subq_12.mf_internal_uuid
                   ORDER BY subq_9.metric_time__day DESC
                   ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                ) AS visits
+                ) AS visits_fill_nulls_with_0_join_to_timespine
                 , FIRST_VALUE(subq_9.metric_time__day) OVER (
                   PARTITION BY
                     subq_12.user
@@ -247,13 +247,13 @@ FROM (
                   ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
                 ) AS user
                 , subq_12.mf_internal_uuid AS mf_internal_uuid
-                , subq_12.buys AS buys
+                , subq_12.buys_fill_nulls_with_0_join_to_timespine AS buys_fill_nulls_with_0_join_to_timespine
               FROM (
-                -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
+                -- Pass Only Elements: ['visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day', 'user']
                 SELECT
                   subq_8.metric_time__day
                   , subq_8.user
-                  , subq_8.visits
+                  , subq_8.visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Metric Time Dimension 'ds'
                   SELECT
@@ -297,12 +297,12 @@ FROM (
                     , subq_0.referrer_id
                     , subq_0.visit__referrer_id
                     , subq_0.visits
-                    , subq_0.visitors
+                    , subq_0.visits_fill_nulls_with_0_join_to_timespine
                   FROM (
                     -- Read Elements From Semantic Model 'visits_source'
                     SELECT
                       1 AS visits
-                      , visits_source_src_28000.user_id AS visitors
+                      , 1 AS visits_fill_nulls_with_0_join_to_timespine
                       , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                       , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                       , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -388,7 +388,8 @@ FROM (
                   , subq_11.buy__user
                   , subq_11.buy__session_id
                   , subq_11.buys
-                  , subq_11.buyers
+                  , subq_11.buys_fill_nulls_with_0
+                  , subq_11.buys_fill_nulls_with_0_join_to_timespine
                   , UUID() AS mf_internal_uuid
                 FROM (
                   -- Metric Time Dimension 'ds'
@@ -443,13 +444,15 @@ FROM (
                     , subq_10.buy__user
                     , subq_10.buy__session_id
                     , subq_10.buys
-                    , subq_10.buyers
+                    , subq_10.buys_fill_nulls_with_0
+                    , subq_10.buys_fill_nulls_with_0_join_to_timespine
                   FROM (
                     -- Read Elements From Semantic Model 'buys_source'
                     SELECT
                       1 AS buys
+                      , 1 AS buys_fill_nulls_with_0
+                      , 1 AS buys_fill_nulls_with_0_join_to_timespine
                       , 1 AS buys_month
-                      , buys_source_src_28000.user_id AS buyers
                       , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                       , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week
                       , DATE_TRUNC('month', buys_source_src_28000.ds) AS ds__month

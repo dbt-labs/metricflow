@@ -12,7 +12,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_22.metric_time__day AS metric_time__day
-    , subq_18.bookings AS bookings_5_days_ago
+    , subq_18.bookings_5_days_ago AS bookings_5_days_ago
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['metric_time__day']
@@ -31,10 +31,10 @@ FROM (
   INNER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['bookings', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(bookings) AS bookings
+      , SUM(bookings) AS bookings_5_days_ago
     FROM (
       -- Metric Time Dimension 'ds'
       -- Join to Custom Granularity Dataset

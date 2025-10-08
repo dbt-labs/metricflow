@@ -4,7 +4,7 @@ sql_engine: BigQuery
 ---
 -- Read Elements From Semantic Model 'revenue'
 SELECT
-  revenue_src_28000.revenue AS txn_revenue
+  revenue_src_28000.revenue
   , DATETIME_TRUNC(revenue_src_28000.created_at, day) AS ds__day
   , DATETIME_TRUNC(revenue_src_28000.created_at, isoweek) AS ds__week
   , DATETIME_TRUNC(revenue_src_28000.created_at, month) AS ds__month

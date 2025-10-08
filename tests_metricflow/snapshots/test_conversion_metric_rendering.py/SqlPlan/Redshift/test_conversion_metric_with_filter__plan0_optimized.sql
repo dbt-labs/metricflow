@@ -22,7 +22,7 @@ SELECT
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['visits']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(visits) AS visits
   FROM (
@@ -37,7 +37,7 @@ FROM (
 CROSS JOIN (
   -- Find conversions for user within the range of INF
   -- Pass Only Elements: ['buys']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(buys) AS buys
   FROM (

@@ -21,7 +21,7 @@ FROM (
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['average_booking_value', 'bookings']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         AVG(average_booking_value) AS average_booking_value
@@ -53,7 +53,7 @@ FROM (
     CROSS JOIN (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['booking_value']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         SUM(booking_value) AS booking_value

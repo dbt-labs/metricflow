@@ -12,7 +12,7 @@ FROM (
   SELECT
     subq_6.total_account_balance_first_day_of_month
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       SUM(subq_5.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
     FROM (

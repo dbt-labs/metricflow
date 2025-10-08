@@ -23,7 +23,7 @@ FROM (
       , MAX(subq_4.visits) AS visits
       , MAX(subq_14.buys) AS buys
     FROM (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_3.metric_time__day
         , subq_3.visit__referrer_id
@@ -77,7 +77,7 @@ FROM (
             , subq_1.referrer_id
             , subq_1.visit__referrer_id
             , subq_1.visits
-            , subq_1.visitors
+            , subq_1.visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -121,12 +121,12 @@ FROM (
               , subq_0.referrer_id
               , subq_0.visit__referrer_id
               , subq_0.visits
-              , subq_0.visitors
+              , subq_0.visits_fill_nulls_with_0_join_to_timespine
             FROM (
               -- Read Elements From Semantic Model 'visits_source'
               SELECT
                 1 AS visits
-                , visits_source_src_28000.user_id AS visitors
+                , 1 AS visits_fill_nulls_with_0_join_to_timespine
                 , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
                 , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
                 , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
@@ -166,7 +166,7 @@ FROM (
         , visit__referrer_id
     ) subq_4
     FULL OUTER JOIN (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_13.metric_time__day
         , subq_13.visit__referrer_id
@@ -272,7 +272,7 @@ FROM (
                   , subq_5.referrer_id
                   , subq_5.visit__referrer_id
                   , subq_5.visits
-                  , subq_5.visitors
+                  , subq_5.visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Metric Time Dimension 'ds'
                   SELECT
@@ -316,12 +316,12 @@ FROM (
                     , subq_0.referrer_id
                     , subq_0.visit__referrer_id
                     , subq_0.visits
-                    , subq_0.visitors
+                    , subq_0.visits_fill_nulls_with_0_join_to_timespine
                   FROM (
                     -- Read Elements From Semantic Model 'visits_source'
                     SELECT
                       1 AS visits
-                      , visits_source_src_28000.user_id AS visitors
+                      , 1 AS visits_fill_nulls_with_0_join_to_timespine
                       , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
                       , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
                       , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
@@ -409,7 +409,8 @@ FROM (
                 , subq_9.buy__user
                 , subq_9.buy__session_id
                 , subq_9.buys
-                , subq_9.buyers
+                , subq_9.buys_fill_nulls_with_0
+                , subq_9.buys_fill_nulls_with_0_join_to_timespine
                 , GENERATE_UUID() AS mf_internal_uuid
               FROM (
                 -- Metric Time Dimension 'ds'
@@ -464,13 +465,15 @@ FROM (
                   , subq_8.buy__user
                   , subq_8.buy__session_id
                   , subq_8.buys
-                  , subq_8.buyers
+                  , subq_8.buys_fill_nulls_with_0
+                  , subq_8.buys_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Read Elements From Semantic Model 'buys_source'
                   SELECT
                     1 AS buys
+                    , 1 AS buys_fill_nulls_with_0
+                    , 1 AS buys_fill_nulls_with_0_join_to_timespine
                     , 1 AS buys_month
-                    , buys_source_src_28000.user_id AS buyers
                     , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS ds__day
                     , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS ds__week
                     , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS ds__month

@@ -21,8 +21,10 @@ FROM (
       -- Read Elements From Semantic Model 'listings_latest'
       SELECT
         1 AS listings
-        , listings_latest_src_28000.capacity AS largest_listing
+        , 1 AS lux_listings
         , listings_latest_src_28000.capacity AS smallest_listing
+        , listings_latest_src_28000.capacity AS largest_listing
+        , 1 AS active_listings
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS ds__day
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS ds__week
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS ds__month

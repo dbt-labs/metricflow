@@ -10,7 +10,8 @@ sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookers', 'metric_time__day']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
+-- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
@@ -19,18 +20,18 @@ SELECT
 FROM (
   -- Join Self Over Time Range
   SELECT
-    subq_12.ds AS metric_time__day
+    subq_13.ds AS metric_time__day
     , bookings_source_src_28000.guest_id AS bookers
-  FROM ***************************.mf_time_spine subq_12
+  FROM ***************************.mf_time_spine subq_13
   INNER JOIN
     ***************************.fct_bookings bookings_source_src_28000
   ON
     (
-      DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_12.ds
+      DATE_TRUNC('day', bookings_source_src_28000.ds) <= subq_13.ds
     ) AND (
-      DATE_TRUNC('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_12.ds)
+      DATE_TRUNC('day', bookings_source_src_28000.ds) > DATEADD(day, -2, subq_13.ds)
     )
-) subq_13
+) subq_14
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'
 GROUP BY
   metric_time__day

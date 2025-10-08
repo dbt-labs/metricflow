@@ -6,7 +6,7 @@ sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'booking__is_instant']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

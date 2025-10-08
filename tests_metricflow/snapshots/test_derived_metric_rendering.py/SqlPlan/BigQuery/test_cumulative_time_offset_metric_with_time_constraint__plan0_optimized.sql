@@ -11,9 +11,10 @@ FROM (
   -- Join to Time Spine Dataset
   -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
   -- Compute Metrics via Expressions
+  -- Compute Metrics via Expressions
   SELECT
-    subq_27.metric_time__day AS metric_time__day
-    , subq_23.bookers AS every_2_days_bookers_2_days_ago
+    subq_28.metric_time__day AS metric_time__day
+    , subq_24.bookers AS every_2_days_bookers_2_days_ago
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
@@ -23,29 +24,29 @@ FROM (
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
     WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
-  ) subq_27
+  ) subq_28
   INNER JOIN (
     -- Join Self Over Time Range
     -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
     -- Pass Only Elements: ['bookers', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
-      subq_19.ds AS metric_time__day
+      subq_20.ds AS metric_time__day
       , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
-    FROM ***************************.mf_time_spine subq_19
+    FROM ***************************.mf_time_spine subq_20
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_19.ds
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_20.ds
       ) AND (
-        DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_19.ds AS DATETIME), INTERVAL 2 day)
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_20.ds AS DATETIME), INTERVAL 2 day)
       )
-    WHERE subq_19.ds BETWEEN '2019-12-19' AND '2020-01-02'
+    WHERE subq_20.ds BETWEEN '2019-12-19' AND '2020-01-02'
     GROUP BY
       metric_time__day
-  ) subq_23
+  ) subq_24
   ON
-    DATE_SUB(CAST(subq_27.metric_time__day AS DATETIME), INTERVAL 2 day) = subq_23.metric_time__day
-  WHERE subq_27.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
-) subq_30
+    DATE_SUB(CAST(subq_28.metric_time__day AS DATETIME), INTERVAL 2 day) = subq_24.metric_time__day
+  WHERE subq_28.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
+) subq_32

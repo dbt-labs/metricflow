@@ -8,27 +8,27 @@ sql_engine: Trino
 -- Write to DataTable
 SELECT
   metric_time__day
-  , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+  , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , subq_14.bookings AS bookings
+    , subq_14.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
   FROM ***************************.mf_time_spine time_spine_src_28006
   LEFT OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
-    -- Aggregate Measures
+    -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'metric_time__day']
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(bookings) AS bookings
+      , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , is_instant AS booking__is_instant
-        , 1 AS bookings
+        , 1 AS bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_11
     WHERE booking__is_instant

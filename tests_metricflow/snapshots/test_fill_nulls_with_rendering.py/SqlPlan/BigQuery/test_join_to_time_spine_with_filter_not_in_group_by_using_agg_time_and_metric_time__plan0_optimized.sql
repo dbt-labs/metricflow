@@ -7,7 +7,7 @@ sql_engine: BigQuery
 -- Write to DataTable
 SELECT
   subq_19.metric_time__day AS metric_time__day
-  , subq_15.bookings AS bookings_join_to_time_spine_with_tiered_filters
+  , subq_15.bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day']
@@ -21,22 +21,22 @@ FROM (
       , DATETIME_TRUNC(ds, month) AS booking__ds__month
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_17
-  WHERE (metric_time__day <= '2020-01-02') AND (booking__ds__month > '2020-01-01')
+  WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
 ) subq_19
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['bookings', 'metric_time__day']
-  -- Aggregate Measures
+  -- Pass Only Elements: ['bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day']
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
-    , SUM(bookings) AS bookings
+    , SUM(bookings_join_to_time_spine_with_tiered_filters) AS bookings_join_to_time_spine_with_tiered_filters
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
       DATETIME_TRUNC(ds, month) AS booking__ds__month
       , DATETIME_TRUNC(ds, day) AS metric_time__day
-      , 1 AS bookings
+      , 1 AS bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_12
   WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')

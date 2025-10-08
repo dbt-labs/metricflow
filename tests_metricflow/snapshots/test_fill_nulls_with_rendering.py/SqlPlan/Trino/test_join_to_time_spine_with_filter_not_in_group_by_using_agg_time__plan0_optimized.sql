@@ -7,7 +7,7 @@ sql_engine: Trino
 -- Write to DataTable
 SELECT
   subq_19.booking__ds__day AS booking__ds__day
-  , subq_15.bookings AS bookings_join_to_time_spine_with_tiered_filters
+  , subq_15.bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['booking__ds__day']
@@ -22,15 +22,15 @@ FROM (
       , DATE_TRUNC('month', ds) AS booking__ds__month
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_17
-  WHERE (metric_time__day <= '2020-01-02') AND (booking__ds__month > '2020-01-01')
+  WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
 ) subq_19
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['bookings', 'booking__ds__day']
-  -- Aggregate Measures
+  -- Pass Only Elements: ['bookings_join_to_time_spine_with_tiered_filters', 'booking__ds__day']
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     booking__ds__day
-    , SUM(bookings) AS bookings
+    , SUM(bookings_join_to_time_spine_with_tiered_filters) AS bookings_join_to_time_spine_with_tiered_filters
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -38,7 +38,7 @@ LEFT OUTER JOIN (
       DATE_TRUNC('day', ds) AS booking__ds__day
       , DATE_TRUNC('month', ds) AS booking__ds__month
       , DATE_TRUNC('day', ds) AS metric_time__day
-      , 1 AS bookings
+      , 1 AS bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_12
   WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')

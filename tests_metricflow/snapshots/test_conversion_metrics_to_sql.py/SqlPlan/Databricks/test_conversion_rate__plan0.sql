@@ -20,7 +20,7 @@ FROM (
       , MAX(subq_3.visits) AS visits
       , MAX(subq_12.buys) AS buys
     FROM (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_2.visit__referrer_id
         , SUM(subq_2.visits) AS visits
@@ -72,12 +72,12 @@ FROM (
             , subq_0.referrer_id
             , subq_0.visit__referrer_id
             , subq_0.visits
-            , subq_0.visitors
+            , subq_0.visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Read Elements From Semantic Model 'visits_source'
             SELECT
               1 AS visits
-              , visits_source_src_28000.user_id AS visitors
+              , 1 AS visits_fill_nulls_with_0_join_to_timespine
               , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
               , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -114,7 +114,7 @@ FROM (
         subq_2.visit__referrer_id
     ) subq_3
     FULL OUTER JOIN (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_11.visit__referrer_id
         , SUM(subq_11.buys) AS buys
@@ -218,12 +218,12 @@ FROM (
                   , subq_0.referrer_id
                   , subq_0.visit__referrer_id
                   , subq_0.visits
-                  , subq_0.visitors
+                  , subq_0.visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Read Elements From Semantic Model 'visits_source'
                   SELECT
                     1 AS visits
-                    , visits_source_src_28000.user_id AS visitors
+                    , 1 AS visits_fill_nulls_with_0_join_to_timespine
                     , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                     , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                     , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -309,7 +309,8 @@ FROM (
                 , subq_7.buy__user
                 , subq_7.buy__session_id
                 , subq_7.buys
-                , subq_7.buyers
+                , subq_7.buys_fill_nulls_with_0
+                , subq_7.buys_fill_nulls_with_0_join_to_timespine
                 , UUID() AS mf_internal_uuid
               FROM (
                 -- Metric Time Dimension 'ds'
@@ -364,13 +365,15 @@ FROM (
                   , subq_6.buy__user
                   , subq_6.buy__session_id
                   , subq_6.buys
-                  , subq_6.buyers
+                  , subq_6.buys_fill_nulls_with_0
+                  , subq_6.buys_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Read Elements From Semantic Model 'buys_source'
                   SELECT
                     1 AS buys
+                    , 1 AS buys_fill_nulls_with_0
+                    , 1 AS buys_fill_nulls_with_0_join_to_timespine
                     , 1 AS buys_month
-                    , buys_source_src_28000.user_id AS buyers
                     , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                     , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week
                     , DATE_TRUNC('month', buys_source_src_28000.ds) AS ds__month

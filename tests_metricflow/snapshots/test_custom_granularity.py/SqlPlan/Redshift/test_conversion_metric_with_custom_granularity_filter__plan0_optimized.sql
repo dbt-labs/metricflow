@@ -26,7 +26,7 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['visits', 'metric_time__alien_day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__alien_day
       , SUM(visits) AS visits
@@ -49,7 +49,7 @@ FROM (
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
     -- Pass Only Elements: ['buys', 'metric_time__alien_day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__alien_day
       , SUM(buys) AS buys

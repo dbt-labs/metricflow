@@ -6,7 +6,7 @@ sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
@@ -25,7 +25,7 @@ FROM (
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_29
   LEFT OUTER JOIN (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       listing

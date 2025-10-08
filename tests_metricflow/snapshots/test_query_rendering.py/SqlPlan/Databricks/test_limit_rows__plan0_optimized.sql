@@ -4,7 +4,7 @@ docstring:
   Tests a plan with a limit to the number of rows returned.
 sql_engine: Databricks
 ---
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Order By [] Limit 1
 -- Write to DataTable

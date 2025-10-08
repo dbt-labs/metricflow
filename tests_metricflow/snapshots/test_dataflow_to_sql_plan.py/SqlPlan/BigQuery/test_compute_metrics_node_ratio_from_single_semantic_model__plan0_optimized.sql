@@ -11,7 +11,7 @@ SELECT
   , CAST(bookings AS FLOAT64) / CAST(NULLIF(bookers, 0) AS FLOAT64) AS bookings_per_booker
 FROM (
   -- Join Standard Outputs
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_7.listing AS listing
     , listings_latest_src_28000.country AS listing__country_latest

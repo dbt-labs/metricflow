@@ -29,7 +29,7 @@ FROM (
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['bookings', 'booking__is_instant']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__is_instant
@@ -47,7 +47,7 @@ FULL OUTER JOIN (
   FROM (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['instant_bookings', 'booking__is_instant']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__is_instant

@@ -12,8 +12,12 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     SELECT
-      1 AS new_users
+      1 AS subdaily_join_to_time_spine_metric
+      , 1 AS simple_subdaily_metric_default_day
+      , 1 AS simple_subdaily_metric_default_hour
+      , 1 AS archived_users_join_to_time_spine
       , 1 AS archived_users
+      , 1 AS new_users
       , DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS ds__day
       , DATETIME_TRUNC(users_ds_source_src_28000.ds, isoweek) AS ds__week
       , DATETIME_TRUNC(users_ds_source_src_28000.ds, month) AS ds__month

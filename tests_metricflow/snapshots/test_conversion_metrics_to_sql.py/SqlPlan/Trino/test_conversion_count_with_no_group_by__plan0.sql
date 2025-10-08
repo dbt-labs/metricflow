@@ -10,14 +10,14 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_13.buys AS visit_buy_conversions
+    subq_13.buys_fill_nulls_with_0 AS visit_buy_conversions
   FROM (
     -- Combine Aggregated Outputs
     SELECT
       MAX(subq_3.visits) AS visits
-      , COALESCE(MAX(subq_12.buys), 0) AS buys
+      , COALESCE(MAX(subq_12.buys_fill_nulls_with_0), 0) AS buys_fill_nulls_with_0
     FROM (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         SUM(subq_2.visits) AS visits
       FROM (
@@ -67,12 +67,12 @@ FROM (
             , subq_0.referrer_id
             , subq_0.visit__referrer_id
             , subq_0.visits
-            , subq_0.visitors
+            , subq_0.visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Read Elements From Semantic Model 'visits_source'
             SELECT
               1 AS visits
-              , visits_source_src_28000.user_id AS visitors
+              , 1 AS visits_fill_nulls_with_0_join_to_timespine
               , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
               , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -107,19 +107,19 @@ FROM (
       ) subq_2
     ) subq_3
     CROSS JOIN (
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
-        SUM(subq_11.buys) AS buys
+        SUM(subq_11.buys_fill_nulls_with_0) AS buys_fill_nulls_with_0
       FROM (
-        -- Pass Only Elements: ['buys']
+        -- Pass Only Elements: ['buys_fill_nulls_with_0']
         SELECT
-          subq_10.buys
+          subq_10.buys_fill_nulls_with_0
         FROM (
           -- Find conversions for user within the range of 7 day
           SELECT
             subq_9.metric_time__day
             , subq_9.user
-            , subq_9.buys
+            , subq_9.buys_fill_nulls_with_0
             , subq_9.visits
           FROM (
             -- Dedupe the fanout with mf_internal_uuid in the conversion data set
@@ -149,7 +149,7 @@ FROM (
                 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
               ) AS user
               , subq_8.mf_internal_uuid AS mf_internal_uuid
-              , subq_8.buys AS buys
+              , subq_8.buys_fill_nulls_with_0 AS buys_fill_nulls_with_0
             FROM (
               -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
               SELECT
@@ -199,12 +199,12 @@ FROM (
                   , subq_0.referrer_id
                   , subq_0.visit__referrer_id
                   , subq_0.visits
-                  , subq_0.visitors
+                  , subq_0.visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Read Elements From Semantic Model 'visits_source'
                   SELECT
                     1 AS visits
-                    , visits_source_src_28000.user_id AS visitors
+                    , 1 AS visits_fill_nulls_with_0_join_to_timespine
                     , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                     , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                     , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -290,7 +290,8 @@ FROM (
                 , subq_7.buy__user
                 , subq_7.buy__session_id
                 , subq_7.buys
-                , subq_7.buyers
+                , subq_7.buys_fill_nulls_with_0
+                , subq_7.buys_fill_nulls_with_0_join_to_timespine
                 , uuid() AS mf_internal_uuid
               FROM (
                 -- Metric Time Dimension 'ds'
@@ -345,13 +346,15 @@ FROM (
                   , subq_6.buy__user
                   , subq_6.buy__session_id
                   , subq_6.buys
-                  , subq_6.buyers
+                  , subq_6.buys_fill_nulls_with_0
+                  , subq_6.buys_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Read Elements From Semantic Model 'buys_source'
                   SELECT
                     1 AS buys
+                    , 1 AS buys_fill_nulls_with_0
+                    , 1 AS buys_fill_nulls_with_0_join_to_timespine
                     , 1 AS buys_month
-                    , buys_source_src_28000.user_id AS buyers
                     , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                     , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week
                     , DATE_TRUNC('month', buys_source_src_28000.ds) AS ds__month

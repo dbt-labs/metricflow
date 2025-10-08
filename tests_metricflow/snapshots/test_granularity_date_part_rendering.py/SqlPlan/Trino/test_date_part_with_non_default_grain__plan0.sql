@@ -12,7 +12,7 @@ FROM (
     subq_4.metric_time__extract_year
     , subq_4.archived_users
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_3.metric_time__extract_year
       , SUM(subq_3.archived_users) AS archived_users
@@ -213,6 +213,10 @@ FROM (
           , subq_1.user
           , subq_1.home_state
           , subq_1.user__home_state
+          , subq_1.subdaily_join_to_time_spine_metric
+          , subq_1.simple_subdaily_metric_default_day
+          , subq_1.simple_subdaily_metric_default_hour
+          , subq_1.archived_users_join_to_time_spine
           , subq_1.archived_users
         FROM (
           -- Metric Time Dimension 'archived_at'
@@ -406,12 +410,20 @@ FROM (
             , subq_0.user
             , subq_0.home_state
             , subq_0.user__home_state
+            , subq_0.subdaily_join_to_time_spine_metric
+            , subq_0.simple_subdaily_metric_default_day
+            , subq_0.simple_subdaily_metric_default_hour
+            , subq_0.archived_users_join_to_time_spine
             , subq_0.archived_users
           FROM (
             -- Read Elements From Semantic Model 'users_ds_source'
             SELECT
-              1 AS new_users
+              1 AS subdaily_join_to_time_spine_metric
+              , 1 AS simple_subdaily_metric_default_day
+              , 1 AS simple_subdaily_metric_default_hour
+              , 1 AS archived_users_join_to_time_spine
               , 1 AS archived_users
+              , 1 AS new_users
               , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
               , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month

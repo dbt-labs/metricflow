@@ -9,7 +9,7 @@ SELECT
   , MAX(subq_4.bookings) AS bookings
   , MAX(subq_9.listings) AS listings
 FROM (
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
@@ -27,7 +27,7 @@ FROM (
     metric_time__day
 ) subq_4
 FULL OUTER JOIN (
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day

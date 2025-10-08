@@ -6,7 +6,7 @@ sql_engine: Trino
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['identity_verifications', 'user__home_state']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

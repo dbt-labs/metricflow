@@ -4,7 +4,7 @@ sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['listings']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 WITH sma_28019_cte AS (
@@ -41,7 +41,7 @@ FROM (
     FROM (
       -- Read From CTE For node_id=sma_28019
       -- Pass Only Elements: ['visits', 'user']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         sma_28019_cte.user
         , SUM(visits) AS visits
@@ -52,7 +52,7 @@ FROM (
     FULL OUTER JOIN (
       -- Find conversions for user within the range of INF
       -- Pass Only Elements: ['buys', 'user']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_46.user
         , SUM(buys) AS buys
