@@ -35,7 +35,9 @@ class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
 
         Args:
             iterable: Create the set using the given iterable.
-            _set_as_dict: For internal use - create a copy of this and use it for the internal representation.
+            _set_as_dict: For internal use cases: Use this exact object for the internal dict. Useful in copy-like
+            operations as `dict.copy()` is faster than initializing a new dictionary with items. The performance
+            difference is only relevant in tight loops.
         """
         self._set_as_dict = _set_as_dict if _set_as_dict is not None else {}
         if iterable is not None:
@@ -150,7 +152,7 @@ class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[Ha
 
     @override
     def as_frozen(self) -> FrozenOrderedSet[HashableT]:
-        return FrozenOrderedSet(self)
+        return FrozenOrderedSet(_set_as_dict=self._set_as_dict.copy())
 
     def clear(self) -> None:
         """Remove all items from this set."""
