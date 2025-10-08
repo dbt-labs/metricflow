@@ -20,7 +20,7 @@ from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.helpers.string_helpers import mf_indent
@@ -1560,20 +1560,51 @@ class DataflowPlanBuilder:
         source_node: DataflowPlanNode,
         queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
         queried_linkable_specs: Sequence[LinkableInstanceSpec],
+        metric_where_filter_specs: Sequence[WhereFilterSpec],
         after_aggregation_where_filter_specs: Sequence[WhereFilterSpec],
         time_range_constraint: Optional[TimeRangeConstraint],
     ) -> DataflowPlanNode:
+        """Build a node that joins the time spine to the aggregated input for the given simple metric.
+
+        Args:
+            join_description: Describes how to join the time spine.
+            metric_reference: The simple metric that is being constructed.
+            source_node: The node that has the aggregated input for the metric.
+            queried_agg_time_dimension_specs: The group-by-item specs in the query that are aggregation time dimensions
+            for the metric.
+            queried_linkable_specs: The group-by-item specs in the query.
+            metric_where_filter_specs: The filters that are defined in the simple metric.
+            after_aggregation_where_filter_specs: The filters that should be applied after aggregation. These are
+            filters that are specified in the query, or when building a derived metric, the filters specified in the
+            derived metric.
+            time_range_constraint: The time range that should be filtered.
+
+        Returns: A sub-DAG with the time-spine join and appropriate filters.
+        """
         # Find filters that contain only metric_time or agg_time_dimension. They will be applied to the time spine table.
+
+        # Aggregation time dimension specs possible for the metric (e.g. `booking__ds__day`, `metric_time__dow`)
+        agg_time_dimension_specs_for_metric: OrderedSet[
+            LinkableInstanceSpec
+        ] = self._metric_lookup.get_aggregation_time_dimension_specs(metric_reference)
+        # Filters that only reference group-by items that are aggregation time dimensions for the metric.
         agg_time_only_filters: List[WhereFilterSpec] = []
-        non_agg_time_filters: List[WhereFilterSpec] = []
+
+        for filter_spec in metric_where_filter_specs:
+            included_agg_time_specs = agg_time_dimension_specs_for_metric.intersection(filter_spec.linkable_specs)
+            if len(included_agg_time_specs) == len(filter_spec.linkable_specs):
+                agg_time_only_filters.append(filter_spec)
+
+        # Filters that include group-by-items that are not aggregation time dimensions for the metric.
+        # Could also contain group-by items that are aggregation time dimensions for the metric, but since the SQL
+        # can't be parsed, those can't be applied separately to the time spine.
+        non_agg_time_only_filters: List[WhereFilterSpec] = []
         for filter_spec in after_aggregation_where_filter_specs:
-            included_agg_time_specs = FrozenOrderedSet(filter_spec.linkable_spec_set.time_dimension_specs).intersection(
-                self._metric_lookup.get_aggregation_time_dimension_specs(metric_reference)
-            )
-            if included_agg_time_specs == FrozenOrderedSet(filter_spec.linkable_spec_set.as_tuple):
+            included_agg_time_specs = agg_time_dimension_specs_for_metric.intersection(filter_spec.linkable_specs)
+            if len(included_agg_time_specs) == len(filter_spec.linkable_specs):
                 agg_time_only_filters.append(filter_spec)
             else:
-                non_agg_time_filters.append(filter_spec)
+                non_agg_time_only_filters.append(filter_spec)
 
         join_spec = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0]
         time_spine_node = self._build_time_spine_node(
@@ -1596,9 +1627,11 @@ class DataflowPlanBuilder:
         # for specs that are also in the queried specs, since those are the only ones that could change after the time
         # spine join. Exclude filters that contain only metric_time or an agg time dimension, since were already applied
         # to the time spine table.
+        # Filters in `metric_where_filter_specs` don't need to be applied since those should have been applied in
+        # `source_node`
         queried_non_agg_time_filter_specs = [
             filter_spec
-            for filter_spec in non_agg_time_filters
+            for filter_spec in non_agg_time_only_filters
             if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs))
         ]
         if len(queried_non_agg_time_filter_specs) > 0:
@@ -1922,7 +1955,8 @@ class DataflowPlanBuilder:
                 source_node=aggregate_node,
                 queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 queried_linkable_specs=queried_linkable_specs.as_tuple,
-                after_aggregation_where_filter_specs=(simple_metric_recipe.additional_filter_spec_set.all_filter_specs),
+                metric_where_filter_specs=simple_metric_recipe.metric_filter_spec_set.all_filter_specs,
+                after_aggregation_where_filter_specs=simple_metric_recipe.additional_filter_spec_set.all_filter_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
             )
 
