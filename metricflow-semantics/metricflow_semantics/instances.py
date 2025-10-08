@@ -16,7 +16,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
@@ -35,7 +35,7 @@ class MdoInstance(ABC, Generic[SpecT]):
     """An instance of a metric definition object.
 
     An instance is different from the metric definition object in that it correlates to columns in a data set and can be
-    in different states. e.g. a measure instance can be aggregated, or a time dimension can be at a different
+    in different states. e.g. simple-metric-input instance can be aggregated, or a time dimension can be at a different
     granularity.
     """
 
@@ -101,19 +101,19 @@ class SemanticModelElementInstance(SerializableDataclass):  # noqa: D101
 
 
 @dataclass(frozen=True)
-class MeasureInstance(MdoInstance[MeasureSpec], SemanticModelElementInstance):  # noqa: D101
+class SimpleMetricInputInstance(MdoInstance[SimpleMetricInputSpec], SemanticModelElementInstance):  # noqa: D101
     associated_columns: Tuple[ColumnAssociation, ...]
-    spec: MeasureSpec
+    spec: SimpleMetricInputSpec
     aggregation_state: AggregationState
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_measure_instance(self)
+        return visitor.visit_simple_metric_input_instance(self)
 
     def with_new_spec(
-        self, new_spec: MeasureSpec, column_association_resolver: ColumnAssociationResolver
-    ) -> MeasureInstance:
+        self, new_spec: SimpleMetricInputSpec, column_association_resolver: ColumnAssociationResolver
+    ) -> SimpleMetricInputInstance:
         """Returns a new instance with the spec replaced."""
-        return MeasureInstance(
+        return SimpleMetricInputInstance(
             associated_columns=(column_association_resolver.resolve_spec(new_spec),),
             defined_from=self.defined_from,
             spec=new_spec,
@@ -306,7 +306,7 @@ class InstanceSet(SerializableDataclass):
     Generally used to help represent that data that is flowing between nodes in the metric dataflow plan.
     """
 
-    measure_instances: Tuple[MeasureInstance, ...] = ()
+    simple_metric_input_instances: Tuple[SimpleMetricInputInstance, ...] = ()
     dimension_instances: Tuple[DimensionInstance, ...] = ()
     time_dimension_instances: Tuple[TimeDimensionInstance, ...] = ()
     entity_instances: Tuple[EntityInstance, ...] = ()
@@ -323,7 +323,7 @@ class InstanceSet(SerializableDataclass):
 
         Instances will be de-duped based on their spec.
         """
-        measure_instances: List[MeasureInstance] = []
+        simple_metric_input_instances: List[SimpleMetricInputInstance] = []
         dimension_instances: List[DimensionInstance] = []
         time_dimension_instances: List[TimeDimensionInstance] = []
         entity_instances: List[EntityInstance] = []
@@ -332,9 +332,9 @@ class InstanceSet(SerializableDataclass):
         metadata_instances: List[MetadataInstance] = []
 
         for instance_set in instance_sets:
-            for measure_instance in instance_set.measure_instances:
-                if measure_instance.spec not in {x.spec for x in measure_instances}:
-                    measure_instances.append(measure_instance)
+            for simple_metric_input_instance in instance_set.simple_metric_input_instances:
+                if simple_metric_input_instance.spec not in {x.spec for x in simple_metric_input_instances}:
+                    simple_metric_input_instances.append(simple_metric_input_instance)
             for dimension_instance in instance_set.dimension_instances:
                 if dimension_instance.spec not in {x.spec for x in dimension_instances}:
                     dimension_instances.append(dimension_instance)
@@ -355,7 +355,7 @@ class InstanceSet(SerializableDataclass):
                     metadata_instances.append(metadata_instance)
 
         return InstanceSet(
-            measure_instances=tuple(measure_instances),
+            simple_metric_input_instances=tuple(simple_metric_input_instances),
             dimension_instances=tuple(dimension_instances),
             time_dimension_instances=tuple(time_dimension_instances),
             entity_instances=tuple(entity_instances),
@@ -367,7 +367,7 @@ class InstanceSet(SerializableDataclass):
     @property
     def spec_set(self) -> InstanceSpecSet:  # noqa: D102
         return InstanceSpecSet(
-            measure_specs=tuple(x.spec for x in self.measure_instances),
+            simple_metric_input_specs=tuple(x.spec for x in self.simple_metric_input_instances),
             dimension_specs=tuple(x.spec for x in self.dimension_instances),
             time_dimension_specs=tuple(x.spec for x in self.time_dimension_instances),
             entity_specs=tuple(x.spec for x in self.entity_instances),
@@ -379,7 +379,7 @@ class InstanceSet(SerializableDataclass):
     @property
     def as_tuple(self) -> Tuple[MdoInstance, ...]:  # noqa: D102
         return (
-            self.measure_instances
+            self.simple_metric_input_instances
             + self.dimension_instances
             + self.time_dimension_instances
             + self.entity_instances
@@ -397,10 +397,10 @@ class InstanceSet(SerializableDataclass):
             + self.group_by_metric_instances
         )
 
-    def without_measures(self) -> InstanceSet:
+    def without_simple_metric_inputs(self) -> InstanceSet:
         """Return a copy of this without the measure instances."""
         return InstanceSet(
-            measure_instances=(),
+            simple_metric_input_instances=(),
             dimension_instances=self.dimension_instances,
             time_dimension_instances=self.time_dimension_instances,
             entity_instances=self.entity_instances,
@@ -414,7 +414,7 @@ class InstanceVisitor(Generic[VisitorOutputT], ABC):
     """Visitor for the Instance classes."""
 
     @abstractmethod
-    def visit_measure_instance(self, measure_instance: MeasureInstance) -> VisitorOutputT:  # noqa: D102
+    def visit_simple_metric_input_instance(self, instance: SimpleMetricInputInstance) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
@@ -451,7 +451,7 @@ class _GroupInstanceByTypeVisitor(InstanceVisitor[None]):
     """Group instances by type into an `InstanceSet`."""
 
     metric_instances: List[MetricInstance] = field(default_factory=list)
-    measure_instances: List[MeasureInstance] = field(default_factory=list)
+    simple_metric_input_instances: List[SimpleMetricInputInstance] = field(default_factory=list)
     dimension_instances: List[DimensionInstance] = field(default_factory=list)
     entity_instances: List[EntityInstance] = field(default_factory=list)
     time_dimension_instances: List[TimeDimensionInstance] = field(default_factory=list)
@@ -459,8 +459,8 @@ class _GroupInstanceByTypeVisitor(InstanceVisitor[None]):
     metadata_instances: List[MetadataInstance] = field(default_factory=list)
 
     @override
-    def visit_measure_instance(self, measure_instance: MeasureInstance) -> None:
-        self.measure_instances.append(measure_instance)
+    def visit_simple_metric_input_instance(self, instance: SimpleMetricInputInstance) -> None:
+        self.simple_metric_input_instances.append(instance)
 
     @override
     def visit_dimension_instance(self, dimension_instance: DimensionInstance) -> None:
@@ -495,7 +495,7 @@ def group_instances_by_type(instances: Sequence[MdoInstance]) -> InstanceSet:
 
     return InstanceSet(
         metric_instances=tuple(grouper.metric_instances),
-        measure_instances=tuple(grouper.measure_instances),
+        simple_metric_input_instances=tuple(grouper.simple_metric_input_instances),
         dimension_instances=tuple(grouper.dimension_instances),
         entity_instances=tuple(grouper.entity_instances),
         time_dimension_instances=tuple(grouper.time_dimension_instances),

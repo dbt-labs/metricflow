@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Sized, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
@@ -22,27 +23,20 @@ class WhereFilterSpecSet(SerializableDataclass, Mergeable, Sized):
     query-level: filters defined at query time
     """
 
-    measure_level_filter_specs: Tuple[WhereFilterSpec, ...] = ()
     metric_level_filter_specs: Tuple[WhereFilterSpec, ...] = ()
     query_level_filter_specs: Tuple[WhereFilterSpec, ...] = ()
 
-    @property
-    def after_measure_aggregation_filter_specs(self) -> Tuple[WhereFilterSpec, ...]:
-        """Returns filters relevant to post-measure aggregation."""
-        return self.metric_level_filter_specs + self.query_level_filter_specs
-
-    @property
+    @cached_property
     def all_filter_specs(self) -> Tuple[WhereFilterSpec, ...]:
         """Returns all the filters in this class.
 
         Generally, before measure aggregation, all filters should be applied.
         """
-        return self.measure_level_filter_specs + self.metric_level_filter_specs + self.query_level_filter_specs
+        return self.metric_level_filter_specs + self.query_level_filter_specs
 
     def merge(self, other: WhereFilterSpecSet) -> WhereFilterSpecSet:
         """Merge 2 WhereFilterSpecSet together."""
         return WhereFilterSpecSet(
-            measure_level_filter_specs=self.measure_level_filter_specs + other.measure_level_filter_specs,
             metric_level_filter_specs=self.metric_level_filter_specs + other.metric_level_filter_specs,
             query_level_filter_specs=self.query_level_filter_specs + other.query_level_filter_specs,
         )
@@ -52,13 +46,16 @@ class WhereFilterSpecSet(SerializableDataclass, Mergeable, Sized):
     def empty_instance(cls) -> WhereFilterSpecSet:
         return WhereFilterSpecSet()
 
-    @override
-    def __len__(self) -> int:
+    @cached_property
+    def _spec_count(self) -> int:
         return sum(
             len(specs)
             for specs in (
-                self.measure_level_filter_specs,
                 self.metric_level_filter_specs,
                 self.query_level_filter_specs,
             )
         )
+
+    @override
+    def __len__(self) -> int:
+        return self._spec_count
