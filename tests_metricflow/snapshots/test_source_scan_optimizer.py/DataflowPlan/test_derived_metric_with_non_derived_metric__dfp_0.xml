@@ -22,13 +22,15 @@ docstring:
                 <!-- description = 'Compute Metrics via Expressions' -->
                 <!-- node_id = NodeId(id_str='cm_0') -->
                 <!-- metric_spec = MetricSpec(element_name='booking_value') -->
-                <AggregateMeasuresNode>
-                    <!-- description = 'Aggregate Measures' -->
+                <AggregateSimpleMetricInputsNode>
+                    <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_0') -->
+                    <!-- alias_mapping = {} -->
+                    <!-- null_fill_value_mapping = {} -->
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
-                        <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                        <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
                         <!-- include_spec =                                                                  -->
                         <!--   TimeDimensionSpec(                                                            -->
                         <!--     element_name='metric_time',                                                 -->
@@ -46,7 +48,7 @@ docstring:
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
                     </FilterElementsNode>
-                </AggregateMeasuresNode>
+                </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
@@ -59,13 +61,15 @@ docstring:
                         <!-- description = 'Compute Metrics via Expressions' -->
                         <!-- node_id = NodeId(id_str='cm_1') -->
                         <!-- metric_spec = MetricSpec(element_name='referred_bookings', alias='ref_bookings') -->
-                        <AggregateMeasuresNode>
-                            <!-- description = 'Aggregate Measures' -->
+                        <AggregateSimpleMetricInputsNode>
+                            <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_1') -->
+                            <!-- alias_mapping = {'referred_bookings': 'ref_bookings'} -->
+                            <!-- null_fill_value_mapping = {} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['referred_bookings', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_1') -->
-                                <!-- include_spec = MeasureSpec(element_name='referred_bookings') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='referred_bookings') -->
                                 <!-- include_spec =                                                                  -->
                                 <!--   TimeDimensionSpec(                                                            -->
                                 <!--     element_name='metric_time',                                                 -->
@@ -83,19 +87,21 @@ docstring:
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
-                        </AggregateMeasuresNode>
+                        </AggregateSimpleMetricInputsNode>
                     </ComputeMetricsNode>
                     <ComputeMetricsNode>
                         <!-- description = 'Compute Metrics via Expressions' -->
                         <!-- node_id = NodeId(id_str='cm_2') -->
                         <!-- metric_spec = MetricSpec(element_name='bookings') -->
-                        <AggregateMeasuresNode>
-                            <!-- description = 'Aggregate Measures' -->
+                        <AggregateSimpleMetricInputsNode>
+                            <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_2') -->
+                            <!-- alias_mapping = {} -->
+                            <!-- null_fill_value_mapping = {} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['bookings', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_2') -->
-                                <!-- include_spec = MeasureSpec(element_name='bookings') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                 <!-- include_spec =                                                                  -->
                                 <!--   TimeDimensionSpec(                                                            -->
                                 <!--     element_name='metric_time',                                                 -->
@@ -113,7 +119,7 @@ docstring:
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </FilterElementsNode>
-                        </AggregateMeasuresNode>
+                        </AggregateSimpleMetricInputsNode>
                     </ComputeMetricsNode>
                 </CombineAggregatedOutputsNode>
             </ComputeMetricsNode>
