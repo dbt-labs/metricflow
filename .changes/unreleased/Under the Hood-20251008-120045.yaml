@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Update `metricflow_semantics` to migrate `measures -> simple metrics`
+time: 2025-10-08T12:00:45.291422-07:00
+custom:
+  Author: plypaul
+  Issue: "1882"
