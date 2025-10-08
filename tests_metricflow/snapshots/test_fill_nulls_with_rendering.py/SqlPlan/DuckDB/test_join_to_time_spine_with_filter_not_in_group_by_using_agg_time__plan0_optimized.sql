@@ -18,10 +18,11 @@ FROM (
     -- Change Column Aliases
     SELECT
       ds AS booking__ds__day
+      , ds AS metric_time__day
       , DATE_TRUNC('month', ds) AS booking__ds__month
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_17
-  WHERE booking__ds__month > '2020-01-01'
+  WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
 ) subq_19
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
