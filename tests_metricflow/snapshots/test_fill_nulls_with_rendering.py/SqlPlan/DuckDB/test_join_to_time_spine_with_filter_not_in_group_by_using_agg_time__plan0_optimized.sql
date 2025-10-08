@@ -40,7 +40,7 @@ LEFT OUTER JOIN (
       , 1 AS bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_12
-  WHERE ((metric_time__day <= '2020-01-02') AND (metric_time__day >= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
+  WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
   GROUP BY
     booking__ds__day
 ) subq_15
