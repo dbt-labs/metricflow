@@ -29,10 +29,6 @@ class ObjectToReference:
         return SemanticModelReference(semantic_model_name=semantic_model.name)
 
     @staticmethod
-    def from_measure(measure: Measure) -> MeasureReference:  # noqa: D102
-        return MeasureReference(element_name=measure.name)
-
-    @staticmethod
     def from_entity(entity: Entity) -> EntityReference:  # noqa: D102
         return EntityReference(element_name=entity.name)
 
