@@ -11,7 +11,7 @@ sql_engine: DuckDB
 -- Aggregate Measures
 SELECT
   SUM(1) AS bookings
+  , AVG(booking_value) AS average_booking_value
   , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
   , COUNT(DISTINCT guest_id) AS bookers
-  , AVG(booking_value) AS average_booking_value
 FROM ***************************.fct_bookings bookings_source_src_28000

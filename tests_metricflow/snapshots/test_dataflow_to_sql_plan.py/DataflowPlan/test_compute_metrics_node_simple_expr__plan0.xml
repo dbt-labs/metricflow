@@ -11,9 +11,11 @@ docstring:
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
             <!-- metric_spec = MetricSpec(element_name='booking_fees') -->
-            <AggregateMeasuresNode>
+            <AggregateSimpleMetricInputsNode>
                 <!-- description = 'Aggregate Measures' -->
                 <!-- node_id = NodeId(id_str='am_0') -->
+                <!-- alias_mapping = {} -->
+                <!-- null_fill_value_mapping = {} -->
                 <JoinOnEntitiesNode>
                     <!-- description = 'Join Standard Outputs' -->
                     <!-- node_id = NodeId(id_str='jso_0') -->
@@ -26,7 +28,7 @@ docstring:
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['booking_value', 'listing']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
-                        <!-- include_spec = MeasureSpec(element_name='booking_value') -->
+                        <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
                         <!-- distinct = False -->
                         <ReadSqlSourceNode>
@@ -48,7 +50,7 @@ docstring:
                         </ReadSqlSourceNode>
                     </FilterElementsNode>
                 </JoinOnEntitiesNode>
-            </AggregateMeasuresNode>
+            </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>
