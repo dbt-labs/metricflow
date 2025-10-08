@@ -413,7 +413,7 @@ FROM (
               FROM ***************************.fct_bookings bookings_source_src_28000
             ) subq_0
           ) subq_1
-          WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
+          WHERE ((listing IS NOT NULL) AND (booking__is_instant)) AND (metric_time__day > '2020-01-01')
         ) subq_2
       ) subq_3
       GROUP BY
