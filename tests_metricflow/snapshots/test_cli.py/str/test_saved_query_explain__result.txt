@@ -12,8 +12,8 @@ FROM (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , id_customer AS customer
-    , 1 AS transactions
     , CASE WHEN CASE WHEN transaction_type_name = 'quick-buy' THEN TRUE ELSE FALSE END THEN 1 ELSE 0 END AS quick_buy_transactions
+    , 1 AS transactions
   FROM "mf_tutorial"."main"."transactions" transactions_src_10000
 ) subq_1
 LEFT OUTER JOIN

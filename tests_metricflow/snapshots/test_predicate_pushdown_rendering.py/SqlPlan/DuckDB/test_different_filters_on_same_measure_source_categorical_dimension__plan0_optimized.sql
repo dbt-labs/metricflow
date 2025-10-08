@@ -20,8 +20,8 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , is_instant AS booking__is_instant
-    , booking_value AS max_booking_value
     , booking_value AS average_booking_value
+    , booking_value AS max_booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
