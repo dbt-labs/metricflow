@@ -24,6 +24,7 @@ FROM (
         -- Constrain Output with WHERE
         SELECT
           subq_6.booking__ds__day
+          , subq_6.metric_time__day
           , subq_6.ds__week
           , subq_6.booking__ds__month
           , subq_6.ds__quarter
@@ -39,6 +40,7 @@ FROM (
           -- Change Column Aliases
           SELECT
             subq_5.ds__day AS booking__ds__day
+            , subq_5.ds__day AS metric_time__day
             , subq_5.ds__week
             , subq_5.ds__month AS booking__ds__month
             , subq_5.ds__quarter
@@ -68,7 +70,7 @@ FROM (
             FROM ***************************.mf_time_spine time_spine_src_28006
           ) subq_5
         ) subq_6
-        WHERE booking__ds__month > '2020-01-01'
+        WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
       ) subq_7
     ) subq_8
     LEFT OUTER JOIN (

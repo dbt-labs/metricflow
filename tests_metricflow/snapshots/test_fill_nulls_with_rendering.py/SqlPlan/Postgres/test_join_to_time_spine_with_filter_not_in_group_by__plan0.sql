@@ -68,7 +68,7 @@ FROM (
             FROM ***************************.mf_time_spine time_spine_src_28006
           ) subq_5
         ) subq_6
-        WHERE metric_time__month > '2020-01-01'
+        WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (metric_time__month > '2020-01-01')
       ) subq_7
     ) subq_8
     LEFT OUTER JOIN (
