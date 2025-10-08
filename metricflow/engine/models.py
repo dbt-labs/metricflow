@@ -18,7 +18,6 @@ from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParamete
 from dbt_semantic_interfaces.protocols.metadata import Metadata
 from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
 from dbt_semantic_interfaces.protocols.metric import (
-    MetricInputMeasure,
     MetricType,
     MetricTypeParams,
     SemanticLayerElementConfig,
@@ -31,7 +30,6 @@ from dbt_semantic_interfaces.protocols.saved_query import (
 )
 from dbt_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
-from dbt_semantic_interfaces.transformations.add_input_metric_measures import AddInputMetricMeasuresRule
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.entity_type import EntityType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -83,15 +81,6 @@ class Metric(SearchableElement):
             config=pydantic_metric.config,
             semantic_models=semantic_models,
         )
-
-    @property
-    def input_measures(self) -> Sequence[MetricInputMeasure]:
-        """Return the complete list of input measure configurations for this metric."""
-        assert self.type_params.input_measures, (
-            f"Metric {self.name} should have had input_measures populated by "
-            f"{AddInputMetricMeasuresRule.__class__.__name__}"
-        )
-        return self.type_params.input_measures
 
     @property
     def default_search_and_sort_attribute(self) -> str:  # noqa: D102
