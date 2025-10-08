@@ -71,13 +71,12 @@ class MetricLookup:
 
         self._group_by_item_set_resolver = group_by_item_set_resolver
 
-        # Cache for `get_min_queryable_time_granularity()`
-        self._metric_reference_to_min_metric_time_grain: Dict[MetricReference, TimeGranularity] = {}
-
+        self._result_cache_for_get_min_queryable_time_granularity: ResultCache[
+            MetricReference, TimeGranularity
+        ] = ResultCache()
         self._result_cache_for_aggregation_time_dimension_specs: ResultCache[
             str, FrozenOrderedSet[TimeDimensionSpec]
         ] = ResultCache()
-
         self._result_cache_for_derived_from_semantic_models: ResultCache[
             MetricReference, FrozenOrderedSet[SemanticModelReference]
         ] = ResultCache()
@@ -322,15 +321,12 @@ class MetricLookup:
 
         Maps to the largest granularity defined for any of the metric's agg_time_dimensions.
         """
-        result = self._metric_reference_to_min_metric_time_grain.get(metric_reference)
-        if result is not None:
-            return result
+        cache = self._result_cache_for_get_min_queryable_time_granularity
+        cache_key = metric_reference
+        result = cache.get(cache_key)
+        if result:
+            return result.value
 
-        result = self._get_min_queryable_time_granularity(metric_reference)
-        self._metric_reference_to_min_metric_time_grain[metric_reference] = result
-        return result
-
-    def _get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         metric = self.get_metric(metric_reference)
         metric_type = metric.type
 
@@ -367,4 +363,6 @@ class MetricLookup:
                 LazyFormat("Unable to resolve an aggregation-time-dimension grain for the given metric", metric=metric)
             )
 
-        return max(agg_time_dimension_grains, key=lambda time_grain: time_grain.to_int())
+        return cache.set_and_get(
+            key=cache_key, value=max(agg_time_dimension_grains, key=lambda time_grain: time_grain.to_int())
+        )
