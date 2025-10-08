@@ -13,10 +13,10 @@ from metricflow_semantics.visitor import Visitable, VisitorOutputT
 
 if TYPE_CHECKING:
     from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-        MeasureGroupByItemSourceNode,
+        SimpleMetricGroupByItemSourceNode,
     )
     from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-        MetricGroupByItemResolutionNode,
+        ComplexMetricGroupByItemResolutionNode,
     )
     from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
         NoMetricsGroupByItemSourceNode,
@@ -67,7 +67,7 @@ class GroupByItemResolutionNodeVisitor(Generic[VisitorOutputT], ABC):
     """Visitor for traversing GroupByItemResolutionNodes."""
 
     @abstractmethod
-    def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> VisitorOutputT:  # noqa: D102
+    def visit_simple_metric_node(self, node: SimpleMetricGroupByItemSourceNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
@@ -75,7 +75,7 @@ class GroupByItemResolutionNodeVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_metric_node(self, node: MetricGroupByItemResolutionNode) -> VisitorOutputT:  # noqa: D102
+    def visit_complex_metric_node(self, node: ComplexMetricGroupByItemResolutionNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
@@ -87,17 +87,17 @@ class GroupByItemResolutionNodeVisitor(Generic[VisitorOutputT], ABC):
 class GroupByItemResolutionNodeSet(Mergeable):
     """Set containing nodes in a group-by-item resolution DAG."""
 
-    measure_nodes: Tuple[MeasureGroupByItemSourceNode, ...] = ()
+    simple_metric_nodes: Tuple[SimpleMetricGroupByItemSourceNode, ...] = ()
     no_metrics_query_nodes: Tuple[NoMetricsGroupByItemSourceNode, ...] = ()
-    metric_nodes: Tuple[MetricGroupByItemResolutionNode, ...] = ()
+    complex_metric_nodes: Tuple[ComplexMetricGroupByItemResolutionNode, ...] = ()
     query_nodes: Tuple[QueryGroupByItemResolutionNode, ...] = ()
 
     @override
     def merge(self, other: GroupByItemResolutionNodeSet) -> GroupByItemResolutionNodeSet:
         return GroupByItemResolutionNodeSet(
-            measure_nodes=self.measure_nodes + other.measure_nodes,
+            simple_metric_nodes=self.simple_metric_nodes + other.simple_metric_nodes,
             no_metrics_query_nodes=self.no_metrics_query_nodes + other.no_metrics_query_nodes,
-            metric_nodes=self.metric_nodes + other.metric_nodes,
+            complex_metric_nodes=self.complex_metric_nodes + other.complex_metric_nodes,
             query_nodes=self.query_nodes + other.query_nodes,
         )
 

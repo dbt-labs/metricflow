@@ -19,6 +19,7 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_pattern_factory import (
@@ -103,6 +104,8 @@ def check_resolution_with_filter(  # noqa: D103
         queried_metrics=queried_metrics,
         where_filter_intersection=where_filter_intersection,
     )
+
+    logger.debug(LazyFormat("Built resolution DAG", resolution_dag=resolution_dag.structure_text()))
 
     spec_pattern_resolver = WhereFilterSpecResolver(
         manifest_lookup=manifest_lookup,

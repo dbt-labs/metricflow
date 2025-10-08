@@ -5,7 +5,7 @@ docstring:
 ---
 Path                               Dunder Name                             Recipe
 ---------------------------------  --------------------------------------  ---------------------------------------------------------------------------------------
-Measure(booking_count)             metric_time__quarter                    AttributeRecipe(
+SimpleMetric(bookings)             metric_time__quarter                    AttributeRecipe(
 -> MetricTime                                                                indexed_dunder_name=('metric_time', 'quarter'),
 -> TimeEntity                                                                joined_model_ids=(bookings_source,),
 -> TimeAttribute(quarter)                                                    element_properties={METRIC_TIME},
@@ -13,7 +13,7 @@ Measure(booking_count)             metric_time__quarter                    Attri
                                                                              source_time_grain=QUARTER,
                                                                              recipe_time_grain=ExpandedTimeGranularity(name='quarter', base_granularity=QUARTER),
                                                                            )
-Measure(booking_count)             metric_time__year                       AttributeRecipe(
+SimpleMetric(bookings)             metric_time__year                       AttributeRecipe(
 -> MetricTime                                                                indexed_dunder_name=('metric_time', 'year'),
 -> TimeEntity                                                                joined_model_ids=(bookings_source,),
 -> TimeAttribute(year)                                                       element_properties={METRIC_TIME},
@@ -21,7 +21,7 @@ Measure(booking_count)             metric_time__year                       Attri
                                                                              source_time_grain=QUARTER,
                                                                              recipe_time_grain=ExpandedTimeGranularity(name='year', base_granularity=YEAR),
                                                                            )
-Measure(booking_count)             metric_time__extract_year               AttributeRecipe(
+SimpleMetric(bookings)             metric_time__extract_year               AttributeRecipe(
 -> MetricTime                                                                indexed_dunder_name=('metric_time', 'extract_year'),
 -> TimeEntity                                                                joined_model_ids=(bookings_source,),
 -> TimeAttribute(extract_year)                                               element_properties={METRIC_TIME, DATE_PART},
@@ -29,7 +29,7 @@ Measure(booking_count)             metric_time__extract_year               Attri
                                                                              source_time_grain=QUARTER,
                                                                              recipe_date_part=YEAR,
                                                                            )
-Measure(booking_count)             metric_time__extract_quarter            AttributeRecipe(
+SimpleMetric(bookings)             metric_time__extract_quarter            AttributeRecipe(
 -> MetricTime                                                                indexed_dunder_name=('metric_time', 'extract_quarter'),
 -> TimeEntity                                                                joined_model_ids=(bookings_source,),
 -> TimeAttribute(extract_quarter)                                            element_properties={METRIC_TIME, DATE_PART},
@@ -37,7 +37,7 @@ Measure(booking_count)             metric_time__extract_quarter            Attri
                                                                              source_time_grain=QUARTER,
                                                                              recipe_date_part=QUARTER,
                                                                            )
-Measure(booking_count)             metric_time__custom_year                AttributeRecipe(
+SimpleMetric(bookings)             metric_time__custom_year                AttributeRecipe(
 -> MetricTime                                                                indexed_dunder_name=('metric_time', 'custom_year'),
 -> TimeEntity                                                                joined_model_ids=(bookings_source,),
 -> TimeAttribute(custom_year)                                                element_properties={METRIC_TIME, DERIVED_TIME_GRANULARITY},
@@ -45,32 +45,32 @@ Measure(booking_count)             metric_time__custom_year                Attri
                                                                              source_time_grain=QUARTER,
                                                                              recipe_time_grain=ExpandedTimeGranularity(name='custom_year', base_granularity=YEAR),
                                                                            )
-Measure(booking_count)             booking                                 AttributeRecipe(
+SimpleMetric(bookings)             booking                                 AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('booking',),
 -> KeyAttribute(booking)                                                     joined_model_ids=(bookings_source,),
                                                                              element_properties={ENTITY},
                                                                              element_type=ENTITY,
                                                                            )
-Measure(booking_count)             listing                                 AttributeRecipe(
+SimpleMetric(bookings)             listing                                 AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('listing',),
 -> KeyAttribute(listing)                                                     joined_model_ids=(bookings_source,),
                                                                              element_properties={ENTITY},
                                                                              element_type=ENTITY,
                                                                            )
-Measure(booking_count)             listing__country_latest                 AttributeRecipe(
+SimpleMetric(bookings)             listing__country_latest                 AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('listing', 'country_latest'),
 -> listings_source.listing                                                   joined_model_ids=(bookings_source, listings_source),
 -> JoinedModel(listings_source)                                              entity_link_names=('listing',),
 -> Dimension(country_latest)                                                 element_type=DIMENSION,
                                                                            )
-Measure(booking_count)             booking__listing                        AttributeRecipe(
+SimpleMetric(bookings)             booking__listing                        AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('booking', 'listing'),
 -> bookings_source.booking                                                   joined_model_ids=(bookings_source,),
 -> JoinedModel(bookings_source)                                              element_properties={ENTITY},
 -> KeyAttribute(listing)                                                     entity_link_names=('booking',),
                                                                              element_type=ENTITY,
                                                                            )
-Measure(booking_count)             booking__booking_time__quarter          AttributeRecipe(
+SimpleMetric(bookings)             booking__booking_time__quarter          AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('booking', 'booking_time', 'quarter'),
 -> bookings_source.booking                                                   joined_model_ids=(bookings_source,),
 -> JoinedModel(bookings_source)                                              entity_link_names=('booking',),
@@ -78,7 +78,7 @@ Measure(booking_count)             booking__booking_time__quarter          Attri
 -> TimeEntity                                                                source_time_grain=QUARTER,
 -> TimeAttribute(quarter)                                                    recipe_time_grain=ExpandedTimeGranularity(name='quarter', base_granularity=QUARTER),
                                                                            )
-Measure(booking_count)             booking__booking_time__year             AttributeRecipe(
+SimpleMetric(bookings)             booking__booking_time__year             AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('booking', 'booking_time', 'year'),
 -> bookings_source.booking                                                   joined_model_ids=(bookings_source,),
 -> JoinedModel(bookings_source)                                              entity_link_names=('booking',),
@@ -86,7 +86,7 @@ Measure(booking_count)             booking__booking_time__year             Attri
 -> TimeEntity                                                                source_time_grain=QUARTER,
 -> TimeAttribute(year)                                                       recipe_time_grain=ExpandedTimeGranularity(name='year', base_granularity=YEAR),
                                                                            )
-Measure(booking_count)             booking__booking_time__extract_year     AttributeRecipe(
+SimpleMetric(bookings)             booking__booking_time__extract_year     AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('booking', 'booking_time', 'extract_year'),
 -> bookings_source.booking                                                   joined_model_ids=(bookings_source,),
 -> JoinedModel(bookings_source)                                              element_properties={DATE_PART},
@@ -95,7 +95,7 @@ Measure(booking_count)             booking__booking_time__extract_year     Attri
 -> TimeAttribute(extract_year)                                               source_time_grain=QUARTER,
                                                                              recipe_date_part=YEAR,
                                                                            )
-Measure(booking_count)             booking__booking_time__extract_quarter  AttributeRecipe(
+SimpleMetric(bookings)             booking__booking_time__extract_quarter  AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('booking', 'booking_time', 'extract_quarter'),
 -> bookings_source.booking                                                   joined_model_ids=(bookings_source,),
 -> JoinedModel(bookings_source)                                              element_properties={DATE_PART},
@@ -104,7 +104,7 @@ Measure(booking_count)             booking__booking_time__extract_quarter  Attri
 -> TimeAttribute(extract_quarter)                                            source_time_grain=QUARTER,
                                                                              recipe_date_part=QUARTER,
                                                                            )
-Measure(booking_count)             booking__booking_time__custom_year      AttributeRecipe(
+SimpleMetric(bookings)             booking__booking_time__custom_year      AttributeRecipe(
 -> LocalModel(bookings_source)                                               indexed_dunder_name=('booking', 'booking_time', 'custom_year'),
 -> bookings_source.booking                                                   joined_model_ids=(bookings_source,),
 -> JoinedModel(bookings_source)                                              element_properties={DERIVED_TIME_GRANULARITY},

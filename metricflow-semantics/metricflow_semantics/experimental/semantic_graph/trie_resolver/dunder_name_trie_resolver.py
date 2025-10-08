@@ -28,6 +28,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     MeasureLabel,
     MetricLabel,
     MetricTimeLabel,
+    SimpleMetricLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
@@ -60,6 +61,7 @@ class DunderNameTrieResolver(ABC):
         self._cumulative_measure_label = CumulativeMeasureLabel.get_instance()
         self._deny_date_part_label = DenyDatePartLabel.get_instance()
         self._measure_label = MeasureLabel.get_instance()
+        self._simple_metric_label = SimpleMetricLabel.get_instance()
         self._local_model_label = LocalModelLabel.get_instance()
         self._metric_time_label = MetricTimeLabel.get_instance()
         self._metric_label = MetricLabel.get_instance()

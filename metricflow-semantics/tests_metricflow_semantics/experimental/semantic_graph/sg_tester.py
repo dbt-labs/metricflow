@@ -36,10 +36,10 @@ class SemanticGraphTester:
     def __init__(self, fixture: SemanticGraphTestFixture) -> None:  # noqa: D107
         self._fixture = fixture
         self._measure_references = tuple(
-            measure.reference
-            for lookup in fixture.manifest_object_lookup.measure_containing_model_lookups
-            for measures in lookup.aggregation_configuration_to_measures.values()
-            for measure in measures
+            MeasureReference(element_name=simple_metric_input.name)
+            for lookup in fixture.manifest_object_lookup.simple_metric_model_lookups
+            for simple_metric_inputs in lookup.aggregation_configuration_to_simple_metric_inputs.values()
+            for simple_metric_input in simple_metric_inputs
         )
         self._metric_references = tuple(
             MetricReference(metric.name) for metric in fixture.manifest_object_lookup.get_metrics()
@@ -69,18 +69,18 @@ class SemanticGraphTester:
         comparison_helper.add_right_rows(right_rows)
         comparison_helper.assert_tables_equal(log_result_table)
 
-    def assert_attribute_set_snapshot_equal_for_a_measure(  # noqa: D102
+    def assert_attribute_set_snapshot_equal_for_simple_metrics(  # noqa: D102
         self,
-        measure_names: Sequence[str],
+        simple_metric_names: Sequence[str],
         expectation_description: Optional[str] = None,
     ) -> None:
         sg_resolver = self.sg_resolver
         description_to_set = {
-            str(measure_name): sg_resolver.get_common_set(
-                measure_references=(MeasureReference(measure_name),),
+            str(simple_metric_name): sg_resolver.get_common_set(
+                metric_references=(MetricReference(simple_metric_name),),
                 set_filter=None,
             )
-            for measure_name in measure_names
+            for simple_metric_name in simple_metric_names
         }
         self.assert_attribute_set_snapshot_equal(description_to_set, expectation_description)
 

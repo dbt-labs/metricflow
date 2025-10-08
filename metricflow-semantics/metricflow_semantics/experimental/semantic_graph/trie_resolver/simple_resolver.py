@@ -100,13 +100,12 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             graph=self._semantic_graph,
             source_nodes=source_nodes,
             target_nodes=self._semantic_graph.nodes_with_labels(
-                self._measure_label,
+                self._simple_metric_label,
                 self._local_model_label,
                 self._metric_time_label,
             ),
             node_allow_set=self._semantic_graph.nodes_with_labels(
                 self._metric_label,
-                self._measure_label,
                 self._local_model_label,
                 self._metric_time_label,
             ),
@@ -166,10 +165,10 @@ class SimpleTrieResolver(DunderNameTrieResolver):
                 element_filter=element_filter,
             )
 
-        # A measure node has 2 successors, a local-model node that represents where the measure is defined, and a
-        # metric-time node. Since many measure nodes point to the same local-model node, generate and cache results
-        # separately for each successor edge.
-        elif self._measure_label in source_node_labels:
+        # A simple-metric node has 2 successors, a local-model node that represents where the simple metric is defined,
+        # and a metric-time node. Since many simple-metric nodes point to the same local-model node, generate and
+        # cache results separately for each successor edge.
+        elif self._simple_metric_label in source_node_labels:
             successors = self._semantic_graph.successors(source_node)
             local_model_edge: Optional[SemanticGraphEdge] = None
             metric_time_edge: Optional[SemanticGraphEdge] = None

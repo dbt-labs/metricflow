@@ -4,16 +4,25 @@ import logging
 from typing import Dict, Final, Iterable, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.protocols import MetricInput
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow_semantics.errors.error_classes import DuplicateMetricError, MetricNotFoundError, NonExistentMeasureError
+from metricflow_semantics.errors.error_classes import (
+    DuplicateMetricError,
+    MetricNotFoundError,
+    NonExistentMeasureError,
+    UnknownMetricError,
+)
+from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricflowInternalError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
@@ -41,6 +50,7 @@ class MetricLookup:
         semantic_model_lookup: SemanticModelLookup,
         custom_granularities: Dict[str, ExpandedTimeGranularity],
         group_by_item_set_resolver: GroupByItemSetResolver,
+        manifest_object_lookup: ManifestObjectLookup,
     ) -> None:
         """Initializer.
 
@@ -51,6 +61,7 @@ class MetricLookup:
         self._metrics: Dict[MetricReference, Metric] = {}
         self._semantic_model_lookup = semantic_model_lookup
         self._custom_granularities = custom_granularities
+        self._manifest_object_lookup = manifest_object_lookup
 
         for metric in semantic_manifest.metrics:
             self._add_metric(metric)
@@ -122,6 +133,92 @@ class MetricLookup:
         if metric_reference not in self._metrics:
             raise MetricNotFoundError(f"Unable to find metric `{metric_reference}`. Perhaps it has not been registered")
         return self._metrics[metric_reference]
+
+    @staticmethod
+    def metric_inputs(metric: Metric, include_conversion_metric_input: bool) -> Sequence[MetricInput]:
+        """Returns the metric inputs for the given metric."""
+        metric_type = metric.type
+        metric_inputs: list[MetricInput] = []
+
+        if metric_type is MetricType.SIMPLE:
+            pass
+        elif metric_type is MetricType.CUMULATIVE:
+            cumulative_type_params = metric.type_params.cumulative_type_params
+            if cumulative_type_params is None:
+                raise MetricflowInternalError(
+                    LazyFormat(
+                        "Expected `cumulative_type_params` to be set for a cumulative metric",
+                        complex_metric=metric,
+                    )
+                )
+
+            input_metric_for_cumulative_metric = cumulative_type_params.metric
+            if input_metric_for_cumulative_metric is None:
+                raise MetricflowInternalError(
+                    LazyFormat(
+                        "Expected `metric` to be set for a cumulative metric",
+                        complex_metric=metric,
+                    )
+                )
+
+            metric_inputs.append(input_metric_for_cumulative_metric)
+        elif metric_type is MetricType.RATIO:
+            numerator = metric.type_params.numerator
+            if numerator is None:
+                raise MetricflowInternalError(
+                    LazyFormat(
+                        "Expected `numerator` to be set for a ratio metric",
+                        complex_metric=metric,
+                    )
+                )
+            metric_inputs.append(numerator)
+
+            denominator = metric.type_params.denominator
+            if denominator is None:
+                raise MetricflowInternalError(
+                    LazyFormat(
+                        "Expected `denominator` to be set for a ratio metric",
+                        complex_metric=metric,
+                    )
+                )
+            metric_inputs.append(denominator)
+        elif metric_type is MetricType.CONVERSION:
+            conversion_type_params = metric.type_params.conversion_type_params
+            if conversion_type_params is None:
+                raise MetricflowInternalError(
+                    LazyFormat(
+                        "Expected `conversion_type_params` to be set for a conversion metric",
+                        complex_metric=metric,
+                    )
+                )
+            base_metric = conversion_type_params.base_metric
+            if base_metric is None:
+                raise MetricflowInternalError(
+                    LazyFormat("Expected `base_metric` to be set for a conversion metric", complex_metric=metric)
+                )
+            metric_inputs.append(base_metric)
+
+            if include_conversion_metric_input:
+                conversion_metric = conversion_type_params.conversion_metric
+                if conversion_metric is None:
+                    raise MetricflowInternalError(
+                        LazyFormat(
+                            "Expected `conversion_metric` to be set for a conversion metric", complex_metric=metric
+                        )
+                    )
+                metric_inputs.append(conversion_metric)
+
+        elif metric_type is MetricType.DERIVED:
+            metrics = metric.type_params.metrics
+            if not metrics:
+                raise MetricflowInternalError(
+                    LazyFormat("Expected `metrics` to be set for a derived metric", derived_metric=metric)
+                )
+            metric_inputs.extend(metrics)
+        else:
+            assert_values_exhausted(metric_type)
+
+        return metric_inputs
 
     def _add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures."""
@@ -221,11 +318,39 @@ class MetricLookup:
 
     def _get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         metric = self.get_metric(metric_reference)
-        agg_time_dimension_grains = set()
-        for input_measure in metric.input_measures:
-            measure_properties = self._semantic_model_lookup.measure_lookup.get_properties(
-                input_measure.measure_reference
-            )
-            agg_time_dimension_grains.add(measure_properties.agg_time_granularity)
+        metric_type = metric.type
 
-        return max(agg_time_dimension_grains, key=lambda time_granularity: time_granularity.to_int())
+        agg_time_dimension_grains: set[TimeGranularity] = set()
+
+        if metric_type is MetricType.SIMPLE:
+            metric_name = metric_reference.element_name
+            simple_metric_input = self._manifest_object_lookup.simple_metric_name_to_input.get(metric_name)
+            if simple_metric_input is None:
+                raise UnknownMetricError((metric_name,))
+            agg_time_dimension_grains.add(simple_metric_input.agg_time_dimension_grain)
+        elif (
+            metric_type is MetricType.CONVERSION
+            or metric_type is MetricType.DERIVED
+            or metric_type is MetricType.RATIO
+            or metric_type is MetricType.CUMULATIVE
+        ):
+            metric_inputs = MetricLookup.metric_inputs(metric, include_conversion_metric_input=True)
+            if not metric_inputs:
+                raise InvalidManifestException(
+                    LazyFormat("Expected `metrics` to be non-empty for a non-simple metric", metric=metric)
+                )
+            agg_time_dimension_grains.update(
+                (
+                    self.get_min_queryable_time_granularity(MetricReference(metric_input.name))
+                    for metric_input in metric_inputs
+                )
+            )
+        else:
+            assert_values_exhausted(metric_type)
+
+        if len(agg_time_dimension_grains) == 0:
+            raise RuntimeError(
+                LazyFormat("Unable to resolve an aggregation-time-dimension grain for the given metric", metric=metric)
+            )
+
+        return max(agg_time_dimension_grains, key=lambda time_grain: time_grain.to_int())

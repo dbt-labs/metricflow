@@ -4,6 +4,7 @@ import dataclasses
 import logging
 import typing
 from dataclasses import dataclass
+from typing import Iterable
 
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 
@@ -14,16 +15,17 @@ if typing.TYPE_CHECKING:
         TimeAttributeNode,
     )
     from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import (
-        BaseMetricNode,
+        ComplexMetricNode,
         ConfiguredEntityNode,
-        DerivedMetricNode,
         JoinedModelNode,
         LocalModelNode,
         MeasureNode,
         MetricTimeNode,
+        SimpleMetricNode,
         TimeDimensionNode,
         TimeNode,
     )
+    from metricflow_semantics.experimental.semantic_graph.sg_interfaces import SemanticGraphNode
 
 logger = logging.getLogger(__name__)
 
@@ -48,10 +50,10 @@ class SemanticGraphNodeTypedCollection:
         default_factory=lambda: MutableOrderedSet()
     )
     time_nodes: MutableOrderedSet[TimeNode] = dataclasses.field(default_factory=lambda: MutableOrderedSet())
-    base_metric_nodes: MutableOrderedSet[BaseMetricNode] = dataclasses.field(
+    simple_metric_nodes: MutableOrderedSet[SimpleMetricNode] = dataclasses.field(
         default_factory=lambda: MutableOrderedSet()
     )
-    derived_metric_nodes: MutableOrderedSet[DerivedMetricNode] = dataclasses.field(
+    complex_metric_nodes: MutableOrderedSet[ComplexMetricNode] = dataclasses.field(
         default_factory=lambda: MutableOrderedSet()
     )
     measure_nodes: MutableOrderedSet[MeasureNode] = dataclasses.field(default_factory=lambda: MutableOrderedSet())
@@ -65,3 +67,10 @@ class SemanticGraphNodeTypedCollection:
     categorical_dimension_attribute_nodes: MutableOrderedSet[CategoricalDimensionAttributeNode] = dataclasses.field(
         default_factory=lambda: MutableOrderedSet()
     )
+
+    @staticmethod
+    def create(nodes: Iterable[SemanticGraphNode]) -> SemanticGraphNodeTypedCollection:  # noqa: D102
+        node_collection = SemanticGraphNodeTypedCollection()
+        for node in nodes:
+            node.add_to_typed_collection(node_collection)
+        return node_collection

@@ -3,12 +3,13 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from hashlib import sha1
-from typing import Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -38,6 +39,19 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
     name: str
     window_choice: AggregationType
     window_groupings: Tuple[str, ...] = ()
+
+    @staticmethod
+    def create_from_simple_metric_input(  # noqa: D102
+        simple_metric_input: SimpleMetricInput,
+    ) -> Optional[NonAdditiveDimensionSpec]:
+        if simple_metric_input.non_additive_dimension is None:
+            return None
+
+        return NonAdditiveDimensionSpec(
+            name=simple_metric_input.non_additive_dimension.name,
+            window_choice=simple_metric_input.non_additive_dimension.window_choice,
+            window_groupings=tuple(simple_metric_input.non_additive_dimension.window_groupings),
+        )
 
     def __post_init__(self) -> None:
         """Post init validator to ensure names with double-underscores are not allowed."""

@@ -14,7 +14,9 @@ AvailableGroupByItemsResolution(
       NoParentCandidates(
         issue_type=ERROR,
         query_resolution_path=MetricFlowQueryResolutionPath(
-          resolution_path_nodes=(MetricGroupByItemResolutionNode(node_id=mtr_0),),
+          resolution_path_nodes=(
+            ComplexMetricGroupByItemResolutionNode(node_id=mtr_0),
+          ),
         ),
       ),
     ),

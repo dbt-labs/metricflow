@@ -1,7 +1,7 @@
-test_name: test_set_for_measures
+test_name: test_complete_set_for_simple_metrics
 test_filename: test_sg_resolver_output.py
 docstring:
-  Check the set for a few measures.
+  Check the complete set for a few simple metrics.
 ---
 bookings:
   ┌──────────────────────────────────────────────────────────────────────────────────┬────────────────────────────────┬──────────────────┬─────────────────────────────────────────────┬───────────────────────────────────────────────────┐
@@ -523,10 +523,12 @@ account_balance:
   │ metric_time__week                                                          │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ accounts_source                                                │
   │ metric_time__year                                                          │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ accounts_source                                                │
   │ user                                                                       │                                │ ENTITY           │ ENTITY,LOCAL                           │ accounts_source                                                │
+  │ user__account__user__account_balance                                       │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__current_account_balance_by_user                       │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__regional_starting_balance_ratios                      │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__total_account_balance_first_day                       │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__account__user__total_account_balance_first_day_of_month              │ account,user                   │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
+  │ user__account_balance                                                      │ user                           │ METRIC           │ JOINED,METRIC                          │ accounts_source                                                │
   │ user__active_listings                                                      │ user                           │ METRIC           │ JOINED,METRIC                          │ accounts_source,listings_latest                                │
   │ user__archived_at__alien_day                                               │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,JOINED        │ accounts_source,users_ds_source                                │
   │ user__archived_at__day                                                     │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,JOINED        │ accounts_source,users_ds_source                                │

@@ -4,7 +4,7 @@ import logging
 
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
-from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import MetricSubgraphGenerator
+from metricflow_semantics.experimental.semantic_graph.builder.metric_subgraph import ComplexMetricSubgraphGenerator
 from metricflow_semantics.helpers.string_helpers import mf_dedent
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
@@ -25,11 +25,10 @@ def test_derived_metric_manifest(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         semantic_manifest=sg_05_derived_metric_manifest,
-        subgraph_generators=[MetricSubgraphGenerator],
+        subgraph_generators=[ComplexMetricSubgraphGenerator],
         expectation_description=mf_dedent(
             """
-            The graph should show a derived-metric node that has edges to base-metric nodes, and base-metric nodes that
-            have edges to measure nodes.
+            The graph should show a complex-metric node that has edges to simple-metric nodes.
             """
         ),
     )

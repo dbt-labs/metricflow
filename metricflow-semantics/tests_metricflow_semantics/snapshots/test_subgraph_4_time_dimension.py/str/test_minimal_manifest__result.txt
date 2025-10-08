@@ -17,12 +17,15 @@ dot_notation:
   		label=bookings_source
   		"JoinedModel(bookings_source)"
   		"LocalModel(bookings_source)"
-  		"Measure(booking_count)"
   	}
   	subgraph cluster_time_dimension {
   		label=time_dimension
   		MetricTime
   		"TimeDimension(booking_time)"
+  	}
+  	subgraph cluster_metric {
+  		label=metric
+  		"SimpleMetric(bookings)"
   	}
   	subgraph cluster_time {
   		label=time
@@ -31,9 +34,9 @@ dot_notation:
   	"bookings_source.booking" -> "JoinedModel(bookings_source)"
   	"JoinedModel(bookings_source)" -> "TimeDimension(booking_time)"
   	"LocalModel(bookings_source)" -> "bookings_source.booking"
-  	"Measure(booking_count)" -> "LocalModel(bookings_source)"
-  	"Measure(booking_count)" -> MetricTime
   	MetricTime -> TimeEntity
+  	"SimpleMetric(bookings)" -> "LocalModel(bookings_source)"
+  	"SimpleMetric(bookings)" -> MetricTime
   	"TimeDimension(booking_time)" -> TimeEntity
   }
 
@@ -43,8 +46,8 @@ pretty_format:
       bookings_source.booking,
       JoinedModel(bookings_source),
       LocalModel(bookings_source),
-      Measure(booking_count),
       MetricTime,
+      SimpleMetric(bookings),
       TimeDimension(booking_time),
       TimeEntity,
     },
@@ -52,9 +55,9 @@ pretty_format:
       EntityRelationshipEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
       EntityRelationshipEdge(tail_node=JoinedModel(bookings_source), head_node=TimeDimension(booking_time)),
       EntityRelationshipEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
-      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=LocalModel(bookings_source)),
-      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=MetricTime),
       EntityRelationshipEdge(tail_node=MetricTime, head_node=TimeEntity),
+      EntityRelationshipEdge(tail_node=SimpleMetric(bookings), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=SimpleMetric(bookings), head_node=MetricTime),
       EntityRelationshipEdge(tail_node=TimeDimension(booking_time), head_node=TimeEntity),
     },
   )

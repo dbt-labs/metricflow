@@ -4,7 +4,7 @@ import logging
 from typing import Sequence
 
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -19,7 +19,7 @@ class DuplicateMetricValidationRule(PostResolutionQueryValidationRule):
     """Validates that a query does not include the same metric multiple times."""
 
     @override
-    def validate_metric_in_resolution_dag(
+    def validate_complex_metric_in_resolution_dag(
         self,
         metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
@@ -51,9 +51,9 @@ class DuplicateMetricValidationRule(PostResolutionQueryValidationRule):
         return MetricFlowQueryResolutionIssueSet.empty_instance()
 
     @override
-    def validate_measure_in_resolution_dag(
+    def validate_simple_metric_in_resolution_dag(
         self,
-        measure_reference: MeasureReference,
+        metric_reference: MetricReference,
         resolution_path: MetricFlowQueryResolutionPath,
     ) -> MetricFlowQueryResolutionIssueSet:
         return MetricFlowQueryResolutionIssueSet.empty_instance()

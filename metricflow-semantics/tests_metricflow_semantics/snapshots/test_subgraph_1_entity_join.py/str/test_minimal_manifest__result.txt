@@ -16,16 +16,19 @@ dot_notation:
   		label=bookings_source
   		"JoinedModel(bookings_source)"
   		"LocalModel(bookings_source)"
-  		"Measure(booking_count)"
   	}
   	subgraph cluster_time_dimension {
   		label=time_dimension
   		MetricTime
   	}
+  	subgraph cluster_metric {
+  		label=metric
+  		"SimpleMetric(bookings)"
+  	}
   	"bookings_source.booking" -> "JoinedModel(bookings_source)"
   	"LocalModel(bookings_source)" -> "bookings_source.booking"
-  	"Measure(booking_count)" -> "LocalModel(bookings_source)"
-  	"Measure(booking_count)" -> MetricTime
+  	"SimpleMetric(bookings)" -> "LocalModel(bookings_source)"
+  	"SimpleMetric(bookings)" -> MetricTime
   }
 
 pretty_format:
@@ -34,13 +37,13 @@ pretty_format:
       bookings_source.booking,
       JoinedModel(bookings_source),
       LocalModel(bookings_source),
-      Measure(booking_count),
       MetricTime,
+      SimpleMetric(bookings),
     },
     edges={
       EntityRelationshipEdge(tail_node=bookings_source.booking, head_node=JoinedModel(bookings_source)),
       EntityRelationshipEdge(tail_node=LocalModel(bookings_source), head_node=bookings_source.booking),
-      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=LocalModel(bookings_source)),
-      EntityRelationshipEdge(tail_node=Measure(booking_count), head_node=MetricTime),
+      EntityRelationshipEdge(tail_node=SimpleMetric(bookings), head_node=LocalModel(bookings_source)),
+      EntityRelationshipEdge(tail_node=SimpleMetric(bookings), head_node=MetricTime),
     },
   )

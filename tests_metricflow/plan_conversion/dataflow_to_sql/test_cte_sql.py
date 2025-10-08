@@ -125,7 +125,6 @@ def test_cte_for_shared_metrics(
     )
     dataflow_plan = dataflow_plan_builder.build_plan(parse_result.query_spec)
     common_nodes = DataflowPlanAnalyzer.find_common_branches(dataflow_plan)
-    # metric_nodes = find_metric_nodes(dataflow_plan.sink_node)
 
     convert_and_check(
         request=request,

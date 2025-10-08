@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import logging
 from collections import defaultdict
-from typing import Dict, List, Sequence, Set
+from typing import Dict, List, Optional, Sequence, Set, Union
 
 from dbt_semantic_interfaces.call_parameter_sets import JinjaCallParameterSets, MetricCallParameterSet
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.protocols import WhereFilter
 from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
+from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.object_builder_str import ObjectBuilderNameConverter
@@ -29,15 +30,17 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
     ResolvedSpecLookUpKey,
 )
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
-from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag, ResolutionDagSinkNode
+from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
+from metricflow_semantics.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
+    GroupByItemResolutionNode,
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-    MeasureGroupByItemSourceNode,
+    SimpleMetricGroupByItemSourceNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
-    MetricGroupByItemResolutionNode,
+    ComplexMetricGroupByItemResolutionNode,
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no_metrics_query_source_node import (
     NoMetricsGroupByItemSourceNode,
@@ -217,29 +220,44 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
         return patterns_in_filter
 
-    @override
-    def visit_measure_node(self, node: MeasureGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
-        """No filters are defined in measures, so this is a no-op."""
-        with self._path_from_start_node_tracker.track_node_visit(node):
-            return FilterSpecResolutionLookUp.empty_instance()
-
-    @override
-    def visit_metric_node(self, node: MetricGroupByItemResolutionNode) -> FilterSpecResolutionLookUp:
-        """Resolve specs for filters in a metric definition."""
+    def _handle_metric_node(
+        self, node: Union[SimpleMetricGroupByItemSourceNode, ComplexMetricGroupByItemResolutionNode]
+    ) -> FilterSpecResolutionLookUp:
         with self._path_from_start_node_tracker.track_node_visit(node) as resolution_path:
             results_to_merge: List[FilterSpecResolutionLookUp] = []
             for parent_node in node.parent_nodes:
                 results_to_merge.append(parent_node.accept(self))
 
+            where_filters_and_locations = self._get_where_filters_at_metric_node(
+                metric_node=node,
+                metric_input_location=node.metric_input_location,
+            )
+
+            logger.debug(
+                LazyFormat(
+                    "Visiting node", node=node.ui_description, where_filters_and_locations=where_filters_and_locations
+                )
+            )
             resolved_spec_lookup_so_far = FilterSpecResolutionLookUp.merge_iterable(results_to_merge)
 
-            return resolved_spec_lookup_so_far.merge(
+            output = resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
                     current_node=node,
                     resolution_path=resolution_path,
-                    where_filters_and_locations=self._get_where_filters_at_metric_node(node),
+                    where_filters_and_locations=where_filters_and_locations,
                 )
             )
+
+            logger.debug(LazyFormat("Generated output", node=node.ui_description, output=output))
+            return output
+
+    @override
+    def visit_simple_metric_node(self, node: SimpleMetricGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
+        return self._handle_metric_node(node)
+
+    @override
+    def visit_complex_metric_node(self, node: ComplexMetricGroupByItemResolutionNode) -> FilterSpecResolutionLookUp:
+        return self._handle_metric_node(node)
 
     @override
     def visit_query_node(self, node: QueryGroupByItemResolutionNode) -> FilterSpecResolutionLookUp:
@@ -252,7 +270,8 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
             # If the same metric is present multiple times in a query - there could be duplicates.
             resolved_spec_lookup_so_far = FilterSpecResolutionLookUp.merge_iterable(results_to_merge)
 
-            return resolved_spec_lookup_so_far.merge(
+            logger.debug(LazyFormat("Visiting node", node=node.ui_description))
+            output = resolved_spec_lookup_so_far.merge(
                 self._resolve_specs_for_where_filters(
                     current_node=node,
                     resolution_path=resolution_path,
@@ -264,14 +283,22 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                 )
             )
 
+            logger.debug(LazyFormat("Generated output", node=node.ui_description, output=output))
+            return output
+
     @override
     def visit_no_metrics_query_node(self, node: NoMetricsGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
         """Similar to the measure node - filters are applied at the query level."""
         with self._path_from_start_node_tracker.track_node_visit(node):
-            return FilterSpecResolutionLookUp.empty_instance()
+            logger.debug(LazyFormat("Visiting node", node=node.ui_description))
+            output = FilterSpecResolutionLookUp.empty_instance()
+            logger.debug(LazyFormat("Generated output", node=node.ui_description, output=output))
+            return output
 
     def _get_where_filters_at_metric_node(
-        self, metric_node: MetricGroupByItemResolutionNode
+        self,
+        metric_node: Union[SimpleMetricGroupByItemSourceNode, ComplexMetricGroupByItemResolutionNode],
+        metric_input_location: Optional[InputMetricDefinitionLocation],
     ) -> Dict[WhereFilterLocation, Set[WhereFilter]]:
         """Return the filters used with a metric in the manifest.
 
@@ -282,20 +309,14 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
         metric = self._manifest_lookup.metric_lookup.get_metric(metric_node.metric_reference)
 
         metric_filter_location = WhereFilterLocation.for_metric(metric_reference=metric_node.metric_reference)
-        if metric.input_measures is not None:
-            for input_measure in metric.input_measures:
-                if input_measure.filter is not None:
-                    for input_measure_where_filter in input_measure.filter.where_filters:
-                        where_filters_and_locations[metric_filter_location].add(input_measure_where_filter)
-
         if metric.filter is not None:
             for metric_where_filter in metric.filter.where_filters:
                 where_filters_and_locations[metric_filter_location].add(metric_where_filter)
 
         # This is a metric that is an input metric for a derived metric. The derived metric is the child node of this
         # metric node.
-        if metric_node.metric_input_location is not None:
-            child_metric_input = metric_node.metric_input_location.get_metric_input(self._manifest_lookup.metric_lookup)
+        if metric_input_location is not None:
+            child_metric_input = metric_input_location.get_metric_input(self._manifest_lookup.metric_lookup)
             if child_metric_input.filter is not None:
                 input_metric_filter_location = WhereFilterLocation.for_input_metric(
                     input_metric_reference=metric_node.metric_reference
@@ -307,7 +328,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
     def _resolve_specs_for_where_filters(
         self,
-        current_node: ResolutionDagSinkNode,
+        current_node: GroupByItemResolutionNode,
         resolution_path: MetricFlowQueryResolutionPath,
         where_filters_and_locations: Dict[WhereFilterLocation, Set[WhereFilter]],
     ) -> FilterSpecResolutionLookUp:

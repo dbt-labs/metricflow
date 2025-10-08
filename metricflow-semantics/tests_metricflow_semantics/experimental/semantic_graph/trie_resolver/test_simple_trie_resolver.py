@@ -11,7 +11,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
     RecipeWriterPathfinder,
 )
 from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import MeasureLabel, MetricLabel
+from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import MetricLabel
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
@@ -19,7 +19,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_sna
 logger = logging.getLogger(__name__)
 
 
-def test_measure(  # noqa: D103
+def test_simple_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sg_02_single_join_manifest: SemanticManifest,
@@ -27,8 +27,8 @@ def test_measure(  # noqa: D103
     semantic_graph = SemanticGraphBuilder(ManifestObjectLookup(sg_02_single_join_manifest)).build()
     pathfinder: RecipeWriterPathfinder = MetricflowPathfinder()
     resolver = SimpleTrieResolver(semantic_graph=semantic_graph, path_finder=pathfinder)
-    measure_node = semantic_graph.node_with_label(MeasureLabel.get_instance("booking_count"))
-    result = resolver.resolve_trie(source_nodes=FrozenOrderedSet((measure_node,)), element_filter=None)
+    simple_metric_node = semantic_graph.node_with_label(MetricLabel.get_instance("bookings"))
+    result = resolver.resolve_trie(source_nodes=FrozenOrderedSet((simple_metric_node,)), element_filter=None)
 
     assert_object_snapshot_equal(
         request=request,
