@@ -43,8 +43,8 @@ class InstanceSpec(SerializableDataclass):
         return result
 
     @property
-    def qualified_name(self) -> str:
-        """Return the qualified name of this spec. e.g. "user_id__country"."""
+    def dunder_name(self) -> str:
+        """Return the dunder name of this spec. e.g. "user_id__country"."""
         raise NotImplementedError()
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:
@@ -126,11 +126,11 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
         return result
 
     @property
-    def qualified_name(self) -> str:
+    def dunder_name(self) -> str:
         """Return the qualified name of this spec. e.g. "user_id__country"."""
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links), element_name=self.element_name
-        ).qualified_name
+        ).dunder_name
 
     @property
     @abstractmethod

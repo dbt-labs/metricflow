@@ -227,7 +227,7 @@ class MetricFlowQueryResolver:
                 if alias:
                     matching_spec = matching_spec.with_alias(alias)
                 metric_specs.append(matching_spec)
-                resolved_name = matching_spec.alias or matching_spec.qualified_name
+                resolved_name = matching_spec.alias or matching_spec.dunder_name
                 alias_to_metrics[resolved_name].append((metric_input, matching_spec.reference))
             else:
                 suggestion_generator = QueryItemSuggestionGenerator(

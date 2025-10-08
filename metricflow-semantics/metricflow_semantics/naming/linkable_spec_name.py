@@ -87,10 +87,10 @@ class StructuredLinkableSpecName:
             return StructuredLinkableSpecName(entity_link_names=tuple(name_parts[:-1]), element_name=name_parts[-1])
 
     @property
-    def qualified_name(self) -> str:
-        """Return the full name form. e.g. ds or listing__ds__month.
+    def dunder_name(self) -> str:
+        """Return the full dunder name. e.g. ds or listing__ds__month.
 
-        If date_part is specified, don't include granularity in qualified_name since it will not impact the result.
+        If date_part is specified, don't include granularity in dunder_name since it will not impact the result.
 
         If `metric_subquery_entity_link_names` is specified, this represents a metric. Metrics follow a different
         format - if same entity links are used in inner & outer query, use standard qualified name (country__bookings).
@@ -127,20 +127,20 @@ class StructuredLinkableSpecName:
         return tuple(EntityReference(entity_link_name.lower()) for entity_link_name in self.entity_link_names)
 
     @property
-    def granularity_free_qualified_name(self) -> str:
+    def granularity_free_dunder_name(self) -> str:
         """Renders the qualified name without the granularity suffix.
 
         In the list metrics and list dimensions outputs we want to render the qualified name of the dimension, but
         without including the base granularity for time dimensions. This method is useful in those contexts.
-        Note: in most cases you should be using the qualified_name - this is only useful in cases where the
+        Note: in most cases you should be using the dunder_name - this is only useful in cases where the
         Dimension set has de-duplicated TimeDimensions such that you never have more than one granularity
         in your set for each TimeDimension.
         """
         return StructuredLinkableSpecName(
             entity_link_names=self.entity_link_names, element_name=self.element_name
-        ).qualified_name
+        ).dunder_name
 
     @property
     def is_element_name(self) -> bool:
         """Indicates whether or not this is an unadorned element name, i.e., one without links or time annotations."""
-        return self.qualified_name == self.element_name
+        return self.dunder_name == self.element_name

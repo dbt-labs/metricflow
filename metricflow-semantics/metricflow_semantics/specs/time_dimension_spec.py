@@ -148,13 +148,13 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
         return DimensionReference(element_name=self.element_name)
 
     @property
-    def qualified_name(self) -> str:  # noqa: D102
+    def dunder_name(self) -> str:  # noqa: D102
         return StructuredLinkableSpecName(
             entity_link_names=tuple(x.element_name for x in self.entity_links),
             element_name=self.element_name,
             time_granularity_name=self.time_granularity_name,
             date_part=self.date_part,
-        ).qualified_name
+        ).dunder_name
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_time_dimension_spec(self)

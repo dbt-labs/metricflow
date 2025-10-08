@@ -27,7 +27,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         return MetricSpec(element_name=element_name)
 
     @property
-    def qualified_name(self) -> str:  # noqa: D102
+    def dunder_name(self) -> str:  # noqa: D102
         return self.element_name
 
     @staticmethod

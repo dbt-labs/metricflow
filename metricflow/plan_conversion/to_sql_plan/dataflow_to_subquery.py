@@ -1757,7 +1757,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             CreateSelectColumnsForInstances(conversion_data_set_alias, self._column_association_resolver)
         ).get_columns()
         deduped_sql_select_node = SqlSelectStatementNode.create(
-            description=f"Dedupe the fanout with {','.join(spec.qualified_name for spec in node.unique_identifier_keys)} in the conversion data set",
+            description=f"Dedupe the fanout with {','.join(spec.dunder_name for spec in node.unique_identifier_keys)} in the conversion data set",
             select_columns=base_sql_select_columns
             + conversion_unique_key_select_columns
             + additional_conversion_select_columns,

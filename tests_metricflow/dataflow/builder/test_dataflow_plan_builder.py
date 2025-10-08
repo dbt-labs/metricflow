@@ -1357,7 +1357,7 @@ def test_all_available_metric_filters(
             where_constraints=[
                 PydanticWhereFilter(
                     where_sql_template=string.Template("{{ Metric('$metric_name', ['$entity_name']) }} > 2").substitute(
-                        metric_name=group_by_metric_spec.element_name, entity_name=entity_spec.qualified_name
+                        metric_name=group_by_metric_spec.element_name, entity_name=entity_spec.dunder_name
                     ),
                 )
             ],
