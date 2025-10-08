@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.merger import Mergeable
@@ -19,8 +18,6 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
-    from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
     from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
     from metricflow_semantics.specs.metadata_spec import MetadataSpec
     from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -54,36 +51,6 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             entity_specs=self.entity_specs,
             group_by_metric_specs=self.group_by_metric_specs,
         )
-
-    def included_agg_time_dimension_specs_for_metric(
-        self, metric_reference: MetricReference, metric_lookup: MetricLookup
-    ) -> List[TimeDimensionSpec]:
-        """Get the time dims included that are valid agg time dimensions for the specified metric."""
-        queried_metric_time_specs = list(self.metric_time_specs)
-
-        valid_agg_time_dimensions = metric_lookup.get_valid_agg_time_dimensions_for_metric(metric_reference)
-        queried_agg_time_dimension_specs = (
-            list(set(self.time_dimension_specs).intersection(set(valid_agg_time_dimensions)))
-            + queried_metric_time_specs
-        )
-
-        return queried_agg_time_dimension_specs
-
-    def included_agg_time_dimension_specs_for_measure(
-        self, measure_reference: MeasureReference, semantic_model_lookup: SemanticModelLookup
-    ) -> List[TimeDimensionSpec]:
-        """Get the time dims included that are valid agg time dimensions for the specified measure."""
-        queried_metric_time_specs = list(self.metric_time_specs)
-
-        valid_agg_time_dimensions = semantic_model_lookup.measure_lookup.get_properties(
-            measure_reference
-        ).agg_time_dimension_specs
-        queried_agg_time_dimension_specs = (
-            list(set(self.time_dimension_specs).intersection(set(valid_agg_time_dimensions)))
-            + queried_metric_time_specs
-        )
-
-        return queried_agg_time_dimension_specs
 
     @property
     def metric_time_specs(self) -> Sequence[TimeDimensionSpec]:

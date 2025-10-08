@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Final, Iterable, Optional, Sequence, Set
+from typing import Dict, Final, Iterable, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import MetricInput
-from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
+from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -73,11 +73,6 @@ class MetricLookup:
 
         # Cache for `get_min_queryable_time_granularity()`
         self._metric_reference_to_min_metric_time_grain: Dict[MetricReference, TimeGranularity] = {}
-
-        # Cache for `get_valid_agg_time_dimensions_for_metric()`.
-        self._metric_reference_to_valid_agg_time_dimension_specs: Dict[
-            MetricReference, Sequence[TimeDimensionSpec]
-        ] = {}
 
         self._result_cache_for_aggregation_time_dimension_specs: ResultCache[
             str, FrozenOrderedSet[TimeDimensionSpec]
@@ -321,77 +316,6 @@ class MetricLookup:
                     f"Metric `{metric.name}` references measure `{measure_reference}` which has not been registered"
                 )
         self._metrics[metric_reference] = metric
-
-    def configured_input_measure_for_metric(  # noqa: D102
-        self, metric_reference: MetricReference
-    ) -> Optional[MetricInputMeasure]:  # noqa: D102
-        metric = self.get_metric(metric_reference=metric_reference)
-        if metric.type is MetricType.CUMULATIVE or metric.type is MetricType.SIMPLE:
-            assert len(metric.input_measures) == 1, "Simple and cumulative metrics should have one input measure."
-            return metric.input_measures[0]
-        elif (
-            metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED or metric.type is MetricType.CONVERSION
-        ):
-            return None
-        else:
-            assert_values_exhausted(metric.type)
-
-    def contains_cumulative_or_time_offset_metric(self, metric_references: Sequence[MetricReference]) -> bool:
-        """Returns true if any of the specs correspond to a cumulative metric or a derived metric with time offset."""
-        for metric_reference in metric_references:
-            metric = self.get_metric(metric_reference)
-            if metric.type == MetricType.CUMULATIVE:
-                return True
-            elif metric.type == MetricType.DERIVED:
-                for input_metric in metric.type_params.metrics or []:
-                    if input_metric.offset_window or input_metric.offset_to_grain:
-                        return True
-        return False
-
-    def _get_agg_time_dimension_specs_for_metric(
-        self, metric_reference: MetricReference
-    ) -> Sequence[TimeDimensionSpec]:
-        """Retrieves the aggregate time dimensions associated with the metric's measures."""
-        metric = self.get_metric(metric_reference)
-        specs: Set[TimeDimensionSpec] = set()
-        for input_measure in metric.input_measures:
-            measure_properties = self._semantic_model_lookup.measure_lookup.get_properties(
-                measure_reference=input_measure.measure_reference
-            )
-            specs.update(measure_properties.agg_time_dimension_specs)
-        return list(specs)
-
-    def get_valid_agg_time_dimensions_for_metric(
-        self, metric_reference: MetricReference
-    ) -> Sequence[TimeDimensionSpec]:
-        """Get the agg time dimension specs that can be used in place of metric time for this metric, if applicable."""
-        result = self._metric_reference_to_valid_agg_time_dimension_specs.get(metric_reference)
-        if result is not None:
-            return result
-
-        result = self._get_valid_agg_time_dimensions_for_metric(metric_reference)
-        self._metric_reference_to_valid_agg_time_dimension_specs[metric_reference] = result
-
-        return result
-
-    def _get_valid_agg_time_dimensions_for_metric(
-        self, metric_reference: MetricReference
-    ) -> Sequence[TimeDimensionSpec]:
-        agg_time_dimension_specs = self._get_agg_time_dimension_specs_for_metric(metric_reference)
-        distinct_agg_time_dimension_identifiers = set(
-            [(spec.reference, spec.entity_links) for spec in agg_time_dimension_specs]
-        )
-        if len(distinct_agg_time_dimension_identifiers) != 1:
-            # If the metric's input measures have different agg_time_dimensions, user must use metric_time.
-            return []
-
-        agg_time_dimension_reference, agg_time_dimension_entity_links = distinct_agg_time_dimension_identifiers.pop()
-        valid_agg_time_dimension_specs = TimeDimensionSpec.generate_possible_specs_for_time_dimension(
-            time_dimension_reference=agg_time_dimension_reference,
-            entity_links=agg_time_dimension_entity_links,
-            custom_granularities=self._custom_granularities,
-        )
-        return valid_agg_time_dimension_specs
 
     def get_min_queryable_time_granularity(self, metric_reference: MetricReference) -> TimeGranularity:
         """The minimum grain that can be queried with this metric.
