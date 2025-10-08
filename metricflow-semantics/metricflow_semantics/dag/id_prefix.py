@@ -94,8 +94,8 @@ class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     # Group by item resolution
     GROUP_BY_ITEM_RESOLUTION_DAG = "gbir"
     QUERY_GROUP_BY_ITEM_RESOLUTION_NODE = "qr"
+    SIMPLE_METRIC_GROUP_BY_ITEM_RESOLUTION_NODE = "msr"
     METRIC_GROUP_BY_ITEM_RESOLUTION_NODE = "mtr"
-    MEASURE_GROUP_BY_ITEM_RESOLUTION_NODE = "msr"
     VALUES_GROUP_BY_ITEM_RESOLUTION_NODE = "vr"
 
     DATAFLOW_PLAN_PREFIX = "dfp"
