@@ -13,10 +13,14 @@ integration_test:
       , bookings AS instant_bookings_with_measure_filter
     FROM (
       SELECT
-        t.ds AS metric_time__day
+        t.metric_time__day AS metric_time__day
         , b.booking__is_instant AS booking__is_instant
         , b.bookings AS bookings
-      FROM {{ source_schema }}.mf_time_spine t
+      FROM (
+        SELECT ds AS metric_time__day
+        FROM {{ source_schema }}.mf_time_spine
+        WHERE {{ render_time_constraint("ds", start_time="2020-01-01") }}
+      ) t
       LEFT OUTER JOIN (
         SELECT
           metric_time__day
@@ -36,6 +40,5 @@ integration_test:
           , booking__is_instant
       ) b
       ON
-        t.ds = b.metric_time__day
+        t.metric_time__day = b.metric_time__day
     ) c
-    WHERE {{ render_time_constraint("metric_time__day", start_time="2020-01-01") }}
