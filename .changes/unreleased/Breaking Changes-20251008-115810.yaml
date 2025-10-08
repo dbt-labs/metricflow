@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: Remove `MetricFlowEngine.get_measures_for_metrics`
+time: 2025-10-08T11:58:10.188775-07:00
+custom:
+  Author: plypaul
+  Issue: "1881"
