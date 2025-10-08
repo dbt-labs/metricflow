@@ -19,7 +19,6 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.test_helpers.fix_simple_metric_rule import FixSimpleMetricRule
 
 
 def mf_load_manifest_from_yaml_directory(
@@ -31,8 +30,7 @@ def mf_load_manifest_from_yaml_directory(
         build_result = parse_directory_of_yaml_files_to_semantic_manifest(
             str(yaml_file_directory), template_mapping=template_mapping
         )
-        # TODO: Check transform in DSI.
-        semantic_manifest = FixSimpleMetricRule.transform_manifest(build_result.semantic_manifest)
+        semantic_manifest = build_result.semantic_manifest
         validator = SemanticManifestValidator[PydanticSemanticManifest]()
         validator.checked_validations(semantic_manifest)
         return semantic_manifest

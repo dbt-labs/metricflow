@@ -21,7 +21,6 @@ from dbt_semantic_interfaces.validations.validator_helpers import SemanticManife
 from halo import Halo
 from metricflow_semantics.dag.dag_visualization import display_dag_as_svg
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.test_helpers.fix_simple_metric_rule import FixSimpleMetricRule
 from update_checker import UpdateChecker
 
 import dbt_metricflow.cli.custom_click_types as click_custom
@@ -589,8 +588,6 @@ def validate_configs(
     except Exception as e:
         parsing_spinner.fail(f"Exception found when parsing manifest from dbt project ({str(e)})")
         exit(1)
-
-    semantic_manifest = FixSimpleMetricRule.transform_manifest(semantic_manifest)
 
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built manifest", spinner="dots")

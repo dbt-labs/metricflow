@@ -9,7 +9,6 @@ from typing import Dict, Optional
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.test_helpers.fix_simple_metric_rule import FixSimpleMetricRule
 
 from dbt_metricflow.cli import PACKAGE_NAME
 from dbt_metricflow.cli.cli_errors import LoadSemanticManifestException
@@ -223,4 +222,4 @@ class CLIConfiguration:
     @property
     def semantic_manifest(self) -> SemanticManifest:
         """Retrieve the semantic manifest from the dbt project root."""
-        return FixSimpleMetricRule.transform_manifest(self.dbt_artifacts.semantic_manifest)
+        return self.dbt_artifacts.semantic_manifest
