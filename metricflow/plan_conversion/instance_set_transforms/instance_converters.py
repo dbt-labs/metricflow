@@ -6,7 +6,9 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -19,9 +21,9 @@ from metricflow_semantics.instances import (
     InstanceSet,
     InstanceSetTransform,
     MdoInstance,
-    MeasureInstance,
     MetadataInstance,
     MetricInstance,
+    SimpleMetricInputInstance,
     TimeDimensionInstance,
 )
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -29,7 +31,6 @@ from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
@@ -43,6 +44,7 @@ from metricflow_semantics.sql.sql_exprs import (
 from more_itertools import bucket
 from typing_extensions import TypeVar
 
+from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping, NullFillValueMapping
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import (
@@ -199,7 +201,7 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
         )
 
         output = InstanceSet(
-            measure_instances=instance_set.measure_instances,
+            simple_metric_input_instances=instance_set.simple_metric_input_instances,
             dimension_instances=filtered_dimension_instances,
             time_dimension_instances=filtered_time_dimension_instances,
             entity_instances=filtered_entity_instances,
@@ -270,7 +272,9 @@ class FilterElements(InstanceSetTransform[InstanceSet]):
             assert False, "Include specs or exclude specs should have been specified."
 
         output = InstanceSet(
-            measure_instances=tuple(x for x in instance_set.measure_instances if self._should_pass(x.spec)),
+            simple_metric_input_instances=tuple(
+                x for x in instance_set.simple_metric_input_instances if self._should_pass(x.spec)
+            ),
             dimension_instances=tuple(x for x in instance_set.dimension_instances if self._should_pass(x.spec)),
             time_dimension_instances=tuple(
                 x for x in instance_set.time_dimension_instances if self._should_pass(x.spec)
@@ -297,7 +301,7 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
         self._aggregation_state_changes = aggregation_state_changes
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
-        for measure_instance in instance_set.measure_instances:
+        for measure_instance in instance_set.simple_metric_input_instances:
             assert measure_instance.aggregation_state in self._aggregation_state_changes, (
                 f"Aggregation state: {measure_instance.aggregation_state} not handled in change dict: "
                 f"{self._aggregation_state_changes}"
@@ -305,16 +309,16 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
 
         # Copy the measures, but just change the aggregation state to COMPLETE.
         measure_instances = tuple(
-            MeasureInstance(
+            SimpleMetricInputInstance(
                 associated_columns=x.associated_columns,
                 defined_from=x.defined_from,
                 aggregation_state=self._aggregation_state_changes[x.aggregation_state],
                 spec=x.spec,
             )
-            for x in instance_set.measure_instances
+            for x in instance_set.simple_metric_input_instances
         )
         return InstanceSet(
-            measure_instances=measure_instances,
+            simple_metric_input_instances=measure_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
@@ -327,39 +331,35 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
 class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
     """Returns a new instance set where all measures have been assigned the fill nulls with property."""
 
-    def __init__(self, metric_input_measure_specs: Sequence[MetricInputMeasureSpec]):
+    def __init__(self, null_fill_value_mapping: NullFillValueMapping):
         """Initializer stores the input specs, which contain the fill_nulls_with for each measure."""
-        self.metric_input_measure_specs = metric_input_measure_specs
+        self._null_fill_value_mapping = null_fill_value_mapping
 
-    def _update_fill_nulls_with(self, measure_instances: Tuple[MeasureInstance, ...]) -> Tuple[MeasureInstance, ...]:
+    def _update_fill_nulls_with(
+        self, measure_instances: Tuple[SimpleMetricInputInstance, ...]
+    ) -> Tuple[SimpleMetricInputInstance, ...]:
         """Update all measure instances with the corresponding fill_nulls_with value."""
-        updated_instances: List[MeasureInstance] = []
+        updated_instances: List[SimpleMetricInputInstance] = []
         for instance in measure_instances:
-            # There might be multiple matching specs, but they'll all have the same fill_nulls_with value so we can use any of them.
-            matching_specs = [spec for spec in self.metric_input_measure_specs if spec.measure_spec == instance.spec]
-            assert (
-                len(matching_specs) >= 1
-            ), f"Found no matching input measure spec for measure instance {instance}. Something has been misconfigured."
-
-            measure_spec = MeasureSpec(
-                element_name=instance.spec.element_name,
-                fill_nulls_with=matching_specs[0].fill_nulls_with,
-                non_additive_dimension_spec=instance.spec.non_additive_dimension_spec,
-            )
-            updated_instances.append(
-                MeasureInstance(
-                    associated_columns=instance.associated_columns,
-                    spec=measure_spec,
-                    aggregation_state=instance.aggregation_state,
-                    defined_from=instance.defined_from,
+            spec = instance.spec
+            mapped_spec = self._null_fill_value_mapping.null_fill_value_spec(spec)
+            if mapped_spec is not None:
+                updated_instances.append(
+                    SimpleMetricInputInstance(
+                        associated_columns=instance.associated_columns,
+                        spec=mapped_spec,
+                        aggregation_state=instance.aggregation_state,
+                        defined_from=instance.defined_from,
+                    )
                 )
-            )
+            else:
+                updated_instances.append(instance)
 
         return tuple(updated_instances)
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
-            measure_instances=self._update_fill_nulls_with(instance_set.measure_instances),
+            simple_metric_input_instances=self._update_fill_nulls_with(instance_set.simple_metric_input_instances),
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
@@ -372,49 +372,42 @@ class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
 class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
     """Returns a new instance set where all measures have been assigned an alias spec."""
 
-    def __init__(self, metric_input_measure_specs: Sequence[MetricInputMeasureSpec]):
+    def __init__(self, alias_mapping: InstanceAliasMapping) -> None:
         """Initializer stores the input specs, which contain the aliases for each measure.
 
-        Note this class only works if used in conjunction with an AggregateMeasuresNode that has been generated
+        Note this class only works if used in conjunction with an AggregateSimpleMetricInputsNode that has been generated
         by querying a single semantic model for a single set of aggregated measures. This is currently enforced
-        by the structure of the DataflowPlanBuilder, which ensures each AggregateMeasuresNode corresponds to
+        by the structure of the DataflowPlanBuilder, which ensures each AggregateSimpleMetricInputsNode corresponds to
         a single semantic model set of measures for a single metric, and that these outputs will then be
-        combinded via joins.
+        combined via joins.
         """
-        self.metric_input_measure_specs = metric_input_measure_specs
+        self._alias_mapping = alias_mapping
 
-    def _alias_measure_instances(self, measure_instances: Tuple[MeasureInstance, ...]) -> Tuple[MeasureInstance, ...]:
+    def _alias_measure_instances(
+        self, measure_instances: Tuple[SimpleMetricInputInstance, ...]
+    ) -> Tuple[SimpleMetricInputInstance, ...]:
         """Update all measure instances with aliases, if any are found in the input spec set."""
-        aliased_instances: List[MeasureInstance] = []
-        aliased_input_specs = [spec for spec in self.metric_input_measure_specs if spec.alias]
+        aliased_instances: List[SimpleMetricInputInstance] = []
         for instance in measure_instances:
-            matches = [spec for spec in aliased_input_specs if spec.measure_spec == instance.spec]
-            assert (
-                len(matches) < 2
-            ), f"Found duplicate aliased measure spec matches: {matches} for measure instance {instance}. "
-            "We should always have 0 or 1 matches, or else we might pass the wrong aggregated measures to the "
-            "downstream metric computation expression!"
-            if matches:
-                aliased_spec = matches[0]
-                aliased_input_specs.remove(aliased_spec)
-                measure_spec = aliased_spec.post_aggregation_spec
-            else:
-                measure_spec = instance.spec
-
-            aliased_instances.append(
-                MeasureInstance(
-                    associated_columns=instance.associated_columns,
-                    spec=measure_spec,
-                    aggregation_state=instance.aggregation_state,
-                    defined_from=instance.defined_from,
+            spec = instance.spec
+            aliased_spec = self._alias_mapping.aliased_spec(spec)
+            if aliased_spec is not None:
+                aliased_instances.append(
+                    SimpleMetricInputInstance(
+                        associated_columns=instance.associated_columns,
+                        spec=aliased_spec,
+                        aggregation_state=instance.aggregation_state,
+                        defined_from=instance.defined_from,
+                    )
                 )
-            )
+            else:
+                aliased_instances.append(instance)
 
         return tuple(aliased_instances)
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
-            measure_instances=self._alias_measure_instances(instance_set.measure_instances),
+            simple_metric_input_instances=self._alias_measure_instances(instance_set.simple_metric_input_instances),
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
@@ -432,7 +425,7 @@ class AddMetrics(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
-            measure_instances=instance_set.measure_instances,
+            simple_metric_input_instances=instance_set.simple_metric_input_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
@@ -450,7 +443,7 @@ class AddGroupByMetric(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
-            measure_instances=instance_set.measure_instances,
+            simple_metric_input_instances=instance_set.simple_metric_input_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
@@ -465,7 +458,7 @@ class RemoveMeasures(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
-            measure_instances=(),
+            simple_metric_input_instances=(),
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
@@ -480,7 +473,7 @@ class RemoveMetrics(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
-            measure_instances=instance_set.measure_instances,
+            simple_metric_input_instances=instance_set.simple_metric_input_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
@@ -572,17 +565,26 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
         select_columns: List[SqlSelectColumn] = []
         for metric_instance in metric_instances:
             metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
-            input_measure = self._metric_lookup.configured_input_measure_for_metric(metric_reference=metric_reference)
-            fill_nulls_with: Optional[int] = None
-            if input_measure and input_measure.fill_nulls_with is not None:
-                fill_nulls_with = input_measure.fill_nulls_with
+            metric = self._metric_lookup.get_metric(metric_reference)
+            metric_type = metric.type
+            if metric_type is MetricType.SIMPLE:
+                fill_nulls_with = metric.type_params.fill_nulls_with
+            elif (
+                metric_type is MetricType.RATIO
+                or metric_type is MetricType.DERIVED
+                or metric_type is MetricType.CUMULATIVE
+                or metric_type is MetricType.CONVERSION
+            ):
+                fill_nulls_with = None
+            else:
+                assert_values_exhausted(metric_type)
             select_columns.append(
                 self._create_select_column(spec=metric_instance.spec, fill_nulls_with=fill_nulls_with)
             )
         return select_columns
 
     def _create_select_columns_for_measures(
-        self, measure_instances: Tuple[MeasureInstance, ...]
+        self, measure_instances: Tuple[SimpleMetricInputInstance, ...]
     ) -> List[SqlSelectColumn]:
         select_columns: List[SqlSelectColumn] = []
         for measure_instance in measure_instances:
@@ -595,7 +597,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
     def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
         return SelectColumnSet.create(
             metric_columns=self._create_select_columns_for_metrics(instance_set.metric_instances),
-            measure_columns=self._create_select_columns_for_measures(instance_set.measure_instances),
+            measure_columns=self._create_select_columns_for_measures(instance_set.simple_metric_input_instances),
         )
 
 
@@ -635,9 +637,9 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         output_measure_instances = []
-        for input_measure_instance in instance_set.measure_instances:
+        for input_measure_instance in instance_set.simple_metric_input_instances:
             output_measure_instances.append(
-                MeasureInstance(
+                SimpleMetricInputInstance(
                     associated_columns=(self._column_association_resolver.resolve_spec(input_measure_instance.spec),),
                     spec=input_measure_instance.spec,
                     defined_from=input_measure_instance.defined_from,
@@ -708,7 +710,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 )
             )
         return InstanceSet(
-            measure_instances=tuple(output_measure_instances),
+            simple_metric_input_instances=tuple(output_measure_instances),
             dimension_instances=tuple(output_dimension_instances),
             time_dimension_instances=tuple(output_time_dimension_instances),
             entity_instances=tuple(output_entity_instances),
@@ -738,7 +740,7 @@ class AddMetadata(InstanceSetTransform[InstanceSet]):
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
-            measure_instances=instance_set.measure_instances,
+            simple_metric_input_instances=instance_set.simple_metric_input_instances,
             dimension_instances=instance_set.dimension_instances,
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,

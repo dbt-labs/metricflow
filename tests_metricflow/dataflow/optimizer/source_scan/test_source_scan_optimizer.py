@@ -19,7 +19,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.dataflow_plan import DataflowPlan, DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
 from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
@@ -59,7 +59,7 @@ class ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> int:  # noqa: D102
+    def visit_aggregate_simple_metric_inputs_node(self, node: AggregateSimpleMetricInputsNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> int:  # noqa: D102
