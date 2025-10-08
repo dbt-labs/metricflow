@@ -6,7 +6,7 @@ sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'listing__capacity_latest', 'metric_time__day', 'listing']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Order By ['bookings', 'metric_time__day', 'listing__capacity_latest', 'listing']
 -- Change Column Aliases
@@ -45,7 +45,7 @@ FROM (
     FROM (
       -- Read From CTE For node_id=sma_28009
       -- Pass Only Elements: ['booking_value', 'listing']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         listing

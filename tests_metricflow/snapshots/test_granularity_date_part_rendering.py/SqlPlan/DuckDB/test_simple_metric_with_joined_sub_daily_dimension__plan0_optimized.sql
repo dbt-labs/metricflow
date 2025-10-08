@@ -4,7 +4,7 @@ sql_engine: DuckDB
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['bookings', 'listing__user__bio_added_ts__minute']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

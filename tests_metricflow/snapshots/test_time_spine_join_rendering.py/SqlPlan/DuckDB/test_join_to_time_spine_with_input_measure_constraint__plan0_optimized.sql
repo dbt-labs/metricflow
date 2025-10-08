@@ -12,7 +12,7 @@ sql_engine: DuckDB
 SELECT
   subq_19.metric_time__day AS metric_time__day
   , subq_15.booking__is_instant AS booking__is_instant
-  , subq_15.bookings AS instant_bookings_with_measure_filter
+  , subq_15.instant_bookings_with_measure_filter AS instant_bookings_with_measure_filter
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day']
@@ -29,12 +29,12 @@ FROM (
 ) subq_19
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
-  -- Aggregate Measures
+  -- Pass Only Elements: ['instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day']
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
     , booking__is_instant
-    , SUM(bookings) AS bookings
+    , SUM(instant_bookings_with_measure_filter) AS instant_bookings_with_measure_filter
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -42,7 +42,7 @@ LEFT OUTER JOIN (
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
       , is_instant AS booking__is_instant
-      , 1 AS bookings
+      , 1 AS instant_bookings_with_measure_filter
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_12
   WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')

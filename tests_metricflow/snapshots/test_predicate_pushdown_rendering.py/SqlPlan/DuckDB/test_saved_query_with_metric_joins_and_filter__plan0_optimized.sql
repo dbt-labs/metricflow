@@ -11,7 +11,7 @@ sql_engine: DuckDB
 WITH cm_6_cte AS (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['bookings', 'listing__capacity_latest']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     listing__capacity_latest
@@ -45,7 +45,7 @@ WITH cm_6_cte AS (
 , cm_7_cte AS (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['views', 'listing__capacity_latest']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     listing__capacity_latest

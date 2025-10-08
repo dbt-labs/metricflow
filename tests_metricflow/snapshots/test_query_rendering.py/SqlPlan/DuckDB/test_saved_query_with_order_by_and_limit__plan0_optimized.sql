@@ -22,7 +22,7 @@ SELECT
 FROM (
   -- Join Standard Outputs
   -- Pass Only Elements: ['bookings', 'listing__capacity_latest', 'metric_time__day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_20.metric_time__day AS metric_time__day
@@ -48,7 +48,7 @@ FROM (
 FULL OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['views', 'listing__capacity_latest', 'metric_time__day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_29.metric_time__day AS metric_time__day

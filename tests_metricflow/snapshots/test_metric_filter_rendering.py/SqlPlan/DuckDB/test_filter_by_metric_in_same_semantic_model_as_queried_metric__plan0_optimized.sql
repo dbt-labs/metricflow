@@ -6,7 +6,7 @@ sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookers']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 WITH sma_28009_cte AS (
@@ -36,7 +36,7 @@ FROM (
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['booking_value', 'guest']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['guest', 'guest__booking_value']
     SELECT

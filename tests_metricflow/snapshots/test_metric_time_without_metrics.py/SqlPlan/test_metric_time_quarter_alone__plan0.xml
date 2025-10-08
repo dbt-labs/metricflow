@@ -103,7 +103,7 @@ test_filename: test_metric_time_without_metrics.py
                     <!-- description = "Read From Time Spine 'mf_time_spine'" -->
                     <!-- node_id = NodeId(id_str='ss_36') -->
                     <!-- col0 =                                                                                         -->
-                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28130), column_alias='ds__day') -->
+                    <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_28132), column_alias='ds__day') -->
                     <!-- col1 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28287), column_alias='ds__week') -->
                     <!-- col2 = SqlSelectColumn(expr=SqlDateTruncExpression(node_id=dt_28288), column_alias='ds__month') -->
                     <!-- col3 =                                                                                       -->
@@ -126,7 +126,7 @@ test_filename: test_metric_time_without_metrics.py
                     <!--   SqlSelectColumn(expr=SqlExtractExpression(node_id=ex_28305), column_alias='ds__extract_doy') -->
                     <!-- col11 =                                                  -->
                     <!--   SqlSelectColumn(                                       -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_28131), -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_28133), -->
                     <!--     column_alias='ds__alien_day',                        -->
                     <!--   )                                                      -->
                     <!-- from_source = SqlTableNode(node_id=tfc_30) -->

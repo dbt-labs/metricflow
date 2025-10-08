@@ -6,13 +6,13 @@ sql_engine: DuckDB
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_21.metric_time__day AS metric_time__day
-  , subq_26.user__home_state_latest AS listing__user__home_state_latest
-  , SUM(subq_21.bookings) AS bookings
+  subq_18.metric_time__day AS metric_time__day
+  , subq_23.user__home_state_latest AS listing__user__home_state_latest
+  , SUM(subq_18.bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -21,7 +21,7 @@ FROM (
     , listing_id AS listing
     , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_21
+) subq_18
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
@@ -35,21 +35,21 @@ LEFT OUTER JOIN (
     ***************************.dim_users_latest users_latest_src_26000
   ON
     listings_src_26000.user_id = users_latest_src_26000.user_id
-) subq_26
+) subq_23
 ON
   (
-    subq_21.listing = subq_26.listing
+    subq_18.listing = subq_23.listing
   ) AND (
     (
-      subq_21.metric_time__day >= subq_26.window_start__day
+      subq_18.metric_time__day >= subq_23.window_start__day
     ) AND (
       (
-        subq_21.metric_time__day < subq_26.window_end__day
+        subq_18.metric_time__day < subq_23.window_end__day
       ) OR (
-        subq_26.window_end__day IS NULL
+        subq_23.window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_21.metric_time__day
-  , subq_26.user__home_state_latest
+  subq_18.metric_time__day
+  , subq_23.user__home_state_latest

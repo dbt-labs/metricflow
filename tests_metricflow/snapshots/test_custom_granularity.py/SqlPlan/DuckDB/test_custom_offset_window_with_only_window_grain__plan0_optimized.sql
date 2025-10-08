@@ -5,17 +5,17 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  booking__ds__alien_day
-  , metric_time__alien_day
+  metric_time__alien_day
+  , booking__ds__alien_day
   , bookings AS bookings_offset_one_alien_day
 FROM (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
-    subq_15.booking__ds__alien_day AS booking__ds__alien_day
-    , subq_15.metric_time__alien_day AS metric_time__alien_day
+    subq_15.metric_time__alien_day AS metric_time__alien_day
+    , subq_15.booking__ds__alien_day AS booking__ds__alien_day
     , SUM(subq_13.bookings) AS bookings
   FROM (
     -- Join Offset Custom Granularity to Base Granularity
@@ -29,8 +29,8 @@ FROM (
 
     SELECT
       cte_6.ds__day AS ds__day
-      , subq_14.ds__alien_day__lead AS booking__ds__alien_day
       , subq_14.ds__alien_day__lead AS metric_time__alien_day
+      , subq_14.ds__alien_day__lead AS booking__ds__alien_day
     FROM cte_6
     INNER JOIN (
       -- Offset Custom Granularity
@@ -55,6 +55,6 @@ FROM (
   ON
     subq_15.ds__day = subq_13.metric_time__day
   GROUP BY
-    subq_15.booking__ds__alien_day
-    , subq_15.metric_time__alien_day
+    subq_15.metric_time__alien_day
+    , subq_15.booking__ds__alien_day
 ) subq_20

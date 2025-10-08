@@ -5,30 +5,30 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings', 'metric_time__day']
--- Aggregate Measures
+-- Pass Only Elements: ['active_listings', 'metric_time__day']
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   metric_time__day
-  , SUM(listings) AS active_listings
+  , SUM(active_listings) AS active_listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_23.listing__bookings AS listing__bookings
     , subq_17.metric_time__day AS metric_time__day
-    , subq_17.listings AS listings
+    , subq_17.active_listings AS active_listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('day', created_at) AS metric_time__day
       , listing_id AS listing
-      , 1 AS listings
+      , 1 AS active_listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_17
   LEFT OUTER JOIN (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
