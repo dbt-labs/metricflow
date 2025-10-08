@@ -16,8 +16,6 @@ from dbt_semantic_interfaces.transformations.semantic_manifest_transformer impor
     PydanticSemanticManifestTransformer,
 )
 
-from metricflow_semantics.model.transformations.dedupe_metric_input_measures import DedupeMetricInputMeasuresRule
-
 
 def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> PydanticSemanticManifest:
     """Parse a PydanticSemanticManifest given the generated semantic_manifest json from dbt."""
@@ -33,9 +31,8 @@ def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> Pyd
         # Secondary - broken out into groups because we run DedupeMetricInputMeasuresRule in the middle.
         (
             *rule_set.legacy_measure_update_rules,
-            DedupeMetricInputMeasuresRule(),  # Remove once fix is in core
             # These individual rules come from rule_set.convert_legacy_measures_to_metrics_rules, but
-            # dsi requires AddInputMetricMeasuresRule, and metricflow requires that we do NOT run that rule
+            # dsi requØires AddInputMetricMeasuresRule, and metricflow requires that we do NOT run that rule
             # as it is incompatible with a parser like dbt-core that pre-populates input measures.
             CreateProxyMeasureRule(),
             FlattenSimpleMetricsWithMeasureInputsRule(),
