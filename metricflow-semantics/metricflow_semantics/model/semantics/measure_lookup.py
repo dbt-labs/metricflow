@@ -18,7 +18,7 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.model.spec_converters import MeasureConverter
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -57,14 +57,14 @@ class MeasureLookup:
         self._measure_non_additive_dimension_specs: Dict[MeasureReference, NonAdditiveDimensionSpec] = {}
         self._model_reference_to_measures: dict[SemanticModelReference, AnyLengthTuple[Measure]] = {}
         self._model_reference_to_aggregation_time_dimensions: dict[
-            SemanticModelReference, ElementGrouper[TimeDimensionReference, MeasureSpec]
+            SemanticModelReference, ElementGrouper[TimeDimensionReference, SimpleMetricInputSpec]
         ] = {}
 
         for semantic_model in semantic_models:
             semantic_model_reference = semantic_model.reference
             self._model_reference_to_measures[semantic_model_reference] = tuple(semantic_model.measures)
             self._model_reference_to_aggregation_time_dimensions[semantic_model_reference] = ElementGrouper[
-                TimeDimensionReference, MeasureSpec
+                TimeDimensionReference, SimpleMetricInputSpec
             ]()
 
             primary_entity = SemanticModelHelper.resolved_primary_entity(semantic_model)
@@ -193,7 +193,7 @@ class MeasureLookup:
 
     def get_aggregation_time_dimensions_with_measures(
         self, semantic_model_reference: SemanticModelReference
-    ) -> ElementGrouper[TimeDimensionReference, MeasureSpec]:
+    ) -> ElementGrouper[TimeDimensionReference, SimpleMetricInputSpec]:
         """Return all time dimensions in a semantic model with their associated measures."""
         try:
             return self._model_reference_to_aggregation_time_dimensions[semantic_model_reference]

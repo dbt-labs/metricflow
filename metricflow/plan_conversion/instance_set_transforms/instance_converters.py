@@ -597,7 +597,9 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
     def transform(self, instance_set: InstanceSet) -> SelectColumnSet:  # noqa: D102
         return SelectColumnSet.create(
             metric_columns=self._create_select_columns_for_metrics(instance_set.metric_instances),
-            measure_columns=self._create_select_columns_for_measures(instance_set.simple_metric_input_instances),
+            simple_metric_input_columns=self._create_select_columns_for_measures(
+                instance_set.simple_metric_input_instances
+            ),
         )
 
 

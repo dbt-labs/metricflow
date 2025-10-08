@@ -30,7 +30,7 @@ def hash_items(items: Sequence[SqlColumnType]) -> str:
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
-    """Spec representing non-additive dimension parameters for use within a MeasureSpec.
+    """Spec representing non-additive dimension parameters for use within a SimpleMetricInputSpec.
 
     This is sourced from the NonAdditiveDimensionParameters model object, which provides the parsed parameter set,
     while the spec contains the information needed for dataflow plan operations
@@ -50,7 +50,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         return NonAdditiveDimensionSpec(
             name=simple_metric_input.non_additive_dimension.name,
             window_choice=simple_metric_input.non_additive_dimension.window_choice,
-            window_groupings=tuple(simple_metric_input.non_additive_dimension.window_groupings),
+            window_groupings=tuple(sorted(simple_metric_input.non_additive_dimension.window_groupings)),
         )
 
     def __post_init__(self) -> None:

@@ -1068,7 +1068,7 @@ class DataflowPlanBuilder:
         if measure_spec_properties:
             candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
             candidate_nodes_for_left_side_of_join += self._select_source_nodes_with_measures(
-                measure_specs=set(measure_spec_properties.measure_specs),
+                measure_specs=set(measure_spec_properties.simple_metric_input_specs),
                 source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
             default_join_type = SqlJoinType.LEFT_OUTER
@@ -1180,7 +1180,7 @@ class DataflowPlanBuilder:
             data_set = self._node_data_set_resolver.get_output_data_set(node)
 
             if measure_spec_properties:
-                measure_specs = measure_spec_properties.measure_specs
+                measure_specs = measure_spec_properties.simple_metric_input_specs
                 missing_specs = [
                     spec for spec in measure_specs if spec not in data_set.instance_set.spec_set.measure_specs
                 ]

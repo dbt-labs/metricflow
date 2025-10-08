@@ -10,7 +10,7 @@ from typing_extensions import override
 if typing.TYPE_CHECKING:
     from metricflow.dataflow.dataflow_plan import DataflowPlanNode
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-    from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+    from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
     from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
     from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
@@ -51,7 +51,9 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> VisitorOutputT:  # noqa: D102
+    def visit_aggregate_simple_metric_inputs_node(  # noqa: D102
+        self, node: AggregateSimpleMetricInputsNode
+    ) -> VisitorOutputT:
         raise NotImplementedError
 
     @abstractmethod
@@ -158,7 +160,9 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
         return self._default_handler(node)
 
     @override
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> VisitorOutputT:  # noqa: D102
+    def visit_aggregate_simple_metric_inputs_node(
+        self, node: AggregateSimpleMetricInputsNode
+    ) -> VisitorOutputT:  # noqa: D102
         return self._default_handler(node)
 
     @override

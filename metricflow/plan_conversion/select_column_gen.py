@@ -22,7 +22,7 @@ class SelectColumnSet(Mergeable):
     """
 
     metric_columns: AnyLengthTuple[SqlSelectColumn]
-    measure_columns: AnyLengthTuple[SqlSelectColumn]
+    simple_metric_input_columns: AnyLengthTuple[SqlSelectColumn]
     dimension_columns: AnyLengthTuple[SqlSelectColumn]
     time_dimension_columns: AnyLengthTuple[SqlSelectColumn]
     entity_columns: AnyLengthTuple[SqlSelectColumn]
@@ -32,7 +32,7 @@ class SelectColumnSet(Mergeable):
     @staticmethod
     def create(  # noqa: D102
         metric_columns: Iterable[SqlSelectColumn] = (),
-        measure_columns: Iterable[SqlSelectColumn] = (),
+        simple_metric_input_columns: Iterable[SqlSelectColumn] = (),
         dimension_columns: Iterable[SqlSelectColumn] = (),
         time_dimension_columns: Iterable[SqlSelectColumn] = (),
         entity_columns: Iterable[SqlSelectColumn] = (),
@@ -40,7 +40,7 @@ class SelectColumnSet(Mergeable):
         metadata_columns: Iterable[SqlSelectColumn] = (),
     ) -> SelectColumnSet:
         metric_columns = tuple(metric_columns)
-        measure_columns = tuple(measure_columns)
+        simple_metric_input_columns = tuple(simple_metric_input_columns)
         dimension_columns = tuple(dimension_columns)
         time_dimension_columns = tuple(time_dimension_columns)
         entity_columns = tuple(entity_columns)
@@ -49,7 +49,7 @@ class SelectColumnSet(Mergeable):
 
         return SelectColumnSet(
             metric_columns=tuple(metric_columns),
-            measure_columns=tuple(measure_columns),
+            simple_metric_input_columns=tuple(simple_metric_input_columns),
             dimension_columns=tuple(dimension_columns),
             time_dimension_columns=tuple(time_dimension_columns),
             entity_columns=tuple(entity_columns),
@@ -66,7 +66,7 @@ class SelectColumnSet(Mergeable):
             + self.dimension_columns
             + self.group_by_metric_columns
             + self.metric_columns
-            + self.measure_columns
+            + self.simple_metric_input_columns
             + self.metadata_columns
         )
 
@@ -75,7 +75,7 @@ class SelectColumnSet(Mergeable):
         """Combine the select columns by type."""
         return SelectColumnSet.create(
             metric_columns=self.metric_columns + other_set.metric_columns,
-            measure_columns=self.measure_columns + other_set.measure_columns,
+            simple_metric_input_columns=self.simple_metric_input_columns + other_set.simple_metric_input_columns,
             dimension_columns=self.dimension_columns + other_set.dimension_columns,
             time_dimension_columns=self.time_dimension_columns + other_set.time_dimension_columns,
             entity_columns=self.entity_columns + other_set.entity_columns,
