@@ -101,9 +101,9 @@ def test_merge_linkable_specs(dimension_spec: DimensionSpec, entity_spec: Entity
     assert LinkableInstanceSpec.merge_linkable_specs([dimension_spec], [entity_spec]) == linkable_specs
 
 
-def test_qualified_name() -> None:  # noqa: D103
+def test_dunder_name() -> None:  # noqa: D103
     assert (
-        DimensionSpec(element_name="country", entity_links=(EntityReference("listing_id"),)).qualified_name
+        DimensionSpec(element_name="country", entity_links=(EntityReference("listing_id"),)).dunder_name
         == "listing_id__country"
     )
 

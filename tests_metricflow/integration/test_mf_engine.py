@@ -18,7 +18,7 @@ def test_list_dimensions(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
-        obj=[dim.qualified_name for dim in dimensions],
+        obj=[dim.dunder_name for dim in dimensions],
     )
 
 
@@ -45,7 +45,7 @@ def test_list_dimensions_for_metrics_for_single_metric(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
-        obj=[dim.qualified_name for dim in single_metric_dims],
+        obj=[dim.dunder_name for dim in single_metric_dims],
     )
 
 
@@ -58,7 +58,7 @@ def test_list_dimensions_for_metrics_for_multiple_metrics(  # noqa: D103
         request=request,
         mf_test_configuration=mf_test_configuration,
         obj_id="result0",
-        obj=[dim.qualified_name for dim in multi_metric_dims],
+        obj=[dim.dunder_name for dim in multi_metric_dims],
     )
 
 
@@ -74,7 +74,7 @@ def test_list_dimensions_order_by_semantic_model_name(  # noqa: D103
         obj=[
             (
                 dim.semantic_model_reference.semantic_model_name if dim.semantic_model_reference else "",
-                dim.qualified_name,
+                dim.dunder_name,
             )
             for dim in single_metric_dims
         ],
@@ -93,7 +93,7 @@ def test_list_group_bys_order_by_semantic_model_name(  # noqa: D103
         obj=[
             (
                 group_by.semantic_model_reference.semantic_model_name if group_by.semantic_model_reference else "",
-                group_by.qualified_name if hasattr(group_by, "qualified_name") else group_by.name,
+                group_by.dunder_name if hasattr(group_by, "dunder_name") else group_by.name,
             )
             for group_by in group_bys
         ],

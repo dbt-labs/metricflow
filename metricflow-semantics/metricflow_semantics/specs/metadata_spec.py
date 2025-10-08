@@ -18,7 +18,7 @@ class MetadataSpec(InstanceSpec):
     agg_type: Optional[AggregationType] = None
 
     @property
-    def qualified_name(self) -> str:  # noqa: D102
+    def dunder_name(self) -> str:  # noqa: D102
         return f"{self.element_name}{DUNDER}{self.agg_type.value}" if self.agg_type else self.element_name
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102

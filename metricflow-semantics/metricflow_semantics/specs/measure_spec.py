@@ -21,7 +21,7 @@ class SimpleMetricInputSpec(InstanceSpec):  # noqa: D101
     fill_nulls_with: Optional[int] = None
 
     @property
-    def qualified_name(self) -> str:  # noqa: D102
+    def dunder_name(self) -> str:  # noqa: D102
         return self.element_name
 
     def accept(self, visitor: InstanceSpecVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102

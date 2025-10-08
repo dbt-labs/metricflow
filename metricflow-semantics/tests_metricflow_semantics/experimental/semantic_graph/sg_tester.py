@@ -132,10 +132,10 @@ class SemanticGraphTester:
 
         for annotated_spec in sorted(
             linkable_element_set.annotated_specs,
-            key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
+            key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.dunder_name,
         ):
             row_dict: dict[str, str] = {
-                "Dunder Name": annotated_spec.spec.qualified_name,
+                "Dunder Name": annotated_spec.spec.dunder_name,
             }
             spec_set = group_spec_by_type(annotated_spec.spec)
 
