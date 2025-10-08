@@ -47,13 +47,15 @@ docstring:
             <!--       ),                                            -->
             <!--     ),                                              -->
             <!--   )                                                 -->
-            <AggregateMeasuresNode>
-                <!-- description = 'Aggregate Measures' -->
+            <AggregateSimpleMetricInputsNode>
+                <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='am_1') -->
+                <!-- alias_mapping = {} -->
+                <!-- null_fill_value_mapping = {} -->
                 <FilterElementsNode>
                     <!-- description = "Pass Only Elements: ['listings']" -->
                     <!-- node_id = NodeId(id_str='pfe_2') -->
-                    <!-- include_spec = MeasureSpec(element_name='listings') -->
+                    <!-- include_spec = SimpleMetricInputSpec(element_name='listings') -->
                     <!-- distinct = False -->
                     <WhereConstraintNode>
                         <!-- description = 'Constrain Output with WHERE' -->
@@ -113,13 +115,15 @@ docstring:
                                     <!-- node_id = NodeId(id_str='cm_0') -->
                                     <!-- metric_spec = MetricSpec(element_name='bookings') -->
                                     <!-- for_group_by_source_node = True -->
-                                    <AggregateMeasuresNode>
-                                        <!-- description = 'Aggregate Measures' -->
+                                    <AggregateSimpleMetricInputsNode>
+                                        <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                                         <!-- node_id = NodeId(id_str='am_0') -->
+                                        <!-- alias_mapping = {} -->
+                                        <!-- null_fill_value_mapping = {} -->
                                         <FilterElementsNode>
                                             <!-- description = "Pass Only Elements: ['bookings', 'listing']" -->
                                             <!-- node_id = NodeId(id_str='pfe_0') -->
-                                            <!-- include_spec = MeasureSpec(element_name='bookings') -->
+                                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                             <!-- include_spec = EntitySpec(element_name='listing') -->
                                             <!-- distinct = False -->
                                             <MetricTimeDimensionTransformNode>
@@ -134,13 +138,13 @@ docstring:
                                                 </ReadSqlSourceNode>
                                             </MetricTimeDimensionTransformNode>
                                         </FilterElementsNode>
-                                    </AggregateMeasuresNode>
+                                    </AggregateSimpleMetricInputsNode>
                                 </ComputeMetricsNode>
                             </FilterElementsNode>
                         </JoinOnEntitiesNode>
                     </WhereConstraintNode>
                 </FilterElementsNode>
-            </AggregateMeasuresNode>
+            </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>
