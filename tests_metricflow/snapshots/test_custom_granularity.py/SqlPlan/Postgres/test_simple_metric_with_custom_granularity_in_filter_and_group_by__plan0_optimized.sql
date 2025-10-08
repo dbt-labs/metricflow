@@ -6,7 +6,7 @@ sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['bookings', 'metric_time__alien_day']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

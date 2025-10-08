@@ -21,7 +21,7 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 if typing.TYPE_CHECKING:
     from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
     from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-    from metricflow_semantics.specs.measure_spec import MeasureSpec
+    from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
     from metricflow_semantics.specs.metadata_spec import MetadataSpec
     from metricflow_semantics.specs.metric_spec import MetricSpec
 
@@ -192,7 +192,7 @@ class _GroupSpecByTypeVisitor(InstanceSpecVisitor[None]):
     group_by_metric_specs: List[GroupByMetricSpec] = dataclasses.field(default_factory=list)
 
     @override
-    def visit_measure_spec(self, measure_spec: MeasureSpec) -> None:
+    def visit_simple_metric_input_spec(self, spec: SimpleMetricInputSpec) -> None:
         pass
 
     @override

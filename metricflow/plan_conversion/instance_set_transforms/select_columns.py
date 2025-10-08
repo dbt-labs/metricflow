@@ -142,7 +142,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
                 spec_to_associated_columns[simplified_metric_spec] = columns
 
         measure_cols = []
-        for measure_instance in instance_set.measure_instances:
+        for measure_instance in instance_set.simple_metric_input_instances:
             columns = self._make_sql_column_expression(measure_instance)
             for column in columns:
                 measure_cols.append(column)
@@ -186,7 +186,7 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
         return CreateSelectColumnsResult.create(
             SelectColumnSet.create(
                 metric_columns=metric_cols,
-                measure_columns=measure_cols,
+                simple_metric_input_columns=measure_cols,
                 dimension_columns=dimension_cols,
                 time_dimension_columns=time_dimension_cols,
                 entity_columns=entity_cols,

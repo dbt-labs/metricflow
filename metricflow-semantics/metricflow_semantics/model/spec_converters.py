@@ -12,16 +12,19 @@ from __future__ import annotations
 
 from dbt_semantic_interfaces.protocols.measure import Measure
 
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 
 
 class MeasureConverter:
-    """Static class for converting Measure model objects to MeasureSpec instances."""
+    """Static class for converting Measure model objects to SimpleMetricInputSpec instances.
+
+    TODO: This class will be removed.
+    """
 
     @staticmethod
-    def convert_to_measure_spec(measure: Measure) -> MeasureSpec:
-        """Converts a Measure to a MeasureSpec, and properly handles non-additive dimension properties."""
+    def convert_to_measure_spec(measure: Measure) -> SimpleMetricInputSpec:
+        """Converts a Measure to a SimpleMetricInputSpec, and properly handles non-additive dimension properties."""
         non_additive_dimension_spec = (
             NonAdditiveDimensionSpec(
                 name=measure.non_additive_dimension.name,
@@ -32,7 +35,7 @@ class MeasureConverter:
             else None
         )
 
-        return MeasureSpec(
+        return SimpleMetricInputSpec(
             element_name=measure.name,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )

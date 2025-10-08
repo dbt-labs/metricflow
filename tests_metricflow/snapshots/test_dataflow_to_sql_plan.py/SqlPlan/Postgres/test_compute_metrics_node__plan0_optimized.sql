@@ -5,7 +5,7 @@ docstring:
 sql_engine: Postgres
 ---
 -- Join Standard Outputs
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 SELECT
   subq_7.listing AS listing

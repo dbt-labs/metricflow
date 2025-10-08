@@ -15,7 +15,7 @@ sql_without_cte:
   FROM (
     -- Join Standard Outputs
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       subq_1.metric_time__day AS metric_time__day
@@ -41,7 +41,7 @@ sql_without_cte:
   FULL OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['views', 'listing__country_latest', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       subq_10.metric_time__day AS metric_time__day
@@ -80,7 +80,7 @@ sql_without_cte:
     FROM (
       -- Join Standard Outputs
       -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         subq_1.metric_time__day AS metric_time__day
@@ -106,7 +106,7 @@ sql_without_cte:
     FULL OUTER JOIN (
       -- Join Standard Outputs
       -- Pass Only Elements: ['views', 'listing__country_latest', 'metric_time__day']
-      -- Aggregate Measures
+      -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         subq_10.metric_time__day AS metric_time__day
@@ -156,7 +156,7 @@ sql_with_cte:
   WITH cm_0_cte AS (
     -- Join Standard Outputs
     -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       subq_23.metric_time__day AS metric_time__day
@@ -183,7 +183,7 @@ sql_with_cte:
   , cm_1_cte AS (
     -- Join Standard Outputs
     -- Pass Only Elements: ['views', 'listing__country_latest', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       subq_32.metric_time__day AS metric_time__day

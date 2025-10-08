@@ -7,7 +7,7 @@ sql_engine: DuckDB
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['bookings', 'listing__user__ds__alien_day']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT

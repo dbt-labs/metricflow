@@ -16,7 +16,7 @@ from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
 from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
@@ -178,10 +178,10 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         )
 
     @override
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> SqlDataSet:
+    def visit_aggregate_simple_metric_inputs_node(self, node: AggregateSimpleMetricInputsNode) -> SqlDataSet:
         return self._default_handler(
             node=node,
-            node_to_select_subquery_function=super().visit_aggregate_measures_node,
+            node_to_select_subquery_function=super().visit_aggregate_simple_metric_inputs_node,
             use_spec_output_order=False,
         )
 

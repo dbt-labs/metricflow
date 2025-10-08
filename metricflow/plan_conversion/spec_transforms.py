@@ -77,7 +77,7 @@ class SelectOnlyLinkableSpecs(InstanceSpecSetTransform[InstanceSpecSet]):
     def transform(self, spec_set: InstanceSpecSet) -> InstanceSpecSet:  # noqa: D102
         return InstanceSpecSet(
             metric_specs=(),
-            measure_specs=(),
+            simple_metric_input_specs=(),
             dimension_specs=spec_set.dimension_specs,
             time_dimension_specs=spec_set.time_dimension_specs,
             entity_specs=spec_set.entity_specs,

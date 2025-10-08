@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from metricflow_semantics.specs.dimension_spec import DimensionSpec
     from metricflow_semantics.specs.entity_spec import EntitySpec
     from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
-    from metricflow_semantics.specs.measure_spec import MeasureSpec
+    from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
     from metricflow_semantics.specs.metadata_spec import MetadataSpec
     from metricflow_semantics.specs.metric_spec import MetricSpec
     from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -27,7 +27,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
     """Consolidates all specs used in an instance set."""
 
     metric_specs: Tuple[MetricSpec, ...] = ()
-    measure_specs: Tuple[MeasureSpec, ...] = ()
+    simple_metric_input_specs: Tuple[SimpleMetricInputSpec, ...] = ()
     dimension_specs: Tuple[DimensionSpec, ...] = ()
     entity_specs: Tuple[EntitySpec, ...] = ()
     time_dimension_specs: Tuple[TimeDimensionSpec, ...] = ()
@@ -38,7 +38,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
     def merge(self, other: InstanceSpecSet) -> InstanceSpecSet:
         return InstanceSpecSet(
             metric_specs=self.metric_specs + other.metric_specs,
-            measure_specs=self.measure_specs + other.measure_specs,
+            simple_metric_input_specs=self.simple_metric_input_specs + other.simple_metric_input_specs,
             dimension_specs=self.dimension_specs + other.dimension_specs,
             entity_specs=self.entity_specs + other.entity_specs,
             group_by_metric_specs=self.group_by_metric_specs + other.group_by_metric_specs,
@@ -62,7 +62,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
                 metric_specs_deduped.append(metric_spec)
 
         measure_specs_deduped = []
-        for measure_spec in self.measure_specs:
+        for measure_spec in self.simple_metric_input_specs:
             if measure_spec not in measure_specs_deduped:
                 measure_specs_deduped.append(measure_spec)
 
@@ -88,7 +88,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
 
         return InstanceSpecSet(
             metric_specs=tuple(metric_specs_deduped),
-            measure_specs=tuple(measure_specs_deduped),
+            simple_metric_input_specs=tuple(measure_specs_deduped),
             dimension_specs=tuple(dimension_specs_deduped),
             time_dimension_specs=tuple(time_dimension_specs_deduped),
             entity_specs=tuple(entity_specs_deduped),
@@ -108,7 +108,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
     def all_specs(self) -> Sequence[InstanceSpec]:  # noqa: D102
         return tuple(
             itertools.chain(
-                self.measure_specs,
+                self.simple_metric_input_specs,
                 self.dimension_specs,
                 self.time_dimension_specs,
                 self.entity_specs,
@@ -153,7 +153,7 @@ class _GroupSpecByTypeVisitor(InstanceSpecVisitor[None]):
     """Groups a spec by type into an `InstanceSpecSet`."""
 
     metric_specs: List[MetricSpec] = dataclasses.field(default_factory=list)
-    measure_specs: List[MeasureSpec] = dataclasses.field(default_factory=list)
+    simple_metric_input_specs: List[SimpleMetricInputSpec] = dataclasses.field(default_factory=list)
     dimension_specs: List[DimensionSpec] = dataclasses.field(default_factory=list)
     entity_specs: List[EntitySpec] = dataclasses.field(default_factory=list)
     time_dimension_specs: List[TimeDimensionSpec] = dataclasses.field(default_factory=list)
@@ -161,8 +161,8 @@ class _GroupSpecByTypeVisitor(InstanceSpecVisitor[None]):
     metadata_specs: List[MetadataSpec] = dataclasses.field(default_factory=list)
 
     @override
-    def visit_measure_spec(self, measure_spec: MeasureSpec) -> None:
-        self.measure_specs.append(measure_spec)
+    def visit_simple_metric_input_spec(self, spec: SimpleMetricInputSpec) -> None:
+        self.simple_metric_input_specs.append(spec)
 
     @override
     def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> None:
@@ -197,7 +197,7 @@ def group_specs_by_type(specs: Iterable[InstanceSpec]) -> InstanceSpecSet:
 
     return InstanceSpecSet(
         metric_specs=tuple(grouper.metric_specs),
-        measure_specs=tuple(grouper.measure_specs),
+        simple_metric_input_specs=tuple(grouper.simple_metric_input_specs),
         dimension_specs=tuple(grouper.dimension_specs),
         entity_specs=tuple(grouper.entity_specs),
         time_dimension_specs=tuple(grouper.time_dimension_specs),

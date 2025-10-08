@@ -14,7 +14,7 @@ from metricflow.dataflow.dataflow_plan import (
 )
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateMeasuresNode
+from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
 from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
@@ -72,19 +72,19 @@ class SourceScanOptimizer(
         ...
         <CombineAggregatedOutputsNode>
             <ComputeMetricsNode metrics="[metric0]">
-                <AggregateMeasuresNode>
+                <AggregateSimpleMetricInputsNode>
                 ...
-                </AggregateMeasuresNode>
+                </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
             <ComputeMetricsNode metrics="[metrics1]">
-                <AggregateMeasuresNode>
+                <AggregateSimpleMetricInputsNode>
                 ...
-                </AggregateMeasuresNode>
+                </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
             <ComputeMetricsNode metric="[metrics2]">
-                <AggregateMeasuresNode>
+                <AggregateSimpleMetricInputsNode>
                 ...
-                </AggregateMeasuresNode>
+                </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
         </CombineAggregatedOutputsNode>
         ...
@@ -92,14 +92,14 @@ class SourceScanOptimizer(
         ...
         <CombineAggregatedOutputsNode>
             <ComputeMetricsNode metrics="[metric0, metric1]">
-                <AggregateMeasuresNode>
+                <AggregateSimpleMetricInputsNode>
                 ...
-                </AggregateMeasuresNode>
+                </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
             <ComputeMetricsNode metrics="[metric2]">
-                <AggregateMeasuresNode>
+                <AggregateSimpleMetricInputsNode>
                 ...
-                </AggregateMeasuresNode>
+                </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
         </CombineAggregatedOutputsNode>
         ...
@@ -148,7 +148,9 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_aggregate_measures_node(self, node: AggregateMeasuresNode) -> OptimizeBranchResult:  # noqa: D102
+    def visit_aggregate_simple_metric_inputs_node(  # noqa: D102
+        self, node: AggregateSimpleMetricInputsNode
+    ) -> OptimizeBranchResult:
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 

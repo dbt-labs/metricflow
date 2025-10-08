@@ -134,7 +134,13 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: Optional[GroupByItemSetFilter] = None,
+        joins_disallowed: bool = False,
     ) -> BaseGroupByItemSet:
+        """Get the group-by items common to all metrics.
+
+        If `joins_disallowed` is set, then only group-by items that can be resolved using the semantic models where the
+        simple metrics are defined will be returned.
+        """
         label_to_references: defaultdict[MetricflowGraphLabel, set[ElementReference]] = defaultdict(set)
         for measure_reference in measure_references:
             label_to_references[MeasureLabel.get_instance(measure_reference.element_name)].add(measure_reference)
@@ -153,7 +159,9 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
             return GroupByItemSet()
 
         node_labels: FrozenOrderedSet[MetricflowGraphLabel] = FrozenOrderedSet(sorted(label_to_references))
-        cache_key = _CommonSetCacheKey(node_labels=node_labels, set_filter=set_filter)
+        cache_key = _CommonSetCacheKey(
+            node_labels=node_labels, set_filter=set_filter, joins_disallowed=joins_disallowed
+        )
         cached_result = self._result_cache_for_common_set.get(cache_key)
         if cached_result:
             return cached_result.value
@@ -176,8 +184,15 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
             source_nodes.add(mf_first_item(matching_nodes))
 
+        if joins_disallowed:
+            simple_trie = self._simple_resolver_limit_one_model.resolve_trie(source_nodes, set_filter).dunder_name_trie
+            return self._result_cache_for_common_set.set_and_get(
+                cache_key, GroupByItemSet.create_from_trie(simple_trie)
+            )
+
         simple_trie = self._simple_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
         group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
+
         return self._result_cache_for_common_set.set_and_get(
             cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         )
@@ -187,3 +202,4 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 class _CommonSetCacheKey:
     node_labels: FrozenOrderedSet[MetricflowGraphLabel]
     set_filter: Optional[GroupByItemSetFilter]
+    joins_disallowed: bool

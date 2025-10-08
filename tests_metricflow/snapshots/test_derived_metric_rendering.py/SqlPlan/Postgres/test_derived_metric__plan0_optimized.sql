@@ -8,7 +8,7 @@ SELECT
   metric_time__day
   , (bookings - ref_bookings) * 1.0 / bookings AS non_referred_bookings_pct
 FROM (
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day

@@ -14,7 +14,7 @@ FROM (
     subq_14.account_id__customer_id__customer_name
     , subq_14.txn_count
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_13.account_id__customer_id__customer_name
       , SUM(subq_13.txn_count) AS txn_count

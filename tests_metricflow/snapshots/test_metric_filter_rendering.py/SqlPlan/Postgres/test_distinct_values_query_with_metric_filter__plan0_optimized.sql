@@ -16,7 +16,7 @@ FROM (
     , lux_listing_mapping_src_28000.listing_id AS listing
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
   FULL OUTER JOIN (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT

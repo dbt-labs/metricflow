@@ -20,8 +20,8 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , is_instant AS booking__is_instant
-    , booking_value AS max_booking_value
     , booking_value AS average_booking_value
+    , booking_value AS max_booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -37,7 +37,7 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['average_booking_value', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
@@ -57,7 +57,7 @@ FROM (
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Pass Only Elements: ['max_booking_value', 'metric_time__day']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day

@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Update to `dbt-semantic-interfaces==0.9.4.dev0`
+time: 2025-10-08T13:07:06.525255-07:00
+custom:
+  Author: plypaul
+  Issue: "1889"

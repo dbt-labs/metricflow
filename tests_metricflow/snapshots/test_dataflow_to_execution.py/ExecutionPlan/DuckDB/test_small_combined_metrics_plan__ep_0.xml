@@ -25,7 +25,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    'FROM (\n'                                                                    -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                  -->
         <!--    "  -- Pass Only Elements: ['bookings', 'is_instant']\n"                       -->
-        <!--    '  -- Aggregate Measures\n'                                                   -->
+        <!--    '  -- Aggregate Inputs for Simple Metrics\n'                                  -->
         <!--    '  -- Compute Metrics via Expressions\n'                                      -->
         <!--    '  SELECT\n'                                                                  -->
         <!--    '    is_instant\n'                                                            -->
@@ -37,7 +37,7 @@ test_filename: test_dataflow_to_execution.py
         <!--    'FULL OUTER JOIN (\n'                                                         -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                  -->
         <!--    "  -- Pass Only Elements: ['booking_value', 'is_instant']\n"                  -->
-        <!--    '  -- Aggregate Measures\n'                                                   -->
+        <!--    '  -- Aggregate Inputs for Simple Metrics\n'                                  -->
         <!--    '  -- Compute Metrics via Expressions\n'                                      -->
         <!--    '  SELECT\n'                                                                  -->
         <!--    '    is_instant\n'                                                            -->

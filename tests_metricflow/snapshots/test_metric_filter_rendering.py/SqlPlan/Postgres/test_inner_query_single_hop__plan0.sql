@@ -12,7 +12,7 @@ FROM (
   SELECT
     subq_16.third_hop_count
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       COUNT(DISTINCT subq_15.third_hop_count) AS third_hop_count
     FROM (
@@ -184,17 +184,17 @@ FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_10.customer_id__customer_third_hop_id
-                , subq_10.customers_with_other_data AS customer_id__customer_third_hop_id__paraguayan_customers
+                , subq_10.paraguayan_customers AS customer_id__customer_third_hop_id__paraguayan_customers
               FROM (
-                -- Aggregate Measures
+                -- Aggregate Inputs for Simple Metrics
                 SELECT
                   subq_9.customer_id__customer_third_hop_id
-                  , SUM(subq_9.customers_with_other_data) AS customers_with_other_data
+                  , SUM(subq_9.paraguayan_customers) AS paraguayan_customers
                 FROM (
-                  -- Pass Only Elements: ['customers_with_other_data', 'customer_id__customer_third_hop_id']
+                  -- Pass Only Elements: ['paraguayan_customers', 'customer_id__customer_third_hop_id']
                   SELECT
                     subq_8.customer_id__customer_third_hop_id
-                    , subq_8.customers_with_other_data
+                    , subq_8.paraguayan_customers
                   FROM (
                     -- Constrain Output with WHERE
                     SELECT
@@ -249,7 +249,7 @@ FROM (
                       , subq_7.country
                       , subq_7.customer_id__country
                       , subq_7.customer_third_hop_id__country
-                      , subq_7.customers_with_other_data
+                      , subq_7.paraguayan_customers
                     FROM (
                       -- Metric Time Dimension 'acquired_ds'
                       SELECT
@@ -304,11 +304,11 @@ FROM (
                         , subq_6.country
                         , subq_6.customer_id__country
                         , subq_6.customer_third_hop_id__country
-                        , subq_6.customers_with_other_data
+                        , subq_6.paraguayan_customers
                       FROM (
                         -- Read Elements From Semantic Model 'customer_other_data'
                         SELECT
-                          1 AS customers_with_other_data
+                          1 AS paraguayan_customers
                           , customer_other_data_src_22000.country
                           , DATE_TRUNC('day', customer_other_data_src_22000.acquired_ds) AS acquired_ds__day
                           , DATE_TRUNC('week', customer_other_data_src_22000.acquired_ds) AS acquired_ds__week

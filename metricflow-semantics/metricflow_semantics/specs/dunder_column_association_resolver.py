@@ -9,7 +9,7 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -40,8 +40,8 @@ class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociati
     def visit_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(metric_spec.alias or metric_spec.element_name)
 
-    def visit_measure_spec(self, measure_spec: MeasureSpec) -> ColumnAssociation:  # noqa: D102
-        return ColumnAssociation(measure_spec.element_name)
+    def visit_simple_metric_input_spec(self, spec: SimpleMetricInputSpec) -> ColumnAssociation:  # noqa: D102
+        return ColumnAssociation(spec.element_name)
 
     def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(dimension_spec.alias or dimension_spec.qualified_name)

@@ -33,7 +33,7 @@ FROM (
         , subq_18.bookings AS bookings
       FROM rss_28018_cte
       INNER JOIN (
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
           , SUM(bookings) AS bookings

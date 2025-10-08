@@ -7,7 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
@@ -87,14 +87,14 @@ def test_cte_for_simple_dataflow_plan(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
     """Test a simple case for generating a CTE for a specific dataflow plan node."""
-    measure_spec = MeasureSpec(
+    measure_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filter_node = FilterElementsNode.create(
-        parent_node=source_node, include_specs=InstanceSpecSet(measure_specs=(measure_spec,))
+        parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(measure_spec,))
     )
 
     convert_and_check(

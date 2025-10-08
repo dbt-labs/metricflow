@@ -9,13 +9,13 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.instances import (
     InstanceSet,
-    MeasureInstance,
+    SimpleMetricInputInstance,
 )
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
@@ -49,15 +49,15 @@ def test_no_parent_node_data_set(
 
     data_set = SqlDataSet(
         instance_set=InstanceSet(
-            measure_instances=(
-                MeasureInstance(
+            simple_metric_input_instances=(
+                SimpleMetricInputInstance(
                     associated_columns=(ColumnAssociation("bookings"),),
                     defined_from=(
                         SemanticModelElementReference(
                             semantic_model_name="fct_bookings_semantic_model", element_name="bookings"
                         ),
                     ),
-                    spec=MeasureSpec(
+                    spec=SimpleMetricInputSpec(
                         element_name="bookings",
                     ),
                     aggregation_state=AggregationState.NON_AGGREGATED,

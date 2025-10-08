@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
@@ -259,7 +259,7 @@ class TimeDimensionSpec(DimensionSpec):  # noqa: D101
         )
 
     @staticmethod
-    def with_base_grains(time_dimension_specs: Sequence[TimeDimensionSpec]) -> Tuple[TimeDimensionSpec, ...]:
+    def with_base_grains(time_dimension_specs: Iterable[TimeDimensionSpec]) -> Tuple[TimeDimensionSpec, ...]:
         """Return the list of time dimension specs, replacing any custom grains with base grains.
 
         Dedupes new specs, but preserves the initial order.

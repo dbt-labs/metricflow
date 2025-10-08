@@ -6,7 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
@@ -70,13 +70,14 @@ def test_filter_combination(
     """Tests combining a single node."""
     source0 = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["bookings_source"]
     filter0 = FilterElementsNode.create(
-        parent_node=source0, include_specs=InstanceSpecSet(measure_specs=(MeasureSpec(element_name="bookings"),))
+        parent_node=source0,
+        include_specs=InstanceSpecSet(simple_metric_input_specs=(SimpleMetricInputSpec(element_name="bookings"),)),
     )
     source1 = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["bookings_source"]
     filter1 = FilterElementsNode.create(
         parent_node=source1,
         include_specs=InstanceSpecSet(
-            measure_specs=(MeasureSpec(element_name="booking_value"),),
+            simple_metric_input_specs=(SimpleMetricInputSpec(element_name="booking_value"),),
         ),
     )
     combiner = ComputeMetricsBranchCombiner(filter0)
