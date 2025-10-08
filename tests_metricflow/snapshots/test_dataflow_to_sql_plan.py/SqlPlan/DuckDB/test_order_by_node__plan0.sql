@@ -16,7 +16,7 @@ FROM (
     , subq_2.is_instant
     , subq_2.bookings
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_1.ds__day
       , subq_1.is_instant

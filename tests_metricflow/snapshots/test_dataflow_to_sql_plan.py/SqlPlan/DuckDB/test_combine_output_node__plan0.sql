@@ -11,7 +11,7 @@ SELECT
   , COALESCE(MAX(subq_5.instant_bookings), 1) AS instant_bookings
   , COALESCE(MAX(subq_5.bookers), 1) AS bookers
 FROM (
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_1.is_instant
     , SUM(subq_1.bookings) AS bookings
@@ -127,7 +127,7 @@ FROM (
     subq_1.is_instant
 ) subq_2
 FULL OUTER JOIN (
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_4.is_instant
     , SUM(subq_4.instant_bookings) AS instant_bookings

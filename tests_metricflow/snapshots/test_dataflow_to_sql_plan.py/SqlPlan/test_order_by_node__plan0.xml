@@ -25,7 +25,7 @@ docstring:
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
-                <!-- description = 'Aggregate Measures' -->
+                <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='ss_2') -->
                 <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_4), column_alias='ds__day') -->
                 <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_3), column_alias='is_instant') -->

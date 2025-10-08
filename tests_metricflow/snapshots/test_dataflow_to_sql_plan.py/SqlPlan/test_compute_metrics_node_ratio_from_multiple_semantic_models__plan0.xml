@@ -87,7 +87,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = 'Aggregate Measures' -->
+                        <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='ss_243') -->
                         <!-- col0 =                                                                                       -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_292), column_alias='ds__day') -->
@@ -2415,7 +2415,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = 'Aggregate Measures' -->
+                        <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='ss_252') -->
                         <!-- col0 =                                                                                       -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_428), column_alias='ds__day') -->

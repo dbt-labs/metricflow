@@ -8,7 +8,7 @@ test_filename: test_dataflow_to_execution.py
         <!-- sql =                                                                               -->
         <!--   ('-- Join Standard Outputs\n'                                                     -->
         <!--    "-- Pass Only Elements: ['bookings', 'is_instant', 'listing__country_latest']\n" -->
-        <!--    '-- Aggregate Measures\n'                                                        -->
+        <!--    '-- Aggregate Inputs for Simple Metrics\n'                                       -->
         <!--    '-- Compute Metrics via Expressions\n'                                           -->
         <!--    '-- Write to DataTable\n'                                                        -->
         <!--    'SELECT\n'                                                                       -->

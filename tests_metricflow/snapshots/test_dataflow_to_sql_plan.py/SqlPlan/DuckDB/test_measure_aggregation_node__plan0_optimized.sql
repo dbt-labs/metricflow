@@ -8,7 +8,7 @@ sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'bookings_source'
 -- Pass Only Elements: ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 SELECT
   SUM(1) AS bookings
   , AVG(booking_value) AS average_booking_value

@@ -10,7 +10,7 @@ SELECT
   , subq_5.listing__country_latest
   , CAST(subq_5.bookings AS DOUBLE) / CAST(NULLIF(subq_5.bookers, 0) AS DOUBLE) AS bookings_per_booker
 FROM (
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_4.listing
     , subq_4.listing__country_latest

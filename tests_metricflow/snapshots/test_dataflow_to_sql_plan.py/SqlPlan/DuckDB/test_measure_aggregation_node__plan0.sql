@@ -6,7 +6,7 @@ docstring:
       Covers SUM, AVERAGE, SUM_BOOLEAN (transformed to SUM upstream), and COUNT_DISTINCT agg types
 sql_engine: DuckDB
 ---
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 SELECT
   SUM(subq_1.bookings) AS bookings
   , AVG(subq_1.average_booking_value) AS average_booking_value

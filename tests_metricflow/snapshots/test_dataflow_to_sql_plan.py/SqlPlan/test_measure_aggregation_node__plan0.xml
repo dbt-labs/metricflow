@@ -7,7 +7,7 @@ docstring:
 ---
 <SqlPlan>
     <SqlSelectStatementNode>
-        <!-- description = 'Aggregate Measures' -->
+        <!-- description = 'Aggregate Inputs for Simple Metrics' -->
         <!-- node_id = NodeId(id_str='ss_2') -->
         <!-- col0 =                                                                    -->
         <!--   SqlSelectColumn(                                                        -->

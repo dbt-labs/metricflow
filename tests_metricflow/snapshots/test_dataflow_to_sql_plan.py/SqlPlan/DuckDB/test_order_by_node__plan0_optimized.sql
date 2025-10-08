@@ -4,7 +4,7 @@ docstring:
   Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node.
 sql_engine: DuckDB
 ---
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Order By ['ds__day', 'bookings']
 SELECT

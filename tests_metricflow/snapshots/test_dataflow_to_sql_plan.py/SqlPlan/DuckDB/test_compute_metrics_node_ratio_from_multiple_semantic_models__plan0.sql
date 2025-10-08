@@ -29,7 +29,7 @@ FROM (
         , subq_7.listing__country_latest
         , subq_7.bookings
       FROM (
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_6.ds__day
           , subq_6.listing__country_latest
@@ -522,7 +522,7 @@ FROM (
         , subq_15.listing__country_latest
         , subq_15.views
       FROM (
-        -- Aggregate Measures
+        -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_14.ds__day
           , subq_14.listing__country_latest

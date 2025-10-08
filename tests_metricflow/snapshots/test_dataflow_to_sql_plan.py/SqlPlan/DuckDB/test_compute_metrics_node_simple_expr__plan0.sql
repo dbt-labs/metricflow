@@ -10,7 +10,7 @@ SELECT
   , subq_5.listing__country_latest
   , booking_value * 0.05 AS booking_fees
 FROM (
-  -- Aggregate Measures
+  -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_4.listing
     , subq_4.listing__country_latest
