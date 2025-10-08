@@ -14,7 +14,7 @@ FROM (
     subq_36.listing__user__ds__alien_day
     , subq_36.bookings
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_35.listing__user__ds__alien_day
       , SUM(subq_35.bookings) AS bookings
@@ -115,18 +115,27 @@ FROM (
           , subq_25.is_instant AS is_instant
           , subq_25.booking__is_instant AS booking__is_instant
           , subq_25.bookings AS bookings
+          , subq_25.average_booking_value AS average_booking_value
           , subq_25.instant_bookings AS instant_bookings
           , subq_25.booking_value AS booking_value
           , subq_25.max_booking_value AS max_booking_value
           , subq_25.min_booking_value AS min_booking_value
+          , subq_25.instant_booking_value AS instant_booking_value
+          , subq_25.average_instant_booking_value AS average_instant_booking_value
+          , subq_25.booking_value_for_non_null_listing_id AS booking_value_for_non_null_listing_id
           , subq_25.bookers AS bookers
-          , subq_25.average_booking_value AS average_booking_value
           , subq_25.referred_bookings AS referred_bookings
           , subq_25.median_booking_value AS median_booking_value
           , subq_25.booking_value_p99 AS booking_value_p99
           , subq_25.discrete_booking_value_p99 AS discrete_booking_value_p99
           , subq_25.approximate_continuous_booking_value_p99 AS approximate_continuous_booking_value_p99
           , subq_25.approximate_discrete_booking_value_p99 AS approximate_discrete_booking_value_p99
+          , subq_25.bookings_join_to_time_spine AS bookings_join_to_time_spine
+          , subq_25.bookings_fill_nulls_with_0_without_time_spine AS bookings_fill_nulls_with_0_without_time_spine
+          , subq_25.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+          , subq_25.instant_bookings_with_measure_filter AS instant_bookings_with_measure_filter
+          , subq_25.bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
+          , subq_25.bookers_fill_nulls_with_0_join_to_timespine AS bookers_fill_nulls_with_0_join_to_timespine
           , subq_33.alien_day AS listing__user__ds__alien_day
         FROM (
           -- Metric Time Dimension 'ds'
@@ -217,35 +226,53 @@ FROM (
             , subq_24.is_instant
             , subq_24.booking__is_instant
             , subq_24.bookings
+            , subq_24.average_booking_value
             , subq_24.instant_bookings
             , subq_24.booking_value
             , subq_24.max_booking_value
             , subq_24.min_booking_value
+            , subq_24.instant_booking_value
+            , subq_24.average_instant_booking_value
+            , subq_24.booking_value_for_non_null_listing_id
             , subq_24.bookers
-            , subq_24.average_booking_value
             , subq_24.referred_bookings
             , subq_24.median_booking_value
             , subq_24.booking_value_p99
             , subq_24.discrete_booking_value_p99
             , subq_24.approximate_continuous_booking_value_p99
             , subq_24.approximate_discrete_booking_value_p99
+            , subq_24.bookings_join_to_time_spine
+            , subq_24.bookings_fill_nulls_with_0_without_time_spine
+            , subq_24.bookings_fill_nulls_with_0
+            , subq_24.instant_bookings_with_measure_filter
+            , subq_24.bookings_join_to_time_spine_with_tiered_filters
+            , subq_24.bookers_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             SELECT
               1 AS bookings
+              , bookings_source_src_28000.booking_value AS average_booking_value
               , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
               , bookings_source_src_28000.booking_value
               , bookings_source_src_28000.booking_value AS max_booking_value
               , bookings_source_src_28000.booking_value AS min_booking_value
+              , bookings_source_src_28000.booking_value AS instant_booking_value
+              , bookings_source_src_28000.booking_value AS average_instant_booking_value
+              , bookings_source_src_28000.booking_value AS booking_value_for_non_null_listing_id
               , bookings_source_src_28000.guest_id AS bookers
-              , bookings_source_src_28000.booking_value AS average_booking_value
-              , bookings_source_src_28000.booking_value AS booking_payments
               , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
               , bookings_source_src_28000.booking_value AS median_booking_value
               , bookings_source_src_28000.booking_value AS booking_value_p99
               , bookings_source_src_28000.booking_value AS discrete_booking_value_p99
               , bookings_source_src_28000.booking_value AS approximate_continuous_booking_value_p99
               , bookings_source_src_28000.booking_value AS approximate_discrete_booking_value_p99
+              , 1 AS bookings_join_to_time_spine
+              , 1 AS bookings_fill_nulls_with_0_without_time_spine
+              , 1 AS bookings_fill_nulls_with_0
+              , 1 AS instant_bookings_with_measure_filter
+              , 1 AS bookings_join_to_time_spine_with_tiered_filters
+              , bookings_source_src_28000.guest_id AS bookers_fill_nulls_with_0_join_to_timespine
+              , bookings_source_src_28000.booking_value AS booking_payments
               , bookings_source_src_28000.is_instant
               , DATE_TRUNC('day', bookings_source_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', bookings_source_src_28000.ds) AS ds__week
@@ -496,8 +523,10 @@ FROM (
               , subq_27.listing__is_lux_latest AS listing__is_lux_latest
               , subq_27.listing__capacity_latest AS listing__capacity_latest
               , subq_27.listings AS listings
-              , subq_27.largest_listing AS largest_listing
+              , subq_27.lux_listings AS lux_listings
               , subq_27.smallest_listing AS smallest_listing
+              , subq_27.largest_listing AS largest_listing
+              , subq_27.active_listings AS active_listings
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
@@ -566,14 +595,18 @@ FROM (
                 , subq_26.listing__is_lux_latest
                 , subq_26.listing__capacity_latest
                 , subq_26.listings
-                , subq_26.largest_listing
+                , subq_26.lux_listings
                 , subq_26.smallest_listing
+                , subq_26.largest_listing
+                , subq_26.active_listings
               FROM (
                 -- Read Elements From Semantic Model 'listings_latest'
                 SELECT
                   1 AS listings
-                  , listings_latest_src_28000.capacity AS largest_listing
+                  , 1 AS lux_listings
                   , listings_latest_src_28000.capacity AS smallest_listing
+                  , listings_latest_src_28000.capacity AS largest_listing
+                  , 1 AS active_listings
                   , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
                   , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
                   , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month
@@ -1205,8 +1238,12 @@ FROM (
                 FROM (
                   -- Read Elements From Semantic Model 'users_ds_source'
                   SELECT
-                    1 AS new_users
+                    1 AS subdaily_join_to_time_spine_metric
+                    , 1 AS simple_subdaily_metric_default_day
+                    , 1 AS simple_subdaily_metric_default_hour
+                    , 1 AS archived_users_join_to_time_spine
                     , 1 AS archived_users
+                    , 1 AS new_users
                     , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
                     , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
                     , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month

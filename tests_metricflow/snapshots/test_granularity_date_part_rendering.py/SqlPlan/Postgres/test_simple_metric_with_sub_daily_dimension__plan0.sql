@@ -12,7 +12,7 @@ FROM (
     subq_3.user__archived_at__hour
     , subq_3.new_users
   FROM (
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_2.user__archived_at__hour
       , SUM(subq_2.new_users) AS new_users
@@ -216,8 +216,12 @@ FROM (
         FROM (
           -- Read Elements From Semantic Model 'users_ds_source'
           SELECT
-            1 AS new_users
+            1 AS subdaily_join_to_time_spine_metric
+            , 1 AS simple_subdaily_metric_default_day
+            , 1 AS simple_subdaily_metric_default_hour
+            , 1 AS archived_users_join_to_time_spine
             , 1 AS archived_users
+            , 1 AS new_users
             , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
             , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
             , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month

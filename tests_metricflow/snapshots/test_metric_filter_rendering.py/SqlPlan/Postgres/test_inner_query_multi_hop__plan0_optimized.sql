@@ -6,7 +6,7 @@ sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
 -- Pass Only Elements: ['third_hop_count']
--- Aggregate Measures
+-- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
@@ -20,7 +20,7 @@ FROM (
   LEFT OUTER JOIN (
     -- Join Standard Outputs
     -- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_third_hop_id']
-    -- Aggregate Measures
+    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['account_id__customer_id__customer_third_hop_id', 'account_id__customer_id__customer_third_hop_id__txn_count']
     SELECT
