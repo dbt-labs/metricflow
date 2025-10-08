@@ -4,7 +4,7 @@ import collections
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Tuple
 
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 
 
@@ -12,17 +12,17 @@ from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDi
 class GroupedMeasureSpecsByAdditiveness:
     """Results after grouping measures by their additive properties."""
 
-    grouped_semi_additive_measures: Sequence[Tuple[MeasureSpec, ...]]
-    additive_measures: Tuple[MeasureSpec, ...]
+    grouped_semi_additive_measures: Sequence[Tuple[SimpleMetricInputSpec, ...]]
+    additive_measures: Tuple[SimpleMetricInputSpec, ...]
 
     @property
-    def measures_by_additiveness(self) -> Dict[Optional[NonAdditiveDimensionSpec], Tuple[MeasureSpec, ...]]:
+    def measures_by_additiveness(self) -> Dict[Optional[NonAdditiveDimensionSpec], Tuple[SimpleMetricInputSpec, ...]]:
         """Returns a mapping from additiveness spec to a tuple of measure specs.
 
         This is useful if you wish to consume the tuples of MeasureSpecs in a single pass without having to
         divide calls up by the existence of an additiveness specification
         """
-        additiveness_to_measures: Dict[Optional[NonAdditiveDimensionSpec], Tuple[MeasureSpec, ...]] = {}
+        additiveness_to_measures: Dict[Optional[NonAdditiveDimensionSpec], Tuple[SimpleMetricInputSpec, ...]] = {}
         if self.additive_measures:
             additiveness_to_measures[None] = self.additive_measures
 
@@ -35,7 +35,9 @@ class GroupedMeasureSpecsByAdditiveness:
         return additiveness_to_measures
 
 
-def group_measure_specs_by_additiveness(measure_specs: Sequence[MeasureSpec]) -> GroupedMeasureSpecsByAdditiveness:
+def group_measure_specs_by_additiveness(
+    measure_specs: Sequence[SimpleMetricInputSpec],
+) -> GroupedMeasureSpecsByAdditiveness:
     """Bucket the provided measure specs by.
 
     - Additive Measures

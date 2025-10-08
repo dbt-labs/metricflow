@@ -4,10 +4,11 @@ import logging
 from typing import Dict, Final, Iterable, Optional, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import MetricInput
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import (
@@ -16,9 +17,10 @@ from metricflow_semantics.errors.error_classes import (
     NonExistentMeasureError,
     UnknownMetricError,
 )
+from metricflow_semantics.experimental.cache.mf_cache import ResultCache
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricflowInternalError
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
+from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
@@ -30,6 +32,7 @@ from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     GroupByItemSetResolver,
 )
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
@@ -76,17 +79,59 @@ class MetricLookup:
             MetricReference, Sequence[TimeDimensionSpec]
         ] = {}
 
+        self._result_cache_for_aggregation_time_dimension_specs: ResultCache[
+            str, FrozenOrderedSet[TimeDimensionSpec]
+        ] = ResultCache()
+
+        self._result_cache_for_derived_from_semantic_models: ResultCache[
+            MetricReference, FrozenOrderedSet[SemanticModelReference]
+        ] = ResultCache()
+
     def get_group_by_items_for_distinct_values_query(
         self, set_filter: GroupByItemSetFilter = GroupByItemSetFilter.create()
     ) -> BaseGroupByItemSet:
         """Return the reachable linkable elements for a dimension values query with no metrics."""
         return self._group_by_item_set_resolver.get_set_for_distinct_values_query(set_filter)
 
+    def get_derived_from_semantic_models(self, metric_reference: MetricReference) -> OrderedSet[SemanticModelReference]:
+        """Return the semantic models that the given metric is derived from.
+
+        i.e. the set of semantic models where constituent simple metrics are located.
+        """
+        result_cache = self._result_cache_for_derived_from_semantic_models
+        result = result_cache.get(metric_reference)
+        if result:
+            return result.value
+
+        metric = self.get_metric(metric_reference)
+        metric_inputs = MetricLookup.metric_inputs(metric, include_conversion_metric_input=True)
+
+        model_references: MutableOrderedSet[SemanticModelReference] = MutableOrderedSet()
+        if len(metric_inputs) == 0:
+            metric_aggregation_params = metric.type_params.metric_aggregation_params
+            if metric_aggregation_params is None:
+                raise MetricflowInternalError(
+                    LazyFormat("Expected `metric_aggregation_params` to be set", metric=metric)
+                )
+            model_references.add(SemanticModelReference(metric_aggregation_params.semantic_model))
+        else:
+            model_references.update(
+                *(
+                    self.get_derived_from_semantic_models(MetricReference(metric_input.name))
+                    for metric_input in metric_inputs
+                )
+            )
+
+        return self._result_cache_for_derived_from_semantic_models.set_and_get(
+            metric_reference, model_references.as_frozen()
+        )
+
     def get_common_group_by_items(
         self,
         measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: GroupByItemSetFilter = DEFAULT_COMMON_SET_FILTER,
+        limit_one_model: bool = False,
     ) -> BaseGroupByItemSet:
         """Gets the set of the valid group-by items common to all inputs."""
         if set_filter.element_name_allowlist is None:
@@ -94,6 +139,7 @@ class MetricLookup:
                 measure_references=measure_references,
                 metric_references=metric_references,
                 set_filter=set_filter,
+                limit_one_model=limit_one_model,
             )
 
         # If the filter specifies element names, make the call to the resolver without element names to get better
@@ -219,6 +265,49 @@ class MetricLookup:
             assert_values_exhausted(metric_type)
 
         return metric_inputs
+
+    def get_aggregation_time_dimension_specs(self, metric_reference: MetricReference) -> OrderedSet[TimeDimensionSpec]:
+        """Return the time dimension specs that are used for aggregating the simple metric."""
+        metric_name = metric_reference.element_name
+        cache_key = metric_name
+        result = self._result_cache_for_aggregation_time_dimension_specs.get(cache_key)
+        if result:
+            return result.value
+
+        metric_inputs = MetricLookup.metric_inputs(
+            self.get_metric(metric_reference), include_conversion_metric_input=False
+        )
+        if len(metric_inputs) > 0:
+            intersection_result = MutableOrderedSet(
+                self.get_aggregation_time_dimension_specs(MetricReference(metric_inputs[0].name))
+            )
+            for metric_input in metric_inputs[1:]:
+                intersection_result.intersection_update(
+                    self.get_aggregation_time_dimension_specs(MetricReference(metric_input.name))
+                )
+        else:
+            simple_metric_input = self._manifest_object_lookup.simple_metric_name_to_input.get(metric_name)
+            if simple_metric_input is None:
+                raise ValueError(
+                    LazyFormat(
+                        "Unable to find a simple metric with the given name",
+                        metric_name=metric_name,
+                    )
+                )
+
+            group_by_item_set = self.get_common_group_by_items(
+                metric_references=(metric_reference,),
+                set_filter=GroupByItemSetFilter.create(
+                    element_name_allowlist=(simple_metric_input.agg_time_dimension_name, METRIC_TIME_ELEMENT_NAME)
+                ),
+                limit_one_model=True,
+            )
+            spec_set = group_specs_by_type(group_by_item_set.specs)
+            intersection_result = MutableOrderedSet(spec_set.time_dimension_specs)
+
+        return self._result_cache_for_aggregation_time_dimension_specs.set_and_get(
+            cache_key, intersection_result.as_frozen()
+        )
 
     def _add_metric(self, metric: Metric) -> None:
         """Add metric, validating presence of required measures."""

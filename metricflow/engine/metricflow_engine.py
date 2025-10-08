@@ -815,22 +815,17 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         for pydantic_metric in metric_lookup.get_metrics(metric_lookup.metric_references):
             if pydantic_metric.type_params.is_private:
                 continue
-            semantic_models = []
-            for measure in pydantic_metric.input_measures:
-                semantic_model_reference = (
-                    self._semantic_manifest_lookup.semantic_model_lookup.measure_lookup.get_properties(
-                        measure_reference=measure.measure_reference
-                    ).model_reference
-                )
-                if semantic_model_reference not in semantic_models:
-                    semantic_models.append(semantic_model_reference)
             metric = Metric.from_pydantic(
                 pydantic_metric=pydantic_metric,
                 dimensions=self.simple_dimensions_for_metrics([pydantic_metric.name]) if include_dimensions else [],
-                semantic_models=semantic_models,
+                semantic_models=list(
+                    self._semantic_manifest_lookup.metric_lookup.get_derived_from_semantic_models(
+                        MetricReference(pydantic_metric.name)
+                    )
+                ),
             )
             metrics.append(metric)
-        return sorted(metrics, key=lambda x: x.default_search_and_sort_attribute)
+        return sorted(metrics, key=lambda m: m.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_saved_queries(self) -> List[SavedQuery]:  # noqa: D102

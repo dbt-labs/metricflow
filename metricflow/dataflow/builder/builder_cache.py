@@ -8,7 +8,7 @@ from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 
-from metricflow.dataflow.builder.measure_spec_properties import MeasureSpecProperties
+from metricflow.dataflow.builder.measure_spec_properties import SimpleMetricInputSpecProperties
 from metricflow.dataflow.builder.source_node_recipe import SourceNodeRecipe
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.plan_conversion.node_processor import PredicatePushdownState
@@ -20,7 +20,7 @@ class FindSourceNodeRecipeParameterSet:
 
     linkable_spec_set: LinkableSpecSet
     predicate_pushdown_state: PredicatePushdownState
-    measure_spec_properties: Optional[MeasureSpecProperties]
+    spec_properties: Optional[SimpleMetricInputSpecProperties]
 
 
 @dataclass(frozen=True)

@@ -525,7 +525,7 @@ def _data_warehouse_validations_runner(
         dw_validator.validate_entities, manifest=manifest, validation_type="entities", timeout=timeout
     )
     measure_results = _run_dw_validations(
-        dw_validator.validate_measures, manifest=manifest, validation_type="measures", timeout=timeout
+        dw_validator.validate_simple_metrics, manifest=manifest, validation_type="measures", timeout=timeout
     )
     metric_results = _run_dw_validations(
         dw_validator.validate_metrics, manifest=manifest, validation_type="metrics", timeout=timeout

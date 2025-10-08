@@ -35,6 +35,7 @@ class GroupByItemSetResolver(ABC):
         measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: Optional[GroupByItemSetFilter] = None,
+        limit_one_model: bool = False,
     ) -> BaseGroupByItemSet:
         """Gets the set of the valid group-by items common to all inputs."""
         raise NotImplementedError

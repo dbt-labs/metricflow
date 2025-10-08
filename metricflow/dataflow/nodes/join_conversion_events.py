@@ -9,7 +9,7 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec
+from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 
@@ -37,7 +37,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
     base_node: DataflowPlanNode
     base_time_dimension_spec: TimeDimensionSpec
     conversion_node: DataflowPlanNode
-    conversion_measure_spec: MeasureSpec
+    conversion_measure_spec: SimpleMetricInputSpec
     conversion_time_dimension_spec: TimeDimensionSpec
     unique_identifier_keys: Tuple[InstanceSpec, ...]
     entity_spec: EntitySpec
@@ -49,7 +49,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
         base_node: DataflowPlanNode,
         base_time_dimension_spec: TimeDimensionSpec,
         conversion_node: DataflowPlanNode,
-        conversion_measure_spec: MeasureSpec,
+        conversion_simple_metric_input_spec: SimpleMetricInputSpec,
         conversion_time_dimension_spec: TimeDimensionSpec,
         unique_identifier_keys: Sequence[InstanceSpec],
         entity_spec: EntitySpec,
@@ -61,7 +61,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
             base_node=base_node,
             base_time_dimension_spec=base_time_dimension_spec,
             conversion_node=conversion_node,
-            conversion_measure_spec=conversion_measure_spec,
+            conversion_measure_spec=conversion_simple_metric_input_spec,
             conversion_time_dimension_spec=conversion_time_dimension_spec,
             unique_identifier_keys=tuple(unique_identifier_keys),
             entity_spec=entity_spec,

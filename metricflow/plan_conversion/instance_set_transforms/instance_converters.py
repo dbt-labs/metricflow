@@ -6,7 +6,9 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -29,7 +31,6 @@ from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
-from metricflow_semantics.specs.measure_spec import MeasureSpec, MetricInputMeasureSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
@@ -43,6 +44,7 @@ from metricflow_semantics.sql.sql_exprs import (
 from more_itertools import bucket
 from typing_extensions import TypeVar
 
+from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping, NullFillValueMapping
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import (
@@ -327,33 +329,27 @@ class ChangeMeasureAggregationState(InstanceSetTransform[InstanceSet]):
 class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
     """Returns a new instance set where all measures have been assigned the fill nulls with property."""
 
-    def __init__(self, metric_input_measure_specs: Sequence[MetricInputMeasureSpec]):
+    def __init__(self, null_fill_value_mapping: NullFillValueMapping):
         """Initializer stores the input specs, which contain the fill_nulls_with for each measure."""
-        self.metric_input_measure_specs = metric_input_measure_specs
+        self._null_fill_value_mapping = null_fill_value_mapping
 
     def _update_fill_nulls_with(self, measure_instances: Tuple[MeasureInstance, ...]) -> Tuple[MeasureInstance, ...]:
         """Update all measure instances with the corresponding fill_nulls_with value."""
         updated_instances: List[MeasureInstance] = []
         for instance in measure_instances:
-            # There might be multiple matching specs, but they'll all have the same fill_nulls_with value so we can use any of them.
-            matching_specs = [spec for spec in self.metric_input_measure_specs if spec.measure_spec == instance.spec]
-            assert (
-                len(matching_specs) >= 1
-            ), f"Found no matching input measure spec for measure instance {instance}. Something has been misconfigured."
-
-            measure_spec = MeasureSpec(
-                element_name=instance.spec.element_name,
-                fill_nulls_with=matching_specs[0].fill_nulls_with,
-                non_additive_dimension_spec=instance.spec.non_additive_dimension_spec,
-            )
-            updated_instances.append(
-                MeasureInstance(
-                    associated_columns=instance.associated_columns,
-                    spec=measure_spec,
-                    aggregation_state=instance.aggregation_state,
-                    defined_from=instance.defined_from,
+            spec = instance.spec
+            mapped_spec = self._null_fill_value_mapping.null_fill_value_spec(spec)
+            if mapped_spec is not None:
+                updated_instances.append(
+                    MeasureInstance(
+                        associated_columns=instance.associated_columns,
+                        spec=mapped_spec,
+                        aggregation_state=instance.aggregation_state,
+                        defined_from=instance.defined_from,
+                    )
                 )
-            )
+            else:
+                updated_instances.append(instance)
 
         return tuple(updated_instances)
 
@@ -372,43 +368,34 @@ class UpdateMeasureFillNullsWith(InstanceSetTransform[InstanceSet]):
 class AliasAggregatedMeasures(InstanceSetTransform[InstanceSet]):
     """Returns a new instance set where all measures have been assigned an alias spec."""
 
-    def __init__(self, metric_input_measure_specs: Sequence[MetricInputMeasureSpec]):
+    def __init__(self, alias_mapping: InstanceAliasMapping) -> None:
         """Initializer stores the input specs, which contain the aliases for each measure.
 
-        Note this class only works if used in conjunction with an AggregateMeasuresNode that has been generated
+        Note this class only works if used in conjunction with an AggregateSimpleMetricInputsNode that has been generated
         by querying a single semantic model for a single set of aggregated measures. This is currently enforced
-        by the structure of the DataflowPlanBuilder, which ensures each AggregateMeasuresNode corresponds to
+        by the structure of the DataflowPlanBuilder, which ensures each AggregateSimpleMetricInputsNode corresponds to
         a single semantic model set of measures for a single metric, and that these outputs will then be
-        combinded via joins.
+        combined via joins.
         """
-        self.metric_input_measure_specs = metric_input_measure_specs
+        self._alias_mapping = alias_mapping
 
     def _alias_measure_instances(self, measure_instances: Tuple[MeasureInstance, ...]) -> Tuple[MeasureInstance, ...]:
         """Update all measure instances with aliases, if any are found in the input spec set."""
         aliased_instances: List[MeasureInstance] = []
-        aliased_input_specs = [spec for spec in self.metric_input_measure_specs if spec.alias]
         for instance in measure_instances:
-            matches = [spec for spec in aliased_input_specs if spec.measure_spec == instance.spec]
-            assert (
-                len(matches) < 2
-            ), f"Found duplicate aliased measure spec matches: {matches} for measure instance {instance}. "
-            "We should always have 0 or 1 matches, or else we might pass the wrong aggregated measures to the "
-            "downstream metric computation expression!"
-            if matches:
-                aliased_spec = matches[0]
-                aliased_input_specs.remove(aliased_spec)
-                measure_spec = aliased_spec.post_aggregation_spec
-            else:
-                measure_spec = instance.spec
-
-            aliased_instances.append(
-                MeasureInstance(
-                    associated_columns=instance.associated_columns,
-                    spec=measure_spec,
-                    aggregation_state=instance.aggregation_state,
-                    defined_from=instance.defined_from,
+            spec = instance.spec
+            aliased_spec = self._alias_mapping.aliased_spec(spec)
+            if aliased_spec is not None:
+                aliased_instances.append(
+                    MeasureInstance(
+                        associated_columns=instance.associated_columns,
+                        spec=aliased_spec,
+                        aggregation_state=instance.aggregation_state,
+                        defined_from=instance.defined_from,
+                    )
                 )
-            )
+            else:
+                aliased_instances.append(instance)
 
         return tuple(aliased_instances)
 
@@ -572,10 +559,19 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
         select_columns: List[SqlSelectColumn] = []
         for metric_instance in metric_instances:
             metric_reference = MetricReference(element_name=metric_instance.defined_from.metric_name)
-            input_measure = self._metric_lookup.configured_input_measure_for_metric(metric_reference=metric_reference)
-            fill_nulls_with: Optional[int] = None
-            if input_measure and input_measure.fill_nulls_with is not None:
-                fill_nulls_with = input_measure.fill_nulls_with
+            metric = self._metric_lookup.get_metric(metric_reference)
+            metric_type = metric.type
+            if metric_type is MetricType.SIMPLE:
+                fill_nulls_with = metric.type_params.fill_nulls_with
+            elif (
+                metric_type is MetricType.RATIO
+                or metric_type is MetricType.DERIVED
+                or metric_type is MetricType.CUMULATIVE
+                or metric_type is MetricType.CONVERSION
+            ):
+                fill_nulls_with = None
+            else:
+                assert_values_exhausted(metric_type)
             select_columns.append(
                 self._create_select_column(spec=metric_instance.spec, fill_nulls_with=fill_nulls_with)
             )
