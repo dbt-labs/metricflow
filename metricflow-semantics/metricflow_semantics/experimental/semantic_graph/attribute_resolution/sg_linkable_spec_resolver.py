@@ -4,7 +4,7 @@ import logging
 from collections import defaultdict
 from typing import Iterable, Optional
 
-from dbt_semantic_interfaces.references import ElementReference, MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import ElementReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
@@ -24,7 +24,6 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
 )
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     LocalModelLabel,
-    MeasureLabel,
     MetricLabel,
     MetricTimeLabel,
 )
@@ -131,7 +130,6 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
     @override
     def get_common_set(
         self,
-        measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: Optional[GroupByItemSetFilter] = None,
         joins_disallowed: bool = False,
@@ -142,8 +140,6 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         simple metrics are defined will be returned.
         """
         label_to_references: defaultdict[MetricflowGraphLabel, set[ElementReference]] = defaultdict(set)
-        for measure_reference in measure_references:
-            label_to_references[MeasureLabel.get_instance(measure_reference.element_name)].add(measure_reference)
         for metric_reference in metric_references:
             label_to_references[MetricLabel.get_instance(metric_reference.element_name)].add(metric_reference)
 
@@ -177,7 +173,6 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
                         label=label,
                         associated_references=label_to_references.get(label),
                         matching_nodes=matching_nodes,
-                        measure_nodes=lambda: self._semantic_graph.nodes_with_labels(MeasureLabel.get_instance()),
                         metric_nodes=lambda: self._semantic_graph.nodes_with_labels(MetricLabel.get_instance()),
                     )
                 )

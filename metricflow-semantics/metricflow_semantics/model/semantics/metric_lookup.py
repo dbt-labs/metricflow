@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import MetricInput
 from dbt_semantic_interfaces.protocols.metric import Metric, MetricType
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
+from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import (
@@ -123,7 +123,6 @@ class MetricLookup:
 
     def get_common_group_by_items(
         self,
-        measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: GroupByItemSetFilter = DEFAULT_COMMON_SET_FILTER,
         joins_disallowed: bool = False,
@@ -131,7 +130,6 @@ class MetricLookup:
         """Gets the set of the valid group-by items common to all inputs."""
         if set_filter.element_name_allowlist is None:
             return self._group_by_item_set_resolver.get_common_set(
-                measure_references=measure_references,
                 metric_references=metric_references,
                 set_filter=set_filter,
                 joins_disallowed=joins_disallowed,
@@ -142,7 +140,6 @@ class MetricLookup:
         filter_without_element_name_condition = set_filter.without_element_name_allowlist()
 
         result_superset = self._group_by_item_set_resolver.get_common_set(
-            measure_references=measure_references,
             metric_references=metric_references,
             set_filter=filter_without_element_name_condition,
             joins_disallowed=joins_disallowed,

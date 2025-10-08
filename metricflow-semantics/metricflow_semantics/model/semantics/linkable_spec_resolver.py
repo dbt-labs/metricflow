@@ -5,7 +5,6 @@ from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
 from dbt_semantic_interfaces.references import (
-    MeasureReference,
     MetricReference,
 )
 
@@ -32,7 +31,6 @@ class GroupByItemSetResolver(ABC):
     @abstractmethod
     def get_common_set(
         self,
-        measure_references: Iterable[MeasureReference] = (),
         metric_references: Iterable[MetricReference] = (),
         set_filter: Optional[GroupByItemSetFilter] = None,
         joins_disallowed: bool = False,
