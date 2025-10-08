@@ -25,7 +25,6 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     ConfiguredEntityLabel,
     JoinedModelLabel,
     LocalModelLabel,
-    MeasureLabel,
     MetricLabel,
     MetricTimeLabel,
     SimpleMetricLabel,
@@ -397,50 +396,3 @@ class ComplexMetricNode(MetricNode, Singleton):
     @override
     def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
         typed_collection.complex_metric_nodes.add(self)
-
-
-@fast_frozen_dataclass(order=False)
-class MeasureNode(SemanticGraphNode, Singleton):
-    """Represents measures.
-
-    * Currently modeled as an entity since it's not a leaf node.
-    * The successors of this node include `LocalModelNode`, `JoinedModelNode`, and `MetricTimeNode`.
-    """
-
-    measure_name: str
-    source_model_id: SemanticModelId
-
-    @classmethod
-    def get_instance(cls, measure_name: str, source_model_id: SemanticModelId) -> MeasureNode:  # noqa: D102
-        return cls._get_instance(measure_name=measure_name, source_model_id=source_model_id)
-
-    @cached_property
-    @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
-            node_name=f"Measure({self.measure_name})",
-            cluster_name=ClusterNameFactory.get_name_for_model(self.source_model_id),
-        )
-
-    @override
-    def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
-        dot_node = super(SemanticGraphNode, self).as_dot_node(include_graphical_attributes)
-        if include_graphical_attributes:
-            dot_node = dot_node.with_attributes(color=DotColor.LIME_GREEN, edge_node_priority=2)
-        return dot_node
-
-    @cached_property
-    @override
-    def labels(self) -> FrozenOrderedSet[MetricflowGraphLabel]:
-        return FrozenOrderedSet(
-            (MeasureLabel.get_instance(measure_name=None), MeasureLabel.get_instance(measure_name=self.measure_name))
-        )
-
-    @cached_property
-    @override
-    def comparison_key(self) -> ComparisonKey:
-        return (self.measure_name,)
-
-    @override
-    def add_to_typed_collection(self, typed_collection: SemanticGraphNodeTypedCollection) -> None:
-        typed_collection.measure_nodes.add(self)

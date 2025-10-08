@@ -232,6 +232,5 @@ class _ValueType(Enum):
     """Different types of objects stored as values in lookup dictionaries."""
 
     ENTITY = "entity"
-    MEASURE = "measure"
     METRIC = "metric"
     MODEL_ID = "model_id"
