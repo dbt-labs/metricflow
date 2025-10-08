@@ -31,11 +31,11 @@ def mf_load_manifest_from_yaml_directory(
         build_result = parse_directory_of_yaml_files_to_semantic_manifest(
             str(yaml_file_directory), template_mapping=template_mapping
         )
-        # TODO: Check transform in DSI.
-        semantic_manifest = FixSimpleMetricRule.transform_manifest(build_result.semantic_manifest)
+        # # TODO: Check transform in DSI.
+        # semantic_manifest = FixSimpleMetricRule.transform_manifest(build_result.semantic_manifest)
         validator = SemanticManifestValidator[PydanticSemanticManifest]()
-        validator.checked_validations(semantic_manifest)
-        return semantic_manifest
+        validator.checked_validations(build_result.semantic_manifest)
+        return build_result.semantic_manifest
     except Exception as e:
         raise RuntimeError(
             LazyFormat("Error while loading semantic manifest", yaml_file_directory=yaml_file_directory)
