@@ -10,6 +10,7 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , 1 AS bookings
+    , 1 AS bookings_fill_nulls_with_0
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -33,20 +34,20 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , COALESCE(bookings, 0) AS bookings_fill_nulls_with_0
+      , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_22.bookings AS bookings
+        , subq_22.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['bookings', 'metric_time__day']
+        -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'metric_time__day']
         -- Aggregate Measures
         SELECT
           metric_time__day
-          , SUM(bookings) AS bookings
+          , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
         FROM sma_28009_cte
         GROUP BY
           metric_time__day
@@ -60,7 +61,7 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_30.bookings AS bookings_2_weeks_ago
+      , subq_30.bookings_2_weeks_ago AS bookings_2_weeks_ago
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
@@ -68,7 +69,7 @@ FROM (
       -- Aggregate Measures
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(bookings) AS bookings_2_weeks_ago
       FROM sma_28009_cte
       GROUP BY
         metric_time__day

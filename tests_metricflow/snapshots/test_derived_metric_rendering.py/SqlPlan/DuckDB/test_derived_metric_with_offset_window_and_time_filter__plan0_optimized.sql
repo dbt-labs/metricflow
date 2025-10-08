@@ -46,7 +46,7 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_31.metric_time__day AS metric_time__day
-      , subq_27.bookings AS bookings_2_weeks_ago
+      , subq_27.bookings_2_weeks_ago AS bookings_2_weeks_ago
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['metric_time__day']
@@ -67,7 +67,7 @@ FROM (
       -- Aggregate Measures
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(bookings) AS bookings_2_weeks_ago
       FROM (
         -- Read From CTE For node_id=sma_28009
         SELECT
