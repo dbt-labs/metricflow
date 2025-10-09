@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Mapping, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import TimeDimensionReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -17,6 +15,8 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
+from metricflow_semantic_interfaces.references import TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 
 @dataclass(frozen=True)

@@ -6,12 +6,6 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums import MetricType
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.instances import (
@@ -50,6 +44,12 @@ from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
 )
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
+from metricflow_semantic_interfaces.type_enums import MetricType
+from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

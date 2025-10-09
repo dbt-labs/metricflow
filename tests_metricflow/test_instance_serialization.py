@@ -4,9 +4,9 @@ import logging
 from typing import Mapping
 
 import pytest
-from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 from metricflow_semantics.instances import InstanceSet
 
+from metricflow_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)

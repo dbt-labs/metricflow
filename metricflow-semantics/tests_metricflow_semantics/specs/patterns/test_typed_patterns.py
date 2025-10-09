@@ -4,20 +4,6 @@ import logging
 from typing import Sequence
 
 import pytest
-from dbt_semantic_interfaces.call_parameter_sets import (
-    DimensionCallParameterSet,
-    EntityCallParameterSet,
-    MetricCallParameterSet,
-    TimeDimensionCallParameterSet,
-)
-from dbt_semantic_interfaces.references import (
-    DimensionReference,
-    EntityReference,
-    MetricReference,
-    TimeDimensionReference,
-)
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -30,6 +16,21 @@ from metricflow_semantics.specs.patterns.typed_patterns import (
 )
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    DimensionCallParameterSet,
+    EntityCallParameterSet,
+    MetricCallParameterSet,
+    TimeDimensionCallParameterSet,
+)
+from metricflow_semantic_interfaces.references import (
+    DimensionReference,
+    EntityReference,
+    MetricReference,
+    TimeDimensionReference,
+)
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 

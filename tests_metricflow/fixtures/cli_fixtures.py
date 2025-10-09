@@ -8,7 +8,6 @@ from typing import Generator, Mapping, Optional, Sequence
 import click
 import pytest
 from click.testing import CliRunner, Result
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from typing_extensions import override
 
@@ -16,6 +15,7 @@ from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts, dbtProjectMetadata
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir
 

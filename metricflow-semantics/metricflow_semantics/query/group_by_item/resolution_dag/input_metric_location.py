@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from dbt_semantic_interfaces.protocols import MetricInput
-from dbt_semantic_interfaces.references import MetricReference
-
+from metricflow_semantic_interfaces.protocols import MetricInput
+from metricflow_semantic_interfaces.references import MetricReference
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 

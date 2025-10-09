@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.instances import InstanceSet
 from typing_extensions import override
 
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
+from metricflow_semantic_interfaces.references import SemanticModelReference
 
 
 class SemanticModelDataSet(SqlDataSet):

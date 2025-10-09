@@ -7,12 +7,12 @@ from abc import ABC, abstractmethod
 from functools import cached_property
 from typing import Iterable, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums import DatePart
 from typing_extensions import Self
 
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference
+from metricflow_semantic_interfaces.type_enums import DatePart
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet

@@ -8,8 +8,6 @@ from enum import Enum
 from typing import Dict, Mapping
 
 import pytest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -53,6 +51,8 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.test_utils import as_datetime
 
 logger = logging.getLogger(__name__)
 

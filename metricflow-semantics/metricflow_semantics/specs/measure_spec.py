@@ -4,9 +4,8 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Optional
 
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-
+from metricflow_semantic_interfaces.protocols import MetricTimeWindow
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor

@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from dbt_semantic_interfaces.implementations.saved_query import PydanticSavedQuery, PydanticSavedQueryQueryParams
-from dbt_semantic_interfaces.references import EntityReference
-
+from metricflow_semantic_interfaces.implementations.saved_query import PydanticSavedQuery, PydanticSavedQueryQueryParams
+from metricflow_semantic_interfaces.references import EntityReference
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_generator import (

@@ -6,10 +6,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Generic, List, Sequence, Tuple, TypeVar
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import EntityReference, MetricModelReference, SemanticModelElementReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.references import (
+    EntityReference,
+    MetricModelReference,
+    SemanticModelElementReference,
+)
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.specs.column_assoc import ColumnAssociation, ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec

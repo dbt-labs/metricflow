@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    MetricCallParameterSet,
-)
-from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
-from dbt_semantic_interfaces.protocols.query_interface import QueryInterfaceMetric, QueryInterfaceMetricFactory
-from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference, MetricReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    MetricCallParameterSet,
+)
+from metricflow_semantic_interfaces.protocols.protocol_hint import ProtocolHint
+from metricflow_semantic_interfaces.protocols.query_interface import QueryInterfaceMetric, QueryInterfaceMetricFactory
+from metricflow_semantic_interfaces.references import EntityReference, LinkableElementReference, MetricReference
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (

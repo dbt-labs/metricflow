@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.references import MetricReference
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemLocation, QueryItemNamingScheme

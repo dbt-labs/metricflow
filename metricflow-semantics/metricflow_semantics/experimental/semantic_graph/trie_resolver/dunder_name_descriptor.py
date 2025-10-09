@@ -3,8 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from dbt_semantic_interfaces.type_enums import DatePart
-
+from metricflow_semantic_interfaces.type_enums import DatePart
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName

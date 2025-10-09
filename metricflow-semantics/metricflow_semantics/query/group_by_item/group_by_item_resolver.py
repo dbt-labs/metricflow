@@ -4,12 +4,12 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.call_parameter_sets import TimeDimensionCallParameterSet
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.call_parameter_sets import TimeDimensionCallParameterSet
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )

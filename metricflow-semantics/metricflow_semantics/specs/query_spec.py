@@ -3,10 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (

@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 
 import pytest
-from dbt_semantic_interfaces.test_utils import as_datetime
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from metricflow_semantics.experimental.test_helpers.benchmark_helpers import (
     BenchmarkFunction,
     OneSecondFunction,
@@ -22,6 +20,10 @@ from typing_extensions import override
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantic_interfaces.transformations.semantic_manifest_transformer import (
+    PydanticSemanticManifestTransformer,
+)
 
 logger = logging.getLogger(__name__)
 

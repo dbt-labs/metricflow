@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.references import MetricReference
-from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.references import MetricReference
+from metricflow_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 
 logger = logging.getLogger(__name__)
 

@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging
 from enum import Enum
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols import Metric
-from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.protocols import Metric
+from metricflow_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel

@@ -5,17 +5,16 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, Union
 
-from dbt_semantic_interfaces.implementations.filters.where_filter import (
+from metricflow_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
 )
-from dbt_semantic_interfaces.parsing.text_input.ti_description import QueryItemType
-from dbt_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser
-from dbt_semantic_interfaces.protocols import SavedQuery
-from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
-from dbt_semantic_interfaces.references import SemanticModelReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-
+from metricflow_semantic_interfaces.parsing.text_input.ti_description import QueryItemType
+from metricflow_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser
+from metricflow_semantic_interfaces.protocols import SavedQuery
+from metricflow_semantic_interfaces.protocols.where_filter import WhereFilter
+from metricflow_semantic_interfaces.references import SemanticModelReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
 from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint

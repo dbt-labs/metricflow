@@ -44,11 +44,11 @@ import os
 from dataclasses import dataclass
 from typing import Callable, Optional, Sequence
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.base import FrozenBaseModel
 from tests_metricflow.fixtures.setup_fixtures import SQL_ENGINE_SNAPSHOT_MARKER_NAME
 
 logger = logging.getLogger(__name__)

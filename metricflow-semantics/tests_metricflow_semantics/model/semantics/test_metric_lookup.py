@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.references import MetricReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+
+from metricflow_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from metricflow_semantic_interfaces.references import MetricReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

@@ -21,7 +21,6 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
@@ -45,6 +44,7 @@ from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import CreateValidityWindowJoinDescription
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
 logger = logging.getLogger(__name__)
 

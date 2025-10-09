@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.references import MetricReference
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern

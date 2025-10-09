@@ -7,9 +7,6 @@ from pathlib import Path
 from typing import Optional
 
 import pytest
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.protocols import SemanticManifest
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from metricflow_semantics.helpers.performance_helpers import ExecutionTimer
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -24,6 +21,11 @@ from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_par
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.protocols import SemanticManifest
+from metricflow_semantic_interfaces.transformations.semantic_manifest_transformer import (
+    PydanticSemanticManifestTransformer,
+)
 
 logger = logging.getLogger(__name__)
 

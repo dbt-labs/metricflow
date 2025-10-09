@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
 
 
 def fill_nulls_with_0(agg_type: AggregationType) -> bool:

@@ -4,14 +4,13 @@ import logging
 from functools import cached_property
 from typing import Optional
 
-from dbt_semantic_interfaces.protocols import (
+from metricflow_semantic_interfaces.protocols import (
     MeasureAggregationParameters,
     NonAdditiveDimensionParameters,
     WhereFilterIntersection,
 )
-from dbt_semantic_interfaces.references import MetricReference
-from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
-
+from metricflow_semantic_interfaces.references import MetricReference
+from metricflow_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId

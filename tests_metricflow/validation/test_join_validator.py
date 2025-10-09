@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Mapping
 
-from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
+from metricflow_semantic_interfaces.references import EntityReference
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 

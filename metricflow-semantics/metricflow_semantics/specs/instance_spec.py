@@ -5,9 +5,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference
-
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.references import EntityReference, LinkableElementReference
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 
 if typing.TYPE_CHECKING:

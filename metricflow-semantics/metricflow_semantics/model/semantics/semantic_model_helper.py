@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from typing import Dict, Mapping, Sequence
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols import Dimension
-from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
-from dbt_semantic_interfaces.references import (
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.protocols import Dimension
+from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
+from metricflow_semantic_interfaces.references import (
     EntityReference,
     LinkableElementReference,
     TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
-
+from metricflow_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 
 

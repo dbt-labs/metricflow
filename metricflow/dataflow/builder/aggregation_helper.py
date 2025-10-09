@@ -5,12 +5,13 @@ from collections.abc import Mapping
 from functools import cached_property
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec, SimpleMetricRecipe
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
 logger = logging.getLogger(__name__)
 

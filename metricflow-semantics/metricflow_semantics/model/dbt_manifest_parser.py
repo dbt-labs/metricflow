@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-from dbt_semantic_interfaces.implementations.semantic_manifest import (
+from metricflow_semantic_interfaces.implementations.semantic_manifest import (
     PydanticSemanticManifest,
 )
-from dbt_semantic_interfaces.transformations.flatten_simple_metrics_with_measure_inputs import (
+from metricflow_semantic_interfaces.transformations.flatten_simple_metrics_with_measure_inputs import (
     FlattenSimpleMetricsWithMeasureInputsRule,
 )
-from dbt_semantic_interfaces.transformations.names import LowerCaseNamesRule
-from dbt_semantic_interfaces.transformations.proxy_measure import CreateProxyMeasureRule
-from dbt_semantic_interfaces.transformations.pydantic_rule_set import PydanticSemanticManifestTransformRuleSet
-from dbt_semantic_interfaces.transformations.replace_input_measures_with_simple_metrics_transformation import (
+from metricflow_semantic_interfaces.transformations.names import LowerCaseNamesRule
+from metricflow_semantic_interfaces.transformations.proxy_measure import CreateProxyMeasureRule
+from metricflow_semantic_interfaces.transformations.pydantic_rule_set import PydanticSemanticManifestTransformRuleSet
+from metricflow_semantic_interfaces.transformations.replace_input_measures_with_simple_metrics_transformation import (
     ReplaceInputMeasuresWithSimpleMetricsTransformationRule,
 )
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import (
+from metricflow_semantic_interfaces.transformations.semantic_manifest_transformer import (
     PydanticSemanticManifestTransformer,
 )
-
 from metricflow_semantics.model.transformations.dedupe_metric_input_measures import DedupeMetricInputMeasuresRule
 
 

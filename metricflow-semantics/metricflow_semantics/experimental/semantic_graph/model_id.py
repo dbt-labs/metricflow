@@ -4,9 +4,9 @@ import logging
 from functools import cached_property
 from typing import Optional
 
-from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.experimental.singleton import Singleton

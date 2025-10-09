@@ -8,8 +8,7 @@ from collections.abc import Set
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
-
+from metricflow_semantic_interfaces.references import MetricReference, SemanticModelReference
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (

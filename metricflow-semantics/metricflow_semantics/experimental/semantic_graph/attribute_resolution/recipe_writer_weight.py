@@ -5,10 +5,10 @@ import logging
 from functools import cached_property
 from typing import Mapping, Optional, Set
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.mf_graph.path_finding.weight_function import WeightFunction
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import AttributeRecipe

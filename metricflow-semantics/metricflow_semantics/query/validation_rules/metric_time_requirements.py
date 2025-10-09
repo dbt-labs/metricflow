@@ -3,14 +3,14 @@ from __future__ import annotations
 import typing
 from typing import List, Sequence
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols import Metric, WhereFilterIntersection
-from dbt_semantic_interfaces.references import (
-    MetricReference,
-)
-from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.protocols import Metric, WhereFilterIntersection
+from metricflow_semantic_interfaces.references import (
+    MetricReference,
+)
+from metricflow_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter

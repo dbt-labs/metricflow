@@ -9,9 +9,9 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Iterable, Optional, Sequence
 
-from dbt_semantic_interfaces.naming.keywords import DUNDER
 from typing_extensions import Self, override
 
+from metricflow_semantic_interfaces.naming.keywords import DUNDER
 from metricflow_semantics.collection_helpers.dictionaries import mf_common_keys
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError

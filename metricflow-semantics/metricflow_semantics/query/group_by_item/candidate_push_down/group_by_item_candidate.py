@@ -5,9 +5,9 @@ import logging
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
-from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )

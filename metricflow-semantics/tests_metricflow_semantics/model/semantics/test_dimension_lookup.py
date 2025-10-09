@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.model.semantics.dimension_lookup import DimensionLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
+
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 
 
 @pytest.fixture(scope="module")

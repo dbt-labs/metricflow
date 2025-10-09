@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from dbt_semantic_interfaces.implementations.semantic_manifest import (
+from typing_extensions import override
+
+from metricflow_semantic_interfaces.implementations.semantic_manifest import (
     PydanticSemanticManifest,
 )
-from dbt_semantic_interfaces.protocols import ProtocolHint
-from dbt_semantic_interfaces.transformations.transform_rule import (
+from metricflow_semantic_interfaces.protocols import ProtocolHint
+from metricflow_semantic_interfaces.transformations.transform_rule import (
     SemanticManifestTransformRule,
 )
-from typing_extensions import override
 
 
 class DedupeMetricInputMeasuresRule(ProtocolHint[SemanticManifestTransformRule[PydanticSemanticManifest]]):

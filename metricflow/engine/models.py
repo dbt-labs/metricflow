@@ -4,36 +4,37 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
-from dbt_semantic_interfaces.protocols.dimension import (
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow_semantics.specs.dimension_spec import DimensionSpec
+
+from metricflow_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
+from metricflow_semantic_interfaces.protocols.dimension import (
     Dimension as SemanticManifestDimension,
 )
-from dbt_semantic_interfaces.protocols.dimension import (
+from metricflow_semantic_interfaces.protocols.dimension import (
     DimensionType,
     DimensionTypeParams,
 )
-from dbt_semantic_interfaces.protocols.entity import Entity as SemanticManifestEntity
-from dbt_semantic_interfaces.protocols.export import Export
-from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
-from dbt_semantic_interfaces.protocols.metadata import Metadata
-from dbt_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
-from dbt_semantic_interfaces.protocols.metric import (
+from metricflow_semantic_interfaces.protocols.entity import Entity as SemanticManifestEntity
+from metricflow_semantic_interfaces.protocols.export import Export
+from metricflow_semantic_interfaces.protocols.measure import MeasureAggregationParameters
+from metricflow_semantic_interfaces.protocols.metadata import Metadata
+from metricflow_semantic_interfaces.protocols.metric import Metric as SemanticManifestMetric
+from metricflow_semantic_interfaces.protocols.metric import (
     MetricType,
     MetricTypeParams,
     SemanticLayerElementConfig,
 )
-from dbt_semantic_interfaces.protocols.saved_query import (
+from metricflow_semantic_interfaces.protocols.saved_query import (
     SavedQuery as SemanticManifestSavedQuery,
 )
-from dbt_semantic_interfaces.protocols.saved_query import (
+from metricflow_semantic_interfaces.protocols.saved_query import (
     SavedQueryQueryParams,
 )
-from dbt_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from dbt_semantic_interfaces.type_enums.entity_type import EntityType
-from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
-from metricflow_semantics.specs.dimension_spec import DimensionSpec
+from metricflow_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference
+from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantic_interfaces.type_enums.entity_type import EntityType
 
 
 class SearchableElement(ABC):

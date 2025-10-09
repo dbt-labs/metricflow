@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 
 import pytest
-from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -21,6 +19,8 @@ from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSql
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

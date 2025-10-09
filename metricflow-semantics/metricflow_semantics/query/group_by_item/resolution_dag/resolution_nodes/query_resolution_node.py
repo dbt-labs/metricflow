@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
+from metricflow_semantic_interfaces.references import MetricReference
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.mf_logging.format_option import PrettyFormatOption

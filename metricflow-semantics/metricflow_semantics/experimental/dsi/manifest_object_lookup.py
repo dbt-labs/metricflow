@@ -6,11 +6,11 @@ from enum import Enum
 from functools import cached_property
 from typing import Iterable, Mapping, Optional, Sequence
 
-from dbt_semantic_interfaces.protocols import Metric, SemanticManifest, SemanticModel
-from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from more_itertools import peekable
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.protocols import Metric, SemanticManifest, SemanticModel
+from metricflow_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, Pair, T
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_flatten
 from metricflow_semantics.experimental.dsi.measure_model_object_lookup import SimpleMetricModelObjectLookup

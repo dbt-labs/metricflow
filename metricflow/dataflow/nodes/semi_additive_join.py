@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.type_enums import AggregationType
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
@@ -12,6 +11,7 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
+from metricflow_semantic_interfaces.type_enums import AggregationType
 
 
 @dataclass(frozen=True, eq=False)

@@ -4,7 +4,6 @@ import logging
 from typing import Optional, Set, Union
 
 import pytest
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_table import SqlTable
@@ -12,6 +11,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow_semantic_interfaces.test_utils import as_datetime
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 

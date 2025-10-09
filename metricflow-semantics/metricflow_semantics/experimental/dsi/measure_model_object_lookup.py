@@ -5,11 +5,11 @@ from collections import defaultdict
 from functools import cached_property
 from typing import Iterable, Mapping, Optional, Sequence
 
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.protocols import Metric, SemanticModel
-from dbt_semantic_interfaces.type_enums import DimensionType, MetricType, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from metricflow_semantic_interfaces.protocols import Metric, SemanticModel
+from metricflow_semantic_interfaces.type_enums import DimensionType, MetricType, TimeGranularity
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.model_object_lookup import ModelObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricflowInternalError

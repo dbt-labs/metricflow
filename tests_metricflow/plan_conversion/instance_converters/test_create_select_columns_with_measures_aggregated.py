@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Mapping
 
 import pytest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
@@ -22,6 +21,7 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     FilterElements,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 __SOURCE_TABLE_ALIAS = "a"

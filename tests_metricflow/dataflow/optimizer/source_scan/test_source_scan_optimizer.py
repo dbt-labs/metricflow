@@ -4,8 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -42,6 +40,8 @@ from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregat
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.references import EntityReference
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 
 logger = logging.getLogger(__name__)

@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Sized, Tuple
 
-from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation

@@ -2,17 +2,17 @@ from __future__ import annotations
 
 from typing import Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    TimeDimensionCallParameterSet,
-)
-from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
-from dbt_semantic_interfaces.protocols.query_interface import (
-    QueryInterfaceTimeDimensionFactory,
-)
-from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    TimeDimensionCallParameterSet,
+)
+from metricflow_semantic_interfaces.protocols.protocol_hint import ProtocolHint
+from metricflow_semantic_interfaces.protocols.query_interface import (
+    QueryInterfaceTimeDimensionFactory,
+)
+from metricflow_semantic_interfaces.references import EntityReference, TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation

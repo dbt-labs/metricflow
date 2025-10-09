@@ -4,8 +4,7 @@ import datetime
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 
 

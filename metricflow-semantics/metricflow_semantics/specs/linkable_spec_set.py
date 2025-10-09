@@ -6,10 +6,10 @@ import typing
 from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.references import MeasureReference, MetricReference
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec

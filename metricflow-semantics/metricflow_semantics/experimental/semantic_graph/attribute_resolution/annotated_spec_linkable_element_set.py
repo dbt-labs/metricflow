@@ -5,10 +5,10 @@ from collections.abc import Sequence
 from functools import cached_property
 from typing import Mapping, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass

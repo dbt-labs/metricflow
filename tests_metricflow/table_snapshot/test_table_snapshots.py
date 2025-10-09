@@ -4,12 +4,12 @@ import os
 from pathlib import Path
 
 import pytest
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow_semantic_interfaces.test_utils import as_datetime
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.sql.compare_data_table import assert_data_tables_equal
 from tests_metricflow.table_snapshot.table_snapshots import (

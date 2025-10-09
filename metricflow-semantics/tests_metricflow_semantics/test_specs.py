@@ -3,8 +3,6 @@ from __future__ import annotations
 from typing import Sequence
 
 import pytest
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
@@ -20,6 +18,9 @@ from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilte
 from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @pytest.fixture

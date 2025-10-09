@@ -4,8 +4,6 @@ import logging
 
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.naming.keywords import DUNDER
-from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
@@ -26,6 +24,9 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_str_snapshot_equal,
 )
+
+from metricflow_semantic_interfaces.naming.keywords import DUNDER
+from metricflow_semantic_interfaces.protocols import SemanticManifest
 
 logger = logging.getLogger(__name__)
 

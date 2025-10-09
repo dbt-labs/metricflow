@@ -3,10 +3,10 @@ from __future__ import annotations
 import re
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.naming.keywords import DUNDER
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.naming.keywords import DUNDER
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName

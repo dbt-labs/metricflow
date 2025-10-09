@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.sql.sql_exprs import (
@@ -28,6 +26,8 @@ from metricflow.dataset.sql_dataset import AnnotatedSqlDataSet
 from metricflow.plan_conversion.sql_expression_builders import make_coalesced_expr
 from metricflow.sql.sql_plan import SqlExpressionNode
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlSelectStatementNode
+from metricflow_semantic_interfaces.protocols.metric import MetricTimeWindow
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @dataclass(frozen=True)

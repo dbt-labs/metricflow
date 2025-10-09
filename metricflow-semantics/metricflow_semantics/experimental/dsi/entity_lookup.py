@@ -6,10 +6,10 @@ from collections.abc import Mapping
 from functools import cached_property
 from typing import Iterable
 
-from dbt_semantic_interfaces.protocols import Entity
-from dbt_semantic_interfaces.type_enums import EntityType
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.protocols import Entity
+from metricflow_semantic_interfaces.type_enums import EntityType
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 

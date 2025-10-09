@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
@@ -20,6 +19,8 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.group_by_met
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
+
+from metricflow_semantic_interfaces.protocols import SemanticManifest
 
 logger = logging.getLogger(__name__)
 

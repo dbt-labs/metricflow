@@ -4,11 +4,11 @@ import logging
 import re
 from typing import Optional
 
-from dbt_semantic_interfaces.call_parameter_sets import ParseJinjaObjectException
-from dbt_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser, QueryItemLocation
-from dbt_semantic_interfaces.references import EntityReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.call_parameter_sets import ParseJinjaObjectException
+from metricflow_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser, QueryItemLocation
+from metricflow_semantic_interfaces.references import EntityReference
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme

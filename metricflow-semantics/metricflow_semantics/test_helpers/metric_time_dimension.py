@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from dbt_semantic_interfaces.references import TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
-
+from metricflow_semantic_interfaces.references import TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 

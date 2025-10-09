@@ -6,7 +6,6 @@ import time
 
 from dbt.adapters.base import BaseAdapter
 from dbt_common.exceptions.base import DbtDatabaseError
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.random_id import random_id
@@ -23,6 +22,7 @@ from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 
 logger = logging.getLogger(__name__)
 

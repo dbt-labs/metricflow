@@ -4,11 +4,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
-from dbt_semantic_interfaces.references import (
+from metricflow_semantic_interfaces.references import (
     MeasureReference,
     MetricReference,
 )
-
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 

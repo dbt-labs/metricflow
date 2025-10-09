@@ -4,11 +4,11 @@ import logging
 from collections.abc import Mapping
 from functools import cached_property
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols import SemanticModel
-from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.protocols import SemanticModel
+from metricflow_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none_or_raise
 from metricflow_semantics.experimental.dsi.entity_lookup import EntityLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException

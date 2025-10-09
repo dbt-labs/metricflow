@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import FrozenSet
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
 

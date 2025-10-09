@@ -3,14 +3,13 @@ from __future__ import annotations
 import logging
 from typing import Dict, Final, Iterable, Optional, Sequence, Set
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.protocols import MetricInput
-from dbt_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.protocols import MetricInput
+from metricflow_semantic_interfaces.protocols.metric import Metric, MetricInputMeasure, MetricType
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantic_interfaces.references import MeasureReference, MetricReference, SemanticModelReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import (
     DuplicateMetricError,
     MetricNotFoundError,

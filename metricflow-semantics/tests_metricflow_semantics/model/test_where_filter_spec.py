@@ -3,27 +3,6 @@ from __future__ import annotations
 import logging
 
 import pytest
-from dbt_semantic_interfaces.call_parameter_sets import (
-    DimensionCallParameterSet,
-    EntityCallParameterSet,
-    MetricCallParameterSet,
-    TimeDimensionCallParameterSet,
-)
-from dbt_semantic_interfaces.implementations.filters.where_filter import (
-    PydanticWhereFilter,
-    PydanticWhereFilterIntersection,
-)
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import (
-    DimensionReference,
-    EntityReference,
-    MetricReference,
-    SemanticModelReference,
-    TimeDimensionReference,
-)
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
@@ -53,6 +32,27 @@ from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilte
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    DimensionCallParameterSet,
+    EntityCallParameterSet,
+    MetricCallParameterSet,
+    TimeDimensionCallParameterSet,
+)
+from metricflow_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
+    PydanticWhereFilterIntersection,
+)
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
+from metricflow_semantic_interfaces.references import (
+    DimensionReference,
+    EntityReference,
+    MetricReference,
+    SemanticModelReference,
+    TimeDimensionReference,
+)
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 logger = logging.getLogger(__name__)

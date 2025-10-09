@@ -3,11 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
-from dbt_semantic_interfaces.references import MetricReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-
+from metricflow_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from metricflow_semantic_interfaces.protocols.metric import MetricTimeWindow
+from metricflow_semantic_interfaces.references import MetricReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
 from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.visitor import VisitorOutputT

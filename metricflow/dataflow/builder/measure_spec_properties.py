@@ -4,8 +4,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.references import TimeDimensionReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
@@ -13,6 +11,9 @@ from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
+
+from metricflow_semantic_interfaces.references import TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 
 @dataclass(frozen=True)

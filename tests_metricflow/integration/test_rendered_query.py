@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -10,6 +9,7 @@ from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSourc
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.test_utils import as_datetime
 from tests_metricflow.integration.conftest import IntegrationTestHelpers
 from tests_metricflow.snapshot_utils import (
     assert_sql_snapshot_equal,

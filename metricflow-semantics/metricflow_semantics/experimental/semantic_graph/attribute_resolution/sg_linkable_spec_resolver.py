@@ -4,9 +4,9 @@ import logging
 from collections import defaultdict
 from typing import Iterable, Optional
 
-from dbt_semantic_interfaces.references import ElementReference, MeasureReference, MetricReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.references import ElementReference, MeasureReference, MetricReference
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass

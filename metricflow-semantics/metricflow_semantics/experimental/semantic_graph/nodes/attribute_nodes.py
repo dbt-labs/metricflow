@@ -3,9 +3,9 @@ from __future__ import annotations
 from abc import ABC
 from functools import cached_property
 
-from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (

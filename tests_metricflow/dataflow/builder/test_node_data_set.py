@@ -4,8 +4,6 @@ import logging
 from typing import Mapping
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import SemanticModelElementReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.instances import (
     InstanceSet,
@@ -32,6 +30,8 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
+from metricflow_semantic_interfaces.references import SemanticModelElementReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)

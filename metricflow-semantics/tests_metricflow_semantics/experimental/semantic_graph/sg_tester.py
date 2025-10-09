@@ -4,7 +4,6 @@ import logging
 from collections.abc import Mapping
 from typing import Callable, Iterable, Optional, Sequence
 
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
@@ -25,6 +24,7 @@ from metricflow_semantics.specs.spec_set import group_spec_by_type
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.test_helpers.table_helpers import PaddedTextTableBuilder
 
+from metricflow_semantic_interfaces.references import MeasureReference, MetricReference
 from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
 
 logger = logging.getLogger(__name__)

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import pytest
-from dbt_semantic_interfaces.implementations.project_configuration import PydanticProjectConfiguration
-from dbt_semantic_interfaces.implementations.semantic_manifest import (
+from metricflow_semantics.api.v0_1.saved_query_dependency_resolver import SavedQueryDependencyResolver
+
+from metricflow_semantic_interfaces.implementations.project_configuration import PydanticProjectConfiguration
+from metricflow_semantic_interfaces.implementations.semantic_manifest import (
     PydanticSemanticManifest,
 )
-from dbt_semantic_interfaces.references import (
+from metricflow_semantic_interfaces.references import (
     SemanticModelReference,
 )
-from metricflow_semantics.api.v0_1.saved_query_dependency_resolver import SavedQueryDependencyResolver
 
 
 @pytest.fixture(scope="session")

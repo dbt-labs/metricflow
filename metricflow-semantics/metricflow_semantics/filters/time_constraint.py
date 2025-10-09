@@ -4,8 +4,7 @@ import datetime
 import logging
 from dataclasses import dataclass
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 

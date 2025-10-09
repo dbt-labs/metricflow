@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 from typing import List, Sequence, Set
 
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
+from metricflow_semantic_interfaces.references import MetricReference
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.issues.parsing.duplicate_column_names import DuplicateOutputColumnIssue

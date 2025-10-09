@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from dbt_semantic_interfaces.protocols.entity import EntityType
-from dbt_semantic_interfaces.references import (
+from metricflow_semantic_interfaces.protocols.entity import EntityType
+from metricflow_semantic_interfaces.references import (
     EntityReference,
     SemanticModelElementReference,
     SemanticModelReference,

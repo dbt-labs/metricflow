@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from typing import Dict, Sequence
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols.entity import EntityType
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import (
     SemanticModelEntityJoin,
@@ -12,6 +9,10 @@ from metricflow_semantics.model.semantics.semantic_model_join_evaluator import (
     SemanticModelJoinEvaluator,
     SemanticModelLink,
 )
+
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.protocols.entity import EntityType
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference
 
 
 def _get_join_types_for_entity_type(entity_type: EntityType) -> Sequence[SemanticModelEntityJoinType]:

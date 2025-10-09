@@ -5,9 +5,8 @@ from __future__ import annotations
 import logging
 import os
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from tests_metricflow.generate_snapshots import (
     MetricFlowEngineConfiguration,
     run_cli,

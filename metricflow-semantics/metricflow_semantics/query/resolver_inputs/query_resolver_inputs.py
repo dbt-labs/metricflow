@@ -9,9 +9,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union
 
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme

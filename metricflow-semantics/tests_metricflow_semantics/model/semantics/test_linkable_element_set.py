@@ -10,11 +10,6 @@ are not supposed to be doing that anyway that's actually a reasonably handy feat
 from __future__ import annotations
 
 import pytest
-from dbt_semantic_interfaces.references import (
-    EntityReference,
-    SemanticModelReference,
-)
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
@@ -31,6 +26,12 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 )
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+
+from metricflow_semantic_interfaces.references import (
+    EntityReference,
+    SemanticModelReference,
+)
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @pytest.fixture(scope="session")

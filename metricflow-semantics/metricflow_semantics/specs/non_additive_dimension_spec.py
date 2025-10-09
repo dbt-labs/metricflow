@@ -5,9 +5,8 @@ from dataclasses import dataclass
 from hashlib import sha1
 from typing import Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
-
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.naming.linkable_spec_name import DUNDER

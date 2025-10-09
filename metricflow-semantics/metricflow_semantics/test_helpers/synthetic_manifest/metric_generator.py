@@ -3,14 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
-from dbt_semantic_interfaces.implementations.metric import (
+from metricflow_semantic_interfaces.implementations.metric import (
     PydanticMetric,
     PydanticMetricInput,
     PydanticMetricInputMeasure,
     PydanticMetricTypeParams,
 )
-from dbt_semantic_interfaces.type_enums import MetricType
-
+from metricflow_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.test_helpers.synthetic_manifest.measure_generator import MeasureGenerator
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
     SyntheticManifestParameterSet,

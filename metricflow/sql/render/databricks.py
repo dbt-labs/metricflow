@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Collection
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_exprs import SqlPercentileExpression, SqlPercentileFunctionType
 from typing_extensions import override
@@ -15,6 +13,8 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderResult,
 )
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 
 
 class DatabricksSqlExpressionRenderer(DefaultSqlExpressionRenderer):

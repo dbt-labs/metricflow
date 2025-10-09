@@ -4,8 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.references import EntityReference, MetricReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
@@ -14,6 +12,9 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_object_snapshot_equal,
 )
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantic_interfaces.references import EntityReference, MetricReference
 
 logger = logging.getLogger(__name__)
 

@@ -5,10 +5,6 @@ import textwrap
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.test_utils import as_datetime
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -25,6 +21,10 @@ from metricflow_semantics.test_helpers.example_project_configuration import (
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
+from metricflow_semantic_interfaces.parsing.objects import YamlConfigFile
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from tests_metricflow_semantics.query.conftest import BOOKINGS_YAML, query_parser_from_yaml
 
 logger = logging.getLogger(__name__)

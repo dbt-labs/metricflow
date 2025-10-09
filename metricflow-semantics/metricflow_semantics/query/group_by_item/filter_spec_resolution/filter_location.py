@@ -4,8 +4,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Sequence, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference
 from more_itertools import is_sorted
+
+from metricflow_semantic_interfaces.references import MetricReference
 
 
 class WhereFilterLocationType(Enum):

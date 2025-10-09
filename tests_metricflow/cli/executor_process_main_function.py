@@ -10,7 +10,6 @@ from typing import Iterator, Optional
 
 import click.testing
 from dbt.cli.main import dbtRunner
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import TextIO
 
@@ -27,6 +26,7 @@ from dbt_metricflow.cli.main import (
     tutorial,
     validate_configs,
 )
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from tests_metricflow.cli.isolated_cli_command_interface import (
     CommandParameterSet,
     ExecutorProcessStartingParameterSet,

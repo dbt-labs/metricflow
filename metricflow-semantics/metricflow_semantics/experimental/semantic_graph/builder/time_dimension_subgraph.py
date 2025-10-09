@@ -4,9 +4,9 @@ import logging
 from collections.abc import Mapping
 from functools import cached_property
 
-from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.dsi.model_object_lookup import (

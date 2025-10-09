@@ -8,27 +8,6 @@ from math import floor
 from time import perf_counter
 from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple, TypeVar
 
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
-from dbt_semantic_interfaces.references import (
-    MetricModelReference,
-    SemanticModelElementReference,
-    SemanticModelReference,
-)
-from dbt_semantic_interfaces.validations.validator_helpers import (
-    FileContext,
-    MetricContext,
-    SavedQueryContext,
-    SavedQueryElementType,
-    SemanticManifestValidationResults,
-    SemanticModelContext,
-    SemanticModelElementContext,
-    SemanticModelElementType,
-    ValidationContext,
-    ValidationError,
-    ValidationIssue,
-    ValidationWarning,
-)
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -45,6 +24,27 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExpl
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
+from metricflow_semantic_interfaces.references import (
+    MetricModelReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
+)
+from metricflow_semantic_interfaces.validations.validator_helpers import (
+    FileContext,
+    MetricContext,
+    SavedQueryContext,
+    SavedQueryElementType,
+    SemanticManifestValidationResults,
+    SemanticModelContext,
+    SemanticModelElementContext,
+    SemanticModelElementType,
+    ValidationContext,
+    ValidationError,
+    ValidationIssue,
+    ValidationWarning,
+)
 
 
 @dataclass

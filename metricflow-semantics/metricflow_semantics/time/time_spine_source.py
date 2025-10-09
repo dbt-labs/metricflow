@@ -4,10 +4,9 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Iterable, Sequence, Tuple
 
-from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
-from dbt_semantic_interfaces.protocols import SemanticManifest
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-
+from metricflow_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
+from metricflow_semantic_interfaces.protocols import SemanticManifest
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
 from metricflow_semantics.errors.error_classes import SemanticManifestConfigurationError
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec

@@ -3,10 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Optional, Sequence, Union
 
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
-
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
+from metricflow_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag

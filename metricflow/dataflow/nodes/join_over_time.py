@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
@@ -13,6 +11,8 @@ from metricflow_semantics.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
+from metricflow_semantic_interfaces.protocols import MetricTimeWindow
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 
 @dataclass(frozen=True, eq=False)

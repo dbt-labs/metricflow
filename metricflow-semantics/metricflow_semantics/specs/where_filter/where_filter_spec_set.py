@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Sized, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 

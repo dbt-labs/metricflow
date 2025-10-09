@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import DimensionType
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )

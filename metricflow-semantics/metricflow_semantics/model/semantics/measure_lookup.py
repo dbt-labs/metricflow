@@ -4,15 +4,14 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Dict, Mapping, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols import Measure, SemanticModel
-from dbt_semantic_interfaces.references import (
+from metricflow_semantic_interfaces.protocols import Measure, SemanticModel
+from metricflow_semantic_interfaces.references import (
     EntityReference,
     MeasureReference,
     SemanticModelReference,
     TimeDimensionReference,
 )
-from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
-
+from metricflow_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.element_group import ElementGrouper
