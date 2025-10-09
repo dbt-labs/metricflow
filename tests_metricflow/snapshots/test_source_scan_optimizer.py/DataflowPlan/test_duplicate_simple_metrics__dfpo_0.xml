@@ -1,7 +1,7 @@
 test_name: test_duplicate_simple_metrics
 test_filename: test_source_scan_optimizer.py
 docstring:
-  Tests a case where derived metrics in a query use the same measure (in the same form e.g. filters).
+  Tests a case where derived metrics in a query use the same simple-metric input (in the same form e.g. filters).
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>
