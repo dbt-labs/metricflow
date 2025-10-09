@@ -239,7 +239,7 @@ def test_simple_metric_aggregation_node(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a leaf measure aggregation node.
+    """Tests converting a dataflow plan to a SQL query plan where there is a leaf simple-metric input aggregation node.
 
     Covers SUM, AVERAGE, SUM_BOOLEAN (transformed to SUM upstream), and COUNT_DISTINCT agg types
     """
@@ -288,7 +288,7 @@ def test_single_join_node(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 1 dimension."""
+    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 simple-metric input and 1 dimension."""
     measure_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
@@ -350,7 +350,7 @@ def test_multi_join_node(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
+    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 simple-metric input and 2 dimensions."""
     measure_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
@@ -491,7 +491,7 @@ def test_compute_metrics_node_simple_expr(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests the compute metrics node for expr type metrics sourced from a single measure."""
+    """Tests the compute metrics node for expr type metrics sourced from a single simple-metric input."""
     measure_spec = SimpleMetricInputSpec(
         element_name="booking_value",
     )
@@ -1008,7 +1008,7 @@ def test_combine_output_node(
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
 
-    # Build compute measures node
+    # Build compute simple-metric inputs node
     measure_specs: List[SimpleMetricInputSpec] = [sum_spec]
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
@@ -1022,7 +1022,7 @@ def test_combine_output_node(
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
-    # Build agg measures node
+    # Build agg simple-metric inputs node
     measure_specs_2 = [sum_boolean_spec, count_distinct_spec]
     filtered_measure_node_2 = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,

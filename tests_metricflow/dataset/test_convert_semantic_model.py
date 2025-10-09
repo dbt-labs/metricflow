@@ -24,7 +24,7 @@ def test_convert_table_semantic_model_without_simple_metrics(
     sql_client: SqlClient,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
-    """Simple test for converting a table semantic model. Since there are no measures, primary time is not checked."""
+    """Simple test for converting a table semantic model. Since there are no simple-metric inputs, primary time is not checked."""
     users_data_set = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].data_set_mapping[
         "users_latest"
     ]
@@ -53,7 +53,7 @@ def test_convert_table_semantic_model_with_simple_metrics(
     sql_client: SqlClient,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
-    """Complete test of table semantic model conversion. This includes the full set of measures/entities/dimensions.
+    """Complete test of table semantic model conversion. This includes the full set of simple-metric inputs/entities/dimensions.
 
     Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
     dimension types, which should cover most, if not all, of the table source branches in the target class.

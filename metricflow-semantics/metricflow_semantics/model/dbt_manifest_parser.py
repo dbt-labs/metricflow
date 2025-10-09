@@ -21,18 +21,18 @@ def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> Pyd
     """Parse a PydanticSemanticManifest given the generated semantic_manifest json from dbt."""
     raw_model = PydanticSemanticManifest.parse_raw(manifest_json_string)
     # The serialized object in the dbt project does not have all transformations applied to it at
-    # this time, which causes failures with input measure resolution.
+    # this time, which causes failures with input simple-metric input resolution.
     # TODO: remove this transform call once the upstream changes are integrated into our dependency tree
     # TODO: align rules between DSI, here, and MFS (if possible!)
     rule_set = PydanticSemanticManifestTransformRuleSet()
     rules = (
         # Primary
         (LowerCaseNamesRule(),),
-        # Secondary - broken out into groups because we run DedupeMetricInputMeasuresRule in the middle.
+        # Secondary
         (
             *rule_set.legacy_measure_update_rules,
             # These individual rules come from rule_set.convert_legacy_measures_to_metrics_rules, but
-            # dsi requØires AddInputMetricMeasuresRule, and metricflow requires that we do NOT run that rule
+            # dsi requires AddInputMetricMeasuresRule, and metricflow requires that we do NOT run that rule
             # as it is incompatible with a parser like dbt-core that pre-populates input measures.
             CreateProxyMeasureRule(),
             FlattenSimpleMetricsWithMeasureInputsRule(),

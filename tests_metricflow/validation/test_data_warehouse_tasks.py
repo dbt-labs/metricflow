@@ -208,8 +208,8 @@ def test_build_simple_metric_input_tasks(  # noqa: D103
         manifest=data_warehouse_validation_model,
         sql_client=sql_client,
     )
-    assert len(tasks) == 1  # on semantic model query with all measures
-    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each measure on the semantic model
+    assert len(tasks) == 1  # on semantic model query with all simple-metric inputs
+    assert len(tasks[0].on_fail_subtasks) == 1  # a sub task for each simple-metric input on the semantic model
 
     tasks = DataWarehouseTaskBuilder.gen_simple_metric_tasks(
         manifest=data_warehouse_validation_model, sql_client=sql_client, semantic_model_filters=[]
@@ -265,7 +265,7 @@ def test_validate_simple_metrics(  # noqa: D103
 
     issues = dw_validator.validate_simple_metrics(semantic_manifest)
     # One issue is created for the short circuit query failure, and another is
-    # created for the subtask checking the specific measure
+    # created for the subtask checking the specific simple-metric input
     assert len(issues.all_issues) == 2
 
 
@@ -310,7 +310,7 @@ def test_validate_metrics(  # noqa: D103
     issues = dw_validator.validate_metrics(model)
     assert len(issues.all_issues) == 0
 
-    # Update model to have a new measure which creates a new metric by proxy
+    # Update model to have a new simple-metric input which creates a new metric by proxy
     new_measures = list(model.semantic_models[0].measures)
     new_measures.append(
         PydanticMeasure(

@@ -14,7 +14,7 @@ from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_par
 
 
 class SimpleMetricSemanticModelGenerator:
-    """Helps generate semantic models containing measures.
+    """Helps generate semantic models containing simple-metric inputs.
 
     Each of the generated semantic models contain an entity common to the semantic models containing dimensions so that any
     measure can be queried by any dimension.

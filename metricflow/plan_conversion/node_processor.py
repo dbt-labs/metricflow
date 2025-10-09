@@ -43,7 +43,7 @@ class MultiHopJoinCandidateLineage:
     For example, if
     * bridge_source has the primary entity account_id and the foreign entity customer_id
     * customers_source has the primary entity customer_id and dimension country
-    * transactions_source has the transactions measure and the account_id foreign entity
+    * transactions_source has the transactions simple-metric input and the account_id foreign entity
 
     Then the candidate lineage can be describe as
         first_node_to_join = bridge_source
@@ -93,7 +93,7 @@ class PredicatePushdownState:
     2. Predicate types eligible for pushdown
     3. Filters which have been applied already
 
-    The first may be updated as things like time constraints get altered or metric and measure filters are
+    The first may be updated as things like time constraints get altered or metric filters are
     added to the query filters.
     The second may be updated based on query configuration, like if a cumulative metric is added to the plan
     there may be changes to what sort of predicate pushdown operations are supported.
@@ -542,7 +542,7 @@ class PreJoinNodeProcessor:
                 ):
                     continue
 
-                # filter measures out of joinable_node
+                # Remove simple-metric inputs from the joined node.
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
                 filtered_joinable_node = FilterElementsNode.create(
                     parent_node=second_node_that_could_be_joined,

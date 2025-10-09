@@ -16,16 +16,16 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 @dataclass(frozen=True, eq=False)
 class AggregateSimpleMetricInputsNode(DataflowPlanNode):
-    """A node that aggregates the measures by the associated group by elements.
+    """A node that aggregates the simple-metric inputs by the associated group by elements.
 
-    In the event that one or more of the aggregated input measures has an alias assigned to it, any output query
-    resulting from an operation on this node must apply the alias and transform the measure instances accordingly,
-    otherwise this join could produce a query with two identically named measure columns with, e.g., different
-    constraints applied to the measure.
+    In the event that one or more of the aggregated input simple-metric inputs has an alias assigned to it, any output query
+    resulting from an operation on this node must apply the alias and transform the simple-metric-input instances accordingly,
+    otherwise this join could produce a query with two identically named simple-metric-input columns with, e.g., different
+    constraints applied to the simple-metric input.
 
-    The input measure specs are required for downstream nodes to be aware of any input measures with
+    The simple-metric-input specs are required for downstream nodes to be aware of any simple-metric inputs with
     user-provided aliases, such as we might encounter with constrained and unconstrained versions of the
-    same input measure.
+    same simple-metric.
     """
 
     alias_mapping: InstanceAliasMapping

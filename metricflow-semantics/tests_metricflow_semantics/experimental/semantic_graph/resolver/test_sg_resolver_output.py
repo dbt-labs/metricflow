@@ -36,7 +36,7 @@ def test_complete_set_for_simple_metrics(sg_tester: SemanticGraphTester) -> None
 
 
 def test_set_filtering_for_simple_metric(sg_tester: SemanticGraphTester) -> None:
-    """Check filtering of the set for a measure."""
+    """Check filtering of the set for a simple-metric input."""
     metric_reference = MetricReference("bookings")
     metric_references = (metric_reference,)
     sg_resolver = sg_tester.sg_resolver

@@ -133,8 +133,8 @@ class SemanticModelJoinLookup:
                     # We cannot join two semantic models with validity dimensions due to concerns with unexpected fanout
                     # due to the key structure of these semantic models. Applying multi-stage validity window filters can
                     # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
-                    # measures in such semantic models, since those will need to be converted to a different type of semantic model
-                    # to support measure computation.
+                    # simple-metric inputs in such semantic models, since those will need to be converted to a different type of semantic model
+                    # to support such computation.
                     continue
 
                 if right_entity_type is EntityType.NATURAL and not right_model_has_validity_dimension:

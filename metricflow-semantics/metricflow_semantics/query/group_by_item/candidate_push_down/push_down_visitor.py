@@ -138,8 +138,8 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
     """A visitor that implements the logic for group-by-item resolution using the resolution DAG.
 
     Please see the behavior at each node for more details. Overall, this visitor pushes candidates that match an
-    ambiguous group-by-item pattern from the root nodes (representing measures / the specs available for those
-    measures) to the leaf node (the query for metrics / valid group-by items for querying). For nodes with multiple
+    ambiguous group-by-item pattern from the root nodes (representing simple-metric inputs / the specs available for those
+    simple-metric inputs) to the leaf node (the query for metrics / valid group-by items for querying). For nodes with multiple
     parents, the candidates from each parent are intersected and passed to the child node.
     """
 
@@ -171,7 +171,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
 
     @override
     def visit_simple_metric_node(self, node: SimpleMetricGroupByItemSourceNode) -> PushDownResult:
-        """Push the group-by-item specs that are available to the measure and match the source patterns to the child."""
+        """Push the group-by-item specs that are available to the simple-metric input and match the source patterns to the child."""
         with self._path_from_start_node_tracker.track_node_visit(node) as current_traversal_path:
             logger.debug(LazyFormat("Visiting Node", node=node.ui_description))
 

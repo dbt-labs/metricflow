@@ -113,8 +113,8 @@ class AnnotatedSpec(SerializableDataclass):
 
     element_properties: Tuple[GroupByItemProperty, ...]
     # The semantic model(s) where the element (e.g. the categorical dimension) was defined.
-    # There can be multiple models if it's a metric / derived metric that references multiple measures, and the join
-    # path from the measure to the dimension is different.
+    # There can be multiple models if it's a metric / derived metric that references multiple simple-metric inputs, and the join
+    # path from the simple-metric input to the dimension is different.
     origin_semantic_model_names: Tuple[str, ...]
     derived_from_semantic_model_names: Tuple[str, ...]
 

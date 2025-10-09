@@ -398,7 +398,7 @@ class InstanceSet(SerializableDataclass):
         )
 
     def without_simple_metric_inputs(self) -> InstanceSet:
-        """Return a copy of this without the measure instances."""
+        """Return a copy of this without the simple-metric input instances."""
         return InstanceSet(
             simple_metric_input_instances=(),
             dimension_instances=self.dimension_instances,
