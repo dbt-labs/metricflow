@@ -1,0 +1,54 @@
+test_name: test_simple_metric_with_cyclic_join_path
+test_filename: test_other_manifest.py
+docstring:
+  Check that a cyclic join path doesn't cause infinite loop / recursion.
+---
+listings:
+  ┌──────────────────────────────────────┬────────────────────────────────┬──────────────────┬────────────────────────────────────────┬──────────────────────────────────────────┐
+  │ Dunder Name                          │ Metric-Subquery Entity-Links   │ Type             │ Properties                             │ Derived-From Semantic Models             │
+  ├──────────────────────────────────────┼────────────────────────────────┼──────────────────┼────────────────────────────────────────┼──────────────────────────────────────────┤
+  │ cyclic_entity                        │                                │ ENTITY           │ ENTITY,LOCAL                           │ listings_latest                          │
+  │ cyclic_entity__capacity_latest       │                                │ DIMENSION        │ JOINED                                 │ listings_latest,listings_latest_cyclic   │
+  │ cyclic_entity__country_latest        │                                │ DIMENSION        │ LOCAL                                  │ listings_latest                          │
+  │ cyclic_entity__ds__alien_day         │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ cyclic_entity__ds__day               │                                │ TIME_DIMENSION   │ LOCAL                                  │ listings_latest                          │
+  │ cyclic_entity__ds__extract_day       │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ cyclic_entity__ds__extract_dow       │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ cyclic_entity__ds__extract_doy       │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ cyclic_entity__ds__extract_month     │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ cyclic_entity__ds__extract_quarter   │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ cyclic_entity__ds__extract_year      │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ cyclic_entity__ds__month             │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ cyclic_entity__ds__quarter           │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ cyclic_entity__ds__week              │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ cyclic_entity__ds__year              │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ cyclic_entity__listings              │ cyclic_entity                  │ METRIC           │ JOINED,METRIC                          │ listings_latest                          │
+  │ listing                              │                                │ ENTITY           │ ENTITY,LOCAL                           │ listings_latest                          │
+  │ listing__capacity_latest             │                                │ DIMENSION        │ JOINED                                 │ listings_latest,listings_latest_cyclic   │
+  │ listing__country_latest              │                                │ DIMENSION        │ LOCAL                                  │ listings_latest                          │
+  │ listing__ds__alien_day               │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ listing__ds__day                     │                                │ TIME_DIMENSION   │ LOCAL                                  │ listings_latest                          │
+  │ listing__ds__extract_day             │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ listing__ds__extract_dow             │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ listing__ds__extract_doy             │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ listing__ds__extract_month           │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ listing__ds__extract_quarter         │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ listing__ds__extract_year            │                                │ TIME_DIMENSION   │ DATE_PART,LOCAL                        │ listings_latest                          │
+  │ listing__ds__month                   │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ listing__ds__quarter                 │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ listing__ds__week                    │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ listing__ds__year                    │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,LOCAL         │ listings_latest                          │
+  │ listing__listings                    │ listing                        │ METRIC           │ JOINED,METRIC                          │ listings_latest                          │
+  │ metric_time__alien_day               │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ listings_latest                          │
+  │ metric_time__day                     │                                │ TIME_DIMENSION   │ METRIC_TIME                            │ listings_latest                          │
+  │ metric_time__extract_day             │                                │ TIME_DIMENSION   │ DATE_PART,METRIC_TIME                  │ listings_latest                          │
+  │ metric_time__extract_dow             │                                │ TIME_DIMENSION   │ DATE_PART,METRIC_TIME                  │ listings_latest                          │
+  │ metric_time__extract_doy             │                                │ TIME_DIMENSION   │ DATE_PART,METRIC_TIME                  │ listings_latest                          │
+  │ metric_time__extract_month           │                                │ TIME_DIMENSION   │ DATE_PART,METRIC_TIME                  │ listings_latest                          │
+  │ metric_time__extract_quarter         │                                │ TIME_DIMENSION   │ DATE_PART,METRIC_TIME                  │ listings_latest                          │
+  │ metric_time__extract_year            │                                │ TIME_DIMENSION   │ DATE_PART,METRIC_TIME                  │ listings_latest                          │
+  │ metric_time__month                   │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ listings_latest                          │
+  │ metric_time__quarter                 │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ listings_latest                          │
+  │ metric_time__week                    │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ listings_latest                          │
+  │ metric_time__year                    │                                │ TIME_DIMENSION   │ DERIVED_TIME_GRANULARITY,METRIC_TIME   │ listings_latest                          │
+  └──────────────────────────────────────┴────────────────────────────────┴──────────────────┴────────────────────────────────────────┴──────────────────────────────────────────┘
