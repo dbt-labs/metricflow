@@ -23,8 +23,8 @@ def test_manifest_generator(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     parameter_set = SyntheticManifestParameterSet(
-        measure_semantic_model_count=2,
-        measures_per_semantic_model=2,
+        simple_metric_semantic_model_count=2,
+        simple_metrics_per_semantic_model=2,
         dimension_semantic_model_count=2,
         categorical_dimensions_per_semantic_model=2,
         max_metric_depth=2,

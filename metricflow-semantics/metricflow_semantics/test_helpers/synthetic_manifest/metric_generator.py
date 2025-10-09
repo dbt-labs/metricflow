@@ -5,13 +5,15 @@ from typing import Sequence
 
 from dbt_semantic_interfaces.implementations.metric import (
     PydanticMetric,
+    PydanticMetricAggregationParams,
     PydanticMetricInput,
-    PydanticMetricInputMeasure,
     PydanticMetricTypeParams,
 )
-from dbt_semantic_interfaces.type_enums import MetricType
+from dbt_semantic_interfaces.type_enums import AggregationType, MetricType
 
-from metricflow_semantics.test_helpers.synthetic_manifest.measure_generator import MeasureGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.measure_semantic_model_generator import (
+    SimpleMetricSemanticModelGenerator,
+)
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
     SyntheticManifestParameterSet,
 )
@@ -47,10 +49,10 @@ class MetricGenerator:
     """Helps generate metrics for the synthetic manifest."""
 
     def __init__(  # noqa: D107
-        self, parameter_set: SyntheticManifestParameterSet, measure_generator: MeasureGenerator
+        self, parameter_set: SyntheticManifestParameterSet, semantic_model_generator: SimpleMetricSemanticModelGenerator
     ) -> None:
         self._parameter_set = parameter_set
-        self._measure_generator = measure_generator
+        self._semantic_model_generator = semantic_model_generator
 
     def generate_metrics(self) -> Sequence[PydanticMetric]:  # noqa: D102
         metrics = []
@@ -89,12 +91,30 @@ class MetricGenerator:
                 name=self.get_metric_name(metric_index),
                 type=MetricType.SIMPLE,
                 type_params=PydanticMetricTypeParams(
-                    measure=PydanticMetricInputMeasure(
-                        name=self._measure_generator.get_measure_name(
-                            measure_index=metric_index.width_index % self._measure_generator.unique_measure_count
-                        )
-                    )
+                    measure=None,
+                    numerator=None,
+                    denominator=None,
+                    expr=None,
+                    window=None,
+                    grain_to_date=None,
+                    metrics=None,
+                    conversion_type_params=None,
+                    cumulative_type_params=None,
+                    metric_aggregation_params=PydanticMetricAggregationParams(
+                        agg=AggregationType.SUM,
+                        agg_params=None,
+                        agg_time_dimension="ds",
+                        non_additive_dimension=None,
+                        semantic_model=self._semantic_model_generator.get_semantic_model_name(
+                            int(metric_index.width_index / self._parameter_set.simple_metrics_per_semantic_model)
+                            % self._parameter_set.simple_metric_semantic_model_count
+                        ),
+                    ),
                 ),
+                description=None,
+                filter=None,
+                metadata=None,
+                config=None,
             )
         else:
             input_metric_names = tuple(
@@ -105,7 +125,12 @@ class MetricGenerator:
                 name=self.get_metric_name(metric_index),
                 type=MetricType.DERIVED,
                 type_params=PydanticMetricTypeParams(
-                    metrics=[PydanticMetricInput(name=input_metric_name) for input_metric_name in input_metric_names],
+                    metrics=[
+                        PydanticMetricInput(
+                            name=input_metric_name, filter=None, alias=None, offset_window=None, offset_to_grain=None
+                        )
+                        for input_metric_name in input_metric_names
+                    ],
                     expr=" + ".join(input_metric_names),
                 ),
             )

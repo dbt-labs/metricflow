@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 def manifest_with_200_models_100_metrics() -> SemanticManifest:
     """A semantic manifest with 200 models (100 with measures) and 100 metrics (50 of them derived)."""
     parameter_set = SyntheticManifestParameterSet(
-        measure_semantic_model_count=100,
-        measures_per_semantic_model=20,
+        simple_metric_semantic_model_count=100,
+        simple_metrics_per_semantic_model=20,
         dimension_semantic_model_count=100,
         categorical_dimensions_per_semantic_model=20,
         max_metric_depth=2,
