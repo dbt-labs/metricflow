@@ -1091,15 +1091,15 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Find which simple-metric inputs have an aggregation time dimension that is the same as the one specified in the node.
         # Only these simple-metric inputs will be in the output data set.
-        output_measure_instances = []
-        for measure_instance in input_data_set.instance_set.simple_metric_input_instances:
+        output_simple_metric_input_instances = []
+        for simple_metric_input_instance in input_data_set.instance_set.simple_metric_input_instances:
             simple_metric_input = self._manifest_object_lookup.simple_metric_name_to_input[
-                measure_instance.spec.element_name
+                simple_metric_input_instance.spec.element_name
             ]
             aggregation_time_dimension_for_measure = TimeDimensionReference(simple_metric_input.agg_time_dimension_name)
 
             if aggregation_time_dimension_for_measure == node.aggregation_time_dimension_reference:
-                output_measure_instances.append(measure_instance)
+                output_simple_metric_input_instances.append(simple_metric_input_instance)
 
         # Find time dimension instances that refer to the same dimension as the one specified in the node.
         matching_time_dimension_instances: List[TimeDimensionInstance] = []
@@ -1136,7 +1136,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ] = matching_time_dimension_instance.associated_column.column_name
 
         output_instance_set = InstanceSet(
-            simple_metric_input_instances=tuple(output_measure_instances),
+            simple_metric_input_instances=tuple(output_simple_metric_input_instances),
             dimension_instances=input_data_set.instance_set.dimension_instances,
             time_dimension_instances=tuple(output_time_dimension_instances),
             entity_instances=input_data_set.instance_set.entity_instances,
