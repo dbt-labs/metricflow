@@ -51,8 +51,6 @@ class SemanticManifestLookup:
 
         self._metric_lookup = MetricLookup(
             semantic_manifest=semantic_manifest,
-            semantic_model_lookup=self._semantic_model_lookup,
-            custom_granularities=self.custom_granularities,
             group_by_item_set_resolver=group_by_item_set_resolver,
             manifest_object_lookup=self._manifest_object_lookup,
         )

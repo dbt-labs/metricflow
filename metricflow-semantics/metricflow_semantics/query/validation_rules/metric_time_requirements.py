@@ -11,6 +11,7 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
+from metricflow_semantics.experimental.ordered_set import OrderedSet
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -27,6 +28,7 @@ from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_tim
 )
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult, ResolveMetricsResult
@@ -60,12 +62,10 @@ class MetricTimeQueryValidationRule(PostResolutionQueryValidationRule):
         ).is_empty
 
     def _query_includes_agg_time_dimension_of_metric(self, metric_reference: MetricReference) -> bool:
-        valid_agg_time_dimensions = self._manifest_lookup.metric_lookup.get_valid_agg_time_dimensions_for_metric(
-            metric_reference
-        )
-        return (
-            len(set(valid_agg_time_dimensions).intersection(self._resolve_group_by_item_result.group_by_item_specs)) > 0
-        )
+        valid_agg_time_dimensions: OrderedSet[
+            LinkableInstanceSpec
+        ] = self._manifest_lookup.metric_lookup.get_aggregation_time_dimension_specs(metric_reference)
+        return len(valid_agg_time_dimensions.intersection(self._resolve_group_by_item_result.group_by_item_specs)) > 0
 
     def _validate_cumulative_metric(
         self,
