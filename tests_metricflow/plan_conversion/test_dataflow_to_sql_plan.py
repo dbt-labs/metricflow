@@ -232,7 +232,7 @@ def test_filter_with_where_constraint_node(
 
 @pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
-def test_measure_aggregation_node(
+def test_simple_metric_aggregation_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
