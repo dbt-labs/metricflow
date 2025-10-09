@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.protocols import Entity
 from dbt_semantic_interfaces.type_enums import EntityType
 from typing_extensions import override
 
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
+from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 
 logger = logging.getLogger(__name__)
@@ -21,17 +21,18 @@ class EntityLookup(AttributePrettyFormattable):
 
     def __init__(self, entities: Iterable[Entity]) -> None:  # noqa: D107
         self._entity_name_to_entity: Mapping[str, Entity] = {entity.name: entity for entity in entities}
+        self._entities = tuple(entities)
 
     @cached_property
     def entity_name_to_type(self) -> Mapping[str, EntityType]:  # noqa: D102
-        return {entity_name: entity.type for entity_name, entity in self._entity_name_to_entity.items()}
+        return {entity.name: entity.type for entity in self._entities}
 
     @cached_property
-    def entity_type_to_names(self) -> Mapping[EntityType, FrozenOrderedSet[str]]:  # noqa: D102
+    def entity_type_to_names(self) -> Mapping[EntityType, OrderedSet[str]]:  # noqa: D102
         entity_type_to_names: dict[EntityType, MutableOrderedSet[str]] = defaultdict(MutableOrderedSet)
-        for entity_name, entity_type in self.entity_name_to_type.items():
-            entity_type_to_names[entity_type].add(entity_name)
-        return {entity_type: entity_names.as_frozen() for entity_type, entity_names in entity_type_to_names.items()}
+        for entity in self._entities:
+            entity_type_to_names[entity.type].add(entity.name)
+        return {entity_type: entity_names for entity_type, entity_names in entity_type_to_names.items()}
 
     @cached_property
     @override
