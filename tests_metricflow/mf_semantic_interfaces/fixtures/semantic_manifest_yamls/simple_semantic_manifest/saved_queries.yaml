@@ -1,0 +1,41 @@
+---
+saved_query:
+  name: p0_booking
+  description: Booking-related metrics that are of the highest priority.
+  query_params:
+    metrics:
+      - bookings
+      - instant_bookings
+    group_by:
+      - TimeDimension('metric_time', 'DAY')
+      - Dimension('listing__capacity_latest')
+    where:
+      - "{{ Dimension('listing__capacity_latest') }} > 3"
+  exports:
+    - name: bookings
+      config:
+        export_as: table
+        schema: exports_schema
+        alias: bookings_export_table
+---
+saved_query:
+  name: highly_active_listings
+  description: Booking-related metrics that are of the highest priority.
+  query_params:
+    metrics:
+      - listings
+    group_by:
+      - TimeDimension('metric_time', 'day')
+    where:
+      - "{{ Metric('bookings', group_by=['listing', 'metric_time']) }} > 5"
+    order_by:
+      - Metric('listings').descending(True)
+      - TimeDimension('metric_time', 'day')
+    limit: 10
+
+  exports:
+    - name: highly_active_listings
+      config:
+        export_as: table
+        schema: exports_schema
+        alias: highly_active_listings_export_table

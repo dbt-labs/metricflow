@@ -1,0 +1,21 @@
+---
+semantic_model:
+  name: users_latest
+  description: users_latest
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_users_latest
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+    - name: home_state_latest
+      type: categorical
+
+  entities:
+    - name: user
+      type: primary
+      expr: user_id

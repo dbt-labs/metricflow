@@ -1,0 +1,33 @@
+---
+semantic_model:
+  name: users_ds_source
+  description: users_ds_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_users
+
+  defaults:
+    agg_time_dimension: ds_source_date
+
+  dimensions:
+    - name: ds_source_date
+      type: time
+      type_params:
+        time_granularity: day
+    - name: created_at
+      type: time
+      type_params:
+        time_granularity: day
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+    - name: home_state
+      type: categorical
+
+  entities:
+    - name: user
+      type: primary
+      expr: user_id

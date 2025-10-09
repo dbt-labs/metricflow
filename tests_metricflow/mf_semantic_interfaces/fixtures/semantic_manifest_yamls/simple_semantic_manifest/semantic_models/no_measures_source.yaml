@@ -1,0 +1,30 @@
+---
+semantic_model:
+  name: no_measures_source
+  description: no_measures_source
+  label: No Measures Source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_accounts
+
+  defaults:
+    agg_time_dimension: ds2
+
+  dimensions:
+    - name: ds2
+      type: time
+      label: Metric Time2
+      type_params:
+        time_granularity: day
+    - name: account_type2
+      type: categorical
+      label: Account Type2
+
+  primary_entity: account
+
+  entities:
+    - name: user
+      type: foreign
+      expr: user_id
+      label: User
