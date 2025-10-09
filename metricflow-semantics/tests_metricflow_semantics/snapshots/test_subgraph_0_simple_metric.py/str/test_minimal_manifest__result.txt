@@ -1,7 +1,7 @@
 test_name: test_minimal_manifest
 test_filename: test_subgraph_0_simple_metric.py
 docstring:
-  Test generation of the measure subgraph using the minimal manifest.
+  Test generation of the simple-metric input subgraph using the minimal manifest.
 expectation_description:
   The graph should show the measure node with edges to the model nodes and metric time.
 ---

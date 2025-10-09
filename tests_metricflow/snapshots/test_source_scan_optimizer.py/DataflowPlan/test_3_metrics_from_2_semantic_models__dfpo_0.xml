@@ -1,7 +1,7 @@
 test_name: test_3_metrics_from_2_semantic_models
 test_filename: test_source_scan_optimizer.py
 docstring:
-  Tests that 3 metrics from the 2 semantic models results in 2 scans.
+  Tests that 3 metrics from the 2 different semantic models results in 2 scans.
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>

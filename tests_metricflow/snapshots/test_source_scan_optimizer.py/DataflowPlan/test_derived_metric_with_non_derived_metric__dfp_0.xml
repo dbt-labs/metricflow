@@ -3,13 +3,13 @@ test_filename: test_source_scan_optimizer.py
 docstring:
   Tests optimization of queries that use derived metrics and non-derived metrics.
 
-      non_referred_bookings_pct is a derived metric that uses measures [bookings, referred_bookings]
-      booking_value is a proxy metric that uses measures [bookings]
+      `non_referred_bookings_pct` is a derived metric that uses metrics [bookings, referred_bookings]
+      `booking_value` is a simple metric.
 
-      All these measures are from a single semantic model.
+      All of these simple metrics are defined from a common semantic model.
 
-      Computation of non_referred_bookings_pct can be optimized to a single source, but isn't combined with the
-      computation for booking_value as it's not yet supported e.g. alias needed to be handled.
+      Computation of `non_referred_bookings_pct` can be optimized to a single source, but isn't combined with the
+      computation for `booking_value` as it's not yet supported e.g. alias needed to be handled.
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>
