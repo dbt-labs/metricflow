@@ -10,7 +10,7 @@ from typing_extensions import override
 if typing.TYPE_CHECKING:
     from metricflow.dataflow.dataflow_plan import DataflowPlanNode
     from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-    from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
+    from metricflow.dataflow.nodes.aggregate_simple_metric_inputs import AggregateSimpleMetricInputsNode
     from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
     from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode

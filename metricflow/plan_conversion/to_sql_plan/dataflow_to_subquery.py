@@ -74,7 +74,7 @@ from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
+from metricflow.dataflow.nodes.aggregate_simple_metric_inputs import AggregateSimpleMetricInputsNode
 from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
@@ -98,7 +98,7 @@ from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTable
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.dataset.sql_dataset import AnnotatedSqlDataSet, SqlDataSet
-from metricflow.plan_conversion.instance_set_transforms.aggregated_measure import (
+from metricflow.plan_conversion.instance_set_transforms.aggregated_simple_metric_input import (
     CreateAggregatedSimpleMetricInputsTransform,
 )
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import (

@@ -4,7 +4,7 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.dsi.measure_model_object_lookup import SimpleMetricModelObjectLookup
+from metricflow_semantics.experimental.dsi.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )

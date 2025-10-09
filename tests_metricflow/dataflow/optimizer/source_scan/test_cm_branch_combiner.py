@@ -6,7 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
-from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
+from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal

@@ -6,7 +6,7 @@ from typing import List, Tuple
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, SimpleMetricInputInstance
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
+from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression, SqlFunctionExpression
 
 from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping

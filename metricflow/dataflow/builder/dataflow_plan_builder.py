@@ -40,17 +40,17 @@ from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
-from metricflow_semantics.specs.measure_spec import (
-    CumulativeDescription,
-    JoinToTimeSpineDescription,
-    SimpleMetricInputSpec,
-    SimpleMetricRecipe,
-)
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.simple_metric_input_spec import (
+    CumulativeDescription,
+    JoinToTimeSpineDescription,
+    SimpleMetricInputSpec,
+    SimpleMetricRecipe,
+)
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
@@ -69,11 +69,11 @@ from metricflow.dataflow.builder.builder_cache import (
     FindSourceNodeRecipeParameterSet,
     FindSourceNodeRecipeResult,
 )
-from metricflow.dataflow.builder.measure_spec_properties import SimpleMetricInputSpecProperties
 from metricflow.dataflow.builder.node_evaluator import (
     LinkableInstanceSatisfiabilityEvaluation,
     NodeEvaluatorForLinkableInstances,
 )
+from metricflow.dataflow.builder.simple_metric_input_spec_properties import SimpleMetricInputSpecProperties
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet
 from metricflow.dataflow.builder.source_node_recipe import SourceNodeRecipe
 from metricflow.dataflow.dataflow_plan import (
@@ -81,7 +81,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
+from metricflow.dataflow.nodes.aggregate_simple_metric_inputs import AggregateSimpleMetricInputsNode
 from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode, SpecToAlias
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode

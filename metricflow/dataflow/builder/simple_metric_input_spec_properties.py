@@ -11,8 +11,8 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
-from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
+from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 
 
 @dataclass(frozen=True)

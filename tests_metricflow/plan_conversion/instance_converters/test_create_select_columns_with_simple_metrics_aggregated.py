@@ -15,7 +15,7 @@ from metricflow_semantics.sql.sql_exprs import (
 )
 
 from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping
-from metricflow.plan_conversion.instance_set_transforms.aggregated_measure import (
+from metricflow.plan_conversion.instance_set_transforms.aggregated_simple_metric_input import (
     CreateAggregatedSimpleMetricInputsTransform,
 )
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
