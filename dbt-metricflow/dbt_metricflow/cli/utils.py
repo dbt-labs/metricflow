@@ -27,7 +27,14 @@ def query_options(function: Callable) -> Callable:
     function = click.option(
         "--order",
         type=click_custom.SequenceParamType(),
-        help='Metrics or group bys to order by ("-" prefix for DESC). For example: --order -ds or --order ds,-revenue',
+        help=(
+            "Specify metrics, dimension, or group bys to order by. "
+            "Add the `-` prefix to sort query in descending (DESC) order. "
+            "Leave blank for ascending (ASC) order.\n\n"
+            "Examples:\n\n"
+            "  To sort metric_time in DESC order: --order -metric_time\n"
+            "  To sort metric_time in ASC and revenue in DESC: --order metric_time,-revenue"
+        ),
         required=False,
     )(function)
     function = click.option(
@@ -40,20 +47,42 @@ def query_options(function: Callable) -> Callable:
         "--where",
         type=str,
         default=None,
-        help='SQL-like where statement provided as a string. For example: --where "revenue > 100"',
+        help=(
+            "SQL-like where statement provided as a string and wrapped in quotes. "
+            "All filter items must explicitly reference fields or dimensions "
+            "that are part of your model.\n\n"
+            "Examples:\n\n"
+            "  Single statement:\n"
+            "    --where \"{{ Dimension('order_id__revenue') }} > 100\"\n\n"
+            "  Multiple statements:\n"
+            "    --where \"{{ Dimension('order_id__revenue') }} > 100\"\n"
+            "    --where \"{{ Dimension('user_count') }} < 1000\"\n\n"
+            "Use the `Dimension()` template wrapper to indicate that the filter "
+            "item is part of your model."
+        ),
     )(function)
     function = start_end_time_options(function)
     function = click.option(
         "--group-by",
         type=click_custom.SequenceParamType(),
         default="",
-        help="Dimensions and/or entities to group by: syntax is --group-by ds or for multiple group bys --group-by ds,org",
+        help=(
+            "Group by dimensions or entities.\n\n"
+            "Examples:\n\n"
+            "  Single dimension: --group-by ds\n"
+            "  Multiple dimensions: --group-by ds,org"
+        ),
     )(function)
     function = click.option(
         "--metrics",
         type=click_custom.SequenceParamType(min_length=0),
         default="",
-        help="Metrics to query for: syntax is --metrics bookings or for multiple metrics --metrics bookings,messages",
+        help=(
+            "Specify metrics to query.\n\n"
+            "Examples:\n\n"
+            "  Single metric: --metrics bookings\n"
+            "  Multiple metrics: --metrics bookings,messages"
+        ),
     )(function)
     return function
 
