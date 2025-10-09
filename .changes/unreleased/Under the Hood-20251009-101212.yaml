@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Update simple-metric generation in the synthetic manifest generator
+time: 2025-10-09T10:12:12.538832-07:00
+custom:
+  Author: plypaul
+  Issue: "1894"
