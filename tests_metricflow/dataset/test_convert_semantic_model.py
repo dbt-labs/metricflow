@@ -16,6 +16,7 @@ from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_convert_table_semantic_model_without_measures(
     request: FixtureRequest,
@@ -44,6 +45,7 @@ def test_convert_table_semantic_model_without_measures(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_convert_table_semantic_model_with_measures(
     request: FixtureRequest,
@@ -79,6 +81,7 @@ def test_convert_table_semantic_model_with_measures(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_convert_query_semantic_model(  # noqa: D103
     request: FixtureRequest,
