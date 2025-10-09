@@ -21,7 +21,6 @@ from tests_metricflow_semantics.fixtures.setup_fixtures import mf_add_slow_marke
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
-from tests_metricflow.snapshots import METRICFLOW_SNAPSHOT_DIRECTORY_ANCHOR
 from tests_metricflow.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
 
 logger = logging.getLogger(__name__)
@@ -166,7 +165,7 @@ def mf_test_configuration(  # noqa: D103
         use_persistent_source_schema=bool(
             request.config.getoption(USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG, default=False)
         ),
-        snapshot_directory=METRICFLOW_SNAPSHOT_DIRECTORY_ANCHOR.directory,
+        snapshot_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory.joinpath("snapshots"),
         tests_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory,
     )
 
