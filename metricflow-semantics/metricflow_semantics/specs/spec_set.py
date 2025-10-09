@@ -16,9 +16,9 @@ if TYPE_CHECKING:
     from metricflow_semantics.specs.dimension_spec import DimensionSpec
     from metricflow_semantics.specs.entity_spec import EntitySpec
     from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
-    from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
     from metricflow_semantics.specs.metadata_spec import MetadataSpec
     from metricflow_semantics.specs.metric_spec import MetricSpec
+    from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
     from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 

@@ -11,9 +11,6 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.group_by_item.resolution_dag.input_metric_location import InputMetricDefinitionLocation
-from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-    SimpleMetricGroupByItemSourceNode,
-)
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     ComplexMetricGroupByItemResolutionNode,
 )
@@ -22,6 +19,9 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
     QueryGroupByItemResolutionNode,
+)
+from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.simple_metric_source_node import (
+    SimpleMetricGroupByItemSourceNode,
 )
 
 logger = logging.getLogger(__name__)

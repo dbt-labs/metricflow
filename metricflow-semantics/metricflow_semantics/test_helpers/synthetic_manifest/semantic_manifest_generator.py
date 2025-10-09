@@ -15,11 +15,11 @@ from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_
 from metricflow_semantics.test_helpers.synthetic_manifest.dimension_semantic_model_generator import (
     DimensionSemanticModelGenerator,
 )
-from metricflow_semantics.test_helpers.synthetic_manifest.measure_semantic_model_generator import (
-    SimpleMetricSemanticModelGenerator,
-)
 from metricflow_semantics.test_helpers.synthetic_manifest.metric_generator import MetricGenerator
 from metricflow_semantics.test_helpers.synthetic_manifest.saved_query_generator import SavedQueryGenerator
+from metricflow_semantics.test_helpers.synthetic_manifest.simple_metric_semantic_model_generator import (
+    SimpleMetricSemanticModelGenerator,
+)
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
     SyntheticManifestParameterSet,
 )

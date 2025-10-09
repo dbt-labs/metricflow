@@ -18,9 +18,9 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
     from metricflow_semantics.specs.metadata_spec import MetadataSpec
     from metricflow_semantics.specs.metric_spec import MetricSpec
+    from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 
 
 @dataclass(frozen=True)

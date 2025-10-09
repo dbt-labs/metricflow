@@ -8,7 +8,7 @@ from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 
-from metricflow.dataflow.builder.measure_spec_properties import SimpleMetricInputSpecProperties
+from metricflow.dataflow.builder.simple_metric_input_spec_properties import SimpleMetricInputSpecProperties
 from metricflow.dataflow.builder.source_node_recipe import SourceNodeRecipe
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.plan_conversion.node_processor import PredicatePushdownState

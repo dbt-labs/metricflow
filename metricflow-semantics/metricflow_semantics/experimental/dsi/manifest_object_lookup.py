@@ -13,10 +13,10 @@ from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, Pair, T
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_flatten
-from metricflow_semantics.experimental.dsi.measure_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
+from metricflow_semantics.experimental.dsi.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
