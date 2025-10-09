@@ -31,7 +31,7 @@ class GroupByItemCandidateSet(PathPrefixable, SemanticModelDerivation):
     For logging / error reporting:
 
     * This includes the path from the leaf node to the measure node where the specs
-    originated. There can be multiple paths as when candidate sets are merged, there can be multiple measures were a
+    originated. There can be multiple paths as when candidate sets are merged, there can be multiple simple-metric inputs were a
     spec could have come from.
 
     * This includes the path from the leaf node to the node where this set was generated since during debugging or in
@@ -43,7 +43,7 @@ class GroupByItemCandidateSet(PathPrefixable, SemanticModelDerivation):
     path_from_leaf_node: MetricFlowQueryResolutionPath
 
     def __post_init__(self) -> None:  # noqa: D105
-        # If there are no specs, there shouldn't be any measure paths.
+        # If there are no specs, there shouldn't be any simple-metric input paths.
         assert (len(self.specs) > 0 and len(self.simple_metric_input_paths) > 0) or (
             len(self.specs) == 0 and len(self.simple_metric_input_paths) == 0
         )

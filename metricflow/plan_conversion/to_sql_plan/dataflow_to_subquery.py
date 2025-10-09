@@ -412,7 +412,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         from_data_set = self.get_output_data_set(node.left_node)
         from_data_set_alias = self._next_unique_table_alias()
 
-        # Change the aggregation state for the measures to be partially aggregated if it was previously aggregated
+        # Change the aggregation state for the simple-metric inputs to be partially aggregated if it was previously aggregated
         # since we removed the entities and added the dimensions. The dimensions could have the same value for
         # multiple rows, so we'll need to re-aggregate.
         from_data_set_output_instance_set = from_data_set.instance_set.transform(
@@ -499,19 +499,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_aggregate_simple_metric_inputs_node(self, node: AggregateSimpleMetricInputsNode) -> SqlDataSet:
         """Generates the query that realizes the behavior of `AggregateSimpleMetricInputsNode`.
 
-        This will produce a query that aggregates all measures from a given input semantic model per the
-        measure spec
+        This will produce a query that aggregates all simple-metric inputs from a given input semantic model per the
+        simple-metric spec
 
-        In the event the input aggregations are applied to measures with aliases set, in case of, e.g.,
-        a constraint applied to one instance of the measure but not another one, this method will
+        In the event the input aggregations are applied to simple-metric inputs with aliases set, in case of, e.g.,
+        a constraint applied to one instance of the simple metric but not another one, this method will
         apply the rename in the select statement for this node, and propagate that further along via an
-        instance set transform to rename the measures.
+        instance set transform to rename the simple-metric inputs.
 
-        Any node operating on the output of this node will need to use the measure aliases instead of
-        the measure names as references.
+        Any node operating on the output of this node will need to use the simple-metric aliases instead of
+        the simple-metric names as references.
 
         """
-        # Get the data from the parent, and change measure instances to the aggregated state.
+        # Get the data from the parent, and change simple-metric input instances to the aggregated state.
         from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         aggregated_instance_set = from_data_set.instance_set.transform(
             ChangeSimpleMetricInputAggregationState(
@@ -534,8 +534,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         from_data_set_alias = self._next_unique_table_alias()
 
         # Convert the instance set into a set of select column statements with updated aliases
-        # Note any measure with an alias requirement will be recast at this point, and
-        # downstream consumers of the resulting node must therefore request aggregated measures
+        # Note any simple-metric input with an alias requirement will be recast at this point, and
+        # downstream consumers of the resulting node must therefore request aggregated simple-metric inputs
         # by their appropriate aliases
         create_columns_result = aggregated_instance_set.transform(
             CreateAggregatedSimpleMetricInputsTransform(
@@ -553,7 +553,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             aggregated_instance_set = aggregated_instance_set.transform(
                 AliasAggregatedSimpleMetricInputs(node.alias_mapping)
             )
-            # and make sure we follow the resolver format for any newly aliased measures....
+            # and make sure we follow the resolver format for any newly aliased simple-metric inputs....
             aggregated_instance_set = aggregated_instance_set.transform(
                 ChangeAssociatedColumns(self._column_association_resolver)
             )
@@ -566,7 +566,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 select_columns=create_columns_result.select_column_set.columns_in_default_order,
                 from_source=from_data_set.checked_sql_select_node,
                 from_source_alias=from_data_set_alias,
-                # This will generate expressions to group by the columns that don't correspond to a measure instance.
+                # This will generate expressions to group by the columns that don't correspond to a simple-metric input instance.
                 group_bys=create_columns_result.group_by_column_set.columns_in_default_order,
             ),
         )
@@ -576,8 +576,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         from_data_set_alias = self._next_unique_table_alias()
 
-        # TODO: Check that all measures for the metrics are in the input instance set
-        # The desired output instance set has no measures, so create a copy with those removed.
+        # TODO: Check that all simple-metric inputs for the metrics are in the input instance set
+        # The desired output instance set has no simple-metric inputs, so create a copy with those removed.
         output_instance_set: InstanceSet = from_data_set.instance_set.transform(RemoveSimpleMetricInputTransform())
 
         # Also, the output columns should always follow the resolver format.
@@ -907,9 +907,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
     def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> SqlDataSet:
-        """Join aggregated output datasets together to return a single dataset containing all metrics/measures.
+        """Join aggregated output datasets together to return a single dataset containing all metrics/simple-metric inputs.
 
-        This node may exist in one of two situations: when metrics/measures need to be combined in order to produce a single
+        This node may exist in one of two situations: when metrics need to be combined in order to produce a single
         dataset with all required inputs for a metric (ie., derived metric), or when metrics need to be combined in order to
         produce a single dataset of output for downstream consumption by the end user.
 
@@ -1082,15 +1082,15 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
     def visit_metric_time_dimension_transform_node(self, node: MetricTimeDimensionTransformNode) -> SqlDataSet:
         """Implement the behavior of the MetricTimeDimensionTransformNode.
 
-        This node will create an output data set that is similar to the input data set, but the measure instances it
-        contains is a subset of the input data set. Only measure instances that have an aggregation time dimension
+        This node will create an output data set that is similar to the input data set, but the simple metric instances it
+        contains is a subset of the input data set. Only simple-metric instances that have an aggregation time dimension
         matching the one defined in the node will be passed. In addition, an additional time dimension instance for
         "metric time" will be included. See DataSet.metric_time_dimension_reference().
         """
         input_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
 
-        # Find which measures have an aggregation time dimension that is the same as the one specified in the node.
-        # Only these measures will be in the output data set.
+        # Find which simple-metric inputs have an aggregation time dimension that is the same as the one specified in the node.
+        # Only these simple-metric inputs will be in the output data set.
         output_measure_instances = []
         for measure_instance in input_data_set.instance_set.simple_metric_input_instances:
             simple_metric_input = self._manifest_object_lookup.simple_metric_name_to_input[

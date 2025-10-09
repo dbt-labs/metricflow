@@ -64,7 +64,7 @@ class SimpleMetricInputNonAdditiveDimension:
 
 @fast_frozen_dataclass()
 class SimpleMetricInput:
-    """Indirection class used for `measure -> simple metric` migration to represent the definition of a simple metric.
+    """Represents the input arguments to construct a simple metric.
 
     This class should contain all relevant values from the semantic manifest for a simple metric. i.e. use this
     instead of fetching the `Metric` from the manifest.

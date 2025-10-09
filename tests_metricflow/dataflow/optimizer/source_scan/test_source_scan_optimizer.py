@@ -176,9 +176,9 @@ def test_2_metrics_from_1_semantic_model(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests that optimizing the plan for 2 metrics from 2 measure semantic models results in half the number of scans.
+    """Tests optimizing the plan for 2 simple-metrics that are defined from the same model.
 
-    Each metric is computed from the same measure semantic model and the dimension semantic model.
+    Since they are defined from the same model, the number of scans should be halved.
     """
     check_optimization(
         request=request,
@@ -202,7 +202,7 @@ def test_2_metrics_from_2_semantic_models(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests that 2 metrics from the 2 semantic models results in 2 scans."""
+    """Tests that 2 metrics from 2 different semantic models results in 2 scans."""
     check_optimization(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -222,7 +222,7 @@ def test_3_metrics_from_2_semantic_models(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests that 3 metrics from the 2 semantic models results in 2 scans."""
+    """Tests that 3 metrics from the 2 different semantic models results in 2 scans."""
     check_optimization(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -273,9 +273,9 @@ def test_derived_metric(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests optimization of a query that use a derived metrics with measures coming from a single semantic model.
+    """Tests optimization of a query that use a derived metrics with simple-metric inputs coming from a single semantic model.
 
-    non_referred_bookings_pct is a derived metric that uses measures [bookings, referred_bookings]
+    non_referred_bookings_pct is a derived metric that uses simple metrics `[bookings, referred_bookings]`
     """
     check_optimization(
         request=request,
@@ -322,13 +322,13 @@ def test_derived_metric_with_non_derived_metric(
 ) -> None:
     """Tests optimization of queries that use derived metrics and non-derived metrics.
 
-    non_referred_bookings_pct is a derived metric that uses measures [bookings, referred_bookings]
-    booking_value is a proxy metric that uses measures [bookings]
+    `non_referred_bookings_pct` is a derived metric that uses metrics [bookings, referred_bookings]
+    `booking_value` is a simple metric.
 
-    All these measures are from a single semantic model.
+    All of these simple metrics are defined from a common semantic model.
 
-    Computation of non_referred_bookings_pct can be optimized to a single source, but isn't combined with the
-    computation for booking_value as it's not yet supported e.g. alias needed to be handled.
+    Computation of `non_referred_bookings_pct` can be optimized to a single source, but isn't combined with the
+    computation for `booking_value` as it's not yet supported e.g. alias needed to be handled.
     """
     check_optimization(
         request=request,
@@ -406,7 +406,7 @@ def test_2_ratio_metrics_from_1_semantic_model(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests that 2 ratio metrics with measures from a 1 semantic model result in 1 scan."""
+    """Tests that 2 ratio metrics with simple-metric inputs from a 1 semantic model result in 1 scan."""
     check_optimization(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -429,7 +429,7 @@ def test_duplicate_simple_metrics(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a case where derived metrics in a query use the same measure (in the same form e.g. filters)."""
+    """Tests a case where derived metrics in a query use the same simple-metric input (in the same form e.g. filters)."""
     check_optimization(
         request=request,
         mf_test_configuration=mf_test_configuration,

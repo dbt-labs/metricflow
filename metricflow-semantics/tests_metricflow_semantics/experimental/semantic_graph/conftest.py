@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.fixture(scope="session")
 def manifest_with_200_models_100_metrics() -> SemanticManifest:
-    """A semantic manifest with 200 models (100 with measures) and 100 metrics (50 of them derived)."""
+    """A semantic manifest with 200 models and 100 metrics (50 of them derived)."""
     parameter_set = SyntheticManifestParameterSet(
         simple_metric_semantic_model_count=100,
         simple_metrics_per_semantic_model=20,

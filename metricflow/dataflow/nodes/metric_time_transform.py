@@ -14,17 +14,17 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 @dataclass(frozen=True, eq=False)
 class MetricTimeDimensionTransformNode(DataflowPlanNode):
-    """A node transforms the input data set so that it contains the metric time dimension and relevant measures.
+    """A node transforms the input data set so that it contains the metric time dimension and relevant simple-metric inputs.
 
-    The metric time dimension is used later to aggregate all measures in the data set.
+    The metric time dimension is used later to aggregate all simple-metric inputs in the data set.
 
-    Input: a data set containing measures along with the associated aggregation time dimension.
+    Input: a data set containing simple-metric inputs along with the associated aggregation time dimension.
 
     Output: a data set similar to the input data set, but includes the configured aggregation time dimension as the
-    metric time dimension and only contains measures that are defined to use it.
+    metric time dimension and only contains simple-metric inputs that are defined to use it.
 
     Attributes:
-        aggregation_time_dimension_reference: The time dimension that measures in the input should be aggregated to.
+        aggregation_time_dimension_reference: The time dimension that simple-metric inputs in the input should be aggregated to.
     """
 
     aggregation_time_dimension_reference: TimeDimensionReference
