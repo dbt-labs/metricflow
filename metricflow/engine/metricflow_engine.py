@@ -727,26 +727,26 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.DUNDER_NAME,
     ) -> List[Dimension]:
         """Get full dimension object for all dimensions in the semantic manifest."""
-        dimensions: List[Dimension] = []
+        engine_model_dimensions: List[Dimension] = []
         if metric_names:
-            dimensions = self.simple_dimensions_for_metrics(metric_names=metric_names)
+            engine_model_dimensions = self.simple_dimensions_for_metrics(metric_names=metric_names)
         else:
-            semantic_model_lookup = self._semantic_manifest_lookup.semantic_model_lookup
-            for dimension_reference in semantic_model_lookup.get_dimension_references():
-                for semantic_model in semantic_model_lookup.get_semantic_models_for_dimension(dimension_reference):
-                    dimension = Dimension.from_pydantic(
-                        pydantic_dimension=SemanticModelHelper.get_dimension_from_semantic_model(
-                            semantic_model=semantic_model, dimension_reference=dimension_reference
-                        ),
-                        entity_links=(SemanticModelHelper.resolved_primary_entity(semantic_model),),
-                        semantic_model_reference=semantic_model.reference,
-                    )
-                    dimensions.append(dimension)
+            model_object_lookups = self._semantic_manifest_lookup.manifest_object_lookup.model_object_lookups
 
-        def sort_dimensions(dimension: Dimension) -> Tuple[str, ...]:
-            if order_by == GroupByOrderByAttribute.DUNDER_NAME:
+            for model_object_lookup in model_object_lookups:
+                primary_entity_name = model_object_lookup.resolved_primary_entity_name
+                for pydantic_dimension in model_object_lookup.dimension_lookup.dimension_name_to_dimension.values():
+                    engine_model_dimension = Dimension.from_pydantic(
+                        pydantic_dimension=pydantic_dimension,
+                        entity_links=(EntityReference(primary_entity_name),),
+                        semantic_model_reference=model_object_lookup.semantic_model.reference,
+                    )
+                    engine_model_dimensions.append(engine_model_dimension)
+
+        def _dimension_sort_key(dimension: Dimension) -> Tuple[str, ...]:
+            if order_by is GroupByOrderByAttribute.DUNDER_NAME:
                 return (dimension.dunder_name,)
-            elif order_by == GroupByOrderByAttribute.SEMANTIC_MODEL_NAME:
+            elif order_by is GroupByOrderByAttribute.SEMANTIC_MODEL_NAME:
                 return (
                     (
                         dimension.semantic_model_reference.semantic_model_name
@@ -758,7 +758,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             else:
                 assert_values_exhausted(order_by)
 
-        return sorted(set(dimensions), key=sort_dimensions)
+        return sorted(set(engine_model_dimensions), key=_dimension_sort_key)
 
     def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
         group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
