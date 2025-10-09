@@ -10,7 +10,7 @@ from typing_extensions import override
 
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
@@ -63,7 +63,7 @@ class ComplexMetricSubgraphGenerator(SemanticSubgraphGenerator):
 
         # Maps the metric name to the corresponding metric node that was generated.
         self._metric_name_to_node: dict[str, MetricNode] = {}
-        self._empty_edge_labels: FrozenOrderedSet[MetricflowGraphLabel] = FrozenOrderedSet()
+        self._empty_edge_labels: FrozenOrderedSet[MetricFlowGraphLabel] = FrozenOrderedSet()
         self._empty_recipe_step = AttributeRecipeStep()
 
         common_cumulative_metric_labels = FrozenOrderedSet(
@@ -105,7 +105,7 @@ class ComplexMetricSubgraphGenerator(SemanticSubgraphGenerator):
         metric_type = complex_metric.type
 
         input_metric_name_to_labels_for_metric_to_input_metric_edge: dict[
-            str, FrozenOrderedSet[MetricflowGraphLabel]
+            str, FrozenOrderedSet[MetricFlowGraphLabel]
         ] = {}
         recipe_step = self._empty_recipe_step
 

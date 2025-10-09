@@ -7,7 +7,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
 )
@@ -53,4 +53,4 @@ class SemanticGraphTestFixture:
 
     @cached_property
     def pathfinder(self) -> RecipeWriterPathfinder:  # noqa: D102
-        return MetricflowPathfinder()
+        return MetricFlowPathfinder()

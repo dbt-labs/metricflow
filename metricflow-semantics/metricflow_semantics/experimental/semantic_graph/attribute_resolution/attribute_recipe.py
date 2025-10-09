@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
@@ -181,7 +181,7 @@ class AttributeRecipe:
                 )
             )
         else:
-            raise MetricflowInternalError(
+            raise MetricFlowInternalError(
                 LazyFormat("Reached unhandled case", model_id_count=model_id_count, recipe=self)
             )
 

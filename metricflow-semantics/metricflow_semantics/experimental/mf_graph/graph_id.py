@@ -15,7 +15,7 @@ from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 logger = logging.getLogger(__name__)
 
 
-class MetricflowGraphId(ABC):
+class MetricFlowGraphId(ABC):
     """Interface for an object to identify different graphs."""
 
     @property
@@ -25,7 +25,7 @@ class MetricflowGraphId(ABC):
         raise NotImplementedError
 
 
-class SequentialGraphId(MetricflowGraphId, MetricFlowPrettyFormattable):
+class SequentialGraphId(MetricFlowGraphId, MetricFlowPrettyFormattable):
     """Graph IDs that are generated sequentially."""
 
     # `itertools.count()` returns an iterable that is thread-safe, so this is a way of generating sequential

@@ -5,7 +5,7 @@ import logging
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
@@ -25,7 +25,7 @@ def test_simple_metric(  # noqa: D103
     sg_02_single_join_manifest: SemanticManifest,
 ) -> None:
     semantic_graph = SemanticGraphBuilder(ManifestObjectLookup(sg_02_single_join_manifest)).build()
-    pathfinder: RecipeWriterPathfinder = MetricflowPathfinder()
+    pathfinder: RecipeWriterPathfinder = MetricFlowPathfinder()
     resolver = SimpleTrieResolver(semantic_graph=semantic_graph, path_finder=pathfinder)
     simple_metric_node = semantic_graph.node_with_label(MetricLabel.get_instance("bookings"))
     result = resolver.resolve_trie(source_nodes=FrozenOrderedSet((simple_metric_node,)), element_filter=None)
@@ -43,7 +43,7 @@ def test_metrics(  # noqa: D103
     sg_05_derived_metric_manifest: SemanticManifest,
 ) -> None:
     semantic_graph = SemanticGraphBuilder(ManifestObjectLookup(sg_05_derived_metric_manifest)).build()
-    pathfinder: RecipeWriterPathfinder = MetricflowPathfinder()
+    pathfinder: RecipeWriterPathfinder = MetricFlowPathfinder()
     resolver = SimpleTrieResolver(semantic_graph=semantic_graph, path_finder=pathfinder)
     resolver._verbose_debug_logs = True
 

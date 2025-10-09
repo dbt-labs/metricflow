@@ -6,7 +6,7 @@ from functools import cached_property
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
 )
@@ -38,7 +38,7 @@ class SemanticManifestLookup:
             semantic_manifest=semantic_manifest, custom_granularities=self.custom_granularities
         )
 
-        pathfinder = MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
+        pathfinder = MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
         self._manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
         graph_builder = SemanticGraphBuilder(manifest_object_lookup=self._manifest_object_lookup)
         semantic_graph = graph_builder.build()

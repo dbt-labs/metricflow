@@ -7,9 +7,9 @@ from typing import Optional
 from typing_extensions import override
 
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.mf_graph.path_finding.traversal_profile_differ import TraversalProfileDiffer
 from metricflow_semantics.experimental.ordered_set import OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import AttributeRecipe
@@ -52,7 +52,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
     def __init__(
         self,
         semantic_graph: SemanticGraph,
-        path_finder: MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
+        path_finder: MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
         max_path_model_count: Optional[int] = None,
     ) -> None:
         """Initializer.
@@ -133,7 +133,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             )
 
         if len(result_intersection_source_nodes) == 0:
-            raise MetricflowInternalError(
+            raise MetricFlowInternalError(
                 LazyFormat("No applicable descendant nodes were found for intersection.", source_nodes=source_nodes)
             )
 
@@ -180,7 +180,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
                     metric_time_edge = edge
 
             if local_model_edge is None or metric_time_edge is None or len(successors) != 2:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "A measure node should have exactly 2 successors: a local-model node and a metric-time node"
                         "\nbut it does not.",
@@ -216,7 +216,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
 
             return MutableDunderNameTrie.union_exclude_common((result_from_local_model_node, result_from_metric_time))
         else:
-            raise MetricflowInternalError(
+            raise MetricFlowInternalError(
                 LazyFormat(
                     "The given node is not a supported source node for resolving attribute names",
                     source_node=source_node,
@@ -262,7 +262,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             if self._verbose_debug_logs:
                 logger.debug(LazyFormat("Found path to target node", path_nodes=found_path.nodes, recipe=recipe))
             if recipe is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "A path from a source node to a target node does not have a recipe. This indicates an error in "
                         "traversal."
@@ -296,7 +296,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
         return self._result_cache.set_and_get(cache_key, result_trie)
 
     def _should_exclude_date_part(
-        self, source_nodes: Set[SemanticGraphNode], collected_labels: OrderedSet[MetricflowGraphLabel]
+        self, source_nodes: Set[SemanticGraphNode], collected_labels: OrderedSet[MetricFlowGraphLabel]
     ) -> bool:
         """To handle a bug, check if we should exclude date part from the query.
 

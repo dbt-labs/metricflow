@@ -21,7 +21,7 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import ExecutionException, InvalidQueryException, UnknownMetricError
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.mf_logging.runtime import log_block_runtime
@@ -700,7 +700,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 origin_semantic_model_reference
             )
             if semantic_model is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Unable to find the semantic model associated with a spec",
                         spec=annotated_spec.spec,

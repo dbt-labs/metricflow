@@ -20,14 +20,14 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotGraphAttributeSet,
     DotNodeAttributeSet,
 )
-from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import MetricflowGraphFormatter
+from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
 from metricflow_semantics.experimental.mf_graph.formatting.pretty_graph_formatter import PrettyFormatGraphFormatter
 from metricflow_semantics.experimental.mf_graph.graph_element import (
-    MetricflowGraphElement,
+    MetricFlowGraphElement,
 )
-from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
-from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
+from metricflow_semantics.experimental.mf_graph.graph_id import MetricFlowGraphId
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -39,17 +39,17 @@ from metricflow_semantics.mf_logging.pretty_formatter import (
 
 logger = logging.getLogger(__name__)
 
-NodeT = TypeVar("NodeT", bound="MetricflowGraphNode")
-EdgeT = TypeVar("EdgeT", bound="MetricflowGraphEdge")
+NodeT = TypeVar("NodeT", bound="MetricFlowGraphNode")
+EdgeT = TypeVar("EdgeT", bound="MetricFlowGraphEdge")
 
-NodeT_co = TypeVar("NodeT_co", bound="MetricflowGraphNode", covariant=True)
-EdgeT_co = TypeVar("EdgeT_co", bound="MetricflowGraphEdge", covariant=True)
+NodeT_co = TypeVar("NodeT_co", bound="MetricFlowGraphNode", covariant=True)
+EdgeT_co = TypeVar("EdgeT_co", bound="MetricFlowGraphEdge", covariant=True)
 
 
-class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, Comparable, ABC):
+class MetricFlowGraphNode(MetricFlowGraphElement, MetricFlowPrettyFormattable, Comparable, ABC):
     """Base class for nodes in a directed graph."""
 
-    _DEFAULT_NODE_LABELS: ClassVar[OrderedSet[MetricflowGraphLabel]] = FrozenOrderedSet()
+    _DEFAULT_NODE_LABELS: ClassVar[OrderedSet[MetricFlowGraphLabel]] = FrozenOrderedSet()
 
     def as_dot_node(self, include_graphical_attributes: bool) -> DotNodeAttributeSet:
         """Return this as attributes for a DOT node.
@@ -65,13 +65,13 @@ class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, C
 
     @property
     @abstractmethod
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:  # noqa: D102
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:  # noqa: D102
         raise NotImplementedError
 
     @property
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         """Return the labels that can be used for lookups to get this node."""
-        return MetricflowGraphNode._DEFAULT_NODE_LABELS
+        return MetricFlowGraphNode._DEFAULT_NODE_LABELS
 
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
@@ -89,13 +89,13 @@ class MetricflowGraphNode(MetricflowGraphElement, MetricFlowPrettyFormattable, C
 
 
 @fast_frozen_dataclass(order=False)
-class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, Comparable, Generic[NodeT_co], ABC):
+class MetricFlowGraphEdge(MetricFlowGraphElement, MetricFlowPrettyFormattable, Comparable, Generic[NodeT_co], ABC):
     """Base class for edges in a directed graph.
 
     An edge can be visualized as an arrow that points from the tail node to the head node.
     """
 
-    _DEFAULT_EDGE_LABELS: ClassVar[OrderedSet[MetricflowGraphLabel]] = FrozenOrderedSet()
+    _DEFAULT_EDGE_LABELS: ClassVar[OrderedSet[MetricFlowGraphLabel]] = FrozenOrderedSet()
 
     tail_node: NodeT_co
     head_node: NodeT_co
@@ -125,9 +125,9 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         )
 
     @property
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         """Return the labels that can be used for lookups to get this edge."""
-        return MetricflowGraphEdge._DEFAULT_EDGE_LABELS
+        return MetricFlowGraphEdge._DEFAULT_EDGE_LABELS
 
     @override
     def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
@@ -144,7 +144,7 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         )
 
     @cached_property
-    def labels_for_path_addition(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels_for_path_addition(self) -> OrderedSet[MetricFlowGraphLabel]:
         """Return the labels for this edge and the head node.
 
         This is useful for collecting labels while building a path by adding an edge.
@@ -152,7 +152,7 @@ class MetricflowGraphEdge(MetricflowGraphElement, MetricFlowPrettyFormattable, C
         return self.labels.union(self.head_node.labels)
 
 
-class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], ABC):
+class MetricFlowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], ABC):
     """Base class for a directed graph."""
 
     @property
@@ -162,11 +162,11 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
         raise NotImplementedError()
 
     @abstractmethod
-    def nodes_with_labels(self, *graph_labels: MetricflowGraphLabel) -> OrderedSet[NodeT_co]:
+    def nodes_with_labels(self, *graph_labels: MetricFlowGraphLabel) -> OrderedSet[NodeT_co]:
         """Return nodes in the graph with any one of the given labels."""
         raise NotImplementedError()
 
-    def node_with_label(self, label: MetricflowGraphLabel) -> NodeT_co:
+    def node_with_label(self, label: MetricFlowGraphLabel) -> NodeT_co:
         """Finds the node with the given label. If not exactly one if found, an error is raised."""
         nodes = self.nodes_with_labels(label)
         matching_node_count = len(nodes)
@@ -187,26 +187,26 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
         raise NotImplementedError()
 
     @abstractmethod
-    def edges_with_tail_node(self, tail_node: MetricflowGraphNode) -> OrderedSet[EdgeT_co]:
+    def edges_with_tail_node(self, tail_node: MetricFlowGraphNode) -> OrderedSet[EdgeT_co]:
         """Returns edges with the given tail node."""
         raise NotImplementedError()
 
     @abstractmethod
-    def edges_with_head_node(self, tail_node: MetricflowGraphNode) -> OrderedSet[EdgeT_co]:
+    def edges_with_head_node(self, tail_node: MetricFlowGraphNode) -> OrderedSet[EdgeT_co]:
         """Returns edges with the given head node."""
         raise NotImplementedError()
 
     @abstractmethod
-    def edges_with_label(self, label: MetricflowGraphLabel) -> OrderedSet[EdgeT_co]:
+    def edges_with_label(self, label: MetricFlowGraphLabel) -> OrderedSet[EdgeT_co]:
         """Return the set of edges in a graph that have the given label."""
         raise NotImplementedError()
 
-    def format(self, formatter: MetricflowGraphFormatter = PrettyFormatGraphFormatter()) -> str:
+    def format(self, formatter: MetricFlowGraphFormatter = PrettyFormatGraphFormatter()) -> str:
         """Return a representation of this graph using the given formatter."""
         return formatter.format_graph(self)
 
     @abstractmethod
-    def successors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT_co]:
+    def successors(self, node: MetricFlowGraphNode) -> OrderedSet[NodeT_co]:
         """Returns successors of the given node.
 
         Raises `UnknownNodeException` if the node does not exist in the graph.
@@ -214,7 +214,7 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
         return FrozenOrderedSet(edge.head_node for edge in self.edges_with_tail_node(node))
 
     @abstractmethod
-    def predecessors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT_co]:
+    def predecessors(self, node: MetricFlowGraphNode) -> OrderedSet[NodeT_co]:
         """Returns predecessors of the given node.
 
         Raises `UnknownNodeException` if the node does not exist in the graph.
@@ -233,7 +233,7 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
         """Return a copy of this graph with the nodes and edges sorted."""
         raise NotImplementedError
 
-    def _intersect_edges(self, other: MetricflowGraph[NodeT_co, EdgeT_co]) -> OrderedSet[EdgeT_co]:
+    def _intersect_edges(self, other: MetricFlowGraph[NodeT_co, EdgeT_co]) -> OrderedSet[EdgeT_co]:
         return self.edges.intersection(other.edges)
 
     @abstractmethod
@@ -267,7 +267,7 @@ class MetricflowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
 
     @property
     @abstractmethod
-    def graph_id(self) -> MetricflowGraphId:
+    def graph_id(self) -> MetricFlowGraphId:
         """Return a graph ID.
 
         This ID will be used for caching cases.

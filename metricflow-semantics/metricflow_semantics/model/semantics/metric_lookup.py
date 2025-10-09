@@ -19,7 +19,7 @@ from metricflow_semantics.errors.error_classes import (
 )
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricflowInternalError
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricFlowInternalError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
@@ -105,7 +105,7 @@ class MetricLookup:
         if len(metric_inputs) == 0:
             metric_aggregation_params = metric.type_params.metric_aggregation_params
             if metric_aggregation_params is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat("Expected `metric_aggregation_params` to be set", metric=metric)
                 )
             model_references.add(SemanticModelReference(metric_aggregation_params.semantic_model))
@@ -177,7 +177,7 @@ class MetricLookup:
         elif metric_type is MetricType.CUMULATIVE:
             cumulative_type_params = metric.type_params.cumulative_type_params
             if cumulative_type_params is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Expected `cumulative_type_params` to be set for a cumulative metric",
                         complex_metric=metric,
@@ -186,7 +186,7 @@ class MetricLookup:
 
             input_metric_for_cumulative_metric = cumulative_type_params.metric
             if input_metric_for_cumulative_metric is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Expected `metric` to be set for a cumulative metric",
                         complex_metric=metric,
@@ -197,7 +197,7 @@ class MetricLookup:
         elif metric_type is MetricType.RATIO:
             numerator = metric.type_params.numerator
             if numerator is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Expected `numerator` to be set for a ratio metric",
                         complex_metric=metric,
@@ -207,7 +207,7 @@ class MetricLookup:
 
             denominator = metric.type_params.denominator
             if denominator is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Expected `denominator` to be set for a ratio metric",
                         complex_metric=metric,
@@ -217,7 +217,7 @@ class MetricLookup:
         elif metric_type is MetricType.CONVERSION:
             conversion_type_params = metric.type_params.conversion_type_params
             if conversion_type_params is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Expected `conversion_type_params` to be set for a conversion metric",
                         complex_metric=metric,
@@ -225,7 +225,7 @@ class MetricLookup:
                 )
             base_metric = conversion_type_params.base_metric
             if base_metric is None:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat("Expected `base_metric` to be set for a conversion metric", complex_metric=metric)
                 )
             metric_inputs.append(base_metric)
@@ -233,7 +233,7 @@ class MetricLookup:
             if include_conversion_metric_input:
                 conversion_metric = conversion_type_params.conversion_metric
                 if conversion_metric is None:
-                    raise MetricflowInternalError(
+                    raise MetricFlowInternalError(
                         LazyFormat(
                             "Expected `conversion_metric` to be set for a conversion metric", complex_metric=metric
                         )
@@ -243,7 +243,7 @@ class MetricLookup:
         elif metric_type is MetricType.DERIVED:
             metrics = metric.type_params.metrics
             if not metrics:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat("Expected `metrics` to be set for a derived metric", derived_metric=metric)
                 )
             metric_inputs.extend(metrics)

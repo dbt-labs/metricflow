@@ -20,12 +20,12 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotNodeAttributeSet,
     DotRankKey,
 )
-from metricflow_semantics.experimental.mf_graph.graph_converter import MetricflowGraphConverter
+from metricflow_semantics.experimental.mf_graph.graph_converter import MetricFlowGraphConverter
 from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.experimental.mf_graph.mf_graph import (
-        MetricflowGraph,
+        MetricFlowGraph,
     )
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class DotConversionArgumentSet:
         )
 
 
-class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionResult]):
+class MetricFlowGraphToDotConverter(MetricFlowGraphConverter[DotGraphConversionResult]):
     """Convert an MF graph to a DOT graph."""
 
     def __init__(  # noqa: D107
@@ -81,7 +81,7 @@ class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionR
 
     def _create_dot_attributes(
         self,
-        graph: MetricflowGraph,
+        graph: MetricFlowGraph,
     ) -> DotAttributeSet:
         cluster_name_to_dot_nodes: dict[Optional[str], AnyLengthTuple[DotNodeAttributeSet]] = {}
 
@@ -138,7 +138,7 @@ class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionR
             with subgraph_context as subgraph:
                 if cluster_name is not None:
                     subgraph.attr(label=cluster_name, **converter_arguments.cluster_attributes)
-                added_nodes = MetricflowGraphToDotConverter._add_nodes_with_rank(
+                added_nodes = MetricFlowGraphToDotConverter._add_nodes_with_rank(
                     converter_arguments=converter_arguments, dot_graph=subgraph, dot_nodes=dot_nodes
                 )
                 all_dot_nodes.extend(added_nodes)
@@ -190,9 +190,9 @@ class MetricflowGraphToDotConverter(MetricflowGraphConverter[DotGraphConversionR
         return added_dot_nodes
 
     @override
-    def convert_graph(self, graph: MetricflowGraph) -> DotGraphConversionResult:
+    def convert_graph(self, graph: MetricFlowGraph) -> DotGraphConversionResult:
         dot_elements = self._create_dot_attributes(graph)
-        return MetricflowGraphToDotConverter.create_dot_graph(self._arguments, dot_elements)
+        return MetricFlowGraphToDotConverter.create_dot_graph(self._arguments, dot_elements)
 
 
 @dataclass

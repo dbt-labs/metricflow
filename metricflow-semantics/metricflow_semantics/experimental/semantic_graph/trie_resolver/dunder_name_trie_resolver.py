@@ -8,7 +8,7 @@ from typing import Optional
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import (
-    MetricflowPathfinder,
+    MetricFlowPathfinder,
 )
 from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder_result import GraphTraversalResult
 from metricflow_semantics.experimental.ordered_set import OrderedSet
@@ -50,7 +50,7 @@ class DunderNameTrieResolver(ABC):
     def __init__(  # noqa: D107
         self,
         semantic_graph: SemanticGraph,
-        path_finder: MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
+        path_finder: MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
     ) -> None:
         self._semantic_graph = semantic_graph
         self._path_finder = path_finder

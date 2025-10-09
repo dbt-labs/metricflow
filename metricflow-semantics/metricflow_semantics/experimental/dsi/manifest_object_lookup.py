@@ -17,7 +17,7 @@ from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
 from metricflow_semantics.experimental.dsi.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
@@ -67,7 +67,7 @@ class ManifestObjectLookup(AttributePrettyFormattable):
             if metric_type is MetricType.SIMPLE:
                 metric_aggregation_params = metric.type_params.metric_aggregation_params
                 if metric_aggregation_params is None:
-                    raise MetricflowInternalError(
+                    raise MetricFlowInternalError(
                         LazyFormat("A simple metric is missing `metric_aggregation_params`", metric=metric)
                     )
                 model_name_to_simple_metrics[metric_aggregation_params.semantic_model].append(metric)

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @fast_frozen_dataclass()
-class MetricflowGraphNodeDescriptor:
+class MetricFlowGraphNodeDescriptor:
     """Descriptor for a node to allow for lookups by strings."""
 
     node_name: str
