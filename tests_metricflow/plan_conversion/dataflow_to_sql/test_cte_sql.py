@@ -87,14 +87,14 @@ def test_cte_for_simple_dataflow_plan(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> None:
     """Test a simple case for generating a CTE for a specific dataflow plan node."""
-    measure_spec = SimpleMetricInputSpec(
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filter_node = FilterElementsNode.create(
-        parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(measure_spec,))
+        parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,))
     )
 
     convert_and_check(
