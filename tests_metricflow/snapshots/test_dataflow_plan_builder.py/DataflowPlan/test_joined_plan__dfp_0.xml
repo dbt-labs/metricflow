@@ -1,7 +1,7 @@
 test_name: test_joined_plan
 test_filename: test_dataflow_plan_builder.py
 docstring:
-  Tests a plan getting a measure and a joined dimension.
+  Tests a plan getting a simple-metric input and a joined dimension.
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>
