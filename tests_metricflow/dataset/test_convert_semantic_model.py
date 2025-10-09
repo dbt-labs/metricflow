@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
-def test_convert_table_semantic_model_without_measures(
+def test_convert_table_semantic_model_without_simple_metrics(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
@@ -47,7 +47,7 @@ def test_convert_table_semantic_model_without_measures(
 
 @pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
-def test_convert_table_semantic_model_with_measures(
+def test_convert_table_semantic_model_with_simple_metrics(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,

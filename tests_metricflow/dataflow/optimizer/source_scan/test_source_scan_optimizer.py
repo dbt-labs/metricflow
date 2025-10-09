@@ -424,7 +424,7 @@ def test_2_ratio_metrics_from_1_semantic_model(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_duplicate_measures(
+def test_duplicate_simple_metrics(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

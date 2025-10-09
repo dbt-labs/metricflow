@@ -155,7 +155,7 @@ def test_join_to_time_spine_with_queried_time_constraint(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_join_to_time_spine_with_input_measure_constraint(
+def test_join_to_time_spine_with_input_simple_metric_constraint(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
