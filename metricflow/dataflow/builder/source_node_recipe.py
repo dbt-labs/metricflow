@@ -12,7 +12,7 @@ from metricflow.dataflow.nodes.join_to_base import JoinDescription
 
 @dataclass(frozen=True)
 class SourceNodeRecipe:
-    """Get a recipe for how to build a dataflow plan node that outputs measures and linkable instances as needed."""
+    """Get a recipe for how to build a dataflow plan node that outputs simple-metric inputs and linkable instances as needed."""
 
     source_node: DataflowPlanNode
     required_local_linkable_specs: LinkableSpecSet

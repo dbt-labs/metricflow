@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class GroupByItemSetResolver(ABC):
-    """Resolves available group-by items for measures and metrics."""
+    """Resolves available group-by items for simple-metric inputs and metrics."""
 
     @abstractmethod
     def get_set_for_distinct_values_query(

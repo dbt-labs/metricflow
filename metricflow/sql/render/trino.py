@@ -106,7 +106,7 @@ class TrinoSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         ):
             raise RuntimeError(
                 "Discrete, Continuous and Approximate discrete percentile aggregates are not supported for Trino. Set "
-                + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
+                + "use_approximate_percentile and disable use_discrete_percentile in all percentile simple-metrics."
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)

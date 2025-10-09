@@ -83,5 +83,5 @@ class JoinToTimeSpineDescription:
 
     @property
     def uses_offset(self) -> bool:
-        """Return True if the measure uses an offset."""
+        """Return True if the simple-metric input uses an offset."""
         return self.offset_window is not None or self.offset_to_grain is not None

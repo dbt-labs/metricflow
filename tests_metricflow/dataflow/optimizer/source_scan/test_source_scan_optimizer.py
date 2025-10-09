@@ -176,7 +176,7 @@ def test_2_metrics_from_1_semantic_model(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests that optimizing the plan for 2 metrics from 2 measure semantic models results in half the number of scans.
+    """Tests that optimizing the plan for 2 metrics from 2 simple-metric input semantic models results in half the number of scans.
 
     Each metric is computed from the same measure semantic model and the dimension semantic model.
     """
@@ -273,7 +273,7 @@ def test_derived_metric(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests optimization of a query that use a derived metrics with measures coming from a single semantic model.
+    """Tests optimization of a query that use a derived metrics with simple-metric inputs coming from a single semantic model.
 
     non_referred_bookings_pct is a derived metric that uses measures [bookings, referred_bookings]
     """
@@ -406,7 +406,7 @@ def test_2_ratio_metrics_from_1_semantic_model(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests that 2 ratio metrics with measures from a 1 semantic model result in 1 scan."""
+    """Tests that 2 ratio metrics with simple-metric inputs from a 1 semantic model result in 1 scan."""
     check_optimization(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -429,7 +429,7 @@ def test_duplicate_simple_metrics(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a case where derived metrics in a query use the same measure (in the same form e.g. filters)."""
+    """Tests a case where derived metrics in a query use the same simple-metric input (in the same form e.g. filters)."""
     check_optimization(
         request=request,
         mf_test_configuration=mf_test_configuration,

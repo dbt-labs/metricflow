@@ -928,7 +928,7 @@ class SqlPercentileExpressionArgument:
 
     @staticmethod
     def from_aggregation_parameters(agg_params: MeasureAggregationParameters) -> SqlPercentileExpressionArgument:
-        """Given the measure parameters, returns a SqlPercentileExpressionArgument with the corresponding percentile args."""
+        """Given the simple-metric input parameters, returns a SqlPercentileExpressionArgument with the corresponding percentile args."""
         if not agg_params.percentile:
             raise RuntimeError("Percentile value is none - this should have been caught during model parsing.")
 

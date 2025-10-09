@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 
 
 class GroupByMetricTrieResolver(DunderNameTrieResolver):
-    """Resolves the group-by metrics that are available for the given measures / metrics.
+    """Resolves the group-by metrics that are available for the given simple-metric inputs / metrics.
 
     Group-by metrics are handled separately to break out the resolution of all available group-by items into smaller
     pieces.
@@ -203,7 +203,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
                     LazyFormat(
                         "Valid group-by metrics for the given entity-key name not found. this may occur"
                         " when a given entity is not accessible from any metric (known case is related to conversion"
-                        " measures)",
+                        " simple-metric inputs)",
                         entity_key_name=entity_key_name,
                         known_key_names=list(self._entity_key_name_to_metric_names.keys()),
                     )
@@ -419,7 +419,7 @@ class _MetricNameToEntityKeyTrieGenerator:
         deny_labels = {
             # For metrics that require metric time to be in a query, it's not possible to query just the entity keys.
             DenyEntityKeyQueryResolutionLabel.get_instance(),
-            # For conversion metrics, the conversion measure is effectively hidden and is not used to generate the
+            # For conversion metrics, the conversion simple-metric input is effectively hidden and is not used to generate the
             # available group-by items for a metric.
             DenyVisibleAttributesLabel.get_instance(),
         }
@@ -441,7 +441,7 @@ class _MetricNameToEntityKeyTrieGenerator:
             if self._verbose_debug_logs:
                 logger.debug(
                     LazyFormat(
-                        "Found model nodes containing the measures for the given metric. Those model nodes"
+                        "Found model nodes containing the simple-metric inputs for the given metric. Those model nodes"
                         " will be used for generating the available group-by items.",
                         simple_metric_node=simple_metric_node,
                         visible_source_model_nodes=visible_source_model_nodes,
@@ -469,7 +469,7 @@ class _MetricNameToEntityKeyTrieGenerator:
             if self._verbose_debug_logs:
                 logger.debug(
                     LazyFormat(
-                        "Found model nodes containing the measures for the given metric. Those model nodes"
+                        "Found model nodes containing the simple-metric inputs for the given metric. Those model nodes"
                         " will be used for generating the available group-by items.",
                         simple_metric_node=simple_metric_node,
                         visible_source_model_nodes=visible_source_model_nodes,

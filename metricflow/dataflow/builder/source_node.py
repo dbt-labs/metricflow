@@ -27,9 +27,9 @@ class SourceNodeSet:
     manifest.
     """
 
-    # Semantic models without measures are 1:1 mapped to a ReadSqlSourceNode. Semantic models containing measures are
+    # Semantic models without simple-metric inputs are 1:1 mapped to a ReadSqlSourceNode. Semantic models containing simple-metric inputs are
     # mapped to components with a transformation node to add `metric_time` / to support multiple aggregation time
-    # dimensions. Each semantic model containing measures with k different aggregation time dimensions is mapped to k
+    # dimensions. Each semantic model containing simple-metric inputs with k different aggregation time dimensions is mapped to k
     # components.
     source_nodes_for_metric_queries: Tuple[DataflowPlanNode, ...]
 
@@ -99,7 +99,7 @@ class SourceNodeBuilder:
             simple_metric_model_lookup = model_reference_to_simple_metric_model_lookup.get(model_reference)
 
             if simple_metric_model_lookup is None:
-                # Dimension sources may not have any measures -> no aggregation time dimensions.
+                # Dimension sources may not have any simple-metric inputs -> no aggregation time dimensions.
                 source_nodes_for_metric_queries.append(read_node)
             else:
                 # Splits the simple metrics by distinct aggregate time dimension.

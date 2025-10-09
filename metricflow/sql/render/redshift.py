@@ -51,12 +51,12 @@ class RedshiftSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         elif node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE:
             raise UnsupportedEngineFeatureError(
                 "Discrete percentile aggregate not supported for Redshift. Use "
-                + "continuous or approximate discrete percentile in all percentile measures."
+                + "continuous or approximate discrete percentile in all percentile simple-metrics."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             raise UnsupportedEngineFeatureError(
                 "Approximate continuous percentile aggregate not supported for Redshift. Use "
-                + "continuous or approximate discrete percentile in all percentile measures."
+                + "continuous or approximate discrete percentile in all percentile simple-metrics."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             function_str = "APPROXIMATE PERCENTILE_DISC"

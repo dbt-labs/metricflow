@@ -103,12 +103,12 @@ class PostgresSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             raise UnsupportedEngineFeatureError(
                 "Approximate continuous percentile aggregate not supported for Postgres. Set "
-                + "use_approximate_percentile to false in all percentile measures."
+                + "use_approximate_percentile to false in all percentile simple-metrics."
             )
         elif node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
             raise UnsupportedEngineFeatureError(
                 "Approximate discrete percentile aggregate not supported for Postgres. Set "
-                + "use_approximate_percentile to false in all percentile measures."
+                + "use_approximate_percentile to false in all percentile simple-metrics."
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)

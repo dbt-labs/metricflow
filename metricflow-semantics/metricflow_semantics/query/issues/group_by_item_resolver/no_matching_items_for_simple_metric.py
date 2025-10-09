@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class NoMatchingItemsForSimpleMetric(MetricFlowQueryResolutionIssue):
-    """Describes an issue with the query where there are no matching items for a measure.
+    """Describes an issue with the query where there are no matching items for a simple-metric input.
 
     This can happen if the user specifies a group-by-item that does not exist or is not available for the measure.
     """

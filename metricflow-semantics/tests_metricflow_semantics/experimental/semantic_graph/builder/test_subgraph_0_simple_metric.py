@@ -22,7 +22,7 @@ def test_minimal_manifest(  # noqa: D103
     mf_test_configuration: MetricFlowTestConfiguration,
     sg_00_minimal_manifest: SemanticManifest,
 ) -> None:
-    """Test generation of the measure subgraph using the minimal manifest."""
+    """Test generation of the simple-metric input subgraph using the minimal manifest."""
     check_graph_build(
         request=request,
         mf_test_configuration=mf_test_configuration,

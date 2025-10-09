@@ -288,7 +288,7 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
 
     @override
     def visit_no_metrics_query_node(self, node: NoMetricsGroupByItemSourceNode) -> FilterSpecResolutionLookUp:
-        """Similar to the measure node - filters are applied at the query level."""
+        """Similar to the simple-metric input node - filters are applied at the query level."""
         with self._path_from_start_node_tracker.track_node_visit(node):
             logger.debug(LazyFormat("Visiting node", node=node.ui_description))
             output = FilterSpecResolutionLookUp.empty_instance()

@@ -113,15 +113,15 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         </>
 
     can't be superpositioned / combined because the different set of linkable specs in the FilterElementsNode will cause
-    the AggregatedMeasuresNode to produce values for the measure that is different from the original branches. The logic
+    the AggregatedMeasuresNode to produce values for the simple-metric input that is different from the original branches. The logic
     to determine whether this is possible for each node type is encapsulated into the handler for each node type.
 
     In general, the questions to consider for combination are:
 
     * For nodes with no parents, can you combine the corresponding left and right nodes to produce an output
-    that is has the same linkable specs, but a superset of the measures / metrics?
+    that is has the same linkable specs, but a superset of the simple-metric inputs / metrics?
     * For other nodes, does a set of inputs that have the same linkable specs as the inputs to the left and right nodes
-    but a superset of measures / metrics produce an output that superset of measures / metrics (with the same values)
+    but a superset of simple-metric inputs / metrics produce an output that superset of simple-metric inputs / metrics (with the same values)
     as the left and right nodes?
 
     The visitor traverses the dataflow plan via DFS, recursively combining the parent nodes first and combining the
@@ -252,7 +252,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_parent_node = combined_parent_nodes[0]
 
         # Avoid combining branches if the AggregateSimpleMetricInputsNode specifies conflicting aliases.
-        # e.g. two metrics use the same alias for two different measures. This is not always the case,
+        # e.g. two metrics use the same alias for two different simple-metric inputs. This is not always the case,
         # so this could be improved later.
         if self._current_left_node.alias_mapping.has_conflict(current_right_node.alias_mapping):
             self._log_combine_failure(

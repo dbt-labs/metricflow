@@ -25,7 +25,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
         base_node: node containing dataset for computing base events.
         base_time_dimension_spec: time dimension for the base events to compute against.
         conversion_node: node containing dataset to join base node for computing conversion events.
-        conversion_input_metric_spec: expose this measure in the resulting dataset for aggregation.
+        conversion_input_metric_spec: expose this simple metric in the resulting dataset for aggregation.
         conversion_time_dimension_spec: time dimension for the conversion events to compute against.
         unique_identifier_keys: columns to uniquely identify each conversion event.
         entity_spec: the specific entity in which the conversion is happening for.

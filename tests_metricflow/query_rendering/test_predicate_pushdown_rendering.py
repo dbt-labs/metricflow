@@ -82,7 +82,7 @@ def test_different_filters_on_same_simple_metric_source_categorical_dimension(
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    """Tests rendering a query where multiple filters against the same measure dimension need to be an effective OR.
+    """Tests rendering a query where multiple filters against the same simple-metric input dimension need to be an effective OR.
 
     This can be an issue where a derived metric takes in two filters that refer to the same dimension from the input
     measure source. If these filters are disjoint the predicate pushdown needs to ensure that all matching rows are

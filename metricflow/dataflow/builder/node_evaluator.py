@@ -2,15 +2,14 @@
 
 For example:
 
-I have a node containing a measure that's needed for a metric, and I also have a list of dimensions that I need for that
-measure.
+I have a node containing a simple metric, and I also have a list of dimensions that I need for that simple metric.
 
 Can I join that node with other nodes using a common entity to get those dimensions? If so, what are those nodes,
 what entity should I join on, and if I do that join, what dimensions can be retrieved?
 
 Note: the term "dimension" is used below, but it actually refers to any LinkableInstance. Also, when you see the term
-"left_node", think "node containing the measure". Using the term "left_node" as the scenario of joining measure nodes
-to dimension nodes is an easy case to explain, but there are non-measure nodes that can be joined with dimension nodes
+"left_node", think "node containing the metric". Using the term "left_node" as the scenario of joining metric nodes
+to dimension nodes is an easy case to explain, but there are non-metric nodes that can be joined with dimension nodes
 to realize other planned features.
 """
 
@@ -153,9 +152,12 @@ class LinkableInstanceSatisfiabilityEvaluation:
 class NodeEvaluatorForLinkableInstances:
     """Helps to evaluate if linkable instances can be obtained using the given node, with joins if necessary.
 
-    For example, consider a "left_node" (that will be on the left side of the join) containing the "bookings" measure,
-    "is_instant" dimension, and "listing_id" entity with nodes_available_for_joins including a node with the
-    "listing_id" entity, and the "country" dimension.
+    For example, consider a "left_node" (that will be on the left side of the join) containing:
+    * the "bookings" simple metric,
+    * the "is_instant" dimension
+    * "listing_id" entity
+
+    with nodes_available_for_joins including a node with the "listing_id" entity, and the "country" dimension.
 
     We want to know if we can get "bookings", "is_instant", "listing_id__country" using the left_node. The result
     should be that we know: "is_instant" is available locally (i.e. in the same node), and if we join another node
@@ -176,7 +178,7 @@ class NodeEvaluatorForLinkableInstances:
         Args:
             semantic_model_lookup: Needed to resolve partition dimensions.
             nodes_available_for_joins: Nodes that contain linkable instances and may be joined with "left_node" (on the
-            left side of the join and containing a desired measure) to retrieve the needed linkable instances.
+            left side of the join and containing a desired simple metric to retrieve the needed linkable instances.
             node_data_set_resolver: Figures out what data set is output by a node.
             time_spine_node: If nodes_available_for_joins contains a time spine node, it should be identical to this
             one as there is logic to check for equality.
@@ -420,8 +422,8 @@ class NodeEvaluatorForLinkableInstances:
             is_metric_time = required_linkable_spec.element_name == DataSet.metric_time_dimension_name()
             is_local = required_linkable_spec in data_set_linkable_specs
             is_unjoinable = (
-                # metric_time is never unjoinable. In metric queries, the agg_time_dimension is local to the measure source node.
-                # In no-metric queries, can always CROSS JOIN to a time spine.
+                # metric_time is never unjoinable. In metric queries, the agg_time_dimension is local to the
+                # simple-metric source node. In no-metric queries, can always CROSS JOIN to a time spine.
                 (not is_metric_time)
                 and (
                     # metric_time is the only element that can be joined without entity links.

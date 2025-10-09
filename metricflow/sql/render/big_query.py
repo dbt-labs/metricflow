@@ -101,7 +101,7 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
         ):
             raise UnsupportedEngineFeatureError(
                 "Only approximate continous percentile aggregations are supported for BigQuery. Set "
-                + "use_approximate_percentile and disable use_discrete_percentile in all percentile measures."
+                + "use_approximate_percentile and disable use_discrete_percentile in all percentile simple-metrics."
             )
         else:
             assert_values_exhausted(node.percentile_args.function_type)

@@ -32,7 +32,7 @@ def __get_filtered_simple_metric_input_instance_set(
     simple_metric_input_name: str,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> InstanceSet:
-    """Gets an InstanceSet consisting of only the measure instance matching the given name and semantic model."""
+    """Gets an InstanceSet consisting of only the simple-metric input instance matching the given name and semantic model."""
     dataset = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].data_set_mapping[
         semantic_model_name
     ]

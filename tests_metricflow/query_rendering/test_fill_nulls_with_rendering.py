@@ -1,4 +1,4 @@
-"""Tests query rendering for coalescing null measures by comparing rendered output against snapshot files."""
+"""Tests query rendering for coalescing null simple-metric inputs by comparing rendered output against snapshot files."""
 
 from __future__ import annotations
 

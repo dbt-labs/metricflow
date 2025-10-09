@@ -36,9 +36,9 @@ class DataSet(ABC):
 
     @staticmethod
     def metric_time_dimension_reference() -> TimeDimensionReference:
-        """Returns a special reference that means 'the aggregation time dimension for all measures in the data set'.
+        """Returns a special reference that means 'the aggregation time dimension for all simple-metric inputs in the data set'.
 
-        Or to put in another way, if metrics for those measures were plotted together on a graph, this is the name of
+        Or to put in another way, if associated metrics were plotted together on a graph, this is the name of
         the time dimension for the x-axis.
         """
         return TimeDimensionReference(element_name=MetricFlowReservedKeywords.METRIC_TIME.value)

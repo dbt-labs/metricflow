@@ -56,7 +56,7 @@ class SimpleMetricSubgraphGenerator(SemanticSubgraphGenerator):
                 simple_metric_name = simple_metric_input.name
 
                 simple_metric_node = SimpleMetricNode.get_instance(simple_metric_name)
-                # Add an edge from the measure node to the metric-time node.
+                # Add an edge from the simple-metric input node to the metric-time node.
                 edge_list.append(
                     EntityRelationshipEdge.create(
                         tail_node=simple_metric_node,
@@ -67,7 +67,7 @@ class SimpleMetricSubgraphGenerator(SemanticSubgraphGenerator):
                         ),
                     )
                 )
-                # Add an edge from the measure node to the model node.
+                # Add an edge from the simple-metric input node to the model node.
                 edge_list.append(
                     EntityRelationshipEdge.create(
                         tail_node=simple_metric_node,
