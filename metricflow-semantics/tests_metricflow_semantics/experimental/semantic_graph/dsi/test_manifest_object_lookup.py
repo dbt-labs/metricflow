@@ -31,7 +31,7 @@ def test_model_lookup_performance(manifest_with_200_models_100_metrics: Semantic
                 time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(semantic_manifest)
                 custom_granularities = TimeSpineSource.build_custom_granularities(list(time_spine_sources.values()))
                 model_lookup = SemanticModelLookup(semantic_manifest, custom_granularities)
-                for _ in model_lookup.measure_lookup.measure_references:
+                for _ in model_lookup.get_dimension_references():
                     pass
 
     class _RightFunction(BenchmarkFunction):

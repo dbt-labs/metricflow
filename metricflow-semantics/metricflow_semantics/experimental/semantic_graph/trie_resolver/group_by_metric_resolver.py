@@ -25,7 +25,6 @@ from metricflow_semantics.experimental.semantic_graph.model_id import SemanticMo
 from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import MetricNode, MetricTimeNode
 from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     LocalModelLabel,
-    MeasureLabel,
     MetricLabel,
 )
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
@@ -76,7 +75,6 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
 
         self._nodes_in_path_from_metric_nodes_to_local_model_nodes = semantic_graph.nodes_with_labels(
             MetricLabel.get_instance(),
-            MeasureLabel.get_instance(),
             LocalModelLabel.get_instance(),
         )
         self._metric_time_node = MetricTimeNode.get_instance()

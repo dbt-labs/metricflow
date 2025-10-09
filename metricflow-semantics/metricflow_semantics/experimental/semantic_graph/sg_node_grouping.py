@@ -19,7 +19,6 @@ if typing.TYPE_CHECKING:
         ConfiguredEntityNode,
         JoinedModelNode,
         LocalModelNode,
-        MeasureNode,
         MetricTimeNode,
         SimpleMetricNode,
         TimeDimensionNode,
@@ -56,7 +55,6 @@ class SemanticGraphNodeTypedCollection:
     complex_metric_nodes: MutableOrderedSet[ComplexMetricNode] = dataclasses.field(
         default_factory=lambda: MutableOrderedSet()
     )
-    measure_nodes: MutableOrderedSet[MeasureNode] = dataclasses.field(default_factory=lambda: MutableOrderedSet())
 
     time_attribute_nodes: MutableOrderedSet[TimeAttributeNode] = dataclasses.field(
         default_factory=lambda: MutableOrderedSet()

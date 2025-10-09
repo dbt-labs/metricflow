@@ -57,9 +57,6 @@ def test_get_names(  # noqa: D103
         obj_id="result0",
         obj={
             "dimension_references": sorted([d.element_name for d in semantic_model_lookup.get_dimension_references()]),
-            "measure_references": sorted(
-                [m.element_name for m in semantic_model_lookup.measure_lookup.measure_references]
-            ),
             "entity_references": sorted([i.element_name for i in semantic_model_lookup.get_entity_references()]),
         },
     )

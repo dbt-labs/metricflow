@@ -148,13 +148,6 @@ class ManifestObjectLookup(AttributePrettyFormattable):
     def get_metrics(self) -> Iterable[Metric]:  # noqa: D102
         return self._metric_name_to_metric.values()
 
-    def get_model_id_for_measure(self, measure_name: str) -> SemanticModelId:  # noqa: D102
-        return self._lookup_object(
-            value_type=_ValueType.MODEL_ID,
-            name=measure_name,
-            name_to_object_mapping=self._measure_name_to_model_id,
-        )
-
     @cached_property
     def min_time_grain_in_time_spine(self) -> TimeGranularity:
         """Return the smallest time grain as configured in the time spine."""
@@ -195,15 +188,6 @@ class ManifestObjectLookup(AttributePrettyFormattable):
             ) from e
 
     @cached_property
-    def _measure_name_to_model_id(self) -> Mapping[str, SemanticModelId]:
-        """Mapping from the name of the measure to the associated semantic-model ID."""
-        return {
-            measure.name: SemanticModelId.get_instance(semantic_model.name)
-            for semantic_model in self.semantic_models
-            for measure in semantic_model.measures
-        }
-
-    @cached_property
     def _metric_name_to_metric(self) -> Mapping[str, Metric]:
         metric_name_to_metric: dict[str, Metric] = {}
 
@@ -232,6 +216,5 @@ class _ValueType(Enum):
     """Different types of objects stored as values in lookup dictionaries."""
 
     ENTITY = "entity"
-    MEASURE = "measure"
     METRIC = "metric"
     MODEL_ID = "model_id"

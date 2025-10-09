@@ -55,7 +55,7 @@ class SimpleMetricGroupByItemSourceNode(GroupByItemResolutionNode):
     @classmethod
     @override
     def id_prefix(cls) -> IdPrefix:
-        return StaticIdPrefix.MEASURE_GROUP_BY_ITEM_RESOLUTION_NODE
+        return StaticIdPrefix.SIMPLE_METRIC_GROUP_BY_ITEM_RESOLUTION_NODE
 
     @property
     @override

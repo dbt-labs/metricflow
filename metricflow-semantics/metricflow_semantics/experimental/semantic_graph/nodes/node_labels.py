@@ -11,20 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 @fast_frozen_dataclass(order=False)
-class MeasureLabel(MetricflowGraphLabel, Singleton):
-    """Used to label measure nodes.
-
-    `measure_name = None` is a label applied to all measure nodes.
-    """
-
-    measure_name: Optional[str]
-
-    @classmethod
-    def get_instance(cls, measure_name: Optional[str] = None) -> MeasureLabel:  # noqa: D102
-        return cls._get_instance(measure_name=measure_name)
-
-
-@fast_frozen_dataclass(order=False)
 class GroupByAttributeLabel(MetricflowGraphLabel, Singleton):
     """Label for any attribute node that can be used in the group-by argument of an MF query."""
 

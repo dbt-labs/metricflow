@@ -19,7 +19,6 @@ from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.dimension_lookup import DimensionLookup
-from metricflow_semantics.model.semantics.measure_lookup import MeasureLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -55,7 +54,6 @@ class SemanticModelLookup:
         for semantic_model in sorted_semantic_models:
             self._add_semantic_model(semantic_model)
 
-        self._measure_lookup = MeasureLookup(sorted_semantic_models, custom_granularities)
         self._dimension_lookup = DimensionLookup(sorted_semantic_models)
 
     @cached_property
@@ -153,10 +151,6 @@ class SemanticModelLookup:
             return self._entity_ref_to_spec[EntityReference(element_name=element_name)]
         else:
             raise ValueError(f"Unable to find linkable element {element_name} in manifest")
-
-    @property
-    def measure_lookup(self) -> MeasureLookup:  # noqa: D102
-        return self._measure_lookup
 
     @property
     def dimension_lookup(self) -> DimensionLookup:  # noqa: D102
