@@ -9,15 +9,15 @@ from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclas
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_trie import DunderNameTrie
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.toolkit.syntactic_sugar import mf_flatten
 
 logger = logging.getLogger(__name__)
 

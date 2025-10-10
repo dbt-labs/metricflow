@@ -4,8 +4,8 @@ from __future__ import annotations
 from collections.abc import Set
 from pathlib import Path
 
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.singleton import Singleton
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.singleton import Singleton
 
 PATH_TO_SINGLETON_TEST_CLASS_PY_FILE = Path(__file__)
 

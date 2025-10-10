@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.protocols import Dimension
 from dbt_semantic_interfaces.type_enums import DimensionType
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 
 logger = logging.getLogger(__name__)
 

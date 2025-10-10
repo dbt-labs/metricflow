@@ -15,9 +15,9 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
 )
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
+from metricflow_semantics.toolkit.mf_graph.formatting.svg_formatter import SvgFormatter
 
 from tests_metricflow_semantics.experimental.graph_helpers import assert_graph_snapshot_equal
-from tests_metricflow_semantics.experimental.mf_graph.formatting.svg_formatter import SvgFormatter
 
 logger = logging.getLogger(__name__)
 

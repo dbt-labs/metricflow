@@ -4,8 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,

@@ -18,7 +18,7 @@ from dbt_semantic_interfaces.parsing.dir_to_model import (
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 
 def mf_load_manifest_from_yaml_directory(

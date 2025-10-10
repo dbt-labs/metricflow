@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from metricflow_semantics.collection_helpers.lru_cache import LruCache
+from metricflow_semantics.toolkit.cache.lru_cache import LruCache
 
 
 def test_lru_cache() -> None:  # noqa: D103

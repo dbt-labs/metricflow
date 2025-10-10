@@ -10,8 +10,8 @@ from dbt_semantic_interfaces.protocols import Entity
 from dbt_semantic_interfaces.type_enums import EntityType
 from typing_extensions import override
 
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet, OrderedSet
-from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
+from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet, OrderedSet
+from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 
 logger = logging.getLogger(__name__)
 

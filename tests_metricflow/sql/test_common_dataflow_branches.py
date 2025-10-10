@@ -3,13 +3,13 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_str_snapshot_equal,
 )
+from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan_analyzer import DataflowPlanAnalyzer

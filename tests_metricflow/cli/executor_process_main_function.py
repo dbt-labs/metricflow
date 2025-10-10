@@ -11,7 +11,7 @@ from typing import Iterator, Optional
 import click.testing
 from dbt.cli.main import dbtRunner
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import TextIO
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration

@@ -7,7 +7,6 @@ from functools import cached_property
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
@@ -29,6 +28,7 @@ from metricflow_semantics.experimental.semantic_graph.nodes.entity_nodes import 
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
 )
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 logger = logging.getLogger(__name__)
 

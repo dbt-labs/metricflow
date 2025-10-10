@@ -11,20 +11,20 @@ from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from more_itertools import peekable
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, Pair, T
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_flatten
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
 from metricflow_semantics.experimental.dsi.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple, Pair, T
+from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item, mf_flatten
 
 logger = logging.getLogger(__name__)
 

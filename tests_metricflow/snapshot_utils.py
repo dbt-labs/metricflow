@@ -4,7 +4,6 @@ import logging
 from typing import Any, Optional
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_plan_snapshot_text_equal,
@@ -12,6 +11,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     make_schema_replacement_function,
     replace_dataset_id_hash,
 )
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 
 from metricflow.dataflow.dataflow_plan import DataflowPlan
 from metricflow.execution.execution_plan import ExecutionPlan

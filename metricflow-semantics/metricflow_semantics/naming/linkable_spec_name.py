@@ -7,9 +7,9 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.errors.error_classes import FeatureNotSupportedError
+from metricflow_semantics.toolkit.cache.lru_cache import typed_lru_cache
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 DUNDER = "__"
 

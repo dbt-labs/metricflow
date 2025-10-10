@@ -4,8 +4,8 @@ import logging
 from collections import defaultdict
 from typing import Dict, FrozenSet, List, Set, Tuple
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_exprs import SqlExpressionTreeLineage
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.sql.optimizer.column_pruning.cte_alias_to_cte_node_mapping import SqlCteAliasMappingLookup

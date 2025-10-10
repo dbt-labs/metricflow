@@ -8,11 +8,11 @@ from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpine
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
-from metricflow_semantics.collection_helpers.lru_cache import typed_lru_cache
 from metricflow_semantics.errors.error_classes import SemanticManifestConfigurationError
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+from metricflow_semantics.toolkit.cache.lru_cache import typed_lru_cache
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,6 @@ import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -43,6 +42,7 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.simple_multi_hop_
     SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
 )
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet

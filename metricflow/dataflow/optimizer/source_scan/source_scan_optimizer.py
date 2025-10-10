@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Sequence
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,

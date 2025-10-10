@@ -5,8 +5,8 @@ import logging
 import time
 from typing import Optional
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient
 from metricflow.data_table.mf_column import ColumnDescription

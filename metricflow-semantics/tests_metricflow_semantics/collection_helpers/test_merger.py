@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
+from metricflow_semantics.toolkit.merger import Mergeable
 from typing_extensions import override
 
 

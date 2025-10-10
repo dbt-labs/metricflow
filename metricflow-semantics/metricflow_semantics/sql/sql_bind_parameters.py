@@ -8,9 +8,9 @@ from typing import Any, Mapping, Optional, Tuple
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from typing_extensions import override
 
-from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
-from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
+from metricflow_semantics.toolkit.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.toolkit.merger import Mergeable
 
 
 @dataclass(frozen=True)
