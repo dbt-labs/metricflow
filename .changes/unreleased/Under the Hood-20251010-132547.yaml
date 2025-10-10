@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Mark tests from `test_dataflow_to_sql_plan.py` as DuckDB-Only
+time: 2025-10-10T13:25:47.926875-07:00
+custom:
+  Author: plypaul
+  Issue: "1896"
