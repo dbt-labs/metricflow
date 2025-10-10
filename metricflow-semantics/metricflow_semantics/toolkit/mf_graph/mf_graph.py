@@ -12,8 +12,7 @@ from typing import ClassVar, Generic, Optional, TypeVar
 
 from typing_extensions import Self, override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.comparable import Comparable
 from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotEdgeAttributeSet,
@@ -28,14 +27,15 @@ from metricflow_semantics.toolkit.mf_graph.graph_element import (
 from metricflow_semantics.toolkit.mf_graph.graph_id import MetricFlowGraphId
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.toolkit.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
-from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_formatter import (
+from metricflow_semantics.toolkit.mf_logging.format_option import PrettyFormatOption
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.pretty_formatter import (
     MetricFlowPrettyFormatter,
     PrettyFormatContext,
 )
+from metricflow_semantics.toolkit.mf_type_aliases import Pair
+from metricflow_semantics.toolkit.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 
 logger = logging.getLogger(__name__)
 

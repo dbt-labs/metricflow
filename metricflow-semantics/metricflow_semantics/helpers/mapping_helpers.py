@@ -4,7 +4,7 @@ import logging
 from collections.abc import Mapping
 from typing import Iterable, TypeVar
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import (
+from metricflow_semantics.toolkit.mf_type_aliases import (
     KeyT,
     MappingItemsTuple,
     Pair,

@@ -6,10 +6,10 @@ from functools import cached_property
 from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec, SimpleMetricRecipe
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.merger import Mergeable
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 logger = logging.getLogger(__name__)

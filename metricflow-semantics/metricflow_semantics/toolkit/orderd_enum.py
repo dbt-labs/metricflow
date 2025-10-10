@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 from enum import Enum
 
-from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType
+from metricflow_semantics.toolkit.comparison_helpers import ComparisonOtherType
 
 
 @functools.total_ordering

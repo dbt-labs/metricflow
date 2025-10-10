@@ -8,8 +8,8 @@ from typing import Union
 
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType, SupportsLessThan
+from metricflow_semantics.toolkit.comparison_helpers import ComparisonOtherType, SupportsLessThan
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 logger = logging.getLogger(__name__)
 

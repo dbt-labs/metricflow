@@ -6,7 +6,7 @@ from typing import Any, Callable, Mapping, Union
 
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
+from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 logger = logging.getLogger(__name__)
 

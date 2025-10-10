@@ -10,10 +10,6 @@ from typing import Optional, Sequence
 
 import graphviz
 from graphviz import Digraph
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.collection_helpers.syntactic_sugar import (
-    mf_ensure_mapping,
-)
 from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotEdgeAttributeSet,
     DotGraphAttributeSet,
@@ -21,6 +17,10 @@ from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotRankKey,
 )
 from metricflow_semantics.toolkit.mf_graph.graph_converter import MetricFlowGraphConverter
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.toolkit.syntactic_sugar import (
+    mf_ensure_mapping,
+)
 from typing_extensions import override
 
 if typing.TYPE_CHECKING:

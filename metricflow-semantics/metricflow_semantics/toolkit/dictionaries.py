@@ -4,7 +4,7 @@ import logging
 from collections.abc import Mapping, Set
 from typing import Sequence
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import KeyT
+from metricflow_semantics.toolkit.mf_type_aliases import KeyT
 
 logger = logging.getLogger(__name__)
 

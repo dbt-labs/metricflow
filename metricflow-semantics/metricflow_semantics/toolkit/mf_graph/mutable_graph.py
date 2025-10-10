@@ -7,7 +7,6 @@ from typing import DefaultDict, Generic, Iterable, TypeVar
 
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
 from metricflow_semantics.toolkit.mf_graph.graph_id import MetricFlowGraphId, SequentialGraphId
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.toolkit.mf_graph.mf_graph import (
@@ -16,7 +15,8 @@ from metricflow_semantics.toolkit.mf_graph.mf_graph import (
     MetricFlowGraphNode,
     NodeT,
 )
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.toolkit.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.toolkit.syntactic_sugar import mf_flatten
 
 logger = logging.getLogger(__name__)
 

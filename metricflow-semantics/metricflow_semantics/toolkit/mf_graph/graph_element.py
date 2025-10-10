@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from abc import ABC
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 
 class HasDisplayedProperty(ABC):

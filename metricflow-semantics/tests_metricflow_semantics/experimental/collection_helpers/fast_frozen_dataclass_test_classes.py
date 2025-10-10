@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 
 PATH_TO_FAST_FROZEN_DATACLASS_TEST_CLASSES_PY_FILE = Path(__file__)
 

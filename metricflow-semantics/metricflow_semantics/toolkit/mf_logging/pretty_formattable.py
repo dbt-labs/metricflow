@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
+    from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 
 
 class MetricFlowPrettyFormattable(ABC):

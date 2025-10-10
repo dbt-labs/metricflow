@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Generic, Tuple
 
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.dag.mf_dag import DagNode
+from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
 
 if TYPE_CHECKING:

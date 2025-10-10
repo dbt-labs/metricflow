@@ -4,7 +4,7 @@ import threading
 from abc import ABC
 from typing import ClassVar, Optional, Type, TypeVar
 
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 
 SingletonT = TypeVar("SingletonT", bound="Singleton")
 

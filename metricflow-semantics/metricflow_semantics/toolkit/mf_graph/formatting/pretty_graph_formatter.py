@@ -6,7 +6,7 @@ import typing
 from typing_extensions import override
 
 from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph

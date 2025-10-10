@@ -8,8 +8,8 @@ from typing import Generic, Iterable, Iterator, Optional, TypeVar
 
 from typing_extensions import Self, override
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import HashableT, HashableT_co
-from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType
+from metricflow_semantics.toolkit.comparison_helpers import ComparisonOtherType
+from metricflow_semantics.toolkit.mf_type_aliases import HashableT, HashableT_co
 
 logger = logging.getLogger(__name__)
 

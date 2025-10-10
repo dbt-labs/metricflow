@@ -7,10 +7,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import ClassVar, DefaultDict, Iterable, Optional
 
-from metricflow_semantics.collection_helpers.syntactic_sugar import (
-    mf_ensure_mapping,
-)
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotColor,
     DotEdgeArrowShape,
@@ -25,9 +23,11 @@ from metricflow_semantics.toolkit.mf_graph.mf_graph import (
     MetricFlowGraphEdge,
     MetricFlowGraphNode,
 )
-from metricflow_semantics.helpers.string_helpers import mf_indent
-from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.toolkit.mf_logging.format_option import PrettyFormatOption
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.toolkit.syntactic_sugar import (
+    mf_ensure_mapping,
+)
 from typing_extensions import override
 
 from tests_metricflow_semantics.experimental.mf_graph.formatting.graphviz_html import (

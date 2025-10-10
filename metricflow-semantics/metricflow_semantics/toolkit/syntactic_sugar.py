@@ -8,7 +8,7 @@ import itertools
 import logging
 from typing import Callable, Iterable, Mapping, Optional
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import KeyT, T, ValueT
+from metricflow_semantics.toolkit.mf_type_aliases import KeyT, T, ValueT
 
 logger = logging.getLogger(__name__)
 

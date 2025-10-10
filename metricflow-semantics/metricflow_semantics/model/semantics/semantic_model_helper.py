@@ -12,7 +12,7 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 
 class SemanticModelHelper:

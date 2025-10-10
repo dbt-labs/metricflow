@@ -13,7 +13,7 @@ import click
 import packaging.version
 import yaml
 from halo import Halo
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from packaging.version import Version
 from typing_extensions import Optional
 

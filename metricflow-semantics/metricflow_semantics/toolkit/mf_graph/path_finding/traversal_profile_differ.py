@@ -4,12 +4,12 @@ import logging
 import threading
 from typing import ContextManager, Optional, Type
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import ExceptionTracebackAnyType
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.toolkit.mf_graph.path_finding.traversal_profile import (
     GraphTraversalProfile,
     MutableGraphTraversalProfile,
 )
+from metricflow_semantics.toolkit.mf_type_aliases import ExceptionTracebackAnyType
 
 logger = logging.getLogger(__name__)
 

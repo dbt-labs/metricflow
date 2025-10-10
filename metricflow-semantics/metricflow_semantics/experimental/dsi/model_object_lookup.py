@@ -9,13 +9,13 @@ from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_first_non_none_or_raise
 from metricflow_semantics.experimental.dsi.dimension_lookup import DimensionLookup
 from metricflow_semantics.experimental.dsi.entity_lookup import EntityLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricflowInternalError
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item, mf_first_non_none_or_raise
 
 logger = logging.getLogger(__name__)
 

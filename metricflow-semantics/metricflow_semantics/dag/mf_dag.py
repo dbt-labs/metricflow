@@ -15,8 +15,8 @@ from typing_extensions import override
 from metricflow_semantics.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow_semantics.dag.id_prefix import IdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
+from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 logger = logging.getLogger(__name__)

@@ -7,8 +7,8 @@ from typing import Optional
 
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
+from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 
 logger = logging.getLogger(__name__)
 

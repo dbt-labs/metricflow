@@ -6,7 +6,7 @@ from collections import defaultdict
 from collections.abc import Mapping, Sequence
 
 from metricflow_semantics.helpers.table_helpers import IsolatedTabulateRunner
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
 

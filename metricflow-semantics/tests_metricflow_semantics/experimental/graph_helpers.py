@@ -4,12 +4,12 @@ import logging
 from typing import Callable, Optional
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     SnapshotConfiguration,
     assert_str_snapshot_equal,
 )
+from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat_dict
 
 from tests_metricflow_semantics.experimental.mf_graph.formatting.dot_formatter import DotNotationFormatter
 

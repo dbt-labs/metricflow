@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Generic, Optional, TypeVar
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import ValueT
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_type_aliases import ValueT
 
 logger = logging.getLogger(__name__)
 

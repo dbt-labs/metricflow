@@ -10,12 +10,12 @@ from collections.abc import Mapping
 from enum import Enum
 from typing import Optional
 
-from metricflow_semantics.collection_helpers.syntactic_sugar import (
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.syntactic_sugar import (
     mf_ensure_mapping,
     mf_first_non_none,
     mf_first_non_none_or_raise,
 )
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 
 logger = logging.getLogger(__name__)
 

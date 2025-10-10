@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass
 from typing import Dict, Optional, SupportsFloat
 
-from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
+from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 from metricflow.data_table.column_types import CellValue
 from metricflow.data_table.mf_table import MetricFlowDataTable

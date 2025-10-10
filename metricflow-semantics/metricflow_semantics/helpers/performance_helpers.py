@@ -5,9 +5,9 @@ import threading
 import time
 from typing import ContextManager, Optional, Type, Union
 
-from metricflow_semantics.collection_helpers.mf_type_aliases import ExceptionTracebackAnyType
 from metricflow_semantics.helpers.time_helpers import PrettyDuration
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_type_aliases import ExceptionTracebackAnyType
 
 logger = logging.getLogger(__name__)
 

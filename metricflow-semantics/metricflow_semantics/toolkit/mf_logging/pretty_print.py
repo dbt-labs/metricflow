@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.helpers.string_helpers import mf_indent
-from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
-from metricflow_semantics.mf_logging.pretty_formatter import MetricFlowPrettyFormatter
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_logging.format_option import PrettyFormatOption
+from metricflow_semantics.toolkit.mf_logging.pretty_formatter import MetricFlowPrettyFormatter
 
 logger = logging.getLogger(__name__)
 
