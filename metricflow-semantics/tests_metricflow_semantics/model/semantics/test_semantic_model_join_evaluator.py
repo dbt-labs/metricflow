@@ -7,10 +7,8 @@ from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import (
-    SemanticModelEntityJoin,
     SemanticModelEntityJoinType,
     SemanticModelJoinEvaluator,
-    SemanticModelLink,
 )
 
 
@@ -202,98 +200,6 @@ def test_semantic_model_join_validation_on_missing_entity(
     ), (
         "Found valid join on `listing` involving the `id_verifications` semantic model, which does not include the "
         "`listing` entity!"
-    )
-
-
-def test_get_joinable_semantic_models_single_hop(  # noqa: D103
-    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-) -> None:
-    semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
-    join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_lookup=partitioned_multi_hop_join_semantic_manifest_lookup.semantic_model_lookup
-    )
-
-    # Single-hop
-    joinable_semantic_models = join_evaluator.get_joinable_semantic_models(
-        left_semantic_model_reference=semantic_model_reference
-    )
-    assert set(joinable_semantic_models.keys()) == {"bridge_table"}
-    assert joinable_semantic_models["bridge_table"] == SemanticModelLink(
-        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
-        join_path=[
-            SemanticModelEntityJoin(
-                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
-                entity_reference=EntityReference(element_name="account_id"),
-                join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
-                ),
-            )
-        ],
-    )
-
-
-def test_get_joinable_semantic_models_multi_hop(  # noqa: D103
-    partitioned_multi_hop_join_semantic_manifest_lookup: SemanticManifestLookup,
-) -> None:
-    semantic_model_reference = SemanticModelReference(semantic_model_name="account_month_txns")
-    join_evaluator = SemanticModelJoinEvaluator(
-        semantic_model_lookup=partitioned_multi_hop_join_semantic_manifest_lookup.semantic_model_lookup
-    )
-
-    # 2-hop
-    joinable_semantic_models = join_evaluator.get_joinable_semantic_models(
-        left_semantic_model_reference=semantic_model_reference, include_multi_hop=True
-    )
-    assert set(joinable_semantic_models.keys()) == {"bridge_table", "customer_other_data", "customer_table"}
-    assert joinable_semantic_models["bridge_table"] == SemanticModelLink(
-        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
-        join_path=[
-            SemanticModelEntityJoin(
-                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
-                entity_reference=EntityReference(element_name="account_id"),
-                join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
-                ),
-            )
-        ],
-    )
-    assert joinable_semantic_models["customer_other_data"] == SemanticModelLink(
-        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
-        join_path=[
-            SemanticModelEntityJoin(
-                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
-                entity_reference=EntityReference(element_name="account_id"),
-                join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
-                ),
-            ),
-            SemanticModelEntityJoin(
-                right_semantic_model_reference=SemanticModelReference(semantic_model_name="customer_other_data"),
-                entity_reference=EntityReference(element_name="customer_id"),
-                join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
-                ),
-            ),
-        ],
-    )
-    assert joinable_semantic_models["customer_table"] == SemanticModelLink(
-        left_semantic_model_reference=SemanticModelReference(semantic_model_name="account_month_txns"),
-        join_path=[
-            SemanticModelEntityJoin(
-                right_semantic_model_reference=SemanticModelReference(semantic_model_name="bridge_table"),
-                entity_reference=EntityReference(element_name="account_id"),
-                join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.PRIMARY, right_entity_type=EntityType.UNIQUE
-                ),
-            ),
-            SemanticModelEntityJoin(
-                right_semantic_model_reference=SemanticModelReference(semantic_model_name="customer_table"),
-                entity_reference=EntityReference(element_name="customer_id"),
-                join_type=SemanticModelEntityJoinType(
-                    left_entity_type=EntityType.FOREIGN, right_entity_type=EntityType.PRIMARY
-                ),
-            ),
-        ],
     )
 
 

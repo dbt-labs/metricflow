@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.references import (
@@ -71,91 +71,6 @@ class SemanticModelJoinEvaluator:
 
     def __init__(self, semantic_model_lookup: SemanticModelLookup) -> None:  # noqa: D107
         self._semantic_model_lookup = semantic_model_lookup
-
-    def get_joinable_semantic_models(
-        self, left_semantic_model_reference: SemanticModelReference, include_multi_hop: bool = False
-    ) -> Dict[str, SemanticModelLink]:
-        """List all semantic models that can join to given semantic model, and the entities to join them."""
-        semantic_model_joins: Dict[str, SemanticModelLink] = {}
-        self._get_remaining_hops_of_joinable_semantic_models(
-            left_semantic_model_reference=left_semantic_model_reference,
-            parent_semantic_model_to_join_paths={left_semantic_model_reference: []},
-            known_semantic_model_joins=semantic_model_joins,
-            join_hops_remaining=(MAX_JOIN_HOPS if include_multi_hop else 1),
-        )
-        return semantic_model_joins
-
-    def _get_remaining_hops_of_joinable_semantic_models(
-        self,
-        left_semantic_model_reference: SemanticModelReference,
-        parent_semantic_model_to_join_paths: Dict[SemanticModelReference, List[SemanticModelEntityJoin]],
-        known_semantic_model_joins: Dict[str, SemanticModelLink],
-        join_hops_remaining: int,
-    ) -> None:
-        assert join_hops_remaining > 0, "No join hops remaining. This is unexpected with proper use of this method."
-        for parent_semantic_model_reference, parent_join_path in parent_semantic_model_to_join_paths.items():
-            parent_semantic_model = self._semantic_model_lookup.get_by_reference(
-                semantic_model_reference=parent_semantic_model_reference
-            )
-            assert parent_semantic_model is not None
-
-            # We'll get all joinable semantic models in this hop before recursing to ensure we find the most
-            # efficient path to each semantic model.
-            join_paths_to_visit_next: List[List[SemanticModelEntityJoin]] = []
-            for entity in parent_semantic_model.entities:
-                entity_reference = EntityReference(element_name=entity.name)
-                entity_semantic_models = self._semantic_model_lookup.get_semantic_models_for_entity(
-                    entity_reference=entity_reference
-                )
-
-                for right_semantic_model in entity_semantic_models:
-                    # Check if we've seen this semantic model already
-                    if (
-                        right_semantic_model.name == left_semantic_model_reference.semantic_model_name
-                        or right_semantic_model.name in known_semantic_model_joins
-                    ):
-                        continue
-
-                    # Check if there is a valid way to join this semantic model to existing join path
-                    right_semantic_model_reference = SemanticModelReference(
-                        semantic_model_name=right_semantic_model.name
-                    )
-                    valid_join_type = self.get_valid_semantic_model_entity_join_type(
-                        left_semantic_model_reference=parent_semantic_model_reference,
-                        right_semantic_model_reference=right_semantic_model_reference,
-                        on_entity_reference=entity_reference,
-                    )
-                    if valid_join_type is None:
-                        continue
-
-                    join_path_for_semantic_model = parent_join_path + [
-                        SemanticModelEntityJoin(
-                            right_semantic_model_reference=right_semantic_model_reference,
-                            entity_reference=entity_reference,
-                            join_type=valid_join_type,
-                        )
-                    ]
-                    join_paths_to_visit_next.append(join_path_for_semantic_model)
-                    known_semantic_model_joins[right_semantic_model_reference.semantic_model_name] = SemanticModelLink(
-                        left_semantic_model_reference=left_semantic_model_reference,
-                        join_path=join_path_for_semantic_model,
-                    )
-
-        join_hops_remaining -= 1
-        if not join_hops_remaining:
-            return
-
-        right_semantic_models_to_join_paths: Dict[SemanticModelReference, List[SemanticModelEntityJoin]] = {}
-        for join_path in join_paths_to_visit_next:
-            assert len(join_path) > 0
-            right_semantic_models_to_join_paths[join_path[-1].right_semantic_model_reference] = join_path
-
-        self._get_remaining_hops_of_joinable_semantic_models(
-            left_semantic_model_reference=left_semantic_model_reference,
-            parent_semantic_model_to_join_paths=right_semantic_models_to_join_paths,
-            known_semantic_model_joins=known_semantic_model_joins,
-            join_hops_remaining=join_hops_remaining,
-        )
 
     def get_valid_semantic_model_entity_join_type(
         self,
