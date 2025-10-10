@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Remove `SimpleMetricInputSpec.non_additive_dimension_spec`
+time: 2025-10-10T13:26:41.503643-07:00
+custom:
+  Author: plypaul
+  Issue: "1897"
