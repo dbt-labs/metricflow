@@ -34,7 +34,7 @@ class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
     ) -> GroupByItemSet:
         dunder_name_to_annotated_spec: dict[str, AnnotatedSpec] = {}
         for annotated_spec in annotated_specs:
-            dunder_name = annotated_spec.spec.qualified_name
+            dunder_name = annotated_spec.spec.dunder_name
             existing_annotated_spec = dunder_name_to_annotated_spec.get(dunder_name)
             if existing_annotated_spec is None:
                 dunder_name_to_annotated_spec[dunder_name] = annotated_spec
@@ -65,7 +65,7 @@ class GroupByItemSet(BaseGroupByItemSet, SerializableDataclass):
     @cached_property
     def dunder_name_to_annotated_spec(self) -> Mapping[str, AnnotatedSpec]:
         """Return a mapping from the dunder name to the annotated spec."""
-        return {annotated_spec.spec.qualified_name: annotated_spec for annotated_spec in self.annotated_specs}
+        return {annotated_spec.spec.dunder_name: annotated_spec for annotated_spec in self.annotated_specs}
 
     @override
     def intersection(self, *other_element_sets: GroupByItemSet) -> GroupByItemSet:

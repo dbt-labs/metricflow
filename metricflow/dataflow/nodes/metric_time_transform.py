@@ -45,7 +45,7 @@ class MetricTimeDimensionTransformNode(DataflowPlanNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
-        return StaticIdPrefix.DATAFLOW_NODE_SET_MEASURE_AGGREGATION_TIME
+        return StaticIdPrefix.DATAFLOW_NODE_SET_METRIC_AGGREGATION_TIME
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_metric_time_dimension_transform_node(self)

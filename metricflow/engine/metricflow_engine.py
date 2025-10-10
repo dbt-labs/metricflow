@@ -95,7 +95,7 @@ class GroupByOrderByAttribute(Enum):
     """Supported dimension attributes to order them by."""
 
     SEMANTIC_MODEL_NAME = "semantic_model_name"
-    QUALIFIED_NAME = "qualified_name"
+    DUNDER_NAME = "dunder_name"
 
 
 @dataclass(frozen=True)
@@ -363,7 +363,7 @@ class AbstractMetricFlowEngine(ABC):
         self,
         metric_names: Optional[List[str]] = None,
         include_derived_time_granularities: bool = False,
-        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.QUALIFIED_NAME,
+        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.DUNDER_NAME,
     ) -> List[Entity | Dimension]:
         """List all group bys in the semantic manifest, with optional filters."""
         pass
@@ -621,11 +621,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         return Dimension(
             name=metric_time_name,
-            qualified_name=StructuredLinkableSpecName(
+            dunder_name=StructuredLinkableSpecName(
                 element_name=metric_time_name,
                 entity_link_names=(),
                 time_granularity_name=(time_grain.name if time_grain is not None else None),
-            ).qualified_name,
+            ).dunder_name,
             entity_links=(),
             description="Event time for metrics.",
             metadata=None,
@@ -724,7 +724,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     def list_dimensions(
         self,
         metric_names: Optional[List[str]] = None,
-        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.QUALIFIED_NAME,
+        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.DUNDER_NAME,
     ) -> List[Dimension]:
         """Get full dimension object for all dimensions in the semantic manifest."""
         dimensions: List[Dimension] = []
@@ -744,8 +744,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     dimensions.append(dimension)
 
         def sort_dimensions(dimension: Dimension) -> Tuple[str, ...]:
-            if order_by == GroupByOrderByAttribute.QUALIFIED_NAME:
-                return (dimension.qualified_name,)
+            if order_by == GroupByOrderByAttribute.DUNDER_NAME:
+                return (dimension.dunder_name,)
             elif order_by == GroupByOrderByAttribute.SEMANTIC_MODEL_NAME:
                 return (
                     (
@@ -753,7 +753,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                         if dimension.semantic_model_reference
                         else ""
                     ),
-                    dimension.qualified_name,
+                    dimension.dunder_name,
                 )
             else:
                 assert_values_exhausted(order_by)
@@ -890,7 +890,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self,
         metric_names: Optional[List[str]] = None,
         include_derived_time_granularities: bool = False,
-        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.QUALIFIED_NAME,
+        order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.DUNDER_NAME,
     ) -> List[Entity | Dimension]:
         """List all possible group bys, or all group bys allowed for the selected metrics."""
         if metric_names:
@@ -911,8 +911,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             group_bys = self.list_dimensions()
 
         def sort_group_bys(group_by: Entity | Dimension) -> Tuple[str, ...]:
-            name_attr = group_by.qualified_name if isinstance(group_by, Dimension) else group_by.name
-            if order_by == GroupByOrderByAttribute.QUALIFIED_NAME:
+            name_attr = group_by.dunder_name if isinstance(group_by, Dimension) else group_by.name
+            if order_by == GroupByOrderByAttribute.DUNDER_NAME:
                 return (name_attr,)
             elif order_by == GroupByOrderByAttribute.SEMANTIC_MODEL_NAME:
                 return (
@@ -930,12 +930,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     def group_by_exists(self, structured_name: StructuredLinkableSpecName) -> bool:
         """Check if a group by exists in the semantic manifest by its element name."""
-        qualified_name = structured_name.granularity_free_qualified_name
+        qualified_name = structured_name.granularity_free_dunder_name
         return (
             qualified_name == METRIC_TIME_ELEMENT_NAME
             or (
                 qualified_name
-                in self._semantic_manifest_lookup.semantic_model_lookup.dimension_lookup.dimensions_by_qualified_name
+                in self._semantic_manifest_lookup.semantic_model_lookup.dimension_lookup.dimensions_by_dunder_name
             )
             or (
                 EntityReference(structured_name.element_name)

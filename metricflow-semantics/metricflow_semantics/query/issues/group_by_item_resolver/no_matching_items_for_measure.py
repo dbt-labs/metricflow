@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class NoMatchingItemsForMeasure(MetricFlowQueryResolutionIssue):
+class NoMatchingItemsForSimpleMetric(MetricFlowQueryResolutionIssue):
     """Describes an issue with the query where there are no matching items for a measure.
 
     This can happen if the user specifies a group-by-item that does not exist or is not available for the measure.
@@ -28,12 +28,12 @@ class NoMatchingItemsForMeasure(MetricFlowQueryResolutionIssue):
     suggestions: Tuple[str, ...]
 
     @staticmethod
-    def from_parameters(  # noqa: D102
+    def create(  # noqa: D102
         parent_issues: Sequence[MetricFlowQueryResolutionIssue],
         query_resolution_path: MetricFlowQueryResolutionPath,
         input_suggestions: Sequence[str],
-    ) -> NoMatchingItemsForMeasure:
-        return NoMatchingItemsForMeasure(
+    ) -> NoMatchingItemsForSimpleMetric:
+        return NoMatchingItemsForSimpleMetric(
             issue_type=MetricFlowQueryIssueType.ERROR,
             parent_issues=tuple(parent_issues),
             query_resolution_path=query_resolution_path,
@@ -61,8 +61,8 @@ class NoMatchingItemsForMeasure(MetricFlowQueryResolutionIssue):
         return "\n".join(lines)
 
     @override
-    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> NoMatchingItemsForMeasure:
-        return NoMatchingItemsForMeasure(
+    def with_path_prefix(self, path_prefix: MetricFlowQueryResolutionPath) -> NoMatchingItemsForSimpleMetric:
+        return NoMatchingItemsForSimpleMetric(
             issue_type=self.issue_type,
             parent_issues=tuple(issue.with_path_prefix(path_prefix) for issue in self.parent_issues),
             query_resolution_path=self.query_resolution_path.with_path_prefix(path_prefix),

@@ -77,6 +77,6 @@ def test_get_aggregation_time_dimension_specs(  # noqa: D103
     result = {}
     for metric_name in ["views", "listings", "bookings_per_view"]:
         specs = metric_lookup.get_aggregation_time_dimension_specs(MetricReference(metric_name))
-        result[metric_name] = list(spec.qualified_name for spec in specs)
+        result[metric_name] = list(spec.dunder_name for spec in specs)
 
     assert_object_snapshot_equal(request=request, snapshot_configuration=mf_test_configuration, obj=result)

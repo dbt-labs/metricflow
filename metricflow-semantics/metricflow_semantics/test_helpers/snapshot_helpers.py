@@ -301,10 +301,10 @@ def _convert_linkable_element_set_to_rows(
     rows: list[dict[str, str]] = []
     for annotated_spec in sorted(
         linkable_element_set.annotated_specs,
-        key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
+        key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.dunder_name,
     ):
         row_dict: dict[str, str] = {
-            "Dunder Name": annotated_spec.spec.qualified_name.ljust(78),
+            "Dunder Name": annotated_spec.spec.dunder_name.ljust(78),
         }
         spec_set = group_spec_by_type(annotated_spec.spec)
 
@@ -364,7 +364,7 @@ def assert_spec_set_snapshot_equal(  # noqa: D103
         request=request,
         snapshot_configuration=snapshot_configuration,
         obj_id=set_id,
-        obj=sorted(spec.qualified_name for spec in spec_set.all_specs),
+        obj=sorted(spec.dunder_name for spec in spec_set.all_specs),
         expectation_description=expectation_description,
     )
 

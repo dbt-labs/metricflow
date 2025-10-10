@@ -7,7 +7,7 @@ GroupByItemResolution(
   linkable_element_set=GroupByItemSet(),
   issue_set=MetricFlowQueryResolutionIssueSet(
     issues=(
-      NoMatchingItemsForMeasure(
+      NoMatchingItemsForSimpleMetric(
         issue_type=ERROR,
         query_resolution_path=MetricFlowQueryResolutionPath(
           resolution_path_nodes=(

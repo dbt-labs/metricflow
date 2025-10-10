@@ -27,9 +27,9 @@ from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixt
 __SOURCE_TABLE_ALIAS = "a"
 
 
-def __get_filtered_measure_instance_set(
+def __get_filtered_simple_metric_input_instance_set(
     semantic_model_name: str,
-    measure_name: str,
+    simple_metric_input_name: str,
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
 ) -> InstanceSet:
     """Gets an InstanceSet consisting of only the measure instance matching the given name and semantic model."""
@@ -40,7 +40,7 @@ def __get_filtered_measure_instance_set(
     include_specs = tuple(
         instance.spec
         for instance in instance_set.simple_metric_input_instances
-        if instance.spec.element_name == measure_name
+        if instance.spec.element_name == simple_metric_input_name
     )
     return FilterElements(include_specs=InstanceSpecSet(simple_metric_input_specs=include_specs)).transform(
         instance_set
@@ -52,8 +52,10 @@ def test_sum_aggregation(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model."""
-    measure_name = "booking_value"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "booking_value"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
 
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(
@@ -85,8 +87,10 @@ def test_sum_boolean_aggregation(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for instant_bookings, a SUM_BOOLEAN type metric in the simple model."""
-    measure_name = "instant_bookings"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "instant_bookings"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
 
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(
@@ -112,8 +116,10 @@ def test_avg_aggregation(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for average_booking_value, an AVG type metric in the simple model."""
-    measure_name = "average_booking_value"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "average_booking_value"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
 
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(
@@ -138,8 +144,10 @@ def test_count_distinct_aggregation(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for bookers, a COUNT_DISTINCT type metric in the simple model."""
-    measure_name = "bookers"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "bookers"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
 
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(
@@ -164,8 +172,10 @@ def test_max_aggregation(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for largest_listing, a MAX type metric in the simple model."""
-    measure_name = "largest_listing"
-    instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "largest_listing"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "listings_latest", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
 
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(
@@ -190,8 +200,10 @@ def test_min_aggregation(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for smallest_listing, a MIN type metric in the simple model."""
-    measure_name = "smallest_listing"
-    instance_set = __get_filtered_measure_instance_set("listings_latest", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "smallest_listing"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "listings_latest", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
 
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(
@@ -216,15 +228,17 @@ def test_aliased_sum(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias."""
-    measure_name = "booking_value"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "booking_value"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
     alias = "bvalue"
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create({measure_name: alias}),
+            alias_mapping=InstanceAliasMapping.create({simple_metric_input_name: alias}),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -243,8 +257,10 @@ def test_percentile_aggregation(
     simple_manifest_object_lookup: ManifestObjectLookup,
 ) -> None:
     """Checks for function expression handling for booking_value, a percentile type metric in the simple model."""
-    measure_name = "booking_value_p99"
-    instance_set = __get_filtered_measure_instance_set("bookings_source", measure_name, mf_engine_test_fixture_mapping)
+    simple_metric_input_name = "booking_value_p99"
+    instance_set = __get_filtered_simple_metric_input_instance_set(
+        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
+    )
 
     select_column_set: SelectColumnSet = (
         CreateAggregatedSimpleMetricInputsTransform(

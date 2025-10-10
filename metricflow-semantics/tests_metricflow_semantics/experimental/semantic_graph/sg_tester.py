@@ -4,7 +4,7 @@ import logging
 from collections.abc import Mapping
 from typing import Callable, Iterable, Optional, Sequence
 
-from dbt_semantic_interfaces.references import MeasureReference, MetricReference
+from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
@@ -35,12 +35,6 @@ class SemanticGraphTester:
 
     def __init__(self, fixture: SemanticGraphTestFixture) -> None:  # noqa: D107
         self._fixture = fixture
-        self._measure_references = tuple(
-            MeasureReference(element_name=simple_metric_input.name)
-            for lookup in fixture.manifest_object_lookup.simple_metric_model_lookups
-            for simple_metric_inputs in lookup.aggregation_configuration_to_simple_metric_inputs.values()
-            for simple_metric_input in simple_metric_inputs
-        )
         self._metric_references = tuple(
             MetricReference(metric.name) for metric in fixture.manifest_object_lookup.get_metrics()
         )
@@ -138,10 +132,10 @@ class SemanticGraphTester:
 
         for annotated_spec in sorted(
             linkable_element_set.annotated_specs,
-            key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.qualified_name,
+            key=lambda annotated_spec_in_lambda: annotated_spec_in_lambda.spec.dunder_name,
         ):
             row_dict: dict[str, str] = {
-                "Dunder Name": annotated_spec.spec.qualified_name,
+                "Dunder Name": annotated_spec.spec.dunder_name,
             }
             spec_set = group_spec_by_type(annotated_spec.spec)
 

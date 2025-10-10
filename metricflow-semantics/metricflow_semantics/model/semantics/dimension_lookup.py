@@ -25,7 +25,7 @@ class DimensionLookup:
 
     def __init__(self, semantic_models: Sequence[SemanticModel]) -> None:  # noqa: D107
         self._dimension_reference_to_invariant: Dict[DimensionReference, DimensionInvariant] = {}
-        self.dimensions_by_qualified_name: Dict[str, Dimension] = {}
+        self.dimensions_by_dunder_name: Dict[str, Dimension] = {}
         for semantic_model in semantic_models:
             for dimension in semantic_model.dimensions:
                 invariant = DimensionInvariant(
@@ -52,7 +52,7 @@ class DimensionLookup:
                 structured_name = StructuredLinkableSpecName(
                     entity_link_names=(primary_entity.element_name,), element_name=dimension.name
                 )
-                self.dimensions_by_qualified_name[structured_name.qualified_name] = dimension
+                self.dimensions_by_dunder_name[structured_name.dunder_name] = dimension
 
     def get_invariant(self, dimension_reference: DimensionReference) -> DimensionInvariant:
         """Get invariants for the given dimension in the semantic manifest."""

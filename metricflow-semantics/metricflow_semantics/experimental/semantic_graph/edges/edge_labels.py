@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 @fast_frozen_dataclass(order=False)
-class CumulativeMeasureLabel(MetricflowGraphLabel, Singleton):
-    """Label for an edge from a cumulative metric node to a measure node.
+class CumulativeMetricLabel(MetricflowGraphLabel, Singleton):
+    """Label for an edge from a cumulative-metric node to a simple-metric node.
 
     This label is helpful for addressing special cases with cumulative metrics (e.g. ability to query by date part).
     """
 
     @classmethod
-    def get_instance(cls) -> CumulativeMeasureLabel:  # noqa: D102
+    def get_instance(cls) -> CumulativeMetricLabel:  # noqa: D102
         return cls._get_instance()
 
 
@@ -44,11 +44,11 @@ class DenyEntityKeyQueryResolutionLabel(MetricflowGraphLabel, Singleton):
 
 
 @fast_frozen_dataclass(order=False)
-class ConversionMeasureLabel(MetricflowGraphLabel, Singleton):
-    """Label for successor edges from a conversion metric to the conversion measure node."""
+class ConversionMetricLabel(MetricflowGraphLabel, Singleton):
+    """Label for successor edges from a conversion metric to the input conversion metric node."""
 
     @classmethod
-    def get_instance(cls) -> ConversionMeasureLabel:  # noqa: D102
+    def get_instance(cls) -> ConversionMetricLabel:  # noqa: D102
         return cls._get_instance()
 
 

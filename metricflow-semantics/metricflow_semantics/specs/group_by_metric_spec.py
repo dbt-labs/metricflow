@@ -74,14 +74,14 @@ class GroupByMetricSpec(LinkableInstanceSpec, SerializableDataclass):
 
     @property
     @override
-    def qualified_name(self) -> str:
+    def dunder_name(self) -> str:
         return StructuredLinkableSpecName(
             entity_link_names=tuple(entity_link.element_name for entity_link in self.entity_links),
             element_name=self.element_name,
             metric_subquery_entity_link_names=tuple(
                 entity_link.element_name for entity_link in self.metric_subquery_entity_links
             ),
-        ).qualified_name
+        ).dunder_name
 
     def __eq__(self, other: Any) -> bool:  # type: ignore[misc] # noqa: D105
         if not isinstance(other, GroupByMetricSpec):

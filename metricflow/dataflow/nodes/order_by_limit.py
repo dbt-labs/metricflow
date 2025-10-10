@@ -51,7 +51,7 @@ class OrderByLimitNode(DataflowPlanNode):
 
     @property
     def description(self) -> str:  # noqa: D102
-        return f"Order By {[order_by_spec.instance_spec.qualified_name for order_by_spec in self.order_by_specs]}" + (
+        return f"Order By {[order_by_spec.instance_spec.dunder_name for order_by_spec in self.order_by_specs]}" + (
             f" Limit {self.limit}" if self.limit else ""
         )
 

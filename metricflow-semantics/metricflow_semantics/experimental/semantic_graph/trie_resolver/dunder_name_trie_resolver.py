@@ -16,7 +16,7 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recip
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.experimental.semantic_graph.edges.edge_labels import (
-    CumulativeMeasureLabel,
+    CumulativeMetricLabel,
     DenyDatePartLabel,
     DenyVisibleAttributesLabel,
 )
@@ -57,7 +57,7 @@ class DunderNameTrieResolver(ABC):
 
         # The below are used for convenient autocomplete in the IDE. There are some additional constants that can
         # be shared between the resolvers - consolidation pending.
-        self._cumulative_measure_label = CumulativeMeasureLabel.get_instance()
+        self._cumulative_metric_label = CumulativeMetricLabel.get_instance()
         self._deny_date_part_label = DenyDatePartLabel.get_instance()
         self._simple_metric_label = SimpleMetricLabel.get_instance()
         self._local_model_label = LocalModelLabel.get_instance()
