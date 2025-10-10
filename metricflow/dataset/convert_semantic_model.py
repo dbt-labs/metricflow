@@ -33,7 +33,6 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
-from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
@@ -206,9 +205,6 @@ class SemanticModelToDataSetConverter:
             for simple_metric_input in simple_metric_inputs:
                 spec = SimpleMetricInputSpec(
                     element_name=simple_metric_input.name,
-                    non_additive_dimension_spec=NonAdditiveDimensionSpec.create_from_simple_metric_input(
-                        simple_metric_input
-                    ),
                     fill_nulls_with=None,
                 )
                 instance = SimpleMetricInputInstance(

@@ -49,7 +49,6 @@ class SimpleMetricInputSpecProperties:
             simple_metric_input_specs=tuple(
                 SimpleMetricInputSpec(
                     element_name=simple_metric_input.name,
-                    non_additive_dimension_spec=common_key.non_additive_dimension_spec,
                 )
                 for simple_metric_input in simple_metric_inputs
             ),
