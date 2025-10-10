@@ -7,10 +7,10 @@ from typing import Optional
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import (
+from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import (
     MetricFlowPathfinder,
 )
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder_result import GraphTraversalResult
+from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder_result import GraphTraversalResult
 from metricflow_semantics.experimental.ordered_set import OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,

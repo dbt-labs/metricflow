@@ -9,7 +9,7 @@ import _pytest.config
 import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.random_id import random_id
+from metricflow_semantics.toolkit.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     DISPLAY_SNAPSHOTS_CLI_FLAG,

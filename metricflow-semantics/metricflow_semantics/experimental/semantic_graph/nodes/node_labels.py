@@ -4,7 +4,7 @@ import logging
 from typing import Optional
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.experimental.singleton import Singleton
 
 logger = logging.getLogger(__name__)

@@ -11,7 +11,7 @@ from metricflow_semantics.collection_helpers.syntactic_sugar import (
     mf_ensure_mapping,
 )
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
+from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotColor,
     DotEdgeArrowShape,
     DotEdgeAttributeSet,
@@ -19,8 +19,8 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotNodeShape,
     DotRankKey,
 )
-from metricflow_semantics.experimental.mf_graph.graph_converter import MetricFlowGraphConverter
-from metricflow_semantics.experimental.mf_graph.mf_graph import (
+from metricflow_semantics.toolkit.mf_graph.graph_converter import MetricFlowGraphConverter
+from metricflow_semantics.toolkit.mf_graph.mf_graph import (
     MetricFlowGraph,
     MetricFlowGraphEdge,
     MetricFlowGraphNode,

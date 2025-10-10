@@ -14,7 +14,7 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNodeSet,
     GroupByItemResolutionNodeVisitor,
 )
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)

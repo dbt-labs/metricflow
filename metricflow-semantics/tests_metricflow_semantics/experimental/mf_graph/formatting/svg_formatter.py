@@ -5,7 +5,7 @@ import typing
 from typing import Optional
 
 from metricflow_semantics.experimental.metricflow_exception import GraphvizException
-from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
+from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
@@ -14,7 +14,7 @@ from tests_metricflow_semantics.experimental.mf_graph.formatting.mf_to_graphical
 )
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.experimental.mf_graph.mf_graph import (
+    from metricflow_semantics.toolkit.mf_graph.mf_graph import (
         MetricFlowGraph,
     )
 

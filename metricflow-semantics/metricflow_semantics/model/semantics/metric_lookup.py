@@ -17,7 +17,7 @@ from metricflow_semantics.errors.error_classes import (
     MetricNotFoundError,
     UnknownMetricError,
 )
-from metricflow_semantics.experimental.cache.mf_cache import ResultCache
+from metricflow_semantics.toolkit.cache import ResultCache
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricFlowInternalError
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet

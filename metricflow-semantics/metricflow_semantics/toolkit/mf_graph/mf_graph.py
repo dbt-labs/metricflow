@@ -14,20 +14,20 @@ from typing_extensions import Self, override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import Pair
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.mf_graph.comparable import Comparable
-from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import (
+from metricflow_semantics.toolkit.mf_graph.comparable import Comparable
+from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotEdgeAttributeSet,
     DotGraphAttributeSet,
     DotNodeAttributeSet,
 )
-from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
-from metricflow_semantics.experimental.mf_graph.formatting.pretty_graph_formatter import PrettyFormatGraphFormatter
-from metricflow_semantics.experimental.mf_graph.graph_element import (
+from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
+from metricflow_semantics.toolkit.mf_graph.formatting.pretty_graph_formatter import PrettyFormatGraphFormatter
+from metricflow_semantics.toolkit.mf_graph.graph_element import (
     MetricFlowGraphElement,
 )
-from metricflow_semantics.experimental.mf_graph.graph_id import MetricFlowGraphId
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
-from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
+from metricflow_semantics.toolkit.mf_graph.graph_id import MetricFlowGraphId
+from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.toolkit.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat

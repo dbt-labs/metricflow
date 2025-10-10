@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from metricflow_semantics.experimental.mf_graph.mf_graph import MetricFlowGraph
+from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph
 
 logger = logging.getLogger(__name__)
 

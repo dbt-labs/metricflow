@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from metricflow_semantics.dag.mf_dag import DagId
-from metricflow_semantics.random_id import random_id
+from metricflow_semantics.toolkit.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration

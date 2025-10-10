@@ -5,7 +5,7 @@ from functools import cached_property
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
+from metricflow_semantics.toolkit.mf_graph.comparable import Comparable, ComparisonKey
 
 
 class MetricFlowGraphLabel(Comparable, ABC):

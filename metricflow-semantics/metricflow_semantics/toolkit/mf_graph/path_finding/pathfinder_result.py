@@ -5,9 +5,9 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Generic, Mapping
 
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
-from metricflow_semantics.experimental.mf_graph.mutable_graph import NodeT
-from metricflow_semantics.experimental.mf_graph.path_finding.traversal_profile import GraphTraversalProfile
+from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.toolkit.mf_graph.mutable_graph import NodeT
+from metricflow_semantics.toolkit.mf_graph.path_finding.traversal_profile import GraphTraversalProfile
 from metricflow_semantics.experimental.ordered_set import OrderedSet
 
 logger = logging.getLogger(__name__)

@@ -7,8 +7,8 @@ from typing import Optional
 from typing_extensions import override
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.toolkit.mf_graph.comparable import ComparisonKey
+from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,

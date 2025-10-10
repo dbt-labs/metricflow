@@ -6,8 +6,8 @@ from typing import Optional
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.mf_graph.path_finding.graph_path import MutableGraphPath
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
+from metricflow_semantics.toolkit.mf_graph.path_finding.graph_path import MutableGraphPath
+from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import (
     AttributeRecipe,
 )

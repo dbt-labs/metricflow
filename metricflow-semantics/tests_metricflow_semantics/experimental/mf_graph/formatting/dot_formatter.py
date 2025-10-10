@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from metricflow_semantics.experimental.mf_graph.formatting.graph_formatter import (
+from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import (
     MetricFlowGraphFormatter,
 )
-from metricflow_semantics.experimental.mf_graph.mf_graph import MetricFlowGraph
+from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph
 from typing_extensions import override
 
 from tests_metricflow_semantics.experimental.mf_graph.formatting.mf_to_dot import (

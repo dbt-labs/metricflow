@@ -13,7 +13,7 @@ from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
-from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
+from metricflow_semantics.toolkit.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.instances import (
     DimensionInstance,
     EntityInstance,

@@ -22,7 +22,7 @@ from metricflow_semantics.dag.mf_dag import DagNode, DisplayedProperty
 from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInputAggregation
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
-from metricflow_semantics.visitor import Visitable, VisitorOutputT
+from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
 
 
 @dataclass(frozen=True, eq=False)

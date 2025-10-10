@@ -8,9 +8,9 @@ from typing import DefaultDict, Generic, Iterable, TypeVar
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
-from metricflow_semantics.experimental.mf_graph.graph_id import MetricFlowGraphId, SequentialGraphId
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
-from metricflow_semantics.experimental.mf_graph.mf_graph import (
+from metricflow_semantics.toolkit.mf_graph.graph_id import MetricFlowGraphId, SequentialGraphId
+from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.toolkit.mf_graph.mf_graph import (
     EdgeT,
     MetricFlowGraph,
     MetricFlowGraphNode,

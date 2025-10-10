@@ -5,7 +5,7 @@ import typing
 from abc import ABC, abstractmethod
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.experimental.mf_graph.mf_graph import MetricFlowGraph
+    from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph
 
 logger = logging.getLogger(__name__)
 

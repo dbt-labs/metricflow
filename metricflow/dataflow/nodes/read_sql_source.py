@@ -8,7 +8,7 @@ import jinja2
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode

@@ -10,14 +10,14 @@ from typing_extensions import Optional, override
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import DotGraphAttributeSet
-from metricflow_semantics.experimental.mf_graph.graph_id import MetricFlowGraphId, SequentialGraphId
-from metricflow_semantics.experimental.mf_graph.mf_graph import (
+from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import DotGraphAttributeSet
+from metricflow_semantics.toolkit.mf_graph.graph_id import MetricFlowGraphId, SequentialGraphId
+from metricflow_semantics.toolkit.mf_graph.mf_graph import (
     MetricFlowGraph,
     MetricFlowGraphEdge,
     MetricFlowGraphNode,
 )
-from metricflow_semantics.experimental.mf_graph.mutable_graph import MutableGraph
+from metricflow_semantics.toolkit.mf_graph.mutable_graph import MutableGraph
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStepProvider,

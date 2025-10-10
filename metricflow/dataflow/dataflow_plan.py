@@ -13,7 +13,7 @@ import more_itertools
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag
 from metricflow_semantics.experimental.comparison_helpers import ComparisonOtherType
-from metricflow_semantics.visitor import Visitable, VisitorOutputT
+from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
     from dbt_semantic_interfaces.references import SemanticModelReference

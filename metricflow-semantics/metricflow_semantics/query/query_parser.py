@@ -16,7 +16,7 @@ from dbt_semantic_interfaces.protocols.where_filter import WhereFilter
 from dbt_semantic_interfaces.references import SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
-from metricflow_semantics.assert_one_arg import assert_at_most_one_arg_set
+from metricflow_semantics.toolkit.assert_one_arg import assert_at_most_one_arg_set
 from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.helpers.string_helpers import mf_indent

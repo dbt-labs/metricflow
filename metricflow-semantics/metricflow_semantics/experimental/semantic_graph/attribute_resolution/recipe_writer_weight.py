@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.experimental.mf_graph.path_finding.weight_function import WeightFunction
+from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import WeightFunction
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import AttributeRecipe
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
