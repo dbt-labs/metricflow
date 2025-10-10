@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Update requirement for dependency `more-itertools` to include newest version
+time: 2025-10-06T14:45:10.7005413+02:00
+custom:
+    Author: MatthijsKok
+    Issue: "1879"
