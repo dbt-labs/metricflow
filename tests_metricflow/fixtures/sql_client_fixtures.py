@@ -10,8 +10,8 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet

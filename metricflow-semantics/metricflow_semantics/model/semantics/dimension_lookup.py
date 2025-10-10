@@ -7,9 +7,9 @@ from dbt_semantic_interfaces.protocols import Dimension, SemanticModel
 from dbt_semantic_interfaces.references import DimensionReference
 from dbt_semantic_interfaces.type_enums import DimensionType
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 
 @dataclass(frozen=True)

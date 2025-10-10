@@ -5,13 +5,13 @@ import logging
 import pytest
 from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 
 from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode

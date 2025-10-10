@@ -14,9 +14,9 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
 

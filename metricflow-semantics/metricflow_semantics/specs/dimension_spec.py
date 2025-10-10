@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.references import DimensionReference, EntityReferen
 from typing_extensions import override
 
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)

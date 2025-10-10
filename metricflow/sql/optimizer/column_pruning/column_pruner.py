@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.sql.optimizer.column_pruning.cte_mapping_lookup_builder import SqlCteAliasMappingLookupBuilderVisitor

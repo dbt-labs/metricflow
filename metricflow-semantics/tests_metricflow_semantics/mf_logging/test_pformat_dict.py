@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 import textwrap
 
-from metricflow_semantics.helpers.string_helpers import mf_dedent
-from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
+from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
+from metricflow_semantics.toolkit.string_helpers import mf_dedent
 
 logger = logging.getLogger(__name__)
 

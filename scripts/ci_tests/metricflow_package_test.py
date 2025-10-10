@@ -10,13 +10,13 @@ from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder, SourceNodeSet

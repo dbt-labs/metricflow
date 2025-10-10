@@ -27,8 +27,6 @@ from metricflow_semantics.instances import (
     TimeDimensionInstance,
     group_instances_by_type,
 )
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -70,6 +68,8 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor

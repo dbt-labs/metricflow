@@ -5,7 +5,6 @@ from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
@@ -19,6 +18,7 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
 )
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.toolkit.assert_one_arg import assert_exactly_one_arg_set
 
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode

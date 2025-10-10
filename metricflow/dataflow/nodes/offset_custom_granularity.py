@@ -7,9 +7,9 @@ from typing import Sequence
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor

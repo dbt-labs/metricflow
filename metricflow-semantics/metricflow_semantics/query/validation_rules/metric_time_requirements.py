@@ -11,7 +11,6 @@ from dbt_semantic_interfaces.references import (
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
-from metricflow_semantics.experimental.ordered_set import OrderedSet
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -29,6 +28,7 @@ from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_tim
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.toolkit.collections.ordered_set import OrderedSet
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult, ResolveMetricsResult

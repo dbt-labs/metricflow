@@ -7,8 +7,8 @@ from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from dbt_metricflow.cli import PACKAGE_NAME
 from dbt_metricflow.cli.cli_errors import LoadSemanticManifestException

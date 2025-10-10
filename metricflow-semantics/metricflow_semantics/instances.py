@@ -21,7 +21,7 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)

@@ -8,7 +8,7 @@ from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.sql.sql_exprs import SqlExpressionNode
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 from typing_extensions import override
 
 from metricflow.sql.sql_plan import SqlPlanNode, SqlPlanNodeVisitor, SqlSelectColumn

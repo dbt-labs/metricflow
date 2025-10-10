@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
+from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 
 from tests_metricflow_semantics.experimental.mf_graph.flow_graph import (
     FlowEdge,

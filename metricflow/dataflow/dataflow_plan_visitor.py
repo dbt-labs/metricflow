@@ -4,7 +4,7 @@ import typing
 from abc import ABC, abstractmethod
 from typing import Generic
 
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 from typing_extensions import override
 
 if typing.TYPE_CHECKING:

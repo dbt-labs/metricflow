@@ -16,13 +16,13 @@ from dbt_semantic_interfaces.type_enums.period_agg import PeriodAggregation
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagNode, DisplayedProperty
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInputAggregation
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
-from metricflow_semantics.visitor import Visitable, VisitorOutputT
+from metricflow_semantics.toolkit.merger import Mergeable
+from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
+from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
 
 
 @dataclass(frozen=True, eq=False)

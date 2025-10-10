@@ -8,7 +8,7 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,

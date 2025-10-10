@@ -11,7 +11,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
