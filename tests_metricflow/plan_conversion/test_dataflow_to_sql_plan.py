@@ -116,6 +116,7 @@ def convert_and_check(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_source_node(
     request: FixtureRequest,
@@ -138,6 +139,7 @@ def test_source_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_filter_node(
     request: FixtureRequest,
@@ -166,6 +168,7 @@ def test_filter_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_filter_with_where_constraint_node(
     request: FixtureRequest,
@@ -227,6 +230,7 @@ def test_filter_with_where_constraint_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_measure_aggregation_node(
     request: FixtureRequest,
@@ -275,6 +279,7 @@ def test_measure_aggregation_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_single_join_node(
     request: FixtureRequest,
@@ -336,6 +341,7 @@ def test_single_join_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_multi_join_node(
     request: FixtureRequest,
@@ -401,6 +407,7 @@ def test_multi_join_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node(
     request: FixtureRequest,
@@ -475,6 +482,7 @@ def test_compute_metrics_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_simple_expr(
     request: FixtureRequest,
@@ -561,6 +569,7 @@ def test_compute_metrics_node_simple_expr(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_ratio_from_single_semantic_model(
     request: FixtureRequest,
@@ -636,6 +645,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_order_by_node(
     request: FixtureRequest,
@@ -708,6 +718,7 @@ def test_order_by_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
 def test_offset_by_custom_granularity_node(  # noqa: D103
@@ -734,6 +745,7 @@ def test_offset_by_custom_granularity_node(  # noqa: D103
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
 def test_offset_custom_granularity_node(  # noqa: D103
@@ -762,6 +774,7 @@ def test_offset_custom_granularity_node(  # noqa: D103
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node(
     request: FixtureRequest,
@@ -797,6 +810,7 @@ def test_semi_additive_join_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node_with_queried_group_by(
     request: FixtureRequest,
@@ -837,6 +851,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_semi_additive_join_node_with_grouping(
     request: FixtureRequest,
@@ -876,6 +891,7 @@ def test_semi_additive_join_node_with_grouping(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_constrain_time_range_node(
     request: FixtureRequest,
@@ -927,6 +943,7 @@ def test_constrain_time_range_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     request: FixtureRequest,
@@ -964,6 +981,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_combine_output_node(
     request: FixtureRequest,
@@ -1028,6 +1046,7 @@ def test_combine_output_node(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_dimensions_requiring_join(
     request: FixtureRequest,
@@ -1054,6 +1073,7 @@ def test_dimensions_requiring_join(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_dimension_with_joined_where_constraint(
     request: FixtureRequest,
