@@ -11,3 +11,4 @@ termcolor>=3.0, <4.0
 types-PyYAML
 types-python-dateutil
 types-tabulate
+ruff==0.3.3
