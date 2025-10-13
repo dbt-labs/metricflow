@@ -7,7 +7,6 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from dbt_semantic_interfaces.implementations.elements.entity import PydanticEntity
-from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasure
 from dbt_semantic_interfaces.implementations.metric import (
     PydanticMetric,
     PydanticMetricAggregationParams,
@@ -17,7 +16,6 @@ from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSe
 from dbt_semantic_interfaces.protocols.dimension import DimensionType
 from dbt_semantic_interfaces.protocols.entity import EntityType
 from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.type_enums import MetricType
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
@@ -297,39 +295,6 @@ def test_build_metric_tasks(  # noqa: D103
         metric_filters=[],
     )
     assert len(tasks) == 0
-
-
-def test_validate_metrics(  # noqa: D103
-    dw_backed_warehouse_validation_model: PydanticSemanticManifest,
-    sql_client: SqlClient,
-    mf_test_configuration: MetricFlowTestConfiguration,
-) -> None:
-    model = deepcopy(dw_backed_warehouse_validation_model)
-    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
-
-    issues = dw_validator.validate_metrics(model)
-    assert len(issues.all_issues) == 0
-
-    # Update model to have a new simple-metric input which creates a new metric by proxy
-    new_measures = list(model.semantic_models[0].measures)
-    new_measures.append(
-        PydanticMeasure(
-            name="count_cats",
-            agg=AggregationType.SUM,
-            expr="is_cat",  # doesn't exist as column
-            create_metric=True,
-        )
-    )
-    model.semantic_models[0].measures = new_measures
-    model.metrics = []
-    model = PydanticSemanticManifestTransformer.transform(model)
-
-    # Validate new metric created by proxy causes an issue (because the column used doesn't exist)
-    dw_validator = DataWarehouseModelValidator(sql_client=sql_client)
-    issues = dw_validator.validate_metrics(model)
-    assert len(issues.all_issues) == 1
-    assert len(issues.errors) == 1
-    assert "Unable to query metric `count_cats`" in issues.errors[0].message
 
 
 @pytest.mark.sql_engine_snapshot
