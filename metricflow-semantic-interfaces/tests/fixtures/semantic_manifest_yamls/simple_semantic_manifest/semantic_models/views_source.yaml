@@ -1,0 +1,38 @@
+---
+semantic_model:
+  name: views_source
+  description: views_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: fct_views
+
+  defaults:
+    agg_time_dimension: ds
+
+  measures:
+    - name: views
+      expr: "1"
+      agg: sum
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+
+  entities:
+    - name: listing
+      type: foreign
+      expr: listing_id
+    - name: user
+      type: foreign
+      expr: user_id
+    - name: create_a_cycle_in_the_join_graph
+      type: primary
+      expr: user_id
