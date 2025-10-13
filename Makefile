@@ -106,6 +106,11 @@ regenerate-test-snapshots:
 populate-persistent-source-schemas:
 	hatch -v run dev-env:python $(TESTS_METRICFLOW)/populate_persistent_source_schemas.py
 
+# Sync dbt-semantic-interfaces files to metricflow-semantic-interfaces folder
+.PHONY: sync-dsi
+sync-dsi:
+	python scripts/sync_dsi.py
+
 # Re-generate snapshots for the default SQL engine.
 .PHONY: test-snap
 test-snap:
