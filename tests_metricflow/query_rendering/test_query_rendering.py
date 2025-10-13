@@ -47,7 +47,7 @@ def test_multihop_node(
     multihop_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
+    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 simple-metric input and 2 dimensions."""
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec(element_name="txn_count"),),
         dimension_specs=(
@@ -80,7 +80,7 @@ def test_filter_with_where_constraint_on_join_dim(
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
+    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 simple-metric input and 2 dimensions."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("booking__is_instant",),
@@ -303,7 +303,7 @@ def test_join_to_scd_dimension(
     scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
-    """Tests conversion of a plan using a dimension with a validity window inside a measure constraint."""
+    """Tests conversion of a plan using a dimension with a validity window inside a simple-metric input constraint."""
     query_spec = scd_query_parser.parse_and_validate_query(
         metric_names=("family_bookings",),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),

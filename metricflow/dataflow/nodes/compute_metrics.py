@@ -18,7 +18,7 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 @dataclass(frozen=True, eq=False)
 class ComputeMetricsNode(DataflowPlanNode):
-    """A node that computes metrics from input measures. Dimensions / entities are passed through.
+    """A node that computes metrics from input simple-metric inputs. Dimensions / entities are passed through.
 
     Attributes:
         metric_specs: The specs for the metrics that this should compute.

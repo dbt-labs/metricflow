@@ -112,7 +112,7 @@ def test_joined_plan(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a plan getting a measure and a joined dimension."""
+    """Tests a plan getting a simple-metric input and a joined dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings"),),
@@ -250,7 +250,7 @@ def test_single_semantic_model_ratio_metrics_plan(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
+    """Tests a plan to retrieve a ratio where both simple-metric inputs come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_per_booker"),),
@@ -284,7 +284,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a plan to retrieve a ratio where both measures come from one semantic model."""
+    """Tests a plan to retrieve a ratio where both simple-metric inputs come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(MetricSpec(element_name="bookings_per_view"),),
@@ -613,7 +613,7 @@ def test_simple_metric_constraint_plan(
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
+    """Tests a plan for querying a simple metric with a constraint on its inputs."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("lux_booking_value_rate_expr",),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),
@@ -641,7 +641,7 @@ def test_simple_metric_constraint_with_reused_simple_metric_plan(
     query_parser: MetricFlowQueryParser,
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
-    """Tests a plan for querying a metric with a constraint on one or more of its input measures."""
+    """Tests a plan for querying a derived metric with a constraint on its inputs and where an input is reused."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("instant_booking_value_ratio",),
         group_by_names=(METRIC_TIME_ELEMENT_NAME,),

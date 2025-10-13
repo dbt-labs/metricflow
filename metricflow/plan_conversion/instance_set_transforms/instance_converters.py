@@ -590,9 +590,11 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
     ) -> List[SqlSelectColumn]:
         select_columns: List[SqlSelectColumn] = []
         for instance in instances:
-            measure_spec = instance.spec
+            simple_metric_input_spec = instance.spec
             select_columns.append(
-                self._create_select_column(spec=measure_spec, fill_nulls_with=measure_spec.fill_nulls_with)
+                self._create_select_column(
+                    spec=simple_metric_input_spec, fill_nulls_with=simple_metric_input_spec.fill_nulls_with
+                )
             )
         return select_columns
 
@@ -640,14 +642,16 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
         self._column_association_resolver = column_association_resolver
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
-        output_measure_instances = []
-        for input_measure_instance in instance_set.simple_metric_input_instances:
-            output_measure_instances.append(
+        output_simple_metric_input_instances = []
+        for input_simple_metric_input_instance in instance_set.simple_metric_input_instances:
+            output_simple_metric_input_instances.append(
                 SimpleMetricInputInstance(
-                    associated_columns=(self._column_association_resolver.resolve_spec(input_measure_instance.spec),),
-                    spec=input_measure_instance.spec,
-                    defined_from=input_measure_instance.defined_from,
-                    aggregation_state=input_measure_instance.aggregation_state,
+                    associated_columns=(
+                        self._column_association_resolver.resolve_spec(input_simple_metric_input_instance.spec),
+                    ),
+                    spec=input_simple_metric_input_instance.spec,
+                    defined_from=input_simple_metric_input_instance.defined_from,
+                    aggregation_state=input_simple_metric_input_instance.aggregation_state,
                 )
             )
 
@@ -714,7 +718,7 @@ class ChangeAssociatedColumns(InstanceSetTransform[InstanceSet]):
                 )
             )
         return InstanceSet(
-            simple_metric_input_instances=tuple(output_measure_instances),
+            simple_metric_input_instances=tuple(output_simple_metric_input_instances),
             dimension_instances=tuple(output_dimension_instances),
             time_dimension_instances=tuple(output_time_dimension_instances),
             entity_instances=tuple(output_entity_instances),

@@ -358,12 +358,12 @@ class DataWarehouseTaskBuilder:
         sql_client: SqlClient,
         semantic_model_filters: Optional[Sequence[str]] = None,
     ) -> List[DataWarehouseValidationTask]:
-        """Generates a list of tasks for validating the measures of the manifest.
+        """Generates a list of tasks for validating the simple-metric inputs of the manifest.
 
         The high level tasks returned are "short cut" queries which try to
-        query all the measures for a given semantic model. If that query fails,
-        one or more of the measures is incorrectly specified. Thus if the
-        query fails, there are subtasks which query the individual measures
+        query all the simple-metric inputs for a given semantic model. If that query fails,
+        one or more of the simple-metric inputs is incorrectly specified. Thus if the
+        query fails, there are subtasks which query the individual simple-metric inputs
         on the semantic model to identify which have issues.
         """
         render_tools = QueryRenderingTools(manifest=manifest)
@@ -397,7 +397,9 @@ class DataWarehouseTaskBuilder:
             ] = collections.defaultdict(list)
             for spec in semantic_model_specs:
                 obtained_source_node = source_node_by_simple_metric_input_spec.get(spec)
-                assert obtained_source_node, f"Unable to find generated source node for measure: {spec.element_name}"
+                assert (
+                    obtained_source_node
+                ), f"Unable to find generated source node for simple-metric input: {spec.element_name}"
 
                 filter_elements_node = FilterElementsNode.create(
                     parent_node=obtained_source_node,
@@ -421,8 +423,8 @@ class DataWarehouseTaskBuilder:
                             ),
                             element_type=SemanticModelElementType.MEASURE,
                         ),
-                        error_message=f"Unable to query measure `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
-                        description=f"Validating measure `{spec.element_name}` in semantic_model `{semantic_model.name}`",
+                        error_message=f"Unable to query simple-metric input `{spec.element_name}` on semantic model `{semantic_model.name}` in data warehouse",
+                        description=f"Validating simple-metric input `{spec.element_name}` in semantic_model `{semantic_model.name}`",
                     )
                 )
 
@@ -437,16 +439,16 @@ class DataWarehouseTaskBuilder:
                             cls.renderize,
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
-                            plan_id=f"{semantic_model.name}_all_measures_validation",
+                            plan_id=f"{semantic_model.name}_all_simple_metric_inputs_validation",
                             nodes=filter_elements_node,
                         ),
                         context=SemanticModelContext(
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
                             semantic_model=SemanticModelReference(semantic_model_name=semantic_model.name),
                         ),
-                        error_message=f"Failed to query measures in data warehouse for semantic model `{semantic_model.name}`",
+                        error_message=f"Failed to query simple-metric inputs in data warehouse for semantic model `{semantic_model.name}`",
                         on_fail_subtasks=source_node_to_sub_task[source_node],
-                        description=f"Validating all measures in semantic_model `{semantic_model.name}`",
+                        description=f"Validating all simple-metric inputs in semantic_model `{semantic_model.name}`",
                     )
                 )
         return tasks

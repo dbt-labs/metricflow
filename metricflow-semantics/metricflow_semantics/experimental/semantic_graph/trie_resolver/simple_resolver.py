@@ -44,9 +44,9 @@ logger = logging.getLogger(__name__)
 
 
 class SimpleTrieResolver(DunderNameTrieResolver):
-    """Resolves the dunder-name trie that represents the "simple" group-by items available for measures / metrics.
+    """Resolves the dunder-name trie that represents the "simple" group-by items available for metrics.
 
-    The set of simple group-by items does not include group-by metrics Those are handled in a separate resolver.
+    The set of simple group-by items does not include group-by metrics. Those are handled in a separate resolver.
     """
 
     def __init__(
@@ -94,7 +94,7 @@ class SimpleTrieResolver(DunderNameTrieResolver):
         the set of group-by items that are available for the source nodes is the intersection of the items that are
         available for each node.
         """
-        # Find the set measures / local-model nodes that the given source nodes depend on. Generating the result for
+        # Find the set simple-metric inputs / local-model nodes that the given source nodes depend on. Generating the result for
         # the set of given source nodes requires intersecting the result produced from each node.
         find_descendants_result = self._path_finder.find_descendants(
             graph=self._semantic_graph,

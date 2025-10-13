@@ -149,14 +149,14 @@ def test_filter_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node."""
-    measure_spec = SimpleMetricInputSpec(
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
     filter_node = FilterElementsNode.create(
-        parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(measure_spec,))
+        parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,))
     )
 
     convert_and_check(
@@ -179,7 +179,7 @@ def test_filter_with_where_constraint_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf pass filter node."""
-    measure_spec = SimpleMetricInputSpec(
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
@@ -193,7 +193,9 @@ def test_filter_with_where_constraint_node(
     )
     filter_node = FilterElementsNode.create(
         parent_node=source_node,
-        include_specs=InstanceSpecSet(simple_metric_input_specs=(measure_spec,), time_dimension_specs=(ds_spec,)),
+        include_specs=InstanceSpecSet(
+            simple_metric_input_specs=(simple_metric_input_spec,), time_dimension_specs=(ds_spec,)
+        ),
     )  # need to include ds_spec because where constraint operates on ds
     time_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY)
     where_constraint_node = WhereConstraintNode.create(
@@ -239,7 +241,7 @@ def test_simple_metric_aggregation_node(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a leaf measure aggregation node.
+    """Tests converting a dataflow plan to a SQL query plan where there is a leaf simple-metric input aggregation node.
 
     Covers SUM, AVERAGE, SUM_BOOLEAN (transformed to SUM upstream), and COUNT_DISTINCT agg types
     """
@@ -255,13 +257,13 @@ def test_simple_metric_aggregation_node(
     count_distinct_spec = SimpleMetricInputSpec(
         element_name="bookers",
     )
-    measure_specs: List[SimpleMetricInputSpec] = [sum_spec, sum_boolean_spec, avg_spec, count_distinct_spec]
+    simple_metric_input_specs: List[SimpleMetricInputSpec] = [sum_spec, sum_boolean_spec, avg_spec, count_distinct_spec]
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
-        include_specs=InstanceSpecSet(simple_metric_input_specs=tuple(measure_specs)),
+        include_specs=InstanceSpecSet(simple_metric_input_specs=tuple(simple_metric_input_specs)),
     )
 
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
@@ -288,8 +290,8 @@ def test_single_join_node(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 1 dimension."""
-    measure_spec = SimpleMetricInputSpec(
+    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 simple-metric input and 1 dimension."""
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
@@ -299,7 +301,7 @@ def test_single_join_node(
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
-            simple_metric_input_specs=(measure_spec,),
+            simple_metric_input_specs=(simple_metric_input_spec,),
             entity_specs=(entity_spec,),
         ),
     )
@@ -350,8 +352,8 @@ def test_multi_join_node(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
-    measure_spec = SimpleMetricInputSpec(
+    """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 simple-metric input and 2 dimensions."""
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
@@ -360,7 +362,9 @@ def test_multi_join_node(
     ].read_node_mapping["bookings_source"]
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
-        include_specs=InstanceSpecSet(simple_metric_input_specs=(measure_spec,), entity_specs=(entity_spec,)),
+        include_specs=InstanceSpecSet(
+            simple_metric_input_specs=(simple_metric_input_spec,), entity_specs=(entity_spec,)
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -417,7 +421,7 @@ def test_compute_metrics_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node."""
-    measure_spec = SimpleMetricInputSpec(
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
@@ -427,7 +431,7 @@ def test_compute_metrics_node(
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
-            simple_metric_input_specs=(measure_spec,),
+            simple_metric_input_specs=(simple_metric_input_spec,),
             entity_specs=(entity_spec,),
         ),
     )
@@ -491,8 +495,8 @@ def test_compute_metrics_node_simple_expr(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     sql_client: SqlClient,
 ) -> None:
-    """Tests the compute metrics node for expr type metrics sourced from a single measure."""
-    measure_spec = SimpleMetricInputSpec(
+    """Tests the compute metrics node for expr type metrics sourced from a single simple-metric input."""
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="booking_value",
     )
     entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
@@ -501,7 +505,9 @@ def test_compute_metrics_node_simple_expr(
     ].read_node_mapping["bookings_source"]
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
-        include_specs=InstanceSpecSet(simple_metric_input_specs=(measure_spec,), entity_specs=(entity_spec,)),
+        include_specs=InstanceSpecSet(
+            simple_metric_input_specs=(simple_metric_input_spec,), entity_specs=(entity_spec,)
+        ),
     )
 
     dimension_spec = DimensionSpec(
@@ -655,7 +661,7 @@ def test_order_by_node(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a leaf compute metrics node."""
-    measure_spec = SimpleMetricInputSpec(
+    simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
 
@@ -676,7 +682,7 @@ def test_order_by_node(
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
-            simple_metric_input_specs=(measure_spec,),
+            simple_metric_input_specs=(simple_metric_input_spec,),
             dimension_specs=(dimension_spec,),
             time_dimension_specs=(time_dimension_spec,),
         ),
@@ -1008,12 +1014,12 @@ def test_combine_output_node(
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
 
-    # Build compute measures node
-    measure_specs: List[SimpleMetricInputSpec] = [sum_spec]
+    # Build compute simple-metric inputs node
+    simple_metric_input_specs: List[SimpleMetricInputSpec] = [sum_spec]
     filtered_measure_node = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
-            simple_metric_input_specs=tuple(measure_specs), dimension_specs=(dimension_spec,)
+            simple_metric_input_specs=tuple(simple_metric_input_specs), dimension_specs=(dimension_spec,)
         ),
     )
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
@@ -1022,18 +1028,20 @@ def test_combine_output_node(
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
-    # Build agg measures node
-    measure_specs_2 = [sum_boolean_spec, count_distinct_spec]
+    # Build agg simple-metric inputs node
+    simple_metric_input_specs_2 = [sum_boolean_spec, count_distinct_spec]
     filtered_measure_node_2 = FilterElementsNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
-            simple_metric_input_specs=tuple(measure_specs_2), dimension_specs=(dimension_spec,)
+            simple_metric_input_specs=tuple(simple_metric_input_specs_2), dimension_specs=(dimension_spec,)
         ),
     )
     aggregated_measure_node_2 = AggregateSimpleMetricInputsNode.create(
         parent_node=filtered_measure_node_2,
         alias_mapping=InstanceAliasMapping.create(),
-        null_fill_value_mapping=NullFillValueMapping.create({spec.element_name: 1 for spec in measure_specs_2}),
+        null_fill_value_mapping=NullFillValueMapping.create(
+            {spec.element_name: 1 for spec in simple_metric_input_specs_2}
+        ),
     )
 
     combine_output_node = CombineAggregatedOutputsNode.create([aggregated_measure_node, aggregated_measure_node_2])
