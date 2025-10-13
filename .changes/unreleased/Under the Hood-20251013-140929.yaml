@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Rename `Metricflow*` -> `MetricFlow*`
+time: 2025-10-13T14:09:29.326515-07:00
+custom:
+  Author: plypaul
+  Issue: "1904"
