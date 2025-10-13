@@ -20,11 +20,11 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
-from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
@@ -40,7 +40,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
     DataflowPlanNode,
 )
-from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
+from metricflow.dataflow.nodes.aggregate_simple_metric_inputs import AggregateSimpleMetricInputsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
@@ -232,7 +232,7 @@ def test_filter_with_where_constraint_node(
 
 @pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
-def test_measure_aggregation_node(
+def test_simple_metric_aggregation_node(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,

@@ -10,9 +10,6 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNode,
     GroupByItemResolutionNodeVisitor,
 )
-from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.measure_source_node import (
-    SimpleMetricGroupByItemSourceNode,
-)
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (
     ComplexMetricGroupByItemResolutionNode,
 )
@@ -21,6 +18,9 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.no
 )
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.query_resolution_node import (
     QueryGroupByItemResolutionNode,
+)
+from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.simple_metric_source_node import (
+    SimpleMetricGroupByItemSourceNode,
 )
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery

@@ -607,7 +607,7 @@ def test_distinct_values_plan_with_join(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_measure_constraint_plan(
+def test_simple_metric_constraint_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,
@@ -635,7 +635,7 @@ def test_measure_constraint_plan(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_measure_constraint_with_reused_measure_plan(
+def test_simple_metric_constraint_with_reused_simple_metric_plan(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     query_parser: MetricFlowQueryParser,

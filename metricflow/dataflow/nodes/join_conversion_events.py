@@ -9,7 +9,7 @@ from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
-from metricflow_semantics.specs.measure_spec import SimpleMetricInputSpec
+from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.visitor import VisitorOutputT
 

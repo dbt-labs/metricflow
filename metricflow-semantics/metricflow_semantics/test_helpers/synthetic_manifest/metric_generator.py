@@ -11,7 +11,7 @@ from dbt_semantic_interfaces.implementations.metric import (
 )
 from dbt_semantic_interfaces.type_enums import AggregationType, MetricType
 
-from metricflow_semantics.test_helpers.synthetic_manifest.measure_semantic_model_generator import (
+from metricflow_semantics.test_helpers.synthetic_manifest.simple_metric_semantic_model_generator import (
     SimpleMetricSemanticModelGenerator,
 )
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (

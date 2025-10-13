@@ -25,7 +25,7 @@ def sg_tester_cyclic_manifest(  # noqa: D103
     return SemanticGraphTester(fixture)
 
 
-def test_measure_with_cyclic_join_path(sg_tester_cyclic_manifest: SemanticGraphTester) -> None:
+def test_simple_metric_with_cyclic_join_path(sg_tester_cyclic_manifest: SemanticGraphTester) -> None:
     """Check that a cyclic join path doesn't cause infinite loop / recursion."""
     cases = ("listings",)
     sg_tester_cyclic_manifest.assert_attribute_set_snapshot_equal_for_simple_metrics(cases)

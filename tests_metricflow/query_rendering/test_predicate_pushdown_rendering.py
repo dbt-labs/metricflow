@@ -74,7 +74,7 @@ def test_multiple_categorical_dimension_pushdown(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_different_filters_on_same_measure_source_categorical_dimension(
+def test_different_filters_on_same_simple_metric_source_categorical_dimension(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,

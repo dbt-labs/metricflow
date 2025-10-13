@@ -19,7 +19,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.dataflow_plan import DataflowPlan, DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataflow.nodes.add_generated_uuid import AddGeneratedUuidColumnNode
-from metricflow.dataflow.nodes.aggregate_measures import AggregateSimpleMetricInputsNode
+from metricflow.dataflow.nodes.aggregate_simple_metric_inputs import AggregateSimpleMetricInputsNode
 from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
@@ -424,7 +424,7 @@ def test_2_ratio_metrics_from_1_semantic_model(
 
 
 @pytest.mark.sql_engine_snapshot
-def test_duplicate_measures(
+def test_duplicate_simple_metrics(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     dataflow_plan_builder: DataflowPlanBuilder,
