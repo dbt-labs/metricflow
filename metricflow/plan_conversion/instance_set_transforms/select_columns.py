@@ -6,15 +6,15 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple, MappingItemsTuple
-from metricflow_semantics.helpers.mapping_helpers import mf_items_to_dict
 from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, MdoInstance
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
+from metricflow_semantics.toolkit.collections.mapping_helpers import mf_items_to_dict
+from metricflow_semantics.toolkit.merger import Mergeable
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple, MappingItemsTuple
 from typing_extensions import override
 
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet

@@ -6,8 +6,8 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.semantic_graph.builder.entity_join_subgraph import EntityJoinSubgraphGenerator
 from metricflow_semantics.experimental.semantic_graph.builder.entity_key_subgraph import EntityKeySubgraphGenerator
-from metricflow_semantics.helpers.string_helpers import mf_dedent
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.string_helpers import mf_dedent
 
 from tests_metricflow_semantics.experimental.semantic_graph.builder.subgraph_test_helpers import (
     check_graph_build,

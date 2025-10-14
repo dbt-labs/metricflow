@@ -12,13 +12,13 @@ from typing import Iterable, Optional, Sequence
 from dbt_semantic_interfaces.naming.keywords import DUNDER
 from typing_extensions import Self, override
 
-from metricflow_semantics.collection_helpers.dictionaries import mf_common_keys
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_descriptor import DunderNameDescriptor
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.collections.mapping_helpers import mf_common_keys
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 logger = logging.getLogger(__name__)
 

@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 
 import pytest
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowQueryResult
 from metricflow.protocols.sql_client import SqlClient

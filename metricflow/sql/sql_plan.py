@@ -11,7 +11,7 @@ from typing import Generic, Optional, Sequence
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId, DagNode, MetricFlowDag
 from metricflow_semantics.sql.sql_exprs import SqlColumnReferenceExpression, SqlExpressionNode
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 from typing_extensions import Self
 
 if typing.TYPE_CHECKING:

@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from metricflow_semantics.collection_helpers.lru_cache import LruCache
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.toolkit.cache.lru_cache import LruCache
 
 from metricflow.dataflow.builder.simple_metric_input_spec_properties import SimpleMetricInputSpecProperties
 from metricflow.dataflow.builder.source_node_recipe import SourceNodeRecipe

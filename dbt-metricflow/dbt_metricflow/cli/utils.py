@@ -11,7 +11,7 @@ from typing import Any, Callable, List, Optional
 
 import click
 from dateutil.parser import parse
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 import dbt_metricflow.cli.custom_click_types as click_custom
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration

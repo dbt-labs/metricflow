@@ -8,8 +8,8 @@ from typing import Iterator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from dbt_metricflow.cli.tutorial import dbtMetricFlowTutorialHelper
 from tests_metricflow.cli.cli_test_helpers import (

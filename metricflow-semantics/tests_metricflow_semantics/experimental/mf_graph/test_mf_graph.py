@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.experimental.mf_graph.formatting.pretty_graph_formatter import PrettyFormatGraphFormatter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
+from metricflow_semantics.toolkit.mf_graph.formatting.pretty_graph_formatter import PrettyFormatGraphFormatter
 
 from tests_metricflow_semantics.experimental.mf_graph.flow_graph import FlowGraph
 

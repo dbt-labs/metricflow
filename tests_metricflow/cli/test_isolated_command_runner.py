@@ -9,8 +9,8 @@ from typing import Dict
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from tests_metricflow.cli.cli_test_helpers import (

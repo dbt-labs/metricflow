@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Iterable
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.toolkit.merger import Mergeable
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from typing_extensions import override
 
 from metricflow.sql.sql_plan import SqlSelectColumn

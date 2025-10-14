@@ -6,8 +6,8 @@ from typing import Mapping, Sequence
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel

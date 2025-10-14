@@ -10,7 +10,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
 from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)
