@@ -7,7 +7,7 @@ name = "metricflow-semantics"
 description = "Modules for semantic understanding of a MetricFlow query."
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
-license = "BUSL-1.1"
+license = "Apache-2.0"
 authors = [
   { name = "dbt Labs", email = "info@dbtlabs.com" },
 ]
