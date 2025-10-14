@@ -8,7 +8,7 @@ from typing_extensions import override
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
@@ -58,7 +58,7 @@ class JoinToModelEdge(SemanticGraphEdge):
         return AttributeRecipeStep(add_model_join=self.right_model_id)
 
 
-_EMPTY_LABEL_SET: FrozenOrderedSet[MetricflowGraphLabel] = FrozenOrderedSet()
+_EMPTY_LABEL_SET: FrozenOrderedSet[MetricFlowGraphLabel] = FrozenOrderedSet()
 _EMPTY_RECIPE_STEP = AttributeRecipeStep()
 
 
@@ -66,14 +66,14 @@ _EMPTY_RECIPE_STEP = AttributeRecipeStep()
 class MetricDefinitionEdge(SemanticGraphEdge):
     """An edge that points from a metric to the inputs for the metric."""
 
-    additional_labels: FrozenOrderedSet[MetricflowGraphLabel]
+    additional_labels: FrozenOrderedSet[MetricFlowGraphLabel]
     _recipe_step: AttributeRecipeStep
 
     @staticmethod
     def create(  # noqa: D102
         tail_node: SemanticGraphNode,
         head_node: SemanticGraphNode,
-        additional_labels: Optional[FrozenOrderedSet[MetricflowGraphLabel]] = None,
+        additional_labels: Optional[FrozenOrderedSet[MetricFlowGraphLabel]] = None,
         recipe_step: Optional[AttributeRecipeStep] = None,
     ) -> MetricDefinitionEdge:
         return MetricDefinitionEdge(
@@ -119,7 +119,7 @@ class MetricDefinitionEdge(SemanticGraphEdge):
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet(self.additional_labels)
 
 

@@ -12,7 +12,7 @@ from typing_extensions import override
 
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.model_object_lookup import ModelObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricflowInternalError
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricFlowInternalError
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantics.simple_metric_input import (
@@ -45,7 +45,7 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
         model_name = semantic_model.name
         # Sanity checks.
         if not simple_metrics:
-            raise MetricflowInternalError(
+            raise MetricFlowInternalError(
                 LazyFormat(
                     "Can't initialize with empty `simple_metrics`",
                     simple_metrics=simple_metrics,
@@ -53,12 +53,12 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
             )
         for metric in simple_metrics:
             if metric.type is not MetricType.SIMPLE:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat("Can't initialize with a metric that is not a simple metric", metric=metric)
                 )
             metric_aggregation_params = metric.type_params.metric_aggregation_params
             if metric_aggregation_params is None or metric_aggregation_params.semantic_model != model_name:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Can't initialize with a metric that is not associated with this semantic model",
                         metric=metric,

@@ -19,11 +19,11 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotNodeShape,
     DotRankKey,
 )
-from metricflow_semantics.experimental.mf_graph.graph_converter import MetricflowGraphConverter
+from metricflow_semantics.experimental.mf_graph.graph_converter import MetricFlowGraphConverter
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
-    MetricflowGraph,
-    MetricflowGraphEdge,
-    MetricflowGraphNode,
+    MetricFlowGraph,
+    MetricFlowGraphEdge,
+    MetricFlowGraphNode,
 )
 from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.mf_logging.format_option import PrettyFormatOption
@@ -42,7 +42,7 @@ from tests_metricflow_semantics.experimental.mf_graph.formatting.mf_to_dot impor
     DotAttributeSet,
     DotConversionArgumentSet,
     DotGraphConversionResult,
-    MetricflowGraphToDotConverter,
+    MetricFlowGraphToDotConverter,
 )
 
 logger = logging.getLogger(__name__)
@@ -145,7 +145,7 @@ class GraphicalDotConversionArgumentSet(DotConversionArgumentSet):
         )
 
 
-class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphConversionResult]):
+class MetricFlowGraphToGraphicalDotConverter(MetricFlowGraphConverter[DotGraphConversionResult]):
     """Converts an MF graph to a DOT graph with graphical attributes for rendering to an image.
 
     TODO: Needs to allow highlighting of nodes / edges for path visualization.
@@ -159,19 +159,19 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
         self._verbose_debug_logs = False
 
     @override
-    def convert_graph(self, graph: MetricflowGraph) -> DotGraphConversionResult:
+    def convert_graph(self, graph: MetricFlowGraph) -> DotGraphConversionResult:
         dot_elements = self._create_dot_element_set(graph)
-        return MetricflowGraphToDotConverter.create_dot_graph(self._arguments, dot_elements)
+        return MetricFlowGraphToDotConverter.create_dot_graph(self._arguments, dot_elements)
 
-    def _create_dot_element_set(self, graph: MetricflowGraph) -> DotAttributeSet:
+    def _create_dot_element_set(self, graph: MetricFlowGraph) -> DotAttributeSet:
         # Convert nodes to DOT.
         cluster_name_to_dot_nodes: DefaultDict[Optional[str], list[DotNodeAttributeSet]] = defaultdict(list)
 
-        cluster_name_to_nodes: dict[str, list[MetricflowGraphNode]] = defaultdict(list)
+        cluster_name_to_nodes: dict[str, list[MetricFlowGraphNode]] = defaultdict(list)
         for mf_node in graph.nodes:
             cluster_name_to_nodes[mf_node.node_descriptor.cluster_name].append(mf_node)
 
-        mf_node_to_dot_node: dict[MetricflowGraphNode, DotNodeAttributeSet] = {}
+        mf_node_to_dot_node: dict[MetricFlowGraphNode, DotNodeAttributeSet] = {}
         for cluster_name, mf_nodes in cluster_name_to_nodes.items():
             sorted_mf_nodes = sorted(mf_nodes)
             for mf_node in sorted_mf_nodes:
@@ -186,7 +186,7 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
                 cluster_name_to_dot_nodes[cluster_name].append(dot_node)
 
         # Map the original edge to the replacement intermediate DOT node.
-        edge_to_edge_as_dot_node_mapping: dict[MetricflowGraphEdge, DotNodeAttributeSet] = {}
+        edge_to_edge_as_dot_node_mapping: dict[MetricFlowGraphEdge, DotNodeAttributeSet] = {}
         # Use to generate unique names for the intermediate nodes.
         edge_as_node_index = 0
 
@@ -263,7 +263,7 @@ class MetricflowGraphToGraphicalDotConverter(MetricflowGraphConverter[DotGraphCo
         """Return a `graphviz` / DOT label to render this node.
 
         Currently, this return a `graphviz` HTML table where the first row is a single column with the ID of
-        the node, and subsequent row show the properties returned by `MetricflowGraphNode.displayed_properties`.
+        the node, and subsequent row show the properties returned by `MetricFlowGraphNode.displayed_properties`.
         """
         table_builder = GraphvizHtmlTableBuilder(table_border=0)
 

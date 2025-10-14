@@ -8,12 +8,12 @@ from typing import DefaultDict, Generic, Iterable, TypeVar
 from typing_extensions import override
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
-from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId, SequentialGraphId
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
+from metricflow_semantics.experimental.mf_graph.graph_id import MetricFlowGraphId, SequentialGraphId
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
     EdgeT,
-    MetricflowGraph,
-    MetricflowGraphNode,
+    MetricFlowGraph,
+    MetricFlowGraphNode,
     NodeT,
 )
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
@@ -24,23 +24,23 @@ MutableGraphT = TypeVar("MutableGraphT", bound="MutableGraph")
 
 
 @dataclass
-class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
+class MutableGraph(Generic[NodeT, EdgeT], MetricFlowGraph[NodeT, EdgeT], ABC):
     """Base class for mutable graphs.
 
     The graph ID is changed to a new value whenever this changes for easier cache management.
     """
 
-    _graph_id: MetricflowGraphId
+    _graph_id: MetricFlowGraphId
     _nodes: MutableOrderedSet[NodeT]
     _edges: MutableOrderedSet[EdgeT]
 
-    _label_to_nodes: DefaultDict[MetricflowGraphLabel, MutableOrderedSet[NodeT]]
-    _tail_node_to_edges: DefaultDict[MetricflowGraphNode, MutableOrderedSet[EdgeT]]
-    _head_node_to_edges: DefaultDict[MetricflowGraphNode, MutableOrderedSet[EdgeT]]
-    _label_to_edges: DefaultDict[MetricflowGraphLabel, MutableOrderedSet[EdgeT]]
+    _label_to_nodes: DefaultDict[MetricFlowGraphLabel, MutableOrderedSet[NodeT]]
+    _tail_node_to_edges: DefaultDict[MetricFlowGraphNode, MutableOrderedSet[EdgeT]]
+    _head_node_to_edges: DefaultDict[MetricFlowGraphNode, MutableOrderedSet[EdgeT]]
+    _label_to_edges: DefaultDict[MetricFlowGraphLabel, MutableOrderedSet[EdgeT]]
 
-    _node_to_predecessor_nodes: DefaultDict[MetricflowGraphNode, MutableOrderedSet[NodeT]]
-    _node_to_successor_nodes: DefaultDict[MetricflowGraphNode, MutableOrderedSet[NodeT]]
+    _node_to_predecessor_nodes: DefaultDict[MetricFlowGraphNode, MutableOrderedSet[NodeT]]
+    _node_to_successor_nodes: DefaultDict[MetricFlowGraphNode, MutableOrderedSet[NodeT]]
 
     def add_node(self, node: NodeT) -> None:  # noqa: D102
         self.add_nodes((node,))
@@ -76,7 +76,7 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
         self._edges.update(edges)
         self._graph_id = SequentialGraphId.create()
 
-    def update(self, other: MetricflowGraph[NodeT, EdgeT]) -> None:
+    def update(self, other: MetricFlowGraph[NodeT, EdgeT]) -> None:
         """Add the nodes and edges to this graph."""
         self.add_nodes(other.nodes)
         self.add_edges(other.edges)
@@ -88,7 +88,7 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
         return self._nodes
 
     @override
-    def nodes_with_labels(self, *graph_labels: MetricflowGraphLabel) -> OrderedSet[NodeT]:
+    def nodes_with_labels(self, *graph_labels: MetricFlowGraphLabel) -> OrderedSet[NodeT]:
         return FrozenOrderedSet(mf_flatten(self._label_to_nodes[label] for label in graph_labels))
 
     @override
@@ -97,26 +97,26 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricflowGraph[NodeT, EdgeT], ABC):
         return self._edges
 
     @override
-    def edges_with_tail_node(self, tail_node: MetricflowGraphNode) -> OrderedSet[EdgeT]:
+    def edges_with_tail_node(self, tail_node: MetricFlowGraphNode) -> OrderedSet[EdgeT]:
         return self._tail_node_to_edges[tail_node]
 
     @override
-    def edges_with_head_node(self, head_node: MetricflowGraphNode) -> OrderedSet[EdgeT]:
+    def edges_with_head_node(self, head_node: MetricFlowGraphNode) -> OrderedSet[EdgeT]:
         return self._head_node_to_edges[head_node]
 
     @override
-    def edges_with_label(self, label: MetricflowGraphLabel) -> OrderedSet[EdgeT]:
+    def edges_with_label(self, label: MetricFlowGraphLabel) -> OrderedSet[EdgeT]:
         return self._label_to_edges[label]
 
     @override
-    def successors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT]:
+    def successors(self, node: MetricFlowGraphNode) -> OrderedSet[NodeT]:
         return self._node_to_successor_nodes[node]
 
     @override
-    def predecessors(self, node: MetricflowGraphNode) -> OrderedSet[NodeT]:
+    def predecessors(self, node: MetricFlowGraphNode) -> OrderedSet[NodeT]:
         return self._node_to_predecessor_nodes[node]
 
     @override
     @property
-    def graph_id(self) -> MetricflowGraphId:
+    def graph_id(self) -> MetricFlowGraphId:
         return self._graph_id

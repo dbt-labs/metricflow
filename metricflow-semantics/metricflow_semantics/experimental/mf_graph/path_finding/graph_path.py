@@ -9,7 +9,7 @@ from typing import Generic, Optional, Sized, TypeVar
 from typing_extensions import Self, override
 
 from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
-from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraphEdge, MetricflowGraphNode
+from metricflow_semantics.experimental.mf_graph.mf_graph import MetricFlowGraphEdge, MetricFlowGraphNode
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat
@@ -17,11 +17,11 @@ from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 logger = logging.getLogger(__name__)
 
 
-NodeT = TypeVar("NodeT", bound=MetricflowGraphNode)
-EdgeT = TypeVar("EdgeT", bound=MetricflowGraphEdge)
+NodeT = TypeVar("NodeT", bound=MetricFlowGraphNode)
+EdgeT = TypeVar("EdgeT", bound=MetricFlowGraphEdge)
 
 
-class MetricflowGraphPath(Generic[NodeT, EdgeT], Comparable, MetricFlowPrettyFormattable, Sized, ABC):
+class MetricFlowGraphPath(Generic[NodeT, EdgeT], Comparable, MetricFlowPrettyFormattable, Sized, ABC):
     """A read-only interface that describes a path in a directed graph."""
 
     @property
@@ -77,7 +77,7 @@ class MetricflowGraphPath(Generic[NodeT, EdgeT], Comparable, MetricFlowPrettyFor
 
 
 @dataclass
-class MutableGraphPath(MetricflowGraphPath[NodeT, EdgeT], Generic[NodeT, EdgeT]):
+class MutableGraphPath(MetricFlowGraphPath[NodeT, EdgeT], Generic[NodeT, EdgeT]):
     """A path that can be extended and also reverted back to the previous state before extension.
 
     * This is a mutable class as path-finding can traverse many edges, and using a single mutable object reduces

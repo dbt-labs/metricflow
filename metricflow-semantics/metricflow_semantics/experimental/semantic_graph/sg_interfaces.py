@@ -11,11 +11,11 @@ from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTup
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import DotGraphAttributeSet
-from metricflow_semantics.experimental.mf_graph.graph_id import MetricflowGraphId, SequentialGraphId
+from metricflow_semantics.experimental.mf_graph.graph_id import MetricFlowGraphId, SequentialGraphId
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
-    MetricflowGraph,
-    MetricflowGraphEdge,
-    MetricflowGraphNode,
+    MetricFlowGraph,
+    MetricFlowGraphEdge,
+    MetricFlowGraphNode,
 )
 from metricflow_semantics.experimental.mf_graph.mutable_graph import MutableGraph
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
@@ -29,7 +29,7 @@ from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
 logger = logging.getLogger(__name__)
 
 
-class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeStepProvider, MetricFlowPrettyFormattable, ABC):
+class SemanticGraphNode(MetricFlowGraphNode, AttributeRecipeStepProvider, MetricFlowPrettyFormattable, ABC):
     """A node in the semantic graph.
 
     At the top level, the semantic graph has two types of nodes: entity nodes and attribute nodes. Entity nodes have
@@ -73,7 +73,7 @@ class SemanticGraphNode(MetricflowGraphNode, AttributeRecipeStepProvider, Metric
 
 
 @fast_frozen_dataclass(order=False)
-class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeRecipeStepProvider, ABC):
+class SemanticGraphEdge(MetricFlowGraphEdge[SemanticGraphNode], AttributeRecipeStepProvider, ABC):
     """An edge in the semantic graph.
 
     Currently, the edges in the semantic graph represent entity relationships and also describe how a related attribute
@@ -106,8 +106,8 @@ class SemanticGraphEdge(MetricflowGraphEdge[SemanticGraphNode], AttributeRecipeS
         return tuple(properties)
 
 
-class SemanticGraph(MetricflowGraph[SemanticGraphNode, SemanticGraphEdge], ABC):
-    """A read-only interface for a semantic graph based on `MetricflowGraph`.
+class SemanticGraph(MetricFlowGraph[SemanticGraphNode, SemanticGraphEdge], ABC):
+    """A read-only interface for a semantic graph based on `MetricFlowGraph`.
 
     Also see `SemanticGraphNode` and `SemanticGraphEdge`.
 
@@ -141,7 +141,7 @@ class MutableSemanticGraph(MutableGraph[SemanticGraphNode, SemanticGraphEdge], S
     """A mutable implementation of `SemanticGraph` for building graphs."""
 
     @classmethod
-    def create(cls, graph_id: Optional[MetricflowGraphId] = None) -> MutableSemanticGraph:  # noqa: D102
+    def create(cls, graph_id: Optional[MetricFlowGraphId] = None) -> MutableSemanticGraph:  # noqa: D102
         return MutableSemanticGraph(
             _graph_id=graph_id or SequentialGraphId.create(),
             _nodes=MutableOrderedSet(),
@@ -155,7 +155,7 @@ class MutableSemanticGraph(MutableGraph[SemanticGraphNode, SemanticGraphEdge], S
         )
 
     @override
-    def intersection(self, other: MetricflowGraph[SemanticGraphNode, SemanticGraphEdge]) -> MutableSemanticGraph:
+    def intersection(self, other: MetricFlowGraph[SemanticGraphNode, SemanticGraphEdge]) -> MutableSemanticGraph:
         intersection_graph = MutableSemanticGraph.create(graph_id=self.graph_id)
         self.add_edges(self._intersect_edges(other))
         return intersection_graph

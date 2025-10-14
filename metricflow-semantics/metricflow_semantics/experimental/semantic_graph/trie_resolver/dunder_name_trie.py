@@ -14,7 +14,7 @@ from typing_extensions import Self, override
 
 from metricflow_semantics.collection_helpers.dictionaries import mf_common_keys
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_descriptor import DunderNameDescriptor
@@ -281,7 +281,7 @@ class MutableDunderNameTrie(DunderNameTrie):
         for indexed_dunder_name, descriptor in items:
             name_element_count = len(indexed_dunder_name)
             if name_element_count == 0:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "There must at least be one name element.",
                         name_element_list=indexed_dunder_name,

@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.naming.keywords import DUNDER
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
     RecipeWriterPathfinder,
@@ -37,7 +37,7 @@ def test_recipe_writer_path(
 ) -> None:
     """Test generating recipes by traversing the semantic graph."""
     semantic_graph = SemanticGraphBuilder(ManifestObjectLookup(sg_02_single_join_manifest)).build()
-    path_finder: RecipeWriterPathfinder = MetricflowPathfinder()
+    path_finder: RecipeWriterPathfinder = MetricFlowPathfinder()
 
     # Find all valid paths from the `bookings` simple metric to any group-by attribute node.
     source_node = semantic_graph.node_with_label(MetricLabel.get_instance("bookings"))

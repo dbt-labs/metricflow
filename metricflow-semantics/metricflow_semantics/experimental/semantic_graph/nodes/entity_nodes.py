@@ -13,8 +13,8 @@ from metricflow_semantics.experimental.mf_graph.formatting.dot_attributes import
     DotColor,
     DotNodeAttributeSet,
 )
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
-from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
@@ -70,15 +70,15 @@ class ConfiguredEntityNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name=f"{self.model_id}.{self.entity_name}",
             cluster_name=ClusterNameFactory.CONFIGURED_ENTITY,
         )
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet((ConfiguredEntityLabel.get_instance(),))
 
     @cached_property
@@ -117,8 +117,8 @@ class JoinedModelNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name=f"JoinedModel({self.model_id})",
             cluster_name=ClusterNameFactory.get_name_for_model(self.model_id),
         )
@@ -130,7 +130,7 @@ class JoinedModelNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet((JoinedModelLabel.get_instance(),))
 
     @override
@@ -161,8 +161,8 @@ class LocalModelNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name=f"LocalModel({self.model_id})",
             cluster_name=ClusterNameFactory.get_name_for_model(self.model_id),
         )
@@ -174,7 +174,7 @@ class LocalModelNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet((LocalModelLabel.get_instance(),))
 
     @cached_property
@@ -210,8 +210,8 @@ class TimeDimensionNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name=f"TimeDimension({self.dimension_name})",
             cluster_name=ClusterNameFactory.TIME_DIMENSION,
         )
@@ -238,7 +238,7 @@ class TimeDimensionNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet((TimeDimensionLabel.get_instance(),))
 
     @override
@@ -256,8 +256,8 @@ class MetricTimeNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name="MetricTime",
             cluster_name=ClusterNameFactory.TIME_DIMENSION,
         )
@@ -269,7 +269,7 @@ class MetricTimeNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet((MetricTimeLabel.get_instance(), TimeDimensionLabel.get_instance()))
 
     @cached_property
@@ -306,8 +306,8 @@ class TimeNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name="TimeEntity",
             cluster_name=ClusterNameFactory.TIME,
         )
@@ -319,7 +319,7 @@ class TimeNode(SemanticGraphNode, Singleton):
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet((TimeClusterLabel.get_instance(),))
 
     @override
@@ -340,7 +340,7 @@ class MetricNode(SemanticGraphNode, ABC):
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return FrozenOrderedSet((MetricLabel.get_instance(), MetricLabel.get_instance(self.metric_name)))
 
 
@@ -354,14 +354,14 @@ class SimpleMetricNode(MetricNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name=f"SimpleMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
         )
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return super(SimpleMetricNode, self).labels.union((SimpleMetricLabel.get_instance(),))
 
     @override
@@ -383,14 +383,14 @@ class ComplexMetricNode(MetricNode, Singleton):
 
     @cached_property
     @override
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(
             node_name=f"ComplexMetric({self.metric_name})", cluster_name=ClusterNameFactory.METRIC
         )
 
     @cached_property
     @override
-    def labels(self) -> OrderedSet[MetricflowGraphLabel]:
+    def labels(self) -> OrderedSet[MetricFlowGraphLabel]:
         return super(ComplexMetricNode, self).labels.union((ComplexMetricLabel.get_instance(),))
 
     @override

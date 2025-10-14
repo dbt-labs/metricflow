@@ -5,7 +5,7 @@ import threading
 from typing import ContextManager, Optional, Type
 
 from metricflow_semantics.collection_helpers.mf_type_aliases import ExceptionTracebackAnyType
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.mf_graph.path_finding.traversal_profile import (
     GraphTraversalProfile,
     MutableGraphTraversalProfile,
@@ -20,7 +20,7 @@ class TraversalProfileDiffer(ContextManager["TraversalProfileDiffer"]):
     This and associated classes are a WIP and may be removed.
     """
 
-    def __init__(self, path_finder: MetricflowPathfinder) -> None:  # noqa: D107
+    def __init__(self, path_finder: MetricFlowPathfinder) -> None:  # noqa: D107
         self._path_finder = path_finder
         self._local_state = _TraversalProfileDifferLocalState()
 

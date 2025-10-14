@@ -6,7 +6,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.mf_graph.path_finding.graph_path import MutableGraphPath
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.mf_graph.path_finding.weight_function import EdgeCountWeightFunction
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -47,7 +47,7 @@ def pathfinder_fixture(  # noqa: D103
         request=request,
         snapshot_configuration=mf_test_configuration,
         graph=flow_graph,
-        pathfinder=MetricflowPathfinder(),
+        pathfinder=MetricFlowPathfinder(),
         path=MutableGraphPath.create(),
     )
 

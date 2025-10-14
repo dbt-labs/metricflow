@@ -15,7 +15,7 @@ class HasDisplayedProperty(ABC):
         return ()
 
 
-class MetricflowGraphElement(HasDisplayedProperty, ABC):
+class MetricFlowGraphElement(HasDisplayedProperty, ABC):
     """An element in a graph (e.g. node)."""
 
     pass

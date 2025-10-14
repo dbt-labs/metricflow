@@ -4,7 +4,7 @@ import logging
 from typing import Callable, Optional
 
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraph
+from metricflow_semantics.experimental.mf_graph.mf_graph import MetricFlowGraph
 from metricflow_semantics.mf_logging.pretty_print import mf_pformat_dict
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     SnapshotConfiguration,
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 def assert_graph_snapshot_equal(
     request: FixtureRequest,
     snapshot_configuration: SnapshotConfiguration,
-    graph: MetricflowGraph,
+    graph: MetricFlowGraph,
     snapshot_id: str = "result",
     expectation_description: Optional[str] = None,
     incomparable_strings_replacement_function: Optional[Callable[[str], str]] = None,

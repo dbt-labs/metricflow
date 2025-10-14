@@ -9,8 +9,8 @@ from typing import Mapping, Optional
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.mf_graph.path_finding.traversal_profile_differ import TraversalProfileDiffer
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
@@ -67,7 +67,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
     def __init__(  # noqa: D107
         self,
         semantic_graph: SemanticGraph,
-        path_finder: MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
+        path_finder: MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
     ) -> None:
         super().__init__(semantic_graph=semantic_graph, path_finder=path_finder)
         self._local_model_nodes = semantic_graph.nodes_with_labels(self._local_model_label)
@@ -162,7 +162,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
             )
 
         if len(reachable_local_model_nodes) == 0:
-            raise MetricflowInternalError(
+            raise MetricFlowInternalError(
                 LazyFormat(
                     "No local-model nodes were found to be reachable from the given source nodes.",
                     source_nodes=source_nodes,
@@ -184,7 +184,7 @@ class GroupByMetricTrieResolver(DunderNameTrieResolver):
 
         for indexed_dunder_name, descriptor in entity_key_trie.name_items(max_length=1):
             if len(indexed_dunder_name) != 1:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "The indexed dunder name should have only contained 1 element.",
                         indexed_dunder_name=indexed_dunder_name,
@@ -257,7 +257,7 @@ class _MetricNameToEntityKeyTrieGenerator:
     def __init__(
         self,
         semantic_graph: SemanticGraph,
-        path_finder: MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
+        path_finder: MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
         model_node_to_entity_key_trie: Mapping[SemanticGraphNode, DunderNameTrie],
     ) -> None:
         self._current_graph = semantic_graph

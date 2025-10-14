@@ -9,10 +9,10 @@ from collections.abc import Set
 from typing import Final, Generic, Iterator, Optional, Sequence, TypeVar
 
 from metricflow_semantics.collection_helpers.syntactic_sugar import mf_flatten
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
-    MetricflowGraph,
+    MetricFlowGraph,
 )
 from metricflow_semantics.experimental.mf_graph.mutable_graph import EdgeT, NodeT
 from metricflow_semantics.experimental.mf_graph.path_finding.graph_path import MutablePathT
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 EdgeWeightFunctionT = TypeVar("EdgeWeightFunctionT", bound="WeightFunction")
 
 
-class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
+class MetricFlowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
     """Finds paths and related nodes (e.g. ancestors) via common graph algorithms.
 
     * This can be swapped out with another implementation.
@@ -45,13 +45,13 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
     _MAX_BFS_ITERATION_COUNT: Final[int] = 100
 
     def __init__(self) -> None:  # noqa: D107
-        self._local_state = _MetricflowPathfinderLocalState()
+        self._local_state = _MetricFlowPathfinderLocalState()
         self._lo = MutableGraphTraversalProfile()
         self._verbose_debug_logs = False
 
     def find_paths_dfs(
         self,
-        graph: MetricflowGraph[NodeT, EdgeT],
+        graph: MetricFlowGraph[NodeT, EdgeT],
         initial_path: MutablePathT,
         target_nodes: Set[NodeT],
         weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
@@ -92,12 +92,12 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
 
     def find_descendants(
         self,
-        graph: MetricflowGraph[NodeT, EdgeT],
+        graph: MetricFlowGraph[NodeT, EdgeT],
         source_nodes: OrderedSet[NodeT],
         target_nodes: OrderedSet[NodeT],
         node_allow_set: Optional[Set[NodeT]] = None,
         downward_closed: bool = False,
-        deny_labels: Optional[Set[MetricflowGraphLabel]] = None,
+        deny_labels: Optional[Set[MetricFlowGraphLabel]] = None,
         max_iteration_count: int = _MAX_BFS_ITERATION_COUNT,
     ) -> FindDescendantsResult[NodeT]:
         """Find descendant nodes of the source nodes via BFS.
@@ -132,7 +132,7 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
             node_to_reachable_source_nodes[node].add(node)
 
         iteration_index = 0
-        labels_collected_during_traversal: set[MetricflowGraphLabel] = set()
+        labels_collected_during_traversal: set[MetricFlowGraphLabel] = set()
         labels_collected_during_traversal.update(*(source_node.labels for source_node in source_nodes))
 
         while iteration_index <= max_iteration_count:
@@ -188,11 +188,11 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
 
     def find_ancestors(
         self,
-        graph: MetricflowGraph[NodeT, EdgeT],
+        graph: MetricFlowGraph[NodeT, EdgeT],
         source_nodes: OrderedSet[NodeT],
         target_nodes: OrderedSet[NodeT],
         node_allow_set: Optional[Set[NodeT]] = None,
-        deny_labels: Optional[Set[MetricflowGraphLabel]] = None,
+        deny_labels: Optional[Set[MetricFlowGraphLabel]] = None,
         upwards_closed: bool = False,
         max_iteration_count: int = _MAX_BFS_ITERATION_COUNT,
     ) -> FindAncestorsResult[NodeT]:
@@ -207,7 +207,7 @@ class MetricflowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
 
         iteration_index = 0
 
-        labels_collected_during_traversal: set[MetricflowGraphLabel] = set(
+        labels_collected_during_traversal: set[MetricFlowGraphLabel] = set(
             mf_flatten(target_node.labels for target_node in target_nodes)
         )
         reachable_nodes: MutableOrderedSet[NodeT] = MutableOrderedSet(source_nodes)
@@ -332,7 +332,7 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
 
     def __init__(
         self,
-        graph: MetricflowGraph[NodeT, EdgeT],
+        graph: MetricFlowGraph[NodeT, EdgeT],
         initial_path: MutablePathT,
         target_nodes: Set[NodeT],
         weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
@@ -345,7 +345,7 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
     ) -> None:
         """See `find_paths_dfs` for description of the arguments."""
         if initial_path.is_empty:
-            raise MetricflowInternalError(
+            raise MetricFlowInternalError(
                 LazyFormat(
                     "The initial path must have at least one node. Otherwise, there's no way to extend it.",
                     traversal_description=traversal_description,
@@ -420,6 +420,6 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
             current_path.pop_end()
 
 
-class _MetricflowPathfinderLocalState(threading.local):
+class _MetricFlowPathfinderLocalState(threading.local):
     def __init__(self) -> None:  # noqa: D107
         self.traversal_profile = MutableGraphTraversalProfile()

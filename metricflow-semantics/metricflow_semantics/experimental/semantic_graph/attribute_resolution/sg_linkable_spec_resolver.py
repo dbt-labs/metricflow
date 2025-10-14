@@ -11,9 +11,9 @@ from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_ite
 from metricflow_semantics.experimental.cache.mf_cache import ResultCache
 from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import MetricflowInternalError
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricflowGraphLabel
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
@@ -58,7 +58,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         self,
         semantic_graph: SemanticGraph,
         manifest_object_lookup: ManifestObjectLookup,
-        path_finder: MetricflowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
+        path_finder: MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
     ) -> None:
         self._semantic_graph = semantic_graph
         self._pathfinder = path_finder
@@ -139,7 +139,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         If `joins_disallowed` is set, then only group-by items that can be resolved using the semantic models where the
         simple metrics are defined will be returned.
         """
-        label_to_references: defaultdict[MetricflowGraphLabel, set[ElementReference]] = defaultdict(set)
+        label_to_references: defaultdict[MetricFlowGraphLabel, set[ElementReference]] = defaultdict(set)
         for metric_reference in metric_references:
             label_to_references[MetricLabel.get_instance(metric_reference.element_name)].add(metric_reference)
 
@@ -154,7 +154,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         if len(label_to_references) == 0:
             return GroupByItemSet()
 
-        node_labels: FrozenOrderedSet[MetricflowGraphLabel] = FrozenOrderedSet(sorted(label_to_references))
+        node_labels: FrozenOrderedSet[MetricFlowGraphLabel] = FrozenOrderedSet(sorted(label_to_references))
         cache_key = _CommonSetCacheKey(
             node_labels=node_labels, set_filter=set_filter, joins_disallowed=joins_disallowed
         )
@@ -167,7 +167,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         for label in node_labels:
             matching_nodes = self._semantic_graph.nodes_with_labels(label)
             if len(matching_nodes) != 1:
-                raise MetricflowInternalError(
+                raise MetricFlowInternalError(
                     LazyFormat(
                         "Did not find exactly 1 node in the semantic graph for the given label",
                         label=label,
@@ -195,6 +195,6 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
 @fast_frozen_dataclass()
 class _CommonSetCacheKey:
-    node_labels: FrozenOrderedSet[MetricflowGraphLabel]
+    node_labels: FrozenOrderedSet[MetricFlowGraphLabel]
     set_filter: Optional[GroupByItemSetFilter]
     joins_disallowed: bool

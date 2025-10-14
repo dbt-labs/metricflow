@@ -5,15 +5,15 @@ import typing
 from abc import ABC, abstractmethod
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.experimental.mf_graph.mf_graph import MetricflowGraph
+    from metricflow_semantics.experimental.mf_graph.mf_graph import MetricFlowGraph
 
 logger = logging.getLogger(__name__)
 
 
-class MetricflowGraphFormatter(ABC):
+class MetricFlowGraphFormatter(ABC):
     """Interface for a graph-to-text formatter."""
 
     @abstractmethod
-    def format_graph(self, graph: MetricflowGraph) -> str:
+    def format_graph(self, graph: MetricFlowGraph) -> str:
         """Format the given graph to text."""
         raise NotImplementedError

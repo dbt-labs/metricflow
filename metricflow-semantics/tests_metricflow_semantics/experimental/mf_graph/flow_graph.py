@@ -14,14 +14,14 @@ from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_data
 from metricflow_semantics.experimental.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.experimental.mf_graph.graph_id import SequentialGraphId
 from metricflow_semantics.experimental.mf_graph.mf_graph import (
-    MetricflowGraph,
-    MetricflowGraphEdge,
-    MetricflowGraphNode,
+    MetricFlowGraph,
+    MetricFlowGraphEdge,
+    MetricFlowGraphNode,
 )
 from metricflow_semantics.experimental.mf_graph.mutable_graph import MutableGraph
-from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricflowGraphNodeDescriptor
+from metricflow_semantics.experimental.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
 from metricflow_semantics.experimental.mf_graph.path_finding.graph_path import MutableGraphPath
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricflowPathfinder
+from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
 from metricflow_semantics.experimental.singleton import Singleton
 from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 @fast_frozen_dataclass(order=False)
-class FlowNode(MetricflowGraphNode, ABC):
+class FlowNode(MetricFlowGraphNode, ABC):
     """Example graph node."""
 
     node_name: str
@@ -43,8 +43,8 @@ class FlowNode(MetricflowGraphNode, ABC):
 
     @override
     @property
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(node_name=self.node_name, cluster_name=None)
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(node_name=self.node_name, cluster_name=None)
 
 
 @fast_frozen_dataclass(order=False)
@@ -69,12 +69,12 @@ class IntermediateNode(FlowNode, Singleton):  # noqa: D101
 
     @override
     @property
-    def node_descriptor(self) -> MetricflowGraphNodeDescriptor:
-        return MetricflowGraphNodeDescriptor(node_name=self.node_name, cluster_name="intermediate_nodes")
+    def node_descriptor(self) -> MetricFlowGraphNodeDescriptor:
+        return MetricFlowGraphNodeDescriptor(node_name=self.node_name, cluster_name="intermediate_nodes")
 
 
 @fast_frozen_dataclass(order=False)
-class FlowEdge(MetricflowGraphEdge):
+class FlowEdge(MetricFlowGraphEdge):
     """Example graph edge."""
 
     weight: int
@@ -123,7 +123,7 @@ class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable):
         return graph
 
     @override
-    def intersection(self, other: MetricflowGraph[FlowNode, FlowEdge]) -> FlowGraph:
+    def intersection(self, other: MetricFlowGraph[FlowNode, FlowEdge]) -> FlowGraph:
         intersection_graph = FlowGraph.create()
         self.add_edges(self._intersect_edges(other))
         return intersection_graph
@@ -147,4 +147,4 @@ class FlowGraph(MutableGraph[FlowNode, FlowEdge], MetricFlowPrettyFormattable):
 
 
 FlowGraphPath = MutableGraphPath[FlowNode, FlowEdge]
-FlowGraphPathFinder = MetricflowPathfinder[FlowNode, FlowEdge, FlowGraphPath]
+FlowGraphPathFinder = MetricFlowPathfinder[FlowNode, FlowEdge, FlowGraphPath]
