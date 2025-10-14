@@ -1,0 +1,84 @@
+from __future__ import annotations
+
+import json
+from copy import deepcopy
+from pathlib import Path
+from typing import Dict, List, Union
+
+from metricflow_semantic_interfaces.parsing import schemas
+
+TOP_LEVEL_SCHEMAS = {
+    "project_configuration_schema": "project_configuration",
+    "metric_schema": "metric",
+    "semantic_model_schema": "semantic_model",
+}
+
+BASE_SCHEMA = {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "title": "MetricFlow file schema",
+}
+
+
+def generate_explict_json_schema(schema_store: Dict) -> Dict:
+    """Generates a single json schema object from the given schema store."""
+    ref_to_definition_mapping = {key: f"#/definitions/{key}" for key in schema_store.keys()}
+    definitions = {}
+    for schema_name, _schema in schema_store.items():
+        schema = deepcopy(_schema)
+
+        rewritten_schema = _rewrite_refs(schema, ref_to_definition_mapping)
+        assert isinstance(rewritten_schema, dict)
+
+        if "definitions" in rewritten_schema:
+            nested_definitions = rewritten_schema["definitions"]
+            for name in nested_definitions.keys():
+                definitions[name] = nested_definitions[name]
+            rewritten_schema.pop("definitions", None)
+
+        definitions[schema_name] = rewritten_schema
+
+    properties = {}
+    for schema_name, object_name in TOP_LEVEL_SCHEMAS.items():
+        properties[object_name] = {"$ref": ref_to_definition_mapping[schema_name]}
+
+    full_schema: Dict = deepcopy(BASE_SCHEMA)
+    full_schema["properties"] = properties
+    full_schema["definitions"] = definitions
+
+    return full_schema
+
+
+def _rewrite_refs(obj: Union[Dict, List, bool, str], mapping: Dict) -> Union[Dict, List, bool, str]:
+    """Replaces the $refs from their names to their definition section identifiers."""
+    if isinstance(obj, dict):
+        _dict = {}
+        for k, v in obj.items():
+            if k == "$ref" and v in mapping:
+                _dict[k] = mapping[v]
+            else:
+                _dict[k] = _rewrite_refs(v, mapping)
+        return _dict
+    if isinstance(obj, list):
+        _list = []
+        for element in obj:
+            _list.append(_rewrite_refs(element, mapping))
+        return _list
+    return obj
+
+
+def write_json_schema(json_schema: Dict, output_dir: str, file_name: str) -> None:
+    """Writes the schema from the specified schema store to the given path."""
+    path = Path(output_dir).resolve()
+    path.mkdir(exist_ok=True)
+    with open(path / file_name, "w") as f:
+        json.dump(json_schema, f, indent=4, sort_keys=True)
+        f.write("\n")
+
+
+if __name__ == "__main__":
+    write_json_schema(
+        json_schema=generate_explict_json_schema(schemas.schema_store),
+        output_dir=str(Path(__file__).parent / "generated_json_schemas"),
+        file_name="default_explicit_schema.json",
+    )

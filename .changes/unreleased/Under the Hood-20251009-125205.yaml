@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Copy dbt-semantic-interfaces into the MetricFlow repo.
+time: 2025-10-09T12:52:05.713867-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1895"

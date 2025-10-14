@@ -11,3 +11,10 @@ termcolor>=3.0, <4.0
 types-PyYAML
 types-python-dateutil
 types-tabulate
+httpx>=0.24,<0.25
+hypothesis>=6.87,<7
+isort>=5.12,<6
+black>=23.3,<24
+pydantic>=1.10,<2
+types-Jinja2>=2.11,<3
+types-jsonschema>=4.17,<5

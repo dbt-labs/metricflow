@@ -1,0 +1,50 @@
+---
+semantic_model:
+  name: listings_latest
+  description: listings_latest
+
+  node_relation:
+    schema_name: $source_schema
+    alias: dim_listings_latest
+
+  defaults:
+    agg_time_dimension: ds
+
+  measures:
+    - name: listings
+      expr: 1
+      agg: sum
+    - name: largest_listing
+      expr: capacity
+      agg: max
+    - name: smallest_listing
+      expr: capacity
+      agg: min
+
+  dimensions:
+    - name: ds
+      type: time
+      expr: created_at
+      type_params:
+        time_granularity: day
+    - name: created_at
+      type: time
+      type_params:
+        time_granularity: day
+    - name: country_latest
+      type: categorical
+      expr: country
+    - name: is_lux_latest
+      type: categorical
+      expr: is_lux
+    - name: capacity_latest
+      type: categorical
+      expr: capacity
+
+  entities:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: user
+      type: foreign
+      expr: user_id
