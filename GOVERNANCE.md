@@ -59,5 +59,3 @@ MetricFlow emulates the [Apache Software Foundation Code of Conduct](https://www
 All community members are expected to engage respectfully and inclusively.
 
 *Last updated: 2025-10-14*
-
-
