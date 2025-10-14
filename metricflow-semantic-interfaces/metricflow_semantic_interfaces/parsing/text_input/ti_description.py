@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantic_interfaces.errors import InvalidQuerySyntax
@@ -131,7 +131,7 @@ class QueryItemType(Enum):
     ENTITY = "Entity"
     METRIC = "Metric"
 
-    def __lt__(self, other) -> bool:  # type: ignore[misc]
+    def __lt__(self, other: Any) -> bool:  # type: ignore[misc]
         """Allow for ordering so that a sequence of these can be consistently represented for test snapshots."""
         if self.__class__ is other.__class__:
             return self.value < other.value

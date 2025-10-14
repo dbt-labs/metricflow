@@ -36,7 +36,7 @@ from metricflow_semantic_interfaces.validations.validator_helpers import (
 
 def test_semantic_model_name_validity(  # noqa: D103
     simple_semantic_manifest__with_primary_transforms: PydanticSemanticManifest,
-):
+) -> None:
     validator = SemanticManifestValidator[PydanticSemanticManifest](
         [UniqueAndValidNameRule[PydanticSemanticManifest]()]
     )
@@ -74,7 +74,7 @@ def test_duplicate_semantic_model_name(  # noqa: D103
 
 def test_metric_name_validity(  # noqa: D103
     simple_semantic_manifest__with_primary_transforms: PydanticSemanticManifest,
-):
+) -> None:
     validator = SemanticManifestValidator[PydanticSemanticManifest](
         [UniqueAndValidNameRule[PydanticSemanticManifest]()]
     )
@@ -124,7 +124,7 @@ def test_top_level_metric_can_have_same_name_as_any_other_top_level_item(  # noq
 
 def test_saved_query_name_validity(  # noqa: D103
     simple_semantic_manifest__with_primary_transforms: PydanticSemanticManifest,
-):
+) -> None:
     validator = SemanticManifestValidator[PydanticSemanticManifest](
         [UniqueAndValidNameRule[PydanticSemanticManifest]()]
     )

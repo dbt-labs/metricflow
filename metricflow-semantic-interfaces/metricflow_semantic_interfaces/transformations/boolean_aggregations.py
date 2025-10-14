@@ -56,7 +56,7 @@ class BooleanAggregationRule(ProtocolHint[SemanticManifestTransformRule[Pydantic
         return self
 
     @staticmethod
-    def build_new_expr_value(*, name: str, expr: Optional[str]):  # noqa: D102
+    def build_new_expr_value(*, name: str, expr: Optional[str]) -> str:  # noqa: D102
         sub_value = expr if expr else name
         return f"CASE WHEN {sub_value} THEN 1 ELSE 0 END"
 

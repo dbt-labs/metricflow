@@ -174,7 +174,7 @@ class SerializableDataclass(ABC):
             cls._concrete_subclass_registry or (), key=lambda class_type: (class_type.__module__, class_type.__name__)
         )
 
-    def __init_subclass__(cls, **kwargs) -> None:
+    def __init_subclass__(cls, **kwargs: Any) -> None:  # type: ignore[misc]
         """Adds the implementing class to the registry and check for non-concrete fields.
 
         It would be helpful to check that the fields of the dataclass are concrete fields, but that would need to be

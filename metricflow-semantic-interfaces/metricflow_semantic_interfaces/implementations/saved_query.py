@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, List, Optional, Union
+from typing import List, Optional, Union
 
 from msi_pydantic_shim import Field
 from typing_extensions import Self, override
@@ -58,7 +58,7 @@ class PydanticSavedQuery(
     )
 
     @classmethod
-    def parse_obj(cls, input: Any) -> Self:  # noqa  # type: ignore[misc]
+    def parse_obj(cls, input: HashableBaseModel) -> Self:  # noqa: D102
         data = deepcopy(input)
         if isinstance(data, dict):
             if isinstance(data.get("tags"), str):
