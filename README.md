@@ -51,7 +51,11 @@ To get up and running with your own metrics, you should rely on [MetricFlow’s 
 
 ## Licensing
 
-MetricFlow is distributed under a Business Source License (BUSL-1.1). For details on our additional use grant, change license, and change date please refer to our [licensing agreement](https://github.com/dbt-labs/metricflow/blob/main/LICENSE).
+MetricFlow is distributed under the Apache 2.0 license. For details, please refer to our [licensing agreement](https://github.com/dbt-labs/metricflow/blob/main/LICENSE).
+
+## Open Semantic Interchange (OSI) Initiative
+
+MetricFlow is developed and maintained as part of the [Open Semantic Interchange (OSI) initiative](https://www.snowflake.com/en/blog/open-semantic-interchange-ai-standard/). The OSI initiative is a collaborative effort among leading technology companies and data practitioners to establish a open standard for defining and exchanging semantic information, enabling AI/BI interoperability across different platforms and tools. 
 
 ## Getting Started
 
@@ -94,11 +98,12 @@ Please read our [code of conduct](https://docs.getdbt.com/community/resources/co
 
 To get started on direct contributions, head on over to our [contributor guide](https://github.com/dbt-labs/metricflow/blob/main/CONTRIBUTING.md).
 
-## License
+## License History
 
 MetricFlow is source-available software.
 
 Version 0 to 0.140.0 was covered by the Affero GPL license.
-Version 0.150.0 and greater is covered by the BSL license.
+Version 0.150.0 to 0.208.2 was covered by the BSL license.
+Version 0.209.0 and greater is covered by the Apache 2.0 license.
 
 MetricFlow is built by [dbt Labs](https://www.getdbt.com/).

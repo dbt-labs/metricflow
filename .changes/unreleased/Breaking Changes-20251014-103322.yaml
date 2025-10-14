@@ -1,0 +1,6 @@
+kind: Breaking Changes
+body: License Change - Version 0.209.0 and greater is covered by the Apache 2.0 license.
+time: 2025-10-14T10:33:22.986318-04:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1905"
