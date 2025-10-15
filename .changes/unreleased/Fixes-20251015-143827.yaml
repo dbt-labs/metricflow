@@ -1,0 +1,7 @@
+kind: Fixes
+body: Fixes a bug related to leaving out metric values in offset metrics, specifically
+  if the queried grain is smaller than the offset grain.
+time: 2025-10-15T14:38:27.163025-04:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1910"
