@@ -9,7 +9,7 @@ Error #1:
     The given input does not exactly match any known metrics.
 
     Suggestions:
-      ['bookings', 'booking_fees', 'bookings_mom', 'booking_value', 'booking_payments', 'instant_bookings']
+      ['bookings', 'booking_fees', 'bookings_mom', 'bookings_yoy', 'booking_value', 'booking_payments']
 
   Query Input:
 
