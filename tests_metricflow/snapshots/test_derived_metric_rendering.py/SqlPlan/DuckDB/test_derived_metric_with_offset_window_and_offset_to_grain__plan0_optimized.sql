@@ -31,35 +31,45 @@ FROM (
     , MAX(subq_35.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
-    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , SUM(sma_28009_cte.bookings) AS month_start_bookings
+      , subq_22.month_start_bookings AS month_start_bookings
     FROM rss_28018_cte
-    INNER JOIN
-      sma_28009_cte
+    INNER JOIN (
+      -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      SELECT
+        metric_time__day
+        , SUM(bookings) AS month_start_bookings
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_22
     ON
-      DATE_TRUNC('month', rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
-    GROUP BY
-      rss_28018_cte.ds__day
+      DATE_TRUNC('month', rss_28018_cte.ds__day) = subq_22.metric_time__day
   ) subq_27
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
-    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , SUM(sma_28009_cte.bookings) AS bookings_1_month_ago
+      , subq_30.bookings_1_month_ago AS bookings_1_month_ago
     FROM rss_28018_cte
-    INNER JOIN
-      sma_28009_cte
+    INNER JOIN (
+      -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      SELECT
+        metric_time__day
+        , SUM(bookings) AS bookings_1_month_ago
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_30
     ON
-      rss_28018_cte.ds__day - INTERVAL 1 month = sma_28009_cte.metric_time__day
-    GROUP BY
-      rss_28018_cte.ds__day
+      rss_28018_cte.ds__day - INTERVAL 1 month = subq_30.metric_time__day
   ) subq_35
   ON
     subq_27.metric_time__day = subq_35.metric_time__day
