@@ -1886,17 +1886,24 @@ class DataflowPlanBuilder:
                 )
             )
         )
-        base_queried_agg_time_dimension_specs = tuple(
-            TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
+        required_agg_time_dimension_specs = tuple(
+            FrozenOrderedSet(required_linkable_specs.time_dimension_specs).intersection(
+                self._metric_lookup.get_aggregation_time_dimension_specs(
+                    metric_reference=MetricReference(simple_metric_input.name),
+                )
+            )
+        )
+        base_required_agg_time_dimension_specs = tuple(
+            TimeDimensionSpec.with_base_grains(required_agg_time_dimension_specs)
         )
 
         # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the simple-metric input will be aggregated over all time.
         unaggregated_simple_metric_input_node: DataflowPlanNode = source_node_recipe.source_node
-        if cumulative and base_queried_agg_time_dimension_specs:
+        if cumulative and base_required_agg_time_dimension_specs:
             unaggregated_simple_metric_input_node = JoinOverTimeRangeNode.create(
                 parent_node=unaggregated_simple_metric_input_node,
-                queried_agg_time_dimension_specs=base_queried_agg_time_dimension_specs,
+                queried_agg_time_dimension_specs=base_required_agg_time_dimension_specs,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 # Note: we use the original constraint here because the JoinOverTimeRangeNode will eventually get
