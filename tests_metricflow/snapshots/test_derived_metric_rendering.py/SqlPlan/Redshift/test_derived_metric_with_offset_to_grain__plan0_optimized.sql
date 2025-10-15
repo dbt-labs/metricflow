@@ -36,19 +36,24 @@ FROM (
   ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
-    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , SUM(sma_28009_cte.bookings) AS bookings_at_start_of_month
+      , subq_22.bookings_at_start_of_month AS bookings_at_start_of_month
     FROM ***************************.mf_time_spine time_spine_src_28006
-    INNER JOIN
-      sma_28009_cte
+    INNER JOIN (
+      -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      SELECT
+        metric_time__day
+        , SUM(bookings) AS bookings_at_start_of_month
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_22
     ON
-      DATE_TRUNC('month', time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
-    GROUP BY
-      time_spine_src_28006.ds
+      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_22.metric_time__day
   ) subq_27
   ON
     subq_19.metric_time__day = subq_27.metric_time__day

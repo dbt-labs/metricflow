@@ -25,19 +25,24 @@ FROM (
     , MAX(subq_27.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['booking_value', 'booking__ds__day']
-    -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS booking__ds__day
-      , SUM(sma_28009_cte.booking_value) AS booking_value
+      , subq_18.booking_value AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
-    INNER JOIN
-      sma_28009_cte
+    INNER JOIN (
+      -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['booking_value', 'booking__ds__day']
+      -- Aggregate Inputs for Simple Metrics
+      SELECT
+        booking__ds__day
+        , SUM(booking_value) AS booking_value
+      FROM sma_28009_cte
+      GROUP BY
+        booking__ds__day
+    ) subq_18
     ON
-      time_spine_src_28006.ds - MAKE_INTERVAL(weeks => 1) = sma_28009_cte.booking__ds__day
-    GROUP BY
-      time_spine_src_28006.ds
+      time_spine_src_28006.ds - MAKE_INTERVAL(weeks => 1) = subq_18.booking__ds__day
   ) subq_23
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
