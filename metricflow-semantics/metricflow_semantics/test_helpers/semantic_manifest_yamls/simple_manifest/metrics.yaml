@@ -519,6 +519,16 @@ metric:
         offset_to_grain: month
 ---
 metric:
+  name: bookings_all_time_at_start_of_year
+  description: bookings at the start of the year
+  type: derived
+  type_params:
+    expr: bookings_all_time
+    metrics:
+      - name: bookings_all_time
+        offset_to_grain: year
+---
+metric:
   name: "bookings_growth_since_start_of_month"
   description: |
     count of bookings on a given day compared to the start of the month,
@@ -544,6 +554,19 @@ metric:
       - name: bookings_all_time
         offset_to_grain: month
         alias: bookings_all_time_at_start_of_month
+---
+metric:
+  name: bookings_since_start_of_year
+  description: |
+    count of bookings since the start of the year, used to test derived metrics with an offset_to_grain.
+  type: derived
+  type_params:
+    expr: bookings_all_time - bookings_all_time_at_start_of_year
+    metrics:
+      - name: bookings_all_time
+      - name: bookings_all_time
+        offset_to_grain: year
+        alias: bookings_all_time_at_start_of_year
 ---
 metric:
   name: "bookings_month_start_compared_to_1_month_prior"
@@ -813,6 +836,28 @@ metric:
       - name: bookings
         offset_window: 1 month
         alias: bookings_1_month_ago
+      - name: bookings
+---
+metric:
+  name: bookings_1_year_ago
+  description: bookings 1 year ago
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+        offset_window: 1 year
+---
+metric:
+  name: bookings_yoy
+  description: bookings year over year
+  type: derived
+  type_params:
+    expr: (bookings - bookings_1_year_ago) / NULLIF(bookings_1_year_ago, 0)
+    metrics:
+      - name: bookings
+        offset_window: 1 year
+        alias: bookings_1_year_ago
       - name: bookings
 ---
 metric:

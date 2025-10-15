@@ -1,0 +1,18 @@
+test_name: test_offset_window_with_grain_smaller_than_offset_non_default
+test_filename: test_offset_metrics.py
+docstring:
+  Test offset window metric queried with grain that is not the default and is smaller than offset grain.
+---
+metric_time__month      bookings    bookings_1_year_ago    bookings_yoy
+--------------------  ----------  ---------------------  --------------
+2019-12-01T00:00:00           31
+2020-01-01T00:00:00           15
+2020-02-01T00:00:00           55
+2020-03-01T00:00:00           57
+2020-04-01T00:00:00           60
+2020-12-01T00:00:00           69                     31         1.22581
+2021-01-01T00:00:00                                  15
+2021-02-01T00:00:00                                  55
+2021-03-01T00:00:00                                  57
+2021-04-01T00:00:00                                  60
+2021-12-01T00:00:00                                  69

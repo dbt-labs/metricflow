@@ -1,0 +1,6 @@
+kind: Fixes
+body: Properly apply time constraints on agg time dimensions for cumulative metrics.
+time: 2025-10-15T14:38:59.627076-04:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1910"

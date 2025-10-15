@@ -178,6 +178,33 @@ def test_offset_window_with_grain_smaller_than_offset(  # noqa: D103
 
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
+def test_offset_window_with_grain_smaller_than_offset_non_default(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset window metric queried with grain that is not the default and is smaller than offset grain."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings", "bookings_1_year_ago", "bookings_yoy"],
+            group_by_names=["metric_time__month"],
+            order_by_names=["metric_time__month"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_offset_window_with_grain_matching_offset(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -353,6 +380,34 @@ def test_offset_to_grain_with_grain_smaller_than_offset(  # noqa: D103
 
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
+def test_offset_to_grain_with_grain_smaller_than_offset_non_default(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset to grain metric queried with grain that is not the default and is smaller than offset grain."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_all_time", "bookings_all_time_at_start_of_year", "bookings_since_start_of_year"],
+            group_by_names=["metric_time__month"],
+            order_by_names=["metric_time__month"],
+            where_constraints=["{{ TimeDimension('metric_time', 'year') }} < '2021-01-01'"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_offset_to_grain_with_grain_matching_offset(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -469,39 +524,6 @@ def test_offset_to_grain_with_multiple_grains(  # noqa: D103
     )
 
 
-# TODO: bug to fix if the constraint below is applied. All agg time dims need to be selected from time spine in
-# JoinOverTimeRangeNod & JoinToTimeSpineNode for constraint to work.
-# @pytest.mark.sql_engine_snapshot
-# @pytest.mark.duckdb_only
-# def test_offset_to_grain_with_grain_matching_offset(  # noqa: D103
-#     request: FixtureRequest,
-#     mf_test_configuration: MetricFlowTestConfiguration,
-#     sql_client: SqlClient,
-#     it_helpers: IntegrationTestHelpers,
-# ) -> None:
-#     """Test offset to grain metric queried with grain matching offset grain.
-
-#     Not likely a useful query, but still demonstrates that we do this correctly.
-#     """
-#     query_result = it_helpers.mf_engine.query(
-#         MetricFlowQueryRequest.create_with_random_request_id(
-#             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
-#             group_by_names=["metric_time__month"],
-#             order_by_names=["metric_time__month"],
-#             # where_constraints=["{{ TimeDimension('metric_time', 'year') }} < '2021-01-01'"],
-#         )
-#     )
-#     assert query_result.result_df is not None, "Unexpected empty result."
-
-#     assert_str_snapshot_equal(
-#         request=request,
-#         mf_test_configuration=mf_test_configuration,
-#         snapshot_id="query_output",
-#         snapshot_str=query_result.result_df.text_format(),
-#         sql_engine=sql_client.sql_engine_type,
-#     )
-
-
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
 def test_offset_window_with_cumulative_input_metric(  # noqa: D103
@@ -516,6 +538,39 @@ def test_offset_window_with_cumulative_input_metric(  # noqa: D103
             metric_names=["trailing_7_days_bookings", "trailing_7_days_bookings_offset_1_week"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+# TODO: bug to fix if the constraint below is applied. All agg time dims need to be selected from time spine in
+# JoinOverTimeRangeNod & JoinToTimeSpineNode for constraint to work.
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_non_default_grain_where_constraint_with_cumulative_offset_to_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test offset to grain metric queried with non-default grain and where constraint.
+
+    Tests that where constraints work properly with JoinOverTimeRangeNode and JoinToTimeSpineNode.
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
+            group_by_names=["metric_time__month"],
+            order_by_names=["metric_time__month"],
+            where_constraints=["{{ TimeDimension('metric_time', 'year') }} < '2021-01-01'"],
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."

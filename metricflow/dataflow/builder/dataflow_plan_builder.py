@@ -1386,8 +1386,8 @@ class DataflowPlanBuilder:
                 0
             ].time_granularity
 
-            # If the smallest queried grain is equal to the offset grain, join after aggregation. Otherwise, the grain
-            # needed for offset will not be available anymore, so join before aggregation.
+            # If the smallest queried grain is less than or equal to the offset grain, join after aggregation.
+            # Otherwise, the grain needed for offset will not be available anymore, so join before aggregation.
             join_to_time_spine_description = JoinToTimeSpineDescription(
                 join_type=SqlJoinType.INNER,
                 offset_window=child_metric_offset_window,
@@ -1395,8 +1395,19 @@ class DataflowPlanBuilder:
             )
             if (
                 offset_grain
-                and smallest_queried_agg_time_grain == offset_grain
-                and not offset_grain.is_custom_granularity  # custom offset window has special logic handled later
+                and smallest_queried_agg_time_grain
+                # We can't know if the custom grain, once aggregated, will be larger or smaller than the offset grain.
+                and not smallest_queried_agg_time_grain.is_custom_granularity
+                # Custom offset windows have special logic handled later.
+                and not offset_grain.is_custom_granularity
+                # If queried grain > offset grain, offset grain won't be available after aggregation.
+                and smallest_queried_agg_time_grain.base_granularity.to_int() <= offset_grain.base_granularity.to_int()
+                # Special case: WEEK does not roll up to the larger granularities cleanly, so we can't apply WEEK
+                # aggregation before offset_to_grain join.
+                and not (
+                    smallest_queried_agg_time_grain.base_granularity is TimeGranularity.WEEK
+                    and child_metric_offset_to_grain
+                )
             ):
                 after_aggregation_time_spine_join_description = join_to_time_spine_description
             else:
@@ -1875,17 +1886,24 @@ class DataflowPlanBuilder:
                 )
             )
         )
-        base_queried_agg_time_dimension_specs = tuple(
-            TimeDimensionSpec.with_base_grains(queried_agg_time_dimension_specs)
+        required_agg_time_dimension_specs = tuple(
+            FrozenOrderedSet(required_linkable_specs.time_dimension_specs).intersection(
+                self._metric_lookup.get_aggregation_time_dimension_specs(
+                    metric_reference=MetricReference(simple_metric_input.name),
+                )
+            )
+        )
+        base_required_agg_time_dimension_specs = tuple(
+            TimeDimensionSpec.with_base_grains(required_agg_time_dimension_specs)
         )
 
         # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the simple-metric input will be aggregated over all time.
         unaggregated_simple_metric_input_node: DataflowPlanNode = source_node_recipe.source_node
-        if cumulative and base_queried_agg_time_dimension_specs:
+        if cumulative and base_required_agg_time_dimension_specs:
             unaggregated_simple_metric_input_node = JoinOverTimeRangeNode.create(
                 parent_node=unaggregated_simple_metric_input_node,
-                queried_agg_time_dimension_specs=base_queried_agg_time_dimension_specs,
+                queried_agg_time_dimension_specs=base_required_agg_time_dimension_specs,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
                 # Note: we use the original constraint here because the JoinOverTimeRangeNode will eventually get

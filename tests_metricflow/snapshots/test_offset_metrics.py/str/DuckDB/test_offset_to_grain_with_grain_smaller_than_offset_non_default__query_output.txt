@@ -1,0 +1,20 @@
+test_name: test_offset_to_grain_with_grain_smaller_than_offset_non_default
+test_filename: test_offset_metrics.py
+docstring:
+  Test offset to grain metric queried with grain that is not the default and is smaller than offset grain.
+---
+metric_time__month      bookings_all_time    bookings_all_time_at_start_of_year    bookings_since_start_of_year
+--------------------  -------------------  ------------------------------------  ------------------------------
+2019-12-01T00:00:00                     1
+2020-01-01T00:00:00                    36                                    36                               0
+2020-02-01T00:00:00                    48                                    36                              12
+2020-03-01T00:00:00                   103                                    36                              67
+2020-04-01T00:00:00                   162                                    36                             126
+2020-05-01T00:00:00                   218                                    36                             182
+2020-06-01T00:00:00                   218                                    36                             182
+2020-07-01T00:00:00                   218                                    36                             182
+2020-08-01T00:00:00                   218                                    36                             182
+2020-09-01T00:00:00                   218                                    36                             182
+2020-10-01T00:00:00                   218                                    36                             182
+2020-11-01T00:00:00                   218                                    36                             182
+2020-12-01T00:00:00                   220                                    36                             184
