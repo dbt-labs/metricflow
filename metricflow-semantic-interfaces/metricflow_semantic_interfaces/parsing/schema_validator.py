@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import re
+from typing import Any, Dict, Iterator, Union
 
 from jsonschema import Draft7Validator, ValidationError
 from jsonschema._utils import extras_msg
 from jsonschema.validators import extend
 
 
-def custom_find_additional_properties(instance, schema):  # type: ignore[no-untyped-def]
+def custom_find_additional_properties(instance: Dict[str, Any], schema: Dict[str, Any]) -> Iterator[str]:  # type: ignore[misc]
     """Return the set of additional properties for the given ``instance``.
 
     NOTE: This is a modified copy of the ``find_additional_properties`` method
@@ -32,7 +33,9 @@ def custom_find_additional_properties(instance, schema):  # type: ignore[no-unty
             yield property
 
 
-def customAdditionalProperties(validator, aP, instance, schema):  # type: ignore[no-untyped-def]
+def customAdditionalProperties(  # type: ignore[misc]
+    validator: Draft7Validator, aP: Union[bool, Dict[str, Any]], instance: Any, schema: Dict[str, Any]
+) -> Iterator[ValidationError]:
     """Validator for checking if a schema has additionalProperties when it shouldn't.
 
     NOTE: This is a modified copy of the ``additionalProperties`` method
