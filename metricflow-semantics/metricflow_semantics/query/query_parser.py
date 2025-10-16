@@ -100,11 +100,21 @@ class MetricFlowQueryParser:
         order_by_names: Optional[Sequence[str]] = None,
         order_by_parameters: Optional[Sequence[OrderByQueryParameter]] = None,
         apply_group_by: bool = True,
+        metrics: Optional[Sequence[MetricQueryParameter]] = None,
+        metric_names: Optional[Sequence[str]] = None,
+        group_by: Optional[Sequence[GroupByQueryParameter]] = None,
+        group_by_names: Optional[Sequence[str]] = None,
     ) -> ParseQueryResult:
         """Parse and validate a query using parameters from a pre-defined / saved query.
 
         Additional parameters act in conjunction with the parameters in the saved query.
         """
+        # Validate that metrics and group_by items cannot be specified with saved queries
+        if metrics or metric_names:
+            raise InvalidQueryException("Metrics can't be specified with a saved query.")
+        if group_by or group_by_names:
+            raise InvalidQueryException("Group by items can't be specified with a saved query.")
+
         saved_query = self._get_saved_query(saved_query_parameter)
 
         # Merge interface could streamline this.
