@@ -3,4 +3,4 @@ body: Refactor saved query validation to eliminate redundant checks in MetricFlo
 time: 2025-10-17T06:57:15.698158+09:00
 custom:
     Author: kiwamizamurai
-    Issue: "1911"
+    Issue: "1912"
