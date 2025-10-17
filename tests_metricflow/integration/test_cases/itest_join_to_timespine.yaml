@@ -1,9 +1,10 @@
+---
 integration_test:
   name: test_constraint_on_measure_selected_in_group_by
   description: Tests that the filter on measure is not re-applied even if selected in group by
   model: SIMPLE_MODEL
-  metrics: ["instant_bookings_with_measure_filter"]
-  group_bys: ["metric_time__day", "booking__is_instant"]
+  metrics: [instant_bookings_with_measure_filter]
+  group_bys: [metric_time__day, booking__is_instant]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('metric_time', 'day'), start_time="2020-01-01") }}
   check_query: |

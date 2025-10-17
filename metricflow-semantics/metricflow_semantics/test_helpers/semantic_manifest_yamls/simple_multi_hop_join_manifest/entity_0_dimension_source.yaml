@@ -8,9 +8,9 @@ semantic_model:
     alias: entity_0_dimension_table
 
   dimensions:
-    - name: country
-      type: categorical
+  - name: country
+    type: categorical
 
   entities:
-    - name: entity_0
-      type: primary
+  - name: entity_0
+    type: primary

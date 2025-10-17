@@ -11,25 +11,25 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-    - name: listings
-      expr: 1
-      agg: sum
-      create_metric: true
+  - name: listings
+    expr: 1
+    agg: sum
+    create_metric: true
 
   dimensions:
-    - name: ds
-      type: time
-      expr: created_at
-      type_params:
-        time_granularity: day
-    - name: country_latest
-      type: categorical
-      expr: country
+  - name: ds
+    type: time
+    expr: created_at
+    type_params:
+      time_granularity: day
+  - name: country_latest
+    type: categorical
+    expr: country
 
   entities:
-    - name: listing
-      type: primary
-      expr: listing_id
-    - name: cyclic_entity
-      type: unique
-      expr: listing_id
+  - name: listing
+    type: primary
+    expr: listing_id
+  - name: cyclic_entity
+    type: unique
+    expr: listing_id

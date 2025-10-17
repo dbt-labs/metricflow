@@ -1,6 +1,7 @@
-kind: Under the Hood
-body: Remove measure-related functionality from `MetricLookup`
-time: 2025-10-09T10:10:45.233937-07:00
+---
+kind  : Under the Hood
+body  : Remove measure-related functionality from `MetricLookup`
+time  : 2025-10-09T10:10:45.233937-07:00
 custom:
   Author: plypaul
-  Issue: "1892"
+  Issue: '1892'

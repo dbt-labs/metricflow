@@ -11,19 +11,19 @@ semantic_model:
     agg_time_dimension: third_hop_ds
 
   measures:
-    - name: third_hop_count
-      expr: customer_third_hop_id
-      agg: count_distinct
-      create_metric: true
+  - name: third_hop_count
+    expr: customer_third_hop_id
+    agg: count_distinct
+    create_metric: true
 
   dimensions:
-    - name: value
-      type: categorical
-    - name: third_hop_ds
-      type: time
-      type_params:
-        time_granularity: day
+  - name: value
+    type: categorical
+  - name: third_hop_ds
+    type: time
+    type_params:
+      time_granularity: day
 
   entities:
-    - name: customer_third_hop_id
-      type: primary
+  - name: customer_third_hop_id
+    type: primary

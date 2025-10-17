@@ -11,23 +11,23 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-    - name: txn_count
-      agg: sum
-      create_metric: true
+  - name: txn_count
+    agg: sum
+    create_metric: true
 
   dimensions:
-    - name: ds_partitioned
-      type: time
-      type_params:
-        time_granularity: day
-      is_partition: true
-    - name: ds
-      type: time
-      type_params:
-        time_granularity: day
-    - name: account_month
-      type: categorical
+  - name: ds_partitioned
+    type: time
+    type_params:
+      time_granularity: day
+    is_partition: true
+  - name: ds
+    type: time
+    type_params:
+      time_granularity: day
+  - name: account_month
+    type: categorical
 
   entities:
-    - name: account_id
-      type: primary
+  - name: account_id
+    type: primary

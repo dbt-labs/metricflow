@@ -1,5 +1,6 @@
-semantic_model:
-  name: foo
+---
+semantic_models:
+- name: foo
   description: bar buzz bazz
   node_relation:
     schema_name: $source_schema
@@ -7,20 +8,19 @@ semantic_model:
   defaults:
     agg_time_dimension: ds
   dimensions:
-    - name: ds
-      type: time
-      type_params:
-        time_granularity: day
-    - name: is_dog
-      type: categorical
-      is_partition: True
+  - name: ds
+    type: time
+    type_params:
+      time_granularity: day
+  - name: is_dog
+    type: categorical
+    is_partition: true
   measures:
-    - name: count_dogs
-      agg: sum
-      expr: 1
-      create_metric: True
-semantic_model:
-  name: foo
+  - name: count_dogs
+    agg: sum
+    expr: 1
+    create_metric: true
+- name: foo_duplicate
   description: bar buzz bazz
   node_relation:
     schema_name: $source_schema
@@ -28,15 +28,15 @@ semantic_model:
   defaults:
     agg_time_dimension: ds
   dimensions:
-    - name: ds
-      type: time
-      type_params:
-        time_granularity: day
-    - name: is_dog
-      type: categorical
-      is_partition: True
+  - name: ds
+    type: time
+    type_params:
+      time_granularity: day
+  - name: is_dog
+    type: categorical
+    is_partition: true
   measures:
-    - name: count_dogs
-      agg: sum
-      expr: 1
-      create_metric: True
+  - name: count_dogs
+    agg: sum
+    expr: 1
+    create_metric: true

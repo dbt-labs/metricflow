@@ -8,13 +8,13 @@ semantic_model:
     alias: dim_companies
 
   dimensions:
-    - name: company_name
-      type: categorical
+  - name: company_name
+    type: categorical
 
   entities:
-    - name: company
-      type: primary
-      expr: company_id
-    - name: user
-      type: unique
-      expr: user_id
+  - name: company
+    type: primary
+    expr: company_id
+  - name: user
+    type: unique
+    expr: user_id
