@@ -1,11 +1,10 @@
----
 table_snapshot:
   table_name: entity_1_dimension_source
   column_definitions:
-  - name: entity_1
-    type: STRING
-  - name: country
-    type: STRING
+    - name: entity_1
+      type: STRING
+    - name: country
+      type: STRING
   rows:
-  - [E0_2, us]
-  - [E0_3, ca]
+    - [E0_2, us]
+    - [E0_3, ca]

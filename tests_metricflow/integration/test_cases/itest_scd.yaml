@@ -1,4 +1,3 @@
----
 integration_test:
   name: simple_scd_grouped_metric
   description: Tests selecting a simple metric grouped by an SCD dimension

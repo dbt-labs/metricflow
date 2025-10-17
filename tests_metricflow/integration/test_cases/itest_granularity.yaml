@@ -1,4 +1,3 @@
----
 integration_test:
   name: query_granularity_for_sum_day
   description: Query a sum metric by time granularities.

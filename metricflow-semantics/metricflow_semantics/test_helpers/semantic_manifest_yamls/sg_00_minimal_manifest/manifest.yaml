@@ -1,4 +1,3 @@
----
 semantic_model:
   name: bookings_source
 
@@ -10,21 +9,21 @@ semantic_model:
     agg_time_dimension: booking_time
 
   entities:
-  - name: booking
-    type: primary
+    - name: booking
+      type: primary
 
   measures:
-  - name: booking_count
-    expr: '1'
-    agg: sum
+    - name: booking_count
+      expr: '1'
+      agg: sum
 
   dimensions:
-  - name: booking_time
-    type: time
-    type_params:
-      time_granularity: quarter
+    - name: booking_time
+      type: time
+      type_params:
+        time_granularity: quarter
 ---
-metric        :
+metric:
   name: bookings
   type: simple
   type_params:

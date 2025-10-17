@@ -1,4 +1,3 @@
----
 integration_test:
   name: multiple_foreign_keys_guest
   description: Query a metric and the first of two foreign entities in the measure semantic model.

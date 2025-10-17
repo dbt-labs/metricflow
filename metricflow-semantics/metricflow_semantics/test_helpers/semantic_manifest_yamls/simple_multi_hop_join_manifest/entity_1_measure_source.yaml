@@ -1,4 +1,3 @@
----
 semantic_model:
   name: entity_1_measure_source
   description: A measure source associated with "entity_1".
@@ -11,15 +10,15 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-  - name: entity_1_measure
-    agg: sum
+    - name: entity_1_measure
+      agg: sum
 
   dimensions:
-  - name: ds
-    type: time
-    type_params:
-      time_granularity: day
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
 
   entities:
-  - name: entity_1
-    type: primary
+    - name: entity_1
+      type: primary

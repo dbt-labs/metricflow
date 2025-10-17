@@ -1,15 +1,14 @@
----
 name: MetricFlow SQL Engine Tests
 #  Runs tests against the other SQL engines that are supported. These engines are hosted externally, and tend to be
 #  slower. As the test will be I/O bound, the tests can be run with higher parallelism to get faster runtimes.
 
-on  :
+on:
   workflow_dispatch:
 
   pull_request:
     types: [labeled]
 
-env :
+env:
   EXTERNAL_ENGINE_TEST_PARALLELISM: 8
   ADDITIONAL_PYTEST_OPTIONS: --use-persistent-source-schema
 
@@ -22,22 +21,22 @@ jobs:
     name: Snowflake Tests
     runs-on: ubuntu-latest
     steps:
-    - name: Check-out the repo
-      uses: actions/checkout@v4
+      - name: Check-out the repo
+        uses: actions/checkout@v4
 
-    - uses: ./.github/actions/run-mf-tests
-      with:
-        mf_sql_engine_url: ${{ secrets.MF_SNOWFLAKE_URL }}
-        mf_sql_engine_password: ${{ secrets.MF_SNOWFLAKE_PWD }}
-        parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
-        additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
-        make-target: test-snowflake
-        hatch-environment-cache-config-json: >-
-          {
-            "configs": [
-              {"hatch_project_directory": ".", "hatch_environment_name": "snowflake-env"}
-            ]
-          }
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          mf_sql_engine_url: ${{ secrets.MF_SNOWFLAKE_URL }}
+          mf_sql_engine_password: ${{ secrets.MF_SNOWFLAKE_PWD }}
+          parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: test-snowflake
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "snowflake-env"}
+              ]
+            }
 
   redshift-tests:
     environment: DW_INTEGRATION_TESTS
@@ -45,22 +44,22 @@ jobs:
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
-    - name: Check-out the repo
-      uses: actions/checkout@v4
+      - name: Check-out the repo
+        uses: actions/checkout@v4
 
-    - uses: ./.github/actions/run-mf-tests
-      with:
-        mf_sql_engine_url: ${{ secrets.MF_REDSHIFT_URL }}
-        mf_sql_engine_password: ${{ secrets.MF_REDSHIFT_PWD }}
-        parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
-        additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
-        make-target: test-redshift
-        hatch-environment-cache-config-json: >-
-          {
-            "configs": [
-              {"hatch_project_directory": ".", "hatch_environment_name": "redshift-env"}
-            ]
-          }
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          mf_sql_engine_url: ${{ secrets.MF_REDSHIFT_URL }}
+          mf_sql_engine_password: ${{ secrets.MF_REDSHIFT_PWD }}
+          parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: test-redshift
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "redshift-env"}
+              ]
+            }
 
   bigquery-tests:
     environment: DW_INTEGRATION_TESTS
@@ -68,22 +67,22 @@ jobs:
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
-    - name: Check-out the repo
-      uses: actions/checkout@v4
+      - name: Check-out the repo
+        uses: actions/checkout@v4
 
-    - uses: ./.github/actions/run-mf-tests
-      with:
-        MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
-        MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
-        parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
-        additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
-        make-target: test-bigquery
-        hatch-environment-cache-config-json: >-
-          {
-            "configs": [
-              {"hatch_project_directory": ".", "hatch_environment_name": "bigquery-env"}
-            ]
-          }
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          MF_SQL_ENGINE_URL: ${{ secrets.MF_BIGQUERY_URL }}
+          MF_SQL_ENGINE_PASSWORD: ${{ secrets.MF_BIGQUERY_PWD }}
+          parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: test-bigquery
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "bigquery-env"}
+              ]
+            }
 
   databricks-tests:
     environment: DW_INTEGRATION_TESTS
@@ -91,22 +90,22 @@ jobs:
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
     runs-on: ubuntu-latest
     steps:
-    - name: Check-out the repo
-      uses: actions/checkout@v4
+      - name: Check-out the repo
+        uses: actions/checkout@v4
 
-    - uses: ./.github/actions/run-mf-tests
-      with:
-        mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_URL }}
-        mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
-        parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
-        additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
-        make-target: test-databricks
-        hatch-environment-cache-config-json: >-
-          {
-            "configs": [
-              {"hatch_project_directory": ".", "hatch_environment_name": "databricks-env"}
-            ]
-          }
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          mf_sql_engine_url: ${{ secrets.MF_DATABRICKS_URL }}
+          mf_sql_engine_password: ${{ secrets.MF_DATABRICKS_PWD }}
+          parallelism: ${{ env.EXTERNAL_ENGINE_TEST_PARALLELISM }}
+          additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
+          make-target: test-databricks
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "databricks-env"}
+              ]
+            }
 
   trino-tests:
     # Trino tests run on a local service container, which obviates the need for separate Environment hosting.
@@ -120,20 +119,20 @@ jobs:
       trino:
         image: trinodb/trino
         ports:
-        - 8080:8080
+          - 8080:8080
     steps:
-    - name: Check-out the repo
-      uses: actions/checkout@v4
+      - name: Check-out the repo
+        uses: actions/checkout@v4
 
-    - uses: ./.github/actions/run-mf-tests
-      with:
-        make-target: test-trino
-        hatch-environment-cache-config-json: >-
-          {
-            "configs": [
-              {"hatch_project_directory": ".", "hatch_environment_name": "trino-env"}
-            ]
-          }
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          make-target: test-trino
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "trino-env"}
+              ]
+            }
 
   remove-label:
     name: Remove Label After Running Tests
@@ -142,7 +141,7 @@ jobs:
     # Default behavior for `needs` is that it requires success, so a success / failure needs to be specifically checked.
     if: ${{ (success() || failure()) && github.event.action == 'labeled' }}
     steps:
-    - name: Remove Label
-      uses: actions-ecosystem/action-remove-labels@v1
-      with:
-        labels: Run Tests With Other SQL Engines
+      - name: Remove Label
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: Run Tests With Other SQL Engines

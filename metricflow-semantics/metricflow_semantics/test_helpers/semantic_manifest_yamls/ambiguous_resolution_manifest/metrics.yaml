@@ -1,4 +1,3 @@
----
 metric:
   name: monthly_metric_0
   description: A metric with a month grain.
@@ -27,8 +26,8 @@ metric:
   type_params:
     expr: monthly_metric_0 + monthly_metric_1
     metrics:
-    - name: monthly_metric_0
-    - name: monthly_metric_1
+      - name: monthly_metric_0
+      - name: monthly_metric_1
 ---
 metric:
   name: derived_metric_with_different_parent_time_grains
@@ -37,8 +36,8 @@ metric:
   type_params:
     expr: monthly_metric_0 + yearly_metric_0
     metrics:
-    - name: monthly_metric_0
-    - name: yearly_metric_0
+      - name: monthly_metric_0
+      - name: yearly_metric_0
 ---
 metric:
   name: metric_derived_from_heterogeneous_derived_metric
@@ -49,7 +48,7 @@ metric:
   type_params:
     expr: derived_metric_with_different_parent_time_grains
     metrics:
-    - name: derived_metric_with_different_parent_time_grains
+      - name: derived_metric_with_different_parent_time_grains
 ---
 metric:
   name: metric_derived_from_homogeneous_derived_metric
@@ -60,7 +59,7 @@ metric:
   type_params:
     expr: derived_metric_with_same_parent_time_grains
     metrics:
-    - name: derived_metric_with_same_parent_time_grains
+      - name: derived_metric_with_same_parent_time_grains
 ---
 metric:
   name: accumulate_last_2_months_metric
@@ -78,8 +77,8 @@ metric:
   type_params:
     expr: monthly_metric_0
     metrics:
-    - name: monthly_metric_0
-      filter: "{{ TimeDimension('metric_time') }} = '2020-01-01'"
+      - name: monthly_metric_0
+        filter: "{{ TimeDimension('metric_time') }} = '2020-01-01'"
 ---
 metric:
   name: derived_metric_with_common_filtered_metric_1
@@ -88,8 +87,8 @@ metric:
   type_params:
     expr: monthly_metric_0
     metrics:
-    - name: monthly_metric_0
-      filter: "{{ TimeDimension('metric_time') }} = '2020-01-01'"
+      - name: monthly_metric_0
+        filter: "{{ TimeDimension('metric_time') }} = '2020-01-01'"
 ---
 metric:
   name: simple_metric_with_default_time_granularity
@@ -107,7 +106,7 @@ metric:
   type_params:
     expr: simple_metric_with_default_time_granularity * 2
     metrics:
-    - name: simple_metric_with_default_time_granularity
+      - name: simple_metric_with_default_time_granularity
 ---
 metric:
   name: derived_metric_without_time_granularity
@@ -116,8 +115,8 @@ metric:
   type_params:
     expr: simple_metric_with_default_time_granularity * monthly_metric_0
     metrics:
-    - name: simple_metric_with_default_time_granularity
-    - name: monthly_metric_0
+      - name: simple_metric_with_default_time_granularity
+      - name: monthly_metric_0
 ---
 metric:
   name: simple_metric_with_default_time_granularity_and_metric_time_filter
@@ -137,7 +136,7 @@ metric:
   type_params:
     expr: simple_metric_with_default_time_granularity * 2
     metrics:
-    - name: simple_metric_with_default_time_granularity
+      - name: simple_metric_with_default_time_granularity
   filter: |
     {{ TimeDimension('metric_time') }} > '2020-01-01'
 ---
@@ -149,6 +148,6 @@ metric:
   type_params:
     expr: simple_metric_with_default_time_granularity_and_metric_time_filter * 2
     metrics:
-    - name: simple_metric_with_default_time_granularity_and_metric_time_filter
-      filter: |
-        {{ TimeDimension('metric_time') }} = '2020-01-01'
+      - name: simple_metric_with_default_time_granularity_and_metric_time_filter
+        filter: |
+          {{ TimeDimension('metric_time') }} = '2020-01-01'

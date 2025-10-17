@@ -1,4 +1,3 @@
----
 integration_test:
   name: test_overlapping_constraint_dimensions
   description: Query a metric with a constraint that was requested as a dimension

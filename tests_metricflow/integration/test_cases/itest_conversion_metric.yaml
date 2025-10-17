@@ -1,4 +1,3 @@
----
 integration_test:
   name: conversion_rate_metric_infinite_window
   description: Query a conversion metric that calculates the conversion rate

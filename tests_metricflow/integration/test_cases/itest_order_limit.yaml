@@ -1,4 +1,3 @@
----
 integration_test:
   name: order_desc
   description: Tests descending order.

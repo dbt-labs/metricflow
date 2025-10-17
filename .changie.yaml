@@ -1,16 +1,15 @@
----
 # Note: See https://github.com/dbt-labs/metricflow/pull/1032 for context on
 # using the same links for issues and PRs.
-changesDir       : .changes
-unreleasedDir    : unreleased
-headerPath       : header.tpl.md
+changesDir: .changes
+unreleasedDir: unreleased
+headerPath: header.tpl.md
 versionHeaderPath: ''
-changelogPath    : CHANGELOG.md
-versionExt       : md
-envPrefix        : CHANGIE_
-versionFormat    : '## MetricFlow {{.Version}} - {{.Time.Format "January 02, 2006"}}'
-kindFormat       : '### {{.Kind}}'
-changeFormat     : |-
+changelogPath: CHANGELOG.md
+versionExt: md
+envPrefix: CHANGIE_
+versionFormat: '## MetricFlow {{.Version}} - {{.Time.Format "January 02, 2006"}}'
+kindFormat: '### {{.Kind}}'
+changeFormat: |-
   {{- $IssueList := list }}
   {{- $changes := splitList " " $.Custom.Issue }}
   {{- range $issueNbr := $changes }}
@@ -21,33 +20,33 @@ changeFormat     : |-
   {{- end -}}
   - {{.Body}}{{if $IssueList}} ({{ join ", " $IssueList }}){{end}}
 
-kinds            :
-- label: Breaking Changes
-- label: Features
-- label: Fixes
-- label: Docs
-- label: Under the Hood
-- label: Dependencies
-- label: Security
+kinds:
+  - label: Breaking Changes
+  - label: Features
+  - label: Fixes
+  - label: Docs
+  - label: Under the Hood
+  - label: Dependencies
+  - label: Security
 
-newlines         :
+newlines:
   afterChangelogHeader: 1
   afterKind: 1
   afterChangelogVersion: 1
   beforeKind: 1
   endOfVersion: 1
 
-custom           :
-- key: Author
-  label: GitHub Username(s) (separated by a single space if multiple)
-  type: string
-  minLength: 3
-- key: Issue
-  label: GitHub Issue (or PR) Number(s) (separated by a single space if multiple)
-  type: string
-  minLength: 1
+custom:
+  - key: Author
+    label: GitHub Username(s) (separated by a single space if multiple)
+    type: string
+    minLength: 3
+  - key: Issue
+    label: GitHub Issue (or PR) Number(s) (separated by a single space if multiple)
+    type: string
+    minLength: 1
 
-footerFormat     : |
+footerFormat: |
   {{- $contributorDict := dict }}
   {{- /* ensure we always skip snyk and dependabot in addition to the core team */}}
   {{- $maintainers := list "dependabot[bot]" "snyk-bot"}}

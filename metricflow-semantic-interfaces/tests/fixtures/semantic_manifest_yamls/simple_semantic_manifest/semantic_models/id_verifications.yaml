@@ -1,4 +1,3 @@
----
 semantic_model:
   name: id_verifications
   description: id_verifications
@@ -11,27 +10,27 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-  - name: identity_verifications
-    expr: '1'
-    agg: sum
+    - name: identity_verifications
+      expr: '1'
+      agg: sum
 
   dimensions:
-  - name: ds
-    type: time
-    type_params:
-      time_granularity: second
-  - name: ds_partitioned
-    type: time
-    is_partition: true
-    type_params:
-      time_granularity: day
-  - name: verification_type
-    type: categorical
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: second
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+    - name: verification_type
+      type: categorical
 
   entities:
-  - name: verification
-    type: primary
-    expr: verification_id
-  - name: user
-    type: foreign
-    expr: user_id
+    - name: verification
+      type: primary
+      expr: verification_id
+    - name: user
+      type: foreign
+      expr: user_id

@@ -1,4 +1,3 @@
----
 integration_test:
   name: simple_query_non_ds
   description: Tests selecting a metric and dimensions in ds-less model

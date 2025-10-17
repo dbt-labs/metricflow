@@ -1,4 +1,3 @@
----
 semantic_model:
   name: extended_bookings_source
   description: extended_bookings_source
@@ -11,25 +10,25 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-  - name: bookings
-    expr: '1'
-    agg: sum
-    create_metric: true
-  - name: unique_listings_booked
-    expr: listing_id
-    agg: count_distinct
-    create_metric: true
+    - name: bookings
+      expr: '1'
+      agg: sum
+      create_metric: true
+    - name: unique_listings_booked
+      expr: listing_id
+      agg: count_distinct
+      create_metric: true
 
   dimensions:
-  - name: ds
-    type: time
-    type_params:
-      time_granularity: day
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
 
   entities:
-  - name: booking
-    expr: booking_id
-    type: primary
-  - name: listing
-    expr: listing_id
-    type: foreign
+    - name: booking
+      expr: booking_id
+      type: primary
+    - name: listing
+      expr: listing_id
+      type: foreign

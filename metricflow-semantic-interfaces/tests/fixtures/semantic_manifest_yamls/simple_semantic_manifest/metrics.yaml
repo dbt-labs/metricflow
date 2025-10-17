@@ -1,4 +1,3 @@
----
 metric:
   name: bookings
   description: bookings metric
@@ -169,7 +168,7 @@ metric:
       name: txn_revenue
 ---
 metric:
-  name: every_two_days_bookers   # because the bookings test data only spans 3 days
+  name: every_two_days_bookers # because the bookings test data only spans 3 days
   description: every_two_days_bookers
   type: cumulative
   type_params:
@@ -196,7 +195,7 @@ metric:
   type_params:
     expr: booking_value * 0.05
     metrics:
-    - name: booking_value
+      - name: booking_value
 ---
 metric:
   name: booking_fees_per_booker
@@ -205,8 +204,8 @@ metric:
   type_params:
     expr: booking_value * 0.05 / bookers
     metrics:
-    - name: booking_value
-    - name: bookers
+      - name: booking_value
+      - name: bookers
 ---
 metric:
   name: views_times_booking_value
@@ -215,8 +214,8 @@ metric:
   type_params:
     expr: booking_value * views
     metrics:
-    - name: booking_value
-    - name: views
+      - name: booking_value
+      - name: views
 ---
 metric:
   name: bookings_per_booker
@@ -309,11 +308,11 @@ metric:
   type_params:
     expr: average_booking_value * bookings / NULLIF(booking_value, 0)
     metrics:
-    - name: average_booking_value
-      filter: "{{ Dimension('listing__is_lux_latest', entity_path=['listing']) }}"
-    - name: bookings
-      filter: "{{ Dimension('listing__is_lux_latest', entity_path=['listing']) }}"
-    - name: booking_value
+      - name: average_booking_value
+        filter: "{{ Dimension('listing__is_lux_latest', entity_path=['listing']) }}"
+      - name: bookings
+        filter: "{{ Dimension('listing__is_lux_latest', entity_path=['listing']) }}"
+      - name: booking_value
 ---
 metric:
   name: instant_booking_value_ratio
@@ -353,9 +352,9 @@ metric:
   type_params:
     expr: delayed_bookings * 2
     metrics:
-    - name: bookings
-      filter: NOT {{ Dimension('booking__is_instant') }}
-      alias: delayed_bookings
+      - name: bookings
+        filter: NOT {{ Dimension('booking__is_instant') }}
+        alias: delayed_bookings
 ---
 metric:
   name: referred_bookings
@@ -372,9 +371,9 @@ metric:
   type_params:
     expr: (bookings - ref_bookings) * 1.0 / bookings
     metrics:
-    - name: referred_bookings
-      alias: ref_bookings
-    - name: bookings
+      - name: referred_bookings
+        alias: ref_bookings
+      - name: bookings
 ---
 metric:
   name: booking_value_sub_instant
@@ -383,8 +382,8 @@ metric:
   type_params:
     expr: booking_value - instant_booking_value
     metrics:
-    - name: instant_booking_value
-    - name: booking_value
+      - name: instant_booking_value
+      - name: booking_value
 ---
 metric:
   name: booking_value_sub_instant_add_10
@@ -393,7 +392,7 @@ metric:
   type_params:
     expr: booking_value_sub_instant + 10
     metrics:
-    - name: booking_value_sub_instant
+      - name: booking_value_sub_instant
 ---
 metric:
   name: bookings_per_lux_listing_derived
@@ -402,10 +401,10 @@ metric:
   type_params:
     expr: bookings * 1.0 / NULLIF(lux_listing, 0)
     metrics:
-    - name: bookings
-    - name: listings
-      alias: lux_listing
-      filter: "{{ Dimension('listing__is_lux_latest') }}"
+      - name: bookings
+      - name: listings
+        alias: lux_listing
+        filter: "{{ Dimension('listing__is_lux_latest') }}"
 ---
 metric:
   name: instant_plus_non_referred_bookings_pct
@@ -416,11 +415,11 @@ metric:
   type_params:
     expr: non_referred + (instant * 1.0 / bookings)
     metrics:
-    - name: non_referred_bookings_pct
-      alias: non_referred
-    - name: instant_bookings
-      alias: instant
-    - name: bookings
+      - name: non_referred_bookings_pct
+        alias: non_referred
+      - name: instant_bookings
+        alias: instant
+      - name: bookings
 ---
 metric:
   name: trailing_2_months_revenue_sub_10
@@ -430,8 +429,8 @@ metric:
   type_params:
     expr: t2mr - 10
     metrics:
-    - name: trailing_2_months_revenue
-      alias: t2mr
+      - name: trailing_2_months_revenue
+        alias: t2mr
 ---
 metric:
   name: booking_value_per_view
@@ -440,8 +439,8 @@ metric:
   type_params:
     expr: booking_value / NULLIF(views, 0)
     metrics:
-    - name: booking_value
-    - name: views
+      - name: booking_value
+      - name: views
 ---
 metric:
   name: median_booking_value
@@ -492,10 +491,10 @@ metric:
   type_params:
     expr: bookings - bookings_2_weeks_ago
     metrics:
-    - name: bookings
-    - name: bookings
-      offset_window: 14 days
-      alias: bookings_2_weeks_ago
+      - name: bookings
+      - name: bookings
+        offset_window: 14 days
+        alias: bookings_2_weeks_ago
 ---
 metric:
   name: bookings_growth_since_start_of_month
@@ -506,10 +505,10 @@ metric:
   type_params:
     expr: bookings - bookings_at_start_of_month
     metrics:
-    - name: bookings
-    - name: bookings
-      offset_to_grain: month
-      alias: bookings_at_start_of_month
+      - name: bookings
+      - name: bookings
+        offset_to_grain: month
+        alias: bookings_at_start_of_month
 ---
 metric:
   name: bookings_month_start_compared_to_1_month_prior
@@ -520,12 +519,12 @@ metric:
   type_params:
     expr: month_start_bookings - bookings_1_month_ago
     metrics:
-    - name: bookings
-      offset_to_grain: month
-      alias: month_start_bookings
-    - name: bookings
-      offset_window: 1 month
-      alias: bookings_1_month_ago
+      - name: bookings
+        offset_to_grain: month
+        alias: month_start_bookings
+      - name: bookings
+        offset_window: 1 month
+        alias: bookings_1_month_ago
 ---
 metric:
   name: bookings_5_day_lag
@@ -536,9 +535,9 @@ metric:
   type_params:
     expr: bookings_5_days_ago
     metrics:
-    - name: bookings
-      offset_window: 5 days
-      alias: bookings_5_days_ago
+      - name: bookings
+        offset_window: 5 days
+        alias: bookings_5_days_ago
 ---
 metric:
   name: ever_active_listings
@@ -586,5 +585,5 @@ metric:
   type_params:
     expr: monthly_bookings * yearly_bookings
     metrics:
-    - name: monthly_bookings
-    - name: yearly_bookings
+      - name: monthly_bookings
+      - name: yearly_bookings

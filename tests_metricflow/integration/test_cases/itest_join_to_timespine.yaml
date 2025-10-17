@@ -1,4 +1,3 @@
----
 integration_test:
   name: test_constraint_on_measure_selected_in_group_by
   description: Tests that the filter on measure is not re-applied even if selected in group by

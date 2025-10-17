@@ -1,4 +1,3 @@
----
 semantic_model:
   name: animals
   description: If a user is a company / business, this defines the mapping.
@@ -11,21 +10,21 @@ semantic_model:
     agg_time_dimension: ds
 
   dimensions:
-  - name: ds
-    type: time
-    type_params:
-      time_granularity: day
-  - name: is_dog
-    type: categorical
-    is_partition: true
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+    - name: is_dog
+      type: categorical
+      is_partition: true
 
   measures:
-  - name: count_dogs
-    agg: sum
-    expr: 1
-    create_metric: true
+    - name: count_dogs
+      agg: sum
+      expr: 1
+      create_metric: true
 
   entities:
-  - name: id
-    type: primary
-    expr: '1'
+    - name: id
+      type: primary
+      expr: '1'

@@ -1,4 +1,3 @@
----
 metric:
   name: bookings_last_month
   description: bookings the prior month, based on dimension with month granularity
@@ -6,6 +5,6 @@ metric:
   type_params:
     expr: bookings_last_month
     metrics:
-    - name: bookings_monthly
-      offset_window: 1 month
-      alias: bookings_last_month
+      - name: bookings_monthly
+        offset_window: 1 month
+        alias: bookings_last_month

@@ -1,4 +1,3 @@
----
 # **what?**
 # Checks that a file has been committed under the /.changes directory
 # as a new CHANGELOG entry.  Cannot check for a specific filename as
@@ -17,14 +16,14 @@
 # and when new code is pushed to the branch.  The action will then get
 # skipped if the 'Skip Changelog' label is present is any of the labels.
 
-name       : Check Changelog Entry
+name: Check Changelog Entry
 
-on         :
+on:
   pull_request:
     types: [opened, reopened, labeled, unlabeled, synchronize]
   workflow_dispatch:
 
-defaults   :
+defaults:
   run:
     shell: bash
 
@@ -32,7 +31,7 @@ permissions:
   contents: read
   pull-requests: write
 
-jobs       :
+jobs:
   changelog:
     uses: dbt-labs/actions/.github/workflows/changelog-existence.yml@main
     with:

@@ -1,4 +1,3 @@
----
 semantic_model:
   name: users_ds_source
   description: users_ds_source
@@ -11,56 +10,56 @@ semantic_model:
     agg_time_dimension: created_at
 
   dimensions:
-  - name: ds
-    type: time
-    type_params:
-      time_granularity: day
-  - name: created_at
-    type: time
-    type_params:
-      time_granularity: day
-  - name: ds_partitioned
-    type: time
-    is_partition: true
-    type_params:
-      time_granularity: day
-  - name: home_state
-    type: categorical
-  - name: last_profile_edit_ts
-    type: time
-    type_params:
-      time_granularity: millisecond
-  - name: bio_added_ts
-    type: time
-    type_params:
-      time_granularity: second
-  - name: last_login_ts
-    type: time
-    type_params:
-      time_granularity: minute
-  - name: archived_at
-    type: time
-    type_params:
-      time_granularity: hour
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+    - name: created_at
+      type: time
+      type_params:
+        time_granularity: day
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+    - name: home_state
+      type: categorical
+    - name: last_profile_edit_ts
+      type: time
+      type_params:
+        time_granularity: millisecond
+    - name: bio_added_ts
+      type: time
+      type_params:
+        time_granularity: second
+    - name: last_login_ts
+      type: time
+      type_params:
+        time_granularity: minute
+    - name: archived_at
+      type: time
+      type_params:
+        time_granularity: hour
 
 
   entities:
-  - name: user
-    type: primary
-    expr: user_id
+    - name: user
+      type: primary
+      expr: user_id
 
   measures:
-  - name: new_users
-    expr: '1'
-    agg: SUM
-    create_metric: true
-  - name: archived_users
-    expr: '1'
-    agg: SUM
-    create_metric: true
-    agg_time_dimension: archived_at
+    - name: new_users
+      expr: '1'
+      agg: SUM
+      create_metric: true
+    - name: archived_users
+      expr: '1'
+      agg: SUM
+      create_metric: true
+      agg_time_dimension: archived_at
 ---
-metric        :
+metric:
   name: subdaily_cumulative_window_metric
   description: cumulative window metric with a sub-daily agg time dim
   type: cumulative
@@ -69,7 +68,7 @@ metric        :
     cumulative_type_params:
       window: 3 hours
 ---
-metric        :
+metric:
   name: subdaily_cumulative_grain_to_date_metric
   description: cumulative grain to date metric with a sub-daily agg time dim
   type: cumulative
@@ -78,27 +77,27 @@ metric        :
     cumulative_type_params:
       grain_to_date: hour
 ---
-metric        :
+metric:
   name: subdaily_offset_window_metric
   description: offset window metric with a sub-daily agg time dim
   type: derived
   type_params:
     expr: archived_users
     metrics:
-    - name: archived_users
-      offset_window: 1 hour
+      - name: archived_users
+        offset_window: 1 hour
 ---
-metric        :
+metric:
   name: subdaily_offset_grain_to_date_metric
   description: offset grain to date metric with a sub-daily agg time dim
   type: derived
   type_params:
     expr: archived_users
     metrics:
-    - name: archived_users
-      offset_to_grain: hour
+      - name: archived_users
+        offset_to_grain: hour
 ---
-metric        :
+metric:
   name: subdaily_join_to_time_spine_metric
   description: simple metric with sub-daily agg time dim that joins to time spine
   type: simple
@@ -107,7 +106,7 @@ metric        :
       name: archived_users
       join_to_timespine: true
 ---
-metric        :
+metric:
   name: simple_subdaily_metric_default_day
   description: simple metric with sub-daily agg time dim that doesn't specify default granularity
   type: simple
@@ -115,7 +114,7 @@ metric        :
     measure:
       name: archived_users
 ---
-metric        :
+metric:
   name: simple_subdaily_metric_default_hour
   description: simple metric with sub-daily agg time dim that has an explicit default granularity
   type: simple
@@ -124,7 +123,7 @@ metric        :
       name: archived_users
   time_granularity: hour
 ---
-metric        :
+metric:
   name: archived_users_join_to_time_spine
   description: subdaily metric joining to time spine
   type: simple

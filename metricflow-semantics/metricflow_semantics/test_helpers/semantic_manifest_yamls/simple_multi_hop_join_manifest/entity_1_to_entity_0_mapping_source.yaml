@@ -1,4 +1,3 @@
----
 semantic_model:
   name: entity_1_to_entity_0_mapping_source
   description: Maps "entity_1" to "entity_0"
@@ -8,7 +7,7 @@ semantic_model:
     alias: entity_1_to_entity_0_mapping_table
 
   entities:
-  - name: entity_1
-    type: primary
-  - name: entity_0
-    type: foreign
+    - name: entity_1
+      type: primary
+    - name: entity_0
+      type: foreign

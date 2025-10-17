@@ -1,4 +1,3 @@
----
 semantic_model:
   name: customer_table
   description: customer_table
@@ -12,22 +11,22 @@ semantic_model:
     agg_time_dimension: ds_partitioned
 
   measures:
-  - name: customers
-    expr: 1
-    agg: sum
-    create_metric: true
+    - name: customers
+      expr: 1
+      agg: sum
+      create_metric: true
 
   dimensions:
-  - name: customer_name
-    type: categorical
-  - name: customer_atomic_weight
-    type: categorical
-  - name: ds_partitioned
-    type: time
-    type_params:
-      time_granularity: day
-    is_partition: true
+    - name: customer_name
+      type: categorical
+    - name: customer_atomic_weight
+      type: categorical
+    - name: ds_partitioned
+      type: time
+      type_params:
+        time_granularity: day
+      is_partition: true
 
   entities:
-  - name: customer_id
-    type: primary
+    - name: customer_id
+      type: primary

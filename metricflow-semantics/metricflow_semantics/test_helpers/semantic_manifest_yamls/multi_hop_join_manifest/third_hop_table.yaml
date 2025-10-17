@@ -1,4 +1,3 @@
----
 semantic_model:
   name: third_hop_table
   description: third_hop_table
@@ -8,9 +7,9 @@ semantic_model:
     alias: third_hop_table
 
   dimensions:
-  - name: value
-    type: categorical
+    - name: value
+      type: categorical
 
   entities:
-  - name: customer_third_hop_id
-    type: primary
+    - name: customer_third_hop_id
+      type: primary

@@ -1,4 +1,3 @@
----
 semantic_model:
   name: monthly_measures_source
   description: Contains measures with a month grain.
@@ -11,15 +10,15 @@ semantic_model:
     agg_time_dimension: creation_time
 
   measures:
-  - name: monthly_measure_0
-    agg: sum
-  - name: monthly_measure_1
-    agg: sum
+    - name: monthly_measure_0
+      agg: sum
+    - name: monthly_measure_1
+      agg: sum
 
   dimensions:
-  - name: creation_time
-    type: time
-    type_params:
-      time_granularity: month
+    - name: creation_time
+      type: time
+      type_params:
+        time_granularity: month
 
   primary_entity: monthly_measure_entity

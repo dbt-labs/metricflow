@@ -1,4 +1,3 @@
----
 metric:
   name: trailing_3_months_bookings
   description: Prior 3 months' bookings. Tests a cumulative metric with non-day granularity.

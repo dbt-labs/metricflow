@@ -1,4 +1,3 @@
----
 integration_test:
   name: multihop_join
   description: Tests a query with a basic multi-hop join

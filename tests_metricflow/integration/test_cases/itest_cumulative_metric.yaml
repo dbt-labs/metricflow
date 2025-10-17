@@ -1,4 +1,3 @@
----
 integration_test:
   name: windowed_cumulative_metric
   description: Query a cumulative metric that aggregates the last 2 months.
