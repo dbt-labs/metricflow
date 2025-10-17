@@ -512,10 +512,6 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES)
 
         if mf_query_request.saved_query_name is not None:
-            if mf_query_request.metrics or mf_query_request.metric_names:
-                raise InvalidQueryException("Metrics can't be specified with a saved query.")
-            if mf_query_request.group_by or mf_query_request.group_by_names:
-                raise InvalidQueryException("Group by items can't be specified with a saved query.")
             query_spec = self._query_parser.parse_and_validate_saved_query(
                 saved_query_parameter=SavedQueryParameter(mf_query_request.saved_query_name),
                 where_filters=(
@@ -532,6 +528,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                 order_by_names=mf_query_request.order_by_names,
                 order_by_parameters=mf_query_request.order_by,
                 apply_group_by=mf_query_request.apply_group_by,
+                metrics=mf_query_request.metrics,
+                metric_names=mf_query_request.metric_names,
+                group_by=mf_query_request.group_by,
+                group_by_names=mf_query_request.group_by_names,
             ).query_spec
         else:
             query_spec = self._query_parser.parse_and_validate_query(
