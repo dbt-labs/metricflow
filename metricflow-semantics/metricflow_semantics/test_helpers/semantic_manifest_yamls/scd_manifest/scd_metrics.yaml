@@ -1,4 +1,3 @@
----
 metric:
   name: bookings
   description: raw booking count
@@ -10,8 +9,7 @@ metric:
   name: family_bookings
   description: Bookings of units with capacity for more than 2 people.
   type: SIMPLE
-  filter:
-    "{{ Dimension('listing__capacity') }} > 2"
+  filter: "{{ Dimension('listing__capacity') }} > 2"
   type_params:
     measure: bookings
 ---
@@ -19,7 +17,6 @@ metric:
   name: potentially_lux_bookings
   description: raw booking count for listings that are lux, or unknown
   type: SIMPLE
-  filter:
-    "{{ Dimension('listing__is_lux') }} OR {{ Dimension('listing__is_lux') }} IS NULL"
+  filter: "{{ Dimension('listing__is_lux') }} OR {{ Dimension('listing__is_lux') }} IS NULL"
   type_params:
     measure: bookings

@@ -1,4 +1,3 @@
----
 integration_test:
   name: simple_scd_grouped_metric
   description: Tests selecting a simple metric grouped by an SCD dimension
@@ -72,8 +71,7 @@ integration_test:
     correct output.
   model: SCD_MODEL
   metrics: ["bookings"]
-  group_bys:
-    ["metric_time", "listing__is_lux", "listing__user__home_state_latest"]
+  group_bys: ["metric_time", "listing__is_lux", "listing__user__home_state_latest"]
   check_query: |
     SELECT
       a.ds AS metric_time__day

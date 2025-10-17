@@ -1,0 +1,6 @@
+kind: Features
+body: Add YAML formatter to pre-commit hooks.
+time: 2025-10-17T21:20:02.367445+09:00
+custom:
+  Author: kiwamizamurai
+  Issue: '237'

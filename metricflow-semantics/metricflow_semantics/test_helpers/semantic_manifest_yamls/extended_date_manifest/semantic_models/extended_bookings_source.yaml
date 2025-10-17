@@ -1,15 +1,11 @@
----
 semantic_model:
   name: extended_bookings_source
   description: extended_bookings_source
-
   node_relation:
     schema_name: $source_schema
     alias: fct_bookings_extended
-
   defaults:
     agg_time_dimension: ds
-
   measures:
     - name: bookings
       expr: "1"
@@ -19,13 +15,11 @@ semantic_model:
       expr: listing_id
       agg: count_distinct
       create_metric: true
-
   dimensions:
     - name: ds
       type: time
       type_params:
         time_granularity: day
-
   entities:
     - name: booking
       expr: booking_id

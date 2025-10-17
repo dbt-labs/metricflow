@@ -1,4 +1,3 @@
----
 integration_test:
   name: windowed_cumulative_metric
   description: Query a cumulative metric that aggregates the last 2 months.
@@ -348,6 +347,8 @@ integration_test:
     GROUP BY a.ds
     ORDER BY a.ds
 ---
+
+
 # TODO: Test is currently broken.
 #integration_test:
 #  name: cumulative_metric_month_granularity

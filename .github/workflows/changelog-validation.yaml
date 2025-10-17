@@ -14,14 +14,12 @@ on:
       - edited
       - reopened
       - synchronize
-
 jobs:
   check_batch:
     name: Check Batch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Run `changie batch`
         uses: miniscruff/changie-action@v2
         with:

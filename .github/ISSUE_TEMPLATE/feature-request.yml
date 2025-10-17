@@ -11,12 +11,11 @@ body:
     attributes:
       label: Is this your first time submitting a feature request?
       description: >
-        We want to make sure that features are distinct and discoverable,
-        so that other members of the community can find them and offer their thoughts.
+        We want to make sure that features are distinct and discoverable, so that other members of the community can find them and offer their thoughts.
 
-        Issues are the right place to request straightforward extensions of existing metricflow functionality.
-        For "big ideas" about future capabilities of metricflow, we ask that you open a
-        [discussion](https://github.com/dbt-labs/metricflow/discussions) in the "Ideas" category instead.
+        Issues are the right place to request straightforward extensions of existing metricflow functionality. For "big ideas" about future capabilities
+        of metricflow, we ask that you open a [discussion](https://github.com/dbt-labs/metricflow/discussions) in the "Ideas" category instead.
+
       options:
         - label: I have read the [expectations for open source contributors](https://docs.getdbt.com/docs/contributing/oss-expectations)
           required: true

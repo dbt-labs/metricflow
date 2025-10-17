@@ -1,4 +1,3 @@
----
 table_snapshot:
   table_name: dim_listings
   column_definitions:
