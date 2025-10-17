@@ -8,11 +8,11 @@ semantic_model:
     alias: customer_table
 
   dimensions:
-    - name: customer_name
-      type: categorical
-    - name: customer_atomic_weight
-      type: categorical
+  - name: customer_name
+    type: categorical
+  - name: customer_atomic_weight
+    type: categorical
 
   entities:
-    - name: customer_id
-      type: primary
+  - name: customer_id
+    type: primary

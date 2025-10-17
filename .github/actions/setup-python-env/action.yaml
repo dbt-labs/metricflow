@@ -1,25 +1,26 @@
-name: Setup Python Environment
+---
+name       : Setup Python Environment
 description: Install Python & Hatch
 
-inputs:
+inputs     :
   python-version:
-    description: "Version of Python to use for testing"
+    description: Version of Python to use for testing
     required: false
-    default: "3.9"
+    default: '3.9'
   hatch-environment-cache-config-json:
-    description: "Configuration JSON to be passed into the script to install `hatch` environments for caching."
+    description: Configuration JSON to be passed into the script to install `hatch` environments for caching.
     required: false
     default: >-
       {
         "configs": []
       }
   cache-pre-commit-environment:
-    description: "Whether to cache the pre-commit-environment."
+    description: Whether to cache the pre-commit-environment.
     required: false
-    default: "false"
+    default: 'false'
 
-runs:
-  using: "composite"
+runs       :
+  using: composite
 
   steps:
   - name: Set Linux Release Environment Variable
@@ -29,11 +30,11 @@ runs:
   - name: Set up Python ${{ inputs.python_version }}
     uses: actions/setup-python@v4
     with:
-      python-version: "${{ inputs.python-version }}"
+      python-version: ${{ inputs.python-version }}
 
   - name: Create a JSON File With the `hatch` Environment Cache Configuration
     shell: bash
-    run: "echo '${{ inputs.hatch-environment-cache-config-json }}' > hatch-environment-cache-config.json"
+    run: echo '${{ inputs.hatch-environment-cache-config-json }}' > hatch-environment-cache-config.json
 
   # Cache the dependencies installed by Hatch so that we don't need to reinstall them on every run.
   - uses: actions/cache@v3
@@ -85,4 +86,4 @@ runs:
   - name: Install `pre-commit` Environment
     shell: bash
     if: ${{ inputs.cache-pre-commit-environment == 'true' }}
-    run: "hatch run dev-env:pre-commit install-hooks"
+    run: hatch run dev-env:pre-commit install-hooks

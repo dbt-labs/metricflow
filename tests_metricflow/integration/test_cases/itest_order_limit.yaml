@@ -3,9 +3,9 @@ integration_test:
   name: order_desc
   description: Tests descending order.
   model: SIMPLE_MODEL
-  metrics: ["booking_value"]
-  group_bys: ["metric_time"]
-  order_bys: ["-booking_value", "metric_time"]
+  metrics: [booking_value]
+  group_bys: [metric_time]
+  order_bys: [-booking_value, metric_time]
   check_order: true
   check_query: |
     SELECT
@@ -21,9 +21,9 @@ integration_test:
   name: order_asc
   description: Tests ascending order.
   model: SIMPLE_MODEL
-  metrics: ["booking_value"]
-  group_bys: ["metric_time"]
-  order_bys: ["booking_value", "metric_time"]
+  metrics: [booking_value]
+  group_bys: [metric_time]
+  order_bys: [booking_value, metric_time]
   check_order: true
   check_query: |
     SELECT
@@ -39,9 +39,9 @@ integration_test:
   name: order_limit
   description: Tests order with a limit.
   model: SIMPLE_MODEL
-  metrics: ["booking_value"]
-  group_bys: ["metric_time"]
-  order_bys: ["booking_value", "metric_time"]
+  metrics: [booking_value]
+  group_bys: [metric_time]
+  order_bys: [booking_value, metric_time]
   limit: 2
   check_order: true
   check_query: |
@@ -59,9 +59,9 @@ integration_test:
   name: order_desc_with_granularity
   description: Tests order with a date granularity.
   model: SIMPLE_MODEL
-  metrics: ["booking_value"]
-  group_bys: ["metric_time__month"]
-  order_bys: ["-metric_time__month", "booking_value"]
+  metrics: [booking_value]
+  group_bys: [metric_time__month]
+  order_bys: [-metric_time__month, booking_value]
   check_order: true
   check_query: |
     SELECT

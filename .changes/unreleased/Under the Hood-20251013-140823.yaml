@@ -1,6 +1,7 @@
-kind: Under the Hood
-body: Renames for the `measures -> simple metrics` migration - Part 2
-time: 2025-10-13T14:08:23.664574-07:00
+---
+kind  : Under the Hood
+body  : Renames for the `measures -> simple metrics` migration - Part 2
+time  : 2025-10-13T14:08:23.664574-07:00
 custom:
   Author: plypaul
-  Issue: "1902"
+  Issue: '1902'

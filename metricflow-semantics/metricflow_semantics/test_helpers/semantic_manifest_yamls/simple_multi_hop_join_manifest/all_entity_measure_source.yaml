@@ -11,23 +11,23 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-    - name: all_entity_measure
-      agg: sum
-      expr: "1"
+  - name: all_entity_measure
+    agg: sum
+    expr: '1'
 
   dimensions:
-    - name: ds
-      type: time
-      type_params:
-        time_granularity: day
+  - name: ds
+    type: time
+    type_params:
+      time_granularity: day
 
   entities:
-    - name: all_entity_composite
-      type: primary
-      expr: entity_0 || entity_1 || entity_2
-    - name: entity_0
-      type: foreign
-    - name: entity_1
-      type: foreign
-    - name: entity_2
-      type: foreign
+  - name: all_entity_composite
+    type: primary
+    expr: entity_0 || entity_1 || entity_2
+  - name: entity_0
+    type: foreign
+  - name: entity_1
+    type: foreign
+  - name: entity_2
+    type: foreign

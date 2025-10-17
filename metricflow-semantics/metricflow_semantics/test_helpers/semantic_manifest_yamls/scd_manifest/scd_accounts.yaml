@@ -8,26 +8,26 @@ semantic_model:
     alias: dim_primary_accounts
 
   dimensions:
-    - name: primary_from
-      type: time
-      expr: set_as_primary
-      type_params:
-        time_granularity: day
-        validity_params:
-          is_start: True
-    - name: primary_to
-      type: time
-      expr: removed_as_primary
-      type_params:
-        time_granularity: day
-        validity_params:
-          is_end: True
-    - name: account_type
-      type: categorical
+  - name: primary_from
+    type: time
+    expr: set_as_primary
+    type_params:
+      time_granularity: day
+      validity_params:
+        is_start: true
+  - name: primary_to
+    type: time
+    expr: removed_as_primary
+    type_params:
+      time_granularity: day
+      validity_params:
+        is_end: true
+  - name: account_type
+    type: categorical
 
   primary_entity: scd_user
 
   entities:
-    - name: user
-      type: natural
-      expr: user_id
+  - name: user
+    type: natural
+    expr: user_id

@@ -8,11 +8,11 @@ semantic_model:
     alias: bridge_table
 
   dimensions:
-    - name: extra_dim
-      type: categorical
+  - name: extra_dim
+    type: categorical
 
   entities:
-    - name: account_id
-      type: primary
-    - name: customer_id
-      type: foreign
+  - name: account_id
+    type: primary
+  - name: customer_id
+    type: foreign

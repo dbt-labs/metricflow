@@ -1,4 +1,3 @@
-# Minimal manifest containing derived metrics.
 ---
 semantic_model:
   name: bookings_source
@@ -11,20 +10,19 @@ semantic_model:
     agg_time_dimension: booking_time
 
   entities:
-    - name: booking
-      type: primary
+  - name: booking
+    type: primary
 
   measures:
-    - name: booking_count
-      expr: "1"
-      agg: sum
+  - name: booking_count
+    expr: '1'
+    agg: sum
 
   dimensions:
-    - name: booking_time
-      type: time
-      type_params:
-        time_granularity: quarter
-
+  - name: booking_time
+    type: time
+    type_params:
+      time_granularity: quarter
 ---
 semantic_model:
   name: views_source
@@ -37,37 +35,35 @@ semantic_model:
     agg_time_dimension: view_time
 
   measures:
-    - name: view_count
-      expr: "1"
-      agg: sum
+  - name: view_count
+    expr: '1'
+    agg: sum
 
   dimensions:
-    - name: view_time
-      type: time
-      type_params:
-        time_granularity: quarter
+  - name: view_time
+    type: time
+    type_params:
+      time_granularity: quarter
 
   entities:
-    - name: view
-      type: primary
-    - name: booking
-      type: foreign
+  - name: view
+    type: primary
+  - name: booking
+    type: foreign
 ---
-metric:
+metric        :
   name: bookings
   type: simple
   type_params:
     measure: booking_count
-
 ---
-metric:
+metric        :
   name: views
   type: simple
   type_params:
     measure: view_count
-
 ---
-metric:
+metric        :
   name: bookings_per_view
   type: ratio
   type_params:

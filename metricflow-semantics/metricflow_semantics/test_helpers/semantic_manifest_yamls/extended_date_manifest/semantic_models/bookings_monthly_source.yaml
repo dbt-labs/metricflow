@@ -13,19 +13,19 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-    - name: bookings_monthly
-      agg: sum
-      create_metric: true
+  - name: bookings_monthly
+    agg: sum
+    create_metric: true
 
   primary_entity: booking_monthly
 
   dimensions:
-    - name: ds
-      type: time
-      type_params:
-        time_granularity: month
+  - name: ds
+    type: time
+    type_params:
+      time_granularity: month
 
   entities:
-    - name: listing
-      expr: listing_id
-      type: foreign
+  - name: listing
+    expr: listing_id
+    type: foreign

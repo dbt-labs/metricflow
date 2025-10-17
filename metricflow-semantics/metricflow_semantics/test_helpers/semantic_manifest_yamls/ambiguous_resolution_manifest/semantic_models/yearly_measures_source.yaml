@@ -11,13 +11,13 @@ semantic_model:
     agg_time_dimension: creation_time
 
   measures:
-    - name: yearly_measure_0
-      agg: sum
+  - name: yearly_measure_0
+    agg: sum
 
   dimensions:
-    - name: creation_time
-      type: time
-      type_params:
-        time_granularity: year
+  - name: creation_time
+    type: time
+    type_params:
+      time_granularity: year
 
   primary_entity: yearly_measure_entity

@@ -1,138 +1,138 @@
 ---
 metric:
-  name: "bookings"
-  description: "bookings metric"
+  name: bookings
+  description: bookings metric
   type: simple
   type_params:
     measure: bookings
 ---
 metric:
-  name: "average_booking_value"
-  description: "average booking value metric"
+  name: average_booking_value
+  description: average booking value metric
   type: simple
   type_params:
     measure: average_booking_value
 ---
 metric:
-  name: "instant_bookings"
-  description: "instant bookings"
+  name: instant_bookings
+  description: instant bookings
   type: simple
   type_params:
     measure: instant_bookings
 ---
 metric:
-  name: "booking_value"
-  description: "booking value"
+  name: booking_value
+  description: booking value
   type: simple
   type_params:
     measure: booking_value
 ---
 metric:
-  name: "max_booking_value"
-  description: "max booking value"
+  name: max_booking_value
+  description: max booking value
   type: simple
   type_params:
     measure: max_booking_value
 ---
 metric:
-  name: "min_booking_value"
-  description: "min booking value"
+  name: min_booking_value
+  description: min booking value
   type: simple
   type_params:
     measure: min_booking_value
 ---
 metric:
-  name: "instant_booking_value"
-  description: "booking value of instant bookings"
+  name: instant_booking_value
+  description: booking value of instant bookings
   type: simple
   type_params:
     measure: booking_value
   filter: "{{ Dimension('booking__is_instant') }}"
 ---
 metric:
-  name: "average_instant_booking_value"
-  description: "average booking value of instant bookings"
+  name: average_instant_booking_value
+  description: average booking value of instant bookings
   type: simple
   type_params:
     measure: average_booking_value
-  filter:  "{{ Dimension('booking__is_instant') }}"
+  filter: "{{ Dimension('booking__is_instant') }}"
 ---
 metric:
-  name: "booking_value_for_non_null_listing_id"
-  description: "booking value of instant bookings"
+  name: booking_value_for_non_null_listing_id
+  description: booking value of instant bookings
   type: simple
   type_params:
     measure: booking_value
   filter: "{{ Entity('listing') }} IS NOT NULL"
 ---
 metric:
-  name: "bookers"
-  description: "bookers"
+  name: bookers
+  description: bookers
   type: simple
   type_params:
     measure: bookers
 ---
 metric:
-  name: "booking_payments"
-  description: "Booking payments."
+  name: booking_payments
+  description: Booking payments.
   type: simple
   type_params:
     measure: booking_payments
 ---
 metric:
-  name: "views"
-  description: "views"
+  name: views
+  description: views
   type: simple
   type_params:
     measure: views
 ---
 metric:
-  name: "listings"
-  description: "listings"
+  name: listings
+  description: listings
   type: simple
   type_params:
     measure: listings
 ---
 metric:
-  name: "lux_listings"
-  description: "lux_listings"
+  name: lux_listings
+  description: lux_listings
   type: simple
   type_params:
     measure: listings
   filter: "{{ Dimension('listing__is_lux_latest') }}"
 ---
 metric:
-  name: "smallest_listing"
-  description: "smallest listing"
+  name: smallest_listing
+  description: smallest listing
   type: simple
   type_params:
     measure: smallest_listing
 ---
 metric:
-  name: "largest_listing"
-  description: "largest listing"
+  name: largest_listing
+  description: largest listing
   type: simple
   type_params:
     measure: largest_listing
   time_granularity: month
 ---
 metric:
-  name: "identity_verifications"
-  description: "identity_verifications"
+  name: identity_verifications
+  description: identity_verifications
   type: simple
   type_params:
     measure: identity_verifications
 ---
 metric:
-  name: "revenue"
-  description: "revenue"
+  name: revenue
+  description: revenue
   type: simple
   type_params:
     measure: txn_revenue
 ---
 metric:
-  name: "trailing_2_months_revenue"
-  description: "trailing_2_months_revenue"
+  name: trailing_2_months_revenue
+  description: trailing_2_months_revenue
   type: cumulative
   type_params:
     measure: txn_revenue
@@ -141,8 +141,8 @@ metric:
       period_agg: average
 ---
 metric:
-  name: "revenue_all_time"
-  description: "revenue_all_time"
+  name: revenue_all_time
+  description: revenue_all_time
   type: cumulative
   type_params:
     measure: txn_revenue
@@ -150,16 +150,16 @@ metric:
       period_agg: last
 ---
 metric:
-  name: "every_two_days_bookers"
-  description: "every_two_days_bookers"
+  name: every_two_days_bookers
+  description: every_two_days_bookers
   type: cumulative
   type_params:
     measure: bookers
     window: 2 days
 ---
 metric:
-  name: "revenue_mtd"
-  description: "revenue mtd"
+  name: revenue_mtd
+  description: revenue mtd
   type: cumulative
   type_params:
     measure: txn_revenue
@@ -171,40 +171,40 @@ metric:
   description: Booking value multiplied by constant - simple expr metric test
   type: derived
   type_params:
-    expr: "booking_value * 0.05"
+    expr: booking_value * 0.05
     metrics:
-      - name: booking_value
+    - name: booking_value
 ---
 metric:
   name: booking_fees_per_booker
   description: booking_fees divided by bookers - single source multi measure expr test
   type: derived
   type_params:
-    expr: "booking_value * 0.05 / bookers"
+    expr: booking_value * 0.05 / bookers
     metrics:
-      - name: booking_value
-      - name: bookers
+    - name: booking_value
+    - name: bookers
 ---
 metric:
   name: booking_fees_last_week_per_booker_this_week
   description: booking_fees divided by bookers - single source multi measure expr test
   type: derived
   type_params:
-    expr: "booking_value * 0.05 / bookers"
+    expr: booking_value * 0.05 / bookers
     metrics:
-      - name: booking_value
-        offset_window: 1 week
-      - name: bookers
+    - name: booking_value
+      offset_window: 1 week
+    - name: bookers
 ---
 metric:
   name: views_times_booking_value
   description: Booking_value multiplied by views - expr metric test
   type: derived
   type_params:
-    expr: "booking_value * views"
+    expr: booking_value * views
     metrics:
-      - name: booking_value
-      - name: views
+    - name: booking_value
+    - name: views
 ---
 metric:
   name: bookings_per_booker
@@ -245,26 +245,24 @@ metric:
       name: bookings
     denominator:
       name: booking_value
-
 ---
 metric:
-  name: "account_balance"
-  description: "account_balance"
+  name: account_balance
+  description: account_balance
   type: simple
   type_params:
     measure: account_balance
-
 ---
 metric:
-  name: "total_account_balance_first_day"
-  description: "total_account_balance_first_day"
+  name: total_account_balance_first_day
+  description: total_account_balance_first_day
   type: simple
   type_params:
     measure: total_account_balance_first_day
 ---
 metric:
-  name: "current_account_balance_by_user"
-  description: "current_account_balance_by_user"
+  name: current_account_balance_by_user
+  description: current_account_balance_by_user
   type: simple
   type_params:
     measure: current_account_balance_by_user
@@ -303,13 +301,13 @@ metric:
     Tests constrained measure expr metric with external dimension join.
   type: derived
   type_params:
-    expr: "average_booking_value * bookings / NULLIF(booking_value, 0)"
+    expr: average_booking_value * bookings / NULLIF(booking_value, 0)
     metrics:
-      - name: average_booking_value
-        filter: "{{ Dimension('listing__is_lux_latest') }}"
-      - name: bookings
-        filter: "{{ Dimension('listing__is_lux_latest') }}"
-      - name: booking_value
+    - name: average_booking_value
+      filter: "{{ Dimension('listing__is_lux_latest') }}"
+    - name: bookings
+      filter: "{{ Dimension('listing__is_lux_latest') }}"
+    - name: booking_value
 ---
 metric:
   name: instant_booking_value_ratio
@@ -334,9 +332,9 @@ metric:
   type_params:
     expr: instant_lux_booking_value_rate
     metrics:
-      - name: lux_booking_value_rate_expr
-        filter: "{{ Dimension('booking__is_instant') }}"
-        alias: instant_lux_booking_value_rate
+    - name: lux_booking_value_rate_expr
+      filter: "{{ Dimension('booking__is_instant') }}"
+      alias: instant_lux_booking_value_rate
 ---
 metric:
   name: regional_starting_balance_ratios
@@ -363,46 +361,46 @@ metric:
   type_params:
     expr: delayed_bookings * 2
     metrics:
-      - name: bookings
-        filter: "NOT {{ Dimension('booking__is_instant') }}"
-        alias: delayed_bookings
+    - name: bookings
+      filter: NOT {{ Dimension('booking__is_instant') }}
+      alias: delayed_bookings
 ---
 metric:
-  name: "referred_bookings"
-  description: "bookings made through a referral"
+  name: referred_bookings
+  description: bookings made through a referral
   type: simple
   type_params:
     measure: referred_bookings
 ---
 metric:
-  name: "non_referred_bookings_pct"
-  description: "percentage of bookings that are not made through a referral"
+  name: non_referred_bookings_pct
+  description: percentage of bookings that are not made through a referral
   type: derived
   type_params:
     expr: (bookings - ref_bookings) * 1.0 / bookings
     metrics:
-      - name: referred_bookings
-        alias: ref_bookings
-      - name: bookings
+    - name: referred_bookings
+      alias: ref_bookings
+    - name: bookings
 ---
 metric:
-  name: "booking_value_sub_instant"
-  description: "booking_value - instant_booking_value"
+  name: booking_value_sub_instant
+  description: booking_value - instant_booking_value
   type: derived
   type_params:
     expr: booking_value - instant_booking_value
     metrics:
-      - name: instant_booking_value
-      - name: booking_value
+    - name: instant_booking_value
+    - name: booking_value
 ---
 metric:
-  name: "booking_value_sub_instant_add_10"
-  description: "Add 10 to booking_value - instant_booking_value"
+  name: booking_value_sub_instant_add_10
+  description: Add 10 to booking_value - instant_booking_value
   type: derived
   type_params:
     expr: booking_value_sub_instant + 10
     metrics:
-      - name: booking_value_sub_instant
+    - name: booking_value_sub_instant
 ---
 metric:
   name: bookings_per_lux_listing_derived
@@ -411,13 +409,13 @@ metric:
   type_params:
     expr: bookings * 1.0 / NULLIF(lux_listing, 0)
     metrics:
-      - name: bookings
-      - name: listings
-        alias: lux_listing
-        filter: "{{ Dimension('listing__is_lux_latest') }}"
+    - name: bookings
+    - name: listings
+      alias: lux_listing
+      filter: "{{ Dimension('listing__is_lux_latest') }}"
 ---
 metric:
-  name: "instant_plus_non_referred_bookings_pct"
+  name: instant_plus_non_referred_bookings_pct
   description: |
     percentage of bookings that are not made through a referral + instant booking pct,
     used to test nested derived metrics.
@@ -425,22 +423,22 @@ metric:
   type_params:
     expr: non_referred + (instant * 1.0 / bookings)
     metrics:
-      - name: non_referred_bookings_pct
-        alias: non_referred
-      - name: instant_bookings
-        alias: instant
-      - name: bookings
+    - name: non_referred_bookings_pct
+      alias: non_referred
+    - name: instant_bookings
+      alias: instant
+    - name: bookings
 ---
 metric:
-  name: "trailing_2_months_revenue_sub_10"
+  name: trailing_2_months_revenue_sub_10
   description: |
     Test derived metric with a cumulative metric
   type: derived
   type_params:
     expr: t2mr - 10
     metrics:
-      - name: trailing_2_months_revenue
-        alias: t2mr
+    - name: trailing_2_months_revenue
+      alias: t2mr
 ---
 metric:
   name: booking_value_per_view
@@ -449,46 +447,46 @@ metric:
   type_params:
     expr: booking_value / NULLIF(views, 0)
     metrics:
-      - name: booking_value
-      - name: views
+    - name: booking_value
+    - name: views
 ---
 metric:
-  name: "median_booking_value"
-  description: "median booking value"
+  name: median_booking_value
+  description: median booking value
   type: simple
   type_params:
     measure: median_booking_value
 ---
 metric:
-  name: "booking_value_p99"
-  description: "p99 booking value"
+  name: booking_value_p99
+  description: p99 booking value
   type: simple
   type_params:
     measure: booking_value_p99
 ---
 metric:
-  name: "discrete_booking_value_p99"
-  description: "discrete p99 booking value"
+  name: discrete_booking_value_p99
+  description: discrete p99 booking value
   type: simple
   type_params:
     measure: discrete_booking_value_p99
 ---
 metric:
-  name: "approximate_continuous_booking_value_p99"
-  description: "approximate continuous p99 booking value"
+  name: approximate_continuous_booking_value_p99
+  description: approximate continuous p99 booking value
   type: simple
   type_params:
     measure: approximate_continuous_booking_value_p99
 ---
 metric:
-  name: "approximate_discrete_booking_value_p99"
-  description: "approximate discrete p99 booking value"
+  name: approximate_discrete_booking_value_p99
+  description: approximate discrete p99 booking value
   type: simple
   type_params:
     measure: approximate_discrete_booking_value_p99
 ---
 metric:
-  name: "bookings_growth_2_weeks"
+  name: bookings_growth_2_weeks
   description: |
     percentage growth of bookings compared to bookings 2 weeks prior,
     used to test derived metrics with an offset_window.
@@ -496,10 +494,10 @@ metric:
   type_params:
     expr: bookings - bookings_2_weeks_ago
     metrics:
-      - name: bookings
-      - name: bookings
-        offset_window: 14 days
-        alias: bookings_2_weeks_ago
+    - name: bookings
+    - name: bookings
+      offset_window: 14 days
+      alias: bookings_2_weeks_ago
 ---
 metric:
   name: bookings_all_time
@@ -515,8 +513,8 @@ metric:
   type_params:
     expr: bookings_all_time
     metrics:
-      - name: bookings_all_time
-        offset_to_grain: month
+    - name: bookings_all_time
+      offset_to_grain: month
 ---
 metric:
   name: bookings_all_time_at_start_of_year
@@ -525,11 +523,11 @@ metric:
   type_params:
     expr: bookings_all_time
     metrics:
-      - name: bookings_all_time
-        offset_to_grain: year
+    - name: bookings_all_time
+      offset_to_grain: year
 ---
 metric:
-  name: "bookings_growth_since_start_of_month"
+  name: bookings_growth_since_start_of_month
   description: |
     count of bookings on a given day compared to the start of the month,
     used to test derived metrics with an offset_to_grain.
@@ -537,10 +535,10 @@ metric:
   type_params:
     expr: bookings - bookings_at_start_of_month
     metrics:
-      - name: bookings
-      - name: bookings
-        offset_to_grain: month
-        alias: bookings_at_start_of_month
+    - name: bookings
+    - name: bookings
+      offset_to_grain: month
+      alias: bookings_at_start_of_month
 ---
 metric:
   name: bookings_since_start_of_month
@@ -550,10 +548,10 @@ metric:
   type_params:
     expr: bookings_all_time - bookings_all_time_at_start_of_month
     metrics:
-      - name: bookings_all_time
-      - name: bookings_all_time
-        offset_to_grain: month
-        alias: bookings_all_time_at_start_of_month
+    - name: bookings_all_time
+    - name: bookings_all_time
+      offset_to_grain: month
+      alias: bookings_all_time_at_start_of_month
 ---
 metric:
   name: bookings_since_start_of_year
@@ -563,13 +561,13 @@ metric:
   type_params:
     expr: bookings_all_time - bookings_all_time_at_start_of_year
     metrics:
-      - name: bookings_all_time
-      - name: bookings_all_time
-        offset_to_grain: year
-        alias: bookings_all_time_at_start_of_year
+    - name: bookings_all_time
+    - name: bookings_all_time
+      offset_to_grain: year
+      alias: bookings_all_time_at_start_of_year
 ---
 metric:
-  name: "bookings_month_start_compared_to_1_month_prior"
+  name: bookings_month_start_compared_to_1_month_prior
   description: |
     percentage growth of bookings compared to bookings 2 weeks prior,
     used to test derived metrics with an offset_window.
@@ -577,15 +575,15 @@ metric:
   type_params:
     expr: month_start_bookings - bookings_1_month_ago
     metrics:
-      - name: bookings
-        offset_to_grain: month
-        alias: month_start_bookings
-      - name: bookings
-        offset_window: 1 month
-        alias: bookings_1_month_ago
+    - name: bookings
+      offset_to_grain: month
+      alias: month_start_bookings
+    - name: bookings
+      offset_window: 1 month
+      alias: bookings_1_month_ago
 ---
 metric:
-  name: "bookings_5_day_lag"
+  name: bookings_5_day_lag
   description: |
     number of bookings 5 days ago. used to test derived metric offset
     with only one input metric.
@@ -593,12 +591,12 @@ metric:
   type_params:
     expr: bookings_5_days_ago
     metrics:
-      - name: bookings
-        offset_window: 5 days
-        alias: bookings_5_days_ago
+    - name: bookings
+      offset_window: 5 days
+      alias: bookings_5_days_ago
 ---
 metric:
-  name: "every_2_days_bookers_2_days_ago"
+  name: every_2_days_bookers_2_days_ago
   description: |
     number of bookers 2 days ago. used to test derived metric offset
     with a cumulative input metric.
@@ -606,9 +604,9 @@ metric:
   type_params:
     expr: every_2_days_bookers_2_days_ago
     metrics:
-      - name: every_two_days_bookers
-        offset_window: 2 days
-        alias: every_2_days_bookers_2_days_ago
+    - name: every_two_days_bookers
+      offset_window: 2 days
+      alias: every_2_days_bookers_2_days_ago
 ---
 metric:
   name: bookings_join_to_time_spine
@@ -680,8 +678,8 @@ metric:
       entity: user
       calculation: conversion_rate
       constant_properties:
-        - base_property: session
-          conversion_property: session_id
+      - base_property: session
+        conversion_property: session_id
 ---
 metric:
   name: bookings_fill_nulls_with_0_without_time_spine
@@ -744,10 +742,10 @@ metric:
   type_params:
     expr: bookings_fill_nulls_with_0 - bookings_2_weeks_ago
     metrics:
-      - name: bookings_fill_nulls_with_0
-      - name: bookings_fill_nulls_with_0
-        offset_window: 14 days
-        alias: bookings_2_weeks_ago
+    - name: bookings_fill_nulls_with_0
+    - name: bookings_fill_nulls_with_0
+      offset_window: 14 days
+      alias: bookings_2_weeks_ago
 ---
 metric:
   name: bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
@@ -756,40 +754,40 @@ metric:
   type_params:
     expr: bookings_fill_nulls_with_0 - bookings_2_weeks_ago
     metrics:
-      - name: bookings_fill_nulls_with_0
-      - name: bookings
-        offset_window: 14 days
-        alias: bookings_2_weeks_ago
+    - name: bookings_fill_nulls_with_0
+    - name: bookings
+      offset_window: 14 days
+      alias: bookings_2_weeks_ago
 ---
 metric:
-  name: "bookings_offset_once"
+  name: bookings_offset_once
   description: bookings metric offset once.
   type: derived
   type_params:
     expr: 2 * bookings
     metrics:
-      - name: bookings
-        offset_window: 5 days
+    - name: bookings
+      offset_window: 5 days
 ---
 metric:
-  name: "bookings_offset_twice"
+  name: bookings_offset_twice
   description: bookings metric offset twice.
   type: derived
   type_params:
     expr: 2 * bookings_offset_once
     metrics:
-      - name: bookings_offset_once
-        offset_window: 2 days
+    - name: bookings_offset_once
+      offset_window: 2 days
 ---
 metric:
-  name: "bookings_offset_alien_day"
+  name: bookings_offset_alien_day
   description: bookings metric offset by a martian day.
   type: derived
   type_params:
     expr: 2 * bookings
     metrics:
-      - name: bookings
-        offset_window: 1 alien_day
+    - name: bookings
+      offset_window: 1 alien_day
 ---
 metric:
   name: bookings_at_start_of_month
@@ -800,9 +798,9 @@ metric:
   type_params:
     expr: bookings_start_of_month
     metrics:
-      - name: bookings
-        offset_to_grain: month
-        alias: bookings_start_of_month
+    - name: bookings
+      offset_to_grain: month
+      alias: bookings_start_of_month
 ---
 metric:
   name: booking_fees_since_start_of_month
@@ -811,10 +809,10 @@ metric:
   type_params:
     expr: booking_fees - booking_fees_start_of_month
     metrics:
-      - name: booking_fees
-        offset_to_grain: month
-        alias: booking_fees_start_of_month
-      - name: booking_fees
+    - name: booking_fees
+      offset_to_grain: month
+      alias: booking_fees_start_of_month
+    - name: booking_fees
 ---
 metric:
   name: bookings_1_month_ago
@@ -823,8 +821,8 @@ metric:
   type_params:
     expr: bookings
     metrics:
-      - name: bookings
-        offset_window: 1 month
+    - name: bookings
+      offset_window: 1 month
 ---
 metric:
   name: bookings_mom
@@ -833,10 +831,10 @@ metric:
   type_params:
     expr: (bookings - bookings_1_month_ago) / NULLIF(bookings_1_month_ago, 0)
     metrics:
-      - name: bookings
-        offset_window: 1 month
-        alias: bookings_1_month_ago
-      - name: bookings
+    - name: bookings
+      offset_window: 1 month
+      alias: bookings_1_month_ago
+    - name: bookings
 ---
 metric:
   name: bookings_1_year_ago
@@ -845,8 +843,8 @@ metric:
   type_params:
     expr: bookings
     metrics:
-      - name: bookings
-        offset_window: 1 year
+    - name: bookings
+      offset_window: 1 year
 ---
 metric:
   name: bookings_yoy
@@ -855,28 +853,28 @@ metric:
   type_params:
     expr: (bookings - bookings_1_year_ago) / NULLIF(bookings_1_year_ago, 0)
     metrics:
-      - name: bookings
-        offset_window: 1 year
-        alias: bookings_1_year_ago
-      - name: bookings
+    - name: bookings
+      offset_window: 1 year
+      alias: bookings_1_year_ago
+    - name: bookings
 ---
 metric:
-  name: "derived_bookings_0"
+  name: derived_bookings_0
   description: Derived metric for testing optimizations for duplicate measures in a query.
   type: derived
   type_params:
     expr: bookings
     metrics:
-      - name: bookings
+    - name: bookings
 ---
 metric:
-  name: "derived_bookings_1"
+  name: derived_bookings_1
   description: Derived metric for testing optimizations for duplicate measures in a query.
   type: derived
   type_params:
     expr: bookings
     metrics:
-      - name: bookings
+    - name: bookings
 ---
 metric:
   name: twice_bookings_fill_nulls_with_0_without_time_spine
@@ -885,7 +883,7 @@ metric:
   type_params:
     expr: 2 * bookings_fill_nulls_with_0_without_time_spine
     metrics:
-      - name: bookings_fill_nulls_with_0_without_time_spine
+    - name: bookings_fill_nulls_with_0_without_time_spine
 ---
 metric:
   name: nested_fill_nulls_without_time_spine
@@ -894,7 +892,7 @@ metric:
   type_params:
     expr: 3 * twice_bookings_fill_nulls_with_0_without_time_spine
     metrics:
-      - name: twice_bookings_fill_nulls_with_0_without_time_spine
+    - name: twice_bookings_fill_nulls_with_0_without_time_spine
 ---
 metric:
   name: visit_buy_conversion_rate_7days_fill_nulls_with_0
@@ -938,33 +936,33 @@ metric:
 # in 2 it refers to "instant_bookings", hence the naming difference
 metric:
   name: derived_shared_alias_1a
-  description: "Minimal repro case for derived metrics which give the same alias for different underlying metrics"
+  description: Minimal repro case for derived metrics which give the same alias for different underlying metrics
   type: derived
   type_params:
     expr: shared_alias - 10
     metrics:
-      - name: bookings
-        alias: shared_alias
+    - name: bookings
+      alias: shared_alias
 ---
 metric:
   name: derived_shared_alias_1b
-  description: "Minimal repro case for derived metrics which give the same alias for different underlying metrics"
+  description: Minimal repro case for derived metrics which give the same alias for different underlying metrics
   type: derived
   type_params:
     expr: shared_alias - 100
     metrics:
-      - name: bookings
-        alias: shared_alias
+    - name: bookings
+      alias: shared_alias
 ---
 metric:
   name: derived_shared_alias_2
-  description: "Minimal repro case for derived metrics which give the same alias for different underlying metrics"
+  description: Minimal repro case for derived metrics which give the same alias for different underlying metrics
   type: derived
   type_params:
     expr: shared_alias + 10
     metrics:
-      - name: instant_bookings
-        alias: shared_alias
+    - name: instant_bookings
+      alias: shared_alias
 ---
 metric:
   name: bookings_offset_one_alien_day
@@ -973,8 +971,8 @@ metric:
   type_params:
     expr: bookings
     metrics:
-      - name: bookings
-        offset_window: 1 alien_day
+    - name: bookings
+      offset_window: 1 alien_day
 ---
 metric:
   name: bookings_alien_day_over_alien_day
@@ -983,14 +981,14 @@ metric:
   type_params:
     expr: bookings - bookings_offset / NULLIF(bookings_offset, 0)
     metrics:
-      - name: bookings
-        offset_window: 1 alien_day
-        alias: bookings_offset
-      - name: bookings
+    - name: bookings
+      offset_window: 1 alien_day
+      alias: bookings_offset
+    - name: bookings
 ---
 metric:
   name: trailing_7_days_bookings
-  description: "trailing 7 days bookings - cumulative metric with window"
+  description: trailing 7 days bookings - cumulative metric with window
   type: cumulative
   type_params:
     measure: bookings
@@ -999,11 +997,11 @@ metric:
 ---
 metric:
   name: trailing_7_days_bookings_offset_1_week
-  description: "trailing 7 days bookings offset by 1 week - offset_window metric using cumulative input"
+  description: trailing 7 days bookings offset by 1 week - offset_window metric using cumulative input
   type: derived
   type_params:
     expr: trailing_7_days_bookings_1_week_ago
     metrics:
-      - name: trailing_7_days_bookings
-        offset_window: 1 week
-        alias: trailing_7_days_bookings_1_week_ago
+    - name: trailing_7_days_bookings
+      offset_window: 1 week
+      alias: trailing_7_days_bookings_1_week_ago

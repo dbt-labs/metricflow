@@ -3,8 +3,8 @@ integration_test:
   name: multiple_dimensions
   description: Query one metric with multiple dimensions from different sources.
   model: SIMPLE_MODEL
-  metrics: ["views"]
-  group_bys: ["user__home_state_latest", "listing__is_lux_latest"]
+  metrics: [views]
+  group_bys: [user__home_state_latest, listing__is_lux_latest]
   check_query: |
     SELECT
       SUM(1) AS views
@@ -23,8 +23,8 @@ integration_test:
   name: groupby_local_identifier
   description: Query a metric and group by a local identifier.
   model: SIMPLE_MODEL
-  metrics: ["booking_value"]
-  group_bys: ["listing"]
+  metrics: [booking_value]
+  group_bys: [listing]
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
@@ -37,8 +37,8 @@ integration_test:
   name: groupby_local_identifier_and_dim
   description: Query a metric and group by a local identifier and local dimension.
   model: SIMPLE_MODEL
-  metrics: ["booking_value"]
-  group_bys: ["listing", "metric_time"]
+  metrics: [booking_value]
+  group_bys: [listing, metric_time]
   check_query: |
     SELECT
       SUM(booking_value) AS booking_value
@@ -53,8 +53,8 @@ integration_test:
   name: groupby_local_identifier_and_remote_dimension
   description: Query a metric and group by a local identifier and non local dimension.
   model: SIMPLE_MODEL
-  metrics: ["views"]
-  group_bys: ["user__home_state_latest", "listing"]
+  metrics: [views]
+  group_bys: [user__home_state_latest, listing]
   check_query: |
     SELECT
       SUM(1) AS views
@@ -73,8 +73,8 @@ integration_test:
   name: local_partition_dimension
   description: Query a metric and group by a partition dimension both in dundered and non dundered forms.
   model: SIMPLE_MODEL
-  metrics: ["identity_verifications"]
-  group_bys: ["metric_time", "verification__ds"]
+  metrics: [identity_verifications]
+  group_bys: [metric_time, verification__ds]
   check_query: |
     SELECT
       SUM(1) AS identity_verifications
@@ -88,8 +88,8 @@ integration_test:
   name: local_partition_dimension_with_other_dims
   description: Query a metric and group by a partition dimension both in dundered and non dundered forms.
   model: SIMPLE_MODEL
-  metrics: ["identity_verifications"]
-  group_bys: ["metric_time", "user__home_state"]
+  metrics: [identity_verifications]
+  group_bys: [metric_time, user__home_state]
   check_query: |
     SELECT
       SUM(1) AS identity_verifications
@@ -107,7 +107,7 @@ integration_test:
   name: query_dimension_only
   description: Query dimension only
   model: SIMPLE_MODEL
-  group_bys: ["user__home_state"]
+  group_bys: [user__home_state]
   check_query: |
     SELECT
       u.home_state AS user__home_state
@@ -119,7 +119,7 @@ integration_test:
   name: query_dimensions_only
   description: Query multiple dimensions without metrics
   model: SIMPLE_MODEL
-  group_bys: ["user__ds__day", "user__home_state"]
+  group_bys: [user__ds__day, user__home_state]
   check_query: |
     SELECT
       u.home_state AS user__home_state
@@ -133,7 +133,7 @@ integration_test:
   name: query_dimensions_from_different_tables
   description: Query multiple dimensions without metrics, requiring a join
   model: SIMPLE_MODEL
-  group_bys: ["user__home_state_latest", "listing__is_lux_latest"]
+  group_bys: [user__home_state_latest, listing__is_lux_latest]
   check_query: |
     SELECT
       u.home_state_latest AS user__home_state_latest
@@ -149,7 +149,7 @@ integration_test:
   name: query_time_dimension_without_granularity
   description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
   model: SIMPLE_MODEL
-  group_bys: [ "verification__ds"]
+  group_bys: [verification__ds]
   check_query: |
     SELECT
       v.ds as verification__ds__day
@@ -161,7 +161,7 @@ integration_test:
   name: query_non_default_time_dimension_without_granularity
   description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
   model: EXTENDED_DATE_MODEL
-  group_bys: [ "booking_monthly__ds"]
+  group_bys: [booking_monthly__ds]
   check_query: |
     SELECT
       ds AS booking_monthly__ds__month
@@ -173,7 +173,7 @@ integration_test:
   name: query_dimension_with_constraint_from_diff_source
   description: Query dimenension only with where constraint, where constraint requires a join
   model: SIMPLE_MODEL
-  group_bys: ["user__home_state_latest"]
+  group_bys: [user__home_state_latest]
   where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
   check_query: |
     SELECT
@@ -192,7 +192,7 @@ integration_test:
   name: metric_time_only
   description: Query metric_time alone
   model: SIMPLE_MODEL
-  group_bys: ["metric_time"]
+  group_bys: [metric_time]
   check_query: |
     SELECT
       {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
@@ -203,7 +203,7 @@ integration_test:
   name: metric_time_week
   description: Query metric_time alone with non-default granularity
   model: SIMPLE_MODEL
-  group_bys: ["metric_time__week"]
+  group_bys: [metric_time__week]
   check_query: |
     SELECT
       {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
@@ -214,7 +214,7 @@ integration_test:
   name: metric_time_date_part
   description: Query metric_time alone with date part
   model: SIMPLE_MODEL
-  group_by_objs: [{"name": "metric_time", "date_part": "dow"}]
+  group_by_objs: [{name: metric_time, date_part: dow}]
   check_query: |
     SELECT
       {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
@@ -225,7 +225,7 @@ integration_test:
   name: metric_time_with_other_dimensions
   description: Query metric_time with other dimensions and filters
   model: SIMPLE_MODEL
-  group_bys: ["metric_time", "metric_time__month", "user__home_state_latest", "listing__is_lux_latest"]
+  group_bys: [metric_time, metric_time__month, user__home_state_latest, listing__is_lux_latest]
   check_query: |
     SELECT
       {{ render_date_trunc("ts.ds", TimeGranularity.DAY) }} AS metric_time__day
@@ -249,8 +249,8 @@ integration_test:
   name: query_dimensions_with_time_constraint
   description: Query dimensions with time constraint
   model: SIMPLE_MODEL
-  group_bys: ["user__home_state_latest", "listing__country_latest", "metric_time__day"]
-  time_constraint: ["2020-01-03", "2020-01-03"]
+  group_bys: [user__home_state_latest, listing__country_latest, metric_time__day]
+  time_constraint: ['2020-01-03', '2020-01-03']
   check_query: |
     SELECT
       {{ render_date_trunc("t.ds", TimeGranularity.DAY) }} AS metric_time__day
@@ -269,7 +269,7 @@ integration_test:
   name: query_dimension_only_with_constraint
   description: Query dimenension only with where constraint
   model: SIMPLE_MODEL
-  group_bys: ["user__home_state"]
+  group_bys: [user__home_state]
   where_filter: "{{ render_dimension_template('user__home_state') }} = 'CA'"
   check_query: |
     SELECT
@@ -283,7 +283,7 @@ integration_test:
   name: min_max_only_categorical
   description: Get min and max of a categorical dimension
   model: SIMPLE_MODEL
-  group_bys: ["user__home_state"]
+  group_bys: [user__home_state]
   min_max_only: true
   check_query: |
     SELECT
@@ -301,7 +301,7 @@ integration_test:
   name: min_max_only_time
   description: Get min and max of a time dimension
   model: SIMPLE_MODEL
-  group_bys: ["verification__ds"]
+  group_bys: [verification__ds]
   min_max_only: true
   check_query: |
     SELECT
@@ -319,7 +319,7 @@ integration_test:
   name: min_max_only_time_month
   description: Get min and max of a time dimension with month granularity
   model: SIMPLE_MODEL
-  group_bys: ["verification__ds__month"]
+  group_bys: [verification__ds__month]
   min_max_only: true
   check_query: |
     SELECT
@@ -337,7 +337,7 @@ integration_test:
   name: min_max_metric_time
   description: Get min and max of metric_time
   model: SIMPLE_MODEL
-  group_bys: ["metric_time"]
+  group_bys: [metric_time]
   min_max_only: true
   check_query: |
     SELECT
@@ -349,7 +349,7 @@ integration_test:
   name: distinct_values_query_with_metric_filter
   description: Query without metrics using a metric filter
   model: SIMPLE_MODEL
-  group_bys: ["listing"]
+  group_bys: [listing]
   where_filter: "{{ render_metric_template('bookings', ['listing']) }} > 2"
   check_query: |
     SELECT
@@ -375,7 +375,7 @@ integration_test:
   name: sub_daily_metric_time
   description: Query metric_time alone with a sub-daily granularity
   model: SIMPLE_MODEL
-  group_bys: ["metric_time__hour"]
+  group_bys: [metric_time__hour]
   check_query: |
     SELECT
       {{ render_date_trunc("ts", TimeGranularity.HOUR) }} AS metric_time__hour
@@ -387,7 +387,7 @@ integration_test:
   name: sub_daily_time_dimension
   description: Query a time dimension alone with a sub-daily granularity
   model: SIMPLE_MODEL
-  group_bys: ["user__bio_added_ts__second"]
+  group_bys: [user__bio_added_ts__second]
   check_query: |
     SELECT
       {{ render_date_trunc("bio_added_ts", TimeGranularity.SECOND) }} AS user__bio_added_ts__second
@@ -399,7 +399,7 @@ integration_test:
   name: no_dedupe
   description: Query without dedupe
   model: SIMPLE_MODEL
-  group_bys: ["user__home_state", "metric_time__month"]
+  group_bys: [user__home_state, metric_time__month]
   apply_group_by: false
   where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
   check_query: |

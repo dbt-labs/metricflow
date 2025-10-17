@@ -11,21 +11,21 @@ semantic_model:
     agg_time_dimension: ds
 
   dimensions:
-    - name: ds
-      type: time
-      type_params:
-        time_granularity: day
-    - name: is_dog
-      type: categorical
-      is_partition: True
+  - name: ds
+    type: time
+    type_params:
+      time_granularity: day
+  - name: is_dog
+    type: categorical
+    is_partition: true
 
   measures:
-    - name: count_dogs
-      agg: sum
-      expr: 1
-      create_metric: True
+  - name: count_dogs
+    agg: sum
+    expr: 1
+    create_metric: true
 
   entities:
-    - name: id
-      type: primary
-      expr: "1"
+  - name: id
+    type: primary
+    expr: '1'

@@ -11,25 +11,25 @@ semantic_model:
     agg_time_dimension: dt
 
   measures:
-    - name: listings
-      expr: 1
-      agg: sum
+  - name: listings
+    expr: 1
+    agg: sum
 
   dimensions:
-    - name: dt
-      type: time
-      expr: created_at
-      type_params:
-        time_granularity: day
-    - name: created_at
-      type: time
-      type_params:
-        time_granularity: day
-    - name: country_latest
-      type: categorical
-      expr: country
+  - name: dt
+    type: time
+    expr: created_at
+    type_params:
+      time_granularity: day
+  - name: created_at
+    type: time
+    type_params:
+      time_granularity: day
+  - name: country_latest
+    type: categorical
+    expr: country
 
   entities:
-    - name: listing
-      type: primary
-      expr: listing_id
+  - name: listing
+    type: primary
+    expr: listing_id

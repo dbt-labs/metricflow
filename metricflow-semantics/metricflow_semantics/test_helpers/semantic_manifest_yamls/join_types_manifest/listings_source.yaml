@@ -8,10 +8,10 @@ semantic_model:
     alias: dim_listings_for_joins
 
   dimensions:
-    - name: country
-      type: categorical
+  - name: country
+    type: categorical
 
   entities:
-    - name: listing
-      type: primary
-      expr: listing_id
+  - name: listing
+    type: primary
+    expr: listing_id

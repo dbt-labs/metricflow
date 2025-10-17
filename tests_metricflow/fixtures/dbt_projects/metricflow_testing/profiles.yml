@@ -1,4 +1,5 @@
-bigquery:
+---
+bigquery  :
   target: dev
   outputs:
     dev:
@@ -27,7 +28,7 @@ databricks:
       token: "{{ env_var('DBT_ENV_SECRET_PASSWORD') }}"
       http_path: "{{ env_var('DBT_ENV_SECRET_HTTP_PATH') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
-postgres:
+postgres  :
   target: dev
   outputs:
     dev:
@@ -38,7 +39,7 @@ postgres:
       pass: "{{ env_var('DBT_ENV_SECRET_PASSWORD') }}"
       dbname: "{{ env_var('DBT_ENV_SECRET_DATABASE') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
-redshift:
+redshift  :
   target: dev
   outputs:
     dev:
@@ -49,7 +50,7 @@ redshift:
       password: "{{ env_var('DBT_ENV_SECRET_PASSWORD') }}"
       dbname: "{{ env_var('DBT_ENV_SECRET_DATABASE') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
-snowflake:
+snowflake :
   target: dev
   outputs:
     dev:
@@ -61,13 +62,13 @@ snowflake:
       warehouse: "{{ env_var('DBT_ENV_SECRET_WAREHOUSE') }}"
       database: "{{ env_var('DBT_ENV_SECRET_DATABASE') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
-duckdb:
+duckdb    :
   target: dev
   outputs:
     dev:
       type: duckdb
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
-trino:
+trino     :
   target: dev
   outputs:
     dev:

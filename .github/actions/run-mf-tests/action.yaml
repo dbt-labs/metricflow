@@ -1,33 +1,34 @@
-name: Run MetricFlow Tests
+---
+name       : Run MetricFlow Tests
 description: Runs MetricFlow using the specified Python version and engine settings.
 
-inputs:
+inputs     :
   python-version:
-    description: "Version of Python to use for testing."
-    required: False
-    default: "3.9"
+    description: Version of Python to use for testing.
+    required: false
+    default: '3.9'
   mf_sql_engine_url:
-    description: "URL for configuring SQL engine connection."
+    description: URL for configuring SQL engine connection.
     required: false
-    default: "duckdb://"
+    default: duckdb://
   mf_sql_engine_password:
-    description: "Password for configuring the SQL engine connection."
+    description: Password for configuring the SQL engine connection.
     required: false
-    default: ""
+    default: ''
   parallelism:
-    description: "How many tests to run in parallel. auto = # of cores."
+    description: 'How many tests to run in parallel. auto = # of cores.'
     required: false
-    default: "auto"
+    default: auto
   make-target:
-    description: "The target to use for the make command."
+    description: The target to use for the make command.
     required: false
-    default: "test"
+    default: test
   additional-pytest-options:
-    description: "Additional options to pass into pytest."
+    description: Additional options to pass into pytest.
     required: false
-    default: ""
+    default: ''
   hatch-environment-cache-config-json:
-    description: "Configuration JSON to be passed into the script to install `hatch` environments for caching."
+    description: Configuration JSON to be passed into the script to install `hatch` environments for caching.
     required: false
     default: >-
       {
@@ -37,23 +38,23 @@ inputs:
         ]
       }
 
-runs:
-  using: "composite"
+runs       :
+  using: composite
   steps:
   - uses: ./.github/actions/setup-python-env
     with:
-      python-version: "${{ inputs.python-version }}"
-      hatch-environment-cache-config-json: "${{ inputs.hatch-environment-cache-config-json }}"
+      python-version: ${{ inputs.python-version }}
+      hatch-environment-cache-config-json: ${{ inputs.hatch-environment-cache-config-json }}
 
   - name: Cache APT Packages
     uses: awalsh128/cache-apt-pkgs-action@v1.4.3
     with:
       packages: graphviz
-      version: "@latest"
+      version: '@latest'
 
   - name: Register `graphviz` plug-ins
     shell: bash
-    run: "sudo dot -c"
+    run: sudo dot -c
 
   - name: Run Tests w/ Python ${{ inputs.python-version }}
     shell: bash

@@ -3,8 +3,8 @@ integration_test:
   name: conversion_rate_metric_infinite_window
   description: Query a conversion metric that calculates the conversion rate
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate"]
-  group_bys: ["metric_time"]
+  metrics: [visit_buy_conversion_rate]
+  group_bys: [metric_time]
   check_query: |
     SELECT
       opportunities.metric_time AS metric_time__day
@@ -47,7 +47,7 @@ integration_test:
   name: conversion_rate_metric_no_group_by
   description: Query a conversion metric that calculates the conversion rate with no group bys
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate_7days"]
+  metrics: [visit_buy_conversion_rate_7days]
   check_query: |
     SELECT
       CAST(conversions.buys AS {{ double_data_type_name }}) / CAST(NULLIF(opportunities.visits, 0) AS {{ double_data_type_name }}) AS visit_buy_conversion_rate_7days
@@ -83,8 +83,8 @@ integration_test:
   name: conversion_rate_metric
   description: Query a conversion metric that calculates the conversion rate
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate_7days"]
-  group_bys: ["metric_time"]
+  metrics: [visit_buy_conversion_rate_7days]
+  group_bys: [metric_time]
   check_query: |
     SELECT
       opportunities.metric_time AS metric_time__day
@@ -127,8 +127,8 @@ integration_test:
   name: conversion_rate_metric_with_dimension
   description: Query a conversion metric that calculates the conversion rate without time dimension
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate_7days"]
-  group_bys: ["visit__referrer_id"]
+  metrics: [visit_buy_conversion_rate_7days]
+  group_bys: [visit__referrer_id]
   check_query: |
     SELECT
       opportunities.referrer_id AS visit__referrer_id
@@ -262,8 +262,8 @@ integration_test:
   name: conversion_rate_metric_with_constant_property
   description: Query a conversion metric that calculates the conversion rate held by a constant property
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate_by_session"]
-  group_bys: ["metric_time"]
+  metrics: [visit_buy_conversion_rate_by_session]
+  group_bys: [metric_time]
   check_query: |
     SELECT
       opportunities.metric_time AS metric_time__day
@@ -308,8 +308,8 @@ integration_test:
   name: conversion_rate_metric_with_constant_property_multiple_dimensions
   description: Query a conversion metric that calculates the conversion rate held by a constant property
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate_by_session"]
-  group_bys: ["metric_time", "visit__referrer_id"]
+  metrics: [visit_buy_conversion_rate_by_session]
+  group_bys: [metric_time, visit__referrer_id]
   check_query: |
     SELECT
       opportunities.referrer_id AS visit__referrer_id

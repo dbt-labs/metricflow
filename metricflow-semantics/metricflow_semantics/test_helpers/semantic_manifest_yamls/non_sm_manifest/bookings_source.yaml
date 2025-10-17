@@ -11,22 +11,22 @@ semantic_model:
     agg_time_dimension: dt
 
   measures:
-    - name: bookings
-      expr: "1"
-      agg: sum
-      create_metric: true
+  - name: bookings
+    expr: '1'
+    agg: sum
+    create_metric: true
 
   dimensions:
-    - name: is_instant
-      type: categorical
-    - name: dt
-      type: time
-      type_params:
-        time_granularity: day
+  - name: is_instant
+    type: categorical
+  - name: dt
+    type: time
+    type_params:
+      time_granularity: day
 
   primary_entity: booking
 
   entities:
-    - name: listing
-      type: foreign
-      expr: listing_id
+  - name: listing
+    type: foreign
+    expr: listing_id

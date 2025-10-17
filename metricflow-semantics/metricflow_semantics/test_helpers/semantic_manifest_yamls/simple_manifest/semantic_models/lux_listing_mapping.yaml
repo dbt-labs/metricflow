@@ -8,9 +8,9 @@ semantic_model:
     alias: dim_lux_listing_id_mapping
 
   entities:
-    - name: listing
-      type: primary
-      expr: listing_id
-    - name: lux_listing
-      type: foreign
-      expr: lux_listing_id
+  - name: listing
+    type: primary
+    expr: listing_id
+  - name: lux_listing
+    type: foreign
+    expr: lux_listing_id

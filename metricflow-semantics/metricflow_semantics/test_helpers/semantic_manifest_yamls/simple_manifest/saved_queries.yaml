@@ -4,29 +4,29 @@ saved_query:
   description: Booking-related metrics that are of the highest priority.
   query_params:
     metrics:
-      - bookings
-      - instant_bookings
+    - bookings
+    - instant_bookings
     group_by:
-      - TimeDimension('metric_time', 'day')
-      - Dimension('listing__capacity_latest')
+    - TimeDimension('metric_time', 'day')
+    - Dimension('listing__capacity_latest')
     where:
-      - "{{ Dimension('listing__capacity_latest') }} > 3"
+    - "{{ Dimension('listing__capacity_latest') }} > 3"
 ---
 saved_query:
   name: p0_booking_with_order_by_and_limit
   description: p0 bookings with order by and limit
   query_params:
     metrics:
-      - bookings
-      - views
+    - bookings
+    - views
     group_by:
-      - TimeDimension('metric_time', 'day')
-      - Dimension('listing__capacity_latest')
+    - TimeDimension('metric_time', 'day')
+    - Dimension('listing__capacity_latest')
     order_by:
-      - TimeDimension('metric_time', 'day').descending(True)
-      - Dimension('listing__capacity_latest')
-      - Metric('bookings').descending(True)
-      - Metric('views')
+    - TimeDimension('metric_time', 'day').descending(True)
+    - Dimension('listing__capacity_latest')
+    - Metric('bookings').descending(True)
+    - Metric('views')
     limit: 10
 ---
 saved_query:
@@ -36,9 +36,9 @@ saved_query:
     adjusting the time constraint.
   query_params:
     metrics:
-      - trailing_2_months_revenue
+    - trailing_2_months_revenue
     group_by:
-      - TimeDimension('metric_time', 'day')
+    - TimeDimension('metric_time', 'day')
 ---
 saved_query:
   name: saved_query_with_metric_joins_and_filter
@@ -49,20 +49,20 @@ saved_query:
     to timestamp types the way other engines do.
   query_params:
     metrics:
-      - bookings
-      - views
-      - bookings_per_view
+    - bookings
+    - views
+    - bookings_per_view
     group_by:
-      - Dimension('listing__capacity_latest')
+    - Dimension('listing__capacity_latest')
     where:
-      - "{{ Dimension('listing__is_lux_latest') }}"
-      - "{{ TimeDimension('metric_time', 'day') }} >= '2020-01-02'"
+    - "{{ Dimension('listing__is_lux_latest') }}"
+    - "{{ TimeDimension('metric_time', 'day') }} >= '2020-01-02'"
 ---
 saved_query:
   name: dimensions_only
   description: Query without metrics
   query_params:
     group_by:
-      - Dimension('listing__capacity_latest')
-      - TimeDimension('metric_time', 'month')
+    - Dimension('listing__capacity_latest')
+    - TimeDimension('metric_time', 'month')
     metrics: []

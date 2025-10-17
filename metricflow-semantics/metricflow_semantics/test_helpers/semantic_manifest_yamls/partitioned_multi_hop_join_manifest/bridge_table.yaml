@@ -11,24 +11,24 @@ semantic_model:
     agg_time_dimension: ds_partitioned
 
   measures:
-    - name: account_customer_combos
-      expr: account_id || customer_id
-      agg: count_distinct
-      create_metric: true
+  - name: account_customer_combos
+    expr: account_id || customer_id
+    agg: count_distinct
+    create_metric: true
 
   dimensions:
-    - name: extra_dim
-      type: categorical
-    - name: ds_partitioned
-      type: time
-      type_params:
-        time_granularity: day
-      is_partition: true
+  - name: extra_dim
+    type: categorical
+  - name: ds_partitioned
+    type: time
+    type_params:
+      time_granularity: day
+    is_partition: true
 
   primary_entity: bridge_account
 
   entities:
-    - name: account_id
-      type: unique
-    - name: customer_id
-      type: foreign
+  - name: account_id
+    type: unique
+  - name: customer_id
+    type: foreign

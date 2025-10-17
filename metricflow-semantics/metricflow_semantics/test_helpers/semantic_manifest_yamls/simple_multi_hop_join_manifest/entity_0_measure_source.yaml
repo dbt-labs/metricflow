@@ -11,15 +11,15 @@ semantic_model:
     agg_time_dimension: ds
 
   measures:
-    - name: entity_0_measure
-      agg: sum
+  - name: entity_0_measure
+    agg: sum
 
   dimensions:
-    - name: ds
-      type: time
-      type_params:
-        time_granularity: day
+  - name: ds
+    type: time
+    type_params:
+      time_granularity: day
 
   entities:
-    - name: entity_0
-      type: primary
+  - name: entity_0
+    type: primary

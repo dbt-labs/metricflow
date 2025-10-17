@@ -1,78 +1,78 @@
 ---
 metrics:
-  - name: new_customers
-    type: SIMPLE
-    type_params:
-      measure: new_customers
-    label: "New Customer"
-  - name: quick_buy_transactions
-    type: SIMPLE
-    type_params:
-      measure: quick_buy_transactions
-    label: "Quick Buy Transactions"
-  - name: quick_buy_amount_usd
-    type: SIMPLE
-    type_params:
-      measure: quick_buy_amount_usd
-    label: "Quick Buy Amount (USD)"
-  - name: cancellations
-    type: SIMPLE
-    type_params:
-      measure: cancellations_usd
-    label: "Cancellations"
-  - name: transactions
-    type: SIMPLE
-    type_params:
-      measure: transactions
-    label: "Transactions"
-  - name: alterations
-    type: SIMPLE
-    type_params:
-      measure: alterations_usd
-    label: "Alterations"
-  - name: transaction_amount
-    type: SIMPLE
-    type_params:
-      measure: transaction_amount_usd
-    label: "Transaction Amount (USD)"
-  - name: cancellation_rate
-    type: ratio
-    type_params:
-      numerator: cancellations
-      denominator: transaction_amount
-    label: "Cancellation Rate"
-  - name: revenue_usd
-    type: derived
-    type_params:
-      expr: transaction_amount - cancellations + alterations
-      metrics:
-        - name: transaction_amount
-        - name: cancellations
-        - name: alterations
-    label: "Revenue (USD)"
-  - name: cancellations_mx
-    type: SIMPLE
-    type_params:
-      measure: cancellations_usd
-    filter: |
-      {{ Dimension('customer__customer_country') }} = 'MX'
-    label: "Cancellations in Mexico"
-  - name: transaction_usd_na
-    type: SIMPLE
-    type_params:
-      measure: transaction_amount_usd
-    filter: |
-      {{ Dimension('country__region', entity_path=['customer']) }} = 'NA'
-    label: "Transaction Amount in NA"
-  - name: cumulative_transactions
-    label: "Total Transactions"
-    type: cumulative
-    type_params:
-      measure: transactions
-  - name: cumulative_transactions_in_last_7_days
-    label: "Total Transaction in the Last 7 Days"
-    type: cumulative
-    type_params:
-      measure: transactions
-      cumulative_type_params:
-        window: 7 days
+- name: new_customers
+  type: SIMPLE
+  type_params:
+    measure: new_customers
+  label: New Customer
+- name: quick_buy_transactions
+  type: SIMPLE
+  type_params:
+    measure: quick_buy_transactions
+  label: Quick Buy Transactions
+- name: quick_buy_amount_usd
+  type: SIMPLE
+  type_params:
+    measure: quick_buy_amount_usd
+  label: Quick Buy Amount (USD)
+- name: cancellations
+  type: SIMPLE
+  type_params:
+    measure: cancellations_usd
+  label: Cancellations
+- name: transactions
+  type: SIMPLE
+  type_params:
+    measure: transactions
+  label: Transactions
+- name: alterations
+  type: SIMPLE
+  type_params:
+    measure: alterations_usd
+  label: Alterations
+- name: transaction_amount
+  type: SIMPLE
+  type_params:
+    measure: transaction_amount_usd
+  label: Transaction Amount (USD)
+- name: cancellation_rate
+  type: ratio
+  type_params:
+    numerator: cancellations
+    denominator: transaction_amount
+  label: Cancellation Rate
+- name: revenue_usd
+  type: derived
+  type_params:
+    expr: transaction_amount - cancellations + alterations
+    metrics:
+    - name: transaction_amount
+    - name: cancellations
+    - name: alterations
+  label: Revenue (USD)
+- name: cancellations_mx
+  type: SIMPLE
+  type_params:
+    measure: cancellations_usd
+  filter: |
+    {{ Dimension('customer__customer_country') }} = 'MX'
+  label: Cancellations in Mexico
+- name: transaction_usd_na
+  type: SIMPLE
+  type_params:
+    measure: transaction_amount_usd
+  filter: |
+    {{ Dimension('country__region', entity_path=['customer']) }} = 'NA'
+  label: Transaction Amount in NA
+- name: cumulative_transactions
+  label: Total Transactions
+  type: cumulative
+  type_params:
+    measure: transactions
+- name: cumulative_transactions_in_last_7_days
+  label: Total Transaction in the Last 7 Days
+  type: cumulative
+  type_params:
+    measure: transactions
+    cumulative_type_params:
+      window: 7 days

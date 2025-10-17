@@ -1,6 +1,7 @@
+---
 name: Pre-Merge Linting
 
-on:
+on  :
   workflow_dispatch:
   # run these jobs against the PR + master.  To run tests against just the PR, use "push" instead of "pull_request"
   pull_request:
@@ -8,10 +9,10 @@ on:
     # edited = title, body, or the base branch of the PR is modified
     # synchronize = commit(s) pushed to the pull request
     types:
-      - opened
-      - edited
-      - reopened
-      - synchronize
+    - opened
+    - edited
+    - reopened
+    - synchronize
 
 jobs:
   pre-commit:
@@ -19,19 +20,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Check-out the repo
-        uses: actions/checkout@v4
+    - name: Check-out the repo
+      uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-python-env
-        with:
-          hatch-environment-cache-config-json: >-
-            {
-              "configs": [
-                {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"}
-              ]
-            }
-          cache-pre-commit-environment: true
+    - uses: ./.github/actions/setup-python-env
+      with:
+        hatch-environment-cache-config-json: >-
+          {
+            "configs": [
+              {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"}
+            ]
+          }
+        cache-pre-commit-environment: true
 
-      - name: Run Linter
-        run: >
-          hatch -v run dev-env:pre-commit run --verbose --show-diff-on-failure --color=always --all-files
+    - name: Run Linter
+      run: >
+        hatch -v run dev-env:pre-commit run --verbose --show-diff-on-failure --color=always --all-files

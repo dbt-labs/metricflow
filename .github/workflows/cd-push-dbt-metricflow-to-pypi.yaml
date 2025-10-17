@@ -1,10 +1,11 @@
+---
 name: Publish dbt-metricflow Release
-on:
+on  :
   workflow_dispatch:
   push:
     # Tag format is <package>/v<pep440_semantic_version>
     tags:
-      - "dbt-metricflow/v[0-9]+.[0-9]+.[0-9]+*"
+    - dbt-metricflow/v[0-9]+.[0-9]+.[0-9]+*
 
 jobs:
   pypi-publish:
@@ -15,16 +16,16 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Check-out the repo
-        uses: actions/checkout@v4
+    - name: Check-out the repo
+      uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-python-env
+    - uses: ./.github/actions/setup-python-env
 
-      - name: Build `dbt-metricflow` package
-        working-directory: ./dbt-metricflow
-        run: hatch build
+    - name: Build `dbt-metricflow` package
+      working-directory: ./dbt-metricflow
+      run: hatch build
 
-      - name: Publish `dbt-metricflow` package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: ./dbt-metricflow/dist/
+    - name: Publish `dbt-metricflow` package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: ./dbt-metricflow/dist/

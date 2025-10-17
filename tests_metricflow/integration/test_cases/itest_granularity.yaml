@@ -3,8 +3,8 @@ integration_test:
   name: query_granularity_for_sum_day
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["metric_time__day"]
+  metrics: [bookings]
+  group_bys: [metric_time__day]
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -17,8 +17,8 @@ integration_test:
   name: query_granularity_for_sum_week
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["metric_time__week"]
+  metrics: [bookings]
+  group_bys: [metric_time__week]
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -31,8 +31,8 @@ integration_test:
   name: query_granularity_for_sum_month
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["metric_time__month"]
+  metrics: [bookings]
+  group_bys: [metric_time__month]
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -45,8 +45,8 @@ integration_test:
   name: query_granularity_for_sum_quarter
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["metric_time__quarter"]
+  metrics: [bookings]
+  group_bys: [metric_time__quarter]
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -59,8 +59,8 @@ integration_test:
   name: query_granularity_for_sum_year
   description: Query a sum metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["metric_time__year"]
+  metrics: [bookings]
+  group_bys: [metric_time__year]
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -73,8 +73,8 @@ integration_test:
   name: query_granularity_for_count_distinct_day
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["unique_listings_booked"]
-  group_bys: ["metric_time__day"]
+  metrics: [unique_listings_booked]
+  group_bys: [metric_time__day]
   check_query: |
     SELECT
       COUNT(DISTINCT listing_id) AS unique_listings_booked
@@ -87,8 +87,8 @@ integration_test:
   name: query_granularity_for_count_distinct_week
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["unique_listings_booked"]
-  group_bys: ["metric_time__week"]
+  metrics: [unique_listings_booked]
+  group_bys: [metric_time__week]
   check_query: |
     SELECT
       COUNT(DISTINCT listing_id) AS unique_listings_booked
@@ -101,8 +101,8 @@ integration_test:
   name: query_granularity_for_count_distinct_month
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["unique_listings_booked"]
-  group_bys: ["metric_time__month"]
+  metrics: [unique_listings_booked]
+  group_bys: [metric_time__month]
   check_query: |
     SELECT
       COUNT(DISTINCT listing_id) AS unique_listings_booked
@@ -115,8 +115,8 @@ integration_test:
   name: query_granularity_for_count_distinct_quarter
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["unique_listings_booked"]
-  group_bys: ["metric_time__quarter"]
+  metrics: [unique_listings_booked]
+  group_bys: [metric_time__quarter]
   check_query: |
     SELECT
       COUNT(DISTINCT listing_id) AS unique_listings_booked
@@ -129,8 +129,8 @@ integration_test:
   name: query_granularity_for_count_distinct_year
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["unique_listings_booked"]
-  group_bys: ["metric_time__year"]
+  metrics: [unique_listings_booked]
+  group_bys: [metric_time__year]
   check_query: |
     SELECT
       COUNT(DISTINCT listing_id) AS unique_listings_booked
@@ -143,8 +143,8 @@ integration_test:
   name: query_granularity_for_joined_dundered_dimension_day
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["listing__ds__day"]
+  metrics: [bookings]
+  group_bys: [listing__ds__day]
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -159,8 +159,8 @@ integration_test:
   name: query_granularity_for_joined_dundered_dimension_month
   description: Query a count distinct metric by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["listing__ds__month"]
+  metrics: [bookings]
+  group_bys: [listing__ds__month]
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -175,9 +175,9 @@ integration_test:
   name: metric_with_non_day_granularity_expected_boundary
   description: Query a metric at a time granularity on expected date boundaries
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings_monthly"]
-  group_bys: ["metric_time"]
-  time_constraint: ["2020-01-01", "2020-02-29"]
+  metrics: [bookings_monthly]
+  group_bys: [metric_time]
+  time_constraint: ['2020-01-01', '2020-02-29']
   check_query: |
     SELECT
       SUM(bookings_monthly) AS bookings_monthly
@@ -191,9 +191,9 @@ integration_test:
   name: metric_with_non_day_granularity_on_non_boundaries
   description: Query a metric at a time granularity on non  date boundaries
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings_monthly"]
-  group_bys: ["metric_time"]
-  time_constraint: ["2020-01-15", "2020-02-15"]
+  metrics: [bookings_monthly]
+  group_bys: [metric_time]
+  time_constraint: ['2020-01-15', '2020-02-15']
   check_query: |
     SELECT
       SUM(bookings_monthly) AS bookings_monthly
@@ -207,9 +207,9 @@ integration_test:
   name: weekly_metric_on_non_boundaries
   description: Query a metric from a sql query by time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["metric_time__week"]
-  time_constraint: ["2020-01-15", "2020-01-22"]
+  metrics: [bookings]
+  group_bys: [metric_time__week]
+  time_constraint: ['2020-01-15', '2020-01-22']
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -223,9 +223,9 @@ integration_test:
   name: daily_metric_with_monthly_time_dimension
   description: Query a metric with a month-granularity time dimensions. Filter should expand to requested granularity.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["metric_time__month"]
-  time_constraint: ["2020-01-01", "2020-01-02"]
+  metrics: [bookings]
+  group_bys: [metric_time__month]
+  time_constraint: ['2020-01-01', '2020-01-02']
   check_query: |
     SELECT
       SUM(booking) AS bookings
@@ -239,9 +239,9 @@ integration_test:
   name: metrics_with_different_time_granularities
   description: Query two metrics with different time granularities.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings_monthly", "bookings"]
-  group_bys: ["metric_time"]
-  time_constraint: ["2020-01-01", "2020-02-29"]
+  metrics: [bookings_monthly, bookings]
+  group_bys: [metric_time]
+  time_constraint: ['2020-01-01', '2020-02-29']
   check_query: |
     SELECT
       SUM(bookings_monthly) as bookings_monthly
@@ -279,9 +279,9 @@ integration_test:
   name: metrics_with_different_time_granularities_and_no_metric_time
   description: Query two metrics with different time granularities with a common dimension, but no metric time.
   model: EXTENDED_DATE_MODEL
-  metrics: ["bookings_monthly", "bookings"]
-  group_bys: ["listing__ds"]
-  time_constraint: ["2020-01-15", "2020-02-15"]
+  metrics: [bookings_monthly, bookings]
+  group_bys: [listing__ds]
+  time_constraint: ['2020-01-15', '2020-02-15']
   check_query: |
     SELECT
       a.bookings_monthly AS bookings_monthly
@@ -315,8 +315,8 @@ integration_test:
   name: simple_metric_with_custom_granularity
   description: A simple metric queried with a custom granularity
   model: SIMPLE_MODEL
-  metrics: [ "bookings"]
-  group_bys: ["booking__ds__alien_day"]
+  metrics: [bookings]
+  group_bys: [booking__ds__alien_day]
   check_query: |
     SELECT
       b.alien_day AS booking__ds__alien_day
@@ -330,8 +330,8 @@ integration_test:
   name: simple_metric_with_custom_granularity_and_join
   description: A simple metric queried with a custom granularity
   model: SIMPLE_MODEL
-  metrics: [ "bookings"]
-  group_bys: ["listing__ds__alien_day"]
+  metrics: [bookings]
+  group_bys: [listing__ds__alien_day]
   check_query: |
     SELECT
       c.alien_day AS listing__ds__alien_day
@@ -347,8 +347,8 @@ integration_test:
   name: cumulative_metric_with_custom_granularity
   description: A cumulative metric queried with a custom granularity
   model: SIMPLE_MODEL
-  metrics: [ "trailing_2_months_revenue"]
-  group_bys: ["metric_time__alien_day"]
+  metrics: [trailing_2_months_revenue]
+  group_bys: [metric_time__alien_day]
   check_query: |
     SELECT
       metric_time__alien_day
@@ -377,8 +377,8 @@ integration_test:
   name: derived_offset_metric_with_custom_granularity
   description: A derived metric queried with a custom granularity
   model: SIMPLE_MODEL
-  metrics: [ "booking_fees_last_week_per_booker_this_week"]
-  group_bys: ["metric_time__alien_day"]
+  metrics: [booking_fees_last_week_per_booker_this_week]
+  group_bys: [metric_time__alien_day]
   check_query: |
     SELECT
       metric_time__alien_day
@@ -415,8 +415,8 @@ integration_test:
   name: multiple_metrics_with_custom_granularity
   description: A derived metric queried with a custom granularity
   model: SIMPLE_MODEL
-  metrics: [ "bookings", "listings"]
-  group_bys: ["metric_time__alien_day", "listing__ds__month"]
+  metrics: [bookings, listings]
+  group_bys: [metric_time__alien_day, listing__ds__month]
   check_query: |
     SELECT
       COALESCE(subq_10.metric_time__alien_day, subq_16.metric_time__alien_day) AS metric_time__alien_day
@@ -454,7 +454,7 @@ integration_test:
   name: simple_metric_with_custom_granularity_filter
   description: Simple metric queried with a filter on a custom grain, where that grain is not used in the group by.
   model: SIMPLE_MODEL
-  metrics: ["bookings"]
+  metrics: [bookings]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('listing__ds', 'alien_day'), start_time="2019-12-20") }}
   check_query: |
@@ -469,8 +469,8 @@ integration_test:
   name: simple_metric_with_custom_granularity_in_filter_and_group_by
   description: Simple metric queried with a filter on a custom grain, where that grain is also used in the group by.
   model: SIMPLE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["listing__ds__alien_day"]
+  metrics: [bookings]
+  group_bys: [listing__ds__alien_day]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('listing__ds', 'alien_day'), start_time="2019-12-20") }}
   check_query: |
@@ -488,7 +488,7 @@ integration_test:
   name: test_no_metrics_with_custom_granularity_filter
   description: Group by items only queried with a filter on a custom grain, where that grain is not used in the group by.
   model: SIMPLE_MODEL
-  group_bys: ["metric_time__day"]
+  group_bys: [metric_time__day]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('listing__ds', 'alien_day'), start_time="2019-12-20") }}
   check_query: |
@@ -505,7 +505,7 @@ integration_test:
   name: test_no_metrics_with_custom_granularity_in_filter_and_group_by
   description: Group by items only queried with a filter on a custom grain, where that grain is also used in the group by.
   model: SIMPLE_MODEL
-  group_bys: ["listing__ds__alien_day"]
+  group_bys: [listing__ds__alien_day]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('listing__ds', 'alien_day'), start_time="2019-12-20") }}
   check_query: |
@@ -521,8 +521,8 @@ integration_test:
   name: test_simple_metric_with_multi_hop_custom_granularity
   description: Test querying a simple metric with a custom grain on a multi-hop dimension
   model: SIMPLE_MODEL
-  metrics: ["bookings"]
-  group_bys: ["listing__user__ds__alien_day"]
+  metrics: [bookings]
+  group_bys: [listing__user__ds__alien_day]
   check_query: |
     SELECT
       ts.alien_day AS listing__user__ds__alien_day
@@ -539,8 +539,8 @@ integration_test:
   name: test_offset_metric_with_custom_granularity_filter_not_in_group_by
   description: Test querying a simple metric with a custom grain on a multi-hop dimension
   model: SIMPLE_MODEL
-  metrics: ["bookings_5_day_lag"]
-  group_bys: ["metric_time__day"]
+  metrics: [bookings_5_day_lag]
+  group_bys: [metric_time__day]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('metric_time', 'alien_day'), start_time="2020-01-01") }}
   check_query: |
@@ -557,8 +557,8 @@ integration_test:
   name: test_conversion_metric_with_custom_granularity
   description: Test querying a conversion metric with a custom grain
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate"]
-  group_bys: ["metric_time__alien_day"]
+  metrics: [visit_buy_conversion_rate]
+  group_bys: [metric_time__alien_day]
   check_query: |
     SELECT
       metric_time__alien_day
@@ -633,8 +633,8 @@ integration_test:
   name: test_windowed_conversion_metric_with_custom_granularity
   description: Test querying a windowed conversion metric with a custom grain
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate_7days"]
-  group_bys: ["metric_time__alien_day"]
+  metrics: [visit_buy_conversion_rate_7days]
+  group_bys: [metric_time__alien_day]
   check_query: |
     SELECT
       metric_time__alien_day
@@ -712,8 +712,8 @@ integration_test:
   name: test_conversion_metric_with_custom_granularity_filter
   description: Test querying a conversion metric with a custom grain in the filter (also in group by)
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate"]
-  group_bys: ["metric_time__alien_day"]
+  metrics: [visit_buy_conversion_rate]
+  group_bys: [metric_time__alien_day]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('metric_time', 'alien_day'), start_time="2019-12-20") }}
   check_query: |
@@ -852,7 +852,7 @@ integration_test:
   name: test_conversion_metric_with_custom_granularity_filter_not_in_group_by
   description: Test querying a conversion metric with a custom grain in the filter that's not in the group by
   model: SIMPLE_MODEL
-  metrics: ["visit_buy_conversion_rate"]
+  metrics: [visit_buy_conversion_rate]
   where_filter: |
     {{ render_time_constraint(render_time_dimension_template('metric_time', 'alien_day'), start_time="2019-12-20") }}
   check_query: |
@@ -939,8 +939,8 @@ integration_test:
   name: test_join_to_time_spine_metric_grouped_by_custom_grain
   description: Test a join to time spine metric with custom grain in group by
   model: SIMPLE_MODEL
-  metrics: ["bookings_join_to_time_spine"]
-  group_bys: ["metric_time__alien_day"]
+  metrics: [bookings_join_to_time_spine]
+  group_bys: [metric_time__alien_day]
   check_query: |
     SELECT
       subq_6.metric_time__alien_day
@@ -966,8 +966,8 @@ integration_test:
   name: custom_offset_window
   description: Test querying a metric with a custom offset window
   model: SIMPLE_MODEL
-  metrics: ["bookings_offset_one_alien_day"]
-  group_bys: ["metric_time__day"]
+  metrics: [bookings_offset_one_alien_day]
+  group_bys: [metric_time__day]
   check_query: |
     WITH cte AS (
       SELECT
@@ -1028,8 +1028,8 @@ integration_test:
   name: custom_offset_window_with_grain_and_date_part
   description: Test querying a metric with a custom offset window
   model: SIMPLE_MODEL
-  metrics: ["bookings_offset_one_alien_day"]
-  group_by_objs: [{"name": "booking__ds", "grain": "week"}, {"name": "metric_time", "date_part": "month"}, {"name": "booking__ds", "grain": "alien_day"}]
+  metrics: [bookings_offset_one_alien_day]
+  group_by_objs: [{name: booking__ds, grain: week}, {name: metric_time, date_part: month}, {name: booking__ds, grain: alien_day}]
   check_query: |
     WITH cte AS (
       SELECT
