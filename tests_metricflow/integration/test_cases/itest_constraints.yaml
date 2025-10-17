@@ -2,8 +2,8 @@ integration_test:
   name: test_overlapping_constraint_dimensions
   description: Query a metric with a constraint that was requested as a dimension
   model: SIMPLE_MODEL
-  metrics: [booking_value]
-  group_bys: [metric_time, booking__is_instant]
+  metrics: ["booking_value"]
+  group_bys: ["metric_time", "booking__is_instant"]
   where_filter: '{{ render_dimension_template("booking__is_instant") }}'
   check_query: |
     SELECT SUM(booking_value) AS booking_value
@@ -19,8 +19,8 @@ integration_test:
   name: test_constraint_non_requested_dimensions
   description: Query a metric with a constraint that was not requested as a dimension
   model: SIMPLE_MODEL
-  metrics: [booking_value]
-  group_bys: [metric_time]
+  metrics: ["booking_value"]
+  group_bys: ["metric_time"]
   where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT SUM(booking_value) AS booking_value
@@ -33,8 +33,8 @@ integration_test:
   name: test_query_with_constraint_on_joined_dimension
   description: Query a metric with a constraint that was not requested as a dimension and is joined from another semantic model
   model: SIMPLE_MODEL
-  metrics: [booking_value]
-  group_bys: [booking__is_instant]
+  metrics: ["booking_value"]
+  group_bys: ["booking__is_instant"]
   where_filter: "{{ render_dimension_template('listing__country_latest') }} = 'us'"
   check_query: |
     SELECT SUM(booking_value) AS booking_value
@@ -48,9 +48,9 @@ integration_test:
   name: test_time_constraint
   description: Test a time constraint.
   model: SIMPLE_MODEL
-  metrics: [booking_value]
-  group_bys: [metric_time]
-  time_constraint: ['2020-01-01', '2020-01-01']
+  metrics: ["booking_value"]
+  group_bys: ["metric_time"]
+  time_constraint: ["2020-01-01", "2020-01-01"]
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
       , ds AS metric_time__day
@@ -63,10 +63,10 @@ integration_test:
   name: test_time_constraint_with_addition_dimension
   description: Test a time constraint with another dimension.
   model: SIMPLE_MODEL
-  metrics: [booking_value]
-  group_bys: [metric_time]
+  metrics: ["booking_value"]
+  group_bys: ["metric_time"]
   where_filter: "{{ render_dimension_template('booking__is_instant') }}"
-  time_constraint: ['2020-01-01', '2020-01-01']
+  time_constraint: ["2020-01-01", "2020-01-01"]
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
       , ds AS metric_time__day
@@ -79,8 +79,8 @@ integration_test:
   name: test_bool_dim
   description: Test a time constraint with a boolean
   model: SIMPLE_MODEL
-  metrics: [booking_value]
-  group_bys: [metric_time, booking__is_instant]
+  metrics: ["booking_value"]
+  group_bys: ["metric_time", "booking__is_instant"]
   where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT  SUM(booking_value) AS booking_value
@@ -95,8 +95,8 @@ integration_test:
   name: test_int_dim
   description: Test a time constraint with an integer
   model: SIMPLE_MODEL
-  metrics: [booking_value]
-  group_bys: [metric_time]
+  metrics: ["booking_value"]
+  group_bys: ["metric_time"]
   where_filter: "{{ render_dimension_template('listing__capacity_latest') }} >= 4"
   check_query: |
     SELECT  SUM(b.booking_value) AS booking_value
@@ -110,9 +110,9 @@ integration_test:
   name: test_time_constraint_on_time_dimension_with_an_expression
   description: Test a time constraint with an expr dimensions
   model: SIMPLE_MODEL
-  metrics: [listings]
-  group_bys: [metric_time]
-  time_constraint: ['2020-01-01', '2020-01-02']
+  metrics: ["listings"]
+  group_bys: ["metric_time"]
+  time_constraint: ["2020-01-01", "2020-01-02"]
   check_query: |
     SELECT  SUM(1) AS listings
       , created_at AS metric_time__day
@@ -124,8 +124,8 @@ integration_test:
   name: test_metric_time_in_where
   description: Tests having metric_time in the where clause constraint.
   model: SIMPLE_MODEL
-  metrics: [bookings]
-  group_bys: [metric_time]
+  metrics: ["bookings"]
+  group_bys: ["metric_time"]
   where_filter: "{{ render_time_constraint('metric_time__day', '2020-01-01', '2021-01-02') }}"
   check_query: |
     SELECT
@@ -139,8 +139,8 @@ integration_test:
   name: test_ambiguous_metric_time_in_query_filter
   description: Tests having metric_time without a grain in the query filter.
   model: SIMPLE_MODEL
-  metrics: [bookings]
-  group_bys: [metric_time]
+  metrics: ["bookings"]
+  group_bys: ["metric_time"]
   where_filter: "{{ render_time_dimension_template('metric_time') }} = {{ cast_to_ts('2020-01-01') }}"
   check_query: |
     SELECT
@@ -155,9 +155,9 @@ integration_test:
   description: |
     Tests a filter on the measure source with a joined in group by item that includes post-filter null values
   model: SIMPLE_MODEL
-  metrics: [bookings]
-  group_bys: [listing__is_lux_latest]
-  where_filter: NOT {{ render_dimension_template('booking__is_instant') }}
+  metrics: ["bookings"]
+  group_bys: ["listing__is_lux_latest"]
+  where_filter: "NOT {{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT
       SUM(1) AS bookings
@@ -172,8 +172,8 @@ integration_test:
   description: |
     Tests a filter on a joined in dimension that allows post-filter null values
   model: SIMPLE_MODEL
-  metrics: [bookings]
-  group_bys: [listing__is_lux_latest]
+  metrics: ["bookings"]
+  group_bys: ["listing__is_lux_latest"]
   where_filter: |
     NOT {{ render_dimension_template('listing__is_lux_latest') }}
       OR {{ render_dimension_template('listing__is_lux_latest') }} IS NULL
@@ -191,8 +191,8 @@ integration_test:
   description: |
     Tests a filter on a joined in dimension AND a measure source dimension
   model: SIMPLE_MODEL
-  metrics: [bookings]
-  group_bys: [listing__is_lux_latest]
+  metrics: ["bookings"]
+  group_bys: ["listing__is_lux_latest"]
   where_filter: |
     NOT {{ render_dimension_template('booking__is_instant') }}
       AND (
@@ -214,7 +214,7 @@ integration_test:
     Tests a filter on a joined in dimension AND a measure source dimension
   model: SIMPLE_MODEL
   metrics: []
-  group_bys: [listing__is_lux_latest, booking__is_instant]
+  group_bys: ["listing__is_lux_latest", "booking__is_instant"]
   where_filter: |
     NOT {{ render_dimension_template('booking__is_instant') }}
       AND (
@@ -233,8 +233,8 @@ integration_test:
   name: test_subdaily_time_constraint
   description: Test a sub-daily time constraint on a no-metric query.
   model: SIMPLE_MODEL
-  group_bys: [metric_time__second]
-  time_constraint: ['2020-01-01 00:00:02', '2020-01-01 00:00:08']
+  group_bys: ["metric_time__second"]
+  time_constraint: ["2020-01-01 00:00:02", "2020-01-01 00:00:08"]
   check_query: |
     SELECT
       {{ render_date_trunc("ts", TimeGranularity.SECOND) }} AS metric_time__second
@@ -246,9 +246,9 @@ integration_test:
   name: test_subdaily_time_constraint_with_metric
   description: Test a sub-daily time constraint on a metric query.
   model: SIMPLE_MODEL
-  metrics: [subdaily_join_to_time_spine_metric]
-  group_bys: [metric_time__hour]
-  time_constraint: ['2020-01-01 02:00:00', '2020-01-03 05:00:00']
+  metrics: ["subdaily_join_to_time_spine_metric"]
+  group_bys: ["metric_time__hour"]
+  time_constraint: ["2020-01-01 02:00:00", "2020-01-03 05:00:00"]
   check_query: |
     SELECT
       ts AS metric_time__hour
@@ -267,9 +267,9 @@ integration_test:
   name: test_subdaily_time_constraint_adjusted
   description: Tests a sub-daily time constraint that requires adjusting.
   model: SIMPLE_MODEL
-  metrics: [subdaily_join_to_time_spine_metric]
-  group_bys: [metric_time__hour]
-  time_constraint: ['2020-01-01 02:00:25', '2020-01-03 05:00:53']
+  metrics: ["subdaily_join_to_time_spine_metric"]
+  group_bys: ["metric_time__hour"]
+  time_constraint: ["2020-01-01 02:00:25", "2020-01-03 05:00:53"]
   check_query: |
     SELECT
       ts AS metric_time__hour
@@ -290,7 +290,7 @@ integration_test:
   name: test_metric_time_in_dimension_jinja
   description: Query a metric with metric_time in the Dimension object of the where filter
   model: SIMPLE_MODEL
-  metrics: [booking_value]
+  metrics: ["booking_value"]
   where_filter: '{{ render_dimension_template("metric_time") }} = {{ cast_to_ts("2020-01-01") }}'
   check_query: |
     SELECT

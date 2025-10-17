@@ -5,8 +5,7 @@ on:
     # MetricFlow historically tagged releases with v<pep440_semantic_version>
     # We restrict to this for now and assume any tag without a package identifier is MetricFlow itself
     tags:
-      - v[0-9]+.[0-9]+.[0-9]+*
-
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 jobs:
   pypi-publish:
     runs-on: ubuntu-latest
@@ -18,11 +17,8 @@ jobs:
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - uses: ./.github/actions/setup-python-env
-
       - name: Build `metricflow` package
         run: hatch build
-
       - name: Publish `metricflow` package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

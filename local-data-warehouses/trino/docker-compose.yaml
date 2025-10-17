@@ -1,10 +1,9 @@
-version: '3.7'
-
+version: "3.7"
 services:
   trino:
     container_name: trino
-    image: trinodb/trino
+    image: "trinodb/trino"
     expose:
-      - '8080'
+      - "8080"
     ports:
-      - 8080:8080
+      - "8080:8080"

@@ -3,4 +3,4 @@ body: Update `metricflow` to migrate `measures -> simple metrics`
 time: 2025-10-08T12:02:25.007138-07:00
 custom:
   Author: plypaul
-  Issue: '1889'
+  Issue: "1889"

@@ -8,4 +8,4 @@ table_snapshot:
     - name: ds
       type: TIME
   rows:
-    - ['1', E1_0, '2020-01-01']
+    - ["1", "E1_0", "2020-01-01"]

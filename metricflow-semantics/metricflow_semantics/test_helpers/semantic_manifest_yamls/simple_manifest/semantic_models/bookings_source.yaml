@@ -1,17 +1,14 @@
 semantic_model:
   name: bookings_source
   description: bookings_source
-
   node_relation:
     schema_name: $source_schema
     alias: fct_bookings
-
   defaults:
     agg_time_dimension: ds
-
   measures:
     - name: bookings
-      expr: '1'
+      expr: "1"
       agg: sum
     - name: instant_bookings
       expr: is_instant
@@ -64,8 +61,6 @@ semantic_model:
         percentile: 0.99
         use_discrete_percentile: true
         use_approximate_percentile: true
-
-
   dimensions:
     - name: is_instant
       type: categorical
@@ -82,9 +77,7 @@ semantic_model:
       type: time
       type_params:
         time_granularity: day
-
   primary_entity: booking
-
   entities:
     - name: listing
       type: foreign

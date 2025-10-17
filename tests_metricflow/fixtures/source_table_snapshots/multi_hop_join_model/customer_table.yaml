@@ -10,7 +10,7 @@ table_snapshot:
     - name: customer_atomic_weight
       type: STRING
   rows:
-    - ['2020-01-01', '0', thorium, '90']
-    - ['2020-01-01', '2', tellurium, '52']
-    - ['2020-01-02', '1', osmium, '76']
-    - ['2020-01-04', '3', einsteinium, '99']
+    - ["2020-01-01", "0", "thorium", "90"]
+    - ["2020-01-01", "2", "tellurium", "52"]
+    - ["2020-01-02", "1", "osmium", "76"]
+    - ["2020-01-04", "3", "einsteinium", "99"]

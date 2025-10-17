@@ -1,14 +1,11 @@
 semantic_model:
   name: visits_source
   description: visits_source
-
   node_relation:
     schema_name: $source_schema
     alias: fct_visits
-
   defaults:
     agg_time_dimension: ds
-
   measures:
     - name: visits
       expr: 1
@@ -16,7 +13,6 @@ semantic_model:
     - name: visitors
       expr: user_id
       agg: count_distinct
-
   dimensions:
     - name: ds
       type: time
@@ -24,9 +20,7 @@ semantic_model:
         time_granularity: day
     - name: referrer_id
       type: categorical
-
   primary_entity: visit
-
   entities:
     - name: user
       type: foreign

@@ -1,14 +1,11 @@
 semantic_model:
   name: animals
   description: If a user is a company / business, this defines the mapping.
-
   node_relation:
     schema_name: $source_schema
     alias: fct_animals
-
   defaults:
     agg_time_dimension: ds
-
   dimensions:
     - name: ds
       type: time
@@ -16,15 +13,13 @@ semantic_model:
         time_granularity: day
     - name: is_dog
       type: categorical
-      is_partition: true
-
+      is_partition: True
   measures:
     - name: count_dogs
       agg: sum
       expr: 1
-      create_metric: true
-
+      create_metric: True
   entities:
     - name: id
       type: primary
-      expr: '1'
+      expr: "1"

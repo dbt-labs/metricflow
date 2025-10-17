@@ -6,4 +6,4 @@ table_snapshot:
     - name: ds
       type: TIME
   rows:
-    - ['True', '2022-06-01']
+    - ["True", "2022-06-01"]

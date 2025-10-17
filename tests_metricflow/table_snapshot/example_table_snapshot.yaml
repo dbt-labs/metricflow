@@ -10,5 +10,5 @@ table_snapshot:
     - name: is_active
       type: BOOLEAN
   rows:
-    - ['0', user0, '0.0', 'False']
-    - ['1', user1, '0.1', 'True']
+    - ["0", "user0", "0.0", "False"]
+    - ["1", "user1", "0.1", "True"]

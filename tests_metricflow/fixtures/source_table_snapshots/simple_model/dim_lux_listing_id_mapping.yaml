@@ -6,6 +6,6 @@ table_snapshot:
     - name: lux_listing_id
       type: STRING
   rows:
-    - [l2718281, ll_002]
-    - [l3141592, ll_001]
-    - [l5948301, LUX_TEST_ID]
+    - ["l2718281", "ll_002"]
+    - ["l3141592", "ll_001"]
+    - ["l5948301", "LUX_TEST_ID"]

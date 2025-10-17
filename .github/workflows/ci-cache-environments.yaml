@@ -5,19 +5,17 @@ name: Cache Python Environments
 on:
   push:
     branches:
-      - main
+      - 'main'
 jobs:
-
   cache-python-environments:
     name: Cache Python Environments
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.12']
+        python-version: ["3.9", "3.12"]
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - name: Cache Python ${{ matrix.python-version }} Environment
         uses: ./.github/actions/setup-python-env
         with:
@@ -25,6 +23,9 @@ jobs:
           cache-pre-commit-environment: true
           hatch-environment-cache-config-json: >-
             {
+
+
+
               "configs": [
                 {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
                 {"hatch_project_directory": ".", "hatch_environment_name": "postgres-env"},

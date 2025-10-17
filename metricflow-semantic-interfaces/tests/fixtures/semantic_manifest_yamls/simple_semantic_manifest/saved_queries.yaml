@@ -31,7 +31,6 @@ saved_query:
       - Metric('listings').descending(True)
       - TimeDimension('metric_time', 'day')
     limit: 10
-
   exports:
     - name: highly_active_listings
       config:

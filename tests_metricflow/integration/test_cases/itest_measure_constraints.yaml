@@ -3,8 +3,8 @@ integration_test:
   description: |
     Tests querying a metric with a measure constraint on a local dimension
   model: SIMPLE_MODEL
-  metrics: [instant_booking_fraction_of_max_value]
-  group_bys: [metric_time]
+  metrics: ["instant_booking_fraction_of_max_value"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       a.average_booking_value / b.max_booking_value AS instant_booking_fraction_of_max_value
@@ -31,8 +31,8 @@ integration_test:
   description: |
     Tests querying a metric with a measure constraint on a dimension requiring a join
   model: SIMPLE_MODEL
-  metrics: [lux_booking_fraction_of_max_value]
-  group_bys: [metric_time]
+  metrics: ["lux_booking_fraction_of_max_value"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       a.average_booking_value / b.max_booking_value AS lux_booking_fraction_of_max_value
@@ -61,8 +61,8 @@ integration_test:
   description: |
     Tests querying an expr metric with a measure constraint on a dimension requiring a join
   model: SIMPLE_MODEL
-  metrics: [lux_booking_value_rate_expr]
-  group_bys: [metric_time]
+  metrics: ["lux_booking_value_rate_expr"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       a.average_booking_value * a.bookings / b.booking_value AS lux_booking_value_rate_expr
@@ -92,8 +92,8 @@ integration_test:
   description: |
     Tests querying a metric with a measure constraint on a local dimension
   model: SIMPLE_MODEL
-  metrics: [instant_booking_value_ratio]
-  group_bys: [metric_time]
+  metrics: ["instant_booking_value_ratio"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       a.booking_value / b.booking_value AS instant_booking_value_ratio
@@ -120,8 +120,8 @@ integration_test:
   description: |
     Tests querying a metric with measure constraints on semi-additive input measures
   model: SIMPLE_MODEL
-  metrics: [regional_starting_balance_ratios]
-  group_bys: [metric_time]
+  metrics: ["regional_starting_balance_ratios"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       a.total_account_balance_first_day / b.total_account_balance_first_day AS regional_starting_balance_ratios
@@ -185,8 +185,8 @@ integration_test:
   description: |
     Tests querying a metric with a single input measure with constraint and alias
   model: SIMPLE_MODEL
-  metrics: [double_counted_delayed_bookings]
-  group_bys: [metric_time]
+  metrics: ["double_counted_delayed_bookings"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       SUM(1) * 2 AS double_counted_delayed_bookings

@@ -16,13 +16,13 @@ table_snapshot:
     - name: user_id
       type: STRING
   rows:
-    - ['2020-01-01', '2020-01-02', l3141592, us, '2', 'True', u0004114]
-    - ['2020-01-01', '2020-01-02', l2718281, cote d'ivoire, '4', 'True', u0005432]
-    - ['2020-01-01', '2020-01-02', l9658588-incomplete, null, null, null, u1004114]
-    - ['2020-01-02', null, l3141592, us, '3', 'True', u0004114]
+    - ["2020-01-01", "2020-01-02", "l3141592", "us", "2", "True", "u0004114"]
+    - ["2020-01-01", "2020-01-02", "l2718281", "cote d'ivoire", "4", "True", "u0005432"]
+    - ["2020-01-01", "2020-01-02", "l9658588-incomplete", null, null, null, "u1004114"]
+    - ["2020-01-02", null, "l3141592", "us", "3", "True", "u0004114"]
     # This cote_divoire property changed hands to a person from Maryland who considers it not lux
-    - ['2020-01-02', null, l2718281, cote d'ivoire, '4', 'False', u0003154]
-    - ['2020-01-02', null, l5948301, us, '5', 'True', u0004114]
-    - ['2020-01-02', null, l9658588-incomplete, us, null, null, u1004114]
-    - ['2020-01-02', null, l8912456-incomplete, null, null, null, u1004114]
-    - ['2020-01-02', null, l7891283-incomplete, ca, null, 'False', u1004114]
+    - ["2020-01-02", null, "l2718281", "cote d'ivoire", "4", "False", "u0003154"]
+    - ["2020-01-02", null, "l5948301", "us", "5", "True", "u0004114"]
+    - ["2020-01-02", null, "l9658588-incomplete", "us", null, null, "u1004114"]
+    - ["2020-01-02", null, "l8912456-incomplete", null, null, null, "u1004114"]
+    - ["2020-01-02", null, "l7891283-incomplete", "ca", null, "False", "u1004114"]

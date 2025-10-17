@@ -3,4 +3,4 @@ body: Bump dependence on dbt-semantic-interfaces to 0.9.3.dev4 to get newest tra
 time: 2025-10-03T08:00:25.705141-07:00
 custom:
   Author: theyostalservice courtneyholcomb
-  Issue: '387'
+  Issue: "387"

@@ -2,10 +2,10 @@ integration_test:
   name: windowed_cumulative_metric
   description: Query a cumulative metric that aggregates the last 2 months.
   model: SIMPLE_MODEL
-  metrics: [trailing_2_months_revenue]
-  group_bys: [metric_time]
-  order_bys: [metric_time]
-  time_constraint: ['2020-03-05', '2021-01-04']
+  metrics: ["trailing_2_months_revenue"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
+  time_constraint: ["2020-03-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
@@ -30,10 +30,10 @@ integration_test:
   name: windowed_cumulative_metric_with_joined_dim
   description: Query a cumulative metric that aggregates the last 2 months with a joined dimension.
   model: SIMPLE_MODEL
-  metrics: [trailing_2_months_revenue]
-  group_bys: [metric_time, user__home_state_latest]
-  order_bys: [metric_time, user__home_state_latest]
-  time_constraint: ['2020-03-05', '2021-01-04']
+  metrics: ["trailing_2_months_revenue"]
+  group_bys: ["metric_time", "user__home_state_latest"]
+  order_bys: ["metric_time", "user__home_state_latest"]
+  time_constraint: ["2020-03-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(revenue) as trailing_2_months_revenue
@@ -63,10 +63,10 @@ integration_test:
   name: cumulative_metric_by_ds
   description: Query a cumulative metric that aggregates revenue for all time in the past by ds.
   model: SIMPLE_MODEL
-  metrics: [revenue_all_time]
-  group_bys: [metric_time]
-  order_bys: [metric_time]
-  time_constraint: ['2020-03-01', '2021-01-05']
+  metrics: ["revenue_all_time"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
+  time_constraint: ["2020-03-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
@@ -90,7 +90,7 @@ integration_test:
   name: cumulative_metric_without_ds
   description: Query a cumulative metric that aggregates revenue for all time in the past.
   model: SIMPLE_MODEL
-  metrics: [revenue_all_time]
+  metrics: ["revenue_all_time"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
@@ -100,10 +100,10 @@ integration_test:
   name: multiple_cumulative_metrics
   description: Query two different cumulative metrics.
   model: SIMPLE_MODEL
-  metrics: [revenue_all_time, trailing_2_months_revenue]
-  group_bys: [metric_time]
-  order_bys: [metric_time]
-  time_constraint: ['2020-03-31', '2021-01-05']
+  metrics: ["revenue_all_time", "trailing_2_months_revenue"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
+  time_constraint: ["2020-03-31", "2021-01-05"]
   check_query: |
     SELECT revenue_all_time, trailing_2_months_revenue, a.ds AS metric_time__day
     FROM (
@@ -155,10 +155,10 @@ integration_test:
   name: windowed_cumulative_metric_by_time_dimension_with_granularity
   description: Query a windowed cumulative metric by a time dimension with the granularity suffix.
   model: SIMPLE_MODEL
-  metrics: [trailing_2_months_revenue]
-  group_bys: [metric_time__day]
-  order_bys: [metric_time__day]
-  time_constraint: ['2020-03-05', '2021-01-04']
+  metrics: ["trailing_2_months_revenue"]
+  group_bys: ["metric_time__day"]
+  order_bys: ["metric_time__day"]
+  time_constraint: ["2020-03-05", "2021-01-04"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as trailing_2_months_revenue
@@ -183,10 +183,10 @@ integration_test:
   name: cumulative_metric_by_ds_and_limited_time
   description: Query a cumulative metric that aggregates revenue for all time in the past for a limit time interval.
   model: SIMPLE_MODEL
-  metrics: [revenue_all_time]
-  group_bys: [metric_time]
-  order_bys: [metric_time]
-  time_constraint: ['2021-01-05', '2021-01-05']
+  metrics: ["revenue_all_time"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
+  time_constraint: ["2021-01-05", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
@@ -210,10 +210,10 @@ integration_test:
   name: non_additive_cumulative_metric_by_ds
   description: Query a cumulative metric with a non-additive measure.
   model: SIMPLE_MODEL
-  metrics: [every_two_days_bookers]
-  group_bys: [metric_time]
-  order_bys: [metric_time]
-  time_constraint: ['2019-12-31', '2020-01-04']
+  metrics: ["every_two_days_bookers"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
+  time_constraint: ["2019-12-31", "2020-01-04"]
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
@@ -237,10 +237,10 @@ integration_test:
   name: non_additive_cumulative_metric_by_ds_and_limited_time
   description: Query a cumulative metric with a non-additive measure and a limited time range.
   model: SIMPLE_MODEL
-  metrics: [every_two_days_bookers]
-  group_bys: [metric_time]
-  order_bys: [metric_time]
-  time_constraint: ['2020-01-03', '2020-01-03']
+  metrics: ["every_two_days_bookers"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
+  time_constraint: ["2020-01-03", "2020-01-03"]
   check_query: |
     SELECT
       COUNT (DISTINCT(b.guest_id)) as every_two_days_bookers
@@ -265,10 +265,10 @@ integration_test:
   name: grain_to_date_cumulative_metric
   description: Query a cumulative metric with a non-additive measure and a limited time range.
   model: SIMPLE_MODEL
-  metrics: [revenue_mtd]
-  group_bys: [metric_time]
-  order_bys: [metric_time]
-  time_constraint: ['2021-01-04', '2021-01-05']
+  metrics: ["revenue_mtd"]
+  group_bys: ["metric_time"]
+  order_bys: ["metric_time"]
+  time_constraint: ["2021-01-04", "2021-01-05"]
   check_query: |
     SELECT
       SUM(b.txn_revenue) as revenue_mtd
@@ -293,10 +293,10 @@ integration_test:
   name: cumulative_metric_by_ds_with_granularity
   description: Query a cumulative metric that aggregates revenue for all time in the past by ds__day.
   model: SIMPLE_MODEL
-  metrics: [revenue_all_time]
-  group_bys: [metric_time__day]
-  order_bys: [metric_time__day]
-  time_constraint: ['2020-01-01', '2021-01-05']
+  metrics: ["revenue_all_time"]
+  group_bys: ["metric_time__day"]
+  order_bys: ["metric_time__day"]
+  time_constraint: ["2020-01-01", "2021-01-05"]
   check_query: |
     SELECT
       SUM(revenue) AS revenue_all_time
@@ -320,9 +320,9 @@ integration_test:
   name: cumulative_metric_with_non_adjustable_filter
   description: Query a cumulative metric that has a time filter which cannot be adapted to cover the full input range
   model: SIMPLE_MODEL
-  metrics: [every_two_days_bookers]
-  group_bys: [metric_time__day]
-  order_bys: [metric_time__day]
+  metrics: ["every_two_days_bookers"]
+  group_bys: ["metric_time__day"]
+  order_bys: ["metric_time__day"]
   where_filter: |
     {{ render_time_dimension_template('metric_time', 'day') }} = {{ cast_to_ts('2019-12-20') }}
       or {{ render_time_dimension_template('metric_time', 'day') }} = {{ cast_to_ts('2020-01-04') }}
@@ -347,14 +347,53 @@ integration_test:
     GROUP BY a.ds
     ORDER BY a.ds
 ---
+
+
+# TODO: Test is currently broken.
+#integration_test:
+#  name: cumulative_metric_month_granularity
+#  description: Query a cumulative metric that uses non-day granularity.
+#  model: EXTENDED_DATE_MODEL
+#  metrics: ["trailing_3_months_bookings"]
+#  group_bys: ["metric_time__month"]
+#  order_bys: ["metric_time__month"]
+#  time_constraint: ["2020-03-05", "2021-01-04"]
+#  check_query: |
+#    SELECT
+#      subq_3.metric_time__month
+#      , SUM(subq_2.bookings_monthly) AS trailing_3_months_bookings
+#    FROM (
+#      SELECT
+#        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+#      FROM {{ source_schema }}.mf_time_spine
+#      WHERE {{ render_time_constraint("ds", "2020-03-01", "2021-01-31") }}
+#      GROUP BY
+#        {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
+#    ) subq_3
+#    INNER JOIN (
+#      SELECT
+#        {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS metric_time__month
+#        , bookings_monthly
+#      FROM {{ source_schema }}.fct_bookings_extended_monthly
+#      WHERE {{ render_time_constraint(render_date_trunc("ds", TimeGranularity.MONTH), "2019-12-01", "2021-01-31") }}
+#    ) subq_2
+#    ON (
+#        subq_2.metric_time__month <= subq_3.metric_time__month
+#      ) AND (
+#        subq_2.metric_time__month > {{ render_date_sub("subq_3", "metric_time__month", 3, TimeGranularity.MONTH) }}
+#      )
+#    WHERE {{ render_time_constraint("subq_3.metric_time__month", "2020-03-01", "2021-01-31") }}
+#    GROUP BY
+#      subq_3.metric_time__month
+#    ORDER BY subq_3.metric_time__month
 ---
 integration_test:
   name: cumulative_metric_with_agg_time_dimension
   description: Query a cumulative metric with its agg_time_dimension and a time constraint.
   model: SIMPLE_MODEL
-  metrics: [trailing_2_months_revenue]
-  group_bys: [revenue_instance__ds__day]
-  order_bys: [revenue_instance__ds__day]
+  metrics: ["trailing_2_months_revenue"]
+  group_bys: ["revenue_instance__ds__day"]
+  order_bys: ["revenue_instance__ds__day"]
   where_filter: '{{ render_time_constraint("revenue_instance__ds__day", "2020-03-05", "2021-01-04") }}'
   check_query: |
     SELECT
@@ -380,8 +419,8 @@ integration_test:
   name: all_time_metric_with_non_default_grains
   description: Query a cumulative all-time metric with non-default grains
   model: SIMPLE_MODEL
-  metrics: [revenue_all_time]
-  group_bys: [metric_time__week, metric_time__quarter]
+  metrics: ["revenue_all_time"]
+  group_bys: ["metric_time__week", "metric_time__quarter"]
   check_query: |
     SELECT
       metric_time__week
@@ -419,8 +458,8 @@ integration_test:
   name: window_metric_with_non_default_grains
   description: Query a cumulative window metric with non-default grains
   model: SIMPLE_MODEL
-  metrics: [trailing_2_months_revenue]
-  group_bys: [metric_time__week, revenue_instance__ds__month]
+  metrics: ["trailing_2_months_revenue"]
+  group_bys: ["metric_time__week", "revenue_instance__ds__month"]
   check_query: |
     SELECT
       revenue_instance__ds__month
@@ -464,8 +503,8 @@ integration_test:
   name: grain_to_date_metric_with_non_default_grains
   description: Query a cumulative grain to date metric with non-default grains
   model: SIMPLE_MODEL
-  metrics: [revenue_mtd]
-  group_bys: [revenue_instance__ds__quarter, revenue_instance__ds__year]
+  metrics: ["revenue_mtd"]
+  group_bys: ["revenue_instance__ds__quarter", "revenue_instance__ds__year"]
   check_query: |
     SELECT
       revenue_instance__ds__quarter
@@ -509,8 +548,8 @@ integration_test:
   name: derived_cumulative_metric_with_non_default_grains
   description: Query a derived cumulative metric with non-default grains
   model: SIMPLE_MODEL
-  metrics: [trailing_2_months_revenue_sub_10]
-  group_bys: [metric_time__month, metric_time__year]
+  metrics: ["trailing_2_months_revenue_sub_10"]
+  group_bys: ["metric_time__month", "metric_time__year"]
   check_query: |
     SELECT
       metric_time__month
@@ -560,8 +599,8 @@ integration_test:
   name: subdaily_cumulative_window_metric
   description: test a subdaily cumulative window metric
   model: SIMPLE_MODEL
-  metrics: [subdaily_cumulative_window_metric]
-  group_bys: [metric_time__hour]
+  metrics: ["subdaily_cumulative_window_metric"]
+  group_bys: ["metric_time__hour"]
   check_query: |
     SELECT
       subq_3.ts AS metric_time__hour
@@ -580,8 +619,8 @@ integration_test:
   name: subdaily_cumulative_grain_to_date_metric
   description: test a subdaily cumulative grain_to_date metric
   model: SIMPLE_MODEL
-  metrics: [subdaily_cumulative_grain_to_date_metric]
-  group_bys: [metric_time__hour]
+  metrics: ["subdaily_cumulative_grain_to_date_metric"]
+  group_bys: ["metric_time__hour"]
   check_query: |
     SELECT
       subq_3.ts AS metric_time__hour

@@ -2,8 +2,8 @@ integration_test:
   name: max_agg
   description: Tests MAX aggregation.
   model: SIMPLE_MODEL
-  metrics: [largest_listing]
-  group_bys: [metric_time]
+  metrics: ["largest_listing"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       MAX(capacity) as largest_listing
@@ -16,8 +16,8 @@ integration_test:
   name: min_agg
   description: Tests MIN aggregation.
   model: SIMPLE_MODEL
-  metrics: [smallest_listing]
-  group_bys: [metric_time]
+  metrics: ["smallest_listing"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       MIN(capacity) as smallest_listing
@@ -30,8 +30,8 @@ integration_test:
   name: sum_agg
   description: Tests SUM aggregation.
   model: SIMPLE_MODEL
-  metrics: [listings]
-  group_bys: [metric_time]
+  metrics: ["listings"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       SUM(1) as listings
@@ -44,8 +44,8 @@ integration_test:
   name: count_distinct_agg
   description: Tests COUNT_DISTINCT aggregation.
   model: SIMPLE_MODEL
-  metrics: [bookers]
-  group_bys: [metric_time]
+  metrics: ["bookers"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) as bookers
@@ -58,8 +58,8 @@ integration_test:
   name: avg_agg
   description: Tests AVG aggregation.
   model: SIMPLE_MODEL
-  metrics: [average_booking_value]
-  group_bys: [metric_time]
+  metrics: ["average_booking_value"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       AVG(CAST(booking_value AS {{ double_data_type_name }})) as average_booking_value
@@ -72,8 +72,8 @@ integration_test:
   name: boolean_agg
   description: Tests BOOLEAN/SUM_BOOLEAN aggregation.
   model: SIMPLE_MODEL
-  metrics: [instant_bookings]
-  group_bys: [metric_time]
+  metrics: ["instant_bookings"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
@@ -86,8 +86,8 @@ integration_test:
   name: count_agg
   description: Tests COUNT aggregation.
   model: SIMPLE_MODEL
-  metrics: [referred_bookings]
-  group_bys: [metric_time]
+  metrics: ["referred_bookings"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS referred_bookings
@@ -100,8 +100,8 @@ integration_test:
   name: count_agg_with_count_expected_query
   description: Tests COUNT aggregation against a query using COUNT instead of SUM-CASE.
   model: SIMPLE_MODEL
-  metrics: [referred_bookings]
-  group_bys: [metric_time]
+  metrics: ["referred_bookings"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       COUNT(referrer_id) AS referred_bookings
@@ -114,9 +114,9 @@ integration_test:
   name: continuous_percentile_agg
   description: Tests continuous PERCENTILE aggregation
   model: SIMPLE_MODEL
-  required_features: [CONTINUOUS_PERCENTILE_AGGREGATION]
-  metrics: [booking_value_p99]
-  group_bys: [metric_time]
+  required_features: ["CONTINUOUS_PERCENTILE_AGGREGATION"]
+  metrics: ["booking_value_p99"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, False, False) }} AS booking_value_p99
@@ -129,9 +129,9 @@ integration_test:
   name: discrete_percentile_agg
   description: Tests discrete PERCENTILE aggregation
   model: SIMPLE_MODEL
-  required_features: [DISCRETE_PERCENTILE_AGGREGATION]
-  metrics: [discrete_booking_value_p99]
-  group_bys: [metric_time]
+  required_features: ["DISCRETE_PERCENTILE_AGGREGATION"]
+  metrics: ["discrete_booking_value_p99"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, True, False) }} AS discrete_booking_value_p99
@@ -144,9 +144,9 @@ integration_test:
   name: approximate_continuous_percentile_agg
   description: Tests approximate continuous PERCENTILE aggregation
   model: SIMPLE_MODEL
-  required_features: [APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION]
-  metrics: [approximate_continuous_booking_value_p99]
-  group_bys: [metric_time]
+  required_features: ["APPROXIMATE_CONTINUOUS_PERCENTILE_AGGREGATION"]
+  metrics: ["approximate_continuous_booking_value_p99"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, False, True) }} AS approximate_continuous_booking_value_p99
@@ -159,9 +159,9 @@ integration_test:
   name: approximate_discrete_percentile_agg
   description: Tests approximate discrete PERCENTILE aggregation
   model: SIMPLE_MODEL
-  required_features: [APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION]
-  metrics: [approximate_discrete_booking_value_p99]
-  group_bys: [metric_time]
+  required_features: ["APPROXIMATE_DISCRETE_PERCENTILE_AGGREGATION"]
+  metrics: ["approximate_discrete_booking_value_p99"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.99, True, True) }} AS approximate_discrete_booking_value_p99
@@ -174,9 +174,9 @@ integration_test:
   name: median_agg
   description: Tests MEDIAN aggregation
   model: SIMPLE_MODEL
-  required_features: [CONTINUOUS_PERCENTILE_AGGREGATION]
-  metrics: [median_booking_value]
-  group_bys: [metric_time]
+  required_features: ["CONTINUOUS_PERCENTILE_AGGREGATION"]
+  metrics: ["median_booking_value"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       {{ render_percentile_expr("booking_value", 0.5, False, False) }} AS median_booking_value

@@ -1,7 +1,7 @@
 name: ☣️ Regression
 description: Report a regression you've observed in a newer version of metricflow
-title: '[Regression] <title>'
-labels: [bug, regression, triage]
+title: "[Regression] <title>"
+labels: ["bug", "regression", "triage"]
 body:
   - type: markdown
     attributes:
@@ -11,8 +11,9 @@ body:
     attributes:
       label: Is this a regression in a recent version of metricflow?
       description: >
-        A regression is when documented functionality works as expected in an older version of metricflow,
-        and no longer works after upgrading to a newer version of metricflow
+        A regression is when documented functionality works as expected in an older version of metricflow, and no longer works after upgrading to a newer
+        version of metricflow
+
       options:
         - label: I believe this is a regression in metricflow functionality
           required: true

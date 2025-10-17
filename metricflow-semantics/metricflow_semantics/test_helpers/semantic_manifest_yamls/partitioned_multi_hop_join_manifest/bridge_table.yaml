@@ -1,20 +1,16 @@
 semantic_model:
   name: bridge_table
   description: bridge_table
-
   node_relation:
     schema_name: $source_schema
     alias: bridge_table
-
   defaults:
     agg_time_dimension: ds_partitioned
-
   measures:
     - name: account_customer_combos
       expr: account_id || customer_id
       agg: count_distinct
       create_metric: true
-
   dimensions:
     - name: extra_dim
       type: categorical
@@ -23,9 +19,7 @@ semantic_model:
       type_params:
         time_granularity: day
       is_partition: true
-
   primary_entity: bridge_account
-
   entities:
     - name: account_id
       type: unique

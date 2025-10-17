@@ -3,4 +3,4 @@ body: Add a test for `MetricLookup. get_aggregation_time_dimension_specs()`
 time: 2025-10-08T15:00:31.500705-07:00
 custom:
   Author: plypaul
-  Issue: '1890'
+  Issue: "1890"

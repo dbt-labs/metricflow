@@ -3,4 +3,4 @@ body: Update SQL engine snapshots for the `measures -> simple metrics` migration
 time: 2025-10-08T15:01:24.083877-07:00
 custom:
   Author: plypaul
-  Issue: '1891'
+  Issue: "1891"

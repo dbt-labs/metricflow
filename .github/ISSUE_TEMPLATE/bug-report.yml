@@ -1,7 +1,7 @@
 name: 🐞 Bug
 description: Report a bug or an issue you've found with metricflow
-title: '[Bug] <title>'
-labels: [bug, triage]
+title: "[Bug] <title>"
+labels: ["bug", "triage"]
 body:
   - type: markdown
     attributes:
@@ -13,10 +13,11 @@ body:
       description: >
         In other words, is this an error, flaw, failure or fault in our software?
 
-        If this is a bug that broke existing functionality that used to work, please open a regression issue.
-        If this is a bug experienced while using the Semantic Layer, please report to [support](mailto:support@getdbt.com).
+        If this is a bug that broke existing functionality that used to work, please open a regression issue. If this is a bug experienced while using the
+        Semantic Layer, please report to [support](mailto:support@getdbt.com).
 
         Please search to see if an issue already exists for the bug you encountered.
+
       options:
         - label: I believe this is a new bug in metricflow
           required: true

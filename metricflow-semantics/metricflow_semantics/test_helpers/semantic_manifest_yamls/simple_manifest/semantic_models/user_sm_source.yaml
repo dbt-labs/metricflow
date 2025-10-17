@@ -1,14 +1,11 @@
 semantic_model:
   name: users_ds_source
   description: users_ds_source
-
   node_relation:
     schema_name: $source_schema
     alias: dim_users
-
   defaults:
     agg_time_dimension: created_at
-
   dimensions:
     - name: ds
       type: time
@@ -41,20 +38,17 @@ semantic_model:
       type: time
       type_params:
         time_granularity: hour
-
-
   entities:
     - name: user
       type: primary
       expr: user_id
-
   measures:
     - name: new_users
-      expr: '1'
+      expr: "1"
       agg: SUM
       create_metric: true
     - name: archived_users
-      expr: '1'
+      expr: "1"
       agg: SUM
       create_metric: true
       agg_time_dimension: archived_at

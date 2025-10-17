@@ -2,8 +2,8 @@ integration_test:
   name: semi_additive_measure_query_with_identifier_grouping
   description: Tests selecting a measure with semi additive properties with a window_grouping
   model: SIMPLE_MODEL
-  metrics: [current_account_balance_by_user]
-  group_bys: [user]
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["user"]
   check_query: |
     SELECT
       a.user AS user
@@ -33,8 +33,8 @@ integration_test:
   description: |
     Tests selecting a measure with semi additive properties with a window_grouping that are not in the query group by
   model: SIMPLE_MODEL
-  metrics: [current_account_balance_by_user]
-  group_bys: [metric_time__week]
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["metric_time__week"]
   check_query: |
     SELECT
       a.metric_time__week
@@ -66,8 +66,8 @@ integration_test:
   name: semi_additive_measure_query
   description: Tests selecting a measure with semi additive properties
   model: SIMPLE_MODEL
-  metrics: [total_account_balance_first_day]
-  group_bys: [metric_time]
+  metrics: ["total_account_balance_first_day"]
+  group_bys: ["metric_time"]
   check_query: |
     SELECT
       a.ds AS metric_time__day
@@ -100,8 +100,8 @@ integration_test:
     then somewhere along the path it would end up throwing a MeasureSpec not in [List of MeasureSpec] due to an attribute
     being missing. This test case hits that path and ensures that we are copying attributes correctly.
   model: SIMPLE_MODEL
-  metrics: [current_account_balance_by_user]
-  group_bys: [user]
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["user"]
   where_filter: "{{ render_dimension_template('user__home_state_latest') }} = 'CA'"
   check_query: |
     SELECT
@@ -147,8 +147,8 @@ integration_test:
   name: semi_additive_measure_query_with_group_by_window
   description: Tests selecting a semi-additive measure with a group by window
   model: SIMPLE_MODEL
-  metrics: [total_account_balance_first_day]
-  group_bys: [metric_time__week]
+  metrics: ["total_account_balance_first_day"]
+  group_bys: ["metric_time__week"]
   check_query: |
     SELECT
       a.metric_time__week
@@ -177,8 +177,8 @@ integration_test:
   name: semi_additive_measure_query_with_where_filter
   description: Tests selecting a semi-additive measure with where_filter
   model: SIMPLE_MODEL
-  metrics: [current_account_balance_by_user]
-  group_bys: [user]
+  metrics: ["current_account_balance_by_user"]
+  group_bys: ["user"]
   where_filter: "{{ render_dimension_template('account__account_type') }} = 'savings'"
   check_query: |
     SELECT
@@ -223,8 +223,8 @@ integration_test:
   name: semi_additive_measure_query_with_where_time_constraint
   description: Tests selecting a semi-additive measure with a time constraint written as a where clause
   model: SIMPLE_MODEL
-  metrics: [total_account_balance_first_day]
-  group_bys: [account__account_type]
+  metrics: ["total_account_balance_first_day"]
+  group_bys: ["account__account_type"]
   where_filter: "{{ render_time_dimension_template('account__ds', 'day') }} >= {{ cast_to_ts('2020-01-03') }}"
   check_query: |
     SELECT
@@ -263,7 +263,7 @@ integration_test:
   name: non_default_grain
   description: Tests selecting a semi-additive measure with an agg_time_dimension that has non-default grain
   model: SIMPLE_MODEL
-  metrics: [total_account_balance_first_day_of_month]
+  metrics: ["total_account_balance_first_day_of_month"]
   check_query: |
     SELECT
       SUM(subq_2.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month

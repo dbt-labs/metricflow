@@ -1,25 +1,20 @@
 semantic_model:
   name: all_entity_measure_source
   description: A measure source associated with ["entity_0", "entity_1", "entity_2"]
-
   node_relation:
     schema_name: $source_schema
     alias: all_entity_measure_table
-
   defaults:
     agg_time_dimension: ds
-
   measures:
     - name: all_entity_measure
       agg: sum
-      expr: '1'
-
+      expr: "1"
   dimensions:
     - name: ds
       type: time
       type_params:
         time_granularity: day
-
   entities:
     - name: all_entity_composite
       type: primary

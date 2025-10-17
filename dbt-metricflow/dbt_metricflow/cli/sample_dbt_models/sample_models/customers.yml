@@ -12,7 +12,7 @@ semantic_models:
         type: foreign
     measures:
       - name: new_customers
-        expr: '1'
+        expr: "1"
         agg: SUM
     dimensions:
       - name: ds

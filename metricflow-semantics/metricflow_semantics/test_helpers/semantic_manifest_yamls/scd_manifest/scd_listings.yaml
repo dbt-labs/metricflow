@@ -1,11 +1,9 @@
 semantic_model:
   name: listings
   description: SCD Type II table of listings history
-
   node_relation:
     schema_name: $source_schema
     alias: dim_listings
-
   dimensions:
     - name: window_start
       type: time
@@ -13,23 +11,21 @@ semantic_model:
       type_params:
         time_granularity: day
         validity_params:
-          is_start: true
+          is_start: True
     - name: window_end
       type: time
       expr: active_to
       type_params:
         time_granularity: day
         validity_params:
-          is_end: true
+          is_end: True
     - name: country
       type: categorical
     - name: is_lux
       type: categorical
     - name: capacity
       type: categorical
-
   primary_entity: listing
-
   entities:
     - name: listing
       type: natural

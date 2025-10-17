@@ -1,14 +1,11 @@
 semantic_model:
   name: buys_source
   description: buys_source
-
   node_relation:
     schema_name: $source_schema
     alias: fct_buys
-
   defaults:
     agg_time_dimension: ds
-
   measures:
     - name: buys
       expr: 1
@@ -20,7 +17,6 @@ semantic_model:
     - name: buyers
       expr: user_id
       agg: count_distinct
-
   dimensions:
     - name: ds
       type: time
@@ -30,9 +26,7 @@ semantic_model:
       type: time
       type_params:
         time_granularity: month
-
   primary_entity: buy
-
   entities:
     - name: user
       type: foreign

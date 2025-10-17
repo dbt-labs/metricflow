@@ -3,4 +3,4 @@ body: Fixes a bug related to leaving out metric values in offset metrics, specif
 time: 2025-10-15T14:38:27.163025-04:00
 custom:
   Author: courtneyholcomb
-  Issue: '1910'
+  Issue: "1910"

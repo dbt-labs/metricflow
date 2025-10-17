@@ -6,5 +6,5 @@ table_snapshot:
     - name: country
       type: STRING
   rows:
-    - [E0_0, us]
-    - [E0_1, ca]
+    - ["E0_0", "us"]
+    - ["E0_1", "ca"]

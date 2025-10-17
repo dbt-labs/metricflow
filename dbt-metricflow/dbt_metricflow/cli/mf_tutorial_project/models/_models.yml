@@ -1,6 +1,5 @@
 # See: https://docs.getdbt.com/docs/build/metricflow-time-spine
 # For the page above, be sure to select the correct version of dbt at the top.
-
 models:
   - name: all_days
     description: A time spine with one row per day.

@@ -25,7 +25,7 @@ semantic_models:
         agg: SUM
       - name: transactions
         description: The total number of transactions.
-        expr: '1'
+        expr: "1"
         agg: SUM
       - name: quick_buy_amount_usd
         description: The total USD value of the transactions that were purchased using the "quick buy" button.

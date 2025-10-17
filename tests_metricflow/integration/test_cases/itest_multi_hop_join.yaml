@@ -2,8 +2,8 @@ integration_test:
   name: multihop_join
   description: Tests a query with a basic multi-hop join
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
-  metrics: [txn_count]
-  group_bys: [account_id__customer_id__customer_name]
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name"]
   check_query: |
     SELECT
         ct.customer_name as account_id__customer_id__customer_name
@@ -20,8 +20,8 @@ integration_test:
   name: multihop_join_two_dims_different_sources
   description: Tests a query requesting mulitple multi-hop join dims that dont come from the same semantic model
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
-  metrics: [txn_count]
-  group_bys: [account_id__customer_id__customer_name, account_id__customer_id__country]
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country"]
   check_query: |
     SELECT
       dim_src0.customer_name as account_id__customer_id__customer_name
@@ -50,8 +50,8 @@ integration_test:
   name: multihop_join_two_dims_same_source
   description: Tests a query requesting mulitple multi-hop join dims from the same source
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
-  metrics: [txn_count]
-  group_bys: [account_id__customer_id__customer_name, account_id__customer_id__customer_atomic_weight]
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__customer_atomic_weight"]
   check_query: |
     SELECT
       ct.customer_name as account_id__customer_id__customer_name
@@ -70,8 +70,8 @@ integration_test:
   name: mixed_length_joins
   description: Tests a query with multihop and single hop join dimensions
   model: UNPARTITIONED_MULTI_HOP_JOIN_MODEL
-  metrics: [txn_count]
-  group_bys: [account_id__customer_id__customer_name, account_id__customer_id__country, account_id__extra_dim]
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name", "account_id__customer_id__country", "account_id__extra_dim"]
   check_query: |
     SELECT
       dim_src0.customer_name as account_id__customer_id__customer_name
@@ -102,8 +102,8 @@ integration_test:
   name: multihop_join_partitioned
   description: Tests a multihop join using the date-partitioned multihop model
   model: PARTITIONED_MULTI_HOP_JOIN_MODEL
-  metrics: [txn_count]
-  group_bys: [account_id__customer_id__customer_name]
+  metrics: ["txn_count"]
+  group_bys: ["account_id__customer_id__customer_name"]
   check_query: |
     SELECT
         SUM(am.txn_count) as txn_count

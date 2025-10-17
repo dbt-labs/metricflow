@@ -1,8 +1,6 @@
 name: mf_tutorial_project
 version: 1.0.0
 config-version: 2
-
 profile: mf_tutorial
-
-model-paths: [models]
-seed-paths: [seeds]
+model-paths: ["models"]
+seed-paths: ["seeds"]

@@ -6,4 +6,4 @@ table_snapshot:
     - name: entity_0
       type: STRING
   rows:
-    - [E2_0, E0_1]
+    - ["E2_0", "E0_1"]
