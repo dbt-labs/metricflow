@@ -1,47 +1,57 @@
+---
 # Exclude snapshots as they can represent specific output and formatting hooks may strip newlines.
-exclude: '^(?:tests_metricflow|tests_metricflow_semantics)/snapshots/.*$'
-repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
-    hooks:
-    - id: check-json
-    - id: trailing-whitespace
-      exclude_types:
-        - "markdown"
-    - id: end-of-file-fixer
-    - id: check-case-conflict
+exclude: ^(?:tests_metricflow|tests_metricflow_semantics)/snapshots/.*$
+repos  :
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.2.0
+  hooks:
+  - id: check-json
+  - id: check-yaml
+    exclude: (test_cases/itest_|test_helpers/semantic_manifest_yamls/|tests/fixtures/semantic_manifest_yamls/)
+  - id: trailing-whitespace
+    exclude_types:
+    - markdown
+  - id: end-of-file-fixer
+  - id: check-case-conflict
+
+  # YAML formatter
+- repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+  rev: 0.2.3
+  hooks:
+  - id: yamlfmt
+    args: [--mapping, '2', --sequence, '2', --offset, '0', --colons, --width, '150']
 
   # Faster version of flake8 / isort / etc.
   # Uses ruff.toml for configuration.
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.3.3'
-    hooks:
-    - id: ruff
-      verbose: true
-      args: [--fix, --exit-non-zero-on-fix]
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: v0.3.3
+  hooks:
+  - id: ruff
+    verbose: true
+    args: [--fix, --exit-non-zero-on-fix]
 
-  - repo: https://github.com/psf/black
-    rev: 23.3.0
-    hooks:
-    - id: black
-      verbose: true
-      args: ["--line-length", "120"]
+- repo: https://github.com/psf/black
+  rev: 23.3.0
+  hooks:
+  - id: black
+    verbose: true
+    args: [--line-length, '120']
 
   # Uses mypy.ini for configuration.
-  - repo: https://github.com/pre-commit/mirrors-mypy
+- repo: https://github.com/pre-commit/mirrors-mypy
     # Note: with "language: system", this version is unrelated to what's run.
-    rev: v1.3.0
-    hooks:
-      - id: mypy
-        args: [--show-error-codes]
-        verbose: true
+  rev: v1.3.0
+  hooks:
+  - id: mypy
+    args: [--show-error-codes]
+    verbose: true
         # "system" means that the current environment will be used to run the hook, not the environment installed by
         # pre-commit. This is set for mypy to use the specified package dependencies in Hatch (assuming pre-commit is
         # run with hatch run ...). Seems like pre-commit calls the mypy on the command line with this settings.
-        language: system
+    language: system
 
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.6
-    hooks:
-      - id: actionlint
-        files: ^\.github/workflows/
+- repo: https://github.com/rhysd/actionlint
+  rev: v1.7.6
+  hooks:
+  - id: actionlint
+    files: ^\.github/workflows/
