@@ -6,12 +6,13 @@ from functools import cached_property
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import SemanticModel
-from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
+from dbt_semantic_interfaces.type_enums import DimensionType, EntityType, TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_non_none_or_raise
+from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item, mf_first_non_none_or_raise
+from metricflow_semantics.experimental.dsi.dimension_lookup import DimensionLookup
 from metricflow_semantics.experimental.dsi.entity_lookup import EntityLookup
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
+from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
@@ -61,6 +62,27 @@ class ModelObjectLookup(AttributePrettyFormattable):
     @cached_property
     def entity_lookup(self) -> EntityLookup:  # noqa: D102
         return EntityLookup(self._semantic_model.entities)
+
+    @cached_property
+    def dimension_lookup(self) -> DimensionLookup:  # noqa: D102
+        return DimensionLookup(self._semantic_model.dimensions)
+
+    @cached_property
+    def resolved_primary_entity_name(self) -> str:
+        """Return the name of the primary entity for this mode."""
+        if self._semantic_model.primary_entity is not None:
+            return self._semantic_model.primary_entity
+
+        primary_entity_set = self.entity_lookup.entity_type_to_names.get(EntityType.PRIMARY)
+        if primary_entity_set is None or len(primary_entity_set) != 1:
+            raise MetricFlowInternalError(
+                LazyFormat(
+                    "Did not find exactly 1 primary entity in the semantic model",
+                    primary_entity_set=primary_entity_set,
+                    semantic_model=self._semantic_model,
+                )
+            )
+        return mf_first_item(primary_entity_set)
 
     @cached_property
     @override
