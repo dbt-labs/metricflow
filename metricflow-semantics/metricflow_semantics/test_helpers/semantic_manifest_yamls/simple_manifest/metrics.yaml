@@ -655,6 +655,27 @@ metric:
       window: 7 days
       entity: user
       calculation: conversions
+
+---
+metric:
+  name: visit_buy_conversion_rate_issue_1676
+  description: "Test metric for issue #1676"
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure:
+        name: visits
+        fill_nulls_with: 0
+        join_to_timespine: true
+        filter: "{{ Dimension('visit__referrer_id') }}"
+      conversion_measure:
+        name: buys
+        fill_nulls_with: 0
+        join_to_timespine: true
+      window: 7 days
+      entity: user
+      calculation: conversion_rate
+
 ---
 metric:
   name: visit_buy_conversion_rate_with_monthly_conversion
