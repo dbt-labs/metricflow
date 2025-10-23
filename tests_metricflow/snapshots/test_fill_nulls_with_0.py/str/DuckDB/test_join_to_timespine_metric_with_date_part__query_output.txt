@@ -1,0 +1,19 @@
+test_name: test_join_to_timespine_metric_with_date_part
+test_filename: test_fill_nulls_with_0.py
+docstring:
+  Test join_to_timespine metric with date part.
+---
+  metric_time__extract_month    bookings_join_to_time_spine
+----------------------------  -----------------------------
+                           1                             15
+                           2                             55
+                           3                             57
+                           4                             60
+                           5
+                           6
+                           7
+                           8
+                           9
+                          10
+                          11
+                          12                            100

@@ -4,6 +4,8 @@ import datetime
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.specs.query_param_implementations import OrderByParameter, TimeDimensionParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
@@ -349,6 +351,33 @@ def test_join_to_timespine_metric_with_custom_granularity_filter_not_in_group_by
                 "{{ TimeDimension('metric_time', 'alien_day') }} = '2020-01-02'",
                 "{{ TimeDimension('metric_time', 'year') }} = '2019-01-01'",
             ],
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
+
+
+@pytest.mark.duckdb_only
+@pytest.mark.sql_engine_snapshot
+def test_join_to_timespine_metric_with_date_part(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test join_to_timespine metric with date part."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=("bookings_join_to_time_spine",),
+            group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
+            order_by=(OrderByParameter(order_by=TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH)),),
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."
