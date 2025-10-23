@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fixes a bug causing errors for join_to_timespine metrics queried with date part.
+time: 2025-10-23T15:48:34.954658-07:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1919"
