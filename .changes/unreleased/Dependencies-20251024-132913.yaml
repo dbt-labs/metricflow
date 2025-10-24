@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Bumping upperbound range for dbt-semantic-interfaces in metricflow-semantics
+time: 2025-10-24T13:29:13.372292-04:00
+custom:
+    Author: WilliamDee
+    Issue: None
