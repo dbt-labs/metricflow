@@ -1311,7 +1311,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             node.join_on_time_dimension_spec
         ).column_name
         time_spine_join_column_name = time_spine_data_set.instance_from_time_dimension_grain_and_date_part(
-            time_granularity_name=node.join_on_time_dimension_spec.time_granularity_name, date_part=None
+            time_granularity_name=node.join_on_time_dimension_spec.time_granularity_name,
+            date_part=node.join_on_time_dimension_spec.date_part,
         ).associated_column.column_name
         join_description = SqlPlanJoinBuilder.make_join_to_time_spine_join_description(
             node=node,
