@@ -1,4 +1,3 @@
----
 integration_test:
   name: one_hop_dundered_identifier
   description: Query a dimension from a different semantic model. Should match a left joined table query.

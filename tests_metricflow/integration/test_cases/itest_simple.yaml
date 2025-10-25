@@ -1,4 +1,3 @@
----
 integration_test:
   name: simple_query
   description: Tests selecting a metric and an associated local dimension.

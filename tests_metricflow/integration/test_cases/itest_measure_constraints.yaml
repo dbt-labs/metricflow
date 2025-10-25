@@ -1,4 +1,3 @@
----
 integration_test:
   name: ratio_with_numerator_constraint_on_local_dimension
   description: |

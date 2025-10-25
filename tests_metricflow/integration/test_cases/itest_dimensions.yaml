@@ -1,4 +1,3 @@
----
 integration_test:
   name: multiple_dimensions
   description: Query one metric with multiple dimensions from different sources.
@@ -149,7 +148,7 @@ integration_test:
   name: query_time_dimension_without_granularity
   description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
   model: SIMPLE_MODEL
-  group_bys: [ "verification__ds"]
+  group_bys: ["verification__ds"]
   check_query: |
     SELECT
       v.ds as verification__ds__day
@@ -161,7 +160,7 @@ integration_test:
   name: query_non_default_time_dimension_without_granularity
   description: Query just a time dimension, no granularity specified. Should assume default granularity for dimension.
   model: EXTENDED_DATE_MODEL
-  group_bys: [ "booking_monthly__ds"]
+  group_bys: ["booking_monthly__ds"]
   check_query: |
     SELECT
       ds AS booking_monthly__ds__month
