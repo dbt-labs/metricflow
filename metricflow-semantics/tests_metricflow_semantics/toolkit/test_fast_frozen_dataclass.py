@@ -7,12 +7,12 @@ from metricflow_semantics.test_helpers.performance.performance_helpers import as
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from pympler import asizeof
 
-from tests_metricflow_semantics.experimental.collection_helpers.fast_frozen_dataclass_test_classes import (
+from tests_metricflow_semantics.toolkit.fast_frozen_dataclass_test_classes import (
     PATH_TO_FAST_FROZEN_DATACLASS_TEST_CLASSES_PY_FILE,
     FastItem,
     Item,
 )
-from tests_metricflow_semantics.experimental.collection_helpers.statement_helpers import read_statement_from_path
+from tests_metricflow_semantics.toolkit.statement_helpers import read_statement_from_path
 
 logger = logging.getLogger(__name__)
 

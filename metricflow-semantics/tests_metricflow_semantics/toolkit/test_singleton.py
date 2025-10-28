@@ -6,11 +6,11 @@ import pytest
 from metricflow_semantics.test_helpers.performance.performance_helpers import assert_performance_factor
 from metricflow_semantics.toolkit.string_helpers import mf_dedent, mf_newline_join
 
-from tests_metricflow_semantics.experimental.collection_helpers.singleton_test_classes import (
+from tests_metricflow_semantics.toolkit.singleton_test_classes import (
     PATH_TO_SINGLETON_TEST_CLASS_PY_FILE,
     SingletonIdElement,
 )
-from tests_metricflow_semantics.experimental.collection_helpers.statement_helpers import read_statement_from_path
+from tests_metricflow_semantics.toolkit.statement_helpers import read_statement_from_path
 
 logger = logging.getLogger(__name__)
 
