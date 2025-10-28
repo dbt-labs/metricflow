@@ -5,6 +5,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
+from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
 )
@@ -30,8 +32,6 @@ from metricflow_semantics.semantic_graph.sg_interfaces import (
 from metricflow_semantics.semantic_graph.trie_resolver.dunder_name_trie import (
     DunderNameTrie,
 )
-from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
-from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.toolkit.collections.ordered_set import OrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import (

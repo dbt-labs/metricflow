@@ -5,9 +5,9 @@ import logging
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.experimental.test_helpers.benchmark_helpers import BenchmarkFunction, PerformanceBenchmark
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration, assert_object_snapshot_equal
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 

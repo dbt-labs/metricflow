@@ -4,7 +4,6 @@ import logging
 
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
@@ -12,6 +11,7 @@ from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path
     RecipeWriterPathfinder,
 )
 from metricflow_semantics.semantic_graph.builder.graph_builder import SemanticGraphBuilder
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.nodes.node_labels import MetricLabel
 from metricflow_semantics.semantic_graph.trie_resolver.group_by_metric_resolver import (
     GroupByMetricTrieResolver,

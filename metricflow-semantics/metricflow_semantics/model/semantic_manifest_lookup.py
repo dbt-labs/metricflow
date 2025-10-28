@@ -5,7 +5,6 @@ from functools import cached_property
 
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
@@ -15,6 +14,7 @@ from metricflow_semantics.semantic_graph.attribute_resolution.sg_linkable_spec_r
     SemanticGraphGroupByItemSetResolver,
 )
 from metricflow_semantics.semantic_graph.builder.graph_builder import SemanticGraphBuilder
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder

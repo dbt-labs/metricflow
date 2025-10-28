@@ -5,6 +5,8 @@ from collections import defaultdict
 from collections.abc import Mapping
 from typing import Set
 
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import (
     AttributeRecipe,
     IndexedDunderName,
@@ -24,8 +26,6 @@ from metricflow_semantics.semantic_graph.trie_resolver.dunder_name_trie import (
     DunderNameTrie,
     MutableDunderNameTrie,
 )
-from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
-from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple

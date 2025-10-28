@@ -8,12 +8,12 @@ from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
-from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
-from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass

@@ -4,13 +4,13 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.dsi.model_object_lookup import (
-    ModelObjectLookup,
-)
 from metricflow_semantics.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
 )
 from metricflow_semantics.semantic_graph.edges.sg_edges import EntityAttributeEdge
+from metricflow_semantics.semantic_graph.lookups.model_object_lookup import (
+    ModelObjectLookup,
+)
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.semantic_graph.nodes.attribute_nodes import (
     KeyAttributeNode,

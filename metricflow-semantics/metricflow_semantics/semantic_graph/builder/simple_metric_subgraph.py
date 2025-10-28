@@ -4,7 +4,6 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.dsi.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )
@@ -12,6 +11,7 @@ from metricflow_semantics.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
 )
 from metricflow_semantics.semantic_graph.edges.sg_edges import EntityRelationshipEdge
+from metricflow_semantics.semantic_graph.lookups.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.semantic_graph.nodes.entity_nodes import (
     LocalModelNode,

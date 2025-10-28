@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import InvalidManifestException
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )
@@ -23,6 +23,7 @@ from metricflow_semantics.semantic_graph.edges.edge_labels import (
     DenyVisibleAttributesLabel,
 )
 from metricflow_semantics.semantic_graph.edges.sg_edges import MetricDefinitionEdge
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.nodes.entity_nodes import (
     ComplexMetricNode,
     MetricNode,
@@ -32,7 +33,6 @@ from metricflow_semantics.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
     SemanticGraphNode,
 )
-from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat

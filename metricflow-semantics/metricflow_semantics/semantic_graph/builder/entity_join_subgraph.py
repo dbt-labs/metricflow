@@ -4,17 +4,17 @@ import logging
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.dsi.join_lookup import SemanticModelJoinLookup
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.dsi.model_object_lookup import (
-    ModelObjectLookup,
-)
 from metricflow_semantics.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
 )
 from metricflow_semantics.semantic_graph.edges.sg_edges import (
     EntityRelationshipEdge,
     JoinToModelEdge,
+)
+from metricflow_semantics.semantic_graph.lookups.join_lookup import SemanticModelJoinLookup
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.semantic_graph.lookups.model_object_lookup import (
+    ModelObjectLookup,
 )
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.semantic_graph.nodes.entity_nodes import (

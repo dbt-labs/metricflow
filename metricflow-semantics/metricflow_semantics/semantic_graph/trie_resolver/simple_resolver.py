@@ -7,6 +7,9 @@ from typing import Optional
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import AttributeRecipe
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
@@ -29,9 +32,6 @@ from metricflow_semantics.semantic_graph.trie_resolver.dunder_name_trie_resolver
     TrieCacheKey,
     TrieResolutionResult,
 )
-from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
-from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
-from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.collections.ordered_set import OrderedSet
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel

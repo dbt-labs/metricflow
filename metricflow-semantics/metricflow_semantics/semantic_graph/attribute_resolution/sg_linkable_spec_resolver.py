@@ -8,7 +8,11 @@ from dbt_semantic_interfaces.references import ElementReference, MetricReference
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
+from metricflow_semantics.model.semantics.linkable_spec_resolver import (
+    GroupByItemSetResolver,
+)
 from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )
@@ -16,6 +20,7 @@ from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe i
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
 )
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.nodes.node_labels import (
     LocalModelLabel,
     MetricLabel,
@@ -35,11 +40,6 @@ from metricflow_semantics.semantic_graph.trie_resolver.group_by_metric_resolver 
     GroupByMetricTrieResolver,
 )
 from metricflow_semantics.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
-from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
-from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
-from metricflow_semantics.model.semantics.linkable_spec_resolver import (
-    GroupByItemSetResolver,
-)
 from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass

@@ -6,6 +6,9 @@ from functools import cached_property
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from typing_extensions import override
 
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )
@@ -17,9 +20,6 @@ from metricflow_semantics.semantic_graph.nodes.node_labels import (
 from metricflow_semantics.semantic_graph.sg_constant import ClusterNameFactory
 from metricflow_semantics.semantic_graph.sg_interfaces import SemanticGraphNode
 from metricflow_semantics.semantic_graph.sg_node_grouping import SemanticGraphNodeTypedCollection
-from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
-from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
-from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass

@@ -11,12 +11,12 @@ from dbt_semantic_interfaces.type_enums import DimensionType, MetricType, TimeGr
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import InvalidManifestException, MetricFlowInternalError
-from metricflow_semantics.experimental.dsi.model_object_lookup import ModelObjectLookup
 from metricflow_semantics.model.semantics.simple_metric_input import (
     SimpleMetricInput,
     SimpleMetricInputAggregation,
     SimpleMetricInputNonAdditiveDimension,
 )
+from metricflow_semantics.semantic_graph.lookups.model_object_lookup import ModelObjectLookup
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat

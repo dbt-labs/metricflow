@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Sequence
 
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
 )
