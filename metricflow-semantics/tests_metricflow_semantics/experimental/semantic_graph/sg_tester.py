@@ -5,7 +5,6 @@ from collections.abc import Mapping
 from typing import Callable, Iterable, Optional, Sequence
 
 from dbt_semantic_interfaces.references import MetricReference
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
 )
@@ -15,15 +14,16 @@ from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_li
 from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
     SemanticGraph,
 )
-from metricflow_semantics.helpers.string_helpers import mf_indent
-from metricflow_semantics.helpers.time_helpers import PrettyDuration
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.specs.spec_set import group_spec_by_type
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.test_helpers.table_helpers import PaddedTextTableBuilder
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.string_helpers import mf_indent
+from metricflow_semantics.toolkit.time_helpers import PrettyDuration
 
 from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
 

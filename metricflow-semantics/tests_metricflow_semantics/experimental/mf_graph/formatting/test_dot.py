@@ -5,9 +5,9 @@ import logging
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
+from metricflow_semantics.toolkit.mf_graph.formatting.dot_formatter import DotNotationFormatter
 
 from tests_metricflow_semantics.experimental.mf_graph.flow_graph import FlowGraph
-from tests_metricflow_semantics.experimental.mf_graph.formatting.dot_formatter import DotNotationFormatter
 
 logger = logging.getLogger(__name__)
 

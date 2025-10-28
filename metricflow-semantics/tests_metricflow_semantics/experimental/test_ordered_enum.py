@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from metricflow_semantics.experimental.orderd_enum import OrderedEnum
+from metricflow_semantics.toolkit.orderd_enum import OrderedEnum
 
 
 class Alphabet(OrderedEnum):  # noqa: D101

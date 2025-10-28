@@ -9,13 +9,13 @@ from typing import Dict, List, Sequence, Tuple
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.toolkit.merger import Mergeable
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.specs.metadata_spec import MetadataSpec

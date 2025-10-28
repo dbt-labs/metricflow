@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
     from metricflow_semantics.specs.metric_spec import MetricSpec
     from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
     from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.visitor import VisitorOutputT
+from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 
 @dataclass(frozen=True)

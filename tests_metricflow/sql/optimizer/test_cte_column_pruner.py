@@ -4,7 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.helpers.string_helpers import mf_dedent
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -15,6 +14,7 @@ from metricflow_semantics.sql.sql_exprs import (
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.string_helpers import mf_dedent
 
 from metricflow.sql.optimizer.column_pruning.column_pruner import SqlColumnPrunerOptimizer
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderer

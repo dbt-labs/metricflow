@@ -6,9 +6,7 @@ import tabulate
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import DUNDER
 from dbt_semantic_interfaces.protocols import SemanticManifest
-from metricflow_semantics.collection_helpers.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
     RecipeWriterPathfinder,
@@ -21,11 +19,13 @@ from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import (
     GroupByAttributeLabel,
     MetricLabel,
 )
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_str_snapshot_equal,
 )
+from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 logger = logging.getLogger(__name__)
 

@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING, List
 
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelElementReference, SemanticModelReference
 from metricflow_semantics.instances import EntityInstance, InstanceSet
-from metricflow_semantics.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup

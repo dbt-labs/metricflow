@@ -6,7 +6,7 @@ import typing
 from dataclasses import dataclass
 from typing import Iterable
 
-from metricflow_semantics.experimental.ordered_set import MutableOrderedSet
+from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.experimental.semantic_graph.nodes.attribute_nodes import (

@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING, Generic, Iterable, List, Sequence, Tuple, Type
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor, LinkableInstanceSpec
+from metricflow_semantics.toolkit.merger import Mergeable
 
 if TYPE_CHECKING:
     from metricflow_semantics.specs.dimension_spec import DimensionSpec

@@ -7,11 +7,11 @@ from typing import Callable, Dict, FrozenSet, Sequence, Tuple, TypeVar
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import NodeId
 from metricflow_semantics.instances import InstanceSet
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode

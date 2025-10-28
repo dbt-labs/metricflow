@@ -6,7 +6,7 @@ from collections import OrderedDict
 from typing import Dict
 
 from metricflow_semantics.dag.mf_dag import NodeId
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.execution.execution_plan import ExecutionPlan, ExecutionPlanTask, TaskExecutionResult
 

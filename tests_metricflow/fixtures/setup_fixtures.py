@@ -8,8 +8,6 @@ from pathlib import Path
 import _pytest.config
 import pytest
 from _pytest.fixtures import FixtureRequest
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     DISPLAY_SNAPSHOTS_CLI_FLAG,
@@ -17,6 +15,8 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_display_snapshots_cli_flag,
     add_overwrite_snapshots_cli_flag,
 )
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.random_id import mf_random_id
 from tests_metricflow_semantics.fixtures.setup_fixtures import mf_add_slow_marker
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
@@ -109,7 +109,7 @@ def mf_test_configuration(  # noqa: D103
     engine_password = os.environ.get("MF_SQL_ENGINE_PASSWORD", "")
 
     current_time = datetime.datetime.now().strftime("%Y_%m_%d")
-    random_suffix = random_id()
+    random_suffix = mf_random_id()
     mf_system_schema = f"mf_test_{current_time}_{random_suffix}"
     default_source_schema = mf_system_schema
 

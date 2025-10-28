@@ -6,7 +6,6 @@ from functools import cached_property
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
 )
@@ -18,6 +17,7 @@ from metricflow_semantics.experimental.semantic_graph.sg_interfaces import Seman
 from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from metricflow_semantics.experimental.ordered_set import FrozenOrderedSet, MutableOrderedSet
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet
 
 logger = logging.getLogger(__name__)
 

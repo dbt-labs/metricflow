@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from metricflow_semantics.experimental.orderd_enum import OrderedEnum
+from metricflow_semantics.toolkit.orderd_enum import OrderedEnum
 
 logger = logging.getLogger(__name__)
 

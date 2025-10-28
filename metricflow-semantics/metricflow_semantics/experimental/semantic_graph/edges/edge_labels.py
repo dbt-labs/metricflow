@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import logging
 
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.mf_graph.graph_labeling import MetricFlowGraphLabel
-from metricflow_semantics.experimental.singleton import Singleton
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
+from metricflow_semantics.toolkit.singleton import Singleton
 
 logger = logging.getLogger(__name__)
 

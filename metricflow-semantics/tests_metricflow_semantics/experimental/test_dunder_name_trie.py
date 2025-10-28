@@ -8,12 +8,12 @@ from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_trie import (
     MutableDunderNameTrie,
 )
-from metricflow_semantics.helpers.string_helpers import mf_dedent
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_object_snapshot_equal,
 )
+from metricflow_semantics.toolkit.string_helpers import mf_dedent
 
 logger = logging.getLogger(__name__)
 

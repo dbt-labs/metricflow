@@ -18,13 +18,10 @@ from dbt_semantic_interfaces.references import (
     SemanticModelElementReference,
 )
 from dbt_semantic_interfaces.type_enums import DimensionType
-from metricflow_semantics.collection_helpers.syntactic_sugar import mf_first_item
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import ExecutionException, InvalidQueryException, UnknownMetricError
 from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.mf_logging.runtime import log_block_runtime
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
@@ -39,7 +36,6 @@ from metricflow_semantics.protocols.query_parameter import (
     OrderByQueryParameter,
 )
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
-from metricflow_semantics.random_id import random_id
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
@@ -49,6 +45,10 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
+from metricflow_semantics.toolkit.random_id import mf_random_id
+from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 from typing_extensions import TypeVar
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -178,7 +178,7 @@ class MetricFlowQueryRequest:
         order_output_columns_by_input_order: bool = False,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
-            request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
+            request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}"),
             saved_query_name=saved_query_name,
             metric_names=metric_names,
             metrics=metrics,

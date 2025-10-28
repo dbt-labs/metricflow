@@ -6,13 +6,13 @@ from dataclasses import dataclass
 from dbt_semantic_interfaces.protocols import WhereFilter
 from typing_extensions import override
 
-from metricflow_semantics.helpers.string_helpers import mf_indent
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryIssueType,
     MetricFlowQueryResolutionIssue,
 )
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
+from metricflow_semantics.toolkit.string_helpers import mf_indent
 
 
 @dataclass(frozen=True)

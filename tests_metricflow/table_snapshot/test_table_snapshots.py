@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
-from metricflow_semantics.random_id import random_id
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.toolkit.random_id import mf_random_id
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
@@ -62,7 +62,7 @@ def test_load(
     table_snapshot: SqlTableSnapshot,
 ) -> None:
     """Test loading a snapshot to the engine."""
-    schema_name = f"mf_test_snapshot_schema_{random_id()}"
+    schema_name = f"mf_test_snapshot_schema_{mf_random_id()}"
 
     try:
         ddl_sql_client.create_schema(schema_name)

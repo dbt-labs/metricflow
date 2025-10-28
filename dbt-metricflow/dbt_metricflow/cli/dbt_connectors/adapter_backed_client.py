@@ -8,9 +8,9 @@ from dbt.adapters.base import BaseAdapter
 from dbt_common.exceptions.base import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
-from metricflow_semantics.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.random_id import random_id
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.random_id import mf_random_id
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
@@ -137,7 +137,7 @@ class AdapterBackedSqlClient:
             parameters.
         """
         start = time.perf_counter()
-        request_id = SqlRequestId(f"mf_rid__{random_id()}")
+        request_id = SqlRequestId(f"mf_rid__{mf_random_id()}")
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
                 f"Invalid query statement - we do not support queries with bind parameters through dbt adapters! "
@@ -184,7 +184,7 @@ class AdapterBackedSqlClient:
                 f"adapters! Bind params: {SqlBindParameterSet.param_dict}"
             )
         start = time.perf_counter()
-        request_id = SqlRequestId(f"mf_rid__{random_id()}")
+        request_id = SqlRequestId(f"mf_rid__{mf_random_id()}")
         logger.info(
             LazyFormat("Running execute() statement", statement=stmt, param_dict=sql_bind_parameter_set.param_dict)
         )
@@ -214,7 +214,7 @@ class AdapterBackedSqlClient:
         """
         start = time.perf_counter()
         logger.info(LazyFormat("Running dry run", statement=stmt, param_dict=sql_bind_parameter_set.param_dict))
-        request_id = SqlRequestId(f"mf_rid__{random_id()}")
+        request_id = SqlRequestId(f"mf_rid__{mf_random_id()}")
         connection_name = f"MetricFlow_dry_run_request_{request_id}"
         # TODO - consolidate to self._adapter.validate_sql() when all implementations will work from within MetricFlow
 

@@ -7,11 +7,11 @@ from typing import Optional
 from dbt_semantic_interfaces.references import SemanticModelReference
 from typing_extensions import override
 
-from metricflow_semantics.experimental.dataclass_helpers import fast_frozen_dataclass
-from metricflow_semantics.experimental.mf_graph.comparable import Comparable, ComparisonKey
-from metricflow_semantics.experimental.singleton import Singleton
-from metricflow_semantics.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
-from metricflow_semantics.mf_logging.pretty_formatter import PrettyFormatContext
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_graph.comparable import Comparable, ComparisonKey
+from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
+from metricflow_semantics.toolkit.singleton import Singleton
 
 logger = logging.getLogger(__name__)
 

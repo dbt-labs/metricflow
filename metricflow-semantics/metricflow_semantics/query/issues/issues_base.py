@@ -7,10 +7,10 @@ from typing import Sequence, Sized, Tuple
 
 from typing_extensions import override
 
-from metricflow_semantics.collection_helpers.merger import Mergeable
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
+from metricflow_semantics.toolkit.merger import Mergeable
 
 
 class MetricFlowQueryIssueType(Enum):
