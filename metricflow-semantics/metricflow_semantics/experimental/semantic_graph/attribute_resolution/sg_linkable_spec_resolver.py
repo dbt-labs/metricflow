@@ -7,8 +7,8 @@ from typing import Iterable, Optional
 from dbt_semantic_interfaces.references import ElementReference, MetricReference
 from typing_extensions import override
 
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )

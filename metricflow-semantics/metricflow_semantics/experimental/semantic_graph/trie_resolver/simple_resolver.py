@@ -6,7 +6,7 @@ from typing import Optional
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import AttributeRecipe
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,

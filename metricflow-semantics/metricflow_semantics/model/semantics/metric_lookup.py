@@ -14,11 +14,12 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import (
     DuplicateMetricError,
+    InvalidManifestException,
+    MetricFlowInternalError,
     MetricNotFoundError,
     UnknownMetricError,
 )
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )

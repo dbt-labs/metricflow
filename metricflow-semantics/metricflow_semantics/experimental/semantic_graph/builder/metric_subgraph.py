@@ -8,8 +8,8 @@ from dbt_semantic_interfaces.protocols import Metric
 from dbt_semantic_interfaces.type_enums import MetricType
 from typing_extensions import override
 
+from metricflow_semantics.errors.error_classes import InvalidManifestException
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )

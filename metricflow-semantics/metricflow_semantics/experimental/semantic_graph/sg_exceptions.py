@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 
 logger = logging.getLogger(__name__)
 

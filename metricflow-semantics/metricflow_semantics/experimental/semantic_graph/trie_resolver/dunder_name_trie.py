@@ -12,7 +12,7 @@ from typing import Iterable, Optional, Sequence
 from dbt_semantic_interfaces.naming.keywords import DUNDER
 from typing_extensions import Self, override
 
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_descriptor import DunderNameDescriptor

@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException
+from metricflow_semantics.errors.error_classes import InvalidManifestException
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
     GroupByItemSet,
 )

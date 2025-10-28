@@ -7,7 +7,7 @@ from typing import Optional, Set
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )

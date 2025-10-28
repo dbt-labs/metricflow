@@ -11,11 +11,11 @@ from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from more_itertools import peekable
 from typing_extensions import override
 
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.experimental.dsi.model_object_lookup import (
     ModelObjectLookup,
 )
 from metricflow_semantics.experimental.dsi.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
 from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
