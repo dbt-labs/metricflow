@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 
 import pytest
-from metricflow_semantics.experimental.test_helpers.performance_helpers import assert_performance_factor
+from metricflow_semantics.test_helpers.performance.performance_helpers import assert_performance_factor
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from pympler import asizeof
 

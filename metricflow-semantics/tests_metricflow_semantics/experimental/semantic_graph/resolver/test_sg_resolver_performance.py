@@ -6,14 +6,14 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
-from metricflow_semantics.experimental.test_helpers.benchmark_helpers import (
+from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
+from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.performance.benchmark_helpers import (
     BenchmarkFunction,
     OneSecondFunction,
     PerformanceBenchmark,
 )
-from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
-from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from typing_extensions import override
 
 from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
