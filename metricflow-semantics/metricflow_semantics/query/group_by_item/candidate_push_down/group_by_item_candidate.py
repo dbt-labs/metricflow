@@ -12,7 +12,7 @@ from metricflow_semantics.model.semantic_model_derivation import SemanticModelDe
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
-from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec

@@ -13,7 +13,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_loca
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
-from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver

@@ -27,7 +27,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
-from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec

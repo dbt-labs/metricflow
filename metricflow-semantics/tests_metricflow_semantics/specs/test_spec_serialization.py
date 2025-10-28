@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec
-from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId

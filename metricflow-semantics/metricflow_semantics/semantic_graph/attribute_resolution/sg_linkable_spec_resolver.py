@@ -13,10 +13,10 @@ from metricflow_semantics.model.semantics.linkable_element_set_base import BaseG
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     GroupByItemSetResolver,
 )
-from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
-from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
 )

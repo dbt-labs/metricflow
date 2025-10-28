@@ -61,7 +61,7 @@ from metricflow_semantics.query.validation_rules.duplicate_metric import Duplica
 from metricflow_semantics.query.validation_rules.metric_time_requirements import MetricTimeQueryValidationRule
 from metricflow_semantics.query.validation_rules.query_validator import PostResolutionQueryValidator
 from metricflow_semantics.query.validation_rules.unique_column_names import UniqueOutputColumnValidationRule
-from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
