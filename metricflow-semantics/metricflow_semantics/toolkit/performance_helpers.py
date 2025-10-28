@@ -18,13 +18,20 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
     This and associates classes are a WIP and may be removed.
     """
 
-    def __init__(self, description: Optional[Union[str, LazyFormat]] = None) -> None:  # noqa: D107
+    def __init__(self, description: Optional[Union[str, LazyFormat]] = None, log_level: int = logging.INFO) -> None:
+        """Initializer.
+
+        Args:
+            description: If specified, log start / end messages using this value.
+            log_level: Log `description` using this log level.
+        """
+        self._log_level = log_level
         self._local_state = _ExecutionTimerLocalState(description)
 
     def __enter__(self) -> ExecutionTimer:  # noqa: D105
         description = self._local_state.description
         if description is not None:
-            logger.info(LazyFormat(lambda: f"[  BEGIN  ] {description}"))
+            logger.log(level=self._log_level, msg=LazyFormat(lambda: f"[  BEGIN  ] {description}"))
         self._local_state.start_time = time.perf_counter()
         return self
 
@@ -41,7 +48,10 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
         description = self._local_state.description
         if description is not None:
             total_duration = self._local_state.total_duration_for_completed_contexts
-            logger.info(LazyFormat(lambda: f"[   END   ] {description} in {PrettyDuration(total_duration)}"))
+            logger.log(
+                level=self._log_level,
+                msg=LazyFormat(lambda: f"[   END   ] {description} in {PrettyDuration(total_duration)}"),
+            )
 
     @property
     def total_duration(self) -> PrettyDuration:  # noqa: D102
@@ -49,6 +59,8 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
 
 
 class _ExecutionTimerLocalState(threading.local):
+    """Mutable thread-local object for storing state for the timer."""
+
     def __init__(self, description: Optional[Union[str, LazyFormat]]) -> None:  # noqa: D107
         self.start_time: Optional[float] = None
         self.total_duration_for_completed_contexts = 0.0
