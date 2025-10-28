@@ -60,6 +60,7 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
         ("Derived metric", ("bookings_per_view",)),
         ("Multiple metrics", ("bookings", "views")),
         ("Cumulative metric", ("trailing_2_months_revenue",)),
+        ("Derived metric from cumulative metric", ("trailing_2_months_revenue_sub_10",)),
     ):
         # Group-by metrics should not be called for metrics, so skip them for smaller snapshots.
         metric_references = tuple(MetricReference(metric_name) for metric_name in metric_names)
