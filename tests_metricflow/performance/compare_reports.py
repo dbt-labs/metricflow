@@ -4,7 +4,7 @@ import argparse
 import json
 from io import StringIO
 
-from metricflow_semantics.test_helpers.performance.performance_helpers import (
+from metricflow_semantics.test_helpers.performance.profiling import (
     PerformanceMetricComparison,
     SessionReportSet,
     SessionReportSetComparison,

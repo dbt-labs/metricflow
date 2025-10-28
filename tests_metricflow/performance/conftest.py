@@ -8,7 +8,7 @@ import pytest
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import DirectoryPathAnchor
-from metricflow_semantics.test_helpers.performance.performance_helpers import (
+from metricflow_semantics.test_helpers.performance.profiling import (
     PerformanceTracker,
     SessionReport,
 )
