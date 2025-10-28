@@ -12,7 +12,7 @@ import uuid
 from hashlib import sha256
 from typing import Callable, List, Optional, TypeVar
 
-from metricflow_semantics.toolkit.random_id import random_id
+from metricflow_semantics.toolkit.random_id import mf_random_id
 from typing_extensions import ParamSpec
 
 from metricflow.telemetry.handlers.handlers import (
@@ -140,7 +140,7 @@ def log_call(telemetry_reporter: TelemetryReporter, module_name: str) -> Callabl
         def wrapped(*args: P.args, **kwargs: P.kwargs) -> R:
             # Not every Callable has a __name__
             function_name = getattr(func, "__name__", repr(func))
-            invocation_id = f"call_{random_id()}"
+            invocation_id = f"call_{mf_random_id()}"
             start_time = time.perf_counter()
             telemetry_reporter.log_function_start(
                 invocation_id=invocation_id, module_name=module_name, function_name=function_name

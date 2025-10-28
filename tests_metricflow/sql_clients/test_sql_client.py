@@ -8,7 +8,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.toolkit.random_id import random_id
+from metricflow_semantics.toolkit.random_id import mf_random_id
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def _random_table() -> str:
-    return f"test_table_{random_id()}"
+    return f"test_table_{mf_random_id()}"
 
 
 def _select_x_as_y(x: int = 1, y: str = "y") -> str:

@@ -47,7 +47,7 @@ from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
-from metricflow_semantics.toolkit.random_id import random_id
+from metricflow_semantics.toolkit.random_id import mf_random_id
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 from typing_extensions import TypeVar
 
@@ -178,7 +178,7 @@ class MetricFlowQueryRequest:
         order_output_columns_by_input_order: bool = False,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
-            request_id=MetricFlowRequestId(mf_rid=f"{random_id()}"),
+            request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}"),
             saved_query_name=saved_query_name,
             metric_names=metric_names,
             metrics=metrics,

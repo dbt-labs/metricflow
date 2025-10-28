@@ -4,9 +4,11 @@ import random
 import string
 
 
-def random_id() -> str:
-    """Generates an 8-digit random alphanumeric string."""
+def mf_random_id(length: int = 8, excluded_characters: str = "gjpqy") -> str:
+    """Generates an 8-digit random alphanumeric string.
+
+    The default `excluded_characters` are characters that extend below the line for better visual appearance.
+    """
     alphabet = string.ascii_lowercase + string.digits
-    # Characters that go below the line are visually unappealing, so don't use those.
-    filtered_alphabet = [x for x in alphabet if x not in "gjpqy"]
-    return "".join(random.choices(filtered_alphabet, k=8))
+    filtered_alphabet = tuple(x for x in alphabet if x not in excluded_characters)
+    return "".join(random.choices(filtered_alphabet, k=length))
