@@ -74,7 +74,6 @@ from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
-from metricflow_semantics.workarounds.reference import sorted_semantic_model_references
 
 logger = logging.getLogger(__name__)
 
@@ -689,7 +688,7 @@ class MetricFlowQueryResolver:
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,
             input_to_issue_set=issue_set_mapping,
-            queried_semantic_models=sorted_semantic_model_references(queried_semantic_models),
+            queried_semantic_models=tuple(sorted(queried_semantic_models)),
         )
 
     def _get_models_for_simple_metrics(self, resolution_dag: GroupByItemResolutionDag) -> Set[SemanticModelReference]:
