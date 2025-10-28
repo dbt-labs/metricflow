@@ -17,7 +17,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfigura
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 from metricflow_semantics.toolkit.mf_graph.formatting.svg_formatter import SvgFormatter
 
-from tests_metricflow_semantics.experimental.graph_helpers import assert_graph_snapshot_equal
+from tests_metricflow_semantics.helpers.graph_helpers import assert_graph_snapshot_equal
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 
-from tests_metricflow_semantics.experimental.mf_graph.flow_graph import (
+from tests_metricflow_semantics.toolkit.mf_graph.flow_graph import (
     FlowEdge,
     FlowGraph,
     IntermediateNode,

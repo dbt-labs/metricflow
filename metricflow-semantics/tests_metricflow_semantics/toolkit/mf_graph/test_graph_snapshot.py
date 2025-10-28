@@ -5,8 +5,8 @@ import logging
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from tests_metricflow_semantics.experimental.graph_helpers import assert_graph_snapshot_equal
-from tests_metricflow_semantics.experimental.mf_graph.flow_graph import FlowGraph
+from tests_metricflow_semantics.helpers.graph_helpers import assert_graph_snapshot_equal
+from tests_metricflow_semantics.toolkit.mf_graph.flow_graph import FlowGraph
 
 logger = logging.getLogger(__name__)
 

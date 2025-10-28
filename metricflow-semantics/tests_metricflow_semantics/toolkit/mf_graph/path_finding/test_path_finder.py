@@ -12,7 +12,7 @@ from metricflow_semantics.toolkit.mf_graph.path_finding.graph_path import Mutabl
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import EdgeCountWeightFunction
 
-from tests_metricflow_semantics.experimental.mf_graph.flow_graph import (
+from tests_metricflow_semantics.toolkit.mf_graph.flow_graph import (
     FlowEdge,
     FlowGraph,
     FlowGraphPath,

@@ -8,7 +8,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 from metricflow_semantics.toolkit.mf_graph.formatting.svg_formatter import SvgFormatter
 
-from tests_metricflow_semantics.experimental.mf_graph.flow_graph import FlowGraph
+from tests_metricflow_semantics.toolkit.mf_graph.flow_graph import FlowGraph
 
 logger = logging.getLogger(__name__)
 

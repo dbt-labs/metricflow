@@ -11,8 +11,8 @@ from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFi
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
-from tests_metricflow_semantics.experimental.semantic_graph.sg_tester import SemanticGraphTester
+from tests_metricflow_semantics.semantic_graph.sg_fixtures import SemanticGraphTestFixture
+from tests_metricflow_semantics.semantic_graph.sg_tester import SemanticGraphTester
 
 logger = logging.getLogger(__name__)
 

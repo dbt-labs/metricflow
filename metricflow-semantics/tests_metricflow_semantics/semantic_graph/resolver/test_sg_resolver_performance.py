@@ -16,7 +16,7 @@ from metricflow_semantics.test_helpers.performance.benchmark_helpers import (
 )
 from typing_extensions import override
 
-from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
+from tests_metricflow_semantics.semantic_graph.sg_fixtures import SemanticGraphTestFixture
 
 logger = logging.getLogger(__name__)
 

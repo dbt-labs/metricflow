@@ -7,8 +7,8 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from tests_metricflow_semantics.experimental.semantic_graph.sg_fixtures import SemanticGraphTestFixture
-from tests_metricflow_semantics.experimental.semantic_graph.sg_tester import SemanticGraphTester
+from tests_metricflow_semantics.semantic_graph.sg_fixtures import SemanticGraphTestFixture
+from tests_metricflow_semantics.semantic_graph.sg_tester import SemanticGraphTester
 
 logger = logging.getLogger(__name__)
 
