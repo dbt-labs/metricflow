@@ -13,11 +13,11 @@ from dbt_semantic_interfaces.references import EntityReference, SemanticModelRef
 from dbt_semantic_interfaces.type_enums import DatePart
 from typing_extensions import Self
 
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -31,8 +31,8 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 if typing.TYPE_CHECKING:
-    from metricflow_semantics.experimental.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
-    from metricflow_semantics.experimental.semantic_graph.trie_resolver.dunder_name_descriptor import (
+    from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
+    from metricflow_semantics.semantic_graph.trie_resolver.dunder_name_descriptor import (
         DunderNameDescriptor,
     )
 

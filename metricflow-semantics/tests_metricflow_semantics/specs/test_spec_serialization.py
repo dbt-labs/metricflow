@@ -5,13 +5,13 @@ import logging
 from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    GroupByItemSet,
-)
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec
+from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+    GroupByItemSet,
+)
+from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameter, SqlBindParameterSet, SqlBindParameterValue
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity

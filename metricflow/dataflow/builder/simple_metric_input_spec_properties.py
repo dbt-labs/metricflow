@@ -6,8 +6,8 @@ from typing import Optional, Sequence
 
 from dbt_semantic_interfaces.references import TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
+from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass

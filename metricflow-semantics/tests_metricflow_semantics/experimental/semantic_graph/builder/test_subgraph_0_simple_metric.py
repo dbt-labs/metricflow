@@ -4,7 +4,7 @@ import logging
 
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
-from metricflow_semantics.experimental.semantic_graph.builder.simple_metric_subgraph import (
+from metricflow_semantics.semantic_graph.builder.simple_metric_subgraph import (
     SimpleMetricSubgraphGenerator,
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration

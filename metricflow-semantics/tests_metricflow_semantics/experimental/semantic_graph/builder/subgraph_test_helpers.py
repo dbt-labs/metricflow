@@ -6,11 +6,11 @@ from typing import Iterable, Optional, Type
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.builder.partial_graph_builder import PartialSemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.builder.subgraph_generator import (
+from metricflow_semantics.semantic_graph.builder.partial_graph_builder import PartialSemanticGraphBuilder
+from metricflow_semantics.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
 )
-from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
+from metricflow_semantics.semantic_graph.sg_interfaces import (
     MutableSemanticGraph,
 )
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration

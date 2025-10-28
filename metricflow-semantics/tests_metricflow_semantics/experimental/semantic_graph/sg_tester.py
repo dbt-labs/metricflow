@@ -5,18 +5,18 @@ from collections.abc import Mapping
 from typing import Callable, Iterable, Optional, Sequence
 
 from dbt_semantic_interfaces.references import MetricReference
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
-    RecipeWriterPathfinder,
-)
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
-    SemanticGraphGroupByItemSetResolver,
-)
-from metricflow_semantics.experimental.semantic_graph.sg_interfaces import (
-    SemanticGraph,
-)
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
+from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
+    RecipeWriterPathfinder,
+)
+from metricflow_semantics.semantic_graph.attribute_resolution.sg_linkable_spec_resolver import (
+    SemanticGraphGroupByItemSetResolver,
+)
+from metricflow_semantics.semantic_graph.sg_interfaces import (
+    SemanticGraph,
+)
 from metricflow_semantics.specs.spec_set import group_spec_by_type
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.test_helpers.table_helpers import PaddedTextTableBuilder

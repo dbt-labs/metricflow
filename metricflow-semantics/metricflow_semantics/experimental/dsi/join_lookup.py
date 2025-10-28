@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums import EntityType
 from typing_extensions import override
 
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
+from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat

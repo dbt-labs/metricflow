@@ -10,9 +10,6 @@ from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimen
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from typing_extensions import override
 
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    GroupByItemSet,
-)
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
@@ -30,6 +27,9 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.query.suggestion_generator import QueryItemSuggestionGenerator
+from metricflow_semantics.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+    GroupByItemSet,
+)
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.metric_time_default_granularity import MetricTimeDefaultGranularityPattern
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern

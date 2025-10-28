@@ -5,12 +5,12 @@ import logging
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.recipe_writer_path import (
+from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
 )
-from metricflow_semantics.experimental.semantic_graph.builder.graph_builder import SemanticGraphBuilder
-from metricflow_semantics.experimental.semantic_graph.nodes.node_labels import MetricLabel
-from metricflow_semantics.experimental.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
+from metricflow_semantics.semantic_graph.builder.graph_builder import SemanticGraphBuilder
+from metricflow_semantics.semantic_graph.nodes.node_labels import MetricLabel
+from metricflow_semantics.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
