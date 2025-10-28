@@ -5,7 +5,11 @@ This project uses **hatch** for dependency management and testing:
 - Dependencies: Use `hatch` commands, not `pip install` directly
 - Tests: Use `hatch run dev-env:pytest <path>` instead of `pytest` directly
 - Snapshots: Add `--overwrite-snapshots` for new snapshot tests
-- Common: `make test` or `hatch run dev-env:pytest tests_metricflow/`
+
+After making a set of changes:
+
+- Run `make lint` to detect and fix lint errors.
+- Run `make test` to run all tests.
 
 ## Python Code Standards
 

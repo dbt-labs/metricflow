@@ -34,4 +34,4 @@ jobs:
 
       - name: Run Linter
         run: >
-          hatch -v run dev-env:pre-commit run --verbose --show-diff-on-failure --color=always --all-files
+           make lint ADDITIONAL_PRECOMMIT_OPTIONS='--show-diff-on-failure'

@@ -6,6 +6,8 @@
 PARALLELISM = auto
 # Additional command line options to pass to pytest.
 ADDITIONAL_PYTEST_OPTIONS =
+# Additional command line options to pass to `pre-commit`
+ADDITIONAL_PRECOMMIT_OPTIONS =
 
 PERFORMANCE_OUTPUT_FILE = performance-report.json
 PERFORMANCE_COMPARISON_OUTPUT_FILE = performance-comparison.md
@@ -85,7 +87,7 @@ test-trino:
 
 .PHONY: lint
 lint:
-	hatch -v run dev-env:pre-commit run --all-files
+	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
 
 # Running data warehouses locally
 .PHONY: postgresql postgres
