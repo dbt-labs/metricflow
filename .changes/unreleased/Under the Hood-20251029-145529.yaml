@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Move semantic-graph modules out of `experimental`
+time: 2025-10-29T14:55:29.241776-07:00
+custom:
+  Author: plypaul
+  Issue: "1921"
