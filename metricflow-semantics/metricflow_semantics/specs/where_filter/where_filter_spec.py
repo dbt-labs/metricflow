@@ -7,7 +7,7 @@ from typing import Tuple
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from typing_extensions import override
 
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec

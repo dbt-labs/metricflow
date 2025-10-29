@@ -5,14 +5,14 @@ import logging
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
-from metricflow_semantics.experimental.test_helpers.benchmark_helpers import (
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.test_helpers.performance.benchmark_helpers import (
     BenchmarkFunction,
     OneSecondFunction,
     PerformanceBenchmark,
 )
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.query.query_parser import MetricFlowQueryParser
-from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.synthetic_manifest.semantic_manifest_generator import SyntheticManifestGenerator
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
     SyntheticManifestParameterSet,

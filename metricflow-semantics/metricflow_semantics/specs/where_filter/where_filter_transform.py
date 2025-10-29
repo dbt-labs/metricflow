@@ -8,13 +8,13 @@ from dbt_semantic_interfaces.implementations.filters.where_filter import Pydanti
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 
 from metricflow_semantics.errors.error_classes import RenderSqlTemplateException
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    GroupByItemSet,
-)
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
+)
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
+    GroupByItemSet,
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker

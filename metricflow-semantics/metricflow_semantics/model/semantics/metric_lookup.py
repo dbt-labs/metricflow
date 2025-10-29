@@ -14,13 +14,10 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 from metricflow_semantics.errors.error_classes import (
     DuplicateMetricError,
+    InvalidManifestException,
+    MetricFlowInternalError,
     MetricNotFoundError,
     UnknownMetricError,
-)
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.experimental.metricflow_exception import InvalidManifestException, MetricFlowInternalError
-from metricflow_semantics.experimental.semantic_graph.attribute_resolution.annotated_spec_linkable_element_set import (
-    GroupByItemSet,
 )
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -28,6 +25,10 @@ from metricflow_semantics.model.semantics.linkable_element_set_base import BaseG
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     GroupByItemSetResolver,
 )
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
+    GroupByItemSet,
+)
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.toolkit.cache.result_cache import ResultCache

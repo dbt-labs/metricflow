@@ -4,8 +4,8 @@ from typing import Mapping
 
 import pytest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from metricflow_semantics.experimental.dsi.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.instances import InstanceSet
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_exprs import (

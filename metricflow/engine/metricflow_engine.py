@@ -19,8 +19,12 @@ from dbt_semantic_interfaces.references import (
 )
 from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.errors.error_classes import ExecutionException, InvalidQueryException, UnknownMetricError
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.errors.error_classes import (
+    ExecutionException,
+    InvalidQueryException,
+    MetricFlowInternalError,
+    UnknownMetricError,
+)
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup

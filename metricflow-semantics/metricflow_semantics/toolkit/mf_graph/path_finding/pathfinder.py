@@ -8,7 +8,7 @@ from collections import defaultdict
 from collections.abc import Set
 from typing import Final, Generic, Iterator, Optional, Sequence, TypeVar
 
-from metricflow_semantics.experimental.metricflow_exception import MetricFlowInternalError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.toolkit.mf_graph.mf_graph import (

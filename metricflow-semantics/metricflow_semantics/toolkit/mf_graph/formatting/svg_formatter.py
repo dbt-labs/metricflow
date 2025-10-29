@@ -6,7 +6,7 @@ from typing import Optional
 
 from typing_extensions import override
 
-from metricflow_semantics.experimental.metricflow_exception import GraphvizException
+from metricflow_semantics.errors.error_classes import GraphvizException
 from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
 from metricflow_semantics.toolkit.mf_graph.formatting.mf_to_graphical_dot import (
     MetricFlowGraphToGraphicalDotConverter,

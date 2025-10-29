@@ -17,8 +17,6 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.experimental.dsi.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
-from metricflow_semantics.experimental.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.instances import (
     DimensionInstance,
     EntityInstance,
@@ -28,6 +26,8 @@ from metricflow_semantics.instances import (
 )
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.semantic_model_helper import SemanticModelHelper
+from metricflow_semantics.semantic_graph.lookups.simple_metric_model_object_lookup import SimpleMetricModelObjectLookup
+from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
