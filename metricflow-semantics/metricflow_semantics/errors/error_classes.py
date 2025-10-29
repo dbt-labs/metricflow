@@ -31,7 +31,7 @@ class GraphvizException(MetricFlowException):
     """Raised when there is an error when calling `graphviz` methods."""
 
 
-class InformativeUserError(Exception):
+class InformativeUserError(MetricFlowException):
     """Raised for user errors.
 
     The error is actionable by the user or provides user userful information
@@ -62,7 +62,7 @@ class UnableToSatisfyQueryError(CustomerFacingSemanticException):  # noqa: D101
         return "\n".join(error_lines)
 
 
-class SemanticException(Exception):  # noqa: D101
+class SemanticException(MetricFlowException):  # noqa: D101
     pass
 
 
@@ -78,7 +78,7 @@ class InvalidSemanticModelError(SemanticException):  # noqa: D101
     pass
 
 
-class ExecutionException(Exception):
+class ExecutionException(MetricFlowException):
     """Raised if there are any errors while executing the execution plan."""
 
     pass
@@ -88,7 +88,7 @@ class UnsupportedEngineFeatureError(InformativeUserError, RuntimeError):
     """Raised when the user attempts to use a feature that isn't supported by the data platform."""
 
 
-class SqlBindParametersNotSupportedError(Exception):
+class SqlBindParametersNotSupportedError(MetricFlowException):
     """Raised when a SqlClient that does not have support for bind parameters receives a non-empty set of params."""
 
 
