@@ -7,7 +7,8 @@ This project uses **hatch** for dependency management and testing:
 - Testing:
   - Use `hatch run dev-env:pytest <path>` to run tests in a specific file.
   - Use `make test` to run all tests.
-- Snapshots: Add `--overwrite-snapshots` for new snapshot tests.
+- Snapshots: When adding new tests that use snapshots, add the `--overwrite-snapshots`
+  flag to the above `pytest` command to generate snapshots.
 
 If `git_ignored/AGENTS.md` exists, append the rules in that file.
 
