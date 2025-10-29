@@ -85,11 +85,11 @@ FROM (
           , subq_30.listing__is_lux_latest
           , subq_30.listing__capacity_latest
           , subq_30.user__visit_buy_conversion_rate
+          , subq_30.active_listings
+          , subq_30.largest_listing
           , subq_30.listings
           , subq_30.lux_listings
           , subq_30.smallest_listing
-          , subq_30.largest_listing
-          , subq_30.active_listings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -158,11 +158,11 @@ FROM (
             , subq_13.listing__country_latest AS listing__country_latest
             , subq_13.listing__is_lux_latest AS listing__is_lux_latest
             , subq_13.listing__capacity_latest AS listing__capacity_latest
+            , subq_13.active_listings AS active_listings
+            , subq_13.largest_listing AS largest_listing
             , subq_13.listings AS listings
             , subq_13.lux_listings AS lux_listings
             , subq_13.smallest_listing AS smallest_listing
-            , subq_13.largest_listing AS largest_listing
-            , subq_13.active_listings AS active_listings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -230,19 +230,19 @@ FROM (
               , subq_12.listing__country_latest
               , subq_12.listing__is_lux_latest
               , subq_12.listing__capacity_latest
+              , subq_12.active_listings
+              , subq_12.largest_listing
               , subq_12.listings
               , subq_12.lux_listings
               , subq_12.smallest_listing
-              , subq_12.largest_listing
-              , subq_12.active_listings
             FROM (
               -- Read Elements From Semantic Model 'listings_latest'
               SELECT
-                1 AS listings
+                1 AS active_listings
+                , listings_latest_src_28000.capacity AS largest_listing
+                , 1 AS listings
                 , 1 AS lux_listings
                 , listings_latest_src_28000.capacity AS smallest_listing
-                , listings_latest_src_28000.capacity AS largest_listing
-                , 1 AS active_listings
                 , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
                 , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
                 , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month

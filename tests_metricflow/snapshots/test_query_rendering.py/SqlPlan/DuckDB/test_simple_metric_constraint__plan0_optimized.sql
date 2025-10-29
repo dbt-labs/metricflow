@@ -28,16 +28,16 @@ FROM (
       SELECT
         listings_latest_src_28000.is_lux AS listing__is_lux_latest
         , subq_25.metric_time__day AS metric_time__day
-        , subq_25.bookings AS bookings
         , subq_25.average_booking_value AS average_booking_value
+        , subq_25.bookings AS bookings
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         SELECT
           DATE_TRUNC('day', ds) AS metric_time__day
           , listing_id AS listing
-          , 1 AS bookings
           , booking_value AS average_booking_value
+          , 1 AS bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_25
       LEFT OUTER JOIN

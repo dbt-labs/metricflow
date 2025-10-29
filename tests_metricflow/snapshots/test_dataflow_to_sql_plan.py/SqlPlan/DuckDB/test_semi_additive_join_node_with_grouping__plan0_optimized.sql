@@ -45,15 +45,15 @@ SELECT
   , subq_3.account_type AS account_type
   , subq_3.account__account_type AS account__account_type
   , subq_3.account_balance AS account_balance
-  , subq_3.total_account_balance_first_day AS total_account_balance_first_day
   , subq_3.current_account_balance_by_user AS current_account_balance_by_user
+  , subq_3.total_account_balance_first_day AS total_account_balance_first_day
   , subq_3.total_account_balance_first_day_of_month AS total_account_balance_first_day_of_month
 FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   SELECT
     account_balance
-    , account_balance AS total_account_balance_first_day
     , account_balance AS current_account_balance_by_user
+    , account_balance AS total_account_balance_first_day
     , account_balance AS total_account_balance_first_day_of_month
     , DATE_TRUNC('day', ds) AS ds__day
     , DATE_TRUNC('week', ds) AS ds__week

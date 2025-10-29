@@ -86,12 +86,12 @@ docstring:
         <!-- col39 =                                              -->
         <!--   SqlSelectColumn(                                   -->
         <!--     expr=SqlColumnReferenceExpression(node_id=cr_4), -->
-        <!--     column_alias='total_account_balance_first_day',  -->
+        <!--     column_alias='current_account_balance_by_user',  -->
         <!--   )                                                  -->
         <!-- col40 =                                              -->
         <!--   SqlSelectColumn(                                   -->
         <!--     expr=SqlColumnReferenceExpression(node_id=cr_5), -->
-        <!--     column_alias='current_account_balance_by_user',  -->
+        <!--     column_alias='total_account_balance_first_day',  -->
         <!--   )                                                  -->
         <!-- col41 =                                                      -->
         <!--   SqlSelectColumn(                                           -->
@@ -116,12 +116,12 @@ docstring:
             <!-- col1 =                                                   -->
             <!--   SqlSelectColumn(                                       -->
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_28001), -->
-            <!--     column_alias='total_account_balance_first_day',      -->
+            <!--     column_alias='current_account_balance_by_user',      -->
             <!--   )                                                      -->
             <!-- col2 =                                                   -->
             <!--   SqlSelectColumn(                                       -->
             <!--     expr=SqlColumnReferenceExpression(node_id=cr_28002), -->
-            <!--     column_alias='current_account_balance_by_user',      -->
+            <!--     column_alias='total_account_balance_first_day',      -->
             <!--   )                                                      -->
             <!-- col3 =                                                       -->
             <!--   SqlSelectColumn(                                           -->
@@ -239,12 +239,12 @@ docstring:
                 <!-- col1 =                                                   -->
                 <!--   SqlSelectColumn(                                       -->
                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_28001), -->
-                <!--     column_alias='total_account_balance_first_day',      -->
+                <!--     column_alias='current_account_balance_by_user',      -->
                 <!--   )                                                      -->
                 <!-- col2 =                                                   -->
                 <!--   SqlSelectColumn(                                       -->
                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_28002), -->
-                <!--     column_alias='current_account_balance_by_user',      -->
+                <!--     column_alias='total_account_balance_first_day',      -->
                 <!--   )                                                      -->
                 <!-- col3 =                                                       -->
                 <!--   SqlSelectColumn(                                           -->

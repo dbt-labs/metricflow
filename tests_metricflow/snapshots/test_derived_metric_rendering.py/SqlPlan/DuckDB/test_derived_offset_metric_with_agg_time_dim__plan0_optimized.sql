@@ -9,8 +9,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS booking__ds__day
-    , booking_value
     , guest_id AS bookers
+    , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 

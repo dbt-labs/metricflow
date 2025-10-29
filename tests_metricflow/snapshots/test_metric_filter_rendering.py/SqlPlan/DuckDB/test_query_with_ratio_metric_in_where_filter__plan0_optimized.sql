@@ -37,8 +37,8 @@ FROM (
       -- Pass Only Elements: ['bookings', 'bookers', 'listing']
       SELECT
         listing_id AS listing
-        , 1 AS bookings
         , guest_id AS bookers
+        , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_32
     GROUP BY

@@ -13,8 +13,8 @@ WITH sma_28009_cte AS (
     DATE_TRUNC('day', ds) AS metric_time__day
     , DATE_TRUNC('month', ds) AS metric_time__month
     , DATE_TRUNC('year', ds) AS metric_time__year
-    , booking_value
     , guest_id AS bookers
+    , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 

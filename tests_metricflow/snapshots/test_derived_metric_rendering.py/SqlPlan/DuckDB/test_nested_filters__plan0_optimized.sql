@@ -31,16 +31,16 @@ FROM (
         SELECT
           listings_latest_src_28000.is_lux AS listing__is_lux_latest
           , subq_27.booking__is_instant AS booking__is_instant
-          , subq_27.bookings AS bookings
           , subq_27.average_booking_value AS average_booking_value
+          , subq_27.bookings AS bookings
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
           SELECT
             listing_id AS listing
             , is_instant AS booking__is_instant
-            , 1 AS bookings
             , booking_value AS average_booking_value
+            , 1 AS bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_27
         LEFT OUTER JOIN

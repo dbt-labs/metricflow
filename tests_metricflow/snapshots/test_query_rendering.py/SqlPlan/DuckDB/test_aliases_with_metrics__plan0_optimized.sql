@@ -17,8 +17,8 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
-    , 1 AS bookings
     , booking_value
+    , 1 AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 

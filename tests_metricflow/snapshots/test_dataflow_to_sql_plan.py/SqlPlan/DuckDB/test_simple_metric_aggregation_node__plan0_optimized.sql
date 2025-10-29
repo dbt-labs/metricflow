@@ -10,8 +10,8 @@ sql_engine: DuckDB
 -- Pass Only Elements: ['bookings', 'instant_bookings', 'average_booking_value', 'bookers']
 -- Aggregate Inputs for Simple Metrics
 SELECT
-  SUM(1) AS bookings
-  , AVG(booking_value) AS average_booking_value
-  , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
+  AVG(booking_value) AS average_booking_value
   , COUNT(DISTINCT guest_id) AS bookers
+  , SUM(1) AS bookings
+  , SUM(CASE WHEN is_instant THEN 1 ELSE 0 END) AS instant_bookings
 FROM ***************************.fct_bookings bookings_source_src_28000

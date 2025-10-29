@@ -14,9 +14,9 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  SELECT\n'                                                                             -->
         <!--    "    DATE_TRUNC('day', ds) AS ds__day\n"                                                 -->
         <!--    '    , is_instant\n'                                                                     -->
+        <!--    '    , booking_value\n'                                                                  -->
         <!--    '    , 1 AS bookings\n'                                                                  -->
         <!--    '    , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings\n'                     -->
-        <!--    '    , booking_value\n'                                                                  -->
         <!--    '  FROM ***************************.fct_bookings bookings_source_src_28000\n'            -->
         <!--    ')\n'                                                                                    -->
         <!--    '\n'                                                                                     -->

@@ -14,8 +14,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     guest_id AS guest
-    , booking_value
     , guest_id AS bookers
+    , booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 

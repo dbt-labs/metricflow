@@ -15,15 +15,15 @@ FROM (
   SELECT
     subq_7.listing AS listing
     , listings_latest_src_28000.country AS listing__country_latest
-    , SUM(subq_7.bookings) AS bookings
     , COUNT(DISTINCT subq_7.bookers) AS bookers
+    , SUM(subq_7.bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Pass Only Elements: ['bookings', 'bookers', 'listing']
     SELECT
       listing_id AS listing
-      , 1 AS bookings
       , guest_id AS bookers
+      , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_7
   LEFT OUTER JOIN

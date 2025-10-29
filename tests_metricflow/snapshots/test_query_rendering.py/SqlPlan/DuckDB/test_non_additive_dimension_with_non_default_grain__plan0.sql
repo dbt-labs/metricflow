@@ -119,8 +119,8 @@ FROM (
             -- Read Elements From Semantic Model 'accounts_source'
             SELECT
               accounts_source_src_28000.account_balance
-              , accounts_source_src_28000.account_balance AS total_account_balance_first_day
               , accounts_source_src_28000.account_balance AS current_account_balance_by_user
+              , accounts_source_src_28000.account_balance AS total_account_balance_first_day
               , accounts_source_src_28000.account_balance AS total_account_balance_first_day_of_month
               , DATE_TRUNC('day', accounts_source_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', accounts_source_src_28000.ds) AS ds__week
@@ -219,8 +219,8 @@ FROM (
               -- Read Elements From Semantic Model 'accounts_source'
               SELECT
                 accounts_source_src_28000.account_balance
-                , accounts_source_src_28000.account_balance AS total_account_balance_first_day
                 , accounts_source_src_28000.account_balance AS current_account_balance_by_user
+                , accounts_source_src_28000.account_balance AS total_account_balance_first_day
                 , accounts_source_src_28000.account_balance AS total_account_balance_first_day_of_month
                 , DATE_TRUNC('day', accounts_source_src_28000.ds) AS ds__day
                 , DATE_TRUNC('week', accounts_source_src_28000.ds) AS ds__week
