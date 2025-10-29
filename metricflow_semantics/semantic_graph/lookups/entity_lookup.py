@@ -20,7 +20,9 @@ class EntityLookup(AttributePrettyFormattable):
     """A lookup for entities within a semantic model."""
 
     def __init__(self, entities: Iterable[Entity]) -> None:  # noqa: D107
-        self._entity_name_to_entity: Mapping[str, Entity] = {entity.name: entity for entity in entities}
+        self._entity_name_to_entity: Mapping[str, Entity] = {
+            entity.name: entity for entity in sorted(entities, key=lambda _entity: _entity.name)
+        }
 
     @cached_property
     def entity_name_to_type(self) -> Mapping[str, EntityType]:  # noqa: D102
