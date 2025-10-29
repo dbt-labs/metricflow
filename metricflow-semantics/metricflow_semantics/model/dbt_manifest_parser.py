@@ -17,9 +17,8 @@ from dbt_semantic_interfaces.transformations.semantic_manifest_transformer impor
 )
 
 
-def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> PydanticSemanticManifest:
-    """Parse a PydanticSemanticManifest given the generated semantic_manifest json from dbt."""
-    raw_model = PydanticSemanticManifest.parse_raw(manifest_json_string)
+def transform_dbt_generated_manifest(manifest: PydanticSemanticManifest) -> PydanticSemanticManifest:
+    """Transform a PydanticSemanticManifest given the generated semantic_manifest json from dbt."""
     # The serialized object in the dbt project does not have all transformations applied to it at
     # this time, which causes failures with input simple-metric input resolution.
     # TODO: remove this transform call once the upstream changes are integrated into our dependency tree
@@ -40,5 +39,10 @@ def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> Pyd
             *rule_set.general_metric_update_rules,
         ),
     )
-    model = PydanticSemanticManifestTransformer.transform(raw_model, rules)
-    return model
+    return PydanticSemanticManifestTransformer.transform(manifest, rules)
+
+
+def parse_manifest_from_dbt_generated_manifest(manifest_json_string: str) -> PydanticSemanticManifest:
+    """Parse a PydanticSemanticManifest given the generated semantic_manifest json from dbt."""
+    raw_model = PydanticSemanticManifest.parse_raw(manifest_json_string)
+    return transform_dbt_generated_manifest(raw_model)
