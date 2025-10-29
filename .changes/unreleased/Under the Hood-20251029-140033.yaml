@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Update Cursor rules file to include linting + loading of additional rules
+time: 2025-10-29T14:00:33.96369-07:00
+custom:
+  Author: plypaul
+  Issue: "1920"
