@@ -56,7 +56,11 @@ class ModelObjectLookup(AttributePrettyFormattable):
                 ),
             )
             time_dimension_name_to_grain[dimension.name] = type_params.time_granularity
-        return time_dimension_name_to_grain
+
+        return {
+            time_dimension_name: time_dimension_name_to_grain[time_dimension_name]
+            for time_dimension_name in sorted(time_dimension_name_to_grain)
+        }
 
     @cached_property
     def entity_lookup(self) -> EntityLookup:  # noqa: D102

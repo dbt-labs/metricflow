@@ -20,7 +20,7 @@ from metricflow_semantics.semantic_graph.lookups.simple_metric_model_object_look
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
-from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple, Pair, T
@@ -55,14 +55,18 @@ class ManifestObjectLookup(AttributePrettyFormattable):
         return self._semantic_manifest
 
     @cached_property
-    def semantic_models(self) -> Sequence[SemanticModel]:  # noqa: D102
-        return self._semantic_manifest.semantic_models
+    def _semantic_models(self) -> Sequence[SemanticModel]:  # noqa: D102
+        return sorted(self._semantic_manifest.semantic_models, key=lambda _semantic_model: _semantic_model.name)
+
+    @cached_property
+    def _metrics(self) -> Sequence[Metric]:
+        return sorted(self._semantic_manifest.metrics, key=lambda _metric: _metric.name)
 
     @cached_property
     def _semantic_model_and_simple_metrics_pairs(self) -> Sequence[Pair[SemanticModel, Sequence[Metric]]]:
         model_name_to_simple_metrics: defaultdict[str, list[Metric]] = defaultdict(list)
 
-        for metric in self._semantic_manifest.metrics:
+        for metric in self._metrics:
             metric_type = metric.type
             if metric_type is MetricType.SIMPLE:
                 metric_aggregation_params = metric.type_params.metric_aggregation_params
@@ -73,7 +77,7 @@ class ManifestObjectLookup(AttributePrettyFormattable):
                 model_name_to_simple_metrics[metric_aggregation_params.semantic_model].append(metric)
 
         semantic_model_and_simple_metrics_pairs: list[Pair[SemanticModel, Sequence[Metric]]] = []
-        for semantic_model in self._semantic_manifest.semantic_models:
+        for semantic_model in self._semantic_models:
             semantic_model_and_simple_metrics_pairs.append(
                 (semantic_model, model_name_to_simple_metrics.get(semantic_model.name) or ())
             )
@@ -122,12 +126,12 @@ class ManifestObjectLookup(AttributePrettyFormattable):
         }
 
     @cached_property
-    def entity_name_to_model_lookups(self) -> Mapping[str, OrderedSet[ModelObjectLookup]]:
+    def entity_name_to_model_lookups(self) -> Mapping[str, Sequence[ModelObjectLookup]]:
         """Mapping from the entity name to the model lookups that have the entity."""
-        entity_name_to_model_lookups: dict[str, MutableOrderedSet[ModelObjectLookup]] = defaultdict(MutableOrderedSet)
+        entity_name_to_model_lookups: dict[str, list[ModelObjectLookup]] = defaultdict(list)
         for model_id, lookup in self.model_id_to_lookup.items():
-            for entity in lookup.semantic_model.entities:
-                entity_name_to_model_lookups[entity.name].add(lookup)
+            for entity in sorted(lookup.semantic_model.entities, key=lambda _entity: _entity.name):
+                entity_name_to_model_lookups[entity.name].append(lookup)
         return entity_name_to_model_lookups
 
     @cached_property
@@ -191,7 +195,7 @@ class ManifestObjectLookup(AttributePrettyFormattable):
     def _metric_name_to_metric(self) -> Mapping[str, Metric]:
         metric_name_to_metric: dict[str, Metric] = {}
 
-        for metric in self._semantic_manifest.metrics:
+        for metric in self._metrics:
             metric_name_to_metric[metric.name] = metric
         return metric_name_to_metric
 

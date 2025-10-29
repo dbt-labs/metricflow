@@ -65,7 +65,7 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
                         model_name=model_name,
                     )
                 )
-        self._simple_metrics = simple_metrics
+        self._simple_metrics = sorted(simple_metrics, key=lambda _metric: _metric.name)
 
     @cached_property
     def _simple_metric_inputs_from_metrics(self) -> Sequence[SimpleMetricInput]:
@@ -150,7 +150,7 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
     def _time_dimension_name_to_grain(self) -> Mapping[str, TimeGranularity]:
         return {
             dimension.name: dimension.type_params.time_granularity
-            for dimension in self._semantic_model.dimensions
+            for dimension in sorted(self._semantic_model.dimensions, key=lambda dimension: dimension.name)
             if (dimension.type is DimensionType.TIME and dimension.type_params is not None)
         }
 
