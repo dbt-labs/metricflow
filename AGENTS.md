@@ -2,14 +2,14 @@
 
 This project uses **hatch** for dependency management and testing:
 
-- Dependencies: Use `hatch` commands, not `pip install` directly
-- Tests: Use `hatch run dev-env:pytest <path>` instead of `pytest` directly
-- Snapshots: Add `--overwrite-snapshots` for new snapshot tests
+- Dependencies: Use `hatch` commands, not `pip install` directly.
+- Linting: Run `make lint` to detect and fix lint errors.
+- Testing:
+  - Use `hatch run dev-env:pytest <path>` to run tests in a specific file.
+  - Use `make test` to run all tests.
+- Snapshots: Add `--overwrite-snapshots` for new snapshot tests.
 
-After making a set of changes:
-
-- Run `make lint` to detect and fix lint errors.
-- Run `make test` to run all tests.
+If `git_ignored/AGENTS.md` exists, append the rules in that file.
 
 ## Python Code Standards
 
