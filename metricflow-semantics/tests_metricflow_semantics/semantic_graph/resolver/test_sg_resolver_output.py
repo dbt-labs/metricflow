@@ -54,19 +54,19 @@ def test_set_for_metrics(sg_tester: SemanticGraphTester) -> None:
     sg_resolver = sg_tester.sg_resolver
     description_to_set: dict[str, BaseGroupByItemSet] = {}
 
-    # Include cases: no metrics, simple metric, derived metric, multiple metrics, cumulative metric.
-    for metric_names in (
-        (),
-        ("bookings",),
-        ("bookings_per_view",),
-        ("bookings", "views"),
-        ("trailing_2_months_revenue",),
+    for case_description, metric_names in (
+        ("No metrics", ()),
+        ("Simple metric", ("bookings",)),
+        ("Derived metric", ("bookings_per_view",)),
+        ("Multiple metrics", ("bookings", "views")),
+        ("Cumulative metric", ("trailing_2_months_revenue",)),
+        ("Derived metric from cumulative metric", ("trailing_2_months_revenue_sub_10",)),
     ):
         # Group-by metrics should not be called for metrics, so skip them for smaller snapshots.
         metric_references = tuple(MetricReference(metric_name) for metric_name in metric_names)
         set_filter = GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.METRIC,))
         complete_set = sg_resolver.get_common_set(metric_references=metric_references, set_filter=set_filter)
-        description_to_set[str(metric_names)] = complete_set
+        description_to_set[f"{case_description} {str(list(metric_names))}"] = complete_set
         sg_tester.check_set_filtering(
             complete_set=complete_set,
             filtered_set_callable=lambda _filter: sg_resolver.get_common_set(

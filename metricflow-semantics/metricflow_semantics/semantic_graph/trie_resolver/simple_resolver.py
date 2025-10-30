@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Set
 from typing import Optional
 
 from typing_extensions import override
@@ -34,7 +33,6 @@ from metricflow_semantics.semantic_graph.trie_resolver.dunder_name_trie_resolver
 )
 from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.collections.ordered_set import OrderedSet
-from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.toolkit.mf_graph.path_finding.traversal_profile_differ import TraversalProfileDiffer
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
@@ -112,11 +110,9 @@ class SimpleTrieResolver(DunderNameTrieResolver):
             deny_labels={self._deny_visible_attributes_label},
         )
 
-        # Match the behavior of a bug in the existing resolver in some cases with date part. This should be removed
-        # after migration.
-        if self._should_exclude_date_part(
-            source_nodes=source_nodes, collected_labels=find_descendants_result.labels_collected_during_traversal
-        ):
+        collected_labels = find_descendants_result.labels_collected_during_traversal
+
+        if self._deny_date_part_label in collected_labels:
             if element_filter is None:
                 element_filter = GroupByItemSetFilter.create()
             element_filter = element_filter.copy(
@@ -294,21 +290,3 @@ class SimpleTrieResolver(DunderNameTrieResolver):
         )
 
         return self._result_cache.set_and_get(cache_key, result_trie)
-
-    def _should_exclude_date_part(
-        self, source_nodes: Set[SemanticGraphNode], collected_labels: OrderedSet[MetricFlowGraphLabel]
-    ) -> bool:
-        """To handle a bug, check if we should exclude date part from the query.
-
-        This reproduces the logic for what seems like a bug in the current resolver. The date part is only not allowed
-        if there's a cumulative metric in the query. A query for a derived metric that is based on a cumulative metric
-        still can be queried by date part.
-        """
-        if self._deny_date_part_label not in collected_labels:
-            return False
-
-        for source_node in source_nodes:
-            for successor_edge in self._semantic_graph.edges_with_tail_node(source_node):
-                if self._cumulative_metric_label in successor_edge.labels:
-                    return True
-        return False
