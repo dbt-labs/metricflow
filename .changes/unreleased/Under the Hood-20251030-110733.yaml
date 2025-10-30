@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Remove case to reproduce date-part bug
+time: 2025-10-30T11:07:33.406269-07:00
+custom:
+  Author: plypaul
+  Issue: "1922"
