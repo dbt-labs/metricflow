@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
 
+from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -178,10 +179,7 @@ class GroupByMetricPattern(EntityLinkPattern):
         # This looks hacky because the typing for the interface does not match the implementation, but that's temporary!
         # This will get a lot less hacky once we enable multiple entities and dimensions in the group by.
         if len(metric_call_parameter_set.group_by) != 1:
-            raise RuntimeError(
-                "Currently only one group by item is allowed for Metric filters. "
-                "This should have been caught by validations."
-            )
+            raise UnableToSatisfyQueryError("Currently only one group by item is allowed for Metric filters.")
         group_by = metric_call_parameter_set.group_by[0]
         # custom_granularity_names is empty because we are not parsing any dimensions here with grain
         structured_name = StructuredLinkableSpecName.from_name(
