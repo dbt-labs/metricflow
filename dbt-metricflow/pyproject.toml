@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "dbt-metricflow"
 description = "Execute commands against the MetricFlow semantic layer with dbt."
 readme = "README.md"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.9,<3.14"
 license = "Apache-2.0"
 authors = [
   { name = "dbt Labs", email = "info@dbtlabs.com" },
@@ -19,6 +19,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
