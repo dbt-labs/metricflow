@@ -1,4 +1,3 @@
----
 integration_test:
   name: semi_additive_measure_query_with_identifier_grouping
   description: Tests selecting a measure with semi additive properties with a window_grouping

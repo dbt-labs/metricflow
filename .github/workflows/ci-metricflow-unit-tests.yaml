@@ -8,7 +8,6 @@ on:
       - reopened
       - synchronize
 jobs:
-
   metricflow-unit-tests-duckdb:
     name: MetricFlow Tests (DuckDB)
     runs-on: ubuntu-latest
@@ -18,12 +17,10 @@ jobs:
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - uses: ./.github/actions/run-mf-tests
         with:
           python-version: ${{ matrix.python-version }}
           make-target: "test-include-slow"
-
   metricflow-unit-tests-postgres:
     name: MetricFlow Tests (PostgreSQL)
     runs-on: ubuntu-latest
@@ -35,27 +32,24 @@ jobs:
           POSTGRES_PASSWORD: metricflowing
           POSTGRES_DB: metricflow
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 5432:5432
     steps:
-
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - uses: ./.github/actions/run-mf-tests
         with:
           make-target: "test-postgresql"
           hatch-environment-cache-config-json: >-
             {
+
+
+
               "configs": [
                 {"hatch_project_directory": ".", "hatch_environment_name": "postgres-env"}
               ]
             }
-
   metricflow-unit-tests:
     # This step is used to simplify setup for branch protection. Branch protection is configured to check if this step
     # fails vs. checking all test steps.
@@ -64,32 +58,30 @@ jobs:
     if: ${{ always() }}
     needs: [metricflow-unit-tests-duckdb, metricflow-unit-tests-postgres]
     steps:
-
       - name: Check success
         run: test ${{ needs.metricflow-unit-tests-duckdb.result }} = 'success' -a ${{ needs.metricflow-unit-tests-postgres.result }} = 'success'
-
   metricflow-package-tests:
     name: MetricFlow Packages Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.9", "3.12" ]
+        python-version: ["3.9", "3.12"]
     steps:
-
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - name: Setup Python ${{ matrix.python-version }} Environment
         uses: ./.github/actions/setup-python-env
         with:
           python-version: "${{ matrix.python-version }}"
           hatch-environment-cache-config-json: >-
             {
+
+
+
               "configs": [
                 {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
                 {"hatch_project_directory": "./metricflow-semantics", "hatch_environment_name": "dev-env"}
               ]
             }
-
       - name: Run Package-Build Tests
         run: "make test-build-packages"

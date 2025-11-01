@@ -28,8 +28,7 @@ semantic_models:
         expr: "1"
         agg: SUM
       - name: quick_buy_amount_usd
-        description: The total USD value of the transactions that were
-                    purchased using the "quick buy" button.
+        description: The total USD value of the transactions that were purchased using the "quick buy" button.
         expr: CASE WHEN transaction_type_name = 'quick-buy' THEN transaction_amount_usd ELSE 0 END
         agg: SUM
       - name: quick_buy_transactions
@@ -37,13 +36,11 @@ semantic_models:
         expr: CASE WHEN transaction_type_name = 'quick-buy' THEN TRUE ELSE FALSE END
         agg: SUM_BOOLEAN
       - name: cancellations_usd
-        description: The total USD value of the transactions that were
-                    cancelled.
+        description: The total USD value of the transactions that were cancelled.
         expr: CASE WHEN transaction_type_name = 'cancellation' THEN transaction_amount_usd ELSE 0 END
         agg: SUM
       - name: alterations_usd
-        description: The total USD value of the transactions that were
-                    altered.
+        description: The total USD value of the transactions that were altered.
         expr: CASE WHEN transaction_type_name = 'alteration' THEN transaction_amount_usd ELSE 0 END
         agg: SUM
       - name: transacting_customers

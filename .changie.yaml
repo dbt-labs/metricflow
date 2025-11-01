@@ -19,7 +19,6 @@ changeFormat: |-
     {{- end -}}
   {{- end -}}
   - {{.Body}}{{if $IssueList}} ({{ join ", " $IssueList }}){{end}}
-
 kinds:
   - label: Breaking Changes
   - label: Features
@@ -28,24 +27,21 @@ kinds:
   - label: Under the Hood
   - label: Dependencies
   - label: Security
-
 newlines:
   afterChangelogHeader: 1
   afterKind: 1
   afterChangelogVersion: 1
   beforeKind: 1
   endOfVersion: 1
-
 custom:
-- key: Author
-  label: GitHub Username(s) (separated by a single space if multiple)
-  type: string
-  minLength: 3
-- key: Issue
-  label: "GitHub Issue (or PR) Number(s) (separated by a single space if multiple)"
-  type: string
-  minLength: 1
-
+  - key: Author
+    label: GitHub Username(s) (separated by a single space if multiple)
+    type: string
+    minLength: 3
+  - key: Issue
+    label: "GitHub Issue (or PR) Number(s) (separated by a single space if multiple)"
+    type: string
+    minLength: 1
 footerFormat: |
   {{- $contributorDict := dict }}
   {{- /* ensure we always skip snyk and dependabot in addition to the core team */}}

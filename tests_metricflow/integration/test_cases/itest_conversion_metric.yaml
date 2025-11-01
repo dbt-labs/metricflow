@@ -1,4 +1,3 @@
----
 integration_test:
   name: conversion_rate_metric_infinite_window
   description: Query a conversion metric that calculates the conversion rate
@@ -166,6 +165,7 @@ integration_test:
         b.referrer_id
     ) conversions
     ON opportunities.referrer_id = conversions.referrer_id
+
 # TODO: the ordering logic is different in databricks which produces a different, but still correct answer.
 # ---
 # integration_test:

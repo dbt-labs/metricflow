@@ -1,15 +1,11 @@
----
 semantic_model:
   name: listings_latest
   description: listings_latest
-
   node_relation:
     schema_name: $source_schema
     alias: dim_listings_latest
-
   defaults:
     agg_time_dimension: ds
-
   measures:
     - name: listings
       expr: 1
@@ -20,7 +16,6 @@ semantic_model:
     - name: smallest_listing
       expr: capacity
       agg: min
-
   dimensions:
     - name: ds
       type: time
@@ -40,7 +35,6 @@ semantic_model:
     - name: capacity_latest
       type: categorical
       expr: capacity
-
   entities:
     - name: listing
       type: primary
