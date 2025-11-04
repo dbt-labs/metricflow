@@ -3,6 +3,9 @@ from __future__ import annotations
 from dbt_semantic_interfaces.implementations.semantic_manifest import (
     PydanticSemanticManifest,
 )
+from dbt_semantic_interfaces.transformations.fix_proxy_metrics import (
+    FixProxyMetricsRule,
+)
 from dbt_semantic_interfaces.transformations.flatten_simple_metrics_with_measure_inputs import (
     FlattenSimpleMetricsWithMeasureInputsRule,
 )
@@ -36,6 +39,7 @@ def transform_dbt_generated_manifest(manifest: PydanticSemanticManifest) -> Pyda
             CreateProxyMeasureRule(),
             FlattenSimpleMetricsWithMeasureInputsRule(),
             ReplaceInputMeasuresWithSimpleMetricsTransformationRule(),
+            FixProxyMetricsRule(),
             *rule_set.general_metric_update_rules,
         ),
     )
