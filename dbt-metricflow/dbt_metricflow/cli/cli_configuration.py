@@ -64,6 +64,9 @@ class CLIConfiguration:
         Returns: None
         """
         cwd = pathlib.Path.cwd()
+        home = pathlib.Path.home()
+
+        dbt_profiles_dir_default_path = cwd if (cwd / "profiles.yml").exists() else home / ".dbt"
 
         dbt_profiles_dir_env_var = os.environ.get(CLIConfiguration.DBT_PROFILES_DIR_ENV_VAR_NAME)
         dbt_profiles_dir_from_env = (
@@ -74,8 +77,8 @@ class CLIConfiguration:
         dbt_project_dir_from_env = (
             pathlib.Path(dbt_project_dir_env_var) if dbt_project_dir_env_var is not None else None
         )
-
-        dbt_profiles_path = dbt_profiles_path or dbt_profiles_dir_from_env or cwd
+        
+        dbt_profiles_path = dbt_profiles_path or dbt_profiles_dir_from_env or dbt_profiles_dir_default_path
         dbt_project_path = dbt_project_path or dbt_project_dir_from_env or cwd
         dbt_project_yaml_path = dbt_project_path / "dbt_project.yml"
         if not dbt_project_yaml_path.exists():
