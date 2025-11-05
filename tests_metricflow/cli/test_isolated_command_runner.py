@@ -13,10 +13,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
-from tests_metricflow.cli.cli_test_helpers import (
-    create_tutorial_project_files,
-    run_dbt_build,
-)
+from tests_metricflow.cli.cli_test_helpers import create_tutorial_project_files, run_dbt_build
 from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
 from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
@@ -148,6 +145,69 @@ def test_environment_variables(
                     "transactions",
                 ],
             )
+        result.raise_exception_on_failure()
+        assert_str_snapshot_equal(
+            request=request,
+            mf_test_configuration=mf_test_configuration,
+            snapshot_id="result",
+            snapshot_str=result.output,
+            expectation_description="A table showing the `transactions` metric.",
+        )
+
+
+@pytest.mark.slow
+def test_home_profiles_dir(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    """Tests running an MF CLI command with the profiles file in the home directory."""
+    with tempfile.TemporaryDirectory() as tmp_directory:
+        tmp_directory_path = Path(tmp_directory)
+        dbt_project_path = create_tutorial_project_files(tmp_directory_path)
+
+        # Move the `profiles.yml` to a the home directory to isolate the two variables.
+        dbt_profiles_path = Path.home() / ".dbt"
+        if not dbt_profiles_path.exists():
+            os.mkdir(dbt_profiles_path)
+
+        if (dbt_profiles_path / "profiles.yml").exists():
+            # Backup the existing profiles.yml file.
+            shutil.move(
+                src=dbt_profiles_path / "profiles.yml",
+                dst=dbt_profiles_path / "profiles.yml.backup",
+            )
+
+        shutil.move(
+            src=dbt_project_path / "profiles.yml",
+            dst=dbt_profiles_path / "profiles.yml",
+        )
+
+        cli_runner = IsolatedCliCommandRunner(
+            dbt_project_path=dbt_project_path,
+            # No need to specify the profiles path since it's in the home directory.
+        )
+        with cli_runner.running_context():
+            run_dbt_build(cli_runner)
+            result = cli_runner.run_command(
+                command_enum=IsolatedCliCommandEnum.MF_QUERY,
+                command_args=[
+                    "--metrics",
+                    "transactions",
+                ],
+            )
+
+        if (dbt_profiles_path / "profiles.yml.backup").exists():
+            # Restore the original profiles.yml file.
+            #   We need to do this before the result is checked
+            #   to avoid raising an exception and failing to restore the original file.
+            shutil.move(
+                src=dbt_profiles_path / "profiles.yml.backup",
+                dst=dbt_profiles_path / "profiles.yml",
+            )
+        else:
+            # No backup so let's cleanup the profiles.yml file.
+            os.remove(dbt_profiles_path / "profiles.yml")
+
         result.raise_exception_on_failure()
         assert_str_snapshot_equal(
             request=request,
