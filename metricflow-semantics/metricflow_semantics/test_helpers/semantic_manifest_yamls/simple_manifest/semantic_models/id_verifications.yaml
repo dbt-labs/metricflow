@@ -1,20 +1,19 @@
 ---
 semantic_model:
   name: id_verifications
-  description: id_verifications
-
-  node_relation:
-    schema_name: $source_schema
-    alias: fct_id_verifications
-
   defaults:
     agg_time_dimension: ds
-
-  measures:
-    - name: identity_verifications
-      expr: "1"
-      agg: sum
-
+  description: id_verifications
+  node_relation:
+    alias: fct_id_verifications
+    schema_name: $source_schema
+  entities:
+    - name: verification
+      type: primary
+      expr: verification_id
+    - name: user
+      type: foreign
+      expr: user_id
   dimensions:
     - name: ds
       type: time
@@ -28,10 +27,13 @@ semantic_model:
     - name: verification_type
       type: categorical
 
-  entities:
-    - name: verification
-      type: primary
-      expr: verification_id
-    - name: user
-      type: foreign
-      expr: user_id
+---
+metric:
+  name: identity_verifications
+  description: identity_verifications
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: id_verifications
+      agg: sum

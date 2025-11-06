@@ -1,23 +1,20 @@
 ---
 semantic_model:
   name: visits_source
-  description: visits_source
-
-  node_relation:
-    schema_name: $source_schema
-    alias: fct_visits
-
   defaults:
     agg_time_dimension: ds
-
-  measures:
-    - name: visits
-      expr: 1
-      agg: count
-    - name: visitors
+  description: visits_source
+  node_relation:
+    alias: fct_visits
+    schema_name: $source_schema
+  primary_entity: visit
+  entities:
+    - name: user
+      type: foreign
       expr: user_id
-      agg: count_distinct
-
+    - name: session
+      type: foreign
+      expr: session_id
   dimensions:
     - name: ds
       type: time
@@ -26,12 +23,26 @@ semantic_model:
     - name: referrer_id
       type: categorical
 
-  primary_entity: visit
+---
+metric:
+  name: visits
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: visits_source
+      agg: sum
+    is_private: true
 
-  entities:
-    - name: user
-      type: foreign
-      expr: user_id
-    - name: session
-      type: foreign
-      expr: session_id
+---
+metric:
+  name: visits_fill_nulls_with_0_join_to_timespine
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: visits_source
+      agg: sum
+    join_to_timespine: true
+    fill_nulls_with: 0
+    is_private: true
