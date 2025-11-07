@@ -1,30 +1,23 @@
----
 semantic_model:
   name: monthly_bookings_source
   description: >
-    Contains bookings by month. Temporarily renamed from `bookings_monthly_source` to trigger edge case for
-    skipped tests in `test_metric_lookup.py`.
+    Contains bookings by month. Temporarily renamed from `bookings_monthly_source` to trigger edge case for skipped tests in `test_metric_lookup.py`.
 
   node_relation:
     schema_name: $source_schema
     alias: fct_bookings_extended_monthly
-
   defaults:
     agg_time_dimension: ds
-
   measures:
     - name: bookings_monthly
       agg: sum
       create_metric: true
-
   primary_entity: booking_monthly
-
   dimensions:
     - name: ds
       type: time
       type_params:
         time_granularity: month
-
   entities:
     - name: listing
       expr: listing_id

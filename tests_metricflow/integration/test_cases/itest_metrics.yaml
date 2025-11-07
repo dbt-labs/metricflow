@@ -1,4 +1,3 @@
----
 integration_test:
   name: simple_expr_metric
   description: Test for expr metric
@@ -584,8 +583,7 @@ integration_test:
   description: Tests querying two metrics with a dimension having a NULL values
   model: SIMPLE_MODEL
   metrics: ["bookings", "views"]
-  group_bys:
-    ["metric_time", "listing__is_lux_latest", "listing__country_latest"]
+  group_bys: ["metric_time", "listing__is_lux_latest", "listing__country_latest"]
   check_query: |
     SELECT
       MAX(bk.bookings) AS bookings
@@ -1110,12 +1108,8 @@ integration_test:
   description: Test query using multiple date_parts
   model: SIMPLE_MODEL
   metrics: ["bookings"]
-  group_by_objs: [
-    {"name": "metric_time", "date_part": "quarter"},
-    {"name": "metric_time", "date_part": "dow"},
-    {"name": "metric_time", "date_part": "doy"},
-    {"name": "metric_time", "date_part": "day"},
-  ]
+  group_by_objs: [{"name": "metric_time", "date_part": "quarter"}, {"name": "metric_time", "date_part": "dow"}, {"name": "metric_time", "date_part": "doy"},
+    {"name": "metric_time", "date_part": "day"}]
   check_query: |
     SELECT
       SUM(1) AS bookings
@@ -1751,7 +1745,8 @@ integration_test:
 ---
 integration_test:
   name: nested_derived_metric_offset_with_joined_where_constraint_not_selected
-  description: Tests a nested derived metric where the outer metric has an offset and where constraint that requires an additional join, and is not used in the select statement.
+  description: Tests a nested derived metric where the outer metric has an offset and where constraint that requires an additional join, and is not used
+    in the select statement.
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
   group_by_objs: [{"name": "metric_time", "grain": "day"}]
@@ -2163,11 +2158,12 @@ integration_test:
 ---
 integration_test:
   name: simple_join_to_time_spine_with_filter
-  description: Test a simple metric that joins to time spine, but doesn't fill nulls, filtered by a dimension that's not in the group by. Should apply constraint only once.
+  description: Test a simple metric that joins to time spine, but doesn't fill nulls, filtered by a dimension that's not in the group by. Should apply constraint
+    only once.
   model: SIMPLE_MODEL
   metrics: ["bookings_join_to_time_spine"]
   group_by_objs: [{"name": "metric_time"}]
-  where_filter:  "{{ render_dimension_template('booking__is_instant') }}"
+  where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT
       b.ds AS metric_time__day
@@ -2184,11 +2180,12 @@ integration_test:
 ---
 integration_test:
   name: simple_join_to_time_spine_with_queried_filter
-  description: Test a simple metric that joins to time spine, but doesn't fill nulls, filtered by a dimension that is in the group by. Should apply constraint twice.
+  description: Test a simple metric that joins to time spine, but doesn't fill nulls, filtered by a dimension that is in the group by. Should apply constraint
+    twice.
   model: SIMPLE_MODEL
   metrics: ["bookings_join_to_time_spine"]
   group_by_objs: [{"name": "metric_time"}, {"name": "booking__is_instant"}]
-  where_filter:  "{{ render_dimension_template('booking__is_instant') }}"
+  where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT
       b.ds AS metric_time__day

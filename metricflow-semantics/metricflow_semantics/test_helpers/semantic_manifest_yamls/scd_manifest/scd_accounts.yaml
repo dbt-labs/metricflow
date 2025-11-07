@@ -1,12 +1,9 @@
----
 semantic_model:
   name: primary_accounts
   description: SCD Type II table of primary account history
-
   node_relation:
     schema_name: $source_schema
     alias: dim_primary_accounts
-
   dimensions:
     - name: primary_from
       type: time
@@ -24,9 +21,7 @@ semantic_model:
           is_end: True
     - name: account_type
       type: categorical
-
   primary_entity: scd_user
-
   entities:
     - name: user
       type: natural

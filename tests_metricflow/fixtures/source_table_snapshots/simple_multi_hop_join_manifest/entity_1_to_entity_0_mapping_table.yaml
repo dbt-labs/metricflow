@@ -1,4 +1,3 @@
----
 table_snapshot:
   table_name: entity_1_to_entity_0_table
   column_definitions:

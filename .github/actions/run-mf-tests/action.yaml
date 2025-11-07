@@ -1,6 +1,5 @@
 name: Run MetricFlow Tests
 description: Runs MetricFlow using the specified Python version and engine settings.
-
 inputs:
   python-version:
     description: "Version of Python to use for testing."
@@ -31,38 +30,35 @@ inputs:
     required: false
     default: >-
       {
+
+
+
         "configs": [
           {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
           {"hatch_project_directory": "./metricflow-semantics", "hatch_environment_name": "dev-env"}
         ]
       }
-
 runs:
   using: "composite"
   steps:
-  - uses: ./.github/actions/setup-python-env
-    with:
-      python-version: "${{ inputs.python-version }}"
-      hatch-environment-cache-config-json: "${{ inputs.hatch-environment-cache-config-json }}"
+    - uses: ./.github/actions/setup-python-env
+      with:
+        python-version: "${{ inputs.python-version }}"
+        hatch-environment-cache-config-json: "${{ inputs.hatch-environment-cache-config-json }}"
+    - name: Cache APT Packages
+      uses: awalsh128/cache-apt-pkgs-action@v1.4.3
+      with:
+        packages: graphviz
+        version: "@latest"
+    - name: Register `graphviz` plug-ins
+      shell: bash
+      run: "sudo dot -c"
+    - name: Run Tests w/ Python ${{ inputs.python-version }}
+      shell: bash
+      run: >
+        make -e PARALLELISM=${{ inputs.parallelism }} ADDITIONAL_PYTEST_OPTIONS="${{ inputs.additional-pytest-options }}" ${{ inputs.make-target }}
 
-  - name: Cache APT Packages
-    uses: awalsh128/cache-apt-pkgs-action@v1.4.3
-    with:
-      packages: graphviz
-      version: "@latest"
-
-  - name: Register `graphviz` plug-ins
-    shell: bash
-    run: "sudo dot -c"
-
-  - name: Run Tests w/ Python ${{ inputs.python-version }}
-    shell: bash
-    run: >
-      make -e
-      PARALLELISM=${{ inputs.parallelism }}
-      ADDITIONAL_PYTEST_OPTIONS="${{ inputs.additional-pytest-options }}"
-      ${{ inputs.make-target }}
-    env:
-      MF_SQL_ENGINE_URL: ${{ inputs.mf_sql_engine_url }}
-      MF_SQL_ENGINE_PASSWORD: ${{ inputs.mf_sql_engine_password }}
-      METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com
+      env:
+        MF_SQL_ENGINE_URL: ${{ inputs.mf_sql_engine_url }}
+        MF_SQL_ENGINE_PASSWORD: ${{ inputs.mf_sql_engine_password }}
+        METRICFLOW_CLIENT_EMAIL: ci-tester@gmail.com

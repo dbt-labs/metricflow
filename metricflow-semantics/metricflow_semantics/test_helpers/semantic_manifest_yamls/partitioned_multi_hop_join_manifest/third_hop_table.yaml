@@ -1,21 +1,16 @@
----
 semantic_model:
   name: third_hop_table
   description: third_hop_table
-
   node_relation:
     schema_name: $source_schema
     alias: third_hop_table
-
   defaults:
     agg_time_dimension: third_hop_ds
-
   measures:
     - name: third_hop_count
       expr: customer_third_hop_id
       agg: count_distinct
       create_metric: true
-
   dimensions:
     - name: value
       type: categorical
@@ -23,7 +18,6 @@ semantic_model:
       type: time
       type_params:
         time_granularity: day
-
   entities:
     - name: customer_third_hop_id
       type: primary

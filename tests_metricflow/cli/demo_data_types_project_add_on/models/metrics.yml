@@ -1,4 +1,3 @@
----
 metrics:
   - name: demo_metric
     type: SIMPLE

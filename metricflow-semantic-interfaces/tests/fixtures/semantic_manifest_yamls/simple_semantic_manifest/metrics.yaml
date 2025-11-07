@@ -1,4 +1,3 @@
----
 metric:
   name: "bookings"
   description: "bookings metric"
@@ -66,7 +65,7 @@ metric:
   type_params:
     measure:
       name: average_booking_value
-  filter:  "{{ Dimension('booking__is_instant') }}"
+  filter: "{{ Dimension('booking__is_instant') }}"
 ---
 metric:
   name: "booking_value_for_non_null_listing_id"

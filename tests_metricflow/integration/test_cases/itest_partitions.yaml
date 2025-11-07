@@ -1,4 +1,3 @@
----
 integration_test:
   name: partition_rollup
   description: Tests grouping by a partition column.

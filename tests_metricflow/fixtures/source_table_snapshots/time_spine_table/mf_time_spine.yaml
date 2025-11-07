@@ -9,7 +9,6 @@ table_snapshot:
       type: STRING
     - name: alien_day
       type: TIME
-
   rows:
     - ["2000-01-01", "FQ4 2000", "FY 2000", "2020-01-01"]
     - ["2000-01-02", "FQ4 2000", "FY 2000", "2020-01-01"]

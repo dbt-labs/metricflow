@@ -1,0 +1,8 @@
+formatter:
+  type: basic
+  retain_line_breaks: true
+  max_line_length: 150
+  scan_folded_as_literal: true
+  indentless_arrays: false
+  drop_merge_tag: false
+  pad_line_comments: 1

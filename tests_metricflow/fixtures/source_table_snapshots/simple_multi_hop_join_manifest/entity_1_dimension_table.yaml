@@ -1,4 +1,3 @@
----
 table_snapshot:
   table_name: entity_1_dimension_source
   column_definitions:

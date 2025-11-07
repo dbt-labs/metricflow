@@ -1,4 +1,3 @@
----
 metric:
   name: monthly_metric_0
   description: A metric with a month grain.
@@ -39,7 +38,6 @@ metric:
     metrics:
       - name: monthly_metric_0
       - name: yearly_metric_0
-
 ---
 metric:
   name: metric_derived_from_heterogeneous_derived_metric
@@ -51,7 +49,6 @@ metric:
     expr: derived_metric_with_different_parent_time_grains
     metrics:
       - name: derived_metric_with_different_parent_time_grains
-
 ---
 metric:
   name: metric_derived_from_homogeneous_derived_metric

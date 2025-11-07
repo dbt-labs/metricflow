@@ -1,6 +1,5 @@
 name: Setup Python Environment
 description: Install Python & Hatch
-
 inputs:
   python-version:
     description: "Version of Python to use for testing"
@@ -11,78 +10,71 @@ inputs:
     required: false
     default: >-
       {
+
+
+
         "configs": []
       }
   cache-pre-commit-environment:
     description: "Whether to cache the pre-commit-environment."
     required: false
     default: "false"
-
 runs:
   using: "composite"
-
   steps:
-  - name: Set Linux Release Environment Variable
-    shell: bash
-    run: echo "LINUX_RELEASE=$(lsb_release -rs)" >> $GITHUB_ENV
+    - name: Set Linux Release Environment Variable
+      shell: bash
+      run: echo "LINUX_RELEASE=$(lsb_release -rs)" >> $GITHUB_ENV
+    - name: Set up Python ${{ inputs.python_version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: "${{ inputs.python-version }}"
+    - name: Create a JSON File With the `hatch` Environment Cache Configuration
+      shell: bash
+      run: "echo '${{ inputs.hatch-environment-cache-config-json }}' > hatch-environment-cache-config.json"
+    # Cache the dependencies installed by Hatch so that we don't need to reinstall them on every run.
+    - uses: actions/cache@v3
+      with:
+        # Save pip cache.
+        # Save Hatch environments.
+        # Save the package cache for Hatch.
+        # Save pre-commit environments.
+        path: |
+          ${{ env.pythonLocation }}
+          ~/.cache/pip
+          ~/.local/share/hatch
+          ~/.cache/hatch
+          ~/.cache/pre-commit
+        # >- means combine all lines to a single line
+        # The cache key can be any string. The format used here is just for readability.
+        # `manual_update_key` can be changed to manually force the cache action to create a new cache.
+        key: >-
+          python_location: "${{ env.pythonLocation }}" AND files_hash: "${{
 
-  - name: Set up Python ${{ inputs.python_version }}
-    uses: actions/setup-python@v4
-    with:
-      python-version: "${{ inputs.python-version }}"
 
-  - name: Create a JSON File With the `hatch` Environment Cache Configuration
-    shell: bash
-    run: "echo '${{ inputs.hatch-environment-cache-config-json }}' > hatch-environment-cache-config.json"
 
-  # Cache the dependencies installed by Hatch so that we don't need to reinstall them on every run.
-  - uses: actions/cache@v3
-    with:
-      # Save pip cache.
-      # Save Hatch environments.
-      # Save the package cache for Hatch.
-      # Save pre-commit environments.
-      path: |
-        ${{ env.pythonLocation }}
-        ~/.cache/pip
-        ~/.local/share/hatch
-        ~/.cache/hatch
-        ~/.cache/pre-commit
-      # >- means combine all lines to a single line
-      # The cache key can be any string. The format used here is just for readability.
-      # `manual_update_key` can be changed to manually force the cache action to create a new cache.
-      key: >-
-        python_location: "${{ env.pythonLocation }}" AND
-        files_hash: "${{
-          hashFiles(
-            'pyproject.toml'
-            , '**/requirements-files/*'
-            , '.pre-commit-config.yaml'
-            , 'hatch-environment-cache-config.json'
-          )
-        }}" AND
-        linux_release: "${{ env.LINUX_RELEASE }}" AND
-        cache-pre-commit-environment: "${{ inputs.cache-pre-commit-environment }}" AND
-        manual_update_key: 2
-
-  - name: Install Hatch
-    shell: bash
-    # Pin click to avoid bug in 8.3.0 - can remove when a fix is released
-    run: |
-      pip3 install "click<8.3.0"
-      pip3 install hatch
-
-  # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
-  # cached.
-  - name: Install Dependencies for Hatch Environment
-    shell: bash
-    run: >-
-      PYTHONPATH=.
-      python scripts/ci_tests/install_hatch_environments.py
-      --json-config-file 'hatch-environment-cache-config.json'
-
-  # Add this step to cache the `pre-commit` environment.
-  - name: Install `pre-commit` Environment
-    shell: bash
-    if: ${{ inputs.cache-pre-commit-environment == 'true' }}
-    run: "hatch run dev-env:pre-commit install-hooks"
+            hashFiles(
+              'pyproject.toml'
+              , '**/requirements-files/*'
+              , '.pre-commit-config.yaml'
+              , 'hatch-environment-cache-config.json'
+            )
+          }}" AND linux_release: "${{ env.LINUX_RELEASE }}" AND cache-pre-commit-environment: "${{ inputs.cache-pre-commit-environment }}" AND manual_update_key:
+          2
+    - name: Install Hatch
+      shell: bash
+      # Pin click to avoid bug in 8.3.0 - can remove when a fix is released
+      run: |
+        pip3 install "click<8.3.0"
+        pip3 install hatch
+    # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
+    # cached.
+    - name: Install Dependencies for Hatch Environment
+      shell: bash
+      run: >-
+        PYTHONPATH=. python scripts/ci_tests/install_hatch_environments.py --json-config-file 'hatch-environment-cache-config.json'
+    # Add this step to cache the `pre-commit` environment.
+    - name: Install `pre-commit` Environment
+      shell: bash
+      if: ${{ inputs.cache-pre-commit-environment == 'true' }}
+      run: "hatch run dev-env:pre-commit install-hooks"

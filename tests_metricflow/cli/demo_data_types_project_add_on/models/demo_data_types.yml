@@ -4,7 +4,6 @@ semantic_models:
     defaults:
       agg_time_dimension: ds
     model: ref('demo_data_types')
-
     measures:
       - name: demo_measure
         expr: 1

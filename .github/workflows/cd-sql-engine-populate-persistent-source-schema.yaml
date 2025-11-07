@@ -1,22 +1,17 @@
 # See [Persistent Source Schema](/GLOSSARY.md#persistent-source-schema)
 # Populating the source schema via this workflow ensures that it's done with the same settings as the tests.
-
 name: Reload Test Data in SQL Engines
-
 # We don't want multiple workflows trying to create the same table.
 concurrency:
   group: POPULATE_PERSISTENT_SOURCE_SCHEMA
   cancel-in-progress: true
-
 on:
   pull_request:
     types: [labeled]
   workflow_dispatch:
-
 env:
   # Unclear on how to make 'Reload Test Data in SQL Engines' a constant here as it does not work here.
   ADDITIONAL_PYTEST_OPTIONS: "--log-cli-level info"
-
 jobs:
   snowflake-populate:
     environment: DW_INTEGRATION_TESTS
@@ -26,7 +21,6 @@ jobs:
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - name: Populate Snowflake
         uses: ./.github/actions/run-mf-tests
         with:
@@ -35,7 +29,6 @@ jobs:
           parallelism: 1
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "populate-persistent-source-schema-snowflake"
-
   redshift-populate:
     environment: DW_INTEGRATION_TESTS
     name: Redshift
@@ -44,7 +37,6 @@ jobs:
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - name: Populate Redshift
         uses: ./.github/actions/run-mf-tests
         with:
@@ -53,7 +45,6 @@ jobs:
           parallelism: 1
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "populate-persistent-source-schema-redshift"
-
   bigquery-populate:
     environment: DW_INTEGRATION_TESTS
     name: BigQuery
@@ -62,7 +53,6 @@ jobs:
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - name: Populate BigQuery
         uses: ./.github/actions/run-mf-tests
         with:
@@ -71,7 +61,6 @@ jobs:
           parallelism: 1
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "populate-persistent-source-schema-bigquery"
-
   databricks-populate:
     environment: DW_INTEGRATION_TESTS
     name: Databricks SQL Warehouse
@@ -80,7 +69,6 @@ jobs:
     steps:
       - name: Check-out the repo
         uses: actions/checkout@v4
-
       - name: Populate Databricks
         uses: ./.github/actions/run-mf-tests
         with:
@@ -89,11 +77,10 @@ jobs:
           parallelism: 1
           additional-pytest-options: ${{ env.ADDITIONAL_PYTEST_OPTIONS }}
           make-target: "populate-persistent-source-schema-databricks"
-
   remove-label:
     name: Remove Label After Populating Test Data
     runs-on: ubuntu-latest
-    needs: [ snowflake-populate, redshift-populate, bigquery-populate, databricks-populate]
+    needs: [snowflake-populate, redshift-populate, bigquery-populate, databricks-populate]
     if: github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines'
     steps:
       - name: Remove Label

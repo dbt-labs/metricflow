@@ -1,48 +1,37 @@
 # Minimal manifest that contains 2 semantic models that can be joined via a foreign / primary relationship.
----
 semantic_model:
   name: bookings_source
-
   node_relation:
     schema_name: $source_schema
     alias: bookings_source
-
   defaults:
     agg_time_dimension: booking_time
-
   entities:
     - name: booking
       type: primary
     - name: listing
       type: foreign
-
   measures:
     - name: booking_count
       expr: "1"
       agg: sum
-
   dimensions:
     - name: booking_time
       type: time
       type_params:
         time_granularity: quarter
-
 ---
 semantic_model:
   name: listings_source
-
   node_relation:
     schema_name: $source_schema
     alias: listings_source
-
   entities:
     - name: listing
       type: primary
-
   dimensions:
     - name: country_latest
       type: categorical
-
 ---
 metric:
   name: bookings
