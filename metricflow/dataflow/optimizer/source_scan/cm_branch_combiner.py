@@ -272,8 +272,10 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         combined_node = AggregateSimpleMetricInputsNode.create(
             parent_node=combined_parent_node,
-            alias_mapping=self._current_left_node.alias_mapping,
-            null_fill_value_mapping=self._current_left_node.null_fill_value_mapping,
+            alias_mapping=self._current_left_node.alias_mapping.merge(current_right_node.alias_mapping),
+            null_fill_value_mapping=self._current_left_node.null_fill_value_mapping.merge(
+                current_right_node.null_fill_value_mapping
+            ),
         )
         self._log_combine_success(
             left_node=self._current_left_node,

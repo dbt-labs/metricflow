@@ -75,6 +75,29 @@ def test_nested_derived_metric(  # noqa: D103
     )
 
 
+@pytest.mark.duckdb_only
+@pytest.mark.sql_engine_snapshot
+def test_simple_derived_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec(element_name="test_simple_derived_metric"),),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
 @pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_offset_window(  # noqa: D103
     request: FixtureRequest,
