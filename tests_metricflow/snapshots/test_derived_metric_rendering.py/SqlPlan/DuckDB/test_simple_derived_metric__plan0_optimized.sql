@@ -14,6 +14,6 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     SUM(1) AS alias_1
-    , alias_2
+    , SUM(CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END) AS alias_2
   FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_15

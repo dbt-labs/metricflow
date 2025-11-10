@@ -75,6 +75,7 @@ def test_nested_derived_metric(  # noqa: D103
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_simple_derived_metric(  # noqa: D103
     request: FixtureRequest,
