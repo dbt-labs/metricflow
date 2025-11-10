@@ -1013,9 +1013,13 @@ metric:
   description: "test simple derived metric"
   type: derived
   type_params:
-    expr: alias_1 + alias_2
+    expr: alias_1 + alias_2 + alias_3 + alias_4
     metrics:
       - name: bookings
         alias: alias_1
       - name: referred_bookings
         alias: alias_2
+      - name: instant_bookings
+        alias: alias_3
+      - name: booking_value
+        alias: alias_4
