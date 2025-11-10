@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
+from logging import StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 from typing import Dict, Optional
 
@@ -23,8 +24,12 @@ logger = logging.getLogger(__name__)
 class CLIConfiguration:
     """Configuration object used for the MetricFlow CLI."""
 
+    LOG_FILE_NAME = "metricflow.log"
     DBT_PROFILES_DIR_ENV_VAR_NAME = "DBT_PROFILES_DIR"
     DBT_PROJECT_DIR_ENV_VAR_NAME = "DBT_PROJECT_DIR"
+
+    # Message to log when logging has been set up. Useful for checking the logging in tests.
+    LOG_SETUP_MESSAGE = "Set up MF CLI logging"
 
     def __init__(self) -> None:  # noqa: D107
         self.verbose = False
@@ -121,11 +126,17 @@ class CLIConfiguration:
         we can swap this out and return to full lazy loading for any context attributes that are slow
         to initialize.
         """
-        logger.debug(LazyFormat("Setting up logging to rotating file", log_file_path=self.log_file_path))
+        root_logger = logging.getLogger()
+        previous_root_logger_level = root_logger.level
+        previous_root_logger_handlers = tuple(root_logger.handlers)
 
-        log_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s"
-        logging.basicConfig(level=logging.INFO, format=log_format)
+        # Show >= CRITICAL logs in the console
+        stream_handler = StreamHandler()
+        stream_handler_log_level = logging.CRITICAL
+        stream_handler.setLevel(stream_handler_log_level)
 
+        # Show >= INFO logs in the log file
+        log_file_handler_log_level = logging.INFO
         log_file_handler = TimedRotatingFileHandler(
             filename=log_file_path,
             # Rotate every day to a new file, keep 7 days worth.
@@ -133,16 +144,26 @@ class CLIConfiguration:
             interval=1,
             backupCount=7,
         )
+        log_file_handler.setLevel(log_file_handler_log_level)
 
-        formatter = logging.Formatter(fmt=log_format)
-        log_file_handler.setFormatter(formatter)
-        log_file_handler.setLevel(logging.INFO)
+        root_logger_level = logging.INFO
+        log_format = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s"
+        # `logging.basicConfig` is a no-op without the `force=True` if any handlers have been added to the root logger.
+        # Imported modules might add handlers, so set the flag to ensure that the above handlers are used.
+        logging.basicConfig(
+            level=root_logger_level, format=log_format, handlers=[stream_handler, log_file_handler], force=True
+        )
 
-        root_logger = logging.getLogger()
-        # StreamHandler to the console would have been setup by logging.basicConfig
-        for handler in root_logger.handlers:
-            handler.setLevel(logging.CRITICAL)
-        root_logger.addHandler(log_file_handler)
+        logger.info(
+            LazyFormat(
+                CLIConfiguration.LOG_SETUP_MESSAGE,
+                root_logger_level=logging.getLevelName(root_logger_level),
+                root_logger_handlers=root_logger.handlers,
+                previous_root_logger_level=logging.getLevelName(previous_root_logger_level),
+                previous_root_logger_handlers=previous_root_logger_handlers,
+                log_format=log_format,
+            )
+        )
 
     @property
     def dbt_project_metadata(self) -> dbtProjectMetadata:
@@ -162,7 +183,7 @@ class CLIConfiguration:
         # The dbt Project.log_path attribute is currently sourced from the final runtime config value accessible
         # through the CLI state flags. As such, it will deviate from the default based on the DBT_LOG_PATH environment
         # variable. Should this behavior change, we will need to update this call.
-        return pathlib.Path(self.dbt_project_metadata.project.log_path, "metricflow.log")
+        return pathlib.Path(self.dbt_project_metadata.project.log_path, CLIConfiguration.LOG_FILE_NAME)
 
     @property
     def sql_client(self) -> SqlClient:
