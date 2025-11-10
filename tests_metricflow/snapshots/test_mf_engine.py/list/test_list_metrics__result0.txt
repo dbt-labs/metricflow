@@ -99,6 +99,7 @@ docstring:
   'subdaily_join_to_time_spine_metric',
   'subdaily_offset_grain_to_date_metric',
   'subdaily_offset_window_metric',
+  'test_simple_derived_metric',
   'total_account_balance_first_day',
   'total_account_balance_first_day_of_month',
   'trailing_2_months_revenue',
