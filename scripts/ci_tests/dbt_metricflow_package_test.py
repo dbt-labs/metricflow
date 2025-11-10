@@ -26,7 +26,6 @@ if __name__ == "__main__":
     # Check that the `mf` command is installed.
     _run_shell_command("which python")
     _run_shell_command("which mf")
-    _run_shell_command("mf")
     # Run the tutorial using `--yes` to create the sample project without user interaction.
     _run_shell_command("mf tutorial --yes")
     tutorial_directory = Path.cwd().joinpath("mf_tutorial_project")
