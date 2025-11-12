@@ -1,0 +1,7 @@
+table_snapshot:
+  table_name: empty_table
+  column_definitions:
+    - name: example_column
+      type: INT
+  rows:
+    - ["1"]

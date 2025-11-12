@@ -66,7 +66,7 @@ class SqlTableSnapshot(FrozenBaseModel):
     table_name: str
     column_definitions: Tuple[SqlTableColumnDefinition, ...]
     rows: Tuple[Tuple[Optional[str], ...], ...]
-    file_path: Path
+    file_path: Optional[Path]
 
     @property
     def snapshot_hash(self) -> SqlTableSnapshotHash:

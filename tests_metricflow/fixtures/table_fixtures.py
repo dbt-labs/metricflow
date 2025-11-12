@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import logging
-import os
-from pathlib import Path
 
 import pytest
 from dbt_semantic_interfaces.type_enums import TimeGranularity
@@ -11,6 +9,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
+from tests_metricflow.fixtures.source_table_snapshots import SOURCE_TABLE_SNAPSHOTS_DIRECTORY
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.source_schema_tools import create_tables_listed_in_table_snapshot_repository
 from tests_metricflow.table_snapshot.table_snapshots import (
@@ -22,9 +21,7 @@ logger = logging.getLogger(__name__)
 
 # Prefer to use the fixture, but there are some cases where fixtures aren't available. e.g. when defining a
 # parameterized test.
-CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY = SqlTableSnapshotRepository(
-    Path(os.path.dirname(__file__)).joinpath("source_table_snapshots")
-)
+CONFIGURED_SOURCE_TABLE_SNAPSHOT_REPOSITORY = SqlTableSnapshotRepository(SOURCE_TABLE_SNAPSHOTS_DIRECTORY)
 
 
 @pytest.fixture(scope="session")
