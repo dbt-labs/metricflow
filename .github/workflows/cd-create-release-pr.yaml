@@ -17,25 +17,25 @@ jobs:
     environment:
       name: "RELEASE_CREATION"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
 
       - uses: ./.github/actions/setup-python-env
 
       - name: Use Changie to Generate Change Log for the New Release
-        uses: miniscruff/changie-action@v2
+        uses: miniscruff/changie-action@6dcc2533cac0495148ed4046c438487e4dceaa23 # miniscruff/changie-action@v2
         with:
           version: latest
           args: batch ${{ inputs.bump }}
 
       - name: Use Changie to Update `CHANGELOG.md` To Include All Changes
-        uses: miniscruff/changie-action@v2
+        uses: miniscruff/changie-action@6dcc2533cac0495148ed4046c438487e4dceaa23 # miniscruff/changie-action@v2
         with:
           version: latest
           args: merge
 
       - name: Use Changie to Get the New Version Number
         id: changie-latest
-        uses: miniscruff/changie-action@v2
+        uses: miniscruff/changie-action@6dcc2533cac0495148ed4046c438487e4dceaa23 # miniscruff/changie-action@v2
         with:
           version: latest
           args: latest
@@ -74,7 +74,7 @@ jobs:
         run: "hatch -v run dev-env:pre-commit run --color=always --all-files"
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # peter-evans/create-pull-request@v7
         with:
           branch: release-${{ steps.get-new-package-version.outputs.version }}
           title: "Release PR for MetricFlow ${{ steps.get-new-package-version.outputs.version }}"
