@@ -3,7 +3,7 @@ test_filename: test_metric_filter_rendering.py
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Pass Only Elements: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -13,21 +13,21 @@ WITH sma_28014_cte AS (
   SELECT
     listing_id AS listing
     , user_id AS user
-    , 1 AS listings
+    , 1 AS __listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
 )
 
 SELECT
-  SUM(listings) AS listings
+  SUM(__listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_32.listing__user__average_booking_value AS user__listing__user__average_booking_value
-    , sma_28014_cte.listings AS listings
+    , sma_28014_cte.__listings AS __listings
   FROM sma_28014_cte
   LEFT OUTER JOIN (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['average_booking_value', 'listing__user']
+    -- Pass Only Elements: ['__average_booking_value', 'listing__user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing__user', 'listing__user__average_booking_value']

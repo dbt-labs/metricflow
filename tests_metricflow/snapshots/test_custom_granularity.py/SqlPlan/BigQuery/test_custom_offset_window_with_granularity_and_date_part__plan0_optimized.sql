@@ -12,14 +12,14 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
+  -- Pass Only Elements: ['__bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_30.alien_day AS metric_time__alien_day
     , DATETIME_TRUNC(subq_27.ds__day__lead, month) AS booking__ds__month
     , EXTRACT(year FROM subq_27.ds__day__lead) AS metric_time__extract_year
-    , SUM(subq_23.bookings) AS bookings
+    , SUM(subq_23.__bookings) AS bookings
   FROM (
     -- Offset Base Granularity By Custom Granularity Period(s)
     WITH cte_6 AS (
@@ -80,7 +80,7 @@ FROM (
     -- Metric Time Dimension 'ds'
     SELECT
       DATETIME_TRUNC(ds, day) AS metric_time__day
-      , 1 AS bookings
+      , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_23
   ON

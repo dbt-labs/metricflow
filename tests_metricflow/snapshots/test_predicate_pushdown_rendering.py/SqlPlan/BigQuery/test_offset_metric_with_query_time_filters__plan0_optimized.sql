@@ -15,7 +15,7 @@ WITH sma_28009_cte AS (
     DATETIME_TRUNC(ds, day) AS metric_time__day
     , listing_id AS listing
     , is_instant AS booking__is_instant
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -41,20 +41,20 @@ FROM (
     , MAX(subq_45.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
+    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
       , listing__country_latest
-      , SUM(bookings) AS bookings
+      , SUM(__bookings) AS bookings
     FROM (
       -- Join Standard Outputs
       SELECT
         sma_28014_cte.country_latest AS listing__country_latest
         , sma_28009_cte.metric_time__day AS metric_time__day
         , sma_28009_cte.booking__is_instant AS booking__is_instant
-        , sma_28009_cte.bookings AS bookings
+        , sma_28009_cte.__bookings AS __bookings
       FROM sma_28009_cte
       LEFT OUTER JOIN
         sma_28014_cte
@@ -72,23 +72,23 @@ FROM (
     SELECT
       time_spine_src_28006.ds AS metric_time__day
       , subq_40.listing__country_latest AS listing__country_latest
-      , subq_40.bookings AS bookings_2_weeks_ago
+      , subq_40.__bookings AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
         , listing__country_latest
-        , SUM(bookings) AS bookings
+        , SUM(__bookings) AS __bookings
       FROM (
         -- Join Standard Outputs
         SELECT
           sma_28014_cte.country_latest AS listing__country_latest
           , sma_28009_cte.metric_time__day AS metric_time__day
           , sma_28009_cte.booking__is_instant AS booking__is_instant
-          , sma_28009_cte.bookings AS bookings
+          , sma_28009_cte.__bookings AS __bookings
         FROM sma_28009_cte
         LEFT OUTER JOIN
           sma_28014_cte

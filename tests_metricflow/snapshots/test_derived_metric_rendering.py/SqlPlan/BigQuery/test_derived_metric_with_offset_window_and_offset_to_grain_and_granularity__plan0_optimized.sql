@@ -9,7 +9,7 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -32,12 +32,12 @@ FROM (
     , MAX(subq_35.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__year']
+    -- Pass Only Elements: ['__bookings', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__year AS metric_time__year
-      , SUM(sma_28009_cte.bookings) AS month_start_bookings
+      , SUM(sma_28009_cte.__bookings) AS month_start_bookings
     FROM rss_28018_cte
     INNER JOIN
       sma_28009_cte
@@ -49,12 +49,12 @@ FROM (
   ) subq_27
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__year']
+    -- Pass Only Elements: ['__bookings', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__year AS metric_time__year
-      , SUM(sma_28009_cte.bookings) AS bookings_1_month_ago
+      , SUM(sma_28009_cte.__bookings) AS bookings_1_month_ago
     FROM rss_28018_cte
     INNER JOIN
       sma_28009_cte

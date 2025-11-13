@@ -12,19 +12,19 @@ FROM (
   SELECT
     subq_4.metric_time__alien_day
     , subq_4.listing__ds__month
-    , subq_4.listings
+    , subq_4.__listings AS listings
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_3.metric_time__alien_day
       , subq_3.listing__ds__month
-      , SUM(subq_3.listings) AS listings
+      , SUM(subq_3.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['listings', 'metric_time__alien_day', 'listing__ds__month']
+      -- Pass Only Elements: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
       SELECT
         subq_2.metric_time__alien_day
         , subq_2.listing__ds__month
-        , subq_2.listings
+        , subq_2.__listings
       FROM (
         -- Metric Time Dimension 'ds'
         -- Join to Custom Granularity Dataset
@@ -93,20 +93,20 @@ FROM (
           , subq_0.listing__country_latest AS listing__country_latest
           , subq_0.listing__is_lux_latest AS listing__is_lux_latest
           , subq_0.listing__capacity_latest AS listing__capacity_latest
-          , subq_0.listings AS listings
-          , subq_0.lux_listings AS lux_listings
-          , subq_0.smallest_listing AS smallest_listing
-          , subq_0.largest_listing AS largest_listing
-          , subq_0.active_listings AS active_listings
+          , subq_0.__listings AS __listings
+          , subq_0.__lux_listings AS __lux_listings
+          , subq_0.__smallest_listing AS __smallest_listing
+          , subq_0.__largest_listing AS __largest_listing
+          , subq_0.__active_listings AS __active_listings
           , subq_1.alien_day AS metric_time__alien_day
         FROM (
           -- Read Elements From Semantic Model 'listings_latest'
           SELECT
-            1 AS listings
-            , 1 AS lux_listings
-            , listings_latest_src_28000.capacity AS smallest_listing
-            , listings_latest_src_28000.capacity AS largest_listing
-            , 1 AS active_listings
+            1 AS __listings
+            , 1 AS __lux_listings
+            , listings_latest_src_28000.capacity AS __smallest_listing
+            , listings_latest_src_28000.capacity AS __largest_listing
+            , 1 AS __active_listings
             , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
             , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
             , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month

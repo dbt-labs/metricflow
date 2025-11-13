@@ -17,17 +17,17 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_9.metric_time__day
-      , subq_9.revenue
+      , subq_9.__revenue AS revenue
     FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_8.metric_time__day
-        , SUM(subq_8.revenue) AS revenue
+        , SUM(subq_8.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['revenue', 'metric_time__day']
+        -- Pass Only Elements: ['__revenue', 'metric_time__day']
         SELECT
           subq_7.metric_time__day
-          , subq_7.revenue
+          , subq_7.__revenue
         FROM (
           -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
           SELECT
@@ -66,7 +66,7 @@ FROM (
             , subq_6.metric_time__extract_doy
             , subq_6.user
             , subq_6.revenue_instance__user
-            , subq_6.revenue
+            , subq_6.__revenue
           FROM (
             -- Join Self Over Time Range
             SELECT
@@ -105,7 +105,7 @@ FROM (
               , subq_3.metric_time__extract_doy AS metric_time__extract_doy
               , subq_3.user AS user
               , subq_3.revenue_instance__user AS revenue_instance__user
-              , subq_3.revenue AS revenue
+              , subq_3.__revenue AS __revenue
             FROM (
               -- Read From Time Spine 'mf_time_spine'
               SELECT
@@ -151,7 +151,7 @@ FROM (
                 , subq_2.metric_time__extract_doy
                 , subq_2.user
                 , subq_2.revenue_instance__user
-                , subq_2.revenue
+                , subq_2.__revenue
               FROM (
                 -- Metric Time Dimension 'ds'
                 SELECT
@@ -190,11 +190,11 @@ FROM (
                   , subq_1.ds__extract_doy AS metric_time__extract_doy
                   , subq_1.user
                   , subq_1.revenue_instance__user
-                  , subq_1.revenue
+                  , subq_1.__revenue
                 FROM (
                   -- Read Elements From Semantic Model 'revenue'
                   SELECT
-                    revenue_src_28000.revenue
+                    revenue_src_28000.revenue AS __revenue
                     , DATE_TRUNC('day', revenue_src_28000.created_at) AS ds__day
                     , DATE_TRUNC('week', revenue_src_28000.created_at) AS ds__week
                     , DATE_TRUNC('month', revenue_src_28000.created_at) AS ds__month

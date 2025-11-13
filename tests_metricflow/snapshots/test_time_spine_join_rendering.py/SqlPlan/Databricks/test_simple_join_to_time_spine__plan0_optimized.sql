@@ -7,20 +7,20 @@ sql_engine: Databricks
 -- Write to DataTable
 SELECT
   time_spine_src_28006.ds AS metric_time__day
-  , subq_12.bookings_join_to_time_spine AS bookings_join_to_time_spine
+  , subq_12.__bookings_join_to_time_spine AS bookings_join_to_time_spine
 FROM ***************************.mf_time_spine time_spine_src_28006
 LEFT OUTER JOIN (
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
-    , SUM(bookings_join_to_time_spine) AS bookings_join_to_time_spine
+    , SUM(__bookings_join_to_time_spine) AS __bookings_join_to_time_spine
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['bookings_join_to_time_spine', 'metric_time__day']
+    -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__day']
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
-      , 1 AS bookings_join_to_time_spine
+      , 1 AS __bookings_join_to_time_spine
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_11
   GROUP BY

@@ -5,11 +5,11 @@ docstring:
 ---
 SELECT
   metric_time__day
-  , SUM(transactions) AS transactions
+  , SUM(__transactions) AS transactions
 FROM (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
-    , 1 AS transactions
+    , 1 AS __transactions
   FROM "mf_tutorial"."main"."transactions" transactions_src_10000
 ) subq_2
 GROUP BY

@@ -13,37 +13,37 @@ WITH sma_28019_cte AS (
   SELECT
     DATE_TRUNC('month', ds) AS metric_time__month
     , user_id AS user
-    , 1 AS visits
+    , 1 AS __visits
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
 SELECT
-  CAST(MAX(subq_27.buys_month) AS DOUBLE) / CAST(NULLIF(MAX(subq_18.visits), 0) AS DOUBLE) AS visit_buy_conversion_rate_with_monthly_conversion
+  CAST(MAX(subq_27.__buys_month) AS DOUBLE) / CAST(NULLIF(MAX(subq_18.__visits), 0) AS DOUBLE) AS visit_buy_conversion_rate_with_monthly_conversion
 FROM (
   -- Read From CTE For node_id=sma_28019
-  -- Pass Only Elements: ['visits']
+  -- Pass Only Elements: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(visits) AS visits
+    SUM(__visits) AS __visits
   FROM sma_28019_cte
 ) subq_18
 CROSS JOIN (
   -- Find conversions for user within the range of 1 month
-  -- Pass Only Elements: ['buys_month']
+  -- Pass Only Elements: ['__buys_month']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(buys_month) AS buys_month
+    SUM(__buys_month) AS __buys_month
   FROM (
     -- Dedupe the fanout with mf_internal_uuid in the conversion data set
     SELECT DISTINCT
-      FIRST_VALUE(sma_28019_cte.visits) OVER (
+      FIRST_VALUE(sma_28019_cte.__visits) OVER (
         PARTITION BY
           subq_23.user
           , subq_23.metric_time__month
           , subq_23.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__month DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS visits
+      ) AS __visits
       , FIRST_VALUE(sma_28019_cte.metric_time__month) OVER (
         PARTITION BY
           subq_23.user
@@ -61,7 +61,7 @@ CROSS JOIN (
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
       , subq_23.mf_internal_uuid AS mf_internal_uuid
-      , subq_23.buys_month AS buys_month
+      , subq_23.__buys_month AS __buys_month
     FROM sma_28019_cte
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
@@ -70,7 +70,7 @@ CROSS JOIN (
       SELECT
         DATE_TRUNC('month', ds_month) AS metric_time__month
         , user_id AS user
-        , 1 AS buys_month
+        , 1 AS __buys_month
         , UUID() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
     ) subq_23

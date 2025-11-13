@@ -14,7 +14,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_20.metric_time__month AS metric_time__month
-    , subq_16.bookings AS bookings_start_of_month
+    , subq_16.__bookings AS bookings_start_of_month
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['metric_time__month']
@@ -34,18 +34,18 @@ FROM (
   ) subq_20
   INNER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'metric_time__month']
+    -- Pass Only Elements: ['__bookings', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__month
-      , SUM(bookings) AS bookings
+      , SUM(__bookings) AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , DATE_TRUNC('month', ds) AS metric_time__month
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_13
     WHERE metric_time__day = '2020-01-01'

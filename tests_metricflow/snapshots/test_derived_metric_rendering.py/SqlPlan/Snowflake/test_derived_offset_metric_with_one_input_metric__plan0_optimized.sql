@@ -12,20 +12,20 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , subq_13.bookings AS bookings_5_days_ago
+    , subq_13.__bookings AS bookings_5_days_ago
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(bookings) AS bookings
+      , SUM(__bookings) AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_12
     GROUP BY

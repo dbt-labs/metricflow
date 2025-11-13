@@ -8,15 +8,15 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_33.listings
+    subq_33.__listings AS listings
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      SUM(subq_32.listings) AS listings
+      SUM(subq_32.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['listings']
+      -- Pass Only Elements: ['__listings']
       SELECT
-        subq_31.listings
+        subq_31.__listings
       FROM (
         -- Constrain Output with WHERE
         SELECT
@@ -85,11 +85,11 @@ FROM (
           , subq_30.listing__is_lux_latest
           , subq_30.listing__capacity_latest
           , subq_30.user__visit_buy_conversion_rate
-          , subq_30.listings
-          , subq_30.lux_listings
-          , subq_30.smallest_listing
-          , subq_30.largest_listing
-          , subq_30.active_listings
+          , subq_30.__listings
+          , subq_30.__lux_listings
+          , subq_30.__smallest_listing
+          , subq_30.__largest_listing
+          , subq_30.__active_listings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -158,11 +158,11 @@ FROM (
             , subq_13.listing__country_latest AS listing__country_latest
             , subq_13.listing__is_lux_latest AS listing__is_lux_latest
             , subq_13.listing__capacity_latest AS listing__capacity_latest
-            , subq_13.listings AS listings
-            , subq_13.lux_listings AS lux_listings
-            , subq_13.smallest_listing AS smallest_listing
-            , subq_13.largest_listing AS largest_listing
-            , subq_13.active_listings AS active_listings
+            , subq_13.__listings AS __listings
+            , subq_13.__lux_listings AS __lux_listings
+            , subq_13.__smallest_listing AS __smallest_listing
+            , subq_13.__largest_listing AS __largest_listing
+            , subq_13.__active_listings AS __active_listings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -230,19 +230,19 @@ FROM (
               , subq_12.listing__country_latest
               , subq_12.listing__is_lux_latest
               , subq_12.listing__capacity_latest
-              , subq_12.listings
-              , subq_12.lux_listings
-              , subq_12.smallest_listing
-              , subq_12.largest_listing
-              , subq_12.active_listings
+              , subq_12.__listings
+              , subq_12.__lux_listings
+              , subq_12.__smallest_listing
+              , subq_12.__largest_listing
+              , subq_12.__active_listings
             FROM (
               -- Read Elements From Semantic Model 'listings_latest'
               SELECT
-                1 AS listings
-                , 1 AS lux_listings
-                , listings_latest_src_28000.capacity AS smallest_listing
-                , listings_latest_src_28000.capacity AS largest_listing
-                , 1 AS active_listings
+                1 AS __listings
+                , 1 AS __lux_listings
+                , listings_latest_src_28000.capacity AS __smallest_listing
+                , listings_latest_src_28000.capacity AS __largest_listing
+                , 1 AS __active_listings
                 , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
                 , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
                 , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month
@@ -308,23 +308,23 @@ FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_27.user
-                , CAST(subq_27.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_27.visits, 0) AS DOUBLE PRECISION) AS user__visit_buy_conversion_rate
+                , CAST(subq_27.__buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_27.__visits, 0) AS DOUBLE PRECISION) AS user__visit_buy_conversion_rate
               FROM (
                 -- Combine Aggregated Outputs
                 SELECT
                   COALESCE(subq_17.user, subq_26.user) AS user
-                  , MAX(subq_17.visits) AS visits
-                  , MAX(subq_26.buys) AS buys
+                  , MAX(subq_17.__visits) AS __visits
+                  , MAX(subq_26.__buys) AS __buys
                 FROM (
                   -- Aggregate Inputs for Simple Metrics
                   SELECT
                     subq_16.user
-                    , SUM(subq_16.visits) AS visits
+                    , SUM(subq_16.__visits) AS __visits
                   FROM (
-                    -- Pass Only Elements: ['visits', 'user']
+                    -- Pass Only Elements: ['__visits', 'user']
                     SELECT
                       subq_15.user
-                      , subq_15.visits
+                      , subq_15.__visits
                     FROM (
                       -- Metric Time Dimension 'ds'
                       SELECT
@@ -367,13 +367,13 @@ FROM (
                         , subq_14.visit__session
                         , subq_14.referrer_id
                         , subq_14.visit__referrer_id
-                        , subq_14.visits
-                        , subq_14.visits_fill_nulls_with_0_join_to_timespine
+                        , subq_14.__visits
+                        , subq_14.__visits_fill_nulls_with_0_join_to_timespine
                       FROM (
                         -- Read Elements From Semantic Model 'visits_source'
                         SELECT
-                          1 AS visits
-                          , 1 AS visits_fill_nulls_with_0_join_to_timespine
+                          1 AS __visits
+                          , 1 AS __visits_fill_nulls_with_0_join_to_timespine
                           , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                           , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                           , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -413,30 +413,30 @@ FROM (
                   -- Aggregate Inputs for Simple Metrics
                   SELECT
                     subq_25.user
-                    , SUM(subq_25.buys) AS buys
+                    , SUM(subq_25.__buys) AS __buys
                   FROM (
-                    -- Pass Only Elements: ['buys', 'user']
+                    -- Pass Only Elements: ['__buys', 'user']
                     SELECT
                       subq_24.user
-                      , subq_24.buys
+                      , subq_24.__buys
                     FROM (
                       -- Find conversions for user within the range of INF
                       SELECT
                         subq_23.metric_time__day
                         , subq_23.user
-                        , subq_23.buys
-                        , subq_23.visits
+                        , subq_23.__buys
+                        , subq_23.__visits
                       FROM (
                         -- Dedupe the fanout with mf_internal_uuid in the conversion data set
                         SELECT DISTINCT
-                          FIRST_VALUE(subq_19.visits) OVER (
+                          FIRST_VALUE(subq_19.__visits) OVER (
                             PARTITION BY
                               subq_22.user
                               , subq_22.metric_time__day
                               , subq_22.mf_internal_uuid
                             ORDER BY subq_19.metric_time__day DESC
                             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-                          ) AS visits
+                          ) AS __visits
                           , FIRST_VALUE(subq_19.metric_time__day) OVER (
                             PARTITION BY
                               subq_22.user
@@ -454,13 +454,13 @@ FROM (
                             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
                           ) AS user
                           , subq_22.mf_internal_uuid AS mf_internal_uuid
-                          , subq_22.buys AS buys
+                          , subq_22.__buys AS __buys
                         FROM (
-                          -- Pass Only Elements: ['visits', 'metric_time__day', 'user']
+                          -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
                           SELECT
                             subq_18.metric_time__day
                             , subq_18.user
-                            , subq_18.visits
+                            , subq_18.__visits
                           FROM (
                             -- Metric Time Dimension 'ds'
                             SELECT
@@ -503,13 +503,13 @@ FROM (
                               , subq_14.visit__session
                               , subq_14.referrer_id
                               , subq_14.visit__referrer_id
-                              , subq_14.visits
-                              , subq_14.visits_fill_nulls_with_0_join_to_timespine
+                              , subq_14.__visits
+                              , subq_14.__visits_fill_nulls_with_0_join_to_timespine
                             FROM (
                               -- Read Elements From Semantic Model 'visits_source'
                               SELECT
-                                1 AS visits
-                                , 1 AS visits_fill_nulls_with_0_join_to_timespine
+                                1 AS __visits
+                                , 1 AS __visits_fill_nulls_with_0_join_to_timespine
                                 , DATE_TRUNC('day', visits_source_src_28000.ds) AS ds__day
                                 , DATE_TRUNC('week', visits_source_src_28000.ds) AS ds__week
                                 , DATE_TRUNC('month', visits_source_src_28000.ds) AS ds__month
@@ -594,9 +594,9 @@ FROM (
                             , subq_21.session_id
                             , subq_21.buy__user
                             , subq_21.buy__session_id
-                            , subq_21.buys
-                            , subq_21.buys_fill_nulls_with_0
-                            , subq_21.buys_fill_nulls_with_0_join_to_timespine
+                            , subq_21.__buys
+                            , subq_21.__buys_fill_nulls_with_0
+                            , subq_21.__buys_fill_nulls_with_0_join_to_timespine
                             , CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR) AS mf_internal_uuid
                           FROM (
                             -- Metric Time Dimension 'ds'
@@ -650,16 +650,16 @@ FROM (
                               , subq_20.session_id
                               , subq_20.buy__user
                               , subq_20.buy__session_id
-                              , subq_20.buys
-                              , subq_20.buys_fill_nulls_with_0
-                              , subq_20.buys_fill_nulls_with_0_join_to_timespine
+                              , subq_20.__buys
+                              , subq_20.__buys_fill_nulls_with_0
+                              , subq_20.__buys_fill_nulls_with_0_join_to_timespine
                             FROM (
                               -- Read Elements From Semantic Model 'buys_source'
                               SELECT
-                                1 AS buys
-                                , 1 AS buys_fill_nulls_with_0
-                                , 1 AS buys_fill_nulls_with_0_join_to_timespine
-                                , 1 AS buys_month
+                                1 AS __buys
+                                , 1 AS __buys_fill_nulls_with_0
+                                , 1 AS __buys_fill_nulls_with_0_join_to_timespine
+                                , 1 AS __buys_month
                                 , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                                 , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week
                                 , DATE_TRUNC('month', buys_source_src_28000.ds) AS ds__month

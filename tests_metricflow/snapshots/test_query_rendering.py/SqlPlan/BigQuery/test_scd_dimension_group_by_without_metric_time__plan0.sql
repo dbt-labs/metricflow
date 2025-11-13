@@ -10,17 +10,17 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_7.listing__capacity
-    , subq_7.family_bookings
+    , subq_7.__family_bookings AS family_bookings
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_6.listing__capacity
-      , SUM(subq_6.family_bookings) AS family_bookings
+      , SUM(subq_6.__family_bookings) AS __family_bookings
     FROM (
-      -- Pass Only Elements: ['family_bookings', 'listing__capacity']
+      -- Pass Only Elements: ['__family_bookings', 'listing__capacity']
       SELECT
         subq_5.listing__capacity
-        , subq_5.family_bookings
+        , subq_5.__family_bookings
       FROM (
         -- Constrain Output with WHERE
         SELECT
@@ -114,9 +114,9 @@ FROM (
           , subq_4.is_instant
           , subq_4.booking__is_instant
           , subq_4.listing__capacity
-          , subq_4.bookings
-          , subq_4.family_bookings
-          , subq_4.potentially_lux_bookings
+          , subq_4.__bookings
+          , subq_4.__family_bookings
+          , subq_4.__potentially_lux_bookings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -210,9 +210,9 @@ FROM (
             , subq_1.booking__user AS booking__user
             , subq_1.is_instant AS is_instant
             , subq_1.booking__is_instant AS booking__is_instant
-            , subq_1.bookings AS bookings
-            , subq_1.family_bookings AS family_bookings
-            , subq_1.potentially_lux_bookings AS potentially_lux_bookings
+            , subq_1.__bookings AS __bookings
+            , subq_1.__family_bookings AS __family_bookings
+            , subq_1.__potentially_lux_bookings AS __potentially_lux_bookings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -303,15 +303,15 @@ FROM (
               , subq_0.booking__user
               , subq_0.is_instant
               , subq_0.booking__is_instant
-              , subq_0.bookings
-              , subq_0.family_bookings
-              , subq_0.potentially_lux_bookings
+              , subq_0.__bookings
+              , subq_0.__family_bookings
+              , subq_0.__potentially_lux_bookings
             FROM (
               -- Read Elements From Semantic Model 'bookings_source'
               SELECT
-                1 AS bookings
-                , 1 AS family_bookings
-                , 1 AS potentially_lux_bookings
+                1 AS __bookings
+                , 1 AS __family_bookings
+                , 1 AS __potentially_lux_bookings
                 , bookings_source_src_26000.is_instant
                 , DATETIME_TRUNC(bookings_source_src_26000.ds, day) AS ds__day
                 , DATETIME_TRUNC(bookings_source_src_26000.ds, isoweek) AS ds__week

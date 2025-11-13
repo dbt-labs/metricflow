@@ -4,19 +4,19 @@ sql_engine: Databricks
 ---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['bookings', 'listing__ds__alien_day']
+-- Pass Only Elements: ['__bookings', 'listing__ds__alien_day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   subq_15.alien_day AS listing__ds__alien_day
-  , SUM(subq_11.bookings) AS bookings
+  , SUM(subq_11.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
     listing_id AS listing
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_11
 LEFT OUTER JOIN

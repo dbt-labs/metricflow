@@ -12,16 +12,16 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
-    , SUM(referred_bookings) AS ref_bookings
-    , SUM(bookings) AS bookings
+    , SUM(__referred_bookings) AS ref_bookings
+    , SUM(__bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['referred_bookings', 'bookings', 'metric_time__day']
+    -- Pass Only Elements: ['__referred_bookings', '__bookings', 'metric_time__day']
     SELECT
       DATETIME_TRUNC(ds, day) AS metric_time__day
-      , 1 AS bookings
-      , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
+      , 1 AS __bookings
+      , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS __referred_bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_13
   GROUP BY

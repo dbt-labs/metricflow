@@ -42,17 +42,17 @@ FROM (
           -- Compute Metrics via Expressions
           SELECT
             subq_7.listing
-            , subq_7.bookings AS listing__bookings
+            , subq_7.__bookings AS listing__bookings
           FROM (
             -- Aggregate Inputs for Simple Metrics
             SELECT
               subq_6.listing
-              , SUM(subq_6.bookings) AS bookings
+              , SUM(subq_6.__bookings) AS __bookings
             FROM (
-              -- Pass Only Elements: ['bookings', 'listing']
+              -- Pass Only Elements: ['__bookings', 'listing']
               SELECT
                 subq_5.listing
-                , subq_5.bookings
+                , subq_5.__bookings
               FROM (
                 -- Metric Time Dimension 'ds'
                 SELECT
@@ -141,54 +141,54 @@ FROM (
                   , subq_4.booking__host
                   , subq_4.is_instant
                   , subq_4.booking__is_instant
-                  , subq_4.bookings
-                  , subq_4.average_booking_value
-                  , subq_4.instant_bookings
-                  , subq_4.booking_value
-                  , subq_4.max_booking_value
-                  , subq_4.min_booking_value
-                  , subq_4.instant_booking_value
-                  , subq_4.average_instant_booking_value
-                  , subq_4.booking_value_for_non_null_listing_id
-                  , subq_4.bookers
-                  , subq_4.referred_bookings
-                  , subq_4.median_booking_value
-                  , subq_4.booking_value_p99
-                  , subq_4.discrete_booking_value_p99
-                  , subq_4.approximate_continuous_booking_value_p99
-                  , subq_4.approximate_discrete_booking_value_p99
-                  , subq_4.bookings_join_to_time_spine
-                  , subq_4.bookings_fill_nulls_with_0_without_time_spine
-                  , subq_4.bookings_fill_nulls_with_0
-                  , subq_4.instant_bookings_with_measure_filter
-                  , subq_4.bookings_join_to_time_spine_with_tiered_filters
-                  , subq_4.bookers_fill_nulls_with_0_join_to_timespine
+                  , subq_4.__bookings
+                  , subq_4.__average_booking_value
+                  , subq_4.__instant_bookings
+                  , subq_4.__booking_value
+                  , subq_4.__max_booking_value
+                  , subq_4.__min_booking_value
+                  , subq_4.__instant_booking_value
+                  , subq_4.__average_instant_booking_value
+                  , subq_4.__booking_value_for_non_null_listing_id
+                  , subq_4.__bookers
+                  , subq_4.__referred_bookings
+                  , subq_4.__median_booking_value
+                  , subq_4.__booking_value_p99
+                  , subq_4.__discrete_booking_value_p99
+                  , subq_4.__approximate_continuous_booking_value_p99
+                  , subq_4.__approximate_discrete_booking_value_p99
+                  , subq_4.__bookings_join_to_time_spine
+                  , subq_4.__bookings_fill_nulls_with_0_without_time_spine
+                  , subq_4.__bookings_fill_nulls_with_0
+                  , subq_4.__instant_bookings_with_measure_filter
+                  , subq_4.__bookings_join_to_time_spine_with_tiered_filters
+                  , subq_4.__bookers_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Read Elements From Semantic Model 'bookings_source'
                   SELECT
-                    1 AS bookings
-                    , bookings_source_src_28000.booking_value AS average_booking_value
-                    , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-                    , bookings_source_src_28000.booking_value
-                    , bookings_source_src_28000.booking_value AS max_booking_value
-                    , bookings_source_src_28000.booking_value AS min_booking_value
-                    , bookings_source_src_28000.booking_value AS instant_booking_value
-                    , bookings_source_src_28000.booking_value AS average_instant_booking_value
-                    , bookings_source_src_28000.booking_value AS booking_value_for_non_null_listing_id
-                    , bookings_source_src_28000.guest_id AS bookers
-                    , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-                    , bookings_source_src_28000.booking_value AS median_booking_value
-                    , bookings_source_src_28000.booking_value AS booking_value_p99
-                    , bookings_source_src_28000.booking_value AS discrete_booking_value_p99
-                    , bookings_source_src_28000.booking_value AS approximate_continuous_booking_value_p99
-                    , bookings_source_src_28000.booking_value AS approximate_discrete_booking_value_p99
-                    , 1 AS bookings_join_to_time_spine
-                    , 1 AS bookings_fill_nulls_with_0_without_time_spine
-                    , 1 AS bookings_fill_nulls_with_0
-                    , 1 AS instant_bookings_with_measure_filter
-                    , 1 AS bookings_join_to_time_spine_with_tiered_filters
-                    , bookings_source_src_28000.guest_id AS bookers_fill_nulls_with_0_join_to_timespine
-                    , bookings_source_src_28000.booking_value AS booking_payments
+                    1 AS __bookings
+                    , bookings_source_src_28000.booking_value AS __average_booking_value
+                    , CASE WHEN is_instant THEN 1 ELSE 0 END AS __instant_bookings
+                    , bookings_source_src_28000.booking_value AS __booking_value
+                    , bookings_source_src_28000.booking_value AS __max_booking_value
+                    , bookings_source_src_28000.booking_value AS __min_booking_value
+                    , bookings_source_src_28000.booking_value AS __instant_booking_value
+                    , bookings_source_src_28000.booking_value AS __average_instant_booking_value
+                    , bookings_source_src_28000.booking_value AS __booking_value_for_non_null_listing_id
+                    , bookings_source_src_28000.guest_id AS __bookers
+                    , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS __referred_bookings
+                    , bookings_source_src_28000.booking_value AS __median_booking_value
+                    , bookings_source_src_28000.booking_value AS __booking_value_p99
+                    , bookings_source_src_28000.booking_value AS __discrete_booking_value_p99
+                    , bookings_source_src_28000.booking_value AS __approximate_continuous_booking_value_p99
+                    , bookings_source_src_28000.booking_value AS __approximate_discrete_booking_value_p99
+                    , 1 AS __bookings_join_to_time_spine
+                    , 1 AS __bookings_fill_nulls_with_0_without_time_spine
+                    , 1 AS __bookings_fill_nulls_with_0
+                    , 1 AS __instant_bookings_with_measure_filter
+                    , 1 AS __bookings_join_to_time_spine_with_tiered_filters
+                    , bookings_source_src_28000.guest_id AS __bookers_fill_nulls_with_0_join_to_timespine
+                    , bookings_source_src_28000.booking_value AS __booking_payments
                     , bookings_source_src_28000.is_instant
                     , DATE_TRUNC('day', bookings_source_src_28000.ds) AS ds__day
                     , DATE_TRUNC('week', bookings_source_src_28000.ds) AS ds__week
