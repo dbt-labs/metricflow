@@ -14,7 +14,6 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlPercentileExpression,
 )
 
-from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping
 from metricflow.plan_conversion.instance_set_transforms.aggregated_simple_metric_input import (
     CreateAggregatedSimpleMetricInputsTransform,
 )
@@ -62,7 +61,6 @@ def test_sum_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -97,7 +95,6 @@ def test_sum_boolean_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -126,7 +123,6 @@ def test_avg_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -154,7 +150,6 @@ def test_count_distinct_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -182,7 +177,6 @@ def test_max_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -210,7 +204,6 @@ def test_min_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -267,7 +260,6 @@ def test_percentile_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set

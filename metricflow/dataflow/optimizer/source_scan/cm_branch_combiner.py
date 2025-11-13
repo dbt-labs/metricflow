@@ -251,17 +251,6 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         assert len(combined_parent_nodes) == 1
         combined_parent_node = combined_parent_nodes[0]
 
-        # Avoid combining branches if the AggregateSimpleMetricInputsNode specifies conflicting aliases.
-        # e.g. two metrics use the same alias for two different simple-metric inputs. This is not always the case,
-        # so this could be improved later.
-        if self._current_left_node.alias_mapping.has_conflict(current_right_node.alias_mapping):
-            self._log_combine_failure(
-                left_node=self._current_left_node,
-                right_node=current_right_node,
-                combine_failure_reason=f"Conflicting alias mapping - left: {self._current_left_node.alias_mapping} right: {current_right_node.alias_mapping}",
-            )
-            return ComputeMetricsBranchCombinerResult()
-
         if self._current_left_node.null_fill_value_mapping != current_right_node.null_fill_value_mapping:
             self._log_combine_failure(
                 left_node=self._current_left_node,
@@ -272,7 +261,6 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         combined_node = AggregateSimpleMetricInputsNode.create(
             parent_node=combined_parent_node,
-            alias_mapping=self._current_left_node.alias_mapping.merge(current_right_node.alias_mapping),
             null_fill_value_mapping=self._current_left_node.null_fill_value_mapping.merge(
                 current_right_node.null_fill_value_mapping
             ),

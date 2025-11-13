@@ -34,7 +34,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
-from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping, NullFillValueMapping
+from metricflow.dataflow.builder.aggregation_helper import NullFillValueMapping
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlan,
@@ -268,7 +268,6 @@ def test_simple_metric_aggregation_node(
 
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
         parent_node=filtered_measure_node,
-        alias_mapping=InstanceAliasMapping.create(),
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
@@ -466,7 +465,6 @@ def test_compute_metrics_node(
 
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
         parent_node=join_node,
-        alias_mapping=InstanceAliasMapping.create(),
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
@@ -540,7 +538,6 @@ def test_compute_metrics_node_simple_expr(
 
     aggregated_measures_node = AggregateSimpleMetricInputsNode.create(
         parent_node=join_node,
-        alias_mapping=InstanceAliasMapping.create(),
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
     metric_spec = MetricSpec(element_name="booking_fees")
@@ -632,7 +629,6 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
 
     aggregated_measures_node = AggregateSimpleMetricInputsNode.create(
         parent_node=join_node,
-        alias_mapping=InstanceAliasMapping.create(),
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
     metric_spec = MetricSpec(element_name="bookings_per_booker")
@@ -690,7 +686,6 @@ def test_order_by_node(
 
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
         parent_node=filtered_measure_node,
-        alias_mapping=InstanceAliasMapping.create(),
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
@@ -1024,7 +1019,6 @@ def test_combine_output_node(
     )
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
         parent_node=filtered_measure_node,
-        alias_mapping=InstanceAliasMapping.create(),
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
@@ -1038,7 +1032,6 @@ def test_combine_output_node(
     )
     aggregated_measure_node_2 = AggregateSimpleMetricInputsNode.create(
         parent_node=filtered_measure_node_2,
-        alias_mapping=InstanceAliasMapping.create(),
         null_fill_value_mapping=NullFillValueMapping.create(
             {spec.element_name: 1 for spec in simple_metric_input_specs_2}
         ),
