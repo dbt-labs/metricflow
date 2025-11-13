@@ -62,7 +62,7 @@ docstring:
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_3') -->
-                        <!-- alias_mapping = {'referred_bookings': 'ref_bookings'} -->
+                        <!-- alias_mapping = {} -->
                         <!-- null_fill_value_mapping = {} -->
                         <FilterElementsNode>
                             <!-- description =                                                                 -->

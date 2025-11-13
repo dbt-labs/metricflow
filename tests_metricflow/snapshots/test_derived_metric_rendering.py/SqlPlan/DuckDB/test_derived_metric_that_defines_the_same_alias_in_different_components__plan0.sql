@@ -30,12 +30,12 @@ FROM (
         -- Compute Metrics via Expressions
         SELECT
           subq_3.booking__is_instant
-          , subq_3.shared_alias
+          , subq_3.bookings AS shared_alias
         FROM (
           -- Aggregate Inputs for Simple Metrics
           SELECT
             subq_2.booking__is_instant
-            , SUM(subq_2.bookings) AS shared_alias
+            , SUM(subq_2.bookings) AS bookings
           FROM (
             -- Pass Only Elements: ['bookings', 'booking__is_instant']
             SELECT
@@ -269,12 +269,12 @@ FROM (
         -- Compute Metrics via Expressions
         SELECT
           subq_8.booking__is_instant
-          , subq_8.shared_alias
+          , subq_8.instant_bookings AS shared_alias
         FROM (
           -- Aggregate Inputs for Simple Metrics
           SELECT
             subq_7.booking__is_instant
-            , SUM(subq_7.instant_bookings) AS shared_alias
+            , SUM(subq_7.instant_bookings) AS instant_bookings
           FROM (
             -- Pass Only Elements: ['instant_bookings', 'booking__is_instant']
             SELECT

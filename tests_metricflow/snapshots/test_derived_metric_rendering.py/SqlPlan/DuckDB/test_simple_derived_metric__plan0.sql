@@ -19,11 +19,11 @@ FROM (
     FROM (
       -- Compute Metrics via Expressions
       SELECT
-        subq_3.alias_1
+        subq_3.bookings AS alias_1
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
-          SUM(subq_2.bookings) AS alias_1
+          SUM(subq_2.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings']
           SELECT
@@ -247,11 +247,11 @@ FROM (
     CROSS JOIN (
       -- Compute Metrics via Expressions
       SELECT
-        subq_7.alias_2
+        subq_7.referred_bookings AS alias_2
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
-          SUM(subq_6.referred_bookings) AS alias_2
+          SUM(subq_6.referred_bookings) AS referred_bookings
         FROM (
           -- Pass Only Elements: ['referred_bookings']
           SELECT
@@ -475,11 +475,11 @@ FROM (
     CROSS JOIN (
       -- Compute Metrics via Expressions
       SELECT
-        subq_11.alias_3
+        subq_11.instant_bookings AS alias_3
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
-          SUM(subq_10.instant_bookings) AS alias_3
+          SUM(subq_10.instant_bookings) AS instant_bookings
         FROM (
           -- Pass Only Elements: ['instant_bookings']
           SELECT
@@ -703,11 +703,11 @@ FROM (
     CROSS JOIN (
       -- Compute Metrics via Expressions
       SELECT
-        subq_15.alias_4
+        subq_15.booking_value AS alias_4
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
-          SUM(subq_14.booking_value) AS alias_4
+          SUM(subq_14.booking_value) AS booking_value
         FROM (
           -- Pass Only Elements: ['booking_value']
           SELECT
