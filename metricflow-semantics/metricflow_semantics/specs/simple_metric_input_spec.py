@@ -50,7 +50,6 @@ class SimpleMetricRecipe:
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
     cumulative_description: Optional[CumulativeDescription]
-    alias: Optional[str]
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
     after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
 
