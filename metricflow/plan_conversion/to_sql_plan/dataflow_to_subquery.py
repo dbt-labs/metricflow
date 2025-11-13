@@ -5,6 +5,7 @@ from collections import OrderedDict, defaultdict
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
 from dbt_semantic_interfaces.references import (
     MetricModelReference,
     SemanticModelElementReference,
@@ -15,7 +16,7 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.errors.error_classes import SemanticManifestConfigurationError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError, SemanticManifestConfigurationError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
@@ -600,6 +601,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         metric_select_columns = []
         metric_instances = []
         group_by_metric_instance: Optional[GroupByMetricInstance] = None
+        simple_metric_input_element_name_to_instance = {
+            instance.spec.element_name: instance
+            for instance in from_data_set.instance_set.simple_metric_input_instances
+        }
         for metric_spec in node.metric_specs:
             metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -632,8 +637,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     ),
                 )
             elif metric.type is MetricType.SIMPLE:
+                metric_name = metric_spec.element_name
+                simple_metric_input_instance = simple_metric_input_element_name_to_instance.get(metric_name)
+                if simple_metric_input_instance is None:
+                    raise MetricFlowInternalError(
+                        LazyFormat(
+                            "Expected a simple metric instance with a element name matching the metric name to be"
+                            " present in the input",
+                            metric_name=metric_name,
+                            input_instance_spec_set=from_data_set.instance_set.spec_set,
+                        )
+                    )
                 metric_expr = self.__make_col_reference_or_coalesce_expr(
-                    column_name=self._column_association_resolver.resolve_spec(metric_spec).column_name,
+                    column_name=simple_metric_input_instance.associated_column.column_name,
                     null_fill_value=metric.type_params.fill_nulls_with,
                     from_data_set_alias=from_data_set_alias,
                 )
@@ -662,24 +678,34 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 assert input_base_metric is not None, "A conversion metric must have a base metric."
                 input_conversion_metric = conversion_type_params.conversion_metric
                 assert input_conversion_metric is not None, "A conversion metric must have a conversion metric."
-                input_base_metric_column = self._column_association_resolver.resolve_spec(
-                    MetricSpec(element_name=input_base_metric.post_aggregation_reference.element_name)
-                ).column_name
-                input_conversion_metric_column = self._column_association_resolver.resolve_spec(
-                    MetricSpec(element_name=input_conversion_metric.post_aggregation_reference.element_name)
-                ).column_name
+
+                base_input_metric_instance = simple_metric_input_element_name_to_instance.get(input_base_metric.name)
+                conversion_input_metric_instance = simple_metric_input_element_name_to_instance.get(
+                    input_conversion_metric.name
+                )
+                if base_input_metric_instance is None or conversion_input_metric_instance is None:
+                    raise MetricFlowInternalError(
+                        LazyFormat(
+                            "Expected a simple metric instances with an element name matching the"
+                            " input metrics for the conversion metric name to be"
+                            " present in the input",
+                            base_input_metric_instance=base_input_metric_instance,
+                            conversion_input_metric_instance=conversion_input_metric_instance,
+                            input_instance_spec_set=from_data_set.instance_set.spec_set,
+                        )
+                    )
 
                 calculation_type = conversion_type_params.calculation
                 conversion_column_reference = SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=input_conversion_metric_column,
+                        column_name=conversion_input_metric_instance.associated_column.column_name,
                     )
                 )
                 base_column_reference = SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=input_base_metric_column,
+                        column_name=base_input_metric_instance.associated_column.column_name,
                     )
                 )
                 if calculation_type == ConversionCalculationType.CONVERSION_RATE:
@@ -1415,6 +1441,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def _get_custom_granularity_column_name(self, custom_granularity_name: str) -> str:
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
+        custom_granularity: Optional[PydanticTimeSpineCustomGranularityColumn] = None
         for custom_granularity in time_spine_source.custom_granularities:
             if custom_granularity.name == custom_granularity_name:
                 return custom_granularity.parsed_column_name
