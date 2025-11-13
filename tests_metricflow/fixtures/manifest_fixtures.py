@@ -32,6 +32,9 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.join_types_manife
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.multi_hop_join_manifest import (
     MULTI_HOP_JOIN_MANIFEST_ANCHOR,
 )
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.name_edge_case_manifest import (
+    NAME_EDGE_CASE_MANIFEST_ANCHOR,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.non_sm_manifest import NON_SM_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.partitioned_multi_hop_join_manifest import (
     PARTITIONED_MULTI_HOP_JOIN_MANIFEST_ANCHOR,
@@ -129,6 +132,11 @@ class SemanticManifestSetup(Enum):
         semantic_manifest_name="simple_multi_hop_join_manifest",
         id_number_space=IdNumberSpace.for_block(10),
         yaml_file_dir=SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR.directory,
+    )
+    NAME_EDGE_CASE_MANIFEST = SemanticManifestSetupPropertySet(
+        semantic_manifest_name="name_edge_case_manifest",
+        id_number_space=IdNumberSpace.for_block(11),
+        yaml_file_dir=NAME_EDGE_CASE_MANIFEST_ANCHOR.directory,
     )
 
     @property
@@ -383,3 +391,11 @@ def simple_multi_hop_join_manifest_lookup(
 ) -> SemanticManifestLookup:
     """Manifest used to test ambiguous resolution of group-by-items."""
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MULTI_HOP_JOIN_MANIFEST].semantic_manifest_lookup
+
+
+@pytest.fixture(scope="session")
+def name_edge_case_manifest(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
+    """Manifest used to test name-related edge cases."""
+    return mf_engine_test_fixture_mapping[SemanticManifestSetup.NAME_EDGE_CASE_MANIFEST].semantic_manifest_lookup
