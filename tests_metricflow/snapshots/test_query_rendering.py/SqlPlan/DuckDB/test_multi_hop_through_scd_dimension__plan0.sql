@@ -14,19 +14,19 @@ FROM (
   SELECT
     subq_15.metric_time__day
     , subq_15.listing__user__home_state_latest
-    , subq_15.bookings
+    , subq_15.__bookings AS bookings
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_14.metric_time__day
       , subq_14.listing__user__home_state_latest
-      , SUM(subq_14.bookings) AS bookings
+      , SUM(subq_14.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
       SELECT
         subq_13.metric_time__day
         , subq_13.listing__user__home_state_latest
-        , subq_13.bookings
+        , subq_13.__bookings
       FROM (
         -- Join Standard Outputs
         SELECT
@@ -120,9 +120,9 @@ FROM (
           , subq_7.booking__user AS booking__user
           , subq_7.is_instant AS is_instant
           , subq_7.booking__is_instant AS booking__is_instant
-          , subq_7.bookings AS bookings
-          , subq_7.family_bookings AS family_bookings
-          , subq_7.potentially_lux_bookings AS potentially_lux_bookings
+          , subq_7.__bookings AS __bookings
+          , subq_7.__family_bookings AS __family_bookings
+          , subq_7.__potentially_lux_bookings AS __potentially_lux_bookings
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
@@ -213,15 +213,15 @@ FROM (
             , subq_6.booking__user
             , subq_6.is_instant
             , subq_6.booking__is_instant
-            , subq_6.bookings
-            , subq_6.family_bookings
-            , subq_6.potentially_lux_bookings
+            , subq_6.__bookings
+            , subq_6.__family_bookings
+            , subq_6.__potentially_lux_bookings
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             SELECT
-              1 AS bookings
-              , 1 AS family_bookings
-              , 1 AS potentially_lux_bookings
+              1 AS __bookings
+              , 1 AS __family_bookings
+              , 1 AS __potentially_lux_bookings
               , bookings_source_src_26000.is_instant
               , DATE_TRUNC('day', bookings_source_src_26000.ds) AS ds__day
               , DATE_TRUNC('week', bookings_source_src_26000.ds) AS ds__week

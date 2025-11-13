@@ -22,19 +22,19 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         metric_time__day
-        , COALESCE(bookings_fill_nulls_with_0_without_time_spine, 0) AS bookings_fill_nulls_with_0_without_time_spine
+        , COALESCE(__bookings_fill_nulls_with_0_without_time_spine, 0) AS bookings_fill_nulls_with_0_without_time_spine
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
-          , SUM(bookings_fill_nulls_with_0_without_time_spine) AS bookings_fill_nulls_with_0_without_time_spine
+          , SUM(__bookings_fill_nulls_with_0_without_time_spine) AS __bookings_fill_nulls_with_0_without_time_spine
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
+          -- Pass Only Elements: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
           SELECT
             DATE_TRUNC('day', ds) AS metric_time__day
-            , 1 AS bookings_fill_nulls_with_0_without_time_spine
+            , 1 AS __bookings_fill_nulls_with_0_without_time_spine
           FROM ***************************.fct_bookings bookings_source_src_28000
         ) subq_15
         GROUP BY
@@ -48,14 +48,14 @@ FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
-    , SUM(listings) AS listings
+    , SUM(__listings) AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['listings', 'metric_time__day']
+    -- Pass Only Elements: ['__listings', 'metric_time__day']
     SELECT
       DATE_TRUNC('day', created_at) AS metric_time__day
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_22
   GROUP BY

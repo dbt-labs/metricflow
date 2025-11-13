@@ -15,12 +15,12 @@ O4:
     SELECT
       subq_1.metric_time__day AS metric_time__day
       , listings_latest_src_10000.country AS listing__country_latest
-      , SUM(subq_1.bookings) AS bookings
+      , SUM(subq_1.__bookings) AS bookings
     FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , listing_id AS listing
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_10000
     ) subq_1
     LEFT OUTER JOIN
@@ -35,12 +35,12 @@ O4:
     SELECT
       subq_10.metric_time__day AS metric_time__day
       , listings_latest_src_10000.country AS listing__country_latest
-      , SUM(subq_10.views) AS views
+      , SUM(subq_10.__views) AS views
     FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , listing_id AS listing
-        , 1 AS views
+        , 1 AS __views
       FROM ***************************.fct_views views_source_src_10000
     ) subq_10
     LEFT OUTER JOIN
@@ -78,12 +78,12 @@ O5:
     SELECT
       subq_1.metric_time__day AS metric_time__day
       , sma_10014_cte.country_latest AS listing__country_latest
-      , SUM(subq_1.bookings) AS bookings
+      , SUM(subq_1.__bookings) AS bookings
     FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , listing_id AS listing
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_10000
     ) subq_1
     LEFT OUTER JOIN
@@ -98,12 +98,12 @@ O5:
     SELECT
       subq_10.metric_time__day AS metric_time__day
       , sma_10014_cte.country_latest AS listing__country_latest
-      , SUM(subq_10.views) AS views
+      , SUM(subq_10.__views) AS views
     FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , listing_id AS listing
-        , 1 AS views
+        , 1 AS __views
       FROM ***************************.fct_views views_source_src_10000
     ) subq_10
     LEFT OUTER JOIN

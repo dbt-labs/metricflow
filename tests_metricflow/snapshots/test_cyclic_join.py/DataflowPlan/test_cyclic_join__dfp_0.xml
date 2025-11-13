@@ -16,7 +16,7 @@ docstring:
                 <!-- node_id = NodeId(id_str='am_0') -->
                 <!-- null_fill_value_mapping = {} -->
                 <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['listings', 'cyclic_entity__capacity_latest']" -->
+                    <!-- description = "Pass Only Elements: ['__listings', 'cyclic_entity__capacity_latest']" -->
                     <!-- node_id = NodeId(id_str='pfe_1') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='listings') -->
                     <!-- include_spec =                                                     -->

@@ -7,29 +7,29 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Pass Only Elements: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(listings) AS listings
+  SUM(__listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_26.user__revenue_all_time AS user__revenue_all_time
-    , subq_19.listings AS listings
+    , subq_19.__listings AS __listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       user_id AS user
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_19
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['revenue', 'user']
+    -- Pass Only Elements: ['__revenue', 'user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions

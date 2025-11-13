@@ -18,13 +18,13 @@ SELECT
   subq_8.country_latest AS listing__country_latest
   , subq_9.country_latest AS listing__country_latest
   , subq_6.listing AS listing
-  , subq_6.bookings AS bookings
+  , subq_6.__bookings AS __bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['bookings', 'listing']
+  -- Pass Only Elements: ['__bookings', 'listing']
   SELECT
     listing_id AS listing
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_6
 LEFT OUTER JOIN (

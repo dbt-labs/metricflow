@@ -23,7 +23,7 @@ docstring:
                         <!-- node_id = NodeId(id_str='am_0') -->
                         <!-- null_fill_value_mapping = {} -->
                         <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['bookings', 'metric_time__day']" -->
+                            <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_0') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                             <!-- include_spec =                                                                  -->
@@ -72,7 +72,7 @@ docstring:
                             <!-- node_id = NodeId(id_str='am_1') -->
                             <!-- null_fill_value_mapping = {} -->
                             <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['bookings', 'metric_time__day']" -->
+                                <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_1') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                 <!-- include_spec =                                                                  -->

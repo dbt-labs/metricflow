@@ -9,7 +9,7 @@ sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'id_verifications'
 SELECT
-  1 AS identity_verifications
+  1 AS __identity_verifications
   , DATE_TRUNC('day', id_verifications_src_28000.ds) AS ds__day
   , DATE_TRUNC('week', id_verifications_src_28000.ds) AS ds__week
   , DATE_TRUNC('month', id_verifications_src_28000.ds) AS ds__month
