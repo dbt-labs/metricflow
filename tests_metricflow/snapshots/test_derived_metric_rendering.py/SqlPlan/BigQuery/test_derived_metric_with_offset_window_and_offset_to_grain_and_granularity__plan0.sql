@@ -21,12 +21,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_7.metric_time__year
-        , subq_7.month_start_bookings
+        , subq_7.bookings AS month_start_bookings
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_6.metric_time__year
-          , SUM(subq_6.bookings) AS month_start_bookings
+          , SUM(subq_6.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings', 'metric_time__year']
           SELECT
@@ -407,12 +407,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_15.metric_time__year
-        , subq_15.bookings_1_month_ago
+        , subq_15.bookings AS bookings_1_month_ago
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_14.metric_time__year
-          , SUM(subq_14.bookings) AS bookings_1_month_ago
+          , SUM(subq_14.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings', 'metric_time__year']
           SELECT
