@@ -35,13 +35,13 @@ class DunderColumnAssociationResolver(ColumnAssociationResolver):
 
 
 class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociation]):
-    """Visitor helper class for DefaultColumnAssociationResolver2."""
+    """Visitor helper class for DefaultColumnAssociationResolver."""
 
     def visit_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(metric_spec.alias or metric_spec.element_name)
 
     def visit_simple_metric_input_spec(self, spec: SimpleMetricInputSpec) -> ColumnAssociation:  # noqa: D102
-        return ColumnAssociation(spec.element_name)
+        return ColumnAssociation(DUNDER + spec.element_name)
 
     def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(dimension_spec.alias or dimension_spec.dunder_name)
