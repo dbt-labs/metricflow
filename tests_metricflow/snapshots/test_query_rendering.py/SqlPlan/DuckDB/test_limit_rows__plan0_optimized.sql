@@ -10,14 +10,14 @@ sql_engine: DuckDB
 -- Write to DataTable
 SELECT
   ds__day
-  , SUM(bookings) AS bookings
+  , SUM(__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['bookings', 'ds__day']
+  -- Pass Only Elements: ['__bookings', 'ds__day']
   SELECT
     DATE_TRUNC('day', ds) AS ds__day
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_8
 GROUP BY

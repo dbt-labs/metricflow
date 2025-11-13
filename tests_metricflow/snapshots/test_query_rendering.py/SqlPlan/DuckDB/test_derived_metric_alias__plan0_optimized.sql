@@ -14,7 +14,7 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
-    , booking_value
+    , booking_value AS __booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -23,18 +23,18 @@ SELECT
   , booking_value * 0.05 AS bookings_alias
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['booking_value', 'metric_time__day']
+  -- Pass Only Elements: ['__booking_value', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
-    , SUM(booking_value) AS booking_value
+    , SUM(__booking_value) AS booking_value
   FROM (
     -- Join Standard Outputs
     SELECT
       subq_27.listing__booking_fees AS listing__booking_fees
       , sma_28009_cte.metric_time__day AS metric_time__day
-      , sma_28009_cte.booking_value AS booking_value
+      , sma_28009_cte.__booking_value AS __booking_value
     FROM sma_28009_cte
     LEFT OUTER JOIN (
       -- Compute Metrics via Expressions
@@ -44,12 +44,12 @@ FROM (
         , booking_value * 0.05 AS listing__booking_fees
       FROM (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['booking_value', 'listing']
+        -- Pass Only Elements: ['__booking_value', 'listing']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
           listing
-          , SUM(booking_value) AS booking_value
+          , SUM(__booking_value) AS booking_value
         FROM sma_28009_cte
         GROUP BY
           listing

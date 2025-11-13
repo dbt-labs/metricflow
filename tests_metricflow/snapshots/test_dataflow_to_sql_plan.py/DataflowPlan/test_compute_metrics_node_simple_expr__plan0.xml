@@ -25,7 +25,7 @@ docstring:
                     <!--     join_type=LEFT_OUTER,                                      -->
                     <!--   )                                                            -->
                     <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['booking_value', 'listing']" -->
+                        <!-- description = "Pass Only Elements: ['__booking_value', 'listing']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing') -->

@@ -21,20 +21,20 @@ SELECT
   , MAX(subq_35.views) AS views
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['bookings', 'listing__capacity_latest', 'metric_time__day']
+  -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_20.metric_time__day AS metric_time__day
     , sma_28014_cte.capacity_latest AS listing__capacity_latest
-    , SUM(subq_20.bookings) AS bookings
+    , SUM(subq_20.__bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
-      , 1 AS bookings
+      , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_20
   LEFT OUTER JOIN
@@ -47,20 +47,20 @@ FROM (
 ) subq_27
 FULL OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['views', 'listing__capacity_latest', 'metric_time__day']
+  -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_29.metric_time__day AS metric_time__day
     , sma_28014_cte.capacity_latest AS listing__capacity_latest
-    , SUM(subq_29.views) AS views
+    , SUM(subq_29.__views) AS views
   FROM (
     -- Read Elements From Semantic Model 'views_source'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
-      , 1 AS views
+      , 1 AS __views
     FROM ***************************.fct_views views_source_src_28000
   ) subq_29
   LEFT OUTER JOIN
