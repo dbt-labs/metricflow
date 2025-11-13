@@ -13,37 +13,37 @@ WITH sma_28019_cte AS (
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
     , user_id AS user
-    , 1 AS visits
+    , 1 AS __visits
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
 SELECT
-  COALESCE(MAX(subq_27.buys_fill_nulls_with_0), 0) AS visit_buy_conversions
+  COALESCE(MAX(subq_27.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
 FROM (
   -- Read From CTE For node_id=sma_28019
-  -- Pass Only Elements: ['visits']
+  -- Pass Only Elements: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(visits) AS visits
+    SUM(__visits) AS __visits
   FROM sma_28019_cte
 ) subq_18
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['buys_fill_nulls_with_0']
+  -- Pass Only Elements: ['__buys_fill_nulls_with_0']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(buys_fill_nulls_with_0) AS buys_fill_nulls_with_0
+    SUM(__buys_fill_nulls_with_0) AS __buys_fill_nulls_with_0
   FROM (
     -- Dedupe the fanout with mf_internal_uuid in the conversion data set
     SELECT DISTINCT
-      FIRST_VALUE(sma_28019_cte.visits) OVER (
+      FIRST_VALUE(sma_28019_cte.__visits) OVER (
         PARTITION BY
           subq_23.user
           , subq_23.metric_time__day
           , subq_23.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS visits
+      ) AS __visits
       , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
         PARTITION BY
           subq_23.user
@@ -61,7 +61,7 @@ CROSS JOIN (
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
       , subq_23.mf_internal_uuid AS mf_internal_uuid
-      , subq_23.buys_fill_nulls_with_0 AS buys_fill_nulls_with_0
+      , subq_23.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
     FROM sma_28019_cte
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
@@ -70,7 +70,7 @@ CROSS JOIN (
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , user_id AS user
-        , 1 AS buys_fill_nulls_with_0
+        , 1 AS __buys_fill_nulls_with_0
         , GENERATE_UUID() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
     ) subq_23

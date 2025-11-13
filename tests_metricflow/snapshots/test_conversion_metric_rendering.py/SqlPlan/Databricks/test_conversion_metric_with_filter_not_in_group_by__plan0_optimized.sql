@@ -14,44 +14,44 @@ WITH sma_28019_cte AS (
     DATE_TRUNC('day', ds) AS metric_time__day
     , user_id AS user
     , referrer_id AS visit__referrer_id
-    , 1 AS visits
+    , 1 AS __visits
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
 SELECT
-  COALESCE(MAX(subq_31.buys_fill_nulls_with_0), 0) AS visit_buy_conversions
+  COALESCE(MAX(subq_31.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['visits']
+  -- Pass Only Elements: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(visits) AS visits
+    SUM(__visits) AS __visits
   FROM (
     -- Read From CTE For node_id=sma_28019
     SELECT
       visit__referrer_id
-      , visits
+      , __visits
     FROM sma_28019_cte
   ) subq_18
   WHERE visit__referrer_id = 'ref_id_01'
 ) subq_21
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['buys_fill_nulls_with_0']
+  -- Pass Only Elements: ['__buys_fill_nulls_with_0']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(buys_fill_nulls_with_0) AS buys_fill_nulls_with_0
+    SUM(__buys_fill_nulls_with_0) AS __buys_fill_nulls_with_0
   FROM (
     -- Dedupe the fanout with mf_internal_uuid in the conversion data set
     SELECT DISTINCT
-      FIRST_VALUE(subq_24.visits) OVER (
+      FIRST_VALUE(subq_24.__visits) OVER (
         PARTITION BY
           subq_27.user
           , subq_27.metric_time__day
           , subq_27.mf_internal_uuid
         ORDER BY subq_24.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS visits
+      ) AS __visits
       , FIRST_VALUE(subq_24.visit__referrer_id) OVER (
         PARTITION BY
           subq_27.user
@@ -77,22 +77,22 @@ CROSS JOIN (
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
       , subq_27.mf_internal_uuid AS mf_internal_uuid
-      , subq_27.buys_fill_nulls_with_0 AS buys_fill_nulls_with_0
+      , subq_27.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['visits', 'visit__referrer_id', 'metric_time__day', 'user']
+      -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
       SELECT
         metric_time__day
         , subq_22.user
         , visit__referrer_id
-        , visits
+        , __visits
       FROM (
         -- Read From CTE For node_id=sma_28019
         SELECT
           metric_time__day
           , sma_28019_cte.user
           , visit__referrer_id
-          , visits
+          , __visits
         FROM sma_28019_cte
       ) subq_22
       WHERE visit__referrer_id = 'ref_id_01'
@@ -104,7 +104,7 @@ CROSS JOIN (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , user_id AS user
-        , 1 AS buys_fill_nulls_with_0
+        , 1 AS __buys_fill_nulls_with_0
         , UUID() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
     ) subq_27

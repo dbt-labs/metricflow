@@ -12,13 +12,13 @@ FROM (
   SELECT
     subq_9.metric_time__alien_day
     , subq_9.metric_time__hour
-    , subq_9.subdaily_join_to_time_spine_metric
+    , subq_9.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
   FROM (
     -- Join to Time Spine Dataset
     SELECT
       subq_8.metric_time__alien_day AS metric_time__alien_day
       , subq_8.metric_time__hour AS metric_time__hour
-      , subq_4.subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
+      , subq_4.__subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
     FROM (
       -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
       SELECT
@@ -69,13 +69,13 @@ FROM (
       SELECT
         subq_3.metric_time__alien_day
         , subq_3.metric_time__hour
-        , SUM(subq_3.subdaily_join_to_time_spine_metric) AS subdaily_join_to_time_spine_metric
+        , SUM(subq_3.__subdaily_join_to_time_spine_metric) AS __subdaily_join_to_time_spine_metric
       FROM (
-        -- Pass Only Elements: ['subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
+        -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
         SELECT
           subq_2.metric_time__alien_day
           , subq_2.metric_time__hour
-          , subq_2.subdaily_join_to_time_spine_metric
+          , subq_2.__subdaily_join_to_time_spine_metric
         FROM (
           -- Metric Time Dimension 'archived_at'
           -- Join to Custom Granularity Dataset
@@ -269,21 +269,21 @@ FROM (
             , subq_0.user AS user
             , subq_0.home_state AS home_state
             , subq_0.user__home_state AS user__home_state
-            , subq_0.subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
-            , subq_0.simple_subdaily_metric_default_day AS simple_subdaily_metric_default_day
-            , subq_0.simple_subdaily_metric_default_hour AS simple_subdaily_metric_default_hour
-            , subq_0.archived_users_join_to_time_spine AS archived_users_join_to_time_spine
-            , subq_0.archived_users AS archived_users
+            , subq_0.__subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
+            , subq_0.__simple_subdaily_metric_default_day AS __simple_subdaily_metric_default_day
+            , subq_0.__simple_subdaily_metric_default_hour AS __simple_subdaily_metric_default_hour
+            , subq_0.__archived_users_join_to_time_spine AS __archived_users_join_to_time_spine
+            , subq_0.__archived_users AS __archived_users
             , subq_1.alien_day AS metric_time__alien_day
           FROM (
             -- Read Elements From Semantic Model 'users_ds_source'
             SELECT
-              1 AS subdaily_join_to_time_spine_metric
-              , 1 AS simple_subdaily_metric_default_day
-              , 1 AS simple_subdaily_metric_default_hour
-              , 1 AS archived_users_join_to_time_spine
-              , 1 AS archived_users
-              , 1 AS new_users
+              1 AS __subdaily_join_to_time_spine_metric
+              , 1 AS __simple_subdaily_metric_default_day
+              , 1 AS __simple_subdaily_metric_default_hour
+              , 1 AS __archived_users_join_to_time_spine
+              , 1 AS __archived_users
+              , 1 AS __new_users
               , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
               , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month

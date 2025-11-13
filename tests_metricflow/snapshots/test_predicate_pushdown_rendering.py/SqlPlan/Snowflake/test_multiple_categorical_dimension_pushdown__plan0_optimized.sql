@@ -5,20 +5,20 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings', 'user__home_state_latest']
+-- Pass Only Elements: ['__listings', 'user__home_state_latest']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   user__home_state_latest
-  , SUM(listings) AS listings
+  , SUM(__listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     users_latest_src_28000.home_state_latest AS user__home_state_latest
     , subq_10.listing__is_lux_latest AS listing__is_lux_latest
     , subq_10.listing__capacity_latest AS listing__capacity_latest
-    , subq_10.listings AS listings
+    , subq_10.__listings AS __listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -26,7 +26,7 @@ FROM (
       user_id AS user
       , is_lux AS listing__is_lux_latest
       , capacity AS listing__capacity_latest
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_10
   LEFT OUTER JOIN

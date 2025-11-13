@@ -9,12 +9,12 @@ SELECT
   , bookings AS bookings_offset_one_alien_day
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements: ['bookings', 'metric_time__day']
+  -- Pass Only Elements: ['__bookings', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_26.ds__day__lead AS metric_time__day
-    , SUM(subq_22.bookings) AS bookings
+    , SUM(subq_22.__bookings) AS bookings
   FROM (
     -- Offset Base Granularity By Custom Granularity Period(s)
     WITH cte_6 AS (
@@ -75,7 +75,7 @@ FROM (
     -- Metric Time Dimension 'ds'
     SELECT
       DATETIME_TRUNC(ds, day) AS metric_time__day
-      , 1 AS bookings
+      , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_22
   ON

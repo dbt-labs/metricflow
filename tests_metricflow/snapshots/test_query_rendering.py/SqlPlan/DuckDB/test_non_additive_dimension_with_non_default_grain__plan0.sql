@@ -10,15 +10,15 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_6.total_account_balance_first_day_of_month
+    subq_6.__total_account_balance_first_day_of_month AS total_account_balance_first_day_of_month
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      SUM(subq_5.total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
+      SUM(subq_5.__total_account_balance_first_day_of_month) AS __total_account_balance_first_day_of_month
     FROM (
-      -- Pass Only Elements: ['total_account_balance_first_day_of_month']
+      -- Pass Only Elements: ['__total_account_balance_first_day_of_month']
       SELECT
-        subq_4.total_account_balance_first_day_of_month
+        subq_4.__total_account_balance_first_day_of_month
       FROM (
         -- Join on MIN(ds_month) and [] grouping by None
         SELECT
@@ -66,7 +66,7 @@ FROM (
           , subq_1.account__user AS account__user
           , subq_1.account_type AS account_type
           , subq_1.account__account_type AS account__account_type
-          , subq_1.total_account_balance_first_day_of_month AS total_account_balance_first_day_of_month
+          , subq_1.__total_account_balance_first_day_of_month AS __total_account_balance_first_day_of_month
         FROM (
           -- Metric Time Dimension 'ds_month'
           SELECT
@@ -114,14 +114,14 @@ FROM (
             , subq_0.account__user
             , subq_0.account_type
             , subq_0.account__account_type
-            , subq_0.total_account_balance_first_day_of_month
+            , subq_0.__total_account_balance_first_day_of_month
           FROM (
             -- Read Elements From Semantic Model 'accounts_source'
             SELECT
-              accounts_source_src_28000.account_balance
-              , accounts_source_src_28000.account_balance AS total_account_balance_first_day
-              , accounts_source_src_28000.account_balance AS current_account_balance_by_user
-              , accounts_source_src_28000.account_balance AS total_account_balance_first_day_of_month
+              accounts_source_src_28000.account_balance AS __account_balance
+              , accounts_source_src_28000.account_balance AS __total_account_balance_first_day
+              , accounts_source_src_28000.account_balance AS __current_account_balance_by_user
+              , accounts_source_src_28000.account_balance AS __total_account_balance_first_day_of_month
               , DATE_TRUNC('day', accounts_source_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', accounts_source_src_28000.ds) AS ds__week
               , DATE_TRUNC('month', accounts_source_src_28000.ds) AS ds__month
@@ -214,14 +214,14 @@ FROM (
               , subq_0.account__user
               , subq_0.account_type
               , subq_0.account__account_type
-              , subq_0.total_account_balance_first_day_of_month
+              , subq_0.__total_account_balance_first_day_of_month
             FROM (
               -- Read Elements From Semantic Model 'accounts_source'
               SELECT
-                accounts_source_src_28000.account_balance
-                , accounts_source_src_28000.account_balance AS total_account_balance_first_day
-                , accounts_source_src_28000.account_balance AS current_account_balance_by_user
-                , accounts_source_src_28000.account_balance AS total_account_balance_first_day_of_month
+                accounts_source_src_28000.account_balance AS __account_balance
+                , accounts_source_src_28000.account_balance AS __total_account_balance_first_day
+                , accounts_source_src_28000.account_balance AS __current_account_balance_by_user
+                , accounts_source_src_28000.account_balance AS __total_account_balance_first_day_of_month
                 , DATE_TRUNC('day', accounts_source_src_28000.ds) AS ds__day
                 , DATE_TRUNC('week', accounts_source_src_28000.ds) AS ds__week
                 , DATE_TRUNC('month', accounts_source_src_28000.ds) AS ds__month

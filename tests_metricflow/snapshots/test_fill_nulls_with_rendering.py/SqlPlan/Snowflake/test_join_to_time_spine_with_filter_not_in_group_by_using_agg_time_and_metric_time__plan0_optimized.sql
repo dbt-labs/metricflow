@@ -7,7 +7,7 @@ sql_engine: Snowflake
 -- Write to DataTable
 SELECT
   subq_19.metric_time__day AS metric_time__day
-  , subq_15.bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
+  , subq_15.__bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__day']
@@ -25,18 +25,18 @@ FROM (
 ) subq_19
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day']
+  -- Pass Only Elements: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
-    , SUM(bookings_join_to_time_spine_with_tiered_filters) AS bookings_join_to_time_spine_with_tiered_filters
+    , SUM(__bookings_join_to_time_spine_with_tiered_filters) AS __bookings_join_to_time_spine_with_tiered_filters
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('month', ds) AS booking__ds__month
       , DATE_TRUNC('day', ds) AS metric_time__day
-      , 1 AS bookings_join_to_time_spine_with_tiered_filters
+      , 1 AS __bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_12
   WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')

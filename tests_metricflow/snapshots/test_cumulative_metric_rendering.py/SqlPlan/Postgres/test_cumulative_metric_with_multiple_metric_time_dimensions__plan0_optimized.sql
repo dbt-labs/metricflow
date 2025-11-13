@@ -5,7 +5,7 @@ docstring:
 sql_engine: Postgres
 ---
 -- Join Self Over Time Range
--- Pass Only Elements: ['revenue', 'metric_time__day', 'metric_time__month']
+-- Pass Only Elements: ['__revenue', 'metric_time__day', 'metric_time__month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

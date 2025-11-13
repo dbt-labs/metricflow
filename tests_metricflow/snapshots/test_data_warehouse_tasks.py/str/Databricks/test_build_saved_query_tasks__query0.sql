@@ -5,20 +5,20 @@ sql_engine: Databricks
 SELECT
   metric_time__day
   , listing__capacity_latest
-  , SUM(bookings) AS bookings
-  , SUM(instant_bookings) AS instant_bookings
+  , SUM(__bookings) AS bookings
+  , SUM(__instant_bookings) AS instant_bookings
 FROM (
   SELECT
     listings_latest_src_10000.capacity AS listing__capacity_latest
     , subq_1.metric_time__day AS metric_time__day
-    , subq_1.bookings AS bookings
-    , subq_1.instant_bookings AS instant_bookings
+    , subq_1.__bookings AS __bookings
+    , subq_1.__instant_bookings AS __instant_bookings
   FROM (
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing
-      , 1 AS bookings
-      , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
+      , 1 AS __bookings
+      , CASE WHEN is_instant THEN 1 ELSE 0 END AS __instant_bookings
     FROM ***************************.fct_bookings bookings_source_src_10000
   ) subq_1
   LEFT OUTER JOIN

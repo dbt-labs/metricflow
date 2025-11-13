@@ -92,26 +92,26 @@ SELECT
   , host_id AS booking__host
   , is_instant
   , is_instant AS booking__is_instant
-  , 1 AS bookings
-  , booking_value AS average_booking_value
-  , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
-  , booking_value
-  , booking_value AS max_booking_value
-  , booking_value AS min_booking_value
-  , booking_value AS instant_booking_value
-  , booking_value AS average_instant_booking_value
-  , booking_value AS booking_value_for_non_null_listing_id
-  , guest_id AS bookers
-  , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS referred_bookings
-  , booking_value AS median_booking_value
-  , booking_value AS booking_value_p99
-  , booking_value AS discrete_booking_value_p99
-  , booking_value AS approximate_continuous_booking_value_p99
-  , booking_value AS approximate_discrete_booking_value_p99
-  , 1 AS bookings_join_to_time_spine
-  , 1 AS bookings_fill_nulls_with_0_without_time_spine
-  , 1 AS bookings_fill_nulls_with_0
-  , 1 AS instant_bookings_with_measure_filter
-  , 1 AS bookings_join_to_time_spine_with_tiered_filters
-  , guest_id AS bookers_fill_nulls_with_0_join_to_timespine
+  , 1 AS __bookings
+  , booking_value AS __average_booking_value
+  , CASE WHEN is_instant THEN 1 ELSE 0 END AS __instant_bookings
+  , booking_value AS __booking_value
+  , booking_value AS __max_booking_value
+  , booking_value AS __min_booking_value
+  , booking_value AS __instant_booking_value
+  , booking_value AS __average_instant_booking_value
+  , booking_value AS __booking_value_for_non_null_listing_id
+  , guest_id AS __bookers
+  , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS __referred_bookings
+  , booking_value AS __median_booking_value
+  , booking_value AS __booking_value_p99
+  , booking_value AS __discrete_booking_value_p99
+  , booking_value AS __approximate_continuous_booking_value_p99
+  , booking_value AS __approximate_discrete_booking_value_p99
+  , 1 AS __bookings_join_to_time_spine
+  , 1 AS __bookings_fill_nulls_with_0_without_time_spine
+  , 1 AS __bookings_fill_nulls_with_0
+  , 1 AS __instant_bookings_with_measure_filter
+  , 1 AS __bookings_join_to_time_spine_with_tiered_filters
+  , guest_id AS __bookers_fill_nulls_with_0_join_to_timespine
 FROM ***************************.fct_bookings bookings_source_src_28000

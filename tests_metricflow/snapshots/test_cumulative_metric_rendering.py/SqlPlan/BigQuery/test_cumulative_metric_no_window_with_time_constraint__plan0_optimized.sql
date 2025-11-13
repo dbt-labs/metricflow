@@ -6,14 +6,14 @@ sql_engine: BigQuery
 ---
 -- Join Self Over Time Range
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-01T00:00:00]
--- Pass Only Elements: ['revenue', 'metric_time__day']
+-- Pass Only Elements: ['__revenue', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   subq_15.metric_time__day AS metric_time__day
-  , SUM(subq_14.revenue) AS revenue_all_time
+  , SUM(subq_14.__revenue) AS revenue_all_time
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   SELECT
@@ -27,7 +27,7 @@ INNER JOIN (
   -- Constrain Time Range to [2000-01-01T00:00:00, 2020-01-01T00:00:00]
   SELECT
     DATETIME_TRUNC(created_at, day) AS metric_time__day
-    , revenue
+    , revenue AS __revenue
   FROM ***************************.fct_revenue revenue_src_28000
   WHERE DATETIME_TRUNC(created_at, day) BETWEEN '2000-01-01' AND '2020-01-01'
 ) subq_14

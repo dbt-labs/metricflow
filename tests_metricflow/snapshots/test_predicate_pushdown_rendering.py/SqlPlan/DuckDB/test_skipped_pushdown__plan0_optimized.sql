@@ -10,27 +10,27 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings', 'listing__country_latest']
+-- Pass Only Elements: ['__bookings', 'listing__country_latest']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   listing__country_latest
-  , SUM(bookings) AS bookings
+  , SUM(__bookings) AS bookings
 FROM (
   -- Join Standard Outputs
   SELECT
     listings_latest_src_28000.country AS listing__country_latest
     , listings_latest_src_28000.is_lux AS listing__is_lux_latest
     , subq_11.booking__is_instant AS booking__is_instant
-    , subq_11.bookings AS bookings
+    , subq_11.__bookings AS __bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
       listing_id AS listing
       , is_instant AS booking__is_instant
-      , 1 AS bookings
+      , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_11
   LEFT OUTER JOIN

@@ -12,8 +12,8 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , DATE_TRUNC('month', ds) AS metric_time__month
-    , booking_value
-    , guest_id AS bookers
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -28,18 +28,18 @@ FROM (
     , MAX(subq_31.bookers) AS bookers
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['booking_value', 'metric_time__month']
+    -- Pass Only Elements: ['__booking_value', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__month
-      , SUM(booking_value) AS booking_value
+      , SUM(__booking_value) AS booking_value
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         time_spine_src_28006.ds AS metric_time__day
         , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
-        , sma_28009_cte.booking_value AS booking_value
+        , sma_28009_cte.__booking_value AS __booking_value
       FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN
         sma_28009_cte
@@ -52,18 +52,18 @@ FROM (
   ) subq_26
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookers', 'metric_time__month']
+    -- Pass Only Elements: ['__bookers', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__month
-      , COUNT(DISTINCT bookers) AS bookers
+      , COUNT(DISTINCT __bookers) AS bookers
     FROM (
       -- Read From CTE For node_id=sma_28009
       SELECT
         metric_time__day
         , metric_time__month
-        , bookers
+        , __bookers
       FROM sma_28009_cte
     ) subq_27
     WHERE metric_time__day = '2020-01-01'

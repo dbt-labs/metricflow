@@ -26,7 +26,7 @@ FROM (
     ) AS revenue_all_time
   FROM (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['revenue', 'metric_time__week', 'metric_time__quarter', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__week', 'metric_time__quarter', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions

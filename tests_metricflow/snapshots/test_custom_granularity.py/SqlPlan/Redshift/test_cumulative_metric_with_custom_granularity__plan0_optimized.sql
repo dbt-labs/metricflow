@@ -13,16 +13,16 @@ FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
     metric_time__alien_day
-    , AVG(revenue) OVER (PARTITION BY metric_time__alien_day) AS trailing_2_months_revenue
+    , AVG(__revenue) OVER (PARTITION BY metric_time__alien_day) AS trailing_2_months_revenue
   FROM (
     -- Join Self Over Time Range
     -- Join to Custom Granularity Dataset
-    -- Pass Only Elements: ['revenue', 'metric_time__alien_day', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__alien_day', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_16.alien_day AS metric_time__alien_day
       , subq_15.ds AS metric_time__day
-      , SUM(revenue_src_28000.revenue) AS revenue
+      , SUM(revenue_src_28000.revenue) AS __revenue
     FROM ***************************.mf_time_spine subq_15
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000

@@ -9,35 +9,35 @@ sql_engine: Snowflake
 SELECT
   metric_time__day
   , booking__is_instant
-  , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
+  , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Constrain Output with WHERE
   SELECT
     metric_time__day
     , booking__is_instant
-    , bookings_fill_nulls_with_0
+    , __bookings_fill_nulls_with_0
   FROM (
     -- Join to Time Spine Dataset
     SELECT
       time_spine_src_28006.ds AS metric_time__day
       , subq_15.booking__is_instant AS booking__is_instant
-      , subq_15.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+      , subq_15.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
     FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
         , booking__is_instant
-        , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+        , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         SELECT
           DATE_TRUNC('day', ds) AS metric_time__day
           , is_instant AS booking__is_instant
-          , 1 AS bookings_fill_nulls_with_0
+          , 1 AS __bookings_fill_nulls_with_0
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_12
       WHERE booking__is_instant

@@ -15,15 +15,15 @@ FROM (
   -- Window Function for Metric Re-aggregation
   SELECT
     metric_time__year
-    , AVG(revenue) OVER (PARTITION BY metric_time__year) AS trailing_2_months_revenue
+    , AVG(__revenue) OVER (PARTITION BY metric_time__year) AS trailing_2_months_revenue
   FROM (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['revenue', 'metric_time__year', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__year', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_14.ds AS metric_time__day
       , DATE_TRUNC('year', subq_14.ds) AS metric_time__year
-      , SUM(revenue_src_28000.revenue) AS revenue
+      , SUM(revenue_src_28000.revenue) AS __revenue
     FROM ***************************.mf_time_spine subq_14
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000

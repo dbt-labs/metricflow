@@ -10,17 +10,17 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_3.listing__country_latest
-    , subq_3.listings
+    , subq_3.__listings AS listings
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_2.listing__country_latest
-      , SUM(subq_2.listings) AS listings
+      , SUM(subq_2.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['listings', 'listing__country_latest']
+      -- Pass Only Elements: ['__listings', 'listing__country_latest']
       SELECT
         subq_1.listing__country_latest
-        , subq_1.listings
+        , subq_1.__listings
       FROM (
         -- Metric Time Dimension 'ds'
         SELECT
@@ -88,19 +88,19 @@ FROM (
           , subq_0.listing__country_latest
           , subq_0.listing__is_lux_latest
           , subq_0.listing__capacity_latest
-          , subq_0.listings
-          , subq_0.lux_listings
-          , subq_0.smallest_listing
-          , subq_0.largest_listing
-          , subq_0.active_listings
+          , subq_0.__listings
+          , subq_0.__lux_listings
+          , subq_0.__smallest_listing
+          , subq_0.__largest_listing
+          , subq_0.__active_listings
         FROM (
           -- Read Elements From Semantic Model 'listings_latest'
           SELECT
-            1 AS listings
-            , 1 AS lux_listings
-            , listings_latest_src_28000.capacity AS smallest_listing
-            , listings_latest_src_28000.capacity AS largest_listing
-            , 1 AS active_listings
+            1 AS __listings
+            , 1 AS __lux_listings
+            , listings_latest_src_28000.capacity AS __smallest_listing
+            , listings_latest_src_28000.capacity AS __largest_listing
+            , 1 AS __active_listings
             , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS ds__day
             , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS ds__week
             , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS ds__month

@@ -9,8 +9,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS booking__ds__day
-    , booking_value
-    , guest_id AS bookers
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -28,15 +28,15 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS booking__ds__day
-      , subq_18.booking_value AS booking_value
+      , subq_18.__booking_value AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['booking_value', 'booking__ds__day']
+      -- Pass Only Elements: ['__booking_value', 'booking__ds__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         booking__ds__day
-        , SUM(booking_value) AS booking_value
+        , SUM(__booking_value) AS __booking_value
       FROM sma_28009_cte
       GROUP BY
         booking__ds__day
@@ -46,12 +46,12 @@ FROM (
   ) subq_23
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'booking__ds__day']
+    -- Pass Only Elements: ['__bookers', 'booking__ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__ds__day
-      , COUNT(DISTINCT bookers) AS bookers
+      , COUNT(DISTINCT __bookers) AS bookers
     FROM sma_28009_cte
     GROUP BY
       booking__ds__day

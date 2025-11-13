@@ -10,7 +10,7 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , EXTRACT(dayofweekiso FROM ds) AS metric_time__extract_dow
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -25,24 +25,24 @@ FROM (
     , MAX(subq_27.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
+    -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__extract_dow
-      , SUM(bookings) AS bookings
+      , SUM(__bookings) AS bookings
     FROM sma_28009_cte
     GROUP BY
       metric_time__extract_dow
   ) subq_19
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
+    -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       EXTRACT(dayofweekiso FROM time_spine_src_28006.ds) AS metric_time__extract_dow
-      , SUM(sma_28009_cte.bookings) AS bookings_2_weeks_ago
+      , SUM(sma_28009_cte.__bookings) AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN
       sma_28009_cte

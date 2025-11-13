@@ -21,14 +21,14 @@ FROM (
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS listing__bookings
+      , SUM(__bookings) AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'listing']
+      -- Pass Only Elements: ['__bookings', 'listing']
       SELECT
         listing_id AS listing
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_16
     GROUP BY

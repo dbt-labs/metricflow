@@ -10,13 +10,13 @@ sql_engine: DuckDB
 SELECT
   subq_7.listing AS listing
   , listings_latest_src_28000.country AS listing__country_latest
-  , SUM(subq_7.bookings) AS bookings
+  , SUM(subq_7.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['bookings', 'listing']
+  -- Pass Only Elements: ['__bookings', 'listing']
   SELECT
     listing_id AS listing
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 ) subq_7
 LEFT OUTER JOIN

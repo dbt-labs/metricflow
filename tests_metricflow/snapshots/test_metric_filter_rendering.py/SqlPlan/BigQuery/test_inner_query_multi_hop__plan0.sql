@@ -10,15 +10,15 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_28.third_hop_count
+    subq_28.__third_hop_count AS third_hop_count
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      COUNT(DISTINCT subq_27.third_hop_count) AS third_hop_count
+      COUNT(DISTINCT subq_27.__third_hop_count) AS __third_hop_count
     FROM (
-      -- Pass Only Elements: ['third_hop_count']
+      -- Pass Only Elements: ['__third_hop_count']
       SELECT
-        subq_26.third_hop_count
+        subq_26.__third_hop_count
       FROM (
         -- Constrain Output with WHERE
         SELECT
@@ -60,7 +60,7 @@ FROM (
           , subq_25.value
           , subq_25.customer_third_hop_id__value
           , subq_25.customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
-          , subq_25.third_hop_count
+          , subq_25.__third_hop_count
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -102,7 +102,7 @@ FROM (
             , subq_10.customer_third_hop_id AS customer_third_hop_id
             , subq_10.value AS value
             , subq_10.customer_third_hop_id__value AS customer_third_hop_id__value
-            , subq_10.third_hop_count AS third_hop_count
+            , subq_10.__third_hop_count AS __third_hop_count
           FROM (
             -- Metric Time Dimension 'third_hop_ds'
             SELECT
@@ -142,11 +142,11 @@ FROM (
               , subq_9.customer_third_hop_id
               , subq_9.value
               , subq_9.customer_third_hop_id__value
-              , subq_9.third_hop_count
+              , subq_9.__third_hop_count
             FROM (
               -- Read Elements From Semantic Model 'third_hop_table'
               SELECT
-                third_hop_table_src_22000.customer_third_hop_id AS third_hop_count
+                third_hop_table_src_22000.customer_third_hop_id AS __third_hop_count
                 , third_hop_table_src_22000.value
                 , DATETIME_TRUNC(third_hop_table_src_22000.third_hop_ds, day) AS third_hop_ds__day
                 , DATETIME_TRUNC(third_hop_table_src_22000.third_hop_ds, isoweek) AS third_hop_ds__week
@@ -184,17 +184,17 @@ FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_22.account_id__customer_id__customer_third_hop_id
-                , subq_22.txn_count AS account_id__customer_id__customer_third_hop_id__txn_count
+                , subq_22.__txn_count AS account_id__customer_id__customer_third_hop_id__txn_count
               FROM (
                 -- Aggregate Inputs for Simple Metrics
                 SELECT
                   subq_21.account_id__customer_id__customer_third_hop_id
-                  , SUM(subq_21.txn_count) AS txn_count
+                  , SUM(subq_21.__txn_count) AS __txn_count
                 FROM (
-                  -- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_third_hop_id']
+                  -- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_third_hop_id']
                   SELECT
                     subq_20.account_id__customer_id__customer_third_hop_id
-                    , subq_20.txn_count
+                    , subq_20.__txn_count
                   FROM (
                     -- Join Standard Outputs
                     SELECT
@@ -258,7 +258,7 @@ FROM (
                       , subq_12.account_id AS account_id
                       , subq_12.account_month AS account_month
                       , subq_12.account_id__account_month AS account_id__account_month
-                      , subq_12.txn_count AS txn_count
+                      , subq_12.__txn_count AS __txn_count
                     FROM (
                       -- Metric Time Dimension 'ds'
                       SELECT
@@ -320,11 +320,11 @@ FROM (
                         , subq_11.account_id
                         , subq_11.account_month
                         , subq_11.account_id__account_month
-                        , subq_11.txn_count
+                        , subq_11.__txn_count
                       FROM (
                         -- Read Elements From Semantic Model 'account_month_txns'
                         SELECT
-                          account_month_txns_src_22000.txn_count
+                          account_month_txns_src_22000.txn_count AS __txn_count
                           , DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) AS ds_partitioned__day
                           , DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, isoweek) AS ds_partitioned__week
                           , DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, month) AS ds_partitioned__month
@@ -473,7 +473,7 @@ FROM (
                           , subq_14.extra_dim AS extra_dim
                           , subq_14.account_id__extra_dim AS account_id__extra_dim
                           , subq_14.bridge_account__extra_dim AS bridge_account__extra_dim
-                          , subq_14.account_customer_combos AS account_customer_combos
+                          , subq_14.__account_customer_combos AS __account_customer_combos
                         FROM (
                           -- Metric Time Dimension 'ds_partitioned'
                           SELECT
@@ -529,11 +529,11 @@ FROM (
                             , subq_13.extra_dim
                             , subq_13.account_id__extra_dim
                             , subq_13.bridge_account__extra_dim
-                            , subq_13.account_customer_combos
+                            , subq_13.__account_customer_combos
                           FROM (
                             -- Read Elements From Semantic Model 'bridge_table'
                             SELECT
-                              account_id || customer_id AS account_customer_combos
+                              account_id || customer_id AS __account_customer_combos
                               , bridge_table_src_22000.extra_dim
                               , DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) AS ds_partitioned__day
                               , DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, isoweek) AS ds_partitioned__week
@@ -738,11 +738,11 @@ FROM (
                               , subq_15.country
                               , subq_15.customer_id__country
                               , subq_15.customer_third_hop_id__country
-                              , subq_15.paraguayan_customers
+                              , subq_15.__paraguayan_customers
                             FROM (
                               -- Read Elements From Semantic Model 'customer_other_data'
                               SELECT
-                                1 AS paraguayan_customers
+                                1 AS __paraguayan_customers
                                 , customer_other_data_src_22000.country
                                 , DATETIME_TRUNC(customer_other_data_src_22000.acquired_ds, day) AS acquired_ds__day
                                 , DATETIME_TRUNC(customer_other_data_src_22000.acquired_ds, isoweek) AS acquired_ds__week

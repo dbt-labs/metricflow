@@ -12,8 +12,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     is_instant AS booking__is_instant
-    , 1 AS bookings
-    , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
+    , 1 AS __bookings
+    , CASE WHEN is_instant THEN 1 ELSE 0 END AS __instant_bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -28,12 +28,12 @@ FROM (
     , shared_alias - 10 AS derived_shared_alias_1a
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookings', 'booking__is_instant']
+    -- Pass Only Elements: ['__bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__is_instant
-      , SUM(bookings) AS shared_alias
+      , SUM(__bookings) AS shared_alias
     FROM sma_28009_cte
     GROUP BY
       booking__is_instant
@@ -46,12 +46,12 @@ FULL OUTER JOIN (
     , shared_alias + 10 AS derived_shared_alias_2
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['instant_bookings', 'booking__is_instant']
+    -- Pass Only Elements: ['__instant_bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__is_instant
-      , SUM(instant_bookings) AS shared_alias
+      , SUM(__instant_bookings) AS shared_alias
     FROM sma_28009_cte
     GROUP BY
       booking__is_instant

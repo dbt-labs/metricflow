@@ -7,7 +7,7 @@ sql_engine: Snowflake
 -- Write to DataTable
 SELECT
   subq_17.metric_time__alien_day AS metric_time__alien_day
-  , subq_14.bookings_join_to_time_spine AS bookings_join_to_time_spine
+  , subq_14.__bookings_join_to_time_spine AS bookings_join_to_time_spine
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   -- Change Column Aliases
@@ -21,15 +21,15 @@ FROM (
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['bookings_join_to_time_spine', 'metric_time__alien_day']
+  -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_11.alien_day AS metric_time__alien_day
-    , SUM(subq_10.bookings_join_to_time_spine) AS bookings_join_to_time_spine
+    , SUM(subq_10.__bookings_join_to_time_spine) AS __bookings_join_to_time_spine
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
-      1 AS bookings_join_to_time_spine
+      1 AS __bookings_join_to_time_spine
       , DATE_TRUNC('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_10

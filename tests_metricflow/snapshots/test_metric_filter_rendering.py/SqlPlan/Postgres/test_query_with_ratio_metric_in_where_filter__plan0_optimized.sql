@@ -5,23 +5,23 @@ docstring:
 sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Pass Only Elements: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(listings) AS listings
+  SUM(__listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     CAST(subq_34.bookings AS DOUBLE PRECISION) / CAST(NULLIF(subq_34.bookers, 0) AS DOUBLE PRECISION) AS listing__bookings_per_booker
-    , subq_29.listings AS listings
+    , subq_29.__listings AS __listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       listing_id AS listing
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_29
   LEFT OUTER JOIN (
@@ -29,16 +29,16 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       listing
-      , SUM(bookings) AS bookings
-      , COUNT(DISTINCT bookers) AS bookers
+      , SUM(__bookings) AS bookings
+      , COUNT(DISTINCT __bookers) AS bookers
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'bookers', 'listing']
+      -- Pass Only Elements: ['__bookings', '__bookers', 'listing']
       SELECT
         listing_id AS listing
-        , 1 AS bookings
-        , guest_id AS bookers
+        , 1 AS __bookings
+        , guest_id AS __bookers
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_32
     GROUP BY

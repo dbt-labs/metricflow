@@ -5,7 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']
+-- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable

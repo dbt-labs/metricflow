@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings', 'listing__capacity_latest', 'metric_time__day', 'listing']
+-- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Order By ['bookings', 'metric_time__day', 'listing__capacity_latest', 'listing']
@@ -17,8 +17,8 @@ WITH sma_28009_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
-    , 1 AS bookings
-    , booking_value
+    , 1 AS __bookings
+    , booking_value AS __booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -26,7 +26,7 @@ SELECT
   metric_time__day AS booking_day
   , listing AS listing_id
   , listing__capacity_latest AS listing_capacity
-  , SUM(bookings) AS bookings_alias
+  , SUM(__bookings) AS bookings_alias
 FROM (
   -- Join Standard Outputs
   SELECT
@@ -34,7 +34,7 @@ FROM (
     , listings_latest_src_28000.capacity AS listing__capacity_latest
     , sma_28009_cte.metric_time__day AS metric_time__day
     , sma_28009_cte.listing AS listing
-    , sma_28009_cte.bookings AS bookings
+    , sma_28009_cte.__bookings AS __bookings
   FROM sma_28009_cte
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
@@ -44,12 +44,12 @@ FROM (
       , booking_value * 0.05 AS listing__booking_fees
     FROM (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['booking_value', 'listing']
+      -- Pass Only Elements: ['__booking_value', 'listing']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         listing
-        , SUM(booking_value) AS booking_value
+        , SUM(__booking_value) AS booking_value
       FROM sma_28009_cte
       GROUP BY
         listing
