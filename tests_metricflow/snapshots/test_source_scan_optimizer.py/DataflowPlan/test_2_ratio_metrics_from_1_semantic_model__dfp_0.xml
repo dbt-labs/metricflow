@@ -24,7 +24,6 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_0') -->
-                            <!-- alias_mapping = {} -->
                             <!-- null_fill_value_mapping = {} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['bookings', 'metric_time__day']" -->
@@ -56,7 +55,6 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_1') -->
-                            <!-- alias_mapping = {} -->
                             <!-- null_fill_value_mapping = {} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['bookers', 'metric_time__day']" -->
@@ -97,7 +95,6 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_0') -->
-                            <!-- alias_mapping = {} -->
                             <!-- null_fill_value_mapping = {} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['bookings', 'metric_time__day']" -->
@@ -129,7 +126,6 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_2') -->
-                            <!-- alias_mapping = {} -->
                             <!-- null_fill_value_mapping = {} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__day']" -->

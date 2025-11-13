@@ -28,7 +28,6 @@ test_filename: test_dataflow_plan_builder.py
                 <AggregateSimpleMetricInputsNode>
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_0') -->
-                    <!-- alias_mapping = {} -->
                     <!-- null_fill_value_mapping = {'bookings_fill_nulls_with_0': 0} -->
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['bookings_fill_nulls_with_0', 'metric_time__day']" -->
