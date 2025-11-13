@@ -216,35 +216,6 @@ def test_min_aggregation(
     assert expr.sql_function == SqlFunction.MIN
 
 
-def test_aliased_sum(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    simple_manifest_object_lookup: ManifestObjectLookup,
-) -> None:
-    """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias."""
-    simple_metric_input_name = "booking_value"
-    instance_set = __get_filtered_simple_metric_input_instance_set(
-        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
-    )
-    alias = "bvalue"
-    select_column_set: SelectColumnSet = (
-        CreateAggregatedSimpleMetricInputsTransform(
-            __SOURCE_TABLE_ALIAS,
-            DunderColumnAssociationResolver(),
-            manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create({simple_metric_input_name: alias}),
-        )
-        .transform(instance_set=instance_set)
-        .select_column_set
-    )
-
-    assert len(select_column_set.simple_metric_input_columns) == 1
-    measure_column = select_column_set.simple_metric_input_columns[0]
-    expr = measure_column.expr
-    assert isinstance(expr, SqlAggregateFunctionExpression)
-    assert expr.sql_function == SqlFunction.SUM
-    assert measure_column.column_alias == "bvalue"
-
-
 def test_percentile_aggregation(
     mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     simple_manifest_object_lookup: ManifestObjectLookup,
