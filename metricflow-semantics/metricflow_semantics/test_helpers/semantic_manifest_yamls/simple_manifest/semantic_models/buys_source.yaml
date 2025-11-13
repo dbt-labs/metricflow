@@ -1,27 +1,19 @@
 ---
 semantic_model:
   name: buys_source
-  description: buys_source
-
-  node_relation:
-    schema_name: $source_schema
-    alias: fct_buys
-
   defaults:
     agg_time_dimension: ds
-
-  measures:
-    - name: buys
-      expr: 1
-      agg: count
-    - name: buys_month
-      expr: 1
-      agg: count
-      agg_time_dimension: ds_month
-    - name: buyers
+  description: buys_source
+  node_relation:
+    alias: fct_buys
+    schema_name: $source_schema
+  primary_entity: buy
+  entities:
+    - name: user
+      type: foreign
       expr: user_id
-      agg: count_distinct
-
+    - name: session_id
+      type: foreign
   dimensions:
     - name: ds
       type: time
@@ -32,11 +24,50 @@ semantic_model:
       type_params:
         time_granularity: month
 
-  primary_entity: buy
+---
+metric:
+  name: buys
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: buys_source
+      agg: sum
+    is_private: true
 
-  entities:
-    - name: user
-      type: foreign
-      expr: user_id
-    - name: session_id
-      type: foreign
+---
+metric:
+  name: buys_fill_nulls_with_0
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: buys_source
+      agg: sum
+    fill_nulls_with: 0
+    is_private: true
+
+---
+metric:
+  name: buys_month
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: buys_source
+      agg: sum
+      agg_time_dimension: ds_month
+    is_private: true
+
+---
+metric:
+  name: buys_fill_nulls_with_0_join_to_timespine
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: buys_source
+      agg: sum
+    join_to_timespine: true
+    fill_nulls_with: 0
+    is_private: true

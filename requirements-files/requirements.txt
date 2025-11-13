@@ -1,6 +1,5 @@
 Jinja2>=3.1.6, <3.7.0
-# bumping to 0.9.3 will cause test failures, so pinning to dev2 until fixed
-dbt-semantic-interfaces==0.9.4.dev1
+dbt-semantic-interfaces @ git+https://github.com/dbt-labs/dbt-semantic-interfaces.git@f2e56222735b02c57ea396e8694e61be5e6d83e6
 more-itertools>=10.0.0, <11.0.0
 pydantic>=1.10.0, <3.0
 tabulate>=0.8.9

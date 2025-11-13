@@ -2,21 +2,18 @@
 semantic_model:
   name: users_latest
   description: users_latest
-
   node_relation:
-    schema_name: $source_schema
     alias: dim_users_latest
-
-  dimensions:
-    - name: ds_latest
-      type: time
-      expr: ds
-      type_params:
-        time_granularity: day
-    - name: home_state_latest
-      type: categorical
-
+    schema_name: $source_schema
   entities:
     - name: user
       type: primary
       expr: user_id
+  dimensions:
+    - name: ds_latest
+      type: time
+      type_params:
+        time_granularity: day
+      expr: ds
+    - name: home_state_latest
+      type: categorical

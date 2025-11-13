@@ -1,44 +1,17 @@
 ---
 semantic_model:
   name: accounts_source
-  description: accounts_source
-
-  node_relation:
-    schema_name: $source_schema
-    alias: fct_accounts
-
   defaults:
     agg_time_dimension: ds
-
-  measures:
-    - name: account_balance
-      agg: sum
-
-    - name: total_account_balance_first_day
-      agg: sum
-      expr: account_balance
-      non_additive_dimension:
-        name: ds
-        window_choice: min
-
-    - name: current_account_balance_by_user
-      agg: sum
-      expr: account_balance
-      non_additive_dimension:
-        name: ds
-        window_choice: max
-        window_groupings:
-          - user
-
-    - name: total_account_balance_first_day_of_month
-      agg: sum
-      expr: account_balance
-      agg_time_dimension: ds_month
-      non_additive_dimension:
-        name: ds_month
-        window_choice: min
-      create_metric: true
-
+  description: accounts_source
+  node_relation:
+    alias: fct_accounts
+    schema_name: $source_schema
+  primary_entity: account
+  entities:
+    - name: user
+      type: foreign
+      expr: user_id
   dimensions:
     - name: ds
       type: time
@@ -46,15 +19,63 @@ semantic_model:
         time_granularity: day
     - name: ds_month
       type: time
-      expr: ds_month
       type_params:
         time_granularity: month
+      expr: ds_month
     - name: account_type
       type: categorical
 
-  primary_entity: account
+---
+metric:
+  name: account_balance
+  description: account_balance
+  type: simple
+  type_params:
+    expr: account_balance
+    metric_aggregation_params:
+      semantic_model: accounts_source
+      agg: sum
 
-  entities:
-    - name: user
-      type: foreign
-      expr: user_id
+---
+metric:
+  name: total_account_balance_first_day
+  description: total_account_balance_first_day
+  type: simple
+  type_params:
+    expr: account_balance
+    metric_aggregation_params:
+      semantic_model: accounts_source
+      agg: sum
+      non_additive_dimension:
+        name: ds
+        window_choice: min
+
+---
+metric:
+  name: current_account_balance_by_user
+  description: current_account_balance_by_user
+  type: simple
+  type_params:
+    expr: account_balance
+    metric_aggregation_params:
+      semantic_model: accounts_source
+      agg: sum
+      non_additive_dimension:
+        name: ds
+        window_choice: max
+        window_groupings:
+          - user
+
+---
+metric:
+  name: total_account_balance_first_day_of_month
+  type: simple
+  type_params:
+    expr: account_balance
+    metric_aggregation_params:
+      semantic_model: accounts_source
+      agg: sum
+      agg_time_dimension: ds_month
+      non_additive_dimension:
+        name: ds_month
+        window_choice: min

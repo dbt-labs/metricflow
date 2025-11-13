@@ -1,20 +1,20 @@
 ---
 semantic_model:
   name: views_source
-  description: views_source
-
-  node_relation:
-    schema_name: $source_schema
-    alias: fct_views
-
   defaults:
     agg_time_dimension: ds
-
-  measures:
-    - name: views
-      expr: "1"
-      agg: sum
-
+  description: views_source
+  node_relation:
+    alias: fct_views
+    schema_name: $source_schema
+  primary_entity: view
+  entities:
+    - name: listing
+      type: foreign
+      expr: listing_id
+    - name: user
+      type: foreign
+      expr: user_id
   dimensions:
     - name: ds
       type: time
@@ -26,12 +26,13 @@ semantic_model:
       type_params:
         time_granularity: day
 
-  primary_entity: view
-
-  entities:
-    - name: listing
-      type: foreign
-      expr: listing_id
-    - name: user
-      type: foreign
-      expr: user_id
+---
+metric:
+  name: views
+  description: views
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: views_source
+      agg: sum

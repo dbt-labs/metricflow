@@ -1,0 +1,117 @@
+---
+semantic_model:
+  name: users_ds_source
+  defaults:
+    agg_time_dimension: created_at
+  description: users_ds_source
+  node_relation:
+    alias: dim_users
+    schema_name: $source_schema
+  entities:
+    - name: user
+      type: primary
+      expr: user_id
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+    - name: created_at
+      type: time
+      type_params:
+        time_granularity: day
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+    - name: home_state
+      type: categorical
+    - name: last_profile_edit_ts
+      type: time
+      type_params:
+        time_granularity: millisecond
+    - name: bio_added_ts
+      type: time
+      type_params:
+        time_granularity: second
+    - name: last_login_ts
+      type: time
+      type_params:
+        time_granularity: minute
+    - name: archived_at
+      type: time
+      type_params:
+        time_granularity: hour
+
+---
+metric:
+  name: subdaily_join_to_time_spine_metric
+  description: simple metric with sub-daily agg time dim that joins to time spine
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: users_ds_source
+      agg: sum
+      agg_time_dimension: archived_at
+    join_to_timespine: true
+
+---
+metric:
+  name: simple_subdaily_metric_default_day
+  description: simple metric with sub-daily agg time dim that doesn't specify default granularity
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: users_ds_source
+      agg: sum
+      agg_time_dimension: archived_at
+
+---
+metric:
+  name: simple_subdaily_metric_default_hour
+  description: simple metric with sub-daily agg time dim that has an explicit default granularity
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: users_ds_source
+      agg: sum
+      agg_time_dimension: archived_at
+  time_granularity: hour
+
+---
+metric:
+  name: archived_users_join_to_time_spine
+  description: subdaily metric joining to time spine
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: users_ds_source
+      agg: sum
+      agg_time_dimension: archived_at
+    join_to_timespine: true
+
+---
+metric:
+  name: new_users
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: users_ds_source
+      agg: sum
+
+---
+metric:
+  name: archived_users
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: users_ds_source
+      agg: sum
+      agg_time_dimension: archived_at
