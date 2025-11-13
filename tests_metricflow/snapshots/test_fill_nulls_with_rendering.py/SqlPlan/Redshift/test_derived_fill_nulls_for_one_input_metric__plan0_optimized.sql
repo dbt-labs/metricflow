@@ -9,8 +9,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
-    , 1 AS bookings
-    , 1 AS bookings_fill_nulls_with_0
+    , 1 AS __bookings
+    , 1 AS __bookings_fill_nulls_with_0
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -34,20 +34,20 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
+      , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_22.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+        , subq_22.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'metric_time__day']
+        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
-          , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+          , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM sma_28009_cte
         GROUP BY
           metric_time__day
@@ -61,15 +61,15 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_30.bookings AS bookings_2_weeks_ago
+      , subq_30.__bookings AS bookings_2_weeks_ago
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(__bookings) AS __bookings
       FROM sma_28009_cte
       GROUP BY
         metric_time__day

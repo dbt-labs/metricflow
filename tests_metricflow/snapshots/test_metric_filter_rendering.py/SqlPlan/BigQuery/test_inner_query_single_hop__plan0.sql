@@ -10,15 +10,15 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_16.third_hop_count
+    subq_16.__third_hop_count AS third_hop_count
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      COUNT(DISTINCT subq_15.third_hop_count) AS third_hop_count
+      COUNT(DISTINCT subq_15.__third_hop_count) AS __third_hop_count
     FROM (
-      -- Pass Only Elements: ['third_hop_count']
+      -- Pass Only Elements: ['__third_hop_count']
       SELECT
-        subq_14.third_hop_count
+        subq_14.__third_hop_count
       FROM (
         -- Constrain Output with WHERE
         SELECT
@@ -60,7 +60,7 @@ FROM (
           , subq_13.value
           , subq_13.customer_third_hop_id__value
           , subq_13.customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers
-          , subq_13.third_hop_count
+          , subq_13.__third_hop_count
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -102,7 +102,7 @@ FROM (
             , subq_5.customer_third_hop_id AS customer_third_hop_id
             , subq_5.value AS value
             , subq_5.customer_third_hop_id__value AS customer_third_hop_id__value
-            , subq_5.third_hop_count AS third_hop_count
+            , subq_5.__third_hop_count AS __third_hop_count
           FROM (
             -- Metric Time Dimension 'third_hop_ds'
             SELECT
@@ -142,11 +142,11 @@ FROM (
               , subq_4.customer_third_hop_id
               , subq_4.value
               , subq_4.customer_third_hop_id__value
-              , subq_4.third_hop_count
+              , subq_4.__third_hop_count
             FROM (
               -- Read Elements From Semantic Model 'third_hop_table'
               SELECT
-                third_hop_table_src_22000.customer_third_hop_id AS third_hop_count
+                third_hop_table_src_22000.customer_third_hop_id AS __third_hop_count
                 , third_hop_table_src_22000.value
                 , DATETIME_TRUNC(third_hop_table_src_22000.third_hop_ds, day) AS third_hop_ds__day
                 , DATETIME_TRUNC(third_hop_table_src_22000.third_hop_ds, isoweek) AS third_hop_ds__week
@@ -184,17 +184,17 @@ FROM (
               -- Compute Metrics via Expressions
               SELECT
                 subq_10.customer_id__customer_third_hop_id
-                , subq_10.paraguayan_customers AS customer_id__customer_third_hop_id__paraguayan_customers
+                , subq_10.__paraguayan_customers AS customer_id__customer_third_hop_id__paraguayan_customers
               FROM (
                 -- Aggregate Inputs for Simple Metrics
                 SELECT
                   subq_9.customer_id__customer_third_hop_id
-                  , SUM(subq_9.paraguayan_customers) AS paraguayan_customers
+                  , SUM(subq_9.__paraguayan_customers) AS __paraguayan_customers
                 FROM (
-                  -- Pass Only Elements: ['paraguayan_customers', 'customer_id__customer_third_hop_id']
+                  -- Pass Only Elements: ['__paraguayan_customers', 'customer_id__customer_third_hop_id']
                   SELECT
                     subq_8.customer_id__customer_third_hop_id
-                    , subq_8.paraguayan_customers
+                    , subq_8.__paraguayan_customers
                   FROM (
                     -- Constrain Output with WHERE
                     SELECT
@@ -249,7 +249,7 @@ FROM (
                       , subq_7.country
                       , subq_7.customer_id__country
                       , subq_7.customer_third_hop_id__country
-                      , subq_7.paraguayan_customers
+                      , subq_7.__paraguayan_customers
                     FROM (
                       -- Metric Time Dimension 'acquired_ds'
                       SELECT
@@ -304,11 +304,11 @@ FROM (
                         , subq_6.country
                         , subq_6.customer_id__country
                         , subq_6.customer_third_hop_id__country
-                        , subq_6.paraguayan_customers
+                        , subq_6.__paraguayan_customers
                       FROM (
                         -- Read Elements From Semantic Model 'customer_other_data'
                         SELECT
-                          1 AS paraguayan_customers
+                          1 AS __paraguayan_customers
                           , customer_other_data_src_22000.country
                           , DATETIME_TRUNC(customer_other_data_src_22000.acquired_ds, day) AS acquired_ds__day
                           , DATETIME_TRUNC(customer_other_data_src_22000.acquired_ds, isoweek) AS acquired_ds__week

@@ -13,8 +13,8 @@ WITH sma_28009_cte AS (
     DATETIME_TRUNC(ds, day) AS metric_time__day
     , DATETIME_TRUNC(ds, month) AS metric_time__month
     , DATETIME_TRUNC(ds, year) AS metric_time__year
-    , booking_value
-    , guest_id AS bookers
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -38,17 +38,17 @@ FROM (
       time_spine_src_28006.ds AS metric_time__day
       , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
       , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
-      , subq_18.booking_value AS booking_value
+      , subq_18.__booking_value AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
         , metric_time__month
         , metric_time__year
-        , SUM(booking_value) AS booking_value
+        , SUM(__booking_value) AS __booking_value
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
@@ -60,14 +60,14 @@ FROM (
   ) subq_23
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+    -- Pass Only Elements: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
       , metric_time__month
       , metric_time__year
-      , COUNT(DISTINCT bookers) AS bookers
+      , COUNT(DISTINCT __bookers) AS bookers
     FROM sma_28009_cte
     GROUP BY
       metric_time__day

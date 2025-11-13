@@ -9,7 +9,7 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
-    , booking_value
+    , booking_value AS __booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -35,12 +35,12 @@ FROM (
         , booking_value * 0.05 AS booking_fees_start_of_month
       FROM (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['booking_value', 'metric_time__day']
+        -- Pass Only Elements: ['__booking_value', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
           metric_time__day
-          , SUM(booking_value) AS booking_value
+          , SUM(__booking_value) AS booking_value
         FROM sma_28009_cte
         GROUP BY
           metric_time__day
@@ -56,12 +56,12 @@ FROM (
       , booking_value * 0.05 AS booking_fees
     FROM (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['booking_value', 'metric_time__day']
+      -- Pass Only Elements: ['__booking_value', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
         metric_time__day
-        , SUM(booking_value) AS booking_value
+        , SUM(__booking_value) AS booking_value
       FROM sma_28009_cte
       GROUP BY
         metric_time__day

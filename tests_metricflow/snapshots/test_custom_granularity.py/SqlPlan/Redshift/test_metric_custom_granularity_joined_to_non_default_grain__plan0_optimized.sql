@@ -4,18 +4,18 @@ sql_engine: Redshift
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['listings', 'metric_time__alien_day', 'listing__ds__month']
+-- Pass Only Elements: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   subq_7.alien_day AS metric_time__alien_day
   , subq_6.listing__ds__month AS listing__ds__month
-  , SUM(subq_6.listings) AS listings
+  , SUM(subq_6.__listings) AS listings
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   SELECT
-    1 AS listings
+    1 AS __listings
     , DATE_TRUNC('day', created_at) AS ds__day
     , DATE_TRUNC('month', created_at) AS listing__ds__month
   FROM ***************************.dim_listings_latest listings_latest_src_28000

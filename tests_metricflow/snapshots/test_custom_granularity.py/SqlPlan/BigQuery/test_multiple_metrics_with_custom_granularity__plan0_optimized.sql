@@ -11,16 +11,16 @@ SELECT
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['bookings', 'metric_time__alien_day']
+  -- Pass Only Elements: ['__bookings', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_14.alien_day AS metric_time__alien_day
-    , SUM(subq_13.bookings) AS bookings
+    , SUM(subq_13.__bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
-      1 AS bookings
+      1 AS __bookings
       , DATETIME_TRUNC(ds, day) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_13
@@ -34,16 +34,16 @@ FROM (
 FULL OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['listings', 'metric_time__alien_day']
+  -- Pass Only Elements: ['__listings', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     subq_20.alien_day AS metric_time__alien_day
-    , SUM(subq_19.listings) AS listings
+    , SUM(subq_19.__listings) AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     SELECT
-      1 AS listings
+      1 AS __listings
       , DATETIME_TRUNC(created_at, day) AS ds__day
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_19

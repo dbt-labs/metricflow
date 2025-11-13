@@ -5,22 +5,22 @@ docstring:
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings']
+-- Pass Only Elements: ['__bookings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(bookings) AS bookings
+  SUM(__bookings) AS bookings
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   SELECT
-    subq_7.bookings AS bookings
+    subq_7.__bookings AS __bookings
     , subq_8.alien_day AS metric_time__alien_day
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
-      1 AS bookings
+      1 AS __bookings
       , DATE_TRUNC('day', ds) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_7

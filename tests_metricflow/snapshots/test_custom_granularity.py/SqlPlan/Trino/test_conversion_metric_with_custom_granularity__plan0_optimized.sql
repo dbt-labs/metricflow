@@ -10,27 +10,27 @@ WITH sma_28019_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , user_id AS user
-    , 1 AS visits
+    , 1 AS __visits
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
 SELECT
   metric_time__alien_day AS metric_time__alien_day
-  , CAST(buys AS DOUBLE) / CAST(NULLIF(visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days
+  , CAST(__buys AS DOUBLE) / CAST(NULLIF(__visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_21.metric_time__alien_day, subq_31.metric_time__alien_day) AS metric_time__alien_day
-    , MAX(subq_21.visits) AS visits
-    , MAX(subq_31.buys) AS buys
+    , MAX(subq_21.__visits) AS __visits
+    , MAX(subq_31.__buys) AS __buys
   FROM (
     -- Read From CTE For node_id=sma_28019
     -- Join to Custom Granularity Dataset
-    -- Pass Only Elements: ['visits', 'metric_time__alien_day']
+    -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_18.alien_day AS metric_time__alien_day
-      , SUM(sma_28019_cte.visits) AS visits
+      , SUM(sma_28019_cte.__visits) AS __visits
     FROM sma_28019_cte
     LEFT OUTER JOIN
       ***************************.mf_time_spine subq_18
@@ -41,22 +41,22 @@ FROM (
   ) subq_21
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
-    -- Pass Only Elements: ['buys', 'metric_time__alien_day']
+    -- Pass Only Elements: ['__buys', 'metric_time__alien_day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__alien_day
-      , SUM(buys) AS buys
+      , SUM(__buys) AS __buys
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        FIRST_VALUE(subq_24.visits) OVER (
+        FIRST_VALUE(subq_24.__visits) OVER (
           PARTITION BY
             subq_27.user
             , subq_27.metric_time__day
             , subq_27.mf_internal_uuid
           ORDER BY subq_24.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS visits
+        ) AS __visits
         , FIRST_VALUE(subq_24.metric_time__alien_day) OVER (
           PARTITION BY
             subq_27.user
@@ -82,16 +82,16 @@ FROM (
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_27.mf_internal_uuid AS mf_internal_uuid
-        , subq_27.buys AS buys
+        , subq_27.__buys AS __buys
       FROM (
         -- Read From CTE For node_id=sma_28019
         -- Join to Custom Granularity Dataset
-        -- Pass Only Elements: ['visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+        -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
         SELECT
           subq_22.alien_day AS metric_time__alien_day
           , sma_28019_cte.metric_time__day AS metric_time__day
           , sma_28019_cte.user AS user
-          , sma_28019_cte.visits AS visits
+          , sma_28019_cte.__visits AS __visits
         FROM sma_28019_cte
         LEFT OUTER JOIN
           ***************************.mf_time_spine subq_22
@@ -105,7 +105,7 @@ FROM (
         SELECT
           DATE_TRUNC('day', ds) AS metric_time__day
           , user_id AS user
-          , 1 AS buys
+          , 1 AS __buys
           , uuid() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
       ) subq_27

@@ -68,20 +68,20 @@ FROM (
       , subq_1.listing__country_latest
       , subq_1.listing__is_lux_latest
       , subq_1.listing__capacity_latest
-      , subq_1.listings
-      , subq_1.lux_listings
-      , subq_1.smallest_listing
-      , subq_1.largest_listing
-      , subq_1.active_listings
+      , subq_1.__listings
+      , subq_1.__lux_listings
+      , subq_1.__smallest_listing
+      , subq_1.__largest_listing
+      , subq_1.__active_listings
     FROM (
       -- Read Elements From Semantic Model 'listings_latest'
       -- Join to Custom Granularity Dataset
       SELECT
-        1 AS listings
-        , 1 AS lux_listings
-        , listings_latest_src_28000.capacity AS smallest_listing
-        , listings_latest_src_28000.capacity AS largest_listing
-        , 1 AS active_listings
+        1 AS __listings
+        , 1 AS __lux_listings
+        , listings_latest_src_28000.capacity AS __smallest_listing
+        , listings_latest_src_28000.capacity AS __largest_listing
+        , 1 AS __active_listings
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS ds__day
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS ds__week
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS ds__month

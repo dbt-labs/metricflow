@@ -5,7 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Pass Only Elements: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,36 +14,36 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     listing_id AS listing
-    , 1 AS bookings
-    , guest_id AS bookers
+    , 1 AS __bookings
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
 SELECT
-  SUM(listings) AS listings
+  SUM(__listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_31.listing__bookings AS listing__bookings
     , subq_36.listing__bookers AS listing__bookers
-    , subq_25.listings AS listings
+    , subq_25.__listings AS __listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       listing_id AS listing
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_25
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookings', 'listing']
+    -- Pass Only Elements: ['__bookings', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS listing__bookings
+      , SUM(__bookings) AS listing__bookings
     FROM sma_28009_cte
     GROUP BY
       listing
@@ -52,13 +52,13 @@ FROM (
     subq_25.listing = subq_31.listing
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'listing']
+    -- Pass Only Elements: ['__bookers', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookers']
     SELECT
       listing
-      , COUNT(DISTINCT bookers) AS listing__bookers
+      , COUNT(DISTINCT __bookers) AS listing__bookers
     FROM sma_28009_cte
     GROUP BY
       listing

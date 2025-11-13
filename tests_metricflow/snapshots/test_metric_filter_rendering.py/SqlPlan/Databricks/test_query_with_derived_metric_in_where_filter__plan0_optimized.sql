@@ -5,23 +5,23 @@ docstring:
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Pass Only Elements: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(listings) AS listings
+  SUM(__listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_43.listing__views_times_booking_value AS listing__views_times_booking_value
-    , subq_30.listings AS listings
+    , subq_30.__listings AS __listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       listing_id AS listing
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_30
   LEFT OUTER JOIN (
@@ -39,7 +39,7 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['booking_value', 'listing']
+        -- Pass Only Elements: ['__booking_value', 'listing']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
@@ -54,14 +54,14 @@ FROM (
         -- Compute Metrics via Expressions
         SELECT
           listing
-          , SUM(views) AS views
+          , SUM(__views) AS views
         FROM (
           -- Read Elements From Semantic Model 'views_source'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['views', 'listing']
+          -- Pass Only Elements: ['__views', 'listing']
           SELECT
             listing_id AS listing
-            , 1 AS views
+            , 1 AS __views
           FROM ***************************.fct_views views_source_src_28000
         ) subq_38
         GROUP BY

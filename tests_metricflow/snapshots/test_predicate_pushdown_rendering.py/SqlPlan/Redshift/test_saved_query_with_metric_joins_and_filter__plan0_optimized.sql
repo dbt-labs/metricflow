@@ -10,26 +10,26 @@ sql_engine: Redshift
 -- Write to DataTable
 WITH cm_6_cte AS (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['bookings', 'listing__capacity_latest']
+  -- Pass Only Elements: ['__bookings', 'listing__capacity_latest']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     listing__capacity_latest
-    , SUM(bookings) AS bookings
+    , SUM(__bookings) AS bookings
   FROM (
     -- Join Standard Outputs
     SELECT
       listings_latest_src_28000.is_lux AS listing__is_lux_latest
       , listings_latest_src_28000.capacity AS listing__capacity_latest
       , subq_25.metric_time__day AS metric_time__day
-      , subq_25.bookings AS bookings
+      , subq_25.__bookings AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , listing_id AS listing
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_25
     LEFT OUTER JOIN
@@ -44,26 +44,26 @@ WITH cm_6_cte AS (
 
 , cm_7_cte AS (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['views', 'listing__capacity_latest']
+  -- Pass Only Elements: ['__views', 'listing__capacity_latest']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
     listing__capacity_latest
-    , SUM(views) AS views
+    , SUM(__views) AS views
   FROM (
     -- Join Standard Outputs
     SELECT
       listings_latest_src_28000.is_lux AS listing__is_lux_latest
       , listings_latest_src_28000.capacity AS listing__capacity_latest
       , subq_35.metric_time__day AS metric_time__day
-      , subq_35.views AS views
+      , subq_35.__views AS __views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , listing_id AS listing
-        , 1 AS views
+        , 1 AS __views
       FROM ***************************.fct_views views_source_src_28000
     ) subq_35
     LEFT OUTER JOIN

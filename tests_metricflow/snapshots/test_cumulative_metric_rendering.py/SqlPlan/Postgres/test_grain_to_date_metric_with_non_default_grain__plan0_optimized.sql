@@ -20,7 +20,7 @@ FROM (
     ) AS revenue_mtd
   FROM (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['revenue', 'metric_time__month', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__month', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions

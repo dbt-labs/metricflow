@@ -17,17 +17,17 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_3.ds__month
-      , subq_3.revenue
+      , subq_3.__revenue AS revenue
     FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_2.ds__month
-        , SUM(subq_2.revenue) AS revenue
+        , SUM(subq_2.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['revenue', 'ds__month']
+        -- Pass Only Elements: ['__revenue', 'ds__month']
         SELECT
           subq_1.ds__month
-          , subq_1.revenue
+          , subq_1.__revenue
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
@@ -66,11 +66,11 @@ FROM (
             , subq_0.ds__extract_doy AS metric_time__extract_doy
             , subq_0.user
             , subq_0.revenue_instance__user
-            , subq_0.revenue
+            , subq_0.__revenue
           FROM (
             -- Read Elements From Semantic Model 'revenue'
             SELECT
-              revenue_src_28000.revenue
+              revenue_src_28000.revenue AS __revenue
               , DATETIME_TRUNC(revenue_src_28000.created_at, day) AS ds__day
               , DATETIME_TRUNC(revenue_src_28000.created_at, isoweek) AS ds__week
               , DATETIME_TRUNC(revenue_src_28000.created_at, month) AS ds__month

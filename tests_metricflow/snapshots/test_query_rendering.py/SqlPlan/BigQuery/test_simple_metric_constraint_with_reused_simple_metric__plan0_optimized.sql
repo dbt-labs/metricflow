@@ -10,7 +10,7 @@ WITH sma_28009_cte AS (
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
     , is_instant AS booking__is_instant
-    , booking_value
+    , booking_value AS __booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -25,18 +25,18 @@ FROM (
     , MAX(subq_21.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['booking_value', 'metric_time__day']
+    -- Pass Only Elements: ['__booking_value', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , SUM(booking_value) AS booking_value_with_is_instant_constraint
+      , SUM(__booking_value) AS booking_value_with_is_instant_constraint
     FROM (
       -- Read From CTE For node_id=sma_28009
       SELECT
         metric_time__day
         , booking__is_instant
-        , booking_value
+        , __booking_value
       FROM sma_28009_cte
     ) subq_13
     WHERE booking__is_instant
@@ -45,12 +45,12 @@ FROM (
   ) subq_17
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['booking_value', 'metric_time__day']
+    -- Pass Only Elements: ['__booking_value', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , SUM(booking_value) AS booking_value
+      , SUM(__booking_value) AS booking_value
     FROM sma_28009_cte
     GROUP BY
       metric_time__day

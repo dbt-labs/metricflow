@@ -13,14 +13,14 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
-    , SUM(bookings) AS bookings
+    , SUM(__bookings) AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    -- Pass Only Elements: ['__bookings', 'metric_time__day']
     SELECT
       DATETIME_TRUNC(ds, day) AS metric_time__day
-      , 1 AS bookings
+      , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_10000
   ) subq_2
   GROUP BY
@@ -31,14 +31,14 @@ FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
-    , SUM(listings) AS listings
+    , SUM(__listings) AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['listings', 'metric_time__day']
+    -- Pass Only Elements: ['__listings', 'metric_time__day']
     SELECT
       DATETIME_TRUNC(created_at, day) AS metric_time__day
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_10000
   ) subq_7
   GROUP BY

@@ -9,7 +9,7 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -34,15 +34,15 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_22.bookings AS month_start_bookings
+      , subq_22.__bookings AS month_start_bookings
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(__bookings) AS __bookings
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
@@ -55,15 +55,15 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_30.bookings AS bookings_1_month_ago
+      , subq_30.__bookings AS bookings_1_month_ago
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(__bookings) AS __bookings
       FROM sma_28009_cte
       GROUP BY
         metric_time__day

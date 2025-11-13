@@ -5,7 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookers']
+-- Pass Only Elements: ['__bookers']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,33 +14,33 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     listing_id AS listing
-    , guest_id AS bookers
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
 SELECT
-  COUNT(DISTINCT bookers) AS bookers
+  COUNT(DISTINCT __bookers) AS bookers
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_21.listing__bookers AS listing__bookers
-    , subq_16.bookers AS bookers
+    , subq_16.__bookers AS __bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       listing
-      , bookers
+      , __bookers
     FROM sma_28009_cte
   ) subq_16
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'listing']
+    -- Pass Only Elements: ['__bookers', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__bookers']
     SELECT
       listing
-      , COUNT(DISTINCT bookers) AS listing__bookers
+      , COUNT(DISTINCT __bookers) AS listing__bookers
     FROM sma_28009_cte
     GROUP BY
       listing

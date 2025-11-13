@@ -39,22 +39,22 @@ FROM (
         SELECT
           rss_28018_cte.ds__day AS metric_time__day
           , subq_20.booking__is_instant AS booking__is_instant
-          , subq_20.bookings AS bookings
+          , subq_20.__bookings AS bookings
         FROM rss_28018_cte
         INNER JOIN (
           -- Aggregate Inputs for Simple Metrics
           SELECT
             metric_time__day
             , booking__is_instant
-            , SUM(bookings) AS bookings
+            , SUM(__bookings) AS __bookings
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             -- Metric Time Dimension 'ds'
-            -- Pass Only Elements: ['bookings', 'booking__is_instant', 'metric_time__day']
+            -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
             SELECT
               DATETIME_TRUNC(ds, day) AS metric_time__day
               , is_instant AS booking__is_instant
-              , 1 AS bookings
+              , 1 AS __bookings
             FROM ***************************.fct_bookings bookings_source_src_28000
           ) subq_19
           GROUP BY

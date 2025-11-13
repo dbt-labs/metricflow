@@ -6,25 +6,25 @@ sql_engine: BigQuery
 -- Write to DataTable
 SELECT
   metric_time__day
-  , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
+  , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , subq_12.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+    , subq_12.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
   FROM ***************************.mf_time_spine time_spine_src_28006
   LEFT OUTER JOIN (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+      , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
-        , 1 AS bookings_fill_nulls_with_0
+        , 1 AS __bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_11
     GROUP BY

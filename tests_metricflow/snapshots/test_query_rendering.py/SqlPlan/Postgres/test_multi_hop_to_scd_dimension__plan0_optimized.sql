@@ -5,21 +5,21 @@ docstring:
 sql_engine: Postgres
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+-- Pass Only Elements: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   subq_15.metric_time__day AS metric_time__day
   , subq_20.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
-  , SUM(subq_15.bookings) AS bookings
+  , SUM(subq_15.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
 ) subq_15
 LEFT OUTER JOIN (

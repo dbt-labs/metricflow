@@ -20,15 +20,15 @@ FROM (
     -- Window Function for Metric Re-aggregation
     SELECT
       metric_time__week
-      , AVG(revenue) OVER (PARTITION BY metric_time__week) AS t2mr
+      , AVG(__revenue) OVER (PARTITION BY metric_time__week) AS t2mr
     FROM (
       -- Join Self Over Time Range
-      -- Pass Only Elements: ['revenue', 'metric_time__week', 'metric_time__day']
+      -- Pass Only Elements: ['__revenue', 'metric_time__week', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_15.ds AS metric_time__day
         , DATETIME_TRUNC(subq_15.ds, isoweek) AS metric_time__week
-        , SUM(revenue_src_28000.revenue) AS revenue
+        , SUM(revenue_src_28000.revenue) AS __revenue
       FROM ***************************.mf_time_spine subq_15
       INNER JOIN
         ***************************.fct_revenue revenue_src_28000

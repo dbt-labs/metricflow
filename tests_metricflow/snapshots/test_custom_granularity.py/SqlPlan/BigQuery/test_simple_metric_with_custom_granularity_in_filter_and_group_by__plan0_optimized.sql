@@ -5,23 +5,23 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookings', 'metric_time__alien_day']
+-- Pass Only Elements: ['__bookings', 'metric_time__alien_day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   metric_time__alien_day
-  , SUM(bookings) AS bookings
+  , SUM(__bookings) AS bookings
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   SELECT
-    subq_7.bookings AS bookings
+    subq_7.__bookings AS __bookings
     , subq_8.alien_day AS metric_time__alien_day
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
-      1 AS bookings
+      1 AS __bookings
       , DATETIME_TRUNC(ds, day) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_7
