@@ -21,12 +21,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_7.metric_time__day
-        , subq_7.month_start_bookings
+        , subq_7.bookings AS month_start_bookings
       FROM (
         -- Join to Time Spine Dataset
         SELECT
           subq_6.metric_time__day AS metric_time__day
-          , subq_3.month_start_bookings AS month_start_bookings
+          , subq_3.bookings AS bookings
         FROM (
           -- Pass Only Elements: ['metric_time__day']
           SELECT
@@ -69,7 +69,7 @@ FROM (
           -- Aggregate Inputs for Simple Metrics
           SELECT
             subq_2.metric_time__day
-            , SUM(subq_2.bookings) AS month_start_bookings
+            , SUM(subq_2.bookings) AS bookings
           FROM (
             -- Pass Only Elements: ['bookings', 'metric_time__day']
             SELECT
@@ -300,12 +300,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_15.metric_time__day
-        , subq_15.bookings_1_month_ago
+        , subq_15.bookings AS bookings_1_month_ago
       FROM (
         -- Join to Time Spine Dataset
         SELECT
           subq_14.metric_time__day AS metric_time__day
-          , subq_11.bookings_1_month_ago AS bookings_1_month_ago
+          , subq_11.bookings AS bookings
         FROM (
           -- Pass Only Elements: ['metric_time__day']
           SELECT
@@ -348,7 +348,7 @@ FROM (
           -- Aggregate Inputs for Simple Metrics
           SELECT
             subq_10.metric_time__day
-            , SUM(subq_10.bookings) AS bookings_1_month_ago
+            , SUM(subq_10.bookings) AS bookings
           FROM (
             -- Pass Only Elements: ['bookings', 'metric_time__day']
             SELECT

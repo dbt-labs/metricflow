@@ -94,13 +94,13 @@ FROM (
     SELECT
       metric_time__day
       , listing__country_latest
-      , COALESCE(bookings_2_weeks_ago, 0) AS bookings_2_weeks_ago
+      , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_2_weeks_ago
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
         , subq_48.listing__country_latest AS listing__country_latest
-        , subq_48.bookings_2_weeks_ago AS bookings_2_weeks_ago
+        , subq_48.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
@@ -109,7 +109,7 @@ FROM (
         SELECT
           metric_time__day
           , listing__country_latest
-          , SUM(bookings_fill_nulls_with_0) AS bookings_2_weeks_ago
+          , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
         FROM (
           -- Join Standard Outputs
           SELECT

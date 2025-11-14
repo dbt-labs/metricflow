@@ -254,12 +254,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_11.metric_time__extract_dow
-        , subq_11.bookings_2_weeks_ago
+        , subq_11.bookings AS bookings_2_weeks_ago
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_10.metric_time__extract_dow
-          , SUM(subq_10.bookings) AS bookings_2_weeks_ago
+          , SUM(subq_10.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings', 'metric_time__extract_dow']
           SELECT

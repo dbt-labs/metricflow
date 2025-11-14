@@ -635,13 +635,13 @@ FROM (
       SELECT
         subq_20.metric_time__day
         , subq_20.listing__country_latest
-        , subq_20.bookings_2_weeks_ago
+        , subq_20.bookings AS bookings_2_weeks_ago
       FROM (
         -- Join to Time Spine Dataset
         SELECT
           subq_19.metric_time__day AS metric_time__day
           , subq_16.listing__country_latest AS listing__country_latest
-          , subq_16.bookings_2_weeks_ago AS bookings_2_weeks_ago
+          , subq_16.bookings AS bookings
         FROM (
           -- Pass Only Elements: ['metric_time__day']
           SELECT
@@ -685,7 +685,7 @@ FROM (
           SELECT
             subq_15.metric_time__day
             , subq_15.listing__country_latest
-            , SUM(subq_15.bookings) AS bookings_2_weeks_ago
+            , SUM(subq_15.bookings) AS bookings
           FROM (
             -- Pass Only Elements: ['bookings', 'listing__country_latest', 'metric_time__day']
             SELECT

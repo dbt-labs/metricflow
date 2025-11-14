@@ -254,12 +254,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_11.metric_time__week
-        , subq_11.bookings_at_start_of_month
+        , subq_11.bookings AS bookings_at_start_of_month
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_10.metric_time__week
-          , SUM(subq_10.bookings) AS bookings_at_start_of_month
+          , SUM(subq_10.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings', 'metric_time__week']
           SELECT

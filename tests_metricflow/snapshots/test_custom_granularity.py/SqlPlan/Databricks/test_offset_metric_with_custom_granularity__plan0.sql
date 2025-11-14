@@ -15,12 +15,12 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_8.booking__ds__alien_day
-      , subq_8.bookings_5_days_ago
+      , subq_8.bookings AS bookings_5_days_ago
     FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_7.booking__ds__alien_day
-        , SUM(subq_7.bookings) AS bookings_5_days_ago
+        , SUM(subq_7.bookings) AS bookings
       FROM (
         -- Pass Only Elements: ['bookings', 'booking__ds__alien_day']
         SELECT

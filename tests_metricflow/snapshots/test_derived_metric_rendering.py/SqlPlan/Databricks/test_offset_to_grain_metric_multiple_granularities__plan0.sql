@@ -23,14 +23,14 @@ FROM (
       subq_7.metric_time__day
       , subq_7.metric_time__month
       , subq_7.metric_time__year
-      , subq_7.bookings_start_of_month
+      , subq_7.bookings AS bookings_start_of_month
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         subq_6.metric_time__day AS metric_time__day
         , subq_6.metric_time__month AS metric_time__month
         , subq_6.metric_time__year AS metric_time__year
-        , subq_3.bookings_start_of_month AS bookings_start_of_month
+        , subq_3.bookings AS bookings
       FROM (
         -- Pass Only Elements: ['metric_time__day', 'metric_time__month', 'metric_time__year']
         SELECT
@@ -77,7 +77,7 @@ FROM (
           subq_2.metric_time__day
           , subq_2.metric_time__month
           , subq_2.metric_time__year
-          , SUM(subq_2.bookings) AS bookings_start_of_month
+          , SUM(subq_2.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
           SELECT

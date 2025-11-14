@@ -32,18 +32,6 @@ class InstanceAliasMapping(Mergeable, SerializableDataclass):
             )
         )
 
-    @staticmethod
-    def create_from_simple_metric_recipe(  # noqa: D102
-        simple_metric_recipe: SimpleMetricRecipe,
-    ) -> InstanceAliasMapping:
-        alias = simple_metric_recipe.alias
-        if alias is None:
-            return InstanceAliasMapping(_element_name_and_alias_items=())
-
-        return InstanceAliasMapping(
-            _element_name_and_alias_items=((simple_metric_recipe.simple_metric_input.name, alias),)
-        )
-
     @cached_property
     def element_name_to_alias(self) -> Mapping[str, str]:  # noqa: D102
         return {element_name: alias for element_name, alias in self._element_name_and_alias_items}
