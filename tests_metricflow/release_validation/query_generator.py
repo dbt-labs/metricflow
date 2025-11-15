@@ -3,12 +3,11 @@ from __future__ import annotations
 import itertools
 import logging
 from collections import defaultdict
-from typing import Iterator, Mapping, Sequence
+from typing import Mapping, Sequence
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
-
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -47,17 +46,6 @@ class ExhaustiveQueryGenerator:
         self._manifest_lookup = SemanticManifestLookup(semantic_manifest)
         self._available_metric_references = tuple(MetricReference(metric.name) for metric in semantic_manifest.metrics)
 
-    # def count_possible_group_by_items(self) -> None:
-    #     for metric_reference in self._available_metric_references:
-    #         group_by_item_set_size = self._count_group_by_items(metric_reference)
-    #         logger.info(
-    #             LazyFormat(
-    #                 "Determined possible group-by-items",
-    #                 metric=metric_reference.element_name,
-    #                 set_size=group_by_item_set_size,
-    #             )
-    #         )
-
     def generate_queries(self) -> Sequence[MetricFlowQueryRequest]:
         mf_requests = []
         for metric_reference in self._available_metric_references:
@@ -77,8 +65,7 @@ class ExhaustiveQueryGenerator:
         self, metric_reference: MetricReference
     ) -> Mapping[LinkableElementType, Sequence[GroupByQueryParameter]]:
         available_group_by_set = self._manifest_lookup.metric_lookup.get_common_group_by_items(
-            [metric_reference],
-            GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.DATE_PART,))
+            [metric_reference], GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.DATE_PART,))
         )
 
         accounted_group_by_item_keys: set[AnyLengthTuple] = set()
@@ -114,3 +101,18 @@ class ExhaustiveQueryGenerator:
             else:
                 assert_values_exhausted(element_type)
         return element_type_to_parameters
+
+
+class SavedQueryGenerator:
+    def __init__(self, semantic_manifest: SemanticManifest) -> None:
+        self._manifest = semantic_manifest
+
+    def generate_queries(self) -> Sequence[MetricFlowQueryRequest]:
+        queries: list[MetricFlowQueryRequest] = []
+        for saved_query in self._manifest.saved_queries:
+            queries.append(
+                MetricFlowQueryRequest.create_with_random_request_id(
+                    saved_query_name=saved_query.name
+                )
+            )
+        return queries

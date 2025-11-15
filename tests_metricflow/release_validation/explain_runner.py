@@ -3,40 +3,47 @@ from __future__ import annotations
 import copy
 import logging
 import re
+import sys
 from collections.abc import Sequence
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
+from enum import Enum
 from functools import cached_property
 from pathlib import Path
 from random import Random
-from typing import Final, Mapping, Optional, Union
+from typing import Final, Iterator, Mapping, Optional, TextIO, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
+from dbt_semantic_interfaces.implementations.project_configuration import PydanticProjectConfiguration
 from dbt_semantic_interfaces.implementations.saved_query import PydanticSavedQuery
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.test_utils import as_datetime
+from dbt_semantic_interfaces.transformations.pydantic_rule_set import PydanticSemanticManifestTransformRuleSet
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import (
     PydanticSemanticManifestTransformer,
 )
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 from dbt_semantic_interfaces.type_enums import DimensionType, MetricType
-from metricflow_semantics.errors.error_classes import MetricFlowException, SemanticManifestConfigurationError
+from metricflow_semantics.errors.error_classes import MetricFlowException, SemanticManifestConfigurationError, \
+    InvalidQueryException
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.sql.sql_table import SqlTable
-from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.manifest_helpers import mf_load_manifest_from_json_file
 from metricflow_semantics.test_helpers.time_helpers import ConfigurableTimeSource
+from metricflow_semantics.toolkit.cache.result_cache import ResultCache
+from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
+from tests_metricflow.fixtures.sql_client_fixtures import make_test_sql_client
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
-from tests_metricflow.release_validation.query_generator import ExhaustiveQueryGenerator
 from tests_metricflow.table_snapshot.table_snapshots import (
     SqlTableColumnDefinition,
     SqlTableColumnType,
@@ -265,6 +272,10 @@ def check_explain_saved_queries_in_manifest(
     saved_query_name: Optional[str] = None,
 ) -> None:
     logger.info(LazyFormat("Starting check", manifest_path=manifest_path))
+
+    if manifest_path in {Path("git_ignored/tmp/dbt_manifest/manifest_json/semantic_manifest_70437463654977.json")}:
+        return
+
     # Skip empty files.
     if manifest_path.stat().st_size == 0:
         return
@@ -335,129 +346,266 @@ def check_explain_saved_queries_in_manifest(
     )
 
 
-def test_explain_saved_queries(
-    mf_test_configuration: MetricFlowTestConfiguration,
-    ddl_sql_client: SqlClientWithDDLMethods,
-    sql_client: SqlClient,
-    simple_semantic_manifest: PydanticSemanticManifest,
-    create_source_tables: None,
-) -> None:
-    # manifest_path = Path("git_ignored/semantic_manifest_4286131.json")
+class ManifestStore:
+    _manifest_cache: ResultCache[str, PydanticSemanticManifest] = ResultCache()
 
-    # Check all manifests
-    manifest_directory = Path("git_ignored/tmp/dbt_manifest/manifest_json")
-    manifest_paths = []
-    for manifest_path in manifest_directory.rglob("*.json"):
-        manifest_paths.append(manifest_path)
+    @classmethod
+    def get_manifest(
+        cls,
+        manifest_handle: ManifestHandle,
+    ) -> PydanticSemanticManifest:
+        cache_key = manifest_handle.manifest_name
+        result = cls._manifest_cache.get(cache_key)
+        if result:
+            return result.value
 
-    skipped_manifest_paths = {Path("git_ignored/tmp/dbt_manifest/manifest_json/semantic_manifest_70437463654977.json")}
+        if manifest_handle.manifest_path.stat().st_size == 0:
+            return cls._manifest_cache.set_and_get(
+                cache_key,
+                PydanticSemanticManifest(
+                    semantic_models=[],
+                    metrics=[],
+                    project_configuration=PydanticProjectConfiguration(),
+                ),
+            )
 
-    for manifest_path in manifest_paths:
-        if manifest_path in skipped_manifest_paths:
-            logger.warning(LazyFormat("Skipping manifest path", manifest_path=manifest_path))
-            continue
+        semantic_manifest = mf_load_manifest_from_json_file(manifest_handle.manifest_path)
+        semantic_manifest = UpdateTimeSpineRule(manifest_handle.time_spine_table).transform_model(semantic_manifest)
+        semantic_manifest = ReplaceSqlRule(manifest_handle.dummy_table).transform_model(semantic_manifest)
 
-        logger.info(LazyFormat("Checking manifest path", manifest_path=manifest_path))
+        primary_rules: Sequence[SemanticManifestTransformRule[PydanticSemanticManifest]] = [
+            UpdateTimeSpineRule(manifest_handle.time_spine_table),
+            ReplaceSqlRule(manifest_handle.dummy_table),
+        ]
+        secondary_rules = PydanticSemanticManifestTransformRuleSet().all_rules[1]
 
-        check_explain_saved_queries_in_manifest(manifest_path, mf_test_configuration.mf_source_schema, ddl_sql_client)
-
-
-def test_explain_one_saved_query(
-    mf_test_configuration: MetricFlowTestConfiguration,
-    ddl_sql_client: SqlClientWithDDLMethods,
-    sql_client: SqlClient,
-    simple_semantic_manifest: PydanticSemanticManifest,
-    create_source_tables: None,
-) -> None:
-    # manifest_path = Path("git_ignored/tmp/dbt_manifest/manifest_json/semantic_manifest_70403103975183.json")
-    # saved_query_name = "bidlevel_extracted_vs_exported_ratio_export"
-    manifest_path = Path("/Users/paul_work/tmp/us_foods_manifest.json")
-    saved_query_name = None
-
-    check_explain_saved_queries_in_manifest(
-        manifest_path, mf_test_configuration.mf_source_schema, ddl_sql_client, saved_query_name=saved_query_name
-    )
+        return cls._manifest_cache.set_and_get(
+            cache_key,
+            PydanticSemanticManifestTransformer.transform(
+                semantic_manifest,
+                ordered_rule_sequences=(
+                    primary_rules,
+                    secondary_rules,
+                ),
+            ),
+        )
 
 
-def check_explain_all_queries_in_manifest(
-    manifest_path: Path,
-    source_schema: str,
-    ddl_sql_client: SqlClientWithDDLMethods,
-) -> None:
-    # Skip empty manifests.
-    if manifest_path.stat().st_size == 0:
-        return
+@fast_frozen_dataclass()
+class ExplainExecutionEnvironment:
+    semantic_manifest: PydanticSemanticManifest
+    mf_engine: MetricFlowEngine
 
-    semantic_manifest = mf_load_manifest_from_json_file(manifest_path)
 
-    # Create a dummy source table with 1 row to use in the node relation field for semantic models.
-    empty_table = SqlTable(schema_name=source_schema, table_name="dummy_source")
-    empty_table_snapshot = SqlTableSnapshot(
-        table_name=empty_table.table_name,
-        column_definitions=(SqlTableColumnDefinition(name="int_column", type=SqlTableColumnType.INT),),
-        rows=(("1",),),
-        file_path=None,
-    )
-    snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client, schema_name=source_schema)
-    snapshot_loader.load(empty_table_snapshot)
+@fast_frozen_dataclass()
+class ManifestHandle:
+    manifest_name: str
+    manifest_path: Path
+    dummy_table: SqlTable
+    time_spine_table: SqlTable
 
-    # Create a dummy time-spine table with the column names referenced in the manifest.
-    time_spine_table = SqlTable(schema_name=source_schema, table_name="dummy_time_spine")
+    @staticmethod
+    def create(manifest_path: Path) -> ManifestHandle:
+        manifest_name = manifest_path.name.replace(".json", "")
+        source_schema = f"mf_explain_runner_{manifest_name}"
+        dummy_table = SqlTable(schema_name=source_schema, table_name="dummy_table")
+        time_spine_table = SqlTable(schema_name=source_schema, table_name="time_spine_table")
 
-    time_spine_table_column_names = get_time_spine_column_names(semantic_manifest)
-    time_spine_table_snapshot = SqlTableSnapshot(
-        table_name=time_spine_table.table_name,
-        column_definitions=tuple(
-            SqlTableColumnDefinition(name=column_name, type=SqlTableColumnType.TIME)
-            for column_name in time_spine_table_column_names
-        ),
-        rows=(tuple("2020-01-01" for _ in time_spine_table_column_names),),
-        file_path=None,
-    )
-    try:
-        ddl_sql_client.execute(f"DROP TABLE IF EXISTS {time_spine_table.sql}")
-        snapshot_loader.load(time_spine_table_snapshot)
-    except BaseException as e:
-        raise RuntimeError(
-            LazyFormat("Error loading table snapshot", time_spine_table_snapshot=time_spine_table_snapshot)
-        ) from e
+        return ManifestHandle(
+            manifest_name=manifest_name,
+            manifest_path=manifest_path,
+            dummy_table=dummy_table,
+            time_spine_table=time_spine_table,
+        )
 
-    semantic_manifest = UpdateTimeSpineRule(time_spine_table).transform_model(semantic_manifest)
-    semantic_manifest = ReplaceSqlRule(empty_table).transform_model(semantic_manifest)
-    semantic_manifest = PydanticSemanticManifestTransformer.transform(semantic_manifest)
 
-    query_generator = ExhaustiveQueryGenerator(semantic_manifest)
-    explain_tester = ExplainTester(
-        sql_client=ddl_sql_client,
-        semantic_manifest=semantic_manifest,
-    )
+@fast_frozen_dataclass()
+class ExplainRunnerInput:
+    manifest_handle: ManifestHandle
+    mf_request: MetricFlowQueryRequest
+    log_file_path: Path
+    pass_file_path: Path
+    fail_file_path: Path
 
-    successful_explain_count = 0
-    queries = query_generator.generate_queries()
-    query_count = len(queries)
-    logger.info(LazyFormat("Generated possible queries", query_count=query_count))
-    for i, query in enumerate(queries):
-        logger.info(f"Running query [{i+1}/{query_count}]")
+
+class ExplainStatus(Enum):
+    PASS = "pass"
+    FAIL = "pass"
+    EXCEPTION_IGNORED = "exception_ignored"
+
+
+class ExplainRunner:
+    _manifest_path_to_engine: dict[Path, MetricFlowEngine] = {}
+
+    _engine_cache: ResultCache[str, MetricFlowEngine] = ResultCache()
+    _invalid_manifests: set[Path] = set()
+
+    _sql_client_cache: ResultCache[None, SqlClientWithDDLMethods] = ResultCache()
+    _execution_environment_cache: ResultCache[str, ExplainExecutionEnvironment] = ResultCache()
+
+    @classmethod
+    def _get_sql_client(cls) -> SqlClientWithDDLMethods:
+        result = cls._sql_client_cache.get(None)
+        if result:
+            return result.value
+
+        return cls._sql_client_cache.set_and_get(
+            None, make_test_sql_client(url="duckdb://", password="", schema="default_schema")
+        )
+
+    @classmethod
+    def _create_execution_environment(
+        cls,
+        manifest_handle: ManifestHandle,
+    ) -> ExplainExecutionEnvironment:
+        sql_client = cls._get_sql_client()
+
+        semantic_manifest = ManifestStore.get_manifest(manifest_handle)
+
+        schema_names: MutableOrderedSet[str] = MutableOrderedSet()
+        if manifest_handle.dummy_table.schema_name is not None:
+            schema_names.add(manifest_handle.dummy_table.schema_name)
+        if manifest_handle.time_spine_table.schema_name is not None:
+            schema_names.add(manifest_handle.time_spine_table.schema_name)
+
+        for schema_name in schema_names:
+            query = f"CREATE SCHEMA IF NOT EXISTS {schema_name}"
+            logger.info(LazyFormat("Executing query", query=query))
+            sql_client.execute(query)
+            # sql_client.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+            # sql_client.execute(f"SELECT 1")
+        # Create a dummy source table with 1 row to use in the node relation field for semantic models.
+        dummy_table = manifest_handle.dummy_table
+        dummy_table_snapshot = SqlTableSnapshot(
+            table_name=dummy_table.table_name,
+            column_definitions=(SqlTableColumnDefinition(name="int_column", type=SqlTableColumnType.INT),),
+            rows=(("1",),),
+            file_path=None,
+        )
+
+        assert dummy_table.schema_name is not None
+        snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=sql_client, schema_name=dummy_table.schema_name)
         try:
-            explain_tester.explain_query(query)
-            successful_explain_count += 1
+            snapshot_loader.load(dummy_table_snapshot)
         except Exception as e:
-            raise RuntimeError(LazyFormat("Error with EXPLAIN", manifest_path=manifest_path, request=query)) from e
-    logger.info(LazyFormat("Finished explaining all queries", saved_query_count=len(semantic_manifest.saved_queries)))
+            raise RuntimeError(
+                LazyFormat("Error loading table snapshot", dummy_table_snapshot=dummy_table_snapshot)
+            ) from e
 
+        # Create a dummy time-spine table with the column names referenced in the manifest.
+        time_spine_table = manifest_handle.time_spine_table
+        assert time_spine_table.schema_name is not None
+        snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=sql_client, schema_name=time_spine_table.schema_name)
+        time_spine_table_column_names = get_time_spine_column_names(semantic_manifest)
 
-def test_explain_all_queries(
-    mf_test_configuration: MetricFlowTestConfiguration,
-    ddl_sql_client: SqlClientWithDDLMethods,
-    sql_client: SqlClient,
-    simple_semantic_manifest: PydanticSemanticManifest,
-    create_source_tables: None,
-) -> None:
-    manifest_path = Path("git_ignored/tmp/dbt_manifest/manifest_json/semantic_manifest_4_pretty.json")
-    # semantic_manifest = mf_load_manifest_from_json_file(manifest_path)
-    # semantic_manifest = PydanticSemanticManifestTransformer.transform(semantic_manifest)
-    #
-    # query_generator = ExhaustiveQueryGenerator(semantic_manifest)
-    # query_generator.count_possible_group_by_items()
+        time_spine_table_snapshot = SqlTableSnapshot(
+            table_name=time_spine_table.table_name,
+            column_definitions=tuple(
+                SqlTableColumnDefinition(name=column_name, type=SqlTableColumnType.TIME)
+                for column_name in time_spine_table_column_names
+            ),
+            rows=(tuple("2020-01-01" for _ in time_spine_table_column_names),),
+            file_path=None,
+        )
+        try:
+            sql_client.execute(f"DROP TABLE IF EXISTS {time_spine_table.sql}")
+            snapshot_loader.load(time_spine_table_snapshot)
+        except Exception as e:
+            raise RuntimeError(
+                LazyFormat("Error loading table snapshot", time_spine_table_snapshot=time_spine_table_snapshot)
+            ) from e
 
-    check_explain_all_queries_in_manifest(manifest_path, mf_test_configuration.mf_source_schema, ddl_sql_client)
+        column_association_resolver = DunderColumnAssociationResolver()
+        semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
+        query_parser = MetricFlowQueryParser(semantic_manifest_lookup=semantic_manifest_lookup)
+        mf_engine = MetricFlowEngine(
+            semantic_manifest_lookup=semantic_manifest_lookup,
+            sql_client=sql_client,
+            time_source=ConfigurableTimeSource(as_datetime("2020-01-01")),
+            query_parser=query_parser,
+            column_association_resolver=column_association_resolver,
+        )
+
+        return ExplainExecutionEnvironment(
+            semantic_manifest=semantic_manifest,
+            mf_engine=mf_engine,
+        )
+
+    @classmethod
+    def _get_execution_environment(cls, manifest_handle: ManifestHandle) -> ExplainExecutionEnvironment:
+        cache_key = manifest_handle.manifest_name
+        result = cls._execution_environment_cache.get(cache_key)
+        if result:
+            return result.value
+
+        return cls._execution_environment_cache.set_and_get(
+            cache_key, cls._create_execution_environment(manifest_handle)
+        )
+
+    @classmethod
+    def explain_query(cls, runner_input: ExplainRunnerInput) -> ExplainStatus:
+        with cls._redirect_output_to_file(runner_input.log_file_path):
+            try:
+                execution_environment = cls._get_execution_environment(runner_input.manifest_handle)
+                result = execution_environment.mf_engine.explain(runner_input.mf_request)
+            except InvalidQueryException as e:
+                logger.exception(
+                    LazyFormat(
+                        "Error running EXPLAIN",
+                        manifest_handle=runner_input.manifest_handle,
+                        mf_request=runner_input.mf_request,
+                    )
+                )
+                with open(runner_input.pass_file_path, "w") as fp:
+                    fp.write(str(LazyFormat("Ignoring invalid query", exception=str(e))))
+                    fp.flush()
+                return ExplainStatus.EXCEPTION_IGNORED
+            except Exception as e:
+                logger.exception(
+                    LazyFormat(
+                        "Error running EXPLAIN",
+                        manifest_handle=runner_input.manifest_handle,
+                        mf_request=runner_input.mf_request,
+                    )
+                )
+                with open(runner_input.fail_file_path, "w") as fp:
+                    fp.write(str(e))
+                    fp.flush()
+                return ExplainStatus.FAIL
+            sql = result.sql_statement.sql
+            logger.info(LazyFormat("Successfully ran request", mf_request=runner_input.mf_request, sql=sql))
+            with open(runner_input.pass_file_path, "w") as fp:
+                fp.write(sql)
+                fp.flush()
+            return ExplainStatus.PASS
+
+    @classmethod
+    @contextmanager
+    def _redirect_output_to_file(cls, log_file_path: Path) -> Iterator[TextIO]:
+        """Provides a context manager the redirects output, stderr, and logging output to the given file.
+
+        Useful for debugging as without the log file, the output is invisible. This method is not thread safe due to
+        mutation of global state (i.e. logging configuration, `redirect_*`).
+        """
+        with (
+            open(log_file_path, "w") as log_file,
+            redirect_stdout(log_file),
+            redirect_stderr(log_file),
+        ):
+            # Setup logging. Note: a new process does not inherit the logging configuration of the parent process.
+            logging_handler = logging.StreamHandler(log_file)
+            logging_handler.setFormatter(
+                logging.Formatter("%(asctime)s %(levelname)s %(filename)s:%(lineno)d [%(threadName)s] - %(message)s")
+            )
+            root_logger = logging.getLogger()
+            previous_level = root_logger.getEffectiveLevel()
+            try:
+                root_logger.setLevel(logging.INFO)
+                root_logger.addHandler(logging_handler)
+                yield log_file
+            finally:
+                root_logger.removeHandler(logging_handler)
+                root_logger.setLevel(previous_level)
+                sys.stdout.flush()
+                sys.stderr.flush()
+                log_file.flush()
