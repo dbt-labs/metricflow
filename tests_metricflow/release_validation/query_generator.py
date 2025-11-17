@@ -65,7 +65,10 @@ class ExhaustiveQueryGenerator:
         self, metric_reference: MetricReference
     ) -> Mapping[LinkableElementType, Sequence[GroupByQueryParameter]]:
         available_group_by_set = self._manifest_lookup.metric_lookup.get_common_group_by_items(
-            [metric_reference], GroupByItemSetFilter.create(any_properties_denylist=(GroupByItemProperty.DATE_PART,))
+            [metric_reference],
+            GroupByItemSetFilter.create(
+                any_properties_denylist=(GroupByItemProperty.DATE_PART, GroupByItemProperty.METRIC)
+            ),
         )
 
         accounted_group_by_item_keys: set[AnyLengthTuple] = set()
@@ -110,9 +113,5 @@ class SavedQueryGenerator:
     def generate_queries(self) -> Sequence[MetricFlowQueryRequest]:
         queries: list[MetricFlowQueryRequest] = []
         for saved_query in self._manifest.saved_queries:
-            queries.append(
-                MetricFlowQueryRequest.create_with_random_request_id(
-                    saved_query_name=saved_query.name
-                )
-            )
+            queries.append(MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query.name))
         return queries

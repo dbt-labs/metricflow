@@ -26,8 +26,11 @@ from dbt_semantic_interfaces.transformations.semantic_manifest_transformer impor
 )
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 from dbt_semantic_interfaces.type_enums import DimensionType, MetricType
-from metricflow_semantics.errors.error_classes import MetricFlowException, SemanticManifestConfigurationError, \
-    InvalidQueryException
+from metricflow_semantics.errors.error_classes import (
+    InvalidQueryException,
+    MetricFlowException,
+    SemanticManifestConfigurationError,
+)
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver

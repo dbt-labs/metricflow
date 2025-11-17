@@ -16,10 +16,11 @@ from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDD
 from tests_metricflow.release_validation.explain_runner import (
     ExplainRunner,
     ExplainRunnerInput,
+    ExplainStatus,
     ManifestHandle,
-    ManifestStore, ExplainStatus,
+    ManifestStore,
 )
-from tests_metricflow.release_validation.query_generator import ExhaustiveQueryGenerator, SavedQueryGenerator
+from tests_metricflow.release_validation.query_generator import ExhaustiveQueryGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +33,9 @@ def check_explain_all_queries_in_manifest(manifest_path: Path, executor: Process
     manifest_handle = ManifestHandle.create(manifest_path)
     semantic_manifest = ManifestStore.get_manifest(manifest_handle)
 
-    # query_generator = ExhaustiveQueryGenerator(semantic_manifest)
-    query_generator = SavedQueryGenerator(semantic_manifest)
+    logger.info("Starting query generation")
+    query_generator = ExhaustiveQueryGenerator(semantic_manifest)
+    # query_generator = SavedQueryGenerator(semantic_manifest)
 
     successful_explain_count = 0
     queries = query_generator.generate_queries()
@@ -43,7 +45,7 @@ def check_explain_all_queries_in_manifest(manifest_path: Path, executor: Process
     output_directory = Path("git_ignored/explain_runner").joinpath(manifest_handle.manifest_name)
     output_directory.mkdir(parents=True, exist_ok=True)
 
-    future_to_runner_input: dict[Future, ExplainRunnerInput] ={}
+    future_to_runner_input: dict[Future, ExplainRunnerInput] = {}
     for i, query in enumerate(queries):
         base_name = f"query_{i:04}"
         pass_file_path = output_directory.joinpath(f"{base_name}_success.txt")
@@ -57,12 +59,12 @@ def check_explain_all_queries_in_manifest(manifest_path: Path, executor: Process
         logger.info(LazyFormat(lambda: f"[{i + 1}/{query_count}] Submitting query"))
 
         runner_input = ExplainRunnerInput(
-                    manifest_handle=manifest_handle,
-                    mf_request=query,
-                    log_file_path=log_file_path,
-                    pass_file_path=pass_file_path,
-                    fail_file_path=fail_file_path,
-                )
+            manifest_handle=manifest_handle,
+            mf_request=query,
+            log_file_path=log_file_path,
+            pass_file_path=pass_file_path,
+            fail_file_path=fail_file_path,
+        )
         future = executor.submit(
             ExplainRunner.explain_query,
             runner_input,
@@ -78,9 +80,18 @@ def check_explain_all_queries_in_manifest(manifest_path: Path, executor: Process
         if status is ExplainStatus.PASS:
             logger.info(LazyFormat(lambda: f"[{i + 1}/{actual_query_count}] Query PASSED"))
         elif status is ExplainStatus.FAIL:
-            logger.error(LazyFormat(lambda: f"[{i + 1}/{actual_query_count}] Query FAILED", log_file_path=runner_input.log_file_path))
+            logger.error(
+                LazyFormat(
+                    lambda: f"[{i + 1}/{actual_query_count}] Query FAILED", log_file_path=runner_input.log_file_path
+                )
+            )
         elif status is ExplainStatus.EXCEPTION_IGNORED:
-            logger.warning(LazyFormat(lambda: f"[{i + 1}/{actual_query_count}] Query EXCEPTION_IGNORED", log_file_path=runner_input.log_file_path))
+            logger.warning(
+                LazyFormat(
+                    lambda: f"[{i + 1}/{actual_query_count}] Query EXCEPTION_IGNORED",
+                    log_file_path=runner_input.log_file_path,
+                )
+            )
         else:
             assert_values_exhausted(status)
 
@@ -116,7 +127,6 @@ def test_explain_all_saved_queries() -> None:
     skipped_manifest_paths: Set[str] = set()
 
     with ProcessPoolExecutor(mp_context=multiprocessing.get_context("spawn"), max_workers=8) as executor:
-
         for manifest_path in manifest_paths:
             if manifest_path in skipped_manifest_paths:
                 logger.warning(LazyFormat("Skipping manifest path", manifest_path=manifest_path))
