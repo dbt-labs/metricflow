@@ -49,9 +49,9 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
-from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 from typing_extensions import TypeVar
 
