@@ -12,15 +12,15 @@ SELECT
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_16.listings
+    subq_16.__listings AS listings
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      SUM(subq_15.listings) AS listings
+      SUM(subq_15.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['listings']
+      -- Pass Only Elements: ['__listings']
       SELECT
-        subq_14.listings
+        subq_14.__listings
       FROM (
         -- Constrain Output with WHERE
         SELECT
@@ -89,11 +89,11 @@ FROM (
           , subq_13.listing__is_lux_latest
           , subq_13.listing__capacity_latest
           , subq_13.user__revenue_all_time
-          , subq_13.listings
-          , subq_13.lux_listings
-          , subq_13.smallest_listing
-          , subq_13.largest_listing
-          , subq_13.active_listings
+          , subq_13.__listings
+          , subq_13.__lux_listings
+          , subq_13.__smallest_listing
+          , subq_13.__largest_listing
+          , subq_13.__active_listings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -162,11 +162,11 @@ FROM (
             , subq_5.listing__country_latest AS listing__country_latest
             , subq_5.listing__is_lux_latest AS listing__is_lux_latest
             , subq_5.listing__capacity_latest AS listing__capacity_latest
-            , subq_5.listings AS listings
-            , subq_5.lux_listings AS lux_listings
-            , subq_5.smallest_listing AS smallest_listing
-            , subq_5.largest_listing AS largest_listing
-            , subq_5.active_listings AS active_listings
+            , subq_5.__listings AS __listings
+            , subq_5.__lux_listings AS __lux_listings
+            , subq_5.__smallest_listing AS __smallest_listing
+            , subq_5.__largest_listing AS __largest_listing
+            , subq_5.__active_listings AS __active_listings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -234,19 +234,19 @@ FROM (
               , subq_4.listing__country_latest
               , subq_4.listing__is_lux_latest
               , subq_4.listing__capacity_latest
-              , subq_4.listings
-              , subq_4.lux_listings
-              , subq_4.smallest_listing
-              , subq_4.largest_listing
-              , subq_4.active_listings
+              , subq_4.__listings
+              , subq_4.__lux_listings
+              , subq_4.__smallest_listing
+              , subq_4.__largest_listing
+              , subq_4.__active_listings
             FROM (
               -- Read Elements From Semantic Model 'listings_latest'
               SELECT
-                1 AS listings
-                , 1 AS lux_listings
-                , listings_latest_src_28000.capacity AS smallest_listing
-                , listings_latest_src_28000.capacity AS largest_listing
-                , 1 AS active_listings
+                1 AS __listings
+                , 1 AS __lux_listings
+                , listings_latest_src_28000.capacity AS __smallest_listing
+                , listings_latest_src_28000.capacity AS __largest_listing
+                , 1 AS __active_listings
                 , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS ds__day
                 , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS ds__week
                 , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS ds__month
@@ -317,17 +317,17 @@ FROM (
                 -- Compute Metrics via Expressions
                 SELECT
                   subq_9.user
-                  , subq_9.revenue
+                  , subq_9.__revenue AS revenue
                 FROM (
                   -- Aggregate Inputs for Simple Metrics
                   SELECT
                     subq_8.user
-                    , SUM(subq_8.revenue) AS revenue
+                    , SUM(subq_8.__revenue) AS __revenue
                   FROM (
-                    -- Pass Only Elements: ['revenue', 'user']
+                    -- Pass Only Elements: ['__revenue', 'user']
                     SELECT
                       subq_7.user
-                      , subq_7.revenue
+                      , subq_7.__revenue
                     FROM (
                       -- Metric Time Dimension 'ds'
                       SELECT
@@ -366,11 +366,11 @@ FROM (
                         , subq_6.ds__extract_doy AS metric_time__extract_doy
                         , subq_6.user
                         , subq_6.revenue_instance__user
-                        , subq_6.revenue
+                        , subq_6.__revenue
                       FROM (
                         -- Read Elements From Semantic Model 'revenue'
                         SELECT
-                          revenue_src_28000.revenue
+                          revenue_src_28000.revenue AS __revenue
                           , DATETIME_TRUNC(revenue_src_28000.created_at, day) AS ds__day
                           , DATETIME_TRUNC(revenue_src_28000.created_at, isoweek) AS ds__week
                           , DATETIME_TRUNC(revenue_src_28000.created_at, month) AS ds__month

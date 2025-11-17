@@ -12,17 +12,17 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_7.user__home_state
-    , subq_7.identity_verifications
+    , subq_7.__identity_verifications AS identity_verifications
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_6.user__home_state
-      , SUM(subq_6.identity_verifications) AS identity_verifications
+      , SUM(subq_6.__identity_verifications) AS __identity_verifications
     FROM (
-      -- Pass Only Elements: ['identity_verifications', 'user__home_state']
+      -- Pass Only Elements: ['__identity_verifications', 'user__home_state']
       SELECT
         subq_5.user__home_state
-        , subq_5.identity_verifications
+        , subq_5.__identity_verifications
       FROM (
         -- Join Standard Outputs
         SELECT
@@ -88,7 +88,7 @@ FROM (
           , subq_1.verification__user AS verification__user
           , subq_1.verification_type AS verification_type
           , subq_1.verification__verification_type AS verification__verification_type
-          , subq_1.identity_verifications AS identity_verifications
+          , subq_1.__identity_verifications AS __identity_verifications
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
@@ -152,11 +152,11 @@ FROM (
             , subq_0.verification__user
             , subq_0.verification_type
             , subq_0.verification__verification_type
-            , subq_0.identity_verifications
+            , subq_0.__identity_verifications
           FROM (
             -- Read Elements From Semantic Model 'id_verifications'
             SELECT
-              1 AS identity_verifications
+              1 AS __identity_verifications
               , DATE_TRUNC('day', id_verifications_src_28000.ds) AS ds__day
               , DATE_TRUNC('week', id_verifications_src_28000.ds) AS ds__week
               , DATE_TRUNC('month', id_verifications_src_28000.ds) AS ds__month
@@ -406,16 +406,16 @@ FROM (
               , subq_2.user
               , subq_2.home_state
               , subq_2.user__home_state
-              , subq_2.new_users
+              , subq_2.__new_users
             FROM (
               -- Read Elements From Semantic Model 'users_ds_source'
               SELECT
-                1 AS subdaily_join_to_time_spine_metric
-                , 1 AS simple_subdaily_metric_default_day
-                , 1 AS simple_subdaily_metric_default_hour
-                , 1 AS archived_users_join_to_time_spine
-                , 1 AS archived_users
-                , 1 AS new_users
+                1 AS __subdaily_join_to_time_spine_metric
+                , 1 AS __simple_subdaily_metric_default_day
+                , 1 AS __simple_subdaily_metric_default_hour
+                , 1 AS __archived_users_join_to_time_spine
+                , 1 AS __archived_users
+                , 1 AS __new_users
                 , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
                 , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
                 , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month

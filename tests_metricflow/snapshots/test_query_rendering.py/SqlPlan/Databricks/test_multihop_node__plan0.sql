@@ -12,17 +12,17 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_14.account_id__customer_id__customer_name
-    , subq_14.txn_count
+    , subq_14.__txn_count AS txn_count
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_13.account_id__customer_id__customer_name
-      , SUM(subq_13.txn_count) AS txn_count
+      , SUM(subq_13.__txn_count) AS __txn_count
     FROM (
-      -- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']
+      -- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
       SELECT
         subq_12.account_id__customer_id__customer_name
-        , subq_12.txn_count
+        , subq_12.__txn_count
       FROM (
         -- Join Standard Outputs
         SELECT
@@ -86,7 +86,7 @@ FROM (
           , subq_4.account_id AS account_id
           , subq_4.account_month AS account_month
           , subq_4.account_id__account_month AS account_id__account_month
-          , subq_4.txn_count AS txn_count
+          , subq_4.__txn_count AS __txn_count
         FROM (
           -- Metric Time Dimension 'ds'
           SELECT
@@ -148,11 +148,11 @@ FROM (
             , subq_3.account_id
             , subq_3.account_month
             , subq_3.account_id__account_month
-            , subq_3.txn_count
+            , subq_3.__txn_count
           FROM (
             -- Read Elements From Semantic Model 'account_month_txns'
             SELECT
-              account_month_txns_src_22000.txn_count
+              account_month_txns_src_22000.txn_count AS __txn_count
               , DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__day
               , DATE_TRUNC('week', account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__week
               , DATE_TRUNC('month', account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__month
@@ -288,7 +288,7 @@ FROM (
               , subq_6.extra_dim AS extra_dim
               , subq_6.account_id__extra_dim AS account_id__extra_dim
               , subq_6.bridge_account__extra_dim AS bridge_account__extra_dim
-              , subq_6.account_customer_combos AS account_customer_combos
+              , subq_6.__account_customer_combos AS __account_customer_combos
             FROM (
               -- Metric Time Dimension 'ds_partitioned'
               SELECT
@@ -344,11 +344,11 @@ FROM (
                 , subq_5.extra_dim
                 , subq_5.account_id__extra_dim
                 , subq_5.bridge_account__extra_dim
-                , subq_5.account_customer_combos
+                , subq_5.__account_customer_combos
               FROM (
                 -- Read Elements From Semantic Model 'bridge_table'
                 SELECT
-                  account_id || customer_id AS account_customer_combos
+                  account_id || customer_id AS __account_customer_combos
                   , bridge_table_src_22000.extra_dim
                   , DATE_TRUNC('day', bridge_table_src_22000.ds_partitioned) AS ds_partitioned__day
                   , DATE_TRUNC('week', bridge_table_src_22000.ds_partitioned) AS ds_partitioned__week
@@ -514,11 +514,11 @@ FROM (
                   , subq_7.customer_atomic_weight
                   , subq_7.customer_id__customer_name
                   , subq_7.customer_id__customer_atomic_weight
-                  , subq_7.customers
+                  , subq_7.__customers
                 FROM (
                   -- Read Elements From Semantic Model 'customer_table'
                   SELECT
-                    1 AS customers
+                    1 AS __customers
                     , customer_table_src_22000.customer_name
                     , customer_table_src_22000.customer_atomic_weight
                     , DATE_TRUNC('day', customer_table_src_22000.ds_partitioned) AS ds_partitioned__day

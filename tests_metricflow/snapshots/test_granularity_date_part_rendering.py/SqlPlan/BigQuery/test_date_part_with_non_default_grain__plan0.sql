@@ -10,17 +10,17 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_4.metric_time__extract_year
-    , subq_4.archived_users
+    , subq_4.__archived_users AS archived_users
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_3.metric_time__extract_year
-      , SUM(subq_3.archived_users) AS archived_users
+      , SUM(subq_3.__archived_users) AS __archived_users
     FROM (
-      -- Pass Only Elements: ['archived_users', 'metric_time__extract_year']
+      -- Pass Only Elements: ['__archived_users', 'metric_time__extract_year']
       SELECT
         subq_2.metric_time__extract_year
-        , subq_2.archived_users
+        , subq_2.__archived_users
       FROM (
         -- Constrain Output with WHERE
         SELECT
@@ -213,11 +213,11 @@ FROM (
           , subq_1.user
           , subq_1.home_state
           , subq_1.user__home_state
-          , subq_1.subdaily_join_to_time_spine_metric
-          , subq_1.simple_subdaily_metric_default_day
-          , subq_1.simple_subdaily_metric_default_hour
-          , subq_1.archived_users_join_to_time_spine
-          , subq_1.archived_users
+          , subq_1.__subdaily_join_to_time_spine_metric
+          , subq_1.__simple_subdaily_metric_default_day
+          , subq_1.__simple_subdaily_metric_default_hour
+          , subq_1.__archived_users_join_to_time_spine
+          , subq_1.__archived_users
         FROM (
           -- Metric Time Dimension 'archived_at'
           SELECT
@@ -410,20 +410,20 @@ FROM (
             , subq_0.user
             , subq_0.home_state
             , subq_0.user__home_state
-            , subq_0.subdaily_join_to_time_spine_metric
-            , subq_0.simple_subdaily_metric_default_day
-            , subq_0.simple_subdaily_metric_default_hour
-            , subq_0.archived_users_join_to_time_spine
-            , subq_0.archived_users
+            , subq_0.__subdaily_join_to_time_spine_metric
+            , subq_0.__simple_subdaily_metric_default_day
+            , subq_0.__simple_subdaily_metric_default_hour
+            , subq_0.__archived_users_join_to_time_spine
+            , subq_0.__archived_users
           FROM (
             -- Read Elements From Semantic Model 'users_ds_source'
             SELECT
-              1 AS subdaily_join_to_time_spine_metric
-              , 1 AS simple_subdaily_metric_default_day
-              , 1 AS simple_subdaily_metric_default_hour
-              , 1 AS archived_users_join_to_time_spine
-              , 1 AS archived_users
-              , 1 AS new_users
+              1 AS __subdaily_join_to_time_spine_metric
+              , 1 AS __simple_subdaily_metric_default_day
+              , 1 AS __simple_subdaily_metric_default_hour
+              , 1 AS __archived_users_join_to_time_spine
+              , 1 AS __archived_users
+              , 1 AS __new_users
               , DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS ds__day
               , DATETIME_TRUNC(users_ds_source_src_28000.ds, isoweek) AS ds__week
               , DATETIME_TRUNC(users_ds_source_src_28000.ds, month) AS ds__month

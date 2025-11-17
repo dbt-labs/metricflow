@@ -5,23 +5,23 @@ docstring:
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Pass Only Elements: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(listings) AS listings
+  SUM(__listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_23.listing__bookings AS listing__bookings
-    , subq_17.listings AS listings
+    , subq_17.__listings AS __listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       listing_id AS listing
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_17
   LEFT OUTER JOIN (
@@ -30,14 +30,14 @@ FROM (
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS listing__bookings
+      , SUM(__bookings) AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'listing']
+      -- Pass Only Elements: ['__bookings', 'listing']
       SELECT
         listing_id AS listing
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_20
     GROUP BY

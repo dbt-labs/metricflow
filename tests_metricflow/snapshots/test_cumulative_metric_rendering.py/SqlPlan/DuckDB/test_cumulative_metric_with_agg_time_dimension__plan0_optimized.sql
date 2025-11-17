@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Join Self Over Time Range
--- Pass Only Elements: ['revenue', 'revenue_instance__ds__day']
+-- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

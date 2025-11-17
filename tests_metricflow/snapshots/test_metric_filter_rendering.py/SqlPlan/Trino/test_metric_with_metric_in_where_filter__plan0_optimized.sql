@@ -5,26 +5,26 @@ docstring:
 sql_engine: Trino
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['active_listings', 'metric_time__day']
+-- Pass Only Elements: ['__active_listings', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   metric_time__day
-  , SUM(active_listings) AS active_listings
+  , SUM(__active_listings) AS active_listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_23.listing__bookings AS listing__bookings
     , subq_17.metric_time__day AS metric_time__day
-    , subq_17.active_listings AS active_listings
+    , subq_17.__active_listings AS __active_listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('day', created_at) AS metric_time__day
       , listing_id AS listing
-      , 1 AS active_listings
+      , 1 AS __active_listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_17
   LEFT OUTER JOIN (
@@ -33,14 +33,14 @@ FROM (
     -- Pass Only Elements: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS listing__bookings
+      , SUM(__bookings) AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'listing']
+      -- Pass Only Elements: ['__bookings', 'listing']
       SELECT
         listing_id AS listing
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_20
     GROUP BY

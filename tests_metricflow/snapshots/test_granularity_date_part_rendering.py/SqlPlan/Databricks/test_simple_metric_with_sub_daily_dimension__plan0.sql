@@ -10,17 +10,17 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_3.user__archived_at__hour
-    , subq_3.new_users
+    , subq_3.__new_users AS new_users
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_2.user__archived_at__hour
-      , SUM(subq_2.new_users) AS new_users
+      , SUM(subq_2.__new_users) AS __new_users
     FROM (
-      -- Pass Only Elements: ['new_users', 'user__archived_at__hour']
+      -- Pass Only Elements: ['__new_users', 'user__archived_at__hour']
       SELECT
         subq_1.user__archived_at__hour
-        , subq_1.new_users
+        , subq_1.__new_users
       FROM (
         -- Metric Time Dimension 'created_at'
         SELECT
@@ -212,16 +212,16 @@ FROM (
           , subq_0.user
           , subq_0.home_state
           , subq_0.user__home_state
-          , subq_0.new_users
+          , subq_0.__new_users
         FROM (
           -- Read Elements From Semantic Model 'users_ds_source'
           SELECT
-            1 AS subdaily_join_to_time_spine_metric
-            , 1 AS simple_subdaily_metric_default_day
-            , 1 AS simple_subdaily_metric_default_hour
-            , 1 AS archived_users_join_to_time_spine
-            , 1 AS archived_users
-            , 1 AS new_users
+            1 AS __subdaily_join_to_time_spine_metric
+            , 1 AS __simple_subdaily_metric_default_day
+            , 1 AS __simple_subdaily_metric_default_hour
+            , 1 AS __archived_users_join_to_time_spine
+            , 1 AS __archived_users
+            , 1 AS __new_users
             , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
             , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
             , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month

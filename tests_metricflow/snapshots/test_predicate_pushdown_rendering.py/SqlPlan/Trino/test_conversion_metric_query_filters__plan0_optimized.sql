@@ -13,7 +13,7 @@ WITH sma_28019_cte AS (
     DATE_TRUNC('day', ds) AS metric_time__day
     , user_id AS user
     , referrer_id AS visit__referrer_id
-    , 1 AS visits
+    , 1 AS __visits
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
@@ -28,29 +28,29 @@ WITH sma_28019_cte AS (
 SELECT
   metric_time__day AS metric_time__day
   , user__home_state_latest AS user__home_state_latest
-  , CAST(buys AS DOUBLE) / CAST(NULLIF(visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days
+  , CAST(__buys AS DOUBLE) / CAST(NULLIF(__visits, 0) AS DOUBLE) AS visit_buy_conversion_rate_7days
 FROM (
   -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_30.metric_time__day, subq_43.metric_time__day) AS metric_time__day
     , COALESCE(subq_30.user__home_state_latest, subq_43.user__home_state_latest) AS user__home_state_latest
-    , MAX(subq_30.visits) AS visits
-    , MAX(subq_43.buys) AS buys
+    , MAX(subq_30.__visits) AS __visits
+    , MAX(subq_43.__buys) AS __buys
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['visits', 'user__home_state_latest', 'metric_time__day']
+    -- Pass Only Elements: ['__visits', 'user__home_state_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
       , user__home_state_latest
-      , SUM(visits) AS visits
+      , SUM(__visits) AS __visits
     FROM (
       -- Join Standard Outputs
       SELECT
         rss_28028_cte.home_state_latest AS user__home_state_latest
         , sma_28019_cte.metric_time__day AS metric_time__day
         , sma_28019_cte.visit__referrer_id AS visit__referrer_id
-        , sma_28019_cte.visits AS visits
+        , sma_28019_cte.__visits AS __visits
       FROM sma_28019_cte
       LEFT OUTER JOIN
         rss_28028_cte
@@ -64,23 +64,23 @@ FROM (
   ) subq_30
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
-    -- Pass Only Elements: ['buys', 'user__home_state_latest', 'metric_time__day']
+    -- Pass Only Elements: ['__buys', 'user__home_state_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
       , user__home_state_latest
-      , SUM(buys) AS buys
+      , SUM(__buys) AS __buys
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        FIRST_VALUE(subq_36.visits) OVER (
+        FIRST_VALUE(subq_36.__visits) OVER (
           PARTITION BY
             subq_39.user
             , subq_39.metric_time__day
             , subq_39.mf_internal_uuid
           ORDER BY subq_36.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-        ) AS visits
+        ) AS __visits
         , FIRST_VALUE(subq_36.visit__referrer_id) OVER (
           PARTITION BY
             subq_39.user
@@ -114,16 +114,16 @@ FROM (
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_39.mf_internal_uuid AS mf_internal_uuid
-        , subq_39.buys AS buys
+        , subq_39.__buys AS __buys
       FROM (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
+        -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
         SELECT
           metric_time__day
           , subq_34.user
           , visit__referrer_id
           , user__home_state_latest
-          , visits
+          , __visits
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -131,7 +131,7 @@ FROM (
             , sma_28019_cte.metric_time__day AS metric_time__day
             , sma_28019_cte.user AS user
             , sma_28019_cte.visit__referrer_id AS visit__referrer_id
-            , sma_28019_cte.visits AS visits
+            , sma_28019_cte.__visits AS __visits
           FROM sma_28019_cte
           LEFT OUTER JOIN
             rss_28028_cte
@@ -147,7 +147,7 @@ FROM (
         SELECT
           DATE_TRUNC('day', ds) AS metric_time__day
           , user_id AS user
-          , 1 AS buys
+          , 1 AS __buys
           , uuid() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
       ) subq_39

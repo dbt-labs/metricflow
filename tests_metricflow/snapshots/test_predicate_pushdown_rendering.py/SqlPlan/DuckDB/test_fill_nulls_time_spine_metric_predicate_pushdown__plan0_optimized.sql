@@ -15,7 +15,7 @@ WITH sma_28009_cte AS (
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
     , is_instant AS booking__is_instant
-    , 1 AS bookings_fill_nulls_with_0
+    , 1 AS __bookings_fill_nulls_with_0
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -51,29 +51,29 @@ FROM (
     SELECT
       metric_time__day
       , listing__country_latest
-      , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
+      , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
         , subq_36.listing__country_latest AS listing__country_latest
-        , subq_36.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+        , subq_36.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
+        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
           , listing__country_latest
-          , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+          , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           -- Join Standard Outputs
           SELECT
             sma_28014_cte.country_latest AS listing__country_latest
             , sma_28009_cte.metric_time__day AS metric_time__day
             , sma_28009_cte.booking__is_instant AS booking__is_instant
-            , sma_28009_cte.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+            , sma_28009_cte.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
           FROM sma_28009_cte
           LEFT OUTER JOIN
             sma_28014_cte
@@ -94,29 +94,29 @@ FROM (
     SELECT
       metric_time__day
       , listing__country_latest
-      , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_2_weeks_ago
+      , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_2_weeks_ago
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
         , subq_48.listing__country_latest AS listing__country_latest
-        , subq_48.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+        , subq_48.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
+        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
           , listing__country_latest
-          , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+          , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           -- Join Standard Outputs
           SELECT
             sma_28014_cte.country_latest AS listing__country_latest
             , sma_28009_cte.metric_time__day AS metric_time__day
             , sma_28009_cte.booking__is_instant AS booking__is_instant
-            , sma_28009_cte.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+            , sma_28009_cte.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
           FROM sma_28009_cte
           LEFT OUTER JOIN
             sma_28014_cte

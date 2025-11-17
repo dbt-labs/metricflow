@@ -9,7 +9,7 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -24,17 +24,17 @@ FROM (
     , MAX(subq_33.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    -- Pass Only Elements: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , SUM(bookings) AS bookings
+      , SUM(__bookings) AS bookings
     FROM (
       -- Read From CTE For node_id=sma_28009
       SELECT
         metric_time__day
-        , bookings
+        , __bookings
       FROM sma_28009_cte
     ) subq_19
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
@@ -46,7 +46,7 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_31.metric_time__day AS metric_time__day
-      , subq_27.bookings AS bookings_2_weeks_ago
+      , subq_27.__bookings AS bookings_2_weeks_ago
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['metric_time__day']
@@ -63,16 +63,16 @@ FROM (
     ) subq_31
     INNER JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings
+        , SUM(__bookings) AS __bookings
       FROM (
         -- Read From CTE For node_id=sma_28009
         SELECT
           metric_time__day
-          , bookings
+          , __bookings
         FROM sma_28009_cte
       ) subq_24
       WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'

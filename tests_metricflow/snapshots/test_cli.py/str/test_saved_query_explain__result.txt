@@ -6,14 +6,14 @@ test_filename: test_cli.py
 SELECT
   subq_1.metric_time__day AS metric_time__day
   , customers_src_10000.country AS customer__customer_country
-  , SUM(subq_1.transactions) AS transactions
-  , SUM(subq_1.quick_buy_transactions) AS quick_buy_transactions
+  , SUM(subq_1.__transactions) AS transactions
+  , SUM(subq_1.__quick_buy_transactions) AS quick_buy_transactions
 FROM (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , id_customer AS customer
-    , CASE WHEN CASE WHEN transaction_type_name = 'quick-buy' THEN TRUE ELSE FALSE END THEN 1 ELSE 0 END AS quick_buy_transactions
-    , 1 AS transactions
+    , CASE WHEN CASE WHEN transaction_type_name = 'quick-buy' THEN TRUE ELSE FALSE END THEN 1 ELSE 0 END AS __quick_buy_transactions
+    , 1 AS __transactions
   FROM "mf_tutorial"."main"."transactions" transactions_src_10000
 ) subq_1
 LEFT OUTER JOIN

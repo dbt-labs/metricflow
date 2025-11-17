@@ -7,7 +7,7 @@ docstring:
 sql_engine: Trino
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookers', 'listing__country_latest', 'metric_time__day']
+-- Pass Only Elements: ['__bookers', 'listing__country_latest', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
@@ -15,21 +15,21 @@ sql_engine: Trino
 SELECT
   metric_time__day
   , listing__country_latest
-  , COUNT(DISTINCT bookers) AS every_two_days_bookers
+  , COUNT(DISTINCT __bookers) AS every_two_days_bookers
 FROM (
   -- Join Standard Outputs
   SELECT
     listings_latest_src_28000.country AS listing__country_latest
     , subq_18.metric_time__day AS metric_time__day
     , subq_18.booking__is_instant AS booking__is_instant
-    , subq_18.bookers AS bookers
+    , subq_18.__bookers AS __bookers
   FROM (
     -- Join Self Over Time Range
     SELECT
       subq_17.ds AS metric_time__day
       , bookings_source_src_28000.listing_id AS listing
       , bookings_source_src_28000.is_instant AS booking__is_instant
-      , bookings_source_src_28000.guest_id AS bookers
+      , bookings_source_src_28000.guest_id AS __bookers
     FROM ***************************.mf_time_spine subq_17
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000

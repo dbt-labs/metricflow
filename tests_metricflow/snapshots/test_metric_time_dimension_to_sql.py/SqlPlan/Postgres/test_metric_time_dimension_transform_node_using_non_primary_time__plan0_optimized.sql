@@ -92,5 +92,5 @@ SELECT
   , host_id AS booking__host
   , is_instant
   , is_instant AS booking__is_instant
-  , booking_value AS booking_payments
+  , booking_value AS __booking_payments
 FROM ***************************.fct_bookings bookings_source_src_28000

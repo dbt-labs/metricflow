@@ -7,20 +7,20 @@ sql_engine: DuckDB
 -- Write to DataTable
 SELECT
   metric_time__day
-  , COALESCE(bookers_fill_nulls_with_0_join_to_timespine, 0) AS every_two_days_bookers_fill_nulls_with_0
+  , COALESCE(__bookers_fill_nulls_with_0_join_to_timespine, 0) AS every_two_days_bookers_fill_nulls_with_0
 FROM (
   -- Join to Time Spine Dataset
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , subq_19.bookers_fill_nulls_with_0_join_to_timespine AS bookers_fill_nulls_with_0_join_to_timespine
+    , subq_19.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
   FROM ***************************.mf_time_spine time_spine_src_28006
   LEFT OUTER JOIN (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+    -- Pass Only Elements: ['__bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_16.ds AS metric_time__day
-      , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers_fill_nulls_with_0_join_to_timespine
+      , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS __bookers_fill_nulls_with_0_join_to_timespine
     FROM ***************************.mf_time_spine subq_16
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000

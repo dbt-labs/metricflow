@@ -15,12 +15,12 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_7.metric_time__month
-      , subq_7.bookings_monthly AS bookings_last_month
+      , subq_7.__bookings_monthly AS bookings_last_month
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         subq_6.metric_time__month AS metric_time__month
-        , subq_3.bookings_monthly AS bookings_monthly
+        , subq_3.__bookings_monthly AS __bookings_monthly
       FROM (
         -- Pass Only Elements: ['metric_time__month']
         SELECT
@@ -65,12 +65,12 @@ FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_2.metric_time__month
-          , SUM(subq_2.bookings_monthly) AS bookings_monthly
+          , SUM(subq_2.__bookings_monthly) AS __bookings_monthly
         FROM (
-          -- Pass Only Elements: ['bookings_monthly', 'metric_time__month']
+          -- Pass Only Elements: ['__bookings_monthly', 'metric_time__month']
           SELECT
             subq_1.metric_time__month
-            , subq_1.bookings_monthly
+            , subq_1.__bookings_monthly
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -94,11 +94,11 @@ FROM (
               , subq_0.ds__extract_month AS metric_time__extract_month
               , subq_0.listing
               , subq_0.booking_monthly__listing
-              , subq_0.bookings_monthly
+              , subq_0.__bookings_monthly
             FROM (
               -- Read Elements From Semantic Model 'monthly_bookings_source'
               SELECT
-                monthly_bookings_source_src_16000.bookings_monthly
+                monthly_bookings_source_src_16000.bookings_monthly AS __bookings_monthly
                 , DATE_TRUNC('month', monthly_bookings_source_src_16000.ds) AS ds__month
                 , DATE_TRUNC('quarter', monthly_bookings_source_src_16000.ds) AS ds__quarter
                 , DATE_TRUNC('year', monthly_bookings_source_src_16000.ds) AS ds__year

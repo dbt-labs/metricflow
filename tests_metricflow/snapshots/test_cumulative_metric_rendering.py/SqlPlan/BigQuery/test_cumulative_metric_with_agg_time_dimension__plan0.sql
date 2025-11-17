@@ -17,17 +17,17 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_6.revenue_instance__ds__day
-      , subq_6.revenue
+      , subq_6.__revenue AS revenue
     FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_5.revenue_instance__ds__day
-        , SUM(subq_5.revenue) AS revenue
+        , SUM(subq_5.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['revenue', 'revenue_instance__ds__day']
+        -- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
         SELECT
           subq_4.revenue_instance__ds__day
-          , subq_4.revenue
+          , subq_4.__revenue
         FROM (
           -- Join Self Over Time Range
           SELECT
@@ -66,7 +66,7 @@ FROM (
             , subq_1.metric_time__extract_doy AS metric_time__extract_doy
             , subq_1.user AS user
             , subq_1.revenue_instance__user AS revenue_instance__user
-            , subq_1.revenue AS revenue
+            , subq_1.__revenue AS __revenue
           FROM (
             -- Read From Time Spine 'mf_time_spine'
             SELECT
@@ -111,11 +111,11 @@ FROM (
               , subq_0.ds__extract_doy AS metric_time__extract_doy
               , subq_0.user
               , subq_0.revenue_instance__user
-              , subq_0.revenue
+              , subq_0.__revenue
             FROM (
               -- Read Elements From Semantic Model 'revenue'
               SELECT
-                revenue_src_28000.revenue
+                revenue_src_28000.revenue AS __revenue
                 , DATETIME_TRUNC(revenue_src_28000.created_at, day) AS ds__day
                 , DATETIME_TRUNC(revenue_src_28000.created_at, isoweek) AS ds__week
                 , DATETIME_TRUNC(revenue_src_28000.created_at, month) AS ds__month

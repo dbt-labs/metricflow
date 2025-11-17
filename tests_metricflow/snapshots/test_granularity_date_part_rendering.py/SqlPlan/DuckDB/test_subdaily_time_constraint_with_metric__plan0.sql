@@ -10,17 +10,17 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_11.metric_time__hour
-    , subq_11.subdaily_join_to_time_spine_metric
+    , subq_11.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
   FROM (
     -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
     SELECT
       subq_10.metric_time__hour
-      , subq_10.subdaily_join_to_time_spine_metric
+      , subq_10.__subdaily_join_to_time_spine_metric
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         subq_9.metric_time__hour AS metric_time__hour
-        , subq_5.subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
+        , subq_5.__subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
       FROM (
         -- Pass Only Elements: ['metric_time__hour']
         SELECT
@@ -80,12 +80,12 @@ FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_4.metric_time__hour
-          , SUM(subq_4.subdaily_join_to_time_spine_metric) AS subdaily_join_to_time_spine_metric
+          , SUM(subq_4.__subdaily_join_to_time_spine_metric) AS __subdaily_join_to_time_spine_metric
         FROM (
-          -- Pass Only Elements: ['subdaily_join_to_time_spine_metric', 'metric_time__hour']
+          -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
           SELECT
             subq_3.metric_time__hour
-            , subq_3.subdaily_join_to_time_spine_metric
+            , subq_3.__subdaily_join_to_time_spine_metric
           FROM (
             -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
             SELECT
@@ -278,11 +278,11 @@ FROM (
               , subq_2.user
               , subq_2.home_state
               , subq_2.user__home_state
-              , subq_2.subdaily_join_to_time_spine_metric
-              , subq_2.simple_subdaily_metric_default_day
-              , subq_2.simple_subdaily_metric_default_hour
-              , subq_2.archived_users_join_to_time_spine
-              , subq_2.archived_users
+              , subq_2.__subdaily_join_to_time_spine_metric
+              , subq_2.__simple_subdaily_metric_default_day
+              , subq_2.__simple_subdaily_metric_default_hour
+              , subq_2.__archived_users_join_to_time_spine
+              , subq_2.__archived_users
             FROM (
               -- Metric Time Dimension 'archived_at'
               SELECT
@@ -475,20 +475,20 @@ FROM (
                 , subq_1.user
                 , subq_1.home_state
                 , subq_1.user__home_state
-                , subq_1.subdaily_join_to_time_spine_metric
-                , subq_1.simple_subdaily_metric_default_day
-                , subq_1.simple_subdaily_metric_default_hour
-                , subq_1.archived_users_join_to_time_spine
-                , subq_1.archived_users
+                , subq_1.__subdaily_join_to_time_spine_metric
+                , subq_1.__simple_subdaily_metric_default_day
+                , subq_1.__simple_subdaily_metric_default_hour
+                , subq_1.__archived_users_join_to_time_spine
+                , subq_1.__archived_users
               FROM (
                 -- Read Elements From Semantic Model 'users_ds_source'
                 SELECT
-                  1 AS subdaily_join_to_time_spine_metric
-                  , 1 AS simple_subdaily_metric_default_day
-                  , 1 AS simple_subdaily_metric_default_hour
-                  , 1 AS archived_users_join_to_time_spine
-                  , 1 AS archived_users
-                  , 1 AS new_users
+                  1 AS __subdaily_join_to_time_spine_metric
+                  , 1 AS __simple_subdaily_metric_default_day
+                  , 1 AS __simple_subdaily_metric_default_hour
+                  , 1 AS __archived_users_join_to_time_spine
+                  , 1 AS __archived_users
+                  , 1 AS __new_users
                   , DATE_TRUNC('day', users_ds_source_src_28000.ds) AS ds__day
                   , DATE_TRUNC('week', users_ds_source_src_28000.ds) AS ds__week
                   , DATE_TRUNC('month', users_ds_source_src_28000.ds) AS ds__month

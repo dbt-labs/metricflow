@@ -18,7 +18,7 @@ FROM (
     time_spine_src_28006.ds AS metric_time__day
     , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
     , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
-    , subq_13.bookings AS bookings_start_of_month
+    , subq_13.__bookings AS bookings_start_of_month
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Aggregate Inputs for Simple Metrics
@@ -26,16 +26,16 @@ FROM (
       metric_time__day
       , metric_time__month
       , metric_time__year
-      , SUM(bookings) AS bookings
+      , SUM(__bookings) AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , DATETIME_TRUNC(ds, month) AS metric_time__month
         , DATETIME_TRUNC(ds, year) AS metric_time__year
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_12
     GROUP BY

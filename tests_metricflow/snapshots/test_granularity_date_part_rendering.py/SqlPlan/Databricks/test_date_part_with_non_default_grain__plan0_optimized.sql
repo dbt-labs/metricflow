@@ -3,20 +3,20 @@ test_filename: test_granularity_date_part_rendering.py
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['archived_users', 'metric_time__extract_year']
+-- Pass Only Elements: ['__archived_users', 'metric_time__extract_year']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
   metric_time__extract_year
-  , SUM(archived_users) AS archived_users
+  , SUM(__archived_users) AS archived_users
 FROM (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
   SELECT
     EXTRACT(year FROM archived_at) AS metric_time__extract_year
     , EXTRACT(day FROM archived_at) AS metric_time__extract_day
-    , 1 AS archived_users
+    , 1 AS __archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
 ) subq_7
 WHERE metric_time__extract_day = '2020-01-01'

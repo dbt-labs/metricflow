@@ -18,7 +18,7 @@ test_filename: test_dataflow_plan_builder.py
                     <!-- node_id = NodeId(id_str='am_0') -->
                     <!-- null_fill_value_mapping = {} -->
                     <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['revenue']" -->
+                        <!-- description = "Pass Only Elements: ['__revenue']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='revenue') -->
                         <!-- distinct = False -->

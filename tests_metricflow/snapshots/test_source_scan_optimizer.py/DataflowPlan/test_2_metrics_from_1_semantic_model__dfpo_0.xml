@@ -19,9 +19,9 @@ docstring:
                 <!-- node_id = NodeId(id_str='am_2') -->
                 <!-- null_fill_value_mapping = {} -->
                 <FilterElementsNode>
-                    <!-- description =                                                                      -->
-                    <!--   ("Pass Only Elements: ['bookings', 'booking_value', 'listing__country_latest', " -->
-                    <!--    "'metric_time__day']")                                                          -->
+                    <!-- description =                                                                          -->
+                    <!--   ("Pass Only Elements: ['__bookings', '__booking_value', 'listing__country_latest', " -->
+                    <!--    "'metric_time__day']")                                                              -->
                     <!-- node_id = NodeId(id_str='pfe_5') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->

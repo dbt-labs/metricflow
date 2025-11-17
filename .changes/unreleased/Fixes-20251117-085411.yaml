@@ -1,0 +1,6 @@
+kind: Fixes
+body: Add dunder prefix to column aliases for simple-metric inputs
+time: 2025-11-17T08:54:11.838469-08:00
+custom:
+  Author: plypaul
+  Issue: "1938"
