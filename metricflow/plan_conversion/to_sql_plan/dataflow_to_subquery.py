@@ -106,7 +106,6 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     AddGroupByMetric,
     AddMetadata,
     AddMetrics,
-    AliasAggregatedSimpleMetricInputs,
     ChangeAssociatedColumns,
     ChangeSimpleMetricInputAggregationState,
     ConvertToMetadata,
@@ -543,21 +542,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
                 manifest_object_lookup=self._manifest_object_lookup,
-                alias_mapping=node.alias_mapping,
             )
         )
-
-        if len(node.alias_mapping.element_name_to_alias) > 0:
-            # This is a little silly, but we need to update the column instance set with the new aliases
-            # There are a number of refactoring options - simplest is to consolidate this with
-            # `ChangeSimpleMetricInputAggregationState`, assuming there are no ordering dependencies up above
-            aggregated_instance_set = aggregated_instance_set.transform(
-                AliasAggregatedSimpleMetricInputs(node.alias_mapping)
-            )
-            # and make sure we follow the resolver format for any newly aliased simple-metric inputs....
-            aggregated_instance_set = aggregated_instance_set.transform(
-                ChangeAssociatedColumns(self._column_association_resolver)
-            )
 
         return SqlDataSet(
             instance_set=aggregated_instance_set,

@@ -9,7 +9,6 @@ from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression, SqlFunctionExpression
 
-from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping
 from metricflow.plan_conversion.instance_set_transforms.select_columns import CreateSelectColumnsForInstances
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
@@ -39,12 +38,10 @@ class CreateAggregatedSimpleMetricInputsTransform(InstanceSetTransform[CreateAgg
         table_alias: str,
         column_resolver: ColumnAssociationResolver,
         manifest_object_lookup: ManifestObjectLookup,
-        alias_mapping: InstanceAliasMapping,
     ) -> None:
         self._table_alias = table_alias
         self._column_resolver = column_resolver
         self._manifest_object_lookup = manifest_object_lookup
-        self._alias_mapping = alias_mapping
         self._create_select_column_transform = CreateSelectColumnsForInstances(
             table_alias=table_alias,
             column_resolver=column_resolver,
@@ -55,11 +52,8 @@ class CreateAggregatedSimpleMetricInputsTransform(InstanceSetTransform[CreateAgg
     ) -> SelectColumnSet:
         output_columns: List[SqlSelectColumn] = []
         for instance in instances:
-            spec = instance.spec
-            output_spec = self._alias_mapping.aliased_spec(spec) or spec
-
             output_columns.append(
-                self._make_aggregation_sql_column_expression(instance=instance, output_spec=output_spec)
+                self._make_aggregation_sql_column_expression(instance=instance, output_spec=instance.spec)
             )
 
         return SelectColumnSet.create(simple_metric_input_columns=output_columns)

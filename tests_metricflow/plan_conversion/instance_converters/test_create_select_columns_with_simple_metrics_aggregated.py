@@ -14,7 +14,6 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlPercentileExpression,
 )
 
-from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping
 from metricflow.plan_conversion.instance_set_transforms.aggregated_simple_metric_input import (
     CreateAggregatedSimpleMetricInputsTransform,
 )
@@ -62,7 +61,6 @@ def test_sum_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -97,7 +95,6 @@ def test_sum_boolean_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -126,7 +123,6 @@ def test_avg_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -154,7 +150,6 @@ def test_count_distinct_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -182,7 +177,6 @@ def test_max_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -210,7 +204,6 @@ def test_min_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set
@@ -221,35 +214,6 @@ def test_min_aggregation(
     expr = measure_column.expr
     assert isinstance(expr, SqlAggregateFunctionExpression)
     assert expr.sql_function == SqlFunction.MIN
-
-
-def test_aliased_sum(
-    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
-    simple_manifest_object_lookup: ManifestObjectLookup,
-) -> None:
-    """Checks for function expression handling for booking_value, a SUM type metric in the simple model, with an alias."""
-    simple_metric_input_name = "booking_value"
-    instance_set = __get_filtered_simple_metric_input_instance_set(
-        "bookings_source", simple_metric_input_name, mf_engine_test_fixture_mapping
-    )
-    alias = "bvalue"
-    select_column_set: SelectColumnSet = (
-        CreateAggregatedSimpleMetricInputsTransform(
-            __SOURCE_TABLE_ALIAS,
-            DunderColumnAssociationResolver(),
-            manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create({simple_metric_input_name: alias}),
-        )
-        .transform(instance_set=instance_set)
-        .select_column_set
-    )
-
-    assert len(select_column_set.simple_metric_input_columns) == 1
-    measure_column = select_column_set.simple_metric_input_columns[0]
-    expr = measure_column.expr
-    assert isinstance(expr, SqlAggregateFunctionExpression)
-    assert expr.sql_function == SqlFunction.SUM
-    assert measure_column.column_alias == "bvalue"
 
 
 def test_percentile_aggregation(
@@ -267,7 +231,6 @@ def test_percentile_aggregation(
             __SOURCE_TABLE_ALIAS,
             DunderColumnAssociationResolver(),
             manifest_object_lookup=simple_manifest_object_lookup,
-            alias_mapping=InstanceAliasMapping.create(),
         )
         .transform(instance_set=instance_set)
         .select_column_set

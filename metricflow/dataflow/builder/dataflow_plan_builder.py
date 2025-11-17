@@ -61,7 +61,7 @@ from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
 from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 
-from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping, NullFillValueMapping
+from metricflow.dataflow.builder.aggregation_helper import NullFillValueMapping
 from metricflow.dataflow.builder.builder_cache import (
     BuildAnyMetricOutputNodeParameterSet,
     DataflowPlanBuilderCache,
@@ -1949,7 +1949,6 @@ class DataflowPlanBuilder:
 
         aggregate_node = AggregateSimpleMetricInputsNode.create(
             parent_node=unaggregated_simple_metric_input_node,
-            alias_mapping=InstanceAliasMapping.create(),
             null_fill_value_mapping=NullFillValueMapping.create_from_simple_metric_recipe(simple_metric_recipe),
         )
 
