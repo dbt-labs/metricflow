@@ -13,7 +13,7 @@ from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
-from metricflow_semantics.toolkit.id_helpers import hash_items
+from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 if TYPE_CHECKING:
@@ -61,9 +61,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
     @property
     def bucket_hash(self) -> str:
         """Returns the hash value used for grouping equivalent params."""
-        values = [self.window_choice.name, self.name]
-        values.extend(sorted(self.window_groupings))
-        return hash_items(values)
+        return mf_sha1_iterables([self.window_choice.name, self.name], sorted(self.window_groupings))
 
     def linkable_specs(self, non_additive_dimension_grain: TimeGranularity) -> Sequence[LinkableInstanceSpec]:
         """Return the set of linkable specs referenced by the NonAdditiveDimensionSpec.

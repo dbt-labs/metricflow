@@ -13,7 +13,7 @@ import yaml
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from metricflow_semantics.sql.sql_table import SqlTable
-from metricflow_semantics.toolkit.id_helpers import hash_items
+from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 
 from metricflow.data_table.column_types import CellValue
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -30,7 +30,7 @@ class SqlTableSnapshotHash:
 
     @staticmethod
     def create_from_hashes(hashes: Sequence[SqlTableSnapshotHash]) -> SqlTableSnapshotHash:  # noqa: D102
-        return SqlTableSnapshotHash(hash_items(tuple(one_hash.str_value for one_hash in hashes)))
+        return SqlTableSnapshotHash(mf_sha1_iterables((one_hash.str_value for one_hash in hashes)))
 
 
 class SqlTableColumnType(Enum):  # noqa: D101
@@ -72,11 +72,11 @@ class SqlTableSnapshot(FrozenBaseModel):
     def snapshot_hash(self) -> SqlTableSnapshotHash:
         """Return a hash that can be used to summarize the schema and data of the snapshot."""
         return SqlTableSnapshotHash(
-            hash_items(
-                (self.table_name,)
-                + tuple(column_definition.name for column_definition in self.column_definitions)
-                + tuple(column_definition.type.name for column_definition in self.column_definitions)
-                + tuple(cell or "" for row in self.rows for cell in row)
+            mf_sha1_iterables(
+                (self.table_name,),
+                (column_definition.name for column_definition in self.column_definitions),
+                (column_definition.type.name for column_definition in self.column_definitions),
+                (cell or "" for row in self.rows for cell in row),
             )
         )
 
