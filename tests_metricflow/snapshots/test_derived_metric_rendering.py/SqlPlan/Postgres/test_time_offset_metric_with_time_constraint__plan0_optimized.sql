@@ -13,7 +13,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_19.metric_time__day AS metric_time__day
-    , subq_15.bookings_5_days_ago AS bookings_5_days_ago
+    , subq_15.bookings AS bookings_5_days_ago
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
@@ -28,7 +28,7 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(bookings) AS bookings_5_days_ago
+      , SUM(bookings) AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'

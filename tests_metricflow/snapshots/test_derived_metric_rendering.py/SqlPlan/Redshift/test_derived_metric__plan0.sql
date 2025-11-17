@@ -21,12 +21,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_3.metric_time__day
-        , subq_3.ref_bookings
+        , subq_3.referred_bookings AS ref_bookings
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_2.metric_time__day
-          , SUM(subq_2.referred_bookings) AS ref_bookings
+          , SUM(subq_2.referred_bookings) AS referred_bookings
         FROM (
           -- Pass Only Elements: ['referred_bookings', 'metric_time__day']
           SELECT

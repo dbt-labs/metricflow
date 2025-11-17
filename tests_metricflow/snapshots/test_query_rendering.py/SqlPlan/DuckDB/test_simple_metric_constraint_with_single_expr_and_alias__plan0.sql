@@ -15,12 +15,12 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_4.metric_time__day
-      , subq_4.delayed_bookings
+      , subq_4.bookings AS delayed_bookings
     FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_3.metric_time__day
-        , SUM(subq_3.bookings) AS delayed_bookings
+        , SUM(subq_3.bookings) AS bookings
       FROM (
         -- Pass Only Elements: ['bookings', 'metric_time__day']
         SELECT

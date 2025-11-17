@@ -21,12 +21,12 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         subq_4.metric_time__day
-        , subq_4.booking_value_with_is_instant_constraint
+        , subq_4.booking_value AS booking_value_with_is_instant_constraint
       FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_3.metric_time__day
-          , SUM(subq_3.booking_value) AS booking_value_with_is_instant_constraint
+          , SUM(subq_3.booking_value) AS booking_value
         FROM (
           -- Pass Only Elements: ['booking_value', 'metric_time__day']
           SELECT

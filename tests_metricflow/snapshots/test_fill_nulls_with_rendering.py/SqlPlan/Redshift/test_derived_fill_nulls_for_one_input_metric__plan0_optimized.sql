@@ -61,7 +61,7 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_30.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      , subq_30.bookings AS bookings_2_weeks_ago
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
@@ -69,7 +69,7 @@ FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings_2_weeks_ago
+        , SUM(bookings) AS bookings
       FROM sma_28009_cte
       GROUP BY
         metric_time__day

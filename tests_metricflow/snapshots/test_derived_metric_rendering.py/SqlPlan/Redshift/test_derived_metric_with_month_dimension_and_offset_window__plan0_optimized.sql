@@ -12,7 +12,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_16.metric_time__month AS metric_time__month
-    , subq_13.bookings_last_month AS bookings_last_month
+    , subq_13.bookings_monthly AS bookings_last_month
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
@@ -30,7 +30,7 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       DATE_TRUNC('month', ds) AS metric_time__month
-      , SUM(bookings_monthly) AS bookings_last_month
+      , SUM(bookings_monthly) AS bookings_monthly
     FROM ***************************.fct_bookings_extended_monthly monthly_bookings_source_src_16000
     GROUP BY
       DATE_TRUNC('month', ds)

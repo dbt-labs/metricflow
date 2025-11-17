@@ -15,12 +15,12 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_7.metric_time__day
-      , subq_7.bookings_5_days_ago
+      , subq_7.bookings AS bookings_5_days_ago
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         subq_6.metric_time__day AS metric_time__day
-        , subq_3.bookings_5_days_ago AS bookings_5_days_ago
+        , subq_3.bookings AS bookings
       FROM (
         -- Pass Only Elements: ['metric_time__day']
         SELECT
@@ -63,7 +63,7 @@ FROM (
         -- Aggregate Inputs for Simple Metrics
         SELECT
           subq_2.metric_time__day
-          , SUM(subq_2.bookings) AS bookings_5_days_ago
+          , SUM(subq_2.bookings) AS bookings
         FROM (
           -- Pass Only Elements: ['bookings', 'metric_time__day']
           SELECT

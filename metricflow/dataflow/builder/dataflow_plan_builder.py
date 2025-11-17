@@ -538,7 +538,6 @@ class DataflowPlanBuilder:
 
         simple_metric_recipe = self._build_simple_metric_recipe(
             simple_metric_input=self._manifest_object_lookup.simple_metric_name_to_input[cumulative_metric_input.name],
-            alias=None,
             queried_linkable_specs=queried_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
@@ -603,7 +602,6 @@ class DataflowPlanBuilder:
 
         simple_metric_recipe = self._build_simple_metric_recipe(
             simple_metric_input=self._manifest_object_lookup.simple_metric_name_to_input[metric.name],
-            alias=metric_spec.alias,
             queried_linkable_specs=queried_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
@@ -1315,7 +1313,6 @@ class DataflowPlanBuilder:
             self._build_simple_metric_recipe(
                 filter_spec_factory=filter_spec_factory,
                 simple_metric_input=self._manifest_object_lookup.simple_metric_name_to_input[input_metric.name],
-                alias=None,
                 cumulative_description=None,
                 queried_linkable_specs=queried_linkable_specs,
                 child_metric_offset_window=None,
@@ -1334,7 +1331,6 @@ class DataflowPlanBuilder:
     def _build_simple_metric_recipe(
         self,
         simple_metric_input: SimpleMetricInput,
-        alias: Optional[str],
         queried_linkable_specs: LinkableSpecSet,
         child_metric_offset_window: Optional[MetricTimeWindow],
         child_metric_offset_to_grain: Optional[TimeGranularity],
@@ -1449,7 +1445,6 @@ class DataflowPlanBuilder:
             cumulative_description=cumulative_description,
             metric_filter_spec_set=metric_filter_spec_set,
             additional_filter_spec_set=additional_filter_spec_set,
-            alias=alias,
             before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
             after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
         )
@@ -1954,7 +1949,7 @@ class DataflowPlanBuilder:
 
         aggregate_node = AggregateSimpleMetricInputsNode.create(
             parent_node=unaggregated_simple_metric_input_node,
-            alias_mapping=InstanceAliasMapping.create_from_simple_metric_recipe(simple_metric_recipe),
+            alias_mapping=InstanceAliasMapping.create(),
             null_fill_value_mapping=NullFillValueMapping.create_from_simple_metric_recipe(simple_metric_recipe),
         )
 
