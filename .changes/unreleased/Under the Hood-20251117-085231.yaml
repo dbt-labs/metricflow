@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Consolidate alias SQL generation to `ComputeMetricsNode`
+time: 2025-11-17T08:52:31.35927-08:00
+custom:
+  Author: plypaul
+  Issue: "1936"
