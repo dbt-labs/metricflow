@@ -41,15 +41,21 @@ FROM (
       metric_time__day
       , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
     FROM (
-      -- Read Elements From Semantic Model 'bookings_source'
-      -- Metric Time Dimension 'ds'
       -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
       SELECT
-        DATE_TRUNC('day', ds) AS metric_time__day
-        , DATE_TRUNC('week', ds) AS metric_time__week
-        , 1 AS __bookings_fill_nulls_with_0
-      FROM ***************************.fct_bookings bookings_source_src_28000
-      WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
+        metric_time__day
+        , metric_time__week
+        , __bookings_fill_nulls_with_0
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , DATE_TRUNC('week', ds) AS metric_time__week
+          , 1 AS __bookings_fill_nulls_with_0
+        FROM ***************************.fct_bookings bookings_source_src_28000
+      ) subq_16
+      WHERE metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
     ) subq_17
     WHERE metric_time__week > '2020-01-01'
     GROUP BY

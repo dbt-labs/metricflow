@@ -7,16 +7,23 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Write to DataTable
 WITH ctr_0_cte AS (
-  -- Read Elements From Semantic Model 'visits_source'
-  -- Metric Time Dimension 'ds'
   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
   SELECT
-    DATE_TRUNC('day', ds) AS metric_time__day
-    , user_id AS user
-    , referrer_id AS visit__referrer_id
-    , 1 AS __visits
-  FROM ***************************.fct_visits visits_source_src_28000
-  WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-01' AND '2020-01-02'
+    metric_time__day
+    , subq_20.user
+    , visit__referrer_id
+    , __visits
+  FROM (
+    -- Read Elements From Semantic Model 'visits_source'
+    -- Metric Time Dimension 'ds'
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , user_id AS user
+      , referrer_id AS visit__referrer_id
+      , 1 AS __visits
+    FROM ***************************.fct_visits visits_source_src_28000
+  ) subq_20
+  WHERE metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'
 )
 
 SELECT

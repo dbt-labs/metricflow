@@ -15,14 +15,18 @@ FROM (
     subq_19.metric_time__day AS metric_time__day
     , subq_15.__bookings AS bookings_5_days_ago
   FROM (
-    -- Read From Time Spine 'mf_time_spine'
-    -- Change Column Aliases
     -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
     -- Pass Only Elements: ['metric_time__day']
     SELECT
-      ds AS metric_time__day
-    FROM ***************************.mf_time_spine time_spine_src_28006
-    WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
+      metric_time__day
+    FROM (
+      -- Read From Time Spine 'mf_time_spine'
+      -- Change Column Aliases
+      SELECT
+        ds AS metric_time__day
+      FROM ***************************.mf_time_spine time_spine_src_28006
+    ) subq_17
+    WHERE metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
   ) subq_19
   INNER JOIN (
     -- Aggregate Inputs for Simple Metrics
