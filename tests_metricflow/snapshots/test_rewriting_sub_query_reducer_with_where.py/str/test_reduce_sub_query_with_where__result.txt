@@ -1,0 +1,47 @@
+test_name: test_reduce_sub_query_with_where
+test_filename: test_rewriting_sub_query_reducer_with_where.py
+docstring:
+  Tests a case where an outer query with a WHERE filter should be reduced into its inner query.
+
+      This is allowed as the `SELECT` statement in the inner query consists of expressions that reference columns with
+      the same alias.
+
+      SQL:
+          -- src2
+          SELECT
+            src1.bookings AS bookings
+            , src1.ds AS ds
+          FROM (
+            -- src1
+            SELECT
+              src0.bookings AS bookings
+              , src0.ds AS ds
+            FROM demo.fct_bookings src0
+          ) src1
+          WHERE src1.ds >= "2020-01-01"
+---
+optimizer:
+  SqlRewritingSubQueryReducer
+
+sql_before_optimizing:
+  -- src2
+  SELECT
+    src1.bookings
+    , src1.ds
+  FROM (
+    -- src1
+    SELECT
+      src0.bookings
+      , src0.ds
+    FROM demo.fct_bookings src0
+  ) src1
+  WHERE src1.ds >= '2020-01-01'
+
+sql_after_optimizing:
+  -- src1
+  -- src2
+  SELECT
+    src0.bookings
+    , src0.ds
+  FROM demo.fct_bookings src0
+  WHERE src0.ds >= '2020-01-01'

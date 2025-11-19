@@ -1,0 +1,52 @@
+test_name: test_reduce_sub_query_with_where_and_alias_mismatch
+test_filename: test_rewriting_sub_query_reducer_with_where.py
+docstring:
+  Tests a case where an outer query with a WHERE filter should be not reduced into its inner query.
+
+      This is not allowed as the `SELECT` statement in the inner query consists of expressions that reference columns with
+      different aliases.
+
+      SQL:
+          -- src2
+          SELECT
+            src1.bookings AS bookings
+            , src1.ds AS ds
+          FROM (
+            -- src1
+            SELECT
+              src0.bookings AS bookings
+              , src0.created_at AS ds
+            FROM demo.fct_bookings src0
+          ) src1
+          WHERE src1.ds >= "2020-01-01"
+---
+optimizer:
+  SqlRewritingSubQueryReducer
+
+sql_before_optimizing:
+  -- src2
+  SELECT
+    src1.bookings
+    , src1.ds
+  FROM (
+    -- src1
+    SELECT
+      src0.bookings
+      , src0.created_at AS ds
+    FROM demo.fct_bookings src0
+  ) src1
+  WHERE src1.ds >= '2020-01-01'
+
+sql_after_optimizing:
+  -- src2
+  SELECT
+    src1.bookings
+    , src1.ds
+  FROM (
+    -- src1
+    SELECT
+      src0.bookings
+      , src0.created_at AS ds
+    FROM demo.fct_bookings src0
+  ) src1
+  WHERE src1.ds >= '2020-01-01'
