@@ -363,6 +363,48 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         ):
             return False
 
+        # If this query has a `WHERE` clause, check if it can be correctly reduced.
+        #
+        # The query in the parent could be using a column alias for an expression, and an expression in the `WHERE`
+        # clause could reference that column. If reduced and re-written, the alias might not be available.
+        #
+        # e.g.
+        #
+        #    -- src2
+        #    SELECT
+        #      src1.bookings AS bookings
+        #      , src1.ds AS ds
+        #    FROM (
+        #      -- src1
+        #      SELECT
+        #        src0.bookings AS bookings
+        #        , src0.created_at AS ds
+        #      FROM demo.fct_bookings src0
+        #    ) src1
+        #    WHERE ds >= "2020-01-01"
+        #
+        #    ->
+        #
+        #    -- Potential error
+        #    SELECT
+        #      src0.bookings AS bookings
+        #      , src0.created_at AS ds
+        #    FROM demo.fct_bookings src0
+        #    WHERE ds >= "2020-01-01"
+        #
+        # If the parent `SELECT` column expressions are all column reference expressions where the column name
+        # and the column alias are the same, then it should be safe to reduce.
+        #
+        # Additional checks for the `WHERE` clause can be added to improve subquery reduction.
+
+        if node.where is not None:
+            for select_column in from_source_node_as_select_node.select_columns:
+                column_reference_expr = select_column.expr.as_column_reference_expression
+                if column_reference_expr is None:
+                    return False
+                if column_reference_expr.col_ref.column_name != select_column.column_alias:
+                    return False
+
         return True
 
     @staticmethod

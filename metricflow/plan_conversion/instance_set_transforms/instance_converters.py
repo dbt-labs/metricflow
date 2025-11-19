@@ -336,7 +336,7 @@ class UpdateSimpleMetricInputFillNullsWith(InstanceSetTransform[InstanceSet]):
         self._null_fill_value_mapping = null_fill_value_mapping
 
     def _update_fill_nulls_with(
-        self, instances: Tuple[SimpleMetricInputInstance, ...]
+        self, instances: Sequence[SimpleMetricInputInstance]
     ) -> Tuple[SimpleMetricInputInstance, ...]:
         """Update all simple-metric input instances with the corresponding fill_nulls_with value."""
         updated_instances: List[SimpleMetricInputInstance] = []
