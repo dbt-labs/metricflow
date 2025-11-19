@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 from dataclasses import dataclass
-from typing import Optional, Sequence, Tuple
+from typing import Iterable, Optional, Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
@@ -75,7 +75,7 @@ class SqlSelectStatementNode(SqlPlanNode):
     @staticmethod
     def create(  # noqa: D102
         description: str,
-        select_columns: Tuple[SqlSelectColumn, ...],
+        select_columns: Iterable[SqlSelectColumn],
         from_source: SqlPlanNode,
         from_source_alias: str,
         cte_sources: Tuple[SqlCteNode, ...] = (),
@@ -90,7 +90,7 @@ class SqlSelectStatementNode(SqlPlanNode):
         return SqlSelectStatementNode(
             parent_nodes=parent_nodes,
             _description=description,
-            select_columns=select_columns,
+            select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,
             cte_sources=cte_sources,
@@ -154,6 +154,38 @@ class SqlSelectStatementNode(SqlPlanNode):
             group_bys=self.group_bys,
             order_bys=self.order_bys,
             where=self.where,
+            limit=self.limit,
+            distinct=self.distinct,
+        )
+
+    def with_select_columns(self, select_columns: Iterable[SqlSelectColumn]) -> SqlSelectStatementNode:
+        """Return a copy with the select columns replaced."""
+        return SqlSelectStatementNode.create(
+            description=self.description,
+            select_columns=tuple(select_columns),
+            from_source=self.from_source,
+            from_source_alias=self.from_source_alias,
+            cte_sources=self.cte_sources,
+            join_descs=self.join_descs,
+            group_bys=self.group_bys,
+            order_bys=self.order_bys,
+            where=self.where,
+            limit=self.limit,
+            distinct=self.distinct,
+        )
+
+    def with_where_clause(self, where: Optional[SqlExpressionNode]) -> SqlSelectStatementNode:
+        """Return a copy with the `WHERE` clause replaced."""
+        return SqlSelectStatementNode.create(
+            description=self.description,
+            select_columns=self.select_columns,
+            from_source=self.from_source,
+            from_source_alias=self.from_source_alias,
+            cte_sources=self.cte_sources,
+            join_descs=self.join_descs,
+            group_bys=self.group_bys,
+            order_bys=self.order_bys,
+            where=where,
             limit=self.limit,
             distinct=self.distinct,
         )
