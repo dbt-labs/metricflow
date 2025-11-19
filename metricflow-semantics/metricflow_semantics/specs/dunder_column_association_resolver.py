@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from typing import Optional
+
+from typing_extensions import override
+
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
@@ -27,20 +31,34 @@ class DunderColumnAssociationResolver(ColumnAssociationResolver):
     listing__country
     """
 
-    def __init__(self) -> None:  # noqa: D107
-        self._visitor_helper = DunderColumnAssociationResolverVisitor()
+    def __init__(self, dunder_prefix_simple_metric_inputs: Optional[bool] = None) -> None:  # noqa: D107
+        self._visitor_helper = DunderColumnAssociationResolverVisitor(
+            dunder_prefix_simple_metric_inputs is None or dunder_prefix_simple_metric_inputs
+        )
+        self._expose_simple_metric_inputs = dunder_prefix_simple_metric_inputs
 
-    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D102
+    @override
+    def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:
         return spec.accept(self._visitor_helper)
+
+    @override
+    def with_options(self, dunder_prefix_simple_metric_inputs: bool) -> DunderColumnAssociationResolver:
+        return DunderColumnAssociationResolver(dunder_prefix_simple_metric_inputs=dunder_prefix_simple_metric_inputs)
 
 
 class DunderColumnAssociationResolverVisitor(InstanceSpecVisitor[ColumnAssociation]):
     """Visitor helper class for DefaultColumnAssociationResolver."""
 
+    def __init__(self, dunder_prefix_simple_metric_inputs: bool) -> None:  # noqa: D107
+        self._dunder_prefix_simple_metric_inputs = dunder_prefix_simple_metric_inputs
+
     def visit_metric_spec(self, metric_spec: MetricSpec) -> ColumnAssociation:  # noqa: D102
         return ColumnAssociation(metric_spec.alias or metric_spec.element_name)
 
     def visit_simple_metric_input_spec(self, spec: SimpleMetricInputSpec) -> ColumnAssociation:  # noqa: D102
+        if not self._dunder_prefix_simple_metric_inputs:
+            return ColumnAssociation(spec.element_name)
+
         return ColumnAssociation(DUNDER + spec.element_name)
 
     def visit_dimension_spec(self, dimension_spec: DimensionSpec) -> ColumnAssociation:  # noqa: D102
