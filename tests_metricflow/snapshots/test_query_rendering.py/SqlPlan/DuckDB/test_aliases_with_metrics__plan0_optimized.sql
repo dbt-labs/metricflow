@@ -26,7 +26,7 @@ SELECT
   metric_time__day AS booking_day
   , listing AS listing_id
   , listing__capacity_latest AS listing_capacity
-  , SUM(__bookings) AS bookings_alias
+  , SUM(bookings) AS bookings_alias
 FROM (
   -- Join Standard Outputs
   SELECT
@@ -34,7 +34,7 @@ FROM (
     , listings_latest_src_28000.capacity AS listing__capacity_latest
     , sma_28009_cte.metric_time__day AS metric_time__day
     , sma_28009_cte.listing AS listing
-    , sma_28009_cte.__bookings AS __bookings
+    , sma_28009_cte.__bookings AS bookings
   FROM sma_28009_cte
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions

@@ -37,13 +37,13 @@ FROM (
     SELECT
       metric_time__day
       , visit__referrer_id
-      , SUM(__visits) AS __visits
+      , SUM(visits) AS __visits
     FROM (
       -- Read From CTE For node_id=ctr_0
       SELECT
         metric_time__day
         , visit__referrer_id
-        , __visits
+        , __visits AS visits
       FROM ctr_0_cte
     ) subq_21
     WHERE visit__referrer_id = 'ref_id_01'
@@ -103,14 +103,14 @@ FROM (
           metric_time__day
           , subq_25.user
           , visit__referrer_id
-          , __visits
+          , visits AS __visits
         FROM (
           -- Read From CTE For node_id=ctr_0
           SELECT
             metric_time__day
             , ctr_0_cte.user
             , visit__referrer_id
-            , __visits
+            , __visits AS visits
           FROM ctr_0_cte
         ) subq_25
         WHERE visit__referrer_id = 'ref_id_01'

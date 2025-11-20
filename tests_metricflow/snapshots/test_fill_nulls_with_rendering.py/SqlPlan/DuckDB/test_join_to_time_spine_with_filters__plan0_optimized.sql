@@ -39,7 +39,7 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
+      , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -47,7 +47,7 @@ FROM (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , DATE_TRUNC('week', ds) AS metric_time__week
-        , 1 AS __bookings_fill_nulls_with_0
+        , 1 AS bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
       WHERE DATE_TRUNC('day', ds) BETWEEN '2020-01-03' AND '2020-01-05'
     ) subq_17

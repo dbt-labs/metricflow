@@ -14,14 +14,14 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
-    , SUM(__bookings) AS delayed_bookings
+    , SUM(bookings) AS delayed_bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , is_instant AS booking__is_instant
-      , 1 AS __bookings
+      , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_8
   WHERE NOT booking__is_instant
