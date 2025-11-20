@@ -1,0 +1,6 @@
+kind: Fixes
+body: Render simple-metric inputs without a dunder prefix for the `WHERE` filter
+time: 2025-11-19T23:36:21.068696-08:00
+custom:
+  Author: plypaul
+  Issue: "1941"
