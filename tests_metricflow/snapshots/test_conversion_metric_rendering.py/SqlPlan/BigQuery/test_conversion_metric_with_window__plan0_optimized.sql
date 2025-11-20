@@ -31,12 +31,12 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(__visits) AS __visits
+      , SUM(visits) AS __visits
     FROM (
       -- Read From CTE For node_id=sma_28019
       SELECT
         metric_time__day
-        , __visits
+        , __visits AS visits
       FROM sma_28019_cte
     ) subq_18
     WHERE metric_time__day = '2020-01-01'
@@ -85,13 +85,13 @@ FROM (
         SELECT
           metric_time__day
           , subq_22.user
-          , __visits
+          , visits AS __visits
         FROM (
           -- Read From CTE For node_id=sma_28019
           SELECT
             metric_time__day
             , sma_28019_cte.user
-            , __visits
+            , __visits AS visits
           FROM sma_28019_cte
         ) subq_22
         WHERE metric_time__day = '2020-01-01'

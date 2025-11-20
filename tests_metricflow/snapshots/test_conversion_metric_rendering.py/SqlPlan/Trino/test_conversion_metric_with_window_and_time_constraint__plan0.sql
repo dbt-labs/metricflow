@@ -37,7 +37,11 @@ FROM (
         FROM (
           -- Constrain Output with WHERE
           SELECT
-            subq_3.ds__day
+            subq_3.visits AS __visits
+            , subq_3.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+            , subq_3.referrer_id
+            , subq_3.visit__referrer_id
+            , subq_3.ds__day
             , subq_3.ds__week
             , subq_3.ds__month
             , subq_3.ds__quarter
@@ -74,10 +78,6 @@ FROM (
             , subq_3.session
             , subq_3.visit__user
             , subq_3.visit__session
-            , subq_3.referrer_id
-            , subq_3.visit__referrer_id
-            , subq_3.__visits
-            , subq_3.__visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
             SELECT
@@ -120,8 +120,8 @@ FROM (
               , subq_2.visit__session
               , subq_2.referrer_id
               , subq_2.visit__referrer_id
-              , subq_2.__visits
-              , subq_2.__visits_fill_nulls_with_0_join_to_timespine
+              , subq_2.__visits AS visits
+              , subq_2.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
@@ -278,7 +278,11 @@ FROM (
               FROM (
                 -- Constrain Output with WHERE
                 SELECT
-                  subq_7.ds__day
+                  subq_7.visits AS __visits
+                  , subq_7.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+                  , subq_7.referrer_id
+                  , subq_7.visit__referrer_id
+                  , subq_7.ds__day
                   , subq_7.ds__week
                   , subq_7.ds__month
                   , subq_7.ds__quarter
@@ -315,10 +319,6 @@ FROM (
                   , subq_7.session
                   , subq_7.visit__user
                   , subq_7.visit__session
-                  , subq_7.referrer_id
-                  , subq_7.visit__referrer_id
-                  , subq_7.__visits
-                  , subq_7.__visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-02T00:00:00]
                   SELECT
@@ -361,8 +361,8 @@ FROM (
                     , subq_2.visit__session
                     , subq_2.referrer_id
                     , subq_2.visit__referrer_id
-                    , subq_2.__visits
-                    , subq_2.__visits_fill_nulls_with_0_join_to_timespine
+                    , subq_2.__visits AS visits
+                    , subq_2.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
                   FROM (
                     -- Metric Time Dimension 'ds'
                     SELECT

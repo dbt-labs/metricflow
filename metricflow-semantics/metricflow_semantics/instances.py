@@ -56,11 +56,11 @@ class MdoInstance(ABC, Generic[SpecT]):
 
     def accept(self, visitor: InstanceVisitor[VisitorOutputT]) -> VisitorOutputT:
         """See Visitable."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def with_new_spec(self, new_spec: SpecT, column_association_resolver: ColumnAssociationResolver) -> MdoInstance:
         """Returns a new instance with the spec replaced."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class LinkableInstance(MdoInstance, Generic[SpecT]):
@@ -70,7 +70,7 @@ class LinkableInstance(MdoInstance, Generic[SpecT]):
         self, entity_prefix: EntityReference, column_association_resolver: ColumnAssociationResolver
     ) -> MdoInstance:
         """Add entity link to the underlying spec and associated column."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 # Instances for the major metric object types

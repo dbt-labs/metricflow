@@ -12,12 +12,12 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(__listings) AS listings
+  SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_26.user__revenue_all_time AS user__revenue_all_time
-    , subq_19.__listings AS __listings
+    , subq_19.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

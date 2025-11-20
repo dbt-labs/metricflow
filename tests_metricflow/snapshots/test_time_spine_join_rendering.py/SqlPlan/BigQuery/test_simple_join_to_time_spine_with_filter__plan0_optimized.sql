@@ -21,14 +21,14 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
+      , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , is_instant AS booking__is_instant
-        , 1 AS __bookings_fill_nulls_with_0
+        , 1 AS bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_11
     WHERE booking__is_instant

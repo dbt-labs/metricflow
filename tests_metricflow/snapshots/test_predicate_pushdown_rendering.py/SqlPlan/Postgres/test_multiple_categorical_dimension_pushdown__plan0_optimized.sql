@@ -11,14 +11,14 @@ sql_engine: Postgres
 -- Write to DataTable
 SELECT
   user__home_state_latest
-  , SUM(__listings) AS listings
+  , SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     users_latest_src_28000.home_state_latest AS user__home_state_latest
     , subq_10.listing__is_lux_latest AS listing__is_lux_latest
     , subq_10.listing__capacity_latest AS listing__capacity_latest
-    , subq_10.__listings AS __listings
+    , subq_10.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

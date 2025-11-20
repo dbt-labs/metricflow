@@ -30,12 +30,12 @@ LEFT OUTER JOIN (
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__alien_day
-    , SUM(__bookings_join_to_time_spine) AS __bookings_join_to_time_spine
+    , SUM(bookings_join_to_time_spine) AS __bookings_join_to_time_spine
   FROM (
     -- Metric Time Dimension 'ds'
     -- Join to Custom Granularity Dataset
     SELECT
-      subq_12.__bookings_join_to_time_spine AS __bookings_join_to_time_spine
+      subq_12.__bookings_join_to_time_spine AS bookings_join_to_time_spine
       , subq_13.alien_day AS metric_time__alien_day
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'

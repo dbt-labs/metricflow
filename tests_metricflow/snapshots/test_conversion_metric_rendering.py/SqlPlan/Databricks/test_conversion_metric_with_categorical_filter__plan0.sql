@@ -37,7 +37,11 @@ FROM (
         FROM (
           -- Constrain Output with WHERE
           SELECT
-            subq_1.ds__day
+            subq_1.visits AS __visits
+            , subq_1.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+            , subq_1.referrer_id
+            , subq_1.visit__referrer_id
+            , subq_1.ds__day
             , subq_1.ds__week
             , subq_1.ds__month
             , subq_1.ds__quarter
@@ -74,10 +78,6 @@ FROM (
             , subq_1.session
             , subq_1.visit__user
             , subq_1.visit__session
-            , subq_1.referrer_id
-            , subq_1.visit__referrer_id
-            , subq_1.__visits
-            , subq_1.__visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT
@@ -120,8 +120,8 @@ FROM (
               , subq_0.visit__session
               , subq_0.referrer_id
               , subq_0.visit__referrer_id
-              , subq_0.__visits
-              , subq_0.__visits_fill_nulls_with_0_join_to_timespine
+              , subq_0.__visits AS visits
+              , subq_0.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
             FROM (
               -- Read Elements From Semantic Model 'visits_source'
               SELECT
@@ -232,7 +232,11 @@ FROM (
               FROM (
                 -- Constrain Output with WHERE
                 SELECT
-                  subq_5.ds__day
+                  subq_5.visits AS __visits
+                  , subq_5.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+                  , subq_5.referrer_id
+                  , subq_5.visit__referrer_id
+                  , subq_5.ds__day
                   , subq_5.ds__week
                   , subq_5.ds__month
                   , subq_5.ds__quarter
@@ -269,10 +273,6 @@ FROM (
                   , subq_5.session
                   , subq_5.visit__user
                   , subq_5.visit__session
-                  , subq_5.referrer_id
-                  , subq_5.visit__referrer_id
-                  , subq_5.__visits
-                  , subq_5.__visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Metric Time Dimension 'ds'
                   SELECT
@@ -315,8 +315,8 @@ FROM (
                     , subq_0.visit__session
                     , subq_0.referrer_id
                     , subq_0.visit__referrer_id
-                    , subq_0.__visits
-                    , subq_0.__visits_fill_nulls_with_0_join_to_timespine
+                    , subq_0.__visits AS visits
+                    , subq_0.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
                   FROM (
                     -- Read Elements From Semantic Model 'visits_source'
                     SELECT

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from typing_extensions import Self
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 
@@ -63,4 +64,13 @@ class ColumnAssociationResolver(ABC):
 
     @abstractmethod
     def resolve_spec(self, spec: InstanceSpec) -> ColumnAssociation:  # noqa: D102
+        raise NotImplementedError
+
+    @abstractmethod
+    def with_options(self, dunder_prefix_simple_metric_inputs: bool) -> Self:
+        """Return a copy that has the given options set.
+
+        `dunder_prefix_simple_metric_inputs` controls whether simple-metric inputs are resolved with a prefix
+        e.g. `__bookings`.
+        """
         raise NotImplementedError

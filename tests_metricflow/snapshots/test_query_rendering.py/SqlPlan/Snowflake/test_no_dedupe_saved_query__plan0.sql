@@ -14,7 +14,19 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     SELECT
-      subq_6.ds__day
+      subq_6.listings AS __listings
+      , subq_6.lux_listings AS __lux_listings
+      , subq_6.smallest_listing AS __smallest_listing
+      , subq_6.largest_listing AS __largest_listing
+      , subq_6.active_listings AS __active_listings
+      , subq_6.country_latest
+      , subq_6.is_lux_latest
+      , subq_6.capacity_latest
+      , subq_6.listing__country_latest
+      , subq_6.listing__is_lux_latest
+      , subq_6.listing__capacity_latest
+      , subq_6.user__home_state_latest
+      , subq_6.ds__day
       , subq_6.ds__week
       , subq_6.ds__month
       , subq_6.ds__quarter
@@ -62,18 +74,6 @@ FROM (
       , subq_6.listing
       , subq_6.user
       , subq_6.listing__user
-      , subq_6.country_latest
-      , subq_6.is_lux_latest
-      , subq_6.capacity_latest
-      , subq_6.listing__country_latest
-      , subq_6.listing__is_lux_latest
-      , subq_6.listing__capacity_latest
-      , subq_6.user__home_state_latest
-      , subq_6.__listings
-      , subq_6.__lux_listings
-      , subq_6.__smallest_listing
-      , subq_6.__largest_listing
-      , subq_6.__active_listings
     FROM (
       -- Join Standard Outputs
       SELECT
@@ -132,11 +132,11 @@ FROM (
         , subq_0.listing__country_latest AS listing__country_latest
         , subq_0.listing__is_lux_latest AS listing__is_lux_latest
         , subq_0.listing__capacity_latest AS listing__capacity_latest
-        , subq_0.__listings AS __listings
-        , subq_0.__lux_listings AS __lux_listings
-        , subq_0.__smallest_listing AS __smallest_listing
-        , subq_0.__largest_listing AS __largest_listing
-        , subq_0.__active_listings AS __active_listings
+        , subq_0.__listings AS listings
+        , subq_0.__lux_listings AS lux_listings
+        , subq_0.__smallest_listing AS smallest_listing
+        , subq_0.__largest_listing AS largest_listing
+        , subq_0.__active_listings AS active_listings
       FROM (
         -- Read Elements From Semantic Model 'listings_latest'
         SELECT

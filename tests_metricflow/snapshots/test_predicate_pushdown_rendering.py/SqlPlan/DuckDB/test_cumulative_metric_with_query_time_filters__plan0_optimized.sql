@@ -15,14 +15,14 @@ sql_engine: DuckDB
 SELECT
   metric_time__day
   , listing__country_latest
-  , COUNT(DISTINCT __bookers) AS every_two_days_bookers
+  , COUNT(DISTINCT bookers) AS every_two_days_bookers
 FROM (
   -- Join Standard Outputs
   SELECT
     listings_latest_src_28000.country AS listing__country_latest
     , subq_18.metric_time__day AS metric_time__day
     , subq_18.booking__is_instant AS booking__is_instant
-    , subq_18.__bookers AS __bookers
+    , subq_18.__bookers AS bookers
   FROM (
     -- Join Self Over Time Range
     SELECT

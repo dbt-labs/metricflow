@@ -16,12 +16,12 @@ sql_engine: Databricks
 -- Write to DataTable
 SELECT
   metric_time__day
-  , COUNT(DISTINCT __bookers) AS every_two_days_bookers
+  , COUNT(DISTINCT bookers) AS every_two_days_bookers
 FROM (
   -- Join Self Over Time Range
   SELECT
     subq_13.ds AS metric_time__day
-    , bookings_source_src_28000.guest_id AS __bookers
+    , bookings_source_src_28000.guest_id AS bookers
   FROM ***************************.mf_time_spine subq_13
   INNER JOIN
     ***************************.fct_bookings bookings_source_src_28000

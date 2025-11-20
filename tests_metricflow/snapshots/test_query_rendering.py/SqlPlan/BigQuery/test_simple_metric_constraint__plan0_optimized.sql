@@ -21,15 +21,15 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , AVG(__average_booking_value) AS average_booking_value
-      , SUM(__bookings) AS bookings
+      , AVG(average_booking_value) AS average_booking_value
+      , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
       SELECT
         listings_latest_src_28000.is_lux AS listing__is_lux_latest
         , subq_25.metric_time__day AS metric_time__day
-        , subq_25.__bookings AS __bookings
-        , subq_25.__average_booking_value AS __average_booking_value
+        , subq_25.__bookings AS bookings
+        , subq_25.__average_booking_value AS average_booking_value
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'

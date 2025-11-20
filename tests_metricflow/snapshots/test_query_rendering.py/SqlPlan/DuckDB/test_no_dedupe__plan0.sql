@@ -14,7 +14,14 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     SELECT
-      subq_6.window_start__day
+      subq_6.country
+      , subq_6.is_lux
+      , subq_6.capacity
+      , subq_6.listing__country
+      , subq_6.listing__is_lux
+      , subq_6.listing__capacity
+      , subq_6.user__home_state_latest
+      , subq_6.window_start__day
       , subq_6.window_start__week
       , subq_6.window_start__month
       , subq_6.window_start__quarter
@@ -62,13 +69,6 @@ FROM (
       , subq_6.listing
       , subq_6.user
       , subq_6.listing__user
-      , subq_6.country
-      , subq_6.is_lux
-      , subq_6.capacity
-      , subq_6.listing__country
-      , subq_6.listing__is_lux
-      , subq_6.listing__capacity
-      , subq_6.user__home_state_latest
     FROM (
       -- Join Standard Outputs
       SELECT

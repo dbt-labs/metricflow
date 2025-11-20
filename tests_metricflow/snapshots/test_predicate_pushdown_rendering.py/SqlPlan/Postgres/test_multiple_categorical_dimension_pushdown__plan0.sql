@@ -26,7 +26,19 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_4.ds__day
+          subq_4.listings AS __listings
+          , subq_4.lux_listings AS __lux_listings
+          , subq_4.smallest_listing AS __smallest_listing
+          , subq_4.largest_listing AS __largest_listing
+          , subq_4.active_listings AS __active_listings
+          , subq_4.country_latest
+          , subq_4.is_lux_latest
+          , subq_4.capacity_latest
+          , subq_4.listing__country_latest
+          , subq_4.listing__is_lux_latest
+          , subq_4.listing__capacity_latest
+          , subq_4.user__home_state_latest
+          , subq_4.ds__day
           , subq_4.ds__week
           , subq_4.ds__month
           , subq_4.ds__quarter
@@ -84,18 +96,6 @@ FROM (
           , subq_4.listing
           , subq_4.user
           , subq_4.listing__user
-          , subq_4.country_latest
-          , subq_4.is_lux_latest
-          , subq_4.capacity_latest
-          , subq_4.listing__country_latest
-          , subq_4.listing__is_lux_latest
-          , subq_4.listing__capacity_latest
-          , subq_4.user__home_state_latest
-          , subq_4.__listings
-          , subq_4.__lux_listings
-          , subq_4.__smallest_listing
-          , subq_4.__largest_listing
-          , subq_4.__active_listings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -164,11 +164,11 @@ FROM (
             , subq_1.listing__country_latest AS listing__country_latest
             , subq_1.listing__is_lux_latest AS listing__is_lux_latest
             , subq_1.listing__capacity_latest AS listing__capacity_latest
-            , subq_1.__listings AS __listings
-            , subq_1.__lux_listings AS __lux_listings
-            , subq_1.__smallest_listing AS __smallest_listing
-            , subq_1.__largest_listing AS __largest_listing
-            , subq_1.__active_listings AS __active_listings
+            , subq_1.__listings AS listings
+            , subq_1.__lux_listings AS lux_listings
+            , subq_1.__smallest_listing AS smallest_listing
+            , subq_1.__largest_listing AS largest_listing
+            , subq_1.__active_listings AS active_listings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT

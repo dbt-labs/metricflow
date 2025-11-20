@@ -28,13 +28,13 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     metric_time__day
-    , SUM(__booking_value) AS booking_value
+    , SUM(booking_value) AS booking_value
   FROM (
     -- Join Standard Outputs
     SELECT
       subq_27.listing__booking_fees AS listing__booking_fees
       , sma_28009_cte.metric_time__day AS metric_time__day
-      , sma_28009_cte.__booking_value AS __booking_value
+      , sma_28009_cte.__booking_value AS booking_value
     FROM sma_28009_cte
     LEFT OUTER JOIN (
       -- Compute Metrics via Expressions

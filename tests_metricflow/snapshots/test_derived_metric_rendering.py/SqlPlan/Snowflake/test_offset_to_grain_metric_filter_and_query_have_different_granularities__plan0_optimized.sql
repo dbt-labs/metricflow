@@ -38,14 +38,14 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__month
-      , SUM(__bookings) AS __bookings
+      , SUM(bookings) AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , DATE_TRUNC('month', ds) AS metric_time__month
-        , 1 AS __bookings
+        , 1 AS bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_13
     WHERE metric_time__day = '2020-01-01'

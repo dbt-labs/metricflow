@@ -15,14 +15,14 @@ WITH cm_6_cte AS (
   -- Compute Metrics via Expressions
   SELECT
     listing__capacity_latest
-    , SUM(__bookings) AS bookings
+    , SUM(bookings) AS bookings
   FROM (
     -- Join Standard Outputs
     SELECT
       listings_latest_src_28000.is_lux AS listing__is_lux_latest
       , listings_latest_src_28000.capacity AS listing__capacity_latest
       , subq_25.metric_time__day AS metric_time__day
-      , subq_25.__bookings AS __bookings
+      , subq_25.__bookings AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -49,14 +49,14 @@ WITH cm_6_cte AS (
   -- Compute Metrics via Expressions
   SELECT
     listing__capacity_latest
-    , SUM(__views) AS views
+    , SUM(views) AS views
   FROM (
     -- Join Standard Outputs
     SELECT
       listings_latest_src_28000.is_lux AS listing__is_lux_latest
       , listings_latest_src_28000.capacity AS listing__capacity_latest
       , subq_35.metric_time__day AS metric_time__day
-      , subq_35.__views AS __views
+      , subq_35.__views AS views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'

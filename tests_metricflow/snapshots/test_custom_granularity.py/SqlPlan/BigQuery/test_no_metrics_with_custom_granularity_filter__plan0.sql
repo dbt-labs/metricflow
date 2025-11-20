@@ -14,7 +14,18 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     SELECT
-      subq_1.listing__ds__alien_day
+      subq_1.listings AS __listings
+      , subq_1.lux_listings AS __lux_listings
+      , subq_1.smallest_listing AS __smallest_listing
+      , subq_1.largest_listing AS __largest_listing
+      , subq_1.active_listings AS __active_listings
+      , subq_1.country_latest
+      , subq_1.is_lux_latest
+      , subq_1.capacity_latest
+      , subq_1.listing__country_latest
+      , subq_1.listing__is_lux_latest
+      , subq_1.listing__capacity_latest
+      , subq_1.listing__ds__alien_day
       , subq_1.ds__day
       , subq_1.ds__week
       , subq_1.ds__month
@@ -62,26 +73,15 @@ FROM (
       , subq_1.listing
       , subq_1.user
       , subq_1.listing__user
-      , subq_1.country_latest
-      , subq_1.is_lux_latest
-      , subq_1.capacity_latest
-      , subq_1.listing__country_latest
-      , subq_1.listing__is_lux_latest
-      , subq_1.listing__capacity_latest
-      , subq_1.__listings
-      , subq_1.__lux_listings
-      , subq_1.__smallest_listing
-      , subq_1.__largest_listing
-      , subq_1.__active_listings
     FROM (
       -- Read Elements From Semantic Model 'listings_latest'
       -- Join to Custom Granularity Dataset
       SELECT
-        1 AS __listings
-        , 1 AS __lux_listings
-        , listings_latest_src_28000.capacity AS __smallest_listing
-        , listings_latest_src_28000.capacity AS __largest_listing
-        , 1 AS __active_listings
+        1 AS listings
+        , 1 AS lux_listings
+        , listings_latest_src_28000.capacity AS smallest_listing
+        , listings_latest_src_28000.capacity AS largest_listing
+        , 1 AS active_listings
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS ds__day
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, isoweek) AS ds__week
         , DATETIME_TRUNC(listings_latest_src_28000.created_at, month) AS ds__month

@@ -41,13 +41,13 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , AVG(__average_booking_value) AS average_booking_value
+      , AVG(average_booking_value) AS average_booking_value
     FROM (
       -- Read From CTE For node_id=sma_28009
       SELECT
         metric_time__day
         , booking__is_instant
-        , __average_booking_value
+        , __average_booking_value AS average_booking_value
       FROM sma_28009_cte
     ) subq_13
     WHERE booking__is_instant

@@ -30,7 +30,7 @@ LEFT OUTER JOIN (
   -- Aggregate Inputs for Simple Metrics
   SELECT
     booking__ds__day
-    , SUM(__bookings_join_to_time_spine_with_tiered_filters) AS __bookings_join_to_time_spine_with_tiered_filters
+    , SUM(bookings_join_to_time_spine_with_tiered_filters) AS __bookings_join_to_time_spine_with_tiered_filters
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -38,7 +38,7 @@ LEFT OUTER JOIN (
       DATETIME_TRUNC(ds, day) AS booking__ds__day
       , DATETIME_TRUNC(ds, month) AS booking__ds__month
       , DATETIME_TRUNC(ds, day) AS metric_time__day
-      , 1 AS __bookings_join_to_time_spine_with_tiered_filters
+      , 1 AS bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_12
   WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')

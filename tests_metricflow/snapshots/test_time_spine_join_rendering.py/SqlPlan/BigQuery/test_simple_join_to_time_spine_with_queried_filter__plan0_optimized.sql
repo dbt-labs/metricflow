@@ -13,15 +13,15 @@ SELECT
 FROM (
   -- Constrain Output with WHERE
   SELECT
-    metric_time__day
+    bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
     , booking__is_instant
-    , __bookings_fill_nulls_with_0
+    , metric_time__day
   FROM (
     -- Join to Time Spine Dataset
     SELECT
       time_spine_src_28006.ds AS metric_time__day
       , subq_15.booking__is_instant AS booking__is_instant
-      , subq_15.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+      , subq_15.__bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
     FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
       -- Constrain Output with WHERE
@@ -30,14 +30,14 @@ FROM (
       SELECT
         metric_time__day
         , booking__is_instant
-        , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
+        , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         SELECT
           DATETIME_TRUNC(ds, day) AS metric_time__day
           , is_instant AS booking__is_instant
-          , 1 AS __bookings_fill_nulls_with_0
+          , 1 AS bookings_fill_nulls_with_0
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_12
       WHERE booking__is_instant

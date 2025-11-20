@@ -22,7 +22,10 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_13.third_hop_ds__day
+          subq_13.third_hop_count AS __third_hop_count
+          , subq_13.value
+          , subq_13.customer_third_hop_id__value
+          , subq_13.third_hop_ds__day
           , subq_13.third_hop_ds__week
           , subq_13.third_hop_ds__month
           , subq_13.third_hop_ds__quarter
@@ -57,10 +60,7 @@ FROM (
           , subq_13.metric_time__extract_doy
           , subq_13.customer_third_hop_id
           , subq_13.customer_third_hop_id__customer_id__customer_third_hop_id
-          , subq_13.value
-          , subq_13.customer_third_hop_id__value
           , subq_13.customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers
-          , subq_13.__third_hop_count
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -102,7 +102,7 @@ FROM (
             , subq_5.customer_third_hop_id AS customer_third_hop_id
             , subq_5.value AS value
             , subq_5.customer_third_hop_id__value AS customer_third_hop_id__value
-            , subq_5.__third_hop_count AS __third_hop_count
+            , subq_5.__third_hop_count AS third_hop_count
           FROM (
             -- Metric Time Dimension 'third_hop_ds'
             SELECT
@@ -198,7 +198,11 @@ FROM (
                   FROM (
                     -- Constrain Output with WHERE
                     SELECT
-                      subq_7.acquired_ds__day
+                      subq_7.paraguayan_customers AS __paraguayan_customers
+                      , subq_7.country
+                      , subq_7.customer_id__country
+                      , subq_7.customer_third_hop_id__country
+                      , subq_7.acquired_ds__day
                       , subq_7.acquired_ds__week
                       , subq_7.acquired_ds__month
                       , subq_7.acquired_ds__quarter
@@ -246,10 +250,6 @@ FROM (
                       , subq_7.customer_third_hop_id
                       , subq_7.customer_id__customer_third_hop_id
                       , subq_7.customer_third_hop_id__customer_id
-                      , subq_7.country
-                      , subq_7.customer_id__country
-                      , subq_7.customer_third_hop_id__country
-                      , subq_7.__paraguayan_customers
                     FROM (
                       -- Metric Time Dimension 'acquired_ds'
                       SELECT
@@ -304,7 +304,7 @@ FROM (
                         , subq_6.country
                         , subq_6.customer_id__country
                         , subq_6.customer_third_hop_id__country
-                        , subq_6.__paraguayan_customers
+                        , subq_6.__paraguayan_customers AS paraguayan_customers
                       FROM (
                         -- Read Elements From Semantic Model 'customer_other_data'
                         SELECT

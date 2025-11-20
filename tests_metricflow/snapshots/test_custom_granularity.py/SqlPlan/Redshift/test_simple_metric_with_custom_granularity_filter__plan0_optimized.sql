@@ -10,12 +10,12 @@ sql_engine: Redshift
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(__bookings) AS bookings
+  SUM(bookings) AS bookings
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   SELECT
-    subq_7.__bookings AS __bookings
+    subq_7.__bookings AS bookings
     , subq_8.alien_day AS metric_time__alien_day
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'

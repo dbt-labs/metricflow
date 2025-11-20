@@ -8,12 +8,12 @@ sql_engine: Databricks
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(__family_bookings) AS family_bookings
+  SUM(family_bookings) AS family_bookings
 FROM (
   -- Join Standard Outputs
   SELECT
     listings_src_26000.capacity AS listing__capacity
-    , subq_10.__family_bookings AS __family_bookings
+    , subq_10.__family_bookings AS family_bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'

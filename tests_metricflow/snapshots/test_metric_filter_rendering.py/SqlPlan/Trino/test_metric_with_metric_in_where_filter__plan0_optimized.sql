@@ -11,13 +11,13 @@ sql_engine: Trino
 -- Write to DataTable
 SELECT
   metric_time__day
-  , SUM(__active_listings) AS active_listings
+  , SUM(active_listings) AS active_listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_23.listing__bookings AS listing__bookings
     , subq_17.metric_time__day AS metric_time__day
-    , subq_17.__active_listings AS __active_listings
+    , subq_17.__active_listings AS active_listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

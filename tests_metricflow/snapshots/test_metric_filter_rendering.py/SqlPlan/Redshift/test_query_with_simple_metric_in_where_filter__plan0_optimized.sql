@@ -10,12 +10,12 @@ sql_engine: Redshift
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(__listings) AS listings
+  SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_23.listing__bookings AS listing__bookings
-    , subq_17.__listings AS __listings
+    , subq_17.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

@@ -18,12 +18,12 @@ WITH sma_28014_cte AS (
 )
 
 SELECT
-  SUM(__listings) AS listings
+  SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_32.listing__user__average_booking_value AS user__listing__user__average_booking_value
-    , sma_28014_cte.__listings AS __listings
+    , sma_28014_cte.__listings AS listings
   FROM sma_28014_cte
   LEFT OUTER JOIN (
     -- Join Standard Outputs

@@ -29,12 +29,12 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , SUM(__bookings) AS bookings
+      , SUM(bookings) AS bookings
     FROM (
       -- Read From CTE For node_id=sma_28009
       SELECT
         metric_time__day
-        , __bookings
+        , __bookings AS bookings
       FROM sma_28009_cte
     ) subq_19
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
@@ -67,12 +67,12 @@ FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(__bookings) AS __bookings
+        , SUM(bookings) AS __bookings
       FROM (
         -- Read From CTE For node_id=sma_28009
         SELECT
           metric_time__day
-          , __bookings
+          , __bookings AS bookings
         FROM sma_28009_cte
       ) subq_24
       WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'

@@ -19,12 +19,12 @@ WITH sma_28009_cte AS (
 )
 
 SELECT
-  COUNT(DISTINCT __bookers) AS bookers
+  COUNT(DISTINCT bookers) AS bookers
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_21.listing__bookers AS listing__bookers
-    , subq_16.__bookers AS __bookers
+    , subq_16.__bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
