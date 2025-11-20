@@ -14,13 +14,13 @@ sql_engine: Redshift
 -- Write to DataTable
 SELECT
   listing__country_latest
-  , SUM(__bookings) AS bookings
+  , SUM(bookings) AS bookings
 FROM (
   -- Join Standard Outputs
   SELECT
     listings_latest_src_28000.country AS listing__country_latest
     , subq_11.metric_time__day AS metric_time__day
-    , subq_11.__bookings AS __bookings
+    , subq_11.__bookings AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'

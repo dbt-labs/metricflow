@@ -24,15 +24,15 @@ FROM (
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
-        AVG(__average_booking_value) AS average_booking_value
-        , SUM(__bookings) AS bookings
+        AVG(average_booking_value) AS average_booking_value
+        , SUM(bookings) AS bookings
       FROM (
         -- Join Standard Outputs
         SELECT
           listings_latest_src_28000.is_lux AS listing__is_lux_latest
           , subq_27.booking__is_instant AS booking__is_instant
-          , subq_27.__bookings AS __bookings
-          , subq_27.__average_booking_value AS __average_booking_value
+          , subq_27.__bookings AS bookings
+          , subq_27.__average_booking_value AS average_booking_value
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -56,13 +56,13 @@ FROM (
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
-        SUM(__booking_value) AS booking_value
+        SUM(booking_value) AS booking_value
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         SELECT
           is_instant AS booking__is_instant
-          , booking_value AS __booking_value
+          , booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_37
       WHERE booking__is_instant

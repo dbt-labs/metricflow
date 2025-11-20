@@ -25,7 +25,11 @@ FROM (
         FROM (
           -- Constrain Output with WHERE
           SELECT
-            subq_2.metric_time__alien_day
+            subq_2.visits AS __visits
+            , subq_2.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+            , subq_2.referrer_id
+            , subq_2.visit__referrer_id
+            , subq_2.metric_time__alien_day
             , subq_2.ds__day
             , subq_2.ds__week
             , subq_2.ds__month
@@ -63,10 +67,6 @@ FROM (
             , subq_2.session
             , subq_2.visit__user
             , subq_2.visit__session
-            , subq_2.referrer_id
-            , subq_2.visit__referrer_id
-            , subq_2.__visits
-            , subq_2.__visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Metric Time Dimension 'ds'
             -- Join to Custom Granularity Dataset
@@ -110,8 +110,8 @@ FROM (
               , subq_0.visit__session AS visit__session
               , subq_0.referrer_id AS referrer_id
               , subq_0.visit__referrer_id AS visit__referrer_id
-              , subq_0.__visits AS __visits
-              , subq_0.__visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+              , subq_0.__visits AS visits
+              , subq_0.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
               , subq_1.alien_day AS metric_time__alien_day
             FROM (
               -- Read Elements From Semantic Model 'visits_source'
@@ -220,7 +220,11 @@ FROM (
               FROM (
                 -- Constrain Output with WHERE
                 SELECT
-                  subq_7.metric_time__alien_day
+                  subq_7.visits AS __visits
+                  , subq_7.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+                  , subq_7.referrer_id
+                  , subq_7.visit__referrer_id
+                  , subq_7.metric_time__alien_day
                   , subq_7.ds__day
                   , subq_7.ds__week
                   , subq_7.ds__month
@@ -258,10 +262,6 @@ FROM (
                   , subq_7.session
                   , subq_7.visit__user
                   , subq_7.visit__session
-                  , subq_7.referrer_id
-                  , subq_7.visit__referrer_id
-                  , subq_7.__visits
-                  , subq_7.__visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Metric Time Dimension 'ds'
                   -- Join to Custom Granularity Dataset
@@ -305,8 +305,8 @@ FROM (
                     , subq_0.visit__session AS visit__session
                     , subq_0.referrer_id AS referrer_id
                     , subq_0.visit__referrer_id AS visit__referrer_id
-                    , subq_0.__visits AS __visits
-                    , subq_0.__visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+                    , subq_0.__visits AS visits
+                    , subq_0.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
                     , subq_6.alien_day AS metric_time__alien_day
                   FROM (
                     -- Read Elements From Semantic Model 'visits_source'

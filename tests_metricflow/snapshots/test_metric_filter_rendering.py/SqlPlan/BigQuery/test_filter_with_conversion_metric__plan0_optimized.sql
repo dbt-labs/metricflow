@@ -18,12 +18,12 @@ WITH sma_28019_cte AS (
 )
 
 SELECT
-  SUM(__listings) AS listings
+  SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     CAST(subq_50.__buys AS FLOAT64) / CAST(NULLIF(subq_50.__visits, 0) AS FLOAT64) AS user__visit_buy_conversion_rate
-    , subq_36.__listings AS __listings
+    , subq_36.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

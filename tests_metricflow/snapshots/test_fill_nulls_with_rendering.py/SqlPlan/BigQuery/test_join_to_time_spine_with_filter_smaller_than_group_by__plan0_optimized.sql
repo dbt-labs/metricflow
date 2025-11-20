@@ -31,14 +31,14 @@ LEFT OUTER JOIN (
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
-    , SUM(__archived_users_join_to_time_spine) AS __archived_users_join_to_time_spine
+    , SUM(archived_users_join_to_time_spine) AS __archived_users_join_to_time_spine
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
     SELECT
       DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
       , DATETIME_TRUNC(archived_at, day) AS metric_time__day
-      , 1 AS __archived_users_join_to_time_spine
+      , 1 AS archived_users_join_to_time_spine
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_12
   WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')

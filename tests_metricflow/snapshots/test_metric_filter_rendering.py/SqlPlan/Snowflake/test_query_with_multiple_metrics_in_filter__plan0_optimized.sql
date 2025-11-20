@@ -20,13 +20,13 @@ WITH sma_28009_cte AS (
 )
 
 SELECT
-  SUM(__listings) AS listings
+  SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_31.listing__bookings AS listing__bookings
     , subq_36.listing__bookers AS listing__bookers
-    , subq_25.__listings AS __listings
+    , subq_25.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

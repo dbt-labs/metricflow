@@ -29,12 +29,12 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__alien_day
-      , SUM(__visits) AS __visits
+      , SUM(visits) AS __visits
     FROM (
       -- Read From CTE For node_id=sma_28019
       -- Join to Custom Granularity Dataset
       SELECT
-        sma_28019_cte.__visits AS __visits
+        sma_28019_cte.__visits AS visits
         , subq_20.alien_day AS metric_time__alien_day
       FROM sma_28019_cte
       LEFT OUTER JOIN
@@ -97,14 +97,14 @@ FROM (
           metric_time__alien_day
           , metric_time__day
           , subq_26.user
-          , __visits
+          , visits AS __visits
         FROM (
           -- Read From CTE For node_id=sma_28019
           -- Join to Custom Granularity Dataset
           SELECT
             sma_28019_cte.metric_time__day AS metric_time__day
             , sma_28019_cte.user AS user
-            , sma_28019_cte.__visits AS __visits
+            , sma_28019_cte.__visits AS visits
             , subq_25.alien_day AS metric_time__alien_day
           FROM sma_28019_cte
           LEFT OUTER JOIN

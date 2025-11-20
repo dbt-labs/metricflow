@@ -37,7 +37,12 @@ FROM (
         FROM (
           -- Constrain Output with WHERE
           SELECT
-            subq_4.ds__day
+            subq_4.visits AS __visits
+            , subq_4.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+            , subq_4.referrer_id
+            , subq_4.visit__referrer_id
+            , subq_4.user__home_state_latest
+            , subq_4.ds__day
             , subq_4.ds__week
             , subq_4.ds__month
             , subq_4.ds__quarter
@@ -74,11 +79,6 @@ FROM (
             , subq_4.session
             , subq_4.visit__user
             , subq_4.visit__session
-            , subq_4.referrer_id
-            , subq_4.visit__referrer_id
-            , subq_4.user__home_state_latest
-            , subq_4.__visits
-            , subq_4.__visits_fill_nulls_with_0_join_to_timespine
           FROM (
             -- Join Standard Outputs
             SELECT
@@ -122,8 +122,8 @@ FROM (
               , subq_1.visit__session AS visit__session
               , subq_1.referrer_id AS referrer_id
               , subq_1.visit__referrer_id AS visit__referrer_id
-              , subq_1.__visits AS __visits
-              , subq_1.__visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+              , subq_1.__visits AS visits
+              , subq_1.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
@@ -327,7 +327,12 @@ FROM (
               FROM (
                 -- Constrain Output with WHERE
                 SELECT
-                  subq_11.ds__day
+                  subq_11.visits AS __visits
+                  , subq_11.visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+                  , subq_11.referrer_id
+                  , subq_11.visit__referrer_id
+                  , subq_11.user__home_state_latest
+                  , subq_11.ds__day
                   , subq_11.ds__week
                   , subq_11.ds__month
                   , subq_11.ds__quarter
@@ -364,11 +369,6 @@ FROM (
                   , subq_11.session
                   , subq_11.visit__user
                   , subq_11.visit__session
-                  , subq_11.referrer_id
-                  , subq_11.visit__referrer_id
-                  , subq_11.user__home_state_latest
-                  , subq_11.__visits
-                  , subq_11.__visits_fill_nulls_with_0_join_to_timespine
                 FROM (
                   -- Join Standard Outputs
                   SELECT
@@ -412,8 +412,8 @@ FROM (
                     , subq_8.visit__session AS visit__session
                     , subq_8.referrer_id AS referrer_id
                     , subq_8.visit__referrer_id AS visit__referrer_id
-                    , subq_8.__visits AS __visits
-                    , subq_8.__visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+                    , subq_8.__visits AS visits
+                    , subq_8.__visits_fill_nulls_with_0_join_to_timespine AS visits_fill_nulls_with_0_join_to_timespine
                   FROM (
                     -- Metric Time Dimension 'ds'
                     SELECT

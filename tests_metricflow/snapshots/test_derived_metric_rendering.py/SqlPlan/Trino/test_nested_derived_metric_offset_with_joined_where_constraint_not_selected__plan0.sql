@@ -19,8 +19,8 @@ FROM (
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_13.metric_time__day
-        , subq_13.booking__is_instant
+        subq_13.booking__is_instant
+        , subq_13.metric_time__day
         , subq_13.bookings_offset_once
       FROM (
         -- Join to Time Spine Dataset

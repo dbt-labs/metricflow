@@ -22,7 +22,10 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_25.third_hop_ds__day
+          subq_25.third_hop_count AS __third_hop_count
+          , subq_25.value
+          , subq_25.customer_third_hop_id__value
+          , subq_25.third_hop_ds__day
           , subq_25.third_hop_ds__week
           , subq_25.third_hop_ds__month
           , subq_25.third_hop_ds__quarter
@@ -57,10 +60,7 @@ FROM (
           , subq_25.metric_time__extract_doy
           , subq_25.customer_third_hop_id
           , subq_25.customer_third_hop_id__account_id__customer_id__customer_third_hop_id
-          , subq_25.value
-          , subq_25.customer_third_hop_id__value
           , subq_25.customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
-          , subq_25.__third_hop_count
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -102,7 +102,7 @@ FROM (
             , subq_10.customer_third_hop_id AS customer_third_hop_id
             , subq_10.value AS value
             , subq_10.customer_third_hop_id__value AS customer_third_hop_id__value
-            , subq_10.__third_hop_count AS __third_hop_count
+            , subq_10.__third_hop_count AS third_hop_count
           FROM (
             -- Metric Time Dimension 'third_hop_ds'
             SELECT

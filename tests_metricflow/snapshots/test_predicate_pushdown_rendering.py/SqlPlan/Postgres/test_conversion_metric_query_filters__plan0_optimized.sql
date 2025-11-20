@@ -43,14 +43,14 @@ FROM (
     SELECT
       metric_time__day
       , user__home_state_latest
-      , SUM(__visits) AS __visits
+      , SUM(visits) AS __visits
     FROM (
       -- Join Standard Outputs
       SELECT
         rss_28028_cte.home_state_latest AS user__home_state_latest
         , sma_28019_cte.metric_time__day AS metric_time__day
         , sma_28019_cte.visit__referrer_id AS visit__referrer_id
-        , sma_28019_cte.__visits AS __visits
+        , sma_28019_cte.__visits AS visits
       FROM sma_28019_cte
       LEFT OUTER JOIN
         rss_28028_cte
@@ -123,7 +123,7 @@ FROM (
           , subq_34.user
           , visit__referrer_id
           , user__home_state_latest
-          , __visits
+          , visits AS __visits
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -131,7 +131,7 @@ FROM (
             , sma_28019_cte.metric_time__day AS metric_time__day
             , sma_28019_cte.user AS user
             , sma_28019_cte.visit__referrer_id AS visit__referrer_id
-            , sma_28019_cte.__visits AS __visits
+            , sma_28019_cte.__visits AS visits
           FROM sma_28019_cte
           LEFT OUTER JOIN
             rss_28028_cte

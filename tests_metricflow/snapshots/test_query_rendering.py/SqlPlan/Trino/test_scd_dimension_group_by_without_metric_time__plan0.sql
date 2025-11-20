@@ -24,7 +24,13 @@ FROM (
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_4.ds__day
+          subq_4.bookings AS __bookings
+          , subq_4.family_bookings AS __family_bookings
+          , subq_4.potentially_lux_bookings AS __potentially_lux_bookings
+          , subq_4.is_instant
+          , subq_4.booking__is_instant
+          , subq_4.listing__capacity
+          , subq_4.ds__day
           , subq_4.ds__week
           , subq_4.ds__month
           , subq_4.ds__quarter
@@ -111,12 +117,6 @@ FROM (
           , subq_4.booking__guest
           , subq_4.booking__host
           , subq_4.booking__user
-          , subq_4.is_instant
-          , subq_4.booking__is_instant
-          , subq_4.listing__capacity
-          , subq_4.__bookings
-          , subq_4.__family_bookings
-          , subq_4.__potentially_lux_bookings
         FROM (
           -- Join Standard Outputs
           SELECT
@@ -210,9 +210,9 @@ FROM (
             , subq_1.booking__user AS booking__user
             , subq_1.is_instant AS is_instant
             , subq_1.booking__is_instant AS booking__is_instant
-            , subq_1.__bookings AS __bookings
-            , subq_1.__family_bookings AS __family_bookings
-            , subq_1.__potentially_lux_bookings AS __potentially_lux_bookings
+            , subq_1.__bookings AS bookings
+            , subq_1.__family_bookings AS family_bookings
+            , subq_1.__potentially_lux_bookings AS potentially_lux_bookings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT

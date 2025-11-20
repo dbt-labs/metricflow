@@ -33,13 +33,13 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__month
-      , SUM(__booking_value) AS booking_value
+      , SUM(booking_value) AS booking_value
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         time_spine_src_28006.ds AS metric_time__day
         , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
-        , sma_28009_cte.__booking_value AS __booking_value
+        , sma_28009_cte.__booking_value AS booking_value
       FROM ***************************.mf_time_spine time_spine_src_28006
       INNER JOIN
         sma_28009_cte
@@ -57,13 +57,13 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__month
-      , COUNT(DISTINCT __bookers) AS bookers
+      , COUNT(DISTINCT bookers) AS bookers
     FROM (
       -- Read From CTE For node_id=sma_28009
       SELECT
         metric_time__day
         , metric_time__month
-        , __bookers
+        , __bookers AS bookers
       FROM sma_28009_cte
     ) subq_27
     WHERE metric_time__day = '2020-01-01'

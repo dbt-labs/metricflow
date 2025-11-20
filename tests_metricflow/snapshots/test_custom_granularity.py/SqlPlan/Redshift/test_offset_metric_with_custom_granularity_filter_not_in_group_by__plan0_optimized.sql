@@ -34,13 +34,13 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(__bookings) AS __bookings
+      , SUM(bookings) AS __bookings
     FROM (
       -- Metric Time Dimension 'ds'
       -- Join to Custom Granularity Dataset
       SELECT
         subq_13.ds__day AS metric_time__day
-        , subq_13.__bookings AS __bookings
+        , subq_13.__bookings AS bookings
         , subq_14.alien_day AS metric_time__alien_day
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'

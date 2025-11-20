@@ -10,12 +10,12 @@ sql_engine: Snowflake
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(__listings) AS listings
+  SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     CAST(subq_34.bookings AS DOUBLE) / CAST(NULLIF(subq_34.bookers, 0) AS DOUBLE) AS listing__bookings_per_booker
-    , subq_29.__listings AS __listings
+    , subq_29.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

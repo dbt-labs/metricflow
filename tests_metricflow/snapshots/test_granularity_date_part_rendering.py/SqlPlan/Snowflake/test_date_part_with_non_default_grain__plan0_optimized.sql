@@ -9,14 +9,14 @@ sql_engine: Snowflake
 -- Write to DataTable
 SELECT
   metric_time__extract_year
-  , SUM(__archived_users) AS archived_users
+  , SUM(archived_users) AS archived_users
 FROM (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
   SELECT
     EXTRACT(year FROM archived_at) AS metric_time__extract_year
     , EXTRACT(day FROM archived_at) AS metric_time__extract_day
-    , 1 AS __archived_users
+    , 1 AS archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
 ) subq_7
 WHERE metric_time__extract_day = '2020-01-01'

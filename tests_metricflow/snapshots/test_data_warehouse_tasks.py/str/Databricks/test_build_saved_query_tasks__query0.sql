@@ -5,14 +5,14 @@ sql_engine: Databricks
 SELECT
   metric_time__day
   , listing__capacity_latest
-  , SUM(__bookings) AS bookings
-  , SUM(__instant_bookings) AS instant_bookings
+  , SUM(bookings) AS bookings
+  , SUM(instant_bookings) AS instant_bookings
 FROM (
   SELECT
     listings_latest_src_10000.capacity AS listing__capacity_latest
     , subq_1.metric_time__day AS metric_time__day
-    , subq_1.__bookings AS __bookings
-    , subq_1.__instant_bookings AS __instant_bookings
+    , subq_1.__bookings AS bookings
+    , subq_1.__instant_bookings AS instant_bookings
   FROM (
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day

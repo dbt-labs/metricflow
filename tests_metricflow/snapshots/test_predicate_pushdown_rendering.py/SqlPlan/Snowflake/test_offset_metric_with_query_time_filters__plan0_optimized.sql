@@ -47,14 +47,14 @@ FROM (
     SELECT
       metric_time__day
       , listing__country_latest
-      , SUM(__bookings) AS bookings
+      , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
       SELECT
         sma_28014_cte.country_latest AS listing__country_latest
         , sma_28009_cte.metric_time__day AS metric_time__day
         , sma_28009_cte.booking__is_instant AS booking__is_instant
-        , sma_28009_cte.__bookings AS __bookings
+        , sma_28009_cte.__bookings AS bookings
       FROM sma_28009_cte
       LEFT OUTER JOIN
         sma_28014_cte
@@ -81,14 +81,14 @@ FROM (
       SELECT
         metric_time__day
         , listing__country_latest
-        , SUM(__bookings) AS __bookings
+        , SUM(bookings) AS __bookings
       FROM (
         -- Join Standard Outputs
         SELECT
           sma_28014_cte.country_latest AS listing__country_latest
           , sma_28009_cte.metric_time__day AS metric_time__day
           , sma_28009_cte.booking__is_instant AS booking__is_instant
-          , sma_28009_cte.__bookings AS __bookings
+          , sma_28009_cte.__bookings AS bookings
         FROM sma_28009_cte
         LEFT OUTER JOIN
           sma_28014_cte

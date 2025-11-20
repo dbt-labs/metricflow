@@ -10,12 +10,12 @@ sql_engine: Databricks
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  SUM(__listings) AS listings
+  SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
   SELECT
     subq_43.listing__views_times_booking_value AS listing__views_times_booking_value
-    , subq_30.__listings AS __listings
+    , subq_30.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'

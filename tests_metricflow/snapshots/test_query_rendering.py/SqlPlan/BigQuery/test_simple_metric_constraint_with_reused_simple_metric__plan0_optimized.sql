@@ -30,13 +30,13 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , SUM(__booking_value) AS booking_value_with_is_instant_constraint
+      , SUM(booking_value) AS booking_value_with_is_instant_constraint
     FROM (
       -- Read From CTE For node_id=sma_28009
       SELECT
         metric_time__day
         , booking__is_instant
-        , __booking_value
+        , __booking_value AS booking_value
       FROM sma_28009_cte
     ) subq_13
     WHERE booking__is_instant
