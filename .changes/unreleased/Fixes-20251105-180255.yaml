@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fixes metricflow not being able to find the profiles.yml in the home directory
+time: 2025-11-05T18:02:55.20941+02:00
+custom:
+    Author: pekapa
+    Issue: https://github.com/dbt-labs/metricflow/issues/1719
