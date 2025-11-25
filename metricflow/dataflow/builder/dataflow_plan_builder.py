@@ -291,8 +291,8 @@ class DataflowPlanBuilder:
         )
         base_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
-                spec_properties=SimpleMetricInputSpecProperties.create_from_simple_metric_inputs(
-                    (base_simple_metric_recipe.simple_metric_input,)
+                spec_properties=SimpleMetricInputSpecProperties.create_from_simple_metric_input(
+                    base_simple_metric_recipe.simple_metric_input
                 ),
                 predicate_pushdown_state=time_range_only_pushdown_state,
                 linkable_spec_set=base_required_linkable_specs,
@@ -306,8 +306,8 @@ class DataflowPlanBuilder:
         )
         conversion_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
-                spec_properties=SimpleMetricInputSpecProperties.create_from_simple_metric_inputs(
-                    (conversion_simple_metric_recipe.simple_metric_input,)
+                spec_properties=SimpleMetricInputSpecProperties.create_from_simple_metric_input(
+                    conversion_simple_metric_recipe.simple_metric_input
                 ),
                 predicate_pushdown_state=disabled_pushdown_state,
                 linkable_spec_set=LinkableSpecSet(),
@@ -1055,7 +1055,7 @@ class DataflowPlanBuilder:
         if spec_properties:
             candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
             candidate_nodes_for_left_side_of_join += self._select_source_nodes_with_simple_metric_inputs(
-                input_specs=set(spec_properties.simple_metric_input_specs),
+                input_specs={spec_properties.simple_metric_input_spec},
                 source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
             default_join_type = SqlJoinType.LEFT_OUTER
@@ -1167,18 +1167,13 @@ class DataflowPlanBuilder:
             data_set = self._node_data_set_resolver.get_output_data_set(node)
 
             if spec_properties:
-                simple_metric_input_specs = spec_properties.simple_metric_input_specs
-                missing_specs = [
-                    spec
-                    for spec in simple_metric_input_specs
-                    if spec not in data_set.instance_set.spec_set.simple_metric_input_specs
-                ]
-                if missing_specs:
+                simple_metric_input_spec = spec_properties.simple_metric_input_spec
+                if simple_metric_input_spec not in data_set.instance_set.spec_set.simple_metric_input_specs:
                     logger.debug(
                         LazyFormat(
                             "Skipping evaluation of the node since it does not have all input specs",
                             node=lambda: node.structure_text(),
-                            missing_specs=missing_specs,
+                            missing_spec=simple_metric_input_spec,
                         )
                     )
                     continue
@@ -1773,7 +1768,7 @@ class DataflowPlanBuilder:
         simple_metric_input_spec = SimpleMetricInputSpec(
             element_name=simple_metric_input.name,
         )
-        spec_properties = SimpleMetricInputSpecProperties.create_from_simple_metric_inputs((simple_metric_input,))
+        spec_properties = SimpleMetricInputSpecProperties.create_from_simple_metric_input(simple_metric_input)
 
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and predicate_pushdown_state.time_range_constraint is not None:
