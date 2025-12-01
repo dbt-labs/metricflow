@@ -86,11 +86,11 @@ FROM (
         FROM (
           -- Constrain Output with WHERE
           SELECT
-            subq_1.subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
-            , subq_1.simple_subdaily_metric_default_day AS __simple_subdaily_metric_default_day
-            , subq_1.simple_subdaily_metric_default_hour AS __simple_subdaily_metric_default_hour
+            subq_1.__subdaily_join_to_time_spine_metric
+            , subq_1.__simple_subdaily_metric_default_day
+            , subq_1.__simple_subdaily_metric_default_hour
             , subq_1.archived_users_join_to_time_spine AS __archived_users_join_to_time_spine
-            , subq_1.archived_users AS __archived_users
+            , subq_1.__archived_users
             , subq_1.home_state
             , subq_1.user__home_state
             , subq_1.ds__day
@@ -472,11 +472,11 @@ FROM (
               , subq_0.user
               , subq_0.home_state
               , subq_0.user__home_state
-              , subq_0.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
-              , subq_0.__simple_subdaily_metric_default_day AS simple_subdaily_metric_default_day
-              , subq_0.__simple_subdaily_metric_default_hour AS simple_subdaily_metric_default_hour
+              , subq_0.__subdaily_join_to_time_spine_metric
+              , subq_0.__simple_subdaily_metric_default_day
+              , subq_0.__simple_subdaily_metric_default_hour
               , subq_0.__archived_users_join_to_time_spine AS archived_users_join_to_time_spine
-              , subq_0.__archived_users AS archived_users
+              , subq_0.__archived_users
             FROM (
               -- Read Elements From Semantic Model 'users_ds_source'
               SELECT
