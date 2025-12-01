@@ -68,9 +68,10 @@ runs:
   - name: Install Hatch
     shell: bash
     # Pin click to avoid bug in 8.3.0 - can remove when a fix is released
+    # `hatch==1.16` gives error `dev-env is not a builder environment`.
     run: |
       pip3 install "click<8.3.0"
-      pip3 install hatch
+      pip3 install "hatch>=1.15,<1.16"
 
   # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
   # cached.
