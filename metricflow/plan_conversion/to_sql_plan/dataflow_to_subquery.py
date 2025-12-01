@@ -900,13 +900,38 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # input_column_alias_to_intermediate_column_alias = {"__bookings": "bookings"}
         column_alias_renamer = ColumnAliasRenamer()
         input_column_alias_to_intermediate_column_alias = {}
-        intermediate_column_alias_to_instance = {}
+        intermediate_column_alias_to_instance: dict[str, MdoInstance] = {}
 
-        for instance in input_dataset.instance_set.as_tuple:
-            next_column_alias = modified_resolver.resolve_spec(instance.spec).column_name
+        input_instance_set = input_dataset.instance_set
+        exposed_simple_metric_names = set(node.exposed_simple_metric_names or ())
+
+        # Map simple-metric inputs to intermediate column aliases.
+        simple_metric_input_column_aliases: set[str] = set()
+        for simple_metric_input_instance in input_instance_set.simple_metric_input_instances:
+            simple_metric_input_spec = simple_metric_input_instance.spec
+            if simple_metric_input_spec.element_name in exposed_simple_metric_names:
+                resolver = modified_resolver
+            else:
+                resolver = self._column_association_resolver
+
+            next_column_alias = resolver.resolve_spec(simple_metric_input_spec).column_name
+            simple_metric_input_column_aliases.add(next_column_alias)
             input_column_alias_to_intermediate_column_alias[
-                instance.associated_column.column_name
-            ] = modified_resolver.resolve_spec(instance.spec).column_name
+                simple_metric_input_instance.associated_column.column_name
+            ] = next_column_alias
+            intermediate_column_alias_to_instance[next_column_alias] = simple_metric_input_instance
+
+        # Map other instances to intermediate column aliases. If an instance maps to an alias that's the same
+        # as a simple-metric instance, only the simple-metric instance will be retained. The exclusion is necessary
+        # to avoid generating a `SELECT` clause with items that have non-unique column aliases e.g. metric and entity
+        # with the same name.
+        for instance in input_instance_set.without_simple_metric_inputs().as_tuple:
+            next_column_alias = self._column_association_resolver.resolve_spec(instance.spec).column_name
+
+            if next_column_alias in simple_metric_input_column_aliases:
+                continue
+
+            input_column_alias_to_intermediate_column_alias[instance.associated_column.column_name] = next_column_alias
             intermediate_column_alias_to_instance[next_column_alias] = instance
 
         inner_query_alias = self._next_unique_table_alias()

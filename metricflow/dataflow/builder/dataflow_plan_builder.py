@@ -369,6 +369,7 @@ class DataflowPlanBuilder:
             .dedupe(),
             custom_granularity_specs=base_required_linkable_specs.time_dimension_specs_with_custom_grain,
             where_filter_specs=base_simple_metric_recipe.combined_filter_spec_set.all_filter_specs,
+            exposed_simple_metric_input_names=(base_spec.element_name,),
         )
 
         # Gets the successful conversions using JoinConversionEventsNode
@@ -1630,7 +1631,10 @@ class DataflowPlanBuilder:
         ]
         if len(queried_non_agg_time_filter_specs) > 0:
             output_node = WhereConstraintNode.create(
-                parent_node=output_node, where_specs=queried_non_agg_time_filter_specs, always_apply=True
+                parent_node=output_node,
+                where_specs=queried_non_agg_time_filter_specs,
+                always_apply=True,
+                exposed_simple_metric_names=[metric_reference.element_name],
             )
 
         # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
@@ -1940,6 +1944,7 @@ class DataflowPlanBuilder:
             ),
             spec_properties=spec_properties,
             queried_linkable_specs_for_semi_additive_join=queried_linkable_specs,
+            exposed_simple_metric_input_names=(simple_metric_input.name,),
         )
 
         aggregate_node = AggregateSimpleMetricInputsNode.create(
@@ -1972,8 +1977,9 @@ class DataflowPlanBuilder:
         spec_properties: Optional[SimpleMetricInputSpecProperties] = None,
         queried_linkable_specs_for_semi_additive_join: Optional[LinkableSpecSet] = None,
         distinct: bool = False,
+        exposed_simple_metric_input_names: Optional[Iterable[str]] = None,
     ) -> DataflowPlanNode:
-        """Adds standard pre-aggegation steps after building source node and before aggregation."""
+        """Adds standard pre-aggregation steps after building source node and before aggregation."""
         output_node = source_node
         if join_targets:
             output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=join_targets)
@@ -1984,7 +1990,11 @@ class DataflowPlanBuilder:
             )
 
         if len(where_filter_specs) > 0:
-            output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
+            output_node = WhereConstraintNode.create(
+                parent_node=output_node,
+                where_specs=where_filter_specs,
+                exposed_simple_metric_names=exposed_simple_metric_input_names,
+            )
 
         if time_range_constraint:
             output_node = ConstrainTimeRangeNode.create(
