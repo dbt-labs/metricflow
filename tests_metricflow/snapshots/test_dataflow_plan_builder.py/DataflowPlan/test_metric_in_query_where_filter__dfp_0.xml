@@ -80,6 +80,7 @@ docstring:
                         <!--       ),                                                  -->
                         <!--     ),                                                    -->
                         <!--   )                                                       -->
+                        <!-- exposed_simple_metric_names = ['listings'] -->
                         <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
                             <!-- node_id = NodeId(id_str='jso_0') -->

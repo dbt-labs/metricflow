@@ -124,6 +124,7 @@ docstring:
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->
+                                <!-- exposed_simple_metric_names = ['booking_value'] -->
                                 <JoinToTimeSpineNode>
                                     <!-- description = 'Join to Time Spine Dataset' -->
                                     <!-- node_id = NodeId(id_str='jts_0') -->
@@ -302,6 +303,7 @@ docstring:
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->
+                                <!-- exposed_simple_metric_names = ['bookers'] -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
                                     <!-- node_id = NodeId(id_str='sma_28009') -->

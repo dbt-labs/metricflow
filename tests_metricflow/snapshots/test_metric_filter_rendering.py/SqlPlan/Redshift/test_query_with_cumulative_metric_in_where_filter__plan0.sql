@@ -25,10 +25,10 @@ FROM (
         -- Constrain Output with WHERE
         SELECT
           subq_13.listings AS __listings
-          , subq_13.lux_listings AS __lux_listings
-          , subq_13.smallest_listing AS __smallest_listing
-          , subq_13.largest_listing AS __largest_listing
-          , subq_13.active_listings AS __active_listings
+          , subq_13.__lux_listings
+          , subq_13.__smallest_listing
+          , subq_13.__largest_listing
+          , subq_13.__active_listings
           , subq_13.country_latest
           , subq_13.is_lux_latest
           , subq_13.capacity_latest
@@ -163,10 +163,10 @@ FROM (
             , subq_5.listing__is_lux_latest AS listing__is_lux_latest
             , subq_5.listing__capacity_latest AS listing__capacity_latest
             , subq_5.__listings AS listings
-            , subq_5.__lux_listings AS lux_listings
-            , subq_5.__smallest_listing AS smallest_listing
-            , subq_5.__largest_listing AS largest_listing
-            , subq_5.__active_listings AS active_listings
+            , subq_5.__lux_listings AS __lux_listings
+            , subq_5.__smallest_listing AS __smallest_listing
+            , subq_5.__largest_listing AS __largest_listing
+            , subq_5.__active_listings AS __active_listings
           FROM (
             -- Metric Time Dimension 'ds'
             SELECT

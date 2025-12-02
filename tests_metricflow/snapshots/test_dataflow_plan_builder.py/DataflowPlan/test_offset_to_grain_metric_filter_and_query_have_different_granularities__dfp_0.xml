@@ -139,6 +139,7 @@ docstring:
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->
+                                <!-- exposed_simple_metric_names = ['bookings'] -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
                                     <!-- node_id = NodeId(id_str='sma_28009') -->

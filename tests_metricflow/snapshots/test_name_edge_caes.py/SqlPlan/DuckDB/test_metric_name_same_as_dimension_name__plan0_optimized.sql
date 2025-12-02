@@ -8,16 +8,16 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  booking__conflicted_name
-  , SUM(__conflicted_name) AS conflicted_name
+  booking__homonymous_metric_and_dimension
+  , SUM(__homonymous_metric_and_dimension) AS homonymous_metric_and_dimension
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['__conflicted_name', 'booking__conflicted_name']
+  -- Pass Only Elements: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
   SELECT
-    'dummy_dimension_value' AS booking__conflicted_name
-    , booking_value AS __conflicted_name
+    'dummy_dimension_value' AS booking__homonymous_metric_and_dimension
+    , booking_value AS __homonymous_metric_and_dimension
   FROM ***************************.fct_bookings bookings_source_src_32000
 ) subq_7
 GROUP BY
-  booking__conflicted_name
+  booking__homonymous_metric_and_dimension

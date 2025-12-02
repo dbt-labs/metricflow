@@ -89,6 +89,7 @@ docstring:
                                 <!--       ),                                      -->
                                 <!--     ),                                        -->
                                 <!--   )                                           -->
+                                <!-- exposed_simple_metric_names = ['average_booking_value'] -->
                                 <JoinOnEntitiesNode>
                                     <!-- description = 'Join Standard Outputs' -->
                                     <!-- node_id = NodeId(id_str='jso_0') -->
@@ -205,6 +206,7 @@ docstring:
                                 <!--       ),                                      -->
                                 <!--     ),                                        -->
                                 <!--   )                                           -->
+                                <!-- exposed_simple_metric_names = ['bookings'] -->
                                 <JoinOnEntitiesNode>
                                     <!-- description = 'Join Standard Outputs' -->
                                     <!-- node_id = NodeId(id_str='jso_1') -->
