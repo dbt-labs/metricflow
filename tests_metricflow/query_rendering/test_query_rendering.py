@@ -614,6 +614,36 @@ def test_non_additive_dimension_with_non_default_grain(
 
 
 @pytest.mark.sql_engine_snapshot
+def test_semi_additive_measure_with_where_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+) -> None:
+    """Tests querying a semi-additive measure with a where filter."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("current_account_balance_by_user",),
+        group_by_names=("user",),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('account__account_type') }} = 'savings'",
+            )
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
 def test_aliases_with_metrics(
     request: FixtureRequest,
