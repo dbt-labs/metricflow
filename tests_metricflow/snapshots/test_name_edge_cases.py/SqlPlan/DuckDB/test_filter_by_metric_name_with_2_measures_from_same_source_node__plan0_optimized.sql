@@ -11,15 +11,18 @@ sql_engine: DuckDB
 -- Write to DataTable
 SELECT
   metric_time__day
-  , SUM(__homonymous_metric_and_entity) AS homonymous_metric_and_entity
-  , SUM(__homonymous_metric_and_dimension) AS homonymous_metric_and_dimension
+  , SUM(homonymous_metric_and_entity) AS homonymous_metric_and_entity
+  , SUM(homonymous_metric_and_dimension) AS homonymous_metric_and_dimension
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
+  -- Pass Only Elements: ['__homonymous_metric_and_entity', '__homonymous_metric_and_dimension', 'metric_time__day']
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
+    , booking_value AS homonymous_metric_and_dimension
+    , booking_value AS homonymous_metric_and_entity
   FROM ***************************.fct_bookings bookings_source_src_32000
-) subq_13
+) subq_16
 WHERE homonymous_metric_and_entity IS NOT NULL
 GROUP BY
   metric_time__day
