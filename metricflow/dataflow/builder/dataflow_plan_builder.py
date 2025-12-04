@@ -30,7 +30,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
@@ -1980,12 +1980,34 @@ class DataflowPlanBuilder:
     ) -> DataflowPlanNode:
         """Adds standard pre-aggegation steps after building source node and before aggregation."""
         output_node = source_node
+        non_additive_dimension_spec = spec_properties.non_additive_dimension_spec if spec_properties else None
+
         if join_targets:
             output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=join_targets)
 
         for custom_granularity_spec in custom_granularity_specs:
             output_node = JoinToCustomGranularityNode.create(
                 parent_node=output_node, time_dimension_spec=custom_granularity_spec
+            )
+
+        # Filter to specs needed for the rest of the query. This is needed to remove the potential for column name
+        # conflicts for elements not needed in the query.
+        if filter_to_specs:
+            preliminary_filter_to_specs = tuple(filter_to_specs.all_specs)
+            # Include specs needed for constraints.
+            for where_filter_spec in where_filter_specs:
+                for linkable_spec in where_filter_spec.linkable_specs:
+                    if linkable_spec not in preliminary_filter_to_specs:
+                        preliminary_filter_to_specs += (linkable_spec,)
+            # TODO: time constraints
+            # Add specs needed for the semi-additive join.
+            if spec_properties and non_additive_dimension_spec:
+                preliminary_filter_to_specs += non_additive_dimension_spec.window_groupings_as_specs
+                preliminary_filter_to_specs += (
+                    non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties),
+                )
+            output_node = FilterElementsNode.create(
+                parent_node=output_node, include_specs=InstanceSpecSet.create_from_specs(preliminary_filter_to_specs)
             )
 
         if len(where_filter_specs) > 0:
@@ -1996,7 +2018,7 @@ class DataflowPlanBuilder:
                 parent_node=output_node, time_range_constraint=time_range_constraint
             )
 
-        if spec_properties and spec_properties.non_additive_dimension_spec:
+        if spec_properties and non_additive_dimension_spec:
             if queried_linkable_specs_for_semi_additive_join is None:
                 raise ValueError(
                     "`queried_linkable_specs_for_semi_additive_join` must be provided in when building pre-aggregation plan "
@@ -2026,21 +2048,13 @@ class DataflowPlanBuilder:
         ), "_build_semi_additive_join_node() should only be called if there is a non_additive_dimension_spec."
         # Apply semi additive join on the node
         agg_time_dimension = spec_properties.agg_time_dimension
-        non_additive_dimension_grain = spec_properties.agg_time_dimension_grain
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = self._find_non_additive_dimension_in_linkable_specs(
             agg_time_dimension=agg_time_dimension,
             linkable_specs=queried_linkable_specs.as_tuple,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
-        time_dimension_spec = TimeDimensionSpec(
-            # The NonAdditiveDimensionSpec name property is a plain element name
-            element_name=non_additive_dimension_spec.name,
-            entity_links=(),
-            time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
-        )
-        window_groupings = tuple(
-            LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
-        )
+        time_dimension_spec = non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties)
+        window_groupings = non_additive_dimension_spec.window_groupings_as_specs
         return SemiAdditiveJoinNode.create(
             parent_node=parent_node,
             entity_specs=window_groupings,
