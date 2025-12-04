@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Filter out unneeded specs in dataflow plan before applying where filter.
+time: 2025-12-04T12:58:47.462903-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1944"
