@@ -22,19 +22,20 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.ds__day, subq_35.ds__day) AS ds__day
-    , COALESCE(subq_27.listing__country_latest, subq_35.listing__country_latest) AS listing__country_latest
-    , MAX(subq_27.bookings) AS bookings
-    , MAX(subq_35.views) AS views
+    COALESCE(subq_30.ds__day, subq_39.ds__day) AS ds__day
+    , COALESCE(subq_30.listing__country_latest, subq_39.listing__country_latest) AS listing__country_latest
+    , MAX(subq_30.bookings) AS bookings
+    , MAX(subq_39.views) AS views
   FROM (
     -- Join Standard Outputs
+    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']
     -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
-      subq_20.ds__day AS ds__day
+      subq_22.ds__day AS ds__day
       , sma_28014_cte.country_latest AS listing__country_latest
-      , SUM(subq_20.__bookings) AS bookings
+      , SUM(subq_22.__bookings) AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -43,24 +44,25 @@ FROM (
         , listing_id AS listing
         , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_20
+    ) subq_22
     LEFT OUTER JOIN
       sma_28014_cte
     ON
-      subq_20.listing = sma_28014_cte.listing
+      subq_22.listing = sma_28014_cte.listing
     GROUP BY
-      subq_20.ds__day
+      subq_22.ds__day
       , sma_28014_cte.country_latest
-  ) subq_27
+  ) subq_30
   FULL OUTER JOIN (
     -- Join Standard Outputs
+    -- Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']
     -- Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
-      subq_29.ds__day AS ds__day
+      subq_32.ds__day AS ds__day
       , sma_28014_cte.country_latest AS listing__country_latest
-      , SUM(subq_29.__views) AS views
+      , SUM(subq_32.__views) AS views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
@@ -69,22 +71,22 @@ FROM (
         , listing_id AS listing
         , 1 AS __views
       FROM ***************************.fct_views views_source_src_28000
-    ) subq_29
+    ) subq_32
     LEFT OUTER JOIN
       sma_28014_cte
     ON
-      subq_29.listing = sma_28014_cte.listing
+      subq_32.listing = sma_28014_cte.listing
     GROUP BY
-      subq_29.ds__day
+      subq_32.ds__day
       , sma_28014_cte.country_latest
-  ) subq_35
+  ) subq_39
   ON
     (
-      subq_27.listing__country_latest = subq_35.listing__country_latest
+      subq_30.listing__country_latest = subq_39.listing__country_latest
     ) AND (
-      subq_27.ds__day = subq_35.ds__day
+      subq_30.ds__day = subq_39.ds__day
     )
   GROUP BY
-    COALESCE(subq_27.ds__day, subq_35.ds__day)
-    , COALESCE(subq_27.listing__country_latest, subq_35.listing__country_latest)
-) subq_36
+    COALESCE(subq_30.ds__day, subq_39.ds__day)
+    , COALESCE(subq_30.listing__country_latest, subq_39.listing__country_latest)
+) subq_40

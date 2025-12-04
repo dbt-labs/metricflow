@@ -23,7 +23,7 @@ docstring:
                     <FilterElementsNode>
                         <!-- description =                                                                         -->
                         <!--   "Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']" -->
-                        <!-- node_id = NodeId(id_str='pfe_1') -->
+                        <!-- node_id = NodeId(id_str='pfe_2') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                         <!-- include_spec =                                               -->
                         <!--   DimensionSpec(                                             -->
@@ -36,43 +36,60 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <JoinOnEntitiesNode>
-                            <!-- description = 'Join Standard Outputs' -->
-                            <!-- node_id = NodeId(id_str='jso_0') -->
-                            <!-- join0_for_node_id_pfe_0 =                                      -->
-                            <!--   JoinDescription(                                             -->
-                            <!--     join_node=FilterElementsNode(node_id=pfe_0),               -->
-                            <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
-                            <!--     join_type=LEFT_OUTER,                                      -->
-                            <!--   )                                                            -->
-                            <MetricTimeDimensionTransformNode>
-                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_28009') -->
-                                <!-- aggregation_time_dimension = 'ds' -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                    <!-- node_id = NodeId(id_str='rss_28020') -->
-                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                </ReadSqlSourceNode>
-                            </MetricTimeDimensionTransformNode>
-                            <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
-                                <!-- node_id = NodeId(id_str='pfe_0') -->
-                                <!-- include_spec = DimensionSpec(element_name='country_latest') -->
-                                <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
-                                <!-- distinct = False -->
+                        <FilterElementsNode>
+                            <!-- description =                                                                         -->
+                            <!--   "Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']" -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                            <!-- include_spec =                                               -->
+                            <!--   DimensionSpec(                                             -->
+                            <!--     element_name='country_latest',                           -->
+                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--   )                                                          -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
+                            <!-- distinct = False -->
+                            <JoinOnEntitiesNode>
+                                <!-- description = 'Join Standard Outputs' -->
+                                <!-- node_id = NodeId(id_str='jso_0') -->
+                                <!-- join0_for_node_id_pfe_0 =                                      -->
+                                <!--   JoinDescription(                                             -->
+                                <!--     join_node=FilterElementsNode(node_id=pfe_0),               -->
+                                <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
+                                <!--     join_type=LEFT_OUTER,                                      -->
+                                <!--   )                                                            -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_28014') -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
-                                        <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                                        <!-- node_id = NodeId(id_str='rss_28024') -->
-                                        <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
-                            </FilterElementsNode>
-                        </JoinOnEntitiesNode>
+                                <FilterElementsNode>
+                                    <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                                    <!-- include_spec = DimensionSpec(element_name='country_latest') -->
+                                    <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                    <!-- distinct = False -->
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                        <!-- node_id = NodeId(id_str='sma_28014') -->
+                                        <!-- aggregation_time_dimension = 'ds' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                                            <!-- node_id = NodeId(id_str='rss_28024') -->
+                                            <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
+                                </FilterElementsNode>
+                            </JoinOnEntitiesNode>
+                        </FilterElementsNode>
                     </FilterElementsNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
@@ -87,7 +104,7 @@ docstring:
                     <FilterElementsNode>
                         <!-- description =                                                                              -->
                         <!--   "Pass Only Elements: ['__booking_value', 'listing__country_latest', 'metric_time__day']" -->
-                        <!-- node_id = NodeId(id_str='pfe_3') -->
+                        <!-- node_id = NodeId(id_str='pfe_5') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
                         <!-- include_spec =                                               -->
                         <!--   DimensionSpec(                                             -->
@@ -100,43 +117,61 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <JoinOnEntitiesNode>
-                            <!-- description = 'Join Standard Outputs' -->
-                            <!-- node_id = NodeId(id_str='jso_1') -->
-                            <!-- join0_for_node_id_pfe_2 =                                      -->
-                            <!--   JoinDescription(                                             -->
-                            <!--     join_node=FilterElementsNode(node_id=pfe_2),               -->
-                            <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
-                            <!--     join_type=LEFT_OUTER,                                      -->
-                            <!--   )                                                            -->
-                            <MetricTimeDimensionTransformNode>
-                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_28009') -->
-                                <!-- aggregation_time_dimension = 'ds' -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                    <!-- node_id = NodeId(id_str='rss_28020') -->
-                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                </ReadSqlSourceNode>
-                            </MetricTimeDimensionTransformNode>
-                            <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
-                                <!-- node_id = NodeId(id_str='pfe_2') -->
-                                <!-- include_spec = DimensionSpec(element_name='country_latest') -->
-                                <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
-                                <!-- distinct = False -->
+                        <FilterElementsNode>
+                            <!-- description =                                                            -->
+                            <!--   ("Pass Only Elements: ['__booking_value', 'listing__country_latest', " -->
+                            <!--    "'metric_time__day']")                                                -->
+                            <!-- node_id = NodeId(id_str='pfe_4') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
+                            <!-- include_spec =                                               -->
+                            <!--   DimensionSpec(                                             -->
+                            <!--     element_name='country_latest',                           -->
+                            <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--   )                                                          -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
+                            <!-- distinct = False -->
+                            <JoinOnEntitiesNode>
+                                <!-- description = 'Join Standard Outputs' -->
+                                <!-- node_id = NodeId(id_str='jso_1') -->
+                                <!-- join0_for_node_id_pfe_3 =                                      -->
+                                <!--   JoinDescription(                                             -->
+                                <!--     join_node=FilterElementsNode(node_id=pfe_3),               -->
+                                <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
+                                <!--     join_type=LEFT_OUTER,                                      -->
+                                <!--   )                                                            -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_28014') -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
-                                        <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                                        <!-- node_id = NodeId(id_str='rss_28024') -->
-                                        <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
-                            </FilterElementsNode>
-                        </JoinOnEntitiesNode>
+                                <FilterElementsNode>
+                                    <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_3') -->
+                                    <!-- include_spec = DimensionSpec(element_name='country_latest') -->
+                                    <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                    <!-- distinct = False -->
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                        <!-- node_id = NodeId(id_str='sma_28014') -->
+                                        <!-- aggregation_time_dimension = 'ds' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                                            <!-- node_id = NodeId(id_str='rss_28024') -->
+                                            <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
+                                </FilterElementsNode>
+                            </JoinOnEntitiesNode>
+                        </FilterElementsNode>
                     </FilterElementsNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>

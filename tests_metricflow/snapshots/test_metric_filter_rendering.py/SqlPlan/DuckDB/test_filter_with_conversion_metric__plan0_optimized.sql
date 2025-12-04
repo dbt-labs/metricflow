@@ -21,9 +21,10 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['__listings', 'user__visit_buy_conversion_rate']
   SELECT
-    CAST(subq_50.__buys AS DOUBLE) / CAST(NULLIF(subq_50.__visits, 0) AS DOUBLE) AS user__visit_buy_conversion_rate
-    , subq_36.__listings AS listings
+    CAST(subq_60.__buys AS DOUBLE) / CAST(NULLIF(subq_60.__visits, 0) AS DOUBLE) AS user__visit_buy_conversion_rate
+    , subq_43.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -31,15 +32,16 @@ FROM (
       user_id AS user
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_36
+  ) subq_43
   LEFT OUTER JOIN (
     -- Combine Aggregated Outputs
     SELECT
-      COALESCE(subq_40.user, subq_49.user) AS user
-      , MAX(subq_40.__visits) AS __visits
-      , MAX(subq_49.__buys) AS __buys
+      COALESCE(subq_48.user, subq_59.user) AS user
+      , MAX(subq_48.__visits) AS __visits
+      , MAX(subq_59.__buys) AS __buys
     FROM (
       -- Read From CTE For node_id=sma_28019
+      -- Pass Only Elements: ['__visits', 'user']
       -- Pass Only Elements: ['__visits', 'user']
       -- Aggregate Inputs for Simple Metrics
       SELECT
@@ -48,43 +50,44 @@ FROM (
       FROM sma_28019_cte
       GROUP BY
         sma_28019_cte.user
-    ) subq_40
+    ) subq_48
     FULL OUTER JOIN (
       -- Find conversions for user within the range of INF
       -- Pass Only Elements: ['__buys', 'user']
+      -- Pass Only Elements: ['__buys', 'user']
       -- Aggregate Inputs for Simple Metrics
       SELECT
-        subq_46.user
+        subq_55.user
         , SUM(__buys) AS __buys
       FROM (
         -- Dedupe the fanout with mf_internal_uuid in the conversion data set
         SELECT DISTINCT
           FIRST_VALUE(sma_28019_cte.__visits) OVER (
             PARTITION BY
-              subq_45.user
-              , subq_45.metric_time__day
-              , subq_45.mf_internal_uuid
+              subq_54.user
+              , subq_54.metric_time__day
+              , subq_54.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS __visits
           , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
             PARTITION BY
-              subq_45.user
-              , subq_45.metric_time__day
-              , subq_45.mf_internal_uuid
+              subq_54.user
+              , subq_54.metric_time__day
+              , subq_54.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS metric_time__day
           , FIRST_VALUE(sma_28019_cte.user) OVER (
             PARTITION BY
-              subq_45.user
-              , subq_45.metric_time__day
-              , subq_45.mf_internal_uuid
+              subq_54.user
+              , subq_54.metric_time__day
+              , subq_54.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
-          , subq_45.mf_internal_uuid AS mf_internal_uuid
-          , subq_45.__buys AS __buys
+          , subq_54.mf_internal_uuid AS mf_internal_uuid
+          , subq_54.__buys AS __buys
         FROM sma_28019_cte
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
@@ -96,23 +99,23 @@ FROM (
             , 1 AS __buys
             , GEN_RANDOM_UUID() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-        ) subq_45
+        ) subq_54
         ON
           (
-            sma_28019_cte.user = subq_45.user
+            sma_28019_cte.user = subq_54.user
           ) AND (
-            (sma_28019_cte.metric_time__day <= subq_45.metric_time__day)
+            (sma_28019_cte.metric_time__day <= subq_54.metric_time__day)
           )
-      ) subq_46
+      ) subq_55
       GROUP BY
-        subq_46.user
-    ) subq_49
+        subq_55.user
+    ) subq_59
     ON
-      subq_40.user = subq_49.user
+      subq_48.user = subq_59.user
     GROUP BY
-      COALESCE(subq_40.user, subq_49.user)
-  ) subq_50
+      COALESCE(subq_48.user, subq_59.user)
+  ) subq_60
   ON
-    subq_36.user = subq_50.user
-) subq_53
+    subq_43.user = subq_60.user
+) subq_64
 WHERE user__visit_buy_conversion_rate > 2

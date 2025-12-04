@@ -15,19 +15,25 @@ test_filename: test_dataflow_plan_builder.py
                 <!-- null_fill_value_mapping = {'bookings_fill_nulls_with_0': 0} -->
                 <FilterElementsNode>
                     <!-- description = "Pass Only Elements: ['__bookings_fill_nulls_with_0']" -->
-                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                    <!-- node_id = NodeId(id_str='pfe_1') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
                     <!-- distinct = False -->
-                    <MetricTimeDimensionTransformNode>
-                        <!-- description = "Metric Time Dimension 'ds'" -->
-                        <!-- node_id = NodeId(id_str='sma_28009') -->
-                        <!-- aggregation_time_dimension = 'ds' -->
-                        <ReadSqlSourceNode>
-                            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                            <!-- node_id = NodeId(id_str='rss_28020') -->
-                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                        </ReadSqlSourceNode>
-                    </MetricTimeDimensionTransformNode>
+                    <FilterElementsNode>
+                        <!-- description = "Pass Only Elements: ['__bookings_fill_nulls_with_0']" -->
+                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
+                        <!-- distinct = False -->
+                        <MetricTimeDimensionTransformNode>
+                            <!-- description = "Metric Time Dimension 'ds'" -->
+                            <!-- node_id = NodeId(id_str='sma_28009') -->
+                            <!-- aggregation_time_dimension = 'ds' -->
+                            <ReadSqlSourceNode>
+                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                <!-- node_id = NodeId(id_str='rss_28020') -->
+                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                            </ReadSqlSourceNode>
+                        </MetricTimeDimensionTransformNode>
+                    </FilterElementsNode>
                 </FilterElementsNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>

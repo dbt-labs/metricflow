@@ -11,8 +11,8 @@ FROM (
   -- Join to Time Spine Dataset
   -- Compute Metrics via Expressions
   SELECT
-    subq_22.metric_time__day AS metric_time__day
-    , subq_18.__bookings AS bookings_5_days_ago
+    subq_26.metric_time__day AS metric_time__day
+    , subq_21.__bookings AS bookings_5_days_ago
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['metric_time__day']
@@ -21,13 +21,14 @@ FROM (
     FROM (
       -- Read From Time Spine 'mf_time_spine'
       -- Change Column Aliases
+      -- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day']
       SELECT
         ds AS metric_time__day
         , alien_day AS metric_time__alien_day
       FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_20
+    ) subq_24
     WHERE metric_time__alien_day = '2020-01-01'
-  ) subq_22
+  ) subq_26
   INNER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['__bookings', 'metric_time__day']
@@ -38,26 +39,27 @@ FROM (
     FROM (
       -- Metric Time Dimension 'ds'
       -- Join to Custom Granularity Dataset
+      -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__alien_day']
       SELECT
-        subq_13.ds__day AS metric_time__day
-        , subq_13.__bookings AS bookings
-        , subq_14.alien_day AS metric_time__alien_day
+        subq_16.alien_day AS metric_time__alien_day
+        , subq_15.ds__day AS metric_time__day
+        , subq_15.__bookings AS bookings
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         SELECT
           1 AS __bookings
           , DATE_TRUNC('day', ds) AS ds__day
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_13
+      ) subq_15
       LEFT OUTER JOIN
-        ***************************.mf_time_spine subq_14
+        ***************************.mf_time_spine subq_16
       ON
-        subq_13.ds__day = subq_14.ds
-    ) subq_15
+        subq_15.ds__day = subq_16.ds
+    ) subq_18
     WHERE metric_time__alien_day = '2020-01-01'
     GROUP BY
       metric_time__day
-  ) subq_18
+  ) subq_21
   ON
-    subq_22.metric_time__day - INTERVAL 5 day = subq_18.metric_time__day
-) subq_24
+    subq_26.metric_time__day - INTERVAL 5 day = subq_21.metric_time__day
+) subq_28

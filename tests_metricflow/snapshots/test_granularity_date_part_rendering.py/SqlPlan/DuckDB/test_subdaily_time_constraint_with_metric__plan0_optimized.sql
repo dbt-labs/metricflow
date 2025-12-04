@@ -7,18 +7,19 @@ sql_engine: DuckDB
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_21.metric_time__hour AS metric_time__hour
-  , subq_17.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
+  subq_25.metric_time__hour AS metric_time__hour
+  , subq_20.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
 FROM (
   -- Read From Time Spine 'mf_time_spine_hour'
   -- Change Column Aliases
+  -- Pass Only Elements: ['metric_time__hour']
   -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
   -- Pass Only Elements: ['metric_time__hour']
   SELECT
     ts AS metric_time__hour
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
   WHERE ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-) subq_21
+) subq_25
 LEFT OUTER JOIN (
   -- Aggregate Inputs for Simple Metrics
   SELECT
@@ -29,15 +30,16 @@ LEFT OUTER JOIN (
     -- Metric Time Dimension 'archived_at'
     -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
     -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
+    -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
     SELECT
       DATE_TRUNC('hour', archived_at) AS metric_time__hour
       , 1 AS __subdaily_join_to_time_spine_metric
     FROM ***************************.dim_users users_ds_source_src_28000
     WHERE DATE_TRUNC('hour', archived_at) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-  ) subq_16
+  ) subq_19
   GROUP BY
     metric_time__hour
-) subq_17
+) subq_20
 ON
-  subq_21.metric_time__hour = subq_17.metric_time__hour
-WHERE subq_21.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+  subq_25.metric_time__hour = subq_20.metric_time__hour
+WHERE subq_25.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'

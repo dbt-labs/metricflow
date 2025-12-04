@@ -31,9 +31,10 @@ FROM (
     , SUM(booking_value) AS booking_value
   FROM (
     -- Join Standard Outputs
+    -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'listing__booking_fees']
     SELECT
-      subq_27.listing__booking_fees AS listing__booking_fees
-      , sma_28009_cte.metric_time__day AS metric_time__day
+      sma_28009_cte.metric_time__day AS metric_time__day
+      , subq_31.listing__booking_fees AS listing__booking_fees
       , sma_28009_cte.__booking_value AS booking_value
     FROM sma_28009_cte
     LEFT OUTER JOIN (
@@ -45,6 +46,7 @@ FROM (
       FROM (
         -- Read From CTE For node_id=sma_28009
         -- Pass Only Elements: ['__booking_value', 'listing']
+        -- Pass Only Elements: ['__booking_value', 'listing']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
@@ -53,13 +55,13 @@ FROM (
         FROM sma_28009_cte
         GROUP BY
           listing
-      ) subq_25
-    ) subq_27
+      ) subq_29
+    ) subq_31
     ON
-      sma_28009_cte.listing = subq_27.listing
-  ) subq_28
+      sma_28009_cte.listing = subq_31.listing
+  ) subq_33
   WHERE listing__booking_fees > 2
   GROUP BY
     metric_time__day
-) subq_32
+) subq_37
 ORDER BY bookings_alias

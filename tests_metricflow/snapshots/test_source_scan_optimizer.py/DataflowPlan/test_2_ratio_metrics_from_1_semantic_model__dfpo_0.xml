@@ -25,7 +25,7 @@ docstring:
                     <FilterElementsNode>
                         <!-- description =                                                                              -->
                         <!--   "Pass Only Elements: ['__bookings', '__bookers', '__booking_value', 'metric_time__day']" -->
-                        <!-- node_id = NodeId(id_str='pfe_5') -->
+                        <!-- node_id = NodeId(id_str='pfe_11') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
@@ -35,16 +35,31 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <MetricTimeDimensionTransformNode>
-                            <!-- description = "Metric Time Dimension 'ds'" -->
-                            <!-- node_id = NodeId(id_str='sma_2') -->
-                            <!-- aggregation_time_dimension = 'ds' -->
-                            <ReadSqlSourceNode>
-                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                <!-- node_id = NodeId(id_str='rss_2') -->
-                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                            </ReadSqlSourceNode>
-                        </MetricTimeDimensionTransformNode>
+                        <FilterElementsNode>
+                            <!-- description =                                                            -->
+                            <!--   ("Pass Only Elements: ['__bookings', '__bookers', '__booking_value', " -->
+                            <!--    "'metric_time__day']")                                                -->
+                            <!-- node_id = NodeId(id_str='pfe_10') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
+                            <!-- distinct = False -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                <!-- node_id = NodeId(id_str='sma_2') -->
+                                <!-- aggregation_time_dimension = 'ds' -->
+                                <ReadSqlSourceNode>
+                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                    <!-- node_id = NodeId(id_str='rss_2') -->
+                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </FilterElementsNode>
                     </FilterElementsNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>

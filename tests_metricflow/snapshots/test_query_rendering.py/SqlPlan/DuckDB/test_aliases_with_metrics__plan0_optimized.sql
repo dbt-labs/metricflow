@@ -29,11 +29,12 @@ SELECT
   , SUM(bookings) AS bookings_alias
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing', 'listing__booking_fees']
   SELECT
-    subq_29.listing__booking_fees AS listing__booking_fees
-    , listings_latest_src_28000.capacity AS listing__capacity_latest
-    , sma_28009_cte.metric_time__day AS metric_time__day
+    sma_28009_cte.metric_time__day AS metric_time__day
     , sma_28009_cte.listing AS listing
+    , listings_latest_src_28000.capacity AS listing__capacity_latest
+    , subq_33.listing__booking_fees AS listing__booking_fees
     , sma_28009_cte.__bookings AS bookings
   FROM sma_28009_cte
   LEFT OUTER JOIN (
@@ -45,6 +46,7 @@ FROM (
     FROM (
       -- Read From CTE For node_id=sma_28009
       -- Pass Only Elements: ['__booking_value', 'listing']
+      -- Pass Only Elements: ['__booking_value', 'listing']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -53,15 +55,15 @@ FROM (
       FROM sma_28009_cte
       GROUP BY
         listing
-    ) subq_27
-  ) subq_29
+    ) subq_31
+  ) subq_33
   ON
-    sma_28009_cte.listing = subq_29.listing
+    sma_28009_cte.listing = subq_33.listing
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000
   ON
     sma_28009_cte.listing = listings_latest_src_28000.listing_id
-) subq_33
+) subq_38
 WHERE listing__booking_fees > 2
 GROUP BY
   metric_time__day
