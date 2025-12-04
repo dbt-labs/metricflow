@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
+from typing import Generic, List, Sequence, Tuple, TypeVar
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, MetricModelReference, SemanticModelElementReference
@@ -407,26 +407,6 @@ class InstanceSet(SerializableDataclass):
             group_by_metric_instances=self.group_by_metric_instances,
             metric_instances=self.metric_instances,
             metadata_instances=self.metadata_instances,
-        )
-
-    def with_substituted_fields(  # noqa: D102
-        self,
-        simple_metric_input_instances: Optional[Sequence[SimpleMetricInputInstance]] = None,
-        dimension_instances: Optional[Sequence[DimensionInstance]] = None,
-        time_dimension_instances: Optional[Sequence[TimeDimensionInstance]] = None,
-        entity_instances: Optional[Sequence[EntityInstance]] = None,
-        group_by_metric_instances: Optional[Sequence[GroupByMetricInstance]] = None,
-        metric_instances: Optional[Sequence[MetricInstance]] = None,
-        metadata_instances: Optional[Sequence[MetadataInstance]] = None,
-    ) -> InstanceSet:
-        return InstanceSet(
-            simple_metric_input_instances=tuple(simple_metric_input_instances or self.simple_metric_input_instances),
-            dimension_instances=tuple(dimension_instances or self.dimension_instances),
-            time_dimension_instances=tuple(time_dimension_instances or self.time_dimension_instances),
-            entity_instances=tuple(entity_instances or self.entity_instances),
-            group_by_metric_instances=tuple(group_by_metric_instances or self.group_by_metric_instances),
-            metric_instances=tuple(metric_instances or self.metric_instances),
-            metadata_instances=tuple(metadata_instances or self.metadata_instances),
         )
 
 
