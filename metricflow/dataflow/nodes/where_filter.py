@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Optional, Sequence, Tuple
+from typing import Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
-from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
@@ -20,38 +19,25 @@ class WhereConstraintNode(DataflowPlanNode):
     Attributes:
         where_specs: Specifications for the WHERE clause to filter rows.
         always_apply: Indicator if the WHERE clause should always be applied.
-        exposed_simple_metric_names: Before the measure -> simple-metric migration, a column with the same name as
-        a measure was present in the `SELECT` associated with this node. Although unsupported, customers may have
-        written SQL that depends on this behavior. Post-migration, simple-metric inputs are normally associated with a
-        column alias that has a dunder prefix. To replicate the prior behavior, this field can be set with the names
-        of the simple-metrics that should be associated with a column name without a dunder prefix. Entity instances
-        with the same name as one of the simple metrics specified here will not be available in this node or
-        the downstream nodes.
     """
 
-    where_specs: Tuple[WhereFilterSpec, ...]
+    where_specs: Sequence[WhereFilterSpec]
     always_apply: bool
-    exposed_simple_metric_names: Tuple[str, ...]
 
     def __post_init__(self) -> None:  # noqa: D105
         super().__post_init__()
         assert len(self.parent_nodes) == 1
-        assert len(self.exposed_simple_metric_names) == len(set(self.exposed_simple_metric_names))
 
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         where_specs: Sequence[WhereFilterSpec],
         always_apply: bool = False,
-        exposed_simple_metric_names: Optional[Iterable[str]] = None,
     ) -> WhereConstraintNode:
         return WhereConstraintNode(
             parent_nodes=(parent_node,),
-            where_specs=tuple(where_specs),
+            where_specs=where_specs,
             always_apply=always_apply,
-            exposed_simple_metric_names=tuple(FrozenOrderedSet(exposed_simple_metric_names))
-            if exposed_simple_metric_names is not None
-            else (),
         )
 
     @classmethod
@@ -88,12 +74,9 @@ class WhereConstraintNode(DataflowPlanNode):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        properties = list(super().displayed_properties)
-        properties.append(DisplayedProperty("where_condition", self.where))
+        properties = tuple(super().displayed_properties) + (DisplayedProperty("where_condition", self.where),)
         if self.always_apply:
-            properties.append(DisplayedProperty("All filters always applied:", self.always_apply))
-        if self.exposed_simple_metric_names:
-            properties.append(DisplayedProperty("exposed_simple_metric_names", list(self.exposed_simple_metric_names)))
+            properties = properties + (DisplayedProperty("All filters always applied:", self.always_apply),)
         return properties
 
     def functionally_identical(self, other_node: DataflowPlanNode) -> bool:  # noqa: D102
@@ -101,7 +84,6 @@ class WhereConstraintNode(DataflowPlanNode):
             isinstance(other_node, self.__class__)
             and other_node.where == self.where
             and other_node.always_apply == self.always_apply
-            and other_node.exposed_simple_metric_names == self.exposed_simple_metric_names
         )
 
     def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WhereConstraintNode:  # noqa: D102
@@ -110,5 +92,4 @@ class WhereConstraintNode(DataflowPlanNode):
             parent_node=new_parent_nodes[0],
             where_specs=self.input_where_specs,
             always_apply=self.always_apply,
-            exposed_simple_metric_names=self.exposed_simple_metric_names,
         )

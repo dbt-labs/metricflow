@@ -18,11 +18,11 @@ FROM (
     FROM (
       -- Constrain Output with WHERE
       SELECT
-        subq_0.__listings
-        , subq_0.__lux_listings
-        , subq_0.__smallest_listing
-        , subq_0.__largest_listing
-        , subq_0.__active_listings
+        subq_0.listings AS __listings
+        , subq_0.lux_listings AS __lux_listings
+        , subq_0.smallest_listing AS __smallest_listing
+        , subq_0.largest_listing AS __largest_listing
+        , subq_0.active_listings AS __active_listings
         , subq_0.country_latest
         , subq_0.is_lux_latest
         , subq_0.capacity_latest
@@ -79,11 +79,11 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'listings_latest'
         SELECT
-          1 AS __listings
-          , 1 AS __lux_listings
-          , listings_latest_src_28000.capacity AS __smallest_listing
-          , listings_latest_src_28000.capacity AS __largest_listing
-          , 1 AS __active_listings
+          1 AS listings
+          , 1 AS lux_listings
+          , listings_latest_src_28000.capacity AS smallest_listing
+          , listings_latest_src_28000.capacity AS largest_listing
+          , 1 AS active_listings
           , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
           , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
           , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month

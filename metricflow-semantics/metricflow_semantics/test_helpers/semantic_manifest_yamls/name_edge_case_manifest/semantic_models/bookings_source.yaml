@@ -14,13 +14,8 @@ semantic_model:
     - name: booking_value
       agg: sum
 
-  entities:
-    - name: homonymous_metric_and_entity
-      expr: "'dummy_entity_value'"
-      type: unique
-
   dimensions:
-    - name: homonymous_metric_and_dimension
+    - name: conflicted_name
       expr: "'dummy_dimension_value'"
       type: categorical
     - name: ds
