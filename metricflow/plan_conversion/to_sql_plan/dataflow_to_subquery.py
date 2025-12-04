@@ -997,7 +997,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         """Build SqlStringExpression from WhereFilterSpec."""
         column_associations_in_where_sql = CreateColumnAssociations(
             column_association_resolver=self._column_association_resolver
-        ).transform(spec_set=InstanceSpecSet.create_from_specs(where_filter.linkable_specs))
+        ).transform(spec_set=where_filter.instance_spec_set)
         return SqlStringExpression.create(
             sql_expr=where_filter.where_sql,
             used_columns=tuple(
@@ -1139,20 +1139,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         from_data_set_alias = self._next_unique_table_alias()
 
-        time_dimension_instances_for_metric_time = sorted(
-            [
-                instance
-                for instance in from_data_set.metric_time_dimension_instances
-                if not instance.spec.has_custom_grain and not instance.spec.date_part
-            ],
-            key=lambda x: x.spec.base_granularity_sort_key,
-        )
-
-        assert (
-            len(time_dimension_instances_for_metric_time) > 0
-        ), "No metric time dimensions with standard granularities found in the input data set for this node"
-
-        time_dimension_instance_for_metric_time = time_dimension_instances_for_metric_time[0]
+        time_dimension_instance_for_metric_time = from_data_set.metric_time_instance_for_time_constraint
 
         # Build an expression like "ds >= CAST('2020-01-01' AS TIMESTAMP) AND ds <= CAST('2020-01-02' AS TIMESTAMP)"
         constrain_metric_time_column_condition = DataflowNodeToSqlSubqueryVisitor._make_time_range_comparison_expr(

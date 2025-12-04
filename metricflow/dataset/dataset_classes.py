@@ -34,6 +34,24 @@ class DataSet(ABC):
             if time_dimension_instance.spec.element_name == DataSet.metric_time_dimension_name()
         )
 
+    @property
+    def metric_time_instance_for_time_constraint(self) -> TimeDimensionInstance:
+        """Returns the metric time instance that should be used for a time constraint if one was requested."""
+        metric_time_instances = sorted(
+            (
+                instance
+                for instance in self.metric_time_dimension_instances
+                if not instance.spec.has_custom_grain and not instance.spec.date_part
+            ),
+            key=lambda x: x.spec.base_granularity_sort_key,
+        )
+
+        assert (
+            len(metric_time_instances) > 0
+        ), "No metric time dimensions with standard granularities found in the input data set for this node"
+
+        return metric_time_instances[0]
+
     @staticmethod
     def metric_time_dimension_reference() -> TimeDimensionReference:
         """Returns a special reference that means 'the aggregation time dimension for all simple-metric inputs in the data set'.
