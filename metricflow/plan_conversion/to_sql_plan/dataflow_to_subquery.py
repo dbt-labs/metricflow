@@ -904,9 +904,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         for instance in input_dataset.instance_set.as_tuple:
             next_column_alias = modified_resolver.resolve_spec(instance.spec).column_name
-            input_column_alias_to_intermediate_column_alias[
-                instance.associated_column.column_name
-            ] = modified_resolver.resolve_spec(instance.spec).column_name
+            input_column_alias_to_intermediate_column_alias[instance.associated_column.column_name] = (
+                modified_resolver.resolve_spec(instance.spec).column_name
+            )
             intermediate_column_alias_to_instance[next_column_alias] = instance
 
         inner_query_alias = self._next_unique_table_alias()
@@ -967,9 +967,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         #   WHERE bookings IS NOT NULL
         intermediate_column_alias_to_output_column_alias = {}
         for intermediate_column_alias, instance in intermediate_column_alias_to_instance.items():
-            intermediate_column_alias_to_output_column_alias[
-                intermediate_column_alias
-            ] = self._column_association_resolver.resolve_spec(instance.spec).column_name
+            intermediate_column_alias_to_output_column_alias[intermediate_column_alias] = (
+                self._column_association_resolver.resolve_spec(instance.spec).column_name
+            )
 
         outer_select_node = column_alias_renamer.rename(
             select_statement_node=outer_select_node,
@@ -1231,9 +1231,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     spec=metric_time_dimension_spec,
                 )
             )
-            output_column_to_input_column[
-                metric_time_dimension_column_association.column_name
-            ] = matching_time_dimension_instance.associated_column.column_name
+            output_column_to_input_column[metric_time_dimension_column_association.column_name] = (
+                matching_time_dimension_instance.associated_column.column_name
+            )
 
         output_instance_set = InstanceSet(
             simple_metric_input_instances=tuple(output_simple_metric_input_instances),
@@ -1276,7 +1276,6 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Get the output_instance_set of the parent_node
         output_instance_set = from_data_set.instance_set
-        output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
 
         # Build the JoinDescriptions to handle the row base filtering on the output_data_set
         inner_join_data_set_alias = self._next_unique_table_alias()
