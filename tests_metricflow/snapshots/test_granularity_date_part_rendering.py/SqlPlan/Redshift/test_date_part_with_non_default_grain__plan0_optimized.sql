@@ -13,12 +13,13 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
+  -- Pass Only Elements: ['__archived_users', 'metric_time__extract_year', 'metric_time__extract_day']
   SELECT
     EXTRACT(year FROM archived_at) AS metric_time__extract_year
     , EXTRACT(day FROM archived_at) AS metric_time__extract_day
     , 1 AS archived_users
   FROM ***************************.dim_users users_ds_source_src_28000
-) subq_7
+) subq_9
 WHERE metric_time__extract_day = '2020-01-01'
 GROUP BY
   metric_time__extract_year

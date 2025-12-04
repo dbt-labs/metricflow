@@ -12,10 +12,11 @@ SELECT
   listing__country_latest
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
+  -- Pass Only Elements: ['listing__country_latest']
   SELECT
     country AS listing__country_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_4
+) subq_6
 WHERE listing__country_latest = 'us'
 GROUP BY
   listing__country_latest

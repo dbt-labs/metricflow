@@ -29,17 +29,18 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day) AS metric_time__day
-    , COALESCE(MAX(subq_30.__visits_fill_nulls_with_0_join_to_timespine), 0) AS __visits_fill_nulls_with_0_join_to_timespine
-    , COALESCE(MAX(subq_43.__buys_fill_nulls_with_0_join_to_timespine), 0) AS __buys_fill_nulls_with_0_join_to_timespine
+    COALESCE(subq_37.metric_time__day, subq_53.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(subq_37.__visits_fill_nulls_with_0_join_to_timespine), 0) AS __visits_fill_nulls_with_0_join_to_timespine
+    , COALESCE(MAX(subq_53.__buys_fill_nulls_with_0_join_to_timespine), 0) AS __buys_fill_nulls_with_0_join_to_timespine
   FROM (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_26.__visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
+      , subq_32.__visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
     FROM rss_28018_cte
     LEFT OUTER JOIN (
       -- Read From CTE For node_id=sma_28019
+      -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
       -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
@@ -48,18 +49,19 @@ FROM (
       FROM sma_28019_cte
       GROUP BY
         metric_time__day
-    ) subq_26
+    ) subq_32
     ON
-      rss_28018_cte.ds__day = subq_26.metric_time__day
-  ) subq_30
+      rss_28018_cte.ds__day = subq_32.metric_time__day
+  ) subq_37
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_39.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
+      , subq_48.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
     FROM rss_28018_cte
     LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
+      -- Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
       -- Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
@@ -70,30 +72,30 @@ FROM (
         SELECT DISTINCT
           FIRST_VALUE(sma_28019_cte.__visits_fill_nulls_with_0_join_to_timespine) OVER (
             PARTITION BY
-              subq_35.user
-              , subq_35.metric_time__day
-              , subq_35.mf_internal_uuid
+              subq_43.user
+              , subq_43.metric_time__day
+              , subq_43.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS __visits_fill_nulls_with_0_join_to_timespine
           , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
             PARTITION BY
-              subq_35.user
-              , subq_35.metric_time__day
-              , subq_35.mf_internal_uuid
+              subq_43.user
+              , subq_43.metric_time__day
+              , subq_43.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS metric_time__day
           , FIRST_VALUE(sma_28019_cte.user) OVER (
             PARTITION BY
-              subq_35.user
-              , subq_35.metric_time__day
-              , subq_35.mf_internal_uuid
+              subq_43.user
+              , subq_43.metric_time__day
+              , subq_43.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
-          , subq_35.mf_internal_uuid AS mf_internal_uuid
-          , subq_35.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
+          , subq_43.mf_internal_uuid AS mf_internal_uuid
+          , subq_43.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
         FROM sma_28019_cte
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
@@ -105,26 +107,26 @@ FROM (
             , 1 AS __buys_fill_nulls_with_0_join_to_timespine
             , UUID() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-        ) subq_35
+        ) subq_43
         ON
           (
-            sma_28019_cte.user = subq_35.user
+            sma_28019_cte.user = subq_43.user
           ) AND (
             (
-              sma_28019_cte.metric_time__day <= subq_35.metric_time__day
+              sma_28019_cte.metric_time__day <= subq_43.metric_time__day
             ) AND (
-              sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_35.metric_time__day)
+              sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_43.metric_time__day)
             )
           )
-      ) subq_36
+      ) subq_44
       GROUP BY
         metric_time__day
-    ) subq_39
+    ) subq_48
     ON
-      rss_28018_cte.ds__day = subq_39.metric_time__day
-  ) subq_43
+      rss_28018_cte.ds__day = subq_48.metric_time__day
+  ) subq_53
   ON
-    subq_30.metric_time__day = subq_43.metric_time__day
+    subq_37.metric_time__day = subq_53.metric_time__day
   GROUP BY
-    COALESCE(subq_30.metric_time__day, subq_43.metric_time__day)
-) subq_44
+    COALESCE(subq_37.metric_time__day, subq_53.metric_time__day)
+) subq_54

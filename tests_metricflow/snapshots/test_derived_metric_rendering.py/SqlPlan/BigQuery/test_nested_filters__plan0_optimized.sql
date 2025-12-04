@@ -15,9 +15,9 @@ FROM (
   FROM (
     -- Combine Aggregated Outputs
     SELECT
-      MAX(subq_35.average_booking_value) AS average_booking_value
-      , MAX(subq_35.bookings) AS bookings
-      , MAX(subq_41.booking_value) AS booking_value
+      MAX(subq_39.average_booking_value) AS average_booking_value
+      , MAX(subq_39.bookings) AS bookings
+      , MAX(subq_46.booking_value) AS booking_value
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['__average_booking_value', '__bookings']
@@ -28,11 +28,12 @@ FROM (
         , SUM(bookings) AS bookings
       FROM (
         -- Join Standard Outputs
+        -- Pass Only Elements: ['__average_booking_value', '__bookings', 'listing__is_lux_latest', 'booking__is_instant']
         SELECT
-          listings_latest_src_28000.is_lux AS listing__is_lux_latest
-          , subq_27.booking__is_instant AS booking__is_instant
-          , subq_27.__bookings AS bookings
-          , subq_27.__average_booking_value AS average_booking_value
+          subq_30.booking__is_instant AS booking__is_instant
+          , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+          , subq_30.__bookings AS bookings
+          , subq_30.__average_booking_value AS average_booking_value
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           -- Metric Time Dimension 'ds'
@@ -42,14 +43,14 @@ FROM (
             , 1 AS __bookings
             , booking_value AS __average_booking_value
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_27
+        ) subq_30
         LEFT OUTER JOIN
           ***************************.dim_listings_latest listings_latest_src_28000
         ON
-          subq_27.listing = listings_latest_src_28000.listing_id
-      ) subq_31
+          subq_30.listing = listings_latest_src_28000.listing_id
+      ) subq_35
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
-    ) subq_35
+    ) subq_39
     CROSS JOIN (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['__booking_value']
@@ -60,12 +61,13 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['__booking_value', 'booking__is_instant']
         SELECT
           is_instant AS booking__is_instant
           , booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_37
+      ) subq_42
       WHERE booking__is_instant
-    ) subq_41
-  ) subq_42
-) subq_43
+    ) subq_46
+  ) subq_47
+) subq_48

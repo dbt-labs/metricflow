@@ -12,7 +12,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28005.ts AS metric_time__hour
-    , subq_13.__archived_users AS archived_users
+    , subq_16.__archived_users AS archived_users
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
   INNER JOIN (
     -- Aggregate Inputs for Simple Metrics
@@ -23,14 +23,15 @@ FROM (
       -- Read Elements From Semantic Model 'users_ds_source'
       -- Metric Time Dimension 'archived_at'
       -- Pass Only Elements: ['__archived_users', 'metric_time__hour']
+      -- Pass Only Elements: ['__archived_users', 'metric_time__hour']
       SELECT
         DATE_TRUNC('hour', archived_at) AS metric_time__hour
         , 1 AS __archived_users
       FROM ***************************.dim_users users_ds_source_src_28000
-    ) subq_12
+    ) subq_15
     GROUP BY
       metric_time__hour
-  ) subq_13
+  ) subq_16
   ON
-    DATEADD(hour, -1, time_spine_src_28005.ts) = subq_13.metric_time__hour
-) subq_18
+    DATEADD(hour, -1, time_spine_src_28005.ts) = subq_16.metric_time__hour
+) subq_22

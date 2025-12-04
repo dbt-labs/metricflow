@@ -13,13 +13,14 @@ FROM (
   -- Join to Time Spine Dataset
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['__bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
+  -- Pass Only Elements: ['__bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
-    subq_30.alien_day AS metric_time__alien_day
-    , DATE_TRUNC('month', subq_27.ds__day__lead) AS booking__ds__month
-    , EXTRACT(year FROM subq_27.ds__day__lead) AS metric_time__extract_year
-    , SUM(subq_23.__bookings) AS bookings
+    subq_33.alien_day AS metric_time__alien_day
+    , DATE_TRUNC('month', subq_29.ds__day__lead) AS booking__ds__month
+    , EXTRACT(year FROM subq_29.ds__day__lead) AS metric_time__extract_year
+    , SUM(subq_25.__bookings) AS bookings
   FROM (
     -- Offset Base Granularity By Custom Granularity Period(s)
     WITH cte_6 AS (
@@ -48,8 +49,8 @@ FROM (
     SELECT
       cte_6.ds__day AS ds__day
       , CASE
-        WHEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_26.ds__alien_day__first_value__lead) <= subq_26.ds__alien_day__last_value__lead
-          THEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_26.ds__alien_day__first_value__lead)
+        WHEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_28.ds__alien_day__first_value__lead) <= subq_28.ds__alien_day__last_value__lead
+          THEN DATE_ADD('day', (cte_6.ds__day__row_number - 1), subq_28.ds__alien_day__first_value__lead)
         ELSE NULL
       END AS ds__day__lead
     FROM cte_6
@@ -70,11 +71,11 @@ FROM (
           ds__alien_day
           , ds__alien_day__first_value
           , ds__alien_day__last_value
-      ) subq_25
-    ) subq_26
+      ) subq_27
+    ) subq_28
     ON
-      cte_6.ds__alien_day = subq_26.ds__alien_day
-  ) subq_27
+      cte_6.ds__alien_day = subq_28.ds__alien_day
+  ) subq_29
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -82,15 +83,15 @@ FROM (
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_23
+  ) subq_25
   ON
-    subq_27.ds__day = subq_23.metric_time__day
+    subq_29.ds__day = subq_25.metric_time__day
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_30
+    ***************************.mf_time_spine subq_33
   ON
-    subq_27.ds__day__lead = subq_30.ds
+    subq_29.ds__day__lead = subq_33.ds
   GROUP BY
-    subq_30.alien_day
-    , DATE_TRUNC('month', subq_27.ds__day__lead)
-    , EXTRACT(year FROM subq_27.ds__day__lead)
-) subq_34
+    subq_33.alien_day
+    , DATE_TRUNC('month', subq_29.ds__day__lead)
+    , EXTRACT(year FROM subq_29.ds__day__lead)
+) subq_38

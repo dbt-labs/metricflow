@@ -25,12 +25,13 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_18.metric_time__day, subq_27.metric_time__day) AS metric_time__day
-    , COALESCE(subq_18.visit__referrer_id, subq_27.visit__referrer_id) AS visit__referrer_id
-    , MAX(subq_18.__visits) AS __visits
-    , MAX(subq_27.__buys) AS __buys
+    COALESCE(subq_22.metric_time__day, subq_33.metric_time__day) AS metric_time__day
+    , COALESCE(subq_22.visit__referrer_id, subq_33.visit__referrer_id) AS visit__referrer_id
+    , MAX(subq_22.__visits) AS __visits
+    , MAX(subq_33.__buys) AS __buys
   FROM (
     -- Read From CTE For node_id=sma_28019
+    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
     -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
@@ -41,9 +42,10 @@ FROM (
     GROUP BY
       metric_time__day
       , visit__referrer_id
-  ) subq_18
+  ) subq_22
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
+    -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
     -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
@@ -55,51 +57,51 @@ FROM (
       SELECT DISTINCT
         FIRST_VALUE(sma_28019_cte.__visits) OVER (
           PARTITION BY
-            subq_23.user
-            , subq_23.metric_time__day
-            , subq_23.mf_internal_uuid
-            , subq_23.session_id
+            subq_28.user
+            , subq_28.metric_time__day
+            , subq_28.mf_internal_uuid
+            , subq_28.session_id
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS __visits
         , FIRST_VALUE(sma_28019_cte.visit__referrer_id) OVER (
           PARTITION BY
-            subq_23.user
-            , subq_23.metric_time__day
-            , subq_23.mf_internal_uuid
-            , subq_23.session_id
+            subq_28.user
+            , subq_28.metric_time__day
+            , subq_28.mf_internal_uuid
+            , subq_28.session_id
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
         , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
           PARTITION BY
-            subq_23.user
-            , subq_23.metric_time__day
-            , subq_23.mf_internal_uuid
-            , subq_23.session_id
+            subq_28.user
+            , subq_28.metric_time__day
+            , subq_28.mf_internal_uuid
+            , subq_28.session_id
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
         , FIRST_VALUE(sma_28019_cte.user) OVER (
           PARTITION BY
-            subq_23.user
-            , subq_23.metric_time__day
-            , subq_23.mf_internal_uuid
-            , subq_23.session_id
+            subq_28.user
+            , subq_28.metric_time__day
+            , subq_28.mf_internal_uuid
+            , subq_28.session_id
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , FIRST_VALUE(sma_28019_cte.session) OVER (
           PARTITION BY
-            subq_23.user
-            , subq_23.metric_time__day
-            , subq_23.mf_internal_uuid
-            , subq_23.session_id
+            subq_28.user
+            , subq_28.metric_time__day
+            , subq_28.mf_internal_uuid
+            , subq_28.session_id
           ORDER BY sma_28019_cte.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS session
-        , subq_23.mf_internal_uuid AS mf_internal_uuid
-        , subq_23.__buys AS __buys
+        , subq_28.mf_internal_uuid AS mf_internal_uuid
+        , subq_28.__buys AS __buys
       FROM sma_28019_cte
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
@@ -112,31 +114,31 @@ FROM (
           , 1 AS __buys
           , uuid() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-      ) subq_23
+      ) subq_28
       ON
         (
-          sma_28019_cte.user = subq_23.user
+          sma_28019_cte.user = subq_28.user
         ) AND (
-          sma_28019_cte.session = subq_23.session_id
+          sma_28019_cte.session = subq_28.session_id
         ) AND (
           (
-            sma_28019_cte.metric_time__day <= subq_23.metric_time__day
+            sma_28019_cte.metric_time__day <= subq_28.metric_time__day
           ) AND (
-            sma_28019_cte.metric_time__day > DATE_ADD('day', -7, subq_23.metric_time__day)
+            sma_28019_cte.metric_time__day > DATE_ADD('day', -7, subq_28.metric_time__day)
           )
         )
-    ) subq_24
+    ) subq_29
     GROUP BY
       metric_time__day
       , visit__referrer_id
-  ) subq_27
+  ) subq_33
   ON
     (
-      subq_18.visit__referrer_id = subq_27.visit__referrer_id
+      subq_22.visit__referrer_id = subq_33.visit__referrer_id
     ) AND (
-      subq_18.metric_time__day = subq_27.metric_time__day
+      subq_22.metric_time__day = subq_33.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_18.metric_time__day, subq_27.metric_time__day)
-    , COALESCE(subq_18.visit__referrer_id, subq_27.visit__referrer_id)
-) subq_28
+    COALESCE(subq_22.metric_time__day, subq_33.metric_time__day)
+    , COALESCE(subq_22.visit__referrer_id, subq_33.visit__referrer_id)
+) subq_34

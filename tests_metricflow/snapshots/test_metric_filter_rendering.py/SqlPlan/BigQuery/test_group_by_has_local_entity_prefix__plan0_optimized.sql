@@ -21,12 +21,14 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['__listings', 'user__listing__user__average_booking_value']
   SELECT
-    subq_32.listing__user__average_booking_value AS user__listing__user__average_booking_value
+    subq_36.listing__user__average_booking_value AS user__listing__user__average_booking_value
     , sma_28014_cte.__listings AS listings
   FROM sma_28014_cte
   LEFT OUTER JOIN (
     -- Join Standard Outputs
+    -- Pass Only Elements: ['__average_booking_value', 'listing__user']
     -- Pass Only Elements: ['__average_booking_value', 'listing__user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -41,8 +43,8 @@ FROM (
       bookings_source_src_28000.listing_id = sma_28014_cte.listing
     GROUP BY
       listing__user
-  ) subq_32
+  ) subq_36
   ON
-    sma_28014_cte.user = subq_32.listing__user
-) subq_33
+    sma_28014_cte.user = subq_36.listing__user
+) subq_38
 WHERE user__listing__user__average_booking_value > 1

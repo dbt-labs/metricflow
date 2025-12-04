@@ -12,10 +12,11 @@ FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
+  -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
   SELECT
     EXTRACT(DAY_OF_WEEK FROM ds) AS metric_time__extract_dow
     , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_9
 GROUP BY
   metric_time__extract_dow

@@ -23,7 +23,7 @@ FROM (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_25.bookings_offset_once AS bookings_offset_once
+      , subq_30.bookings_offset_once AS bookings_offset_once
     FROM rss_28018_cte
     INNER JOIN (
       -- Compute Metrics via Expressions
@@ -35,7 +35,7 @@ FROM (
         -- Compute Metrics via Expressions
         SELECT
           rss_28018_cte.ds__day AS metric_time__day
-          , subq_19.__bookings AS bookings
+          , subq_23.__bookings AS bookings
         FROM rss_28018_cte
         INNER JOIN (
           -- Aggregate Inputs for Simple Metrics
@@ -46,20 +46,21 @@ FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             -- Metric Time Dimension 'ds'
             -- Pass Only Elements: ['__bookings', 'metric_time__day']
+            -- Pass Only Elements: ['__bookings', 'metric_time__day']
             SELECT
               DATE_TRUNC('day', ds) AS metric_time__day
               , 1 AS __bookings
             FROM ***************************.fct_bookings bookings_source_src_28000
-          ) subq_18
+          ) subq_22
           GROUP BY
             metric_time__day
-        ) subq_19
+        ) subq_23
         ON
-          rss_28018_cte.ds__day - MAKE_INTERVAL(days => 5) = subq_19.metric_time__day
-      ) subq_24
-    ) subq_25
+          rss_28018_cte.ds__day - MAKE_INTERVAL(days => 5) = subq_23.metric_time__day
+      ) subq_29
+    ) subq_30
     ON
-      rss_28018_cte.ds__day - MAKE_INTERVAL(days => 2) = subq_25.metric_time__day
-  ) subq_29
+      rss_28018_cte.ds__day - MAKE_INTERVAL(days => 2) = subq_30.metric_time__day
+  ) subq_35
   WHERE metric_time__day = '2020-01-12' or metric_time__day = '2020-01-13'
-) subq_30
+) subq_36

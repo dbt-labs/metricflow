@@ -21,25 +21,26 @@ FROM (
   FROM (
     -- Join Self Over Time Range
     -- Pass Only Elements: ['__revenue', 'metric_time__week', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__week', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
     SELECT
-      subq_14.ds AS metric_time__day
-      , DATETIME_TRUNC(subq_14.ds, isoweek) AS metric_time__week
+      subq_15.ds AS metric_time__day
+      , DATETIME_TRUNC(subq_15.ds, isoweek) AS metric_time__week
       , SUM(revenue_src_28000.revenue) AS revenue_all_time
-    FROM ***************************.mf_time_spine subq_14
+    FROM ***************************.mf_time_spine subq_15
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_14.ds
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
       )
     GROUP BY
       metric_time__day
       , metric_time__week
-  ) subq_19
-) subq_20
+  ) subq_21
+) subq_22
 GROUP BY
   metric_time__week
   , revenue_all_time

@@ -22,18 +22,20 @@ SELECT
   COUNT(DISTINCT bookers) AS bookers
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['__bookers', 'listing__bookers']
   SELECT
-    subq_21.listing__bookers AS listing__bookers
-    , subq_16.__bookers AS bookers
+    subq_25.listing__bookers AS listing__bookers
+    , subq_19.__bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       listing
       , __bookers
     FROM sma_28009_cte
-  ) subq_16
+  ) subq_19
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__bookers', 'listing']
     -- Pass Only Elements: ['__bookers', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -44,8 +46,8 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_21
+  ) subq_25
   ON
-    subq_16.listing = subq_21.listing
-) subq_22
+    subq_19.listing = subq_25.listing
+) subq_27
 WHERE listing__bookers > 1.00

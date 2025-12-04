@@ -13,9 +13,10 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['__listings', 'listing__views_times_booking_value']
   SELECT
-    subq_43.listing__views_times_booking_value AS listing__views_times_booking_value
-    , subq_30.__listings AS listings
+    subq_50.listing__views_times_booking_value AS listing__views_times_booking_value
+    , subq_35.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -23,7 +24,7 @@ FROM (
       listing_id AS listing
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_30
+  ) subq_35
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
     -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
@@ -33,12 +34,13 @@ FROM (
     FROM (
       -- Combine Aggregated Outputs
       SELECT
-        COALESCE(subq_35.listing, subq_40.listing) AS listing
-        , MAX(subq_35.booking_value) AS booking_value
-        , MAX(subq_40.views) AS views
+        COALESCE(subq_41.listing, subq_47.listing) AS listing
+        , MAX(subq_41.booking_value) AS booking_value
+        , MAX(subq_47.views) AS views
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['__booking_value', 'listing']
         -- Pass Only Elements: ['__booking_value', 'listing']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
@@ -48,7 +50,7 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_28000
         GROUP BY
           listing
-      ) subq_35
+      ) subq_41
       FULL OUTER JOIN (
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
@@ -59,21 +61,22 @@ FROM (
           -- Read Elements From Semantic Model 'views_source'
           -- Metric Time Dimension 'ds'
           -- Pass Only Elements: ['__views', 'listing']
+          -- Pass Only Elements: ['__views', 'listing']
           SELECT
             listing_id AS listing
             , 1 AS __views
           FROM ***************************.fct_views views_source_src_28000
-        ) subq_38
+        ) subq_45
         GROUP BY
           listing
-      ) subq_40
+      ) subq_47
       ON
-        subq_35.listing = subq_40.listing
+        subq_41.listing = subq_47.listing
       GROUP BY
         listing
-    ) subq_41
-  ) subq_43
+    ) subq_48
+  ) subq_50
   ON
-    subq_30.listing = subq_43.listing
-) subq_44
+    subq_35.listing = subq_50.listing
+) subq_52
 WHERE listing__views_times_booking_value > 1

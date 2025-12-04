@@ -11,12 +11,13 @@ SELECT
 FROM (
   -- Join to Time Spine Dataset
   -- Pass Only Elements: ['__bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
+  -- Pass Only Elements: ['__bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
-    subq_15.metric_time__alien_day AS metric_time__alien_day
-    , subq_15.booking__ds__alien_day AS booking__ds__alien_day
-    , SUM(subq_13.__bookings) AS bookings
+    subq_17.metric_time__alien_day AS metric_time__alien_day
+    , subq_17.booking__ds__alien_day AS booking__ds__alien_day
+    , SUM(subq_15.__bookings) AS bookings
   FROM (
     -- Join Offset Custom Granularity to Base Granularity
     WITH cte_6 AS (
@@ -29,8 +30,8 @@ FROM (
 
     SELECT
       cte_6.ds__day AS ds__day
-      , subq_14.ds__alien_day__lead AS metric_time__alien_day
-      , subq_14.ds__alien_day__lead AS booking__ds__alien_day
+      , subq_16.ds__alien_day__lead AS metric_time__alien_day
+      , subq_16.ds__alien_day__lead AS booking__ds__alien_day
     FROM cte_6
     INNER JOIN (
       -- Offset Custom Granularity
@@ -40,10 +41,10 @@ FROM (
       FROM cte_6
       GROUP BY
         ds__alien_day
-    ) subq_14
+    ) subq_16
     ON
-      cte_6.ds__alien_day = subq_14.ds__alien_day
-  ) subq_15
+      cte_6.ds__alien_day = subq_16.ds__alien_day
+  ) subq_17
   INNER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
@@ -51,10 +52,10 @@ FROM (
       DATETIME_TRUNC(ds, day) AS metric_time__day
       , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_13
+  ) subq_15
   ON
-    subq_15.ds__day = subq_13.metric_time__day
+    subq_17.ds__day = subq_15.metric_time__day
   GROUP BY
     metric_time__alien_day
     , booking__ds__alien_day
-) subq_20
+) subq_24

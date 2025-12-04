@@ -19,11 +19,12 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_19.booking__ds__day, subq_27.booking__ds__day) AS booking__ds__day
-    , MAX(subq_19.bookings) AS bookings
-    , MAX(subq_27.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_23.booking__ds__day, subq_33.booking__ds__day) AS booking__ds__day
+    , MAX(subq_23.bookings) AS bookings
+    , MAX(subq_33.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__bookings', 'booking__ds__day']
     -- Pass Only Elements: ['__bookings', 'booking__ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -33,16 +34,17 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       booking__ds__day
-  ) subq_19
+  ) subq_23
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS booking__ds__day
-      , subq_22.__bookings AS bookings_2_weeks_ago
+      , subq_27.__bookings AS bookings_2_weeks_ago
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['__bookings', 'booking__ds__day']
       -- Pass Only Elements: ['__bookings', 'booking__ds__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
@@ -51,12 +53,12 @@ FROM (
       FROM sma_28009_cte
       GROUP BY
         booking__ds__day
-    ) subq_22
+    ) subq_27
     ON
-      time_spine_src_28006.ds - MAKE_INTERVAL(days => 14) = subq_22.booking__ds__day
-  ) subq_27
+      time_spine_src_28006.ds - MAKE_INTERVAL(days => 14) = subq_27.booking__ds__day
+  ) subq_33
   ON
-    subq_19.booking__ds__day = subq_27.booking__ds__day
+    subq_23.booking__ds__day = subq_33.booking__ds__day
   GROUP BY
-    COALESCE(subq_19.booking__ds__day, subq_27.booking__ds__day)
-) subq_28
+    COALESCE(subq_23.booking__ds__day, subq_33.booking__ds__day)
+) subq_34

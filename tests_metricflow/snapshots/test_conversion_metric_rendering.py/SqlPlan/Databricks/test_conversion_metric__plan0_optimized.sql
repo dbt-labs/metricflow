@@ -22,9 +22,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_21.metric_time__day, subq_31.metric_time__day) AS metric_time__day
-    , MAX(subq_21.__visits) AS __visits
-    , MAX(subq_31.__buys) AS __buys
+    COALESCE(subq_25.metric_time__day, subq_37.metric_time__day) AS metric_time__day
+    , MAX(subq_25.__visits) AS __visits
+    , MAX(subq_37.__buys) AS __buys
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['__visits', 'metric_time__day']
@@ -34,17 +34,19 @@ FROM (
       , SUM(visits) AS __visits
     FROM (
       -- Read From CTE For node_id=sma_28019
+      -- Pass Only Elements: ['__visits', 'metric_time__day']
       SELECT
         metric_time__day
         , __visits AS visits
       FROM sma_28019_cte
-    ) subq_18
+    ) subq_22
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) subq_25
   FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
+    -- Pass Only Elements: ['__buys', 'metric_time__day']
     -- Pass Only Elements: ['__buys', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
@@ -53,49 +55,50 @@ FROM (
     FROM (
       -- Dedupe the fanout with mf_internal_uuid in the conversion data set
       SELECT DISTINCT
-        FIRST_VALUE(subq_24.__visits) OVER (
+        FIRST_VALUE(subq_29.__visits) OVER (
           PARTITION BY
-            subq_27.user
-            , subq_27.metric_time__day
-            , subq_27.mf_internal_uuid
-          ORDER BY subq_24.metric_time__day DESC
+            subq_32.user
+            , subq_32.metric_time__day
+            , subq_32.mf_internal_uuid
+          ORDER BY subq_29.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS __visits
-        , FIRST_VALUE(subq_24.metric_time__day) OVER (
+        , FIRST_VALUE(subq_29.metric_time__day) OVER (
           PARTITION BY
-            subq_27.user
-            , subq_27.metric_time__day
-            , subq_27.mf_internal_uuid
-          ORDER BY subq_24.metric_time__day DESC
+            subq_32.user
+            , subq_32.metric_time__day
+            , subq_32.mf_internal_uuid
+          ORDER BY subq_29.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_24.user) OVER (
+        , FIRST_VALUE(subq_29.user) OVER (
           PARTITION BY
-            subq_27.user
-            , subq_27.metric_time__day
-            , subq_27.mf_internal_uuid
-          ORDER BY subq_24.metric_time__day DESC
+            subq_32.user
+            , subq_32.metric_time__day
+            , subq_32.mf_internal_uuid
+          ORDER BY subq_29.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
-        , subq_27.mf_internal_uuid AS mf_internal_uuid
-        , subq_27.__buys AS __buys
+        , subq_32.mf_internal_uuid AS mf_internal_uuid
+        , subq_32.__buys AS __buys
       FROM (
         -- Constrain Output with WHERE
         -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
         SELECT
           metric_time__day
-          , subq_22.user
+          , subq_27.user
           , visits AS __visits
         FROM (
           -- Read From CTE For node_id=sma_28019
+          -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
           SELECT
             metric_time__day
             , sma_28019_cte.user
             , __visits AS visits
           FROM sma_28019_cte
-        ) subq_22
+        ) subq_27
         WHERE metric_time__day = '2020-01-01'
-      ) subq_24
+      ) subq_29
       INNER JOIN (
         -- Read Elements From Semantic Model 'buys_source'
         -- Metric Time Dimension 'ds'
@@ -106,19 +109,19 @@ FROM (
           , 1 AS __buys
           , UUID() AS mf_internal_uuid
         FROM ***************************.fct_buys buys_source_src_28000
-      ) subq_27
+      ) subq_32
       ON
         (
-          subq_24.user = subq_27.user
+          subq_29.user = subq_32.user
         ) AND (
-          (subq_24.metric_time__day <= subq_27.metric_time__day)
+          (subq_29.metric_time__day <= subq_32.metric_time__day)
         )
-    ) subq_28
+    ) subq_33
     GROUP BY
       metric_time__day
-  ) subq_31
+  ) subq_37
   ON
-    subq_21.metric_time__day = subq_31.metric_time__day
+    subq_25.metric_time__day = subq_37.metric_time__day
   GROUP BY
-    COALESCE(subq_21.metric_time__day, subq_31.metric_time__day)
-) subq_32
+    COALESCE(subq_25.metric_time__day, subq_37.metric_time__day)
+) subq_38

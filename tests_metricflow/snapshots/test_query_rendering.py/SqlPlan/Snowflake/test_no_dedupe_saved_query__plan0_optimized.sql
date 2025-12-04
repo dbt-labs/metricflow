@@ -10,10 +10,11 @@ SELECT
   , listing__capacity_latest
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['listing__capacity_latest', 'user__home_state_latest', 'metric_time__month']
   SELECT
-    users_latest_src_28000.home_state_latest AS user__home_state_latest
-    , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
+    DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
     , listings_latest_src_28000.capacity AS listing__capacity_latest
+    , users_latest_src_28000.home_state_latest AS user__home_state_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   CROSS JOIN
     ***************************.mf_time_spine time_spine_src_28006
@@ -21,5 +22,5 @@ FROM (
     ***************************.dim_users_latest users_latest_src_28000
   ON
     listings_latest_src_28000.user_id = users_latest_src_28000.user_id
-) subq_15
+) subq_17
 WHERE user__home_state_latest = 'CA'

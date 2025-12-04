@@ -19,7 +19,7 @@ WITH sma_28019_cte AS (
 )
 
 SELECT
-  COALESCE(MAX(subq_31.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
+  COALESCE(MAX(subq_37.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['__visits']
@@ -28,15 +28,17 @@ FROM (
     SUM(visits) AS __visits
   FROM (
     -- Read From CTE For node_id=sma_28019
+    -- Pass Only Elements: ['__visits', 'visit__referrer_id']
     SELECT
       visit__referrer_id
       , __visits AS visits
     FROM sma_28019_cte
-  ) subq_18
+  ) subq_22
   WHERE visit__referrer_id = 'ref_id_01'
-) subq_21
+) subq_25
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
+  -- Pass Only Elements: ['__buys_fill_nulls_with_0']
   -- Pass Only Elements: ['__buys_fill_nulls_with_0']
   -- Aggregate Inputs for Simple Metrics
   SELECT
@@ -44,59 +46,60 @@ CROSS JOIN (
   FROM (
     -- Dedupe the fanout with mf_internal_uuid in the conversion data set
     SELECT DISTINCT
-      FIRST_VALUE(subq_24.__visits) OVER (
+      FIRST_VALUE(subq_29.__visits) OVER (
         PARTITION BY
-          subq_27.user
-          , subq_27.metric_time__day
-          , subq_27.mf_internal_uuid
-        ORDER BY subq_24.metric_time__day DESC
+          subq_32.user
+          , subq_32.metric_time__day
+          , subq_32.mf_internal_uuid
+        ORDER BY subq_29.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS __visits
-      , FIRST_VALUE(subq_24.visit__referrer_id) OVER (
+      , FIRST_VALUE(subq_29.visit__referrer_id) OVER (
         PARTITION BY
-          subq_27.user
-          , subq_27.metric_time__day
-          , subq_27.mf_internal_uuid
-        ORDER BY subq_24.metric_time__day DESC
+          subq_32.user
+          , subq_32.metric_time__day
+          , subq_32.mf_internal_uuid
+        ORDER BY subq_29.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS visit__referrer_id
-      , FIRST_VALUE(subq_24.metric_time__day) OVER (
+      , FIRST_VALUE(subq_29.metric_time__day) OVER (
         PARTITION BY
-          subq_27.user
-          , subq_27.metric_time__day
-          , subq_27.mf_internal_uuid
-        ORDER BY subq_24.metric_time__day DESC
+          subq_32.user
+          , subq_32.metric_time__day
+          , subq_32.mf_internal_uuid
+        ORDER BY subq_29.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS metric_time__day
-      , FIRST_VALUE(subq_24.user) OVER (
+      , FIRST_VALUE(subq_29.user) OVER (
         PARTITION BY
-          subq_27.user
-          , subq_27.metric_time__day
-          , subq_27.mf_internal_uuid
-        ORDER BY subq_24.metric_time__day DESC
+          subq_32.user
+          , subq_32.metric_time__day
+          , subq_32.mf_internal_uuid
+        ORDER BY subq_29.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
-      , subq_27.mf_internal_uuid AS mf_internal_uuid
-      , subq_27.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
+      , subq_32.mf_internal_uuid AS mf_internal_uuid
+      , subq_32.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
     FROM (
       -- Constrain Output with WHERE
       -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
       SELECT
         metric_time__day
-        , subq_22.user
+        , subq_27.user
         , visit__referrer_id
         , visits AS __visits
       FROM (
         -- Read From CTE For node_id=sma_28019
+        -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
         SELECT
           metric_time__day
           , sma_28019_cte.user
           , visit__referrer_id
           , __visits AS visits
         FROM sma_28019_cte
-      ) subq_22
+      ) subq_27
       WHERE visit__referrer_id = 'ref_id_01'
-    ) subq_24
+    ) subq_29
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
       -- Metric Time Dimension 'ds'
@@ -107,16 +110,16 @@ CROSS JOIN (
         , 1 AS __buys_fill_nulls_with_0
         , GEN_RANDOM_UUID() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
-    ) subq_27
+    ) subq_32
     ON
       (
-        subq_24.user = subq_27.user
+        subq_29.user = subq_32.user
       ) AND (
         (
-          subq_24.metric_time__day <= subq_27.metric_time__day
+          subq_29.metric_time__day <= subq_32.metric_time__day
         ) AND (
-          subq_24.metric_time__day > subq_27.metric_time__day - MAKE_INTERVAL(days => 7)
+          subq_29.metric_time__day > subq_32.metric_time__day - MAKE_INTERVAL(days => 7)
         )
       )
-  ) subq_28
-) subq_31
+  ) subq_33
+) subq_37

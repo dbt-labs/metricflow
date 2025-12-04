@@ -4,6 +4,7 @@ sql_engine: Trino
 ---
 -- Read From Time Spine 'mf_time_spine_second'
 -- Metric Time Dimension 'ts'
+-- Pass Only Elements: ['metric_time__second']
 -- Constrain Time Range to [2020-01-01T00:00:02, 2020-01-01T00:00:08]
 -- Pass Only Elements: ['metric_time__second']
 -- Write to DataTable

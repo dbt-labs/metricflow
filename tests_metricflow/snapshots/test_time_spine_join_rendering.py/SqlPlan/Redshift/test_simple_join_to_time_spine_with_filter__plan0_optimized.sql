@@ -13,7 +13,7 @@ FROM (
   -- Join to Time Spine Dataset
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , subq_14.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+    , subq_17.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
   FROM ***************************.mf_time_spine time_spine_src_28006
   LEFT OUTER JOIN (
     -- Constrain Output with WHERE
@@ -25,16 +25,17 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , is_instant AS booking__is_instant
         , 1 AS bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_11
+    ) subq_14
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
-  ) subq_14
+  ) subq_17
   ON
-    time_spine_src_28006.ds = subq_14.metric_time__day
-) subq_18
+    time_spine_src_28006.ds = subq_17.metric_time__day
+) subq_22

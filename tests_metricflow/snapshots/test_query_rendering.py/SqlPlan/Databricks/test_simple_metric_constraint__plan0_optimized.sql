@@ -10,10 +10,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_33.metric_time__day, subq_38.metric_time__day) AS metric_time__day
-    , MAX(subq_33.average_booking_value) AS average_booking_value
-    , MAX(subq_33.bookings) AS bookings
-    , MAX(subq_38.booking_value) AS booking_value
+    COALESCE(subq_37.metric_time__day, subq_43.metric_time__day) AS metric_time__day
+    , MAX(subq_37.average_booking_value) AS average_booking_value
+    , MAX(subq_37.bookings) AS bookings
+    , MAX(subq_43.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['__average_booking_value', '__bookings', 'metric_time__day']
@@ -25,11 +25,12 @@ FROM (
       , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
+      -- Pass Only Elements: ['__average_booking_value', '__bookings', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
-        listings_latest_src_28000.is_lux AS listing__is_lux_latest
-        , subq_25.metric_time__day AS metric_time__day
-        , subq_25.__bookings AS bookings
-        , subq_25.__average_booking_value AS average_booking_value
+        subq_28.metric_time__day AS metric_time__day
+        , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+        , subq_28.__bookings AS bookings
+        , subq_28.__average_booking_value AS average_booking_value
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
@@ -39,19 +40,20 @@ FROM (
           , 1 AS __bookings
           , booking_value AS __average_booking_value
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_25
+      ) subq_28
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_25.listing = listings_latest_src_28000.listing_id
-    ) subq_29
+        subq_28.listing = listings_latest_src_28000.listing_id
+    ) subq_33
     WHERE listing__is_lux_latest
     GROUP BY
       metric_time__day
-  ) subq_33
+  ) subq_37
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['__booking_value', 'metric_time__day']
     -- Pass Only Elements: ['__booking_value', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -61,9 +63,9 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
     GROUP BY
       DATE_TRUNC('day', ds)
-  ) subq_38
+  ) subq_43
   ON
-    subq_33.metric_time__day = subq_38.metric_time__day
+    subq_37.metric_time__day = subq_43.metric_time__day
   GROUP BY
-    COALESCE(subq_33.metric_time__day, subq_38.metric_time__day)
-) subq_39
+    COALESCE(subq_37.metric_time__day, subq_43.metric_time__day)
+) subq_44

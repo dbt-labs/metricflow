@@ -18,29 +18,30 @@ FROM (
     -- Join Self Over Time Range
     -- Join to Custom Granularity Dataset
     -- Pass Only Elements: ['__revenue', 'metric_time__alien_day', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__alien_day', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      subq_16.alien_day AS metric_time__alien_day
-      , subq_15.ds AS metric_time__day
+      subq_17.alien_day AS metric_time__alien_day
+      , subq_16.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS __revenue
-    FROM ***************************.mf_time_spine subq_15
+    FROM ***************************.mf_time_spine subq_16
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_16.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_15.ds AS DATETIME), INTERVAL 2 month)
+        DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_16.ds AS DATETIME), INTERVAL 2 month)
       )
     LEFT OUTER JOIN
-      ***************************.mf_time_spine subq_16
+      ***************************.mf_time_spine subq_17
     ON
-      subq_15.ds = subq_16.ds
+      subq_16.ds = subq_17.ds
     GROUP BY
       metric_time__alien_day
       , metric_time__day
-  ) subq_19
-) subq_22
+  ) subq_21
+) subq_24
 GROUP BY
   metric_time__alien_day
   , trailing_2_months_revenue

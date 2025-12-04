@@ -6,21 +6,22 @@ sql_engine: Redshift
 ---
 -- Join Self Over Time Range
 -- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
+-- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_12.ds AS revenue_instance__ds__day
+  subq_13.ds AS revenue_instance__ds__day
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
-FROM ***************************.mf_time_spine subq_12
+FROM ***************************.mf_time_spine subq_13
 INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_12.ds
+    DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_13.ds
   ) AND (
-    DATE_TRUNC('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_12.ds)
+    DATE_TRUNC('day', revenue_src_28000.created_at) > DATEADD(month, -2, subq_13.ds)
   )
 GROUP BY
-  subq_12.ds
+  subq_13.ds

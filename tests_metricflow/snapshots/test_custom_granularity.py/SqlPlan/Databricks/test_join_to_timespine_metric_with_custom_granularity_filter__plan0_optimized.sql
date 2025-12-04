@@ -6,8 +6,8 @@ sql_engine: Databricks
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_21.metric_time__alien_day AS metric_time__alien_day
-  , subq_17.__bookings_join_to_time_spine AS bookings_join_to_time_spine
+  subq_25.metric_time__alien_day AS metric_time__alien_day
+  , subq_20.__bookings_join_to_time_spine AS bookings_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['metric_time__alien_day']
@@ -16,14 +16,15 @@ FROM (
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
+    -- Pass Only Elements: ['metric_time__alien_day']
     SELECT
       alien_day AS metric_time__alien_day
     FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_19
+  ) subq_23
   WHERE metric_time__alien_day = '2020-01-01'
   GROUP BY
     metric_time__alien_day
-) subq_21
+) subq_25
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
@@ -34,24 +35,25 @@ LEFT OUTER JOIN (
   FROM (
     -- Metric Time Dimension 'ds'
     -- Join to Custom Granularity Dataset
+    -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
     SELECT
-      subq_12.__bookings_join_to_time_spine AS bookings_join_to_time_spine
-      , subq_13.alien_day AS metric_time__alien_day
+      subq_15.alien_day AS metric_time__alien_day
+      , subq_14.__bookings_join_to_time_spine AS bookings_join_to_time_spine
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
         1 AS __bookings_join_to_time_spine
         , DATE_TRUNC('day', ds) AS ds__day
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_12
+    ) subq_14
     LEFT OUTER JOIN
-      ***************************.mf_time_spine subq_13
+      ***************************.mf_time_spine subq_15
     ON
-      subq_12.ds__day = subq_13.ds
-  ) subq_14
+      subq_14.ds__day = subq_15.ds
+  ) subq_17
   WHERE metric_time__alien_day = '2020-01-01'
   GROUP BY
     metric_time__alien_day
-) subq_17
+) subq_20
 ON
-  subq_21.metric_time__alien_day = subq_17.metric_time__alien_day
+  subq_25.metric_time__alien_day = subq_20.metric_time__alien_day

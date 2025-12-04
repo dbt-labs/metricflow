@@ -7,12 +7,13 @@ sql_engine: Postgres
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['__bookings', 'listing__user__ds__alien_day']
+-- Pass Only Elements: ['__bookings', 'listing__user__ds__alien_day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_47.alien_day AS listing__user__ds__alien_day
-  , SUM(subq_39.__bookings) AS bookings
+  subq_48.alien_day AS listing__user__ds__alien_day
+  , SUM(subq_40.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -21,7 +22,7 @@ FROM (
     , listing_id AS listing
     , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_39
+) subq_40
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__ds_partitioned__day', 'user__ds__day', 'listing']
@@ -34,16 +35,16 @@ LEFT OUTER JOIN (
     ***************************.dim_users users_ds_source_src_28000
   ON
     listings_latest_src_28000.user_id = users_ds_source_src_28000.user_id
-) subq_46
+) subq_47
 ON
   (
-    subq_39.listing = subq_46.listing
+    subq_40.listing = subq_47.listing
   ) AND (
-    subq_39.ds_partitioned__day = subq_46.user__ds_partitioned__day
+    subq_40.ds_partitioned__day = subq_47.user__ds_partitioned__day
   )
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_47
+  ***************************.mf_time_spine subq_48
 ON
-  subq_46.user__ds__day = subq_47.ds
+  subq_47.user__ds__day = subq_48.ds
 GROUP BY
-  subq_47.alien_day
+  subq_48.alien_day
