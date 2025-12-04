@@ -33,8 +33,8 @@ FROM (
         FROM (
           -- Constrain Output with WHERE
           SELECT
-            subq_1.__homonymous_metric_and_dimension
-            , subq_1.homonymous_metric_and_entity AS __homonymous_metric_and_entity
+            subq_1.homonymous_metric_and_dimension
+            , subq_1.homonymous_metric_and_entity
             , subq_1.homonymous_metric_and_dimension
             , subq_1.booking__homonymous_metric_and_dimension
             , subq_1.homonymous_metric_and_entity__homonymous_metric_and_dimension
@@ -82,6 +82,7 @@ FROM (
             , subq_1.metric_time__extract_day
             , subq_1.metric_time__extract_dow
             , subq_1.metric_time__extract_doy
+            , subq_1.homonymous_metric_and_entity
             , subq_1.booking__homonymous_metric_and_entity
           FROM (
             -- Metric Time Dimension 'ds'
@@ -130,11 +131,12 @@ FROM (
               , subq_0.ds__extract_day AS metric_time__extract_day
               , subq_0.ds__extract_dow AS metric_time__extract_dow
               , subq_0.ds__extract_doy AS metric_time__extract_doy
+              , subq_0.homonymous_metric_and_entity
               , subq_0.booking__homonymous_metric_and_entity
               , subq_0.homonymous_metric_and_dimension
               , subq_0.booking__homonymous_metric_and_dimension
               , subq_0.homonymous_metric_and_entity__homonymous_metric_and_dimension
-              , subq_0.__homonymous_metric_and_dimension
+              , subq_0.__homonymous_metric_and_dimension AS homonymous_metric_and_dimension
               , subq_0.__homonymous_metric_and_entity AS homonymous_metric_and_entity
             FROM (
               -- Read Elements From Semantic Model 'bookings_source'
@@ -207,8 +209,9 @@ FROM (
         FROM (
           -- Constrain Output with WHERE
           SELECT
-            subq_6.homonymous_metric_and_dimension AS __homonymous_metric_and_dimension
-            , subq_6.__homonymous_metric_and_entity
+            subq_6.homonymous_metric_and_dimension
+            , subq_6.homonymous_metric_and_entity
+            , subq_6.homonymous_metric_and_dimension
             , subq_6.booking__homonymous_metric_and_dimension
             , subq_6.homonymous_metric_and_entity__homonymous_metric_and_dimension
             , subq_6.ds__day
@@ -306,10 +309,11 @@ FROM (
               , subq_0.ds__extract_doy AS metric_time__extract_doy
               , subq_0.homonymous_metric_and_entity
               , subq_0.booking__homonymous_metric_and_entity
+              , subq_0.homonymous_metric_and_dimension
               , subq_0.booking__homonymous_metric_and_dimension
               , subq_0.homonymous_metric_and_entity__homonymous_metric_and_dimension
               , subq_0.__homonymous_metric_and_dimension AS homonymous_metric_and_dimension
-              , subq_0.__homonymous_metric_and_entity
+              , subq_0.__homonymous_metric_and_entity AS homonymous_metric_and_entity
             FROM (
               -- Read Elements From Semantic Model 'bookings_source'
               SELECT
