@@ -79,7 +79,6 @@ class ColumnAliasRenamer:
         inner_select_node = select_statement_node.with_select_columns(
             select_column.copy_with_new_alias(previous_column_name_to_next_column_name[select_column.column_alias])
             for select_column in select_statement_node.select_columns
-            if select_column.column_alias in previous_column_name_to_next_column_name
         )
         return SqlSelectStatementNode.create(
             description=description,

@@ -1,6 +1,0 @@
-kind: Fixes
-body: Selective aliasing for simple-metrics in `WHERE` filters
-time: 2025-12-01T10:19:18.566907-08:00
-custom:
-  Author: plypaul
-  Issue: "1943"

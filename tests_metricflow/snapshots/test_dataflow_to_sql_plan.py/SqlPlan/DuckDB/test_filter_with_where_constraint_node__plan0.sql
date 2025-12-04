@@ -6,13 +6,13 @@ sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
 SELECT
-  subq_1.__bookings
+  subq_1.bookings AS __bookings
   , subq_1.ds__day
 FROM (
   -- Pass Only Elements: ['__bookings', 'ds__day']
   SELECT
     subq_0.ds__day
-    , subq_0.__bookings
+    , subq_0.__bookings AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
