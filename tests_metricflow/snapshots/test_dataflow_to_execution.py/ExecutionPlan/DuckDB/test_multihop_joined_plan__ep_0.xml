@@ -10,6 +10,7 @@ docstring:
         <!-- sql =                                                                                                   -->
         <!--   ('-- Join Standard Outputs\n'                                                                         -->
         <!--    "-- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']\n"                 -->
+        <!--    "-- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']\n"                 -->
         <!--    '-- Aggregate Inputs for Simple Metrics\n'                                                           -->
         <!--    '-- Compute Metrics via Expressions\n'                                                               -->
         <!--    '-- Write to DataTable\n'                                                                            -->

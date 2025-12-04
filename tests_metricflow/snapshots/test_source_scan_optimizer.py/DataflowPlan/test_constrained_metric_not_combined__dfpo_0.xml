@@ -23,7 +23,7 @@ docstring:
                     <!-- null_fill_value_mapping = {} -->
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['__booking_value', 'metric_time__day']" -->
-                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
                         <!-- include_spec =                                                                  -->
                         <!--   TimeDimensionSpec(                                                            -->
@@ -31,16 +31,27 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <MetricTimeDimensionTransformNode>
-                            <!-- description = "Metric Time Dimension 'ds'" -->
-                            <!-- node_id = NodeId(id_str='sma_28009') -->
-                            <!-- aggregation_time_dimension = 'ds' -->
-                            <ReadSqlSourceNode>
-                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                <!-- node_id = NodeId(id_str='rss_28020') -->
-                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                            </ReadSqlSourceNode>
-                        </MetricTimeDimensionTransformNode>
+                        <FilterElementsNode>
+                            <!-- description = "Pass Only Elements: ['__booking_value', 'metric_time__day']" -->
+                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
+                            <!-- distinct = False -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                <!-- node_id = NodeId(id_str='sma_28009') -->
+                                <!-- aggregation_time_dimension = 'ds' -->
+                                <ReadSqlSourceNode>
+                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                    <!-- node_id = NodeId(id_str='rss_28020') -->
+                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </FilterElementsNode>
                     </FilterElementsNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
@@ -54,7 +65,7 @@ docstring:
                     <!-- null_fill_value_mapping = {} -->
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['__instant_booking_value', 'metric_time__day']" -->
-                        <!-- node_id = NodeId(id_str='pfe_1') -->
+                        <!-- node_id = NodeId(id_str='pfe_3') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='instant_booking_value') -->
                         <!-- include_spec =                                                                  -->
                         <!--   TimeDimensionSpec(                                                            -->
@@ -84,16 +95,34 @@ docstring:
                             <!--       ),                                                    -->
                             <!--     ),                                                      -->
                             <!--   )                                                         -->
-                            <MetricTimeDimensionTransformNode>
-                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_28009') -->
-                                <!-- aggregation_time_dimension = 'ds' -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                    <!-- node_id = NodeId(id_str='rss_28020') -->
-                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                </ReadSqlSourceNode>
-                            </MetricTimeDimensionTransformNode>
+                            <FilterElementsNode>
+                                <!-- description =                                                                -->
+                                <!--   ("Pass Only Elements: ['__instant_booking_value', 'booking__is_instant', " -->
+                                <!--    "'metric_time__day']")                                                    -->
+                                <!-- node_id = NodeId(id_str='pfe_2') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='instant_booking_value') -->
+                                <!-- include_spec =                                               -->
+                                <!--   DimensionSpec(                                             -->
+                                <!--     element_name='is_instant',                               -->
+                                <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                                <!--   )                                                          -->
+                                <!-- include_spec =                                                                  -->
+                                <!--   TimeDimensionSpec(                                                            -->
+                                <!--     element_name='metric_time',                                                 -->
+                                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                <!--   )                                                                             -->
+                                <!-- distinct = False -->
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
+                            </FilterElementsNode>
                         </WhereConstraintNode>
                     </FilterElementsNode>
                 </AggregateSimpleMetricInputsNode>

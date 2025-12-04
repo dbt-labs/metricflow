@@ -22,10 +22,11 @@ FROM (
     , bookings_offset_once
   FROM (
     -- Join to Time Spine Dataset
+    -- Pass Only Elements: ['booking__is_instant', 'metric_time__day', 'bookings_offset_once']
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_26.booking__is_instant AS booking__is_instant
-      , subq_26.bookings_offset_once AS bookings_offset_once
+      , subq_32.booking__is_instant AS booking__is_instant
+      , subq_32.bookings_offset_once AS bookings_offset_once
     FROM rss_28018_cte
     INNER JOIN (
       -- Compute Metrics via Expressions
@@ -38,8 +39,8 @@ FROM (
         -- Compute Metrics via Expressions
         SELECT
           rss_28018_cte.ds__day AS metric_time__day
-          , subq_20.booking__is_instant AS booking__is_instant
-          , subq_20.__bookings AS bookings
+          , subq_25.booking__is_instant AS booking__is_instant
+          , subq_25.__bookings AS bookings
         FROM rss_28018_cte
         INNER JOIN (
           -- Aggregate Inputs for Simple Metrics
@@ -51,22 +52,23 @@ FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             -- Metric Time Dimension 'ds'
             -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
+            -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
             SELECT
               DATE_TRUNC('day', ds) AS metric_time__day
               , is_instant AS booking__is_instant
               , 1 AS __bookings
             FROM ***************************.fct_bookings bookings_source_src_28000
-          ) subq_19
+          ) subq_24
           GROUP BY
             metric_time__day
             , booking__is_instant
-        ) subq_20
+        ) subq_25
         ON
-          rss_28018_cte.ds__day - INTERVAL 5 day = subq_20.metric_time__day
-      ) subq_25
-    ) subq_26
+          rss_28018_cte.ds__day - INTERVAL 5 day = subq_25.metric_time__day
+      ) subq_31
+    ) subq_32
     ON
-      rss_28018_cte.ds__day - INTERVAL 2 day = subq_26.metric_time__day
-  ) subq_30
+      rss_28018_cte.ds__day - INTERVAL 2 day = subq_32.metric_time__day
+  ) subq_38
   WHERE booking__is_instant
-) subq_32
+) subq_40

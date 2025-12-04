@@ -7,13 +7,14 @@ sql_without_cte:
   -- Combine Aggregated Outputs
   -- Write to DataTable
   SELECT
-    COALESCE(subq_8.metric_time__day, subq_16.metric_time__day, subq_19.metric_time__day) AS metric_time__day
-    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest, subq_19.listing__country_latest) AS listing__country_latest
-    , MAX(subq_8.bookings) AS bookings
-    , MAX(subq_16.views) AS views
-    , MAX(CAST(subq_19.bookings AS DOUBLE) / CAST(NULLIF(subq_19.views, 0) AS DOUBLE)) AS bookings_per_view
+    COALESCE(subq_9.metric_time__day, subq_18.metric_time__day, subq_21.metric_time__day) AS metric_time__day
+    , COALESCE(subq_9.listing__country_latest, subq_18.listing__country_latest, subq_21.listing__country_latest) AS listing__country_latest
+    , MAX(subq_9.bookings) AS bookings
+    , MAX(subq_18.views) AS views
+    , MAX(CAST(subq_21.bookings AS DOUBLE) / CAST(NULLIF(subq_21.views, 0) AS DOUBLE)) AS bookings_per_view
   FROM (
     -- Join Standard Outputs
+    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
     -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -37,16 +38,17 @@ sql_without_cte:
     GROUP BY
       subq_1.metric_time__day
       , listings_latest_src_28000.country
-  ) subq_8
+  ) subq_9
   FULL OUTER JOIN (
     -- Join Standard Outputs
+    -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
     -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
-      subq_10.metric_time__day AS metric_time__day
+      subq_11.metric_time__day AS metric_time__day
       , listings_latest_src_28000.country AS listing__country_latest
-      , SUM(subq_10.__views) AS views
+      , SUM(subq_11.__views) AS views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
@@ -55,30 +57,31 @@ sql_without_cte:
         , listing_id AS listing
         , 1 AS __views
       FROM ***************************.fct_views views_source_src_28000
-    ) subq_10
+    ) subq_11
     LEFT OUTER JOIN
       ***************************.dim_listings_latest listings_latest_src_28000
     ON
-      subq_10.listing = listings_latest_src_28000.listing_id
+      subq_11.listing = listings_latest_src_28000.listing_id
     GROUP BY
-      subq_10.metric_time__day
+      subq_11.metric_time__day
       , listings_latest_src_28000.country
-  ) subq_16
+  ) subq_18
   ON
     (
-      subq_8.listing__country_latest = subq_16.listing__country_latest
+      subq_9.listing__country_latest = subq_18.listing__country_latest
     ) AND (
-      subq_8.metric_time__day = subq_16.metric_time__day
+      subq_9.metric_time__day = subq_18.metric_time__day
     )
   FULL OUTER JOIN (
     -- Combine Aggregated Outputs
     SELECT
-      COALESCE(subq_17.metric_time__day, subq_18.metric_time__day) AS metric_time__day
-      , COALESCE(subq_17.listing__country_latest, subq_18.listing__country_latest) AS listing__country_latest
-      , MAX(subq_17.bookings) AS bookings
-      , MAX(subq_18.views) AS views
+      COALESCE(subq_19.metric_time__day, subq_20.metric_time__day) AS metric_time__day
+      , COALESCE(subq_19.listing__country_latest, subq_20.listing__country_latest) AS listing__country_latest
+      , MAX(subq_19.bookings) AS bookings
+      , MAX(subq_20.views) AS views
     FROM (
       -- Join Standard Outputs
+      -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
       -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
@@ -102,16 +105,17 @@ sql_without_cte:
       GROUP BY
         subq_1.metric_time__day
         , listings_latest_src_28000.country
-    ) subq_17
+    ) subq_19
     FULL OUTER JOIN (
       -- Join Standard Outputs
+      -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
       -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
-        subq_10.metric_time__day AS metric_time__day
+        subq_11.metric_time__day AS metric_time__day
         , listings_latest_src_28000.country AS listing__country_latest
-        , SUM(subq_10.__views) AS views
+        , SUM(subq_11.__views) AS views
       FROM (
         -- Read Elements From Semantic Model 'views_source'
         -- Metric Time Dimension 'ds'
@@ -120,34 +124,34 @@ sql_without_cte:
           , listing_id AS listing
           , 1 AS __views
         FROM ***************************.fct_views views_source_src_28000
-      ) subq_10
+      ) subq_11
       LEFT OUTER JOIN
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
-        subq_10.listing = listings_latest_src_28000.listing_id
+        subq_11.listing = listings_latest_src_28000.listing_id
       GROUP BY
-        subq_10.metric_time__day
+        subq_11.metric_time__day
         , listings_latest_src_28000.country
-    ) subq_18
+    ) subq_20
     ON
       (
-        subq_17.listing__country_latest = subq_18.listing__country_latest
+        subq_19.listing__country_latest = subq_20.listing__country_latest
       ) AND (
-        subq_17.metric_time__day = subq_18.metric_time__day
+        subq_19.metric_time__day = subq_20.metric_time__day
       )
     GROUP BY
-      COALESCE(subq_17.metric_time__day, subq_18.metric_time__day)
-      , COALESCE(subq_17.listing__country_latest, subq_18.listing__country_latest)
-  ) subq_19
+      COALESCE(subq_19.metric_time__day, subq_20.metric_time__day)
+      , COALESCE(subq_19.listing__country_latest, subq_20.listing__country_latest)
+  ) subq_21
   ON
     (
-      COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest) = subq_19.listing__country_latest
+      COALESCE(subq_9.listing__country_latest, subq_18.listing__country_latest) = subq_21.listing__country_latest
     ) AND (
-      COALESCE(subq_8.metric_time__day, subq_16.metric_time__day) = subq_19.metric_time__day
+      COALESCE(subq_9.metric_time__day, subq_18.metric_time__day) = subq_21.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_8.metric_time__day, subq_16.metric_time__day, subq_19.metric_time__day)
-    , COALESCE(subq_8.listing__country_latest, subq_16.listing__country_latest, subq_19.listing__country_latest)
+    COALESCE(subq_9.metric_time__day, subq_18.metric_time__day, subq_21.metric_time__day)
+    , COALESCE(subq_9.listing__country_latest, subq_18.listing__country_latest, subq_21.listing__country_latest)
 
 
 sql_with_cte:
@@ -156,12 +160,13 @@ sql_with_cte:
   WITH cm_0_cte AS (
     -- Join Standard Outputs
     -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
+    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
-      subq_23.metric_time__day AS metric_time__day
+      subq_25.metric_time__day AS metric_time__day
       , listings_latest_src_28000.country AS listing__country_latest
-      , SUM(subq_23.__bookings) AS bookings
+      , SUM(subq_25.__bookings) AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
@@ -170,25 +175,26 @@ sql_with_cte:
         , listing_id AS listing
         , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_23
+    ) subq_25
     LEFT OUTER JOIN
       ***************************.dim_listings_latest listings_latest_src_28000
     ON
-      subq_23.listing = listings_latest_src_28000.listing_id
+      subq_25.listing = listings_latest_src_28000.listing_id
     GROUP BY
-      subq_23.metric_time__day
+      subq_25.metric_time__day
       , listings_latest_src_28000.country
   )
 
   , cm_1_cte AS (
     -- Join Standard Outputs
     -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
+    -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
-      subq_32.metric_time__day AS metric_time__day
+      subq_35.metric_time__day AS metric_time__day
       , listings_latest_src_28000.country AS listing__country_latest
-      , SUM(subq_32.__views) AS views
+      , SUM(subq_35.__views) AS views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
@@ -197,22 +203,22 @@ sql_with_cte:
         , listing_id AS listing
         , 1 AS __views
       FROM ***************************.fct_views views_source_src_28000
-    ) subq_32
+    ) subq_35
     LEFT OUTER JOIN
       ***************************.dim_listings_latest listings_latest_src_28000
     ON
-      subq_32.listing = listings_latest_src_28000.listing_id
+      subq_35.listing = listings_latest_src_28000.listing_id
     GROUP BY
-      subq_32.metric_time__day
+      subq_35.metric_time__day
       , listings_latest_src_28000.country
   )
 
   SELECT
-    COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day, subq_41.metric_time__day) AS metric_time__day
-    , COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest, subq_41.listing__country_latest) AS listing__country_latest
+    COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day, subq_45.metric_time__day) AS metric_time__day
+    , COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest, subq_45.listing__country_latest) AS listing__country_latest
     , MAX(cm_0_cte.bookings) AS bookings
     , MAX(cm_1_cte.views) AS views
-    , MAX(CAST(subq_41.bookings AS DOUBLE) / CAST(NULLIF(subq_41.views, 0) AS DOUBLE)) AS bookings_per_view
+    , MAX(CAST(subq_45.bookings AS DOUBLE) / CAST(NULLIF(subq_45.views, 0) AS DOUBLE)) AS bookings_per_view
   FROM cm_0_cte
   FULL OUTER JOIN
     cm_1_cte
@@ -241,13 +247,13 @@ sql_with_cte:
     GROUP BY
       COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day)
       , COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest)
-  ) subq_41
+  ) subq_45
   ON
     (
-      COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest) = subq_41.listing__country_latest
+      COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest) = subq_45.listing__country_latest
     ) AND (
-      COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day) = subq_41.metric_time__day
+      COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day) = subq_45.metric_time__day
     )
   GROUP BY
-    COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day, subq_41.metric_time__day)
-    , COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest, subq_41.listing__country_latest)
+    COALESCE(cm_0_cte.metric_time__day, cm_1_cte.metric_time__day, subq_45.metric_time__day)
+    , COALESCE(cm_0_cte.listing__country_latest, cm_1_cte.listing__country_latest, subq_45.listing__country_latest)

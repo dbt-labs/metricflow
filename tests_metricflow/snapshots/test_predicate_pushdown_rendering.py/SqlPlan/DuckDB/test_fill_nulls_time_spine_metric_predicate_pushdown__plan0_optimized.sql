@@ -42,10 +42,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day) AS metric_time__day
-    , COALESCE(subq_41.listing__country_latest, subq_53.listing__country_latest) AS listing__country_latest
-    , COALESCE(MAX(subq_41.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
-    , COALESCE(MAX(subq_53.bookings_2_weeks_ago), 0) AS bookings_2_weeks_ago
+    COALESCE(subq_47.metric_time__day, subq_61.metric_time__day) AS metric_time__day
+    , COALESCE(subq_47.listing__country_latest, subq_61.listing__country_latest) AS listing__country_latest
+    , COALESCE(MAX(subq_47.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , COALESCE(MAX(subq_61.bookings_2_weeks_ago), 0) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -56,8 +56,8 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_36.listing__country_latest AS listing__country_latest
-        , subq_36.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+        , subq_41.listing__country_latest AS listing__country_latest
+        , subq_41.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
@@ -69,26 +69,27 @@ FROM (
           , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           -- Join Standard Outputs
+          -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
           SELECT
-            sma_28014_cte.country_latest AS listing__country_latest
-            , sma_28009_cte.metric_time__day AS metric_time__day
+            sma_28009_cte.metric_time__day AS metric_time__day
             , sma_28009_cte.booking__is_instant AS booking__is_instant
+            , sma_28014_cte.country_latest AS listing__country_latest
             , sma_28009_cte.__bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
           FROM sma_28009_cte
           LEFT OUTER JOIN
             sma_28014_cte
           ON
             sma_28009_cte.listing = sma_28014_cte.listing
-        ) subq_33
+        ) subq_38
         WHERE booking__is_instant
         GROUP BY
           metric_time__day
           , listing__country_latest
-      ) subq_36
+      ) subq_41
       ON
-        rss_28018_cte.ds__day = subq_36.metric_time__day
-    ) subq_40
-  ) subq_41
+        rss_28018_cte.ds__day = subq_41.metric_time__day
+    ) subq_46
+  ) subq_47
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
@@ -99,8 +100,8 @@ FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_48.listing__country_latest AS listing__country_latest
-        , subq_48.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+        , subq_55.listing__country_latest AS listing__country_latest
+        , subq_55.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
@@ -112,33 +113,34 @@ FROM (
           , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           -- Join Standard Outputs
+          -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
           SELECT
-            sma_28014_cte.country_latest AS listing__country_latest
-            , sma_28009_cte.metric_time__day AS metric_time__day
+            sma_28009_cte.metric_time__day AS metric_time__day
             , sma_28009_cte.booking__is_instant AS booking__is_instant
+            , sma_28014_cte.country_latest AS listing__country_latest
             , sma_28009_cte.__bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
           FROM sma_28009_cte
           LEFT OUTER JOIN
             sma_28014_cte
           ON
             sma_28009_cte.listing = sma_28014_cte.listing
-        ) subq_45
+        ) subq_52
         WHERE booking__is_instant
         GROUP BY
           metric_time__day
           , listing__country_latest
-      ) subq_48
+      ) subq_55
       ON
-        rss_28018_cte.ds__day - INTERVAL 14 day = subq_48.metric_time__day
-    ) subq_52
-  ) subq_53
+        rss_28018_cte.ds__day - INTERVAL 14 day = subq_55.metric_time__day
+    ) subq_60
+  ) subq_61
   ON
     (
-      subq_41.listing__country_latest = subq_53.listing__country_latest
+      subq_47.listing__country_latest = subq_61.listing__country_latest
     ) AND (
-      subq_41.metric_time__day = subq_53.metric_time__day
+      subq_47.metric_time__day = subq_61.metric_time__day
     )
   GROUP BY
-    COALESCE(subq_41.metric_time__day, subq_53.metric_time__day)
-    , COALESCE(subq_41.listing__country_latest, subq_53.listing__country_latest)
-) subq_54
+    COALESCE(subq_47.metric_time__day, subq_61.metric_time__day)
+    , COALESCE(subq_47.listing__country_latest, subq_61.listing__country_latest)
+) subq_62

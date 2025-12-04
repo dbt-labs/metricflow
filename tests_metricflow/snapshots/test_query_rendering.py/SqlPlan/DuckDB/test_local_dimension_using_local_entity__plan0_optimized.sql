@@ -12,10 +12,11 @@ FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
   -- Pass Only Elements: ['__listings', 'listing__country_latest']
+  -- Pass Only Elements: ['__listings', 'listing__country_latest']
   SELECT
     country AS listing__country_latest
     , 1 AS __listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_7
+) subq_9
 GROUP BY
   listing__country_latest

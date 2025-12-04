@@ -21,7 +21,7 @@ docstring:
             <!-- limit = '100' -->
             <FilterElementsNode>
                 <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
-                <!-- node_id = NodeId(id_str='pfe_0') -->
+                <!-- node_id = NodeId(id_str='pfe_1') -->
                 <!-- include_spec =                                               -->
                 <!--   DimensionSpec(                                             -->
                 <!--     element_name='country_latest',                           -->
@@ -48,11 +48,21 @@ docstring:
                     <!--       ),                                                          -->
                     <!--     ),                                                            -->
                     <!--   )                                                               -->
-                    <ReadSqlSourceNode>
-                        <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                        <!-- node_id = NodeId(id_str='rss_28024') -->
-                        <!-- data_set = SemanticModelDataSet('listings_latest') -->
-                    </ReadSqlSourceNode>
+                    <FilterElementsNode>
+                        <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
+                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- include_spec =                                               -->
+                        <!--   DimensionSpec(                                             -->
+                        <!--     element_name='country_latest',                           -->
+                        <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                        <!--   )                                                          -->
+                        <!-- distinct = False -->
+                        <ReadSqlSourceNode>
+                            <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                            <!-- node_id = NodeId(id_str='rss_28024') -->
+                            <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                        </ReadSqlSourceNode>
+                    </FilterElementsNode>
                 </WhereConstraintNode>
             </FilterElementsNode>
         </OrderByLimitNode>

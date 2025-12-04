@@ -42,7 +42,7 @@ docstring:
                             <FilterElementsNode>
                                 <!-- description =                                                                   -->
                                 <!--   "Pass Only Elements: ['__revenue', 'metric_time__month', 'metric_time__day']" -->
-                                <!-- node_id = NodeId(id_str='pfe_0') -->
+                                <!-- node_id = NodeId(id_str='pfe_1') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='revenue') -->
                                 <!-- include_spec =                                                                      -->
                                 <!--   TimeDimensionSpec(                                                                -->
@@ -55,35 +55,58 @@ docstring:
                                 <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                 <!--   )                                                                             -->
                                 <!-- distinct = False -->
-                                <JoinOverTimeRangeNode>
-                                    <!-- description = 'Join Self Over Time Range' -->
-                                    <!-- node_id = NodeId(id_str='jotr_0') -->
-                                    <!-- queried_agg_time_dimension_specs =                                                -->
-                                    <!--   (                                                                               -->
-                                    <!--     TimeDimensionSpec(                                                            -->
-                                    <!--       element_name='metric_time',                                                 -->
-                                    <!--       time_granularity=ExpandedTimeGranularity(                                   -->
-                                    <!--         name='month',                                                             -->
-                                    <!--         base_granularity=MONTH,                                                   -->
-                                    <!--       ),                                                                          -->
-                                    <!--     ),                                                                            -->
-                                    <!--     TimeDimensionSpec(                                                            -->
-                                    <!--       element_name='metric_time',                                                 -->
-                                    <!--       time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                    <!--     ),                                                                            -->
-                                    <!--   )                                                                               -->
-                                    <!-- window = PydanticMetricTimeWindow(count=2, granularity='month') -->
-                                    <MetricTimeDimensionTransformNode>
-                                        <!-- description = "Metric Time Dimension 'ds'" -->
-                                        <!-- node_id = NodeId(id_str='sma_28015') -->
-                                        <!-- aggregation_time_dimension = 'ds' -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description = "Read From SemanticModelDataSet('revenue')" -->
-                                            <!-- node_id = NodeId(id_str='rss_28026') -->
-                                            <!-- data_set = SemanticModelDataSet('revenue') -->
-                                        </ReadSqlSourceNode>
-                                    </MetricTimeDimensionTransformNode>
-                                </JoinOverTimeRangeNode>
+                                <FilterElementsNode>
+                                    <!-- description =                                                                   -->
+                                    <!--   "Pass Only Elements: ['__revenue', 'metric_time__month', 'metric_time__day']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                                    <!-- include_spec = SimpleMetricInputSpec(element_name='revenue') -->
+                                    <!-- include_spec =                                -->
+                                    <!--   TimeDimensionSpec(                          -->
+                                    <!--     element_name='metric_time',               -->
+                                    <!--     time_granularity=ExpandedTimeGranularity( -->
+                                    <!--       name='month',                           -->
+                                    <!--       base_granularity=MONTH,                 -->
+                                    <!--     ),                                        -->
+                                    <!--   )                                           -->
+                                    <!-- include_spec =                                                                  -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='metric_time',                                                 -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
+                                    <!-- distinct = False -->
+                                    <JoinOverTimeRangeNode>
+                                        <!-- description = 'Join Self Over Time Range' -->
+                                        <!-- node_id = NodeId(id_str='jotr_0') -->
+                                        <!-- queried_agg_time_dimension_specs =              -->
+                                        <!--   (                                             -->
+                                        <!--     TimeDimensionSpec(                          -->
+                                        <!--       element_name='metric_time',               -->
+                                        <!--       time_granularity=ExpandedTimeGranularity( -->
+                                        <!--         name='month',                           -->
+                                        <!--         base_granularity=MONTH,                 -->
+                                        <!--       ),                                        -->
+                                        <!--     ),                                          -->
+                                        <!--     TimeDimensionSpec(                          -->
+                                        <!--       element_name='metric_time',               -->
+                                        <!--       time_granularity=ExpandedTimeGranularity( -->
+                                        <!--         name='day',                             -->
+                                        <!--         base_granularity=DAY,                   -->
+                                        <!--       ),                                        -->
+                                        <!--     ),                                          -->
+                                        <!--   )                                             -->
+                                        <!-- window = PydanticMetricTimeWindow(count=2, granularity='month') -->
+                                        <MetricTimeDimensionTransformNode>
+                                            <!-- description = "Metric Time Dimension 'ds'" -->
+                                            <!-- node_id = NodeId(id_str='sma_28015') -->
+                                            <!-- aggregation_time_dimension = 'ds' -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description = "Read From SemanticModelDataSet('revenue')" -->
+                                                <!-- node_id = NodeId(id_str='rss_28026') -->
+                                                <!-- data_set = SemanticModelDataSet('revenue') -->
+                                            </ReadSqlSourceNode>
+                                        </MetricTimeDimensionTransformNode>
+                                    </JoinOverTimeRangeNode>
+                                </FilterElementsNode>
                             </FilterElementsNode>
                         </AggregateSimpleMetricInputsNode>
                     </ComputeMetricsNode>
