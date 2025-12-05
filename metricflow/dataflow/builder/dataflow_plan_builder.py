@@ -1972,7 +1972,7 @@ class DataflowPlanBuilder:
     def _build_pre_aggregation_plan(
         self,
         source_node: DataflowPlanNode,
-        specs_to_keep_for_aggregation: Optional[InstanceSpecSet] = None,
+        specs_to_keep_for_aggregation: InstanceSpecSet,
         join_targets: Sequence[JoinDescription] = (),
         custom_granularity_specs: Sequence[TimeDimensionSpec] = (),
         where_filter_specs: Sequence[WhereFilterSpec] = (),
@@ -1995,34 +1995,15 @@ class DataflowPlanBuilder:
 
         # Filter to specs needed for the rest of the query. This is needed to remove the potential for column name
         # conflicts for elements not needed in the query.
-        if specs_to_keep_for_aggregation:
-            preliminary_specs_to_keep_for_aggregation = specs_to_keep_for_aggregation
-            # Include specs needed for where constraints.
-            for where_filter_spec in where_filter_specs:
-                preliminary_specs_to_keep_for_aggregation = preliminary_specs_to_keep_for_aggregation.merge(
-                    where_filter_spec.instance_spec_set
-                )
-            # Include specs needed for time constraints.
-            if time_range_constraint:
-                time_constraint_spec = self._node_data_set_resolver.get_output_data_set(
-                    output_node
-                ).metric_time_instance_for_time_constraint.spec
-                preliminary_specs_to_keep_for_aggregation = preliminary_specs_to_keep_for_aggregation.merge(
-                    InstanceSpecSet.create_from_specs((time_constraint_spec,))
-                )
-            # Include specs needed for the semi-additive join.
-            if spec_properties and non_additive_dimension_spec:
-                semi_additive_join_specs: Tuple[
-                    InstanceSpec, ...
-                ] = non_additive_dimension_spec.window_groupings_as_specs
-                semi_additive_join_specs += (non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties),)
-                preliminary_specs_to_keep_for_aggregation = preliminary_specs_to_keep_for_aggregation.merge(
-                    InstanceSpecSet.create_from_specs(semi_additive_join_specs)
-                )
-            preliminary_specs_to_keep_for_aggregation = preliminary_specs_to_keep_for_aggregation.dedupe()
-            output_node = FilterElementsNode.create(
-                parent_node=output_node, include_specs=preliminary_specs_to_keep_for_aggregation
-            )
+        specs_to_keep_before_constraints = self._get_specs_to_keep_before_constraints(
+            output_node=output_node,
+            specs_to_keep_for_aggregation=specs_to_keep_for_aggregation,
+            where_filter_specs=where_filter_specs,
+            time_range_constraint=time_range_constraint,
+            spec_properties=spec_properties,
+            non_additive_dimension_spec=non_additive_dimension_spec,
+        )
+        output_node = FilterElementsNode.create(parent_node=output_node, include_specs=specs_to_keep_before_constraints)
 
         if len(where_filter_specs) > 0:
             output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
@@ -2043,12 +2024,44 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs_for_semi_additive_join,
                 parent_node=output_node,
             )
-        if specs_to_keep_for_aggregation:
-            output_node = FilterElementsNode.create(
-                parent_node=output_node, include_specs=specs_to_keep_for_aggregation, distinct=distinct
-            )
+
+        output_node = FilterElementsNode.create(
+            parent_node=output_node, include_specs=specs_to_keep_for_aggregation, distinct=distinct
+        )
 
         return output_node
+
+    def _get_specs_to_keep_before_constraints(
+        self,
+        output_node: DataflowPlanNode,
+        specs_to_keep_for_aggregation: InstanceSpecSet,
+        where_filter_specs: Sequence[WhereFilterSpec],
+        time_range_constraint: Optional[TimeRangeConstraint],
+        spec_properties: Optional[SimpleMetricInputSpecProperties],
+        non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec],
+    ) -> InstanceSpecSet:
+        specs_to_keep_before_constraints = specs_to_keep_for_aggregation
+        # Include specs needed for where constraints.
+        for where_filter_spec in where_filter_specs:
+            specs_to_keep_before_constraints = specs_to_keep_before_constraints.merge(
+                where_filter_spec.instance_spec_set
+            )
+        # Include specs needed for time constraints.
+        if time_range_constraint:
+            time_constraint_spec = self._node_data_set_resolver.get_output_data_set(
+                output_node
+            ).metric_time_instance_for_time_constraint.spec
+            specs_to_keep_before_constraints = specs_to_keep_before_constraints.merge(
+                InstanceSpecSet.create_from_specs((time_constraint_spec,))
+            )
+        # Include specs needed for the semi-additive join.
+        if spec_properties and non_additive_dimension_spec:
+            semi_additive_join_specs: Tuple[InstanceSpec, ...] = non_additive_dimension_spec.window_groupings_as_specs
+            semi_additive_join_specs += (non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties),)
+            specs_to_keep_before_constraints = specs_to_keep_before_constraints.merge(
+                InstanceSpecSet.create_from_specs(semi_additive_join_specs)
+            )
+        return specs_to_keep_before_constraints.dedupe()
 
     def _build_semi_additive_join_node(
         self,
