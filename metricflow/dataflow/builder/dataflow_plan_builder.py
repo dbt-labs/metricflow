@@ -1673,23 +1673,24 @@ class DataflowPlanBuilder:
 
         # TODO: fix bug here where filter specs are being included in when aggregating.
         if len(metric_spec.filter_spec_set.all_filter_specs) > 0 or time_range_constraint:
-            # FilterElementsNode will only be needed if there are where filter specs that were selected in the group by.
-            specs_in_filters = set(
-                linkable_spec
-                for filter_spec in metric_spec.filter_spec_set.all_filter_specs
-                for linkable_spec in filter_spec.linkable_specs
-            )
+            where_filter_specs = metric_spec.filter_spec_set.all_filter_specs
+            if len(where_filter_specs) > 0:
+                output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
+            if time_range_constraint:
+                output_node = ConstrainTimeRangeNode.create(
+                    parent_node=output_node, time_range_constraint=time_range_constraint
+                )
+            # FilterElementsNode will be needed if there are where filter specs that were not selected in the group by.
             filter_to_specs = None
+            specs_in_filters = set(
+                linkable_spec for filter_spec in where_filter_specs for linkable_spec in filter_spec.linkable_specs
+            )
             if not specs_in_filters.issubset(queried_linkable_specs):
                 filter_to_specs = InstanceSpecSet(metric_specs=(metric_spec,)).merge(
                     InstanceSpecSet.create_from_specs(queried_linkable_specs)
                 )
-            output_node = self._build_pre_aggregation_plan(
-                source_node=output_node,
-                where_filter_specs=metric_spec.filter_spec_set.all_filter_specs,
-                time_range_constraint=time_range_constraint,
-                filter_to_specs=filter_to_specs,
-            )
+            if filter_to_specs:
+                output_node = FilterElementsNode.create(parent_node=output_node, include_specs=filter_to_specs)
         return output_node
 
     def _build_time_spine_join_node_for_before_aggregation(

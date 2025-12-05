@@ -22,11 +22,10 @@ FROM (
     , bookings_offset_once
   FROM (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['booking__is_instant', 'metric_time__day', 'bookings_offset_once']
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_32.booking__is_instant AS booking__is_instant
-      , subq_32.bookings_offset_once AS bookings_offset_once
+      , subq_31.booking__is_instant AS booking__is_instant
+      , subq_31.bookings_offset_once AS bookings_offset_once
     FROM rss_28018_cte
     INNER JOIN (
       -- Compute Metrics via Expressions
@@ -39,8 +38,8 @@ FROM (
         -- Compute Metrics via Expressions
         SELECT
           rss_28018_cte.ds__day AS metric_time__day
-          , subq_25.booking__is_instant AS booking__is_instant
-          , subq_25.__bookings AS bookings
+          , subq_24.booking__is_instant AS booking__is_instant
+          , subq_24.__bookings AS bookings
         FROM rss_28018_cte
         INNER JOIN (
           -- Aggregate Inputs for Simple Metrics
@@ -58,17 +57,17 @@ FROM (
               , is_instant AS booking__is_instant
               , 1 AS __bookings
             FROM ***************************.fct_bookings bookings_source_src_28000
-          ) subq_24
+          ) subq_23
           GROUP BY
             metric_time__day
             , booking__is_instant
-        ) subq_25
+        ) subq_24
         ON
-          rss_28018_cte.ds__day - INTERVAL 5 day = subq_25.metric_time__day
-      ) subq_31
-    ) subq_32
+          rss_28018_cte.ds__day - INTERVAL 5 day = subq_24.metric_time__day
+      ) subq_30
+    ) subq_31
     ON
-      rss_28018_cte.ds__day - INTERVAL 2 day = subq_32.metric_time__day
-  ) subq_38
+      rss_28018_cte.ds__day - INTERVAL 2 day = subq_31.metric_time__day
+  ) subq_36
   WHERE booking__is_instant
-) subq_40
+) subq_38
