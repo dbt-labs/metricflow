@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from hashlib import sha1
-from typing import Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
@@ -16,6 +16,9 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_column_type import SqlColumnType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+
+if TYPE_CHECKING:
+    from metricflow.dataflow.builder.simple_metric_input_spec_properties import SimpleMetricInputSpecProperties
 
 logger = logging.getLogger(__file__)
 
@@ -85,3 +88,16 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
             ),
         ) + tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)
+
+    @property
+    def window_groupings_as_specs(self) -> Tuple[LinklessEntitySpec, ...]:  # noqa: D102
+        return tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)
+
+    def name_as_time_dimension_spec(  # noqa: D102
+        self, spec_properties: SimpleMetricInputSpecProperties
+    ) -> TimeDimensionSpec:
+        return TimeDimensionSpec(
+            element_name=self.name,
+            entity_links=(),
+            time_granularity=ExpandedTimeGranularity.from_time_granularity(spec_properties.agg_time_dimension_grain),
+        )

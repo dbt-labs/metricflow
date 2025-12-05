@@ -26,13 +26,14 @@ FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
+        -- Pass Only Elements: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
         SELECT
           DATETIME_TRUNC(ds, day) AS metric_time__day
           , 1 AS __bookings_fill_nulls_with_0_without_time_spine
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_9
+      ) subq_11
       GROUP BY
         metric_time__day
-    ) subq_10
-  ) subq_11
-) subq_12
+    ) subq_12
+  ) subq_13
+) subq_14

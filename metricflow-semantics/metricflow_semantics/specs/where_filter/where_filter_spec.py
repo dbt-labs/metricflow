@@ -12,6 +12,7 @@ from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set 
 )
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.toolkit.merger import Mergeable
 
@@ -58,6 +59,10 @@ class WhereFilterSpec(Mergeable, SerializableDataclass):
     @cached_property
     def linkable_specs(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D102
         return self.element_set.specs
+
+    @cached_property
+    def instance_spec_set(self) -> InstanceSpecSet:  # noqa: D102
+        return InstanceSpecSet.create_from_specs(self.linkable_specs)
 
     def merge(self, other: WhereFilterSpec) -> WhereFilterSpec:  # noqa: D102
         if self == WhereFilterSpec.empty_instance():

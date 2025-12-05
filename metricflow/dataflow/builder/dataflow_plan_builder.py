@@ -30,8 +30,8 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
-from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -364,7 +364,7 @@ class DataflowPlanBuilder:
         unaggregated_base_input_metric_node = self._build_pre_aggregation_plan(
             source_node=base_source_node_recipe.source_node,
             join_targets=base_source_node_recipe.join_targets,
-            filter_to_specs=group_specs_by_type(required_local_specs)
+            specs_to_keep_for_aggregation=group_specs_by_type(required_local_specs)
             .merge(base_required_linkable_specs.as_instance_spec_set)
             .dedupe(),
             custom_granularity_specs=base_required_linkable_specs.time_dimension_specs_with_custom_grain,
@@ -886,7 +886,7 @@ class DataflowPlanBuilder:
         output_node = self._build_pre_aggregation_plan(
             source_node=dataflow_recipe.source_node,
             join_targets=dataflow_recipe.join_targets,
-            filter_to_specs=InstanceSpecSet.create_from_specs(base_query_spec.linkable_specs.as_tuple),
+            specs_to_keep_for_aggregation=InstanceSpecSet.create_from_specs(base_query_spec.linkable_specs.as_tuple),
             custom_granularity_specs=required_linkable_specs.time_dimension_specs_with_custom_grain,
             where_filter_specs=query_level_filter_specs,
             time_range_constraint=base_query_spec.time_range_constraint,
@@ -1673,23 +1673,26 @@ class DataflowPlanBuilder:
 
         # TODO: fix bug here where filter specs are being included in when aggregating.
         if len(metric_spec.filter_spec_set.all_filter_specs) > 0 or time_range_constraint:
-            # FilterElementsNode will only be needed if there are where filter specs that were selected in the group by.
+            where_filter_specs = metric_spec.filter_spec_set.all_filter_specs
+            if len(where_filter_specs) > 0:
+                output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
+            if time_range_constraint:
+                output_node = ConstrainTimeRangeNode.create(
+                    parent_node=output_node, time_range_constraint=time_range_constraint
+                )
+            # FilterElementsNode will be needed if there are where filter specs that were not selected in the group by.
+            specs_to_keep_for_aggregation = None
             specs_in_filters = set(
-                linkable_spec
-                for filter_spec in metric_spec.filter_spec_set.all_filter_specs
-                for linkable_spec in filter_spec.linkable_specs
+                linkable_spec for filter_spec in where_filter_specs for linkable_spec in filter_spec.linkable_specs
             )
-            filter_to_specs = None
             if not specs_in_filters.issubset(queried_linkable_specs):
-                filter_to_specs = InstanceSpecSet(metric_specs=(metric_spec,)).merge(
+                specs_to_keep_for_aggregation = InstanceSpecSet(metric_specs=(metric_spec,)).merge(
                     InstanceSpecSet.create_from_specs(queried_linkable_specs)
                 )
-            output_node = self._build_pre_aggregation_plan(
-                source_node=output_node,
-                where_filter_specs=metric_spec.filter_spec_set.all_filter_specs,
-                time_range_constraint=time_range_constraint,
-                filter_to_specs=filter_to_specs,
-            )
+            if specs_to_keep_for_aggregation:
+                output_node = FilterElementsNode.create(
+                    parent_node=output_node, include_specs=specs_to_keep_for_aggregation
+                )
         return output_node
 
     def _build_time_spine_join_node_for_before_aggregation(
@@ -1940,7 +1943,7 @@ class DataflowPlanBuilder:
             custom_granularity_specs=custom_granularity_specs_to_join,
             where_filter_specs=simple_metric_recipe.combined_filter_spec_set.all_filter_specs,
             time_range_constraint=time_range_constraint_to_apply,
-            filter_to_specs=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,)).merge(
+            specs_to_keep_for_aggregation=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,)).merge(
                 InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
             ),
             spec_properties=spec_properties,
@@ -1969,7 +1972,7 @@ class DataflowPlanBuilder:
     def _build_pre_aggregation_plan(
         self,
         source_node: DataflowPlanNode,
-        filter_to_specs: Optional[InstanceSpecSet] = None,
+        specs_to_keep_for_aggregation: InstanceSpecSet,
         join_targets: Sequence[JoinDescription] = (),
         custom_granularity_specs: Sequence[TimeDimensionSpec] = (),
         where_filter_specs: Sequence[WhereFilterSpec] = (),
@@ -1980,6 +1983,8 @@ class DataflowPlanBuilder:
     ) -> DataflowPlanNode:
         """Adds standard pre-aggegation steps after building source node and before aggregation."""
         output_node = source_node
+        non_additive_dimension_spec = spec_properties.non_additive_dimension_spec if spec_properties else None
+
         if join_targets:
             output_node = JoinOnEntitiesNode.create(left_node=output_node, join_targets=join_targets)
 
@@ -1987,6 +1992,18 @@ class DataflowPlanBuilder:
             output_node = JoinToCustomGranularityNode.create(
                 parent_node=output_node, time_dimension_spec=custom_granularity_spec
             )
+
+        # Filter to specs needed for the rest of the query. This is needed to remove the potential for column name
+        # conflicts for elements not needed in the query.
+        specs_to_keep_before_constraints = self._get_specs_to_keep_before_constraints(
+            output_node=output_node,
+            specs_to_keep_for_aggregation=specs_to_keep_for_aggregation,
+            where_filter_specs=where_filter_specs,
+            time_range_constraint=time_range_constraint,
+            spec_properties=spec_properties,
+            non_additive_dimension_spec=non_additive_dimension_spec,
+        )
+        output_node = FilterElementsNode.create(parent_node=output_node, include_specs=specs_to_keep_before_constraints)
 
         if len(where_filter_specs) > 0:
             output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
@@ -1996,7 +2013,7 @@ class DataflowPlanBuilder:
                 parent_node=output_node, time_range_constraint=time_range_constraint
             )
 
-        if spec_properties and spec_properties.non_additive_dimension_spec:
+        if spec_properties and non_additive_dimension_spec:
             if queried_linkable_specs_for_semi_additive_join is None:
                 raise ValueError(
                     "`queried_linkable_specs_for_semi_additive_join` must be provided in when building pre-aggregation plan "
@@ -2007,12 +2024,44 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs_for_semi_additive_join,
                 parent_node=output_node,
             )
-        if filter_to_specs:
-            output_node = FilterElementsNode.create(
-                parent_node=output_node, include_specs=filter_to_specs, distinct=distinct
-            )
+
+        output_node = FilterElementsNode.create(
+            parent_node=output_node, include_specs=specs_to_keep_for_aggregation, distinct=distinct
+        )
 
         return output_node
+
+    def _get_specs_to_keep_before_constraints(
+        self,
+        output_node: DataflowPlanNode,
+        specs_to_keep_for_aggregation: InstanceSpecSet,
+        where_filter_specs: Sequence[WhereFilterSpec],
+        time_range_constraint: Optional[TimeRangeConstraint],
+        spec_properties: Optional[SimpleMetricInputSpecProperties],
+        non_additive_dimension_spec: Optional[NonAdditiveDimensionSpec],
+    ) -> InstanceSpecSet:
+        specs_to_keep_before_constraints = specs_to_keep_for_aggregation
+        # Include specs needed for where constraints.
+        for where_filter_spec in where_filter_specs:
+            specs_to_keep_before_constraints = specs_to_keep_before_constraints.merge(
+                where_filter_spec.instance_spec_set
+            )
+        # Include specs needed for time constraints.
+        if time_range_constraint:
+            time_constraint_spec = self._node_data_set_resolver.get_output_data_set(
+                output_node
+            ).metric_time_instance_for_time_constraint.spec
+            specs_to_keep_before_constraints = specs_to_keep_before_constraints.merge(
+                InstanceSpecSet.create_from_specs((time_constraint_spec,))
+            )
+        # Include specs needed for the semi-additive join.
+        if spec_properties and non_additive_dimension_spec:
+            semi_additive_join_specs: Tuple[InstanceSpec, ...] = non_additive_dimension_spec.window_groupings_as_specs
+            semi_additive_join_specs += (non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties),)
+            specs_to_keep_before_constraints = specs_to_keep_before_constraints.merge(
+                InstanceSpecSet.create_from_specs(semi_additive_join_specs)
+            )
+        return specs_to_keep_before_constraints.dedupe()
 
     def _build_semi_additive_join_node(
         self,
@@ -2026,21 +2075,13 @@ class DataflowPlanBuilder:
         ), "_build_semi_additive_join_node() should only be called if there is a non_additive_dimension_spec."
         # Apply semi additive join on the node
         agg_time_dimension = spec_properties.agg_time_dimension
-        non_additive_dimension_grain = spec_properties.agg_time_dimension_grain
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = self._find_non_additive_dimension_in_linkable_specs(
             agg_time_dimension=agg_time_dimension,
             linkable_specs=queried_linkable_specs.as_tuple,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
-        time_dimension_spec = TimeDimensionSpec(
-            # The NonAdditiveDimensionSpec name property is a plain element name
-            element_name=non_additive_dimension_spec.name,
-            entity_links=(),
-            time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
-        )
-        window_groupings = tuple(
-            LinklessEntitySpec.from_element_name(name) for name in non_additive_dimension_spec.window_groupings
-        )
+        time_dimension_spec = non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties)
+        window_groupings = non_additive_dimension_spec.window_groupings_as_specs
         return SemiAdditiveJoinNode.create(
             parent_node=parent_node,
             entity_specs=window_groupings,
@@ -2086,7 +2127,7 @@ class DataflowPlanBuilder:
         if join_on_time_dimension_spec not in required_specs:
             required_specs = (join_on_time_dimension_spec,) + required_specs
 
-        filter_to_specs = required_specs  # Filter to specs should not include where filter specs
+        specs_to_keep_for_aggregation = required_specs  # Filter to specs should not include where filter specs
 
         for filter_spec in where_filter_specs:
             for time_dimension_spec in filter_spec.linkable_spec_set.time_dimension_specs:
@@ -2101,7 +2142,7 @@ class DataflowPlanBuilder:
                 required_time_spine_specs=required_specs,
                 use_offset_custom_granularity_node=use_offset_custom_granularity_node,
             )
-            filter_to_specs = self._node_data_set_resolver.get_output_data_set(
+            specs_to_keep_for_aggregation = self._node_data_set_resolver.get_output_data_set(
                 time_spine_node
             ).instance_set.spec_set.time_dimension_specs
         else:
@@ -2138,11 +2179,11 @@ class DataflowPlanBuilder:
             # If the base grain of the time spine isn't selected, it will have duplicate rows that need deduping.
             should_dedupe = ExpandedTimeGranularity.from_time_granularity(
                 smallest_time_spine_source.base_granularity
-            ) not in {spec.time_granularity for spec in filter_to_specs}
+            ) not in {spec.time_granularity for spec in specs_to_keep_for_aggregation}
 
         return self._build_pre_aggregation_plan(
             source_node=time_spine_node,
-            filter_to_specs=InstanceSpecSet(time_dimension_specs=filter_to_specs),
+            specs_to_keep_for_aggregation=InstanceSpecSet(time_dimension_specs=specs_to_keep_for_aggregation),
             time_range_constraint=time_range_constraint,
             where_filter_specs=where_filter_specs,
             custom_granularity_specs=custom_grain_specs_to_join,

@@ -14,11 +14,12 @@ SELECT
   , listing__capacity_latest AS listing_capacity
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
+  -- Pass Only Elements: ['listing__capacity_latest', 'listing']
   SELECT
-    capacity AS listing__capacity_latest
-    , listing_id AS listing
+    listing_id AS listing
+    , capacity AS listing__capacity_latest
   FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_5
+) subq_7
 WHERE listing__capacity_latest > 2
 GROUP BY
   listing

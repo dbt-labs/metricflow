@@ -26,11 +26,11 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day) AS metric_time__day
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month) AS metric_time__month
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year) AS metric_time__year
-    , MAX(subq_23.booking_value) AS booking_value
-    , MAX(subq_27.bookers) AS bookers
+    COALESCE(subq_28.metric_time__day, subq_33.metric_time__day) AS metric_time__day
+    , COALESCE(subq_28.metric_time__month, subq_33.metric_time__month) AS metric_time__month
+    , COALESCE(subq_28.metric_time__year, subq_33.metric_time__year) AS metric_time__year
+    , MAX(subq_28.booking_value) AS booking_value
+    , MAX(subq_33.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
@@ -38,10 +38,11 @@ FROM (
       time_spine_src_28006.ds AS metric_time__day
       , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
       , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
-      , subq_18.__booking_value AS booking_value
+      , subq_22.__booking_value AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       -- Aggregate Inputs for Simple Metrics
       SELECT
@@ -54,12 +55,13 @@ FROM (
         metric_time__day
         , metric_time__month
         , metric_time__year
-    ) subq_18
+    ) subq_22
     ON
-      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = subq_18.metric_time__day
-  ) subq_23
+      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = subq_22.metric_time__day
+  ) subq_28
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Pass Only Elements: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -73,17 +75,17 @@ FROM (
       metric_time__day
       , metric_time__month
       , metric_time__year
-  ) subq_27
+  ) subq_33
   ON
     (
-      subq_23.metric_time__day = subq_27.metric_time__day
+      subq_28.metric_time__day = subq_33.metric_time__day
     ) AND (
-      subq_23.metric_time__month = subq_27.metric_time__month
+      subq_28.metric_time__month = subq_33.metric_time__month
     ) AND (
-      subq_23.metric_time__year = subq_27.metric_time__year
+      subq_28.metric_time__year = subq_33.metric_time__year
     )
   GROUP BY
     metric_time__day
     , metric_time__month
     , metric_time__year
-) subq_28
+) subq_34

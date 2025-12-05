@@ -13,27 +13,28 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , subq_20.__bookers AS every_2_days_bookers_2_days_ago
+    , subq_23.__bookers AS every_2_days_bookers_2_days_ago
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Join Self Over Time Range
     -- Pass Only Elements: ['__bookers', 'metric_time__day']
+    -- Pass Only Elements: ['__bookers', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      subq_17.ds AS metric_time__day
+      subq_19.ds AS metric_time__day
       , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS __bookers
-    FROM ***************************.mf_time_spine subq_17
+    FROM ***************************.mf_time_spine subq_19
     INNER JOIN
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_17.ds
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_19.ds
       ) AND (
-        DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_17.ds AS DATETIME), INTERVAL 2 day)
+        DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_19.ds AS DATETIME), INTERVAL 2 day)
       )
     GROUP BY
       metric_time__day
-  ) subq_20
+  ) subq_23
   ON
-    DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 2 day) = subq_20.metric_time__day
-) subq_26
+    DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 2 day) = subq_23.metric_time__day
+) subq_30

@@ -25,6 +25,15 @@ FROM (
   --   'metric_time__extract_quarter',
   --   'metric_time__extract_year',
   -- ]
+  -- Pass Only Elements: [
+  --   '__bookings',
+  --   'metric_time__extract_day',
+  --   'metric_time__extract_dow',
+  --   'metric_time__extract_doy',
+  --   'metric_time__extract_month',
+  --   'metric_time__extract_quarter',
+  --   'metric_time__extract_year',
+  -- ]
   SELECT
     EXTRACT(year FROM ds) AS metric_time__extract_year
     , EXTRACT(quarter FROM ds) AS metric_time__extract_quarter
@@ -34,7 +43,7 @@ FROM (
     , EXTRACT(dayofyear FROM ds) AS metric_time__extract_doy
     , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_9
 GROUP BY
   metric_time__extract_year
   , metric_time__extract_quarter

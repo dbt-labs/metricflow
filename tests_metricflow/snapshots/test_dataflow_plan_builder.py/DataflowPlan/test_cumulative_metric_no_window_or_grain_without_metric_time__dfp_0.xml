@@ -19,19 +19,25 @@ test_filename: test_dataflow_plan_builder.py
                     <!-- null_fill_value_mapping = {} -->
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['__revenue']" -->
-                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='revenue') -->
                         <!-- distinct = False -->
-                        <MetricTimeDimensionTransformNode>
-                            <!-- description = "Metric Time Dimension 'ds'" -->
-                            <!-- node_id = NodeId(id_str='sma_28015') -->
-                            <!-- aggregation_time_dimension = 'ds' -->
-                            <ReadSqlSourceNode>
-                                <!-- description = "Read From SemanticModelDataSet('revenue')" -->
-                                <!-- node_id = NodeId(id_str='rss_28026') -->
-                                <!-- data_set = SemanticModelDataSet('revenue') -->
-                            </ReadSqlSourceNode>
-                        </MetricTimeDimensionTransformNode>
+                        <FilterElementsNode>
+                            <!-- description = "Pass Only Elements: ['__revenue']" -->
+                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='revenue') -->
+                            <!-- distinct = False -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                <!-- node_id = NodeId(id_str='sma_28015') -->
+                                <!-- aggregation_time_dimension = 'ds' -->
+                                <ReadSqlSourceNode>
+                                    <!-- description = "Read From SemanticModelDataSet('revenue')" -->
+                                    <!-- node_id = NodeId(id_str='rss_28026') -->
+                                    <!-- data_set = SemanticModelDataSet('revenue') -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </FilterElementsNode>
                     </FilterElementsNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>

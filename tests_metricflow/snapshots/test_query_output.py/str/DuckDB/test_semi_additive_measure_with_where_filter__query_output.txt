@@ -1,0 +1,8 @@
+test_name: test_semi_additive_measure_with_where_filter
+test_filename: test_query_output.py
+---
+user        current_account_balance_by_user
+--------  ---------------------------------
+u0004114                               1213
+u0005414                               5582
+u0005432                                234

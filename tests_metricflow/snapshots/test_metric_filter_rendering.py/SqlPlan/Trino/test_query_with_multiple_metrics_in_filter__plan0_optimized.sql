@@ -23,10 +23,11 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['__listings', 'listing__bookings', 'listing__bookers']
   SELECT
-    subq_31.listing__bookings AS listing__bookings
-    , subq_36.listing__bookers AS listing__bookers
-    , subq_25.__listings AS listings
+    subq_37.listing__bookings AS listing__bookings
+    , subq_43.listing__bookers AS listing__bookers
+    , subq_30.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -34,9 +35,10 @@ FROM (
       listing_id AS listing
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_25
+  ) subq_30
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__bookings', 'listing']
     -- Pass Only Elements: ['__bookings', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -47,11 +49,12 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_31
+  ) subq_37
   ON
-    subq_25.listing = subq_31.listing
+    subq_30.listing = subq_37.listing
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__bookers', 'listing']
     -- Pass Only Elements: ['__bookers', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -62,8 +65,8 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_36
+  ) subq_43
   ON
-    subq_25.listing = subq_36.listing
-) subq_37
+    subq_30.listing = subq_43.listing
+) subq_45
 WHERE listing__bookings > 2 AND listing__bookers > 1

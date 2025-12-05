@@ -18,9 +18,9 @@ WITH sma_28009_cte AS (
 )
 
 SELECT
-  COALESCE(subq_18.booking__is_instant, subq_23.booking__is_instant) AS booking__is_instant
-  , MAX(subq_18.derived_shared_alias_1a) AS derived_shared_alias_1a
-  , MAX(subq_23.derived_shared_alias_2) AS derived_shared_alias_2
+  COALESCE(subq_21.booking__is_instant, subq_27.booking__is_instant) AS booking__is_instant
+  , MAX(subq_21.derived_shared_alias_1a) AS derived_shared_alias_1a
+  , MAX(subq_27.derived_shared_alias_2) AS derived_shared_alias_2
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -28,6 +28,7 @@ FROM (
     , shared_alias - 10 AS derived_shared_alias_1a
   FROM (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__bookings', 'booking__is_instant']
     -- Pass Only Elements: ['__bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -37,8 +38,8 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       booking__is_instant
-  ) subq_17
-) subq_18
+  ) subq_20
+) subq_21
 FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
@@ -46,6 +47,7 @@ FULL OUTER JOIN (
     , shared_alias + 10 AS derived_shared_alias_2
   FROM (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__instant_bookings', 'booking__is_instant']
     -- Pass Only Elements: ['__instant_bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -55,10 +57,10 @@ FULL OUTER JOIN (
     FROM sma_28009_cte
     GROUP BY
       booking__is_instant
-  ) subq_22
-) subq_23
+  ) subq_26
+) subq_27
 ON
-  subq_18.booking__is_instant = subq_23.booking__is_instant
+  subq_21.booking__is_instant = subq_27.booking__is_instant
 GROUP BY
   booking__is_instant
 LIMIT 1

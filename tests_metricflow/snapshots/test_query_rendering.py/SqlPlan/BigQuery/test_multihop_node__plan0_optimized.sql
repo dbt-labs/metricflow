@@ -6,11 +6,12 @@ sql_engine: BigQuery
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
+-- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_24.customer_id__customer_name AS account_id__customer_id__customer_name
+  subq_25.customer_id__customer_name AS account_id__customer_id__customer_name
   , SUM(account_month_txns_src_22000.txn_count) AS txn_count
 FROM ***************************.account_month_txns account_month_txns_src_22000
 LEFT OUTER JOIN (
@@ -29,12 +30,12 @@ LEFT OUTER JOIN (
     ) AND (
       DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) = DATETIME_TRUNC(customer_table_src_22000.ds_partitioned, day)
     )
-) subq_24
+) subq_25
 ON
   (
-    account_month_txns_src_22000.account_id = subq_24.account_id
+    account_month_txns_src_22000.account_id = subq_25.account_id
   ) AND (
-    DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_24.ds_partitioned__day
+    DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_25.ds_partitioned__day
   )
 GROUP BY
   account_id__customer_id__customer_name

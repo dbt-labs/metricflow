@@ -6,8 +6,8 @@ sql_engine: Redshift
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_19.booking__ds__day AS booking__ds__day
-  , subq_15.__bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
+  subq_23.booking__ds__day AS booking__ds__day
+  , subq_18.__bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['booking__ds__day']
@@ -16,14 +16,15 @@ FROM (
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
+    -- Pass Only Elements: ['booking__ds__day', 'metric_time__day', 'booking__ds__month']
     SELECT
       ds AS booking__ds__day
       , ds AS metric_time__day
       , DATE_TRUNC('month', ds) AS booking__ds__month
     FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_17
+  ) subq_21
   WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
-) subq_19
+) subq_23
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
   -- Pass Only Elements: ['__bookings_join_to_time_spine_with_tiered_filters', 'booking__ds__day']
@@ -34,16 +35,17 @@ LEFT OUTER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['__bookings_join_to_time_spine_with_tiered_filters', 'booking__ds__day', 'metric_time__day', 'booking__ds__month']
     SELECT
       DATE_TRUNC('day', ds) AS booking__ds__day
       , DATE_TRUNC('month', ds) AS booking__ds__month
       , DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
-  ) subq_12
+  ) subq_15
   WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
   GROUP BY
     booking__ds__day
-) subq_15
+) subq_18
 ON
-  subq_19.booking__ds__day = subq_15.booking__ds__day
+  subq_23.booking__ds__day = subq_18.booking__ds__day

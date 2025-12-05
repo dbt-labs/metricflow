@@ -3,6 +3,7 @@ test_filename: test_metric_time_without_metrics.py
 sql_engine: Redshift
 ---
 -- Join Standard Outputs
+-- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
 -- Constrain Time Range to [2020-01-01T00:00:00, 2020-01-03T00:00:00]
 -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
 -- Write to DataTable

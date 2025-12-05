@@ -32,35 +32,36 @@ FROM (
       time_spine_src_28006.ds AS metric_time__day
       , DATETIME_TRUNC(time_spine_src_28006.ds, isoweek) AS metric_time__week
       , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS booking__ds__month
-      , subq_21.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
+      , subq_24.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
     FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
       -- Join Self Over Time Range
       -- Pass Only Elements: ['__bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
+      -- Pass Only Elements: ['__bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
-        DATETIME_TRUNC(subq_18.ds, month) AS booking__ds__month
-        , subq_18.ds AS metric_time__day
-        , DATETIME_TRUNC(subq_18.ds, isoweek) AS metric_time__week
+        DATETIME_TRUNC(subq_20.ds, month) AS booking__ds__month
+        , subq_20.ds AS metric_time__day
+        , DATETIME_TRUNC(subq_20.ds, isoweek) AS metric_time__week
         , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS __bookers_fill_nulls_with_0_join_to_timespine
-      FROM ***************************.mf_time_spine subq_18
+      FROM ***************************.mf_time_spine subq_20
       INNER JOIN
         ***************************.fct_bookings bookings_source_src_28000
       ON
         (
-          DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_18.ds
+          DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_20.ds
         ) AND (
-          DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_18.ds AS DATETIME), INTERVAL 2 day)
+          DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_20.ds AS DATETIME), INTERVAL 2 day)
         )
       GROUP BY
         booking__ds__month
         , metric_time__day
         , metric_time__week
-    ) subq_21
+    ) subq_24
     ON
-      time_spine_src_28006.ds = subq_21.metric_time__day
-  ) subq_25
-) subq_28
+      time_spine_src_28006.ds = subq_24.metric_time__day
+  ) subq_29
+) subq_32
 GROUP BY
   metric_time__week
   , booking__ds__month

@@ -12,14 +12,15 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Join to Custom Granularity Dataset
+  -- Pass Only Elements: ['listing__ds__alien_day']
   SELECT
-    subq_4.alien_day AS listing__ds__alien_day
+    subq_5.alien_day AS listing__ds__alien_day
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_4
+    ***************************.mf_time_spine subq_5
   ON
-    DATETIME_TRUNC(listings_latest_src_28000.created_at, day) = subq_4.ds
-) subq_5
+    DATETIME_TRUNC(listings_latest_src_28000.created_at, day) = subq_5.ds
+) subq_7
 WHERE listing__ds__alien_day = '2020-01-01'
 GROUP BY
   listing__ds__alien_day

@@ -23,9 +23,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month) AS metric_time__month
-    , MAX(subq_26.booking_value) AS booking_value
-    , MAX(subq_31.bookers) AS bookers
+    COALESCE(subq_31.metric_time__month, subq_37.metric_time__month) AS metric_time__month
+    , MAX(subq_31.booking_value) AS booking_value
+    , MAX(subq_37.bookers) AS bookers
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['__booking_value', 'metric_time__month']
@@ -36,6 +36,7 @@ FROM (
       , SUM(booking_value) AS booking_value
     FROM (
       -- Join to Time Spine Dataset
+      -- Pass Only Elements: ['__booking_value', 'metric_time__month', 'metric_time__day']
       SELECT
         time_spine_src_28006.ds AS metric_time__day
         , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
@@ -45,11 +46,11 @@ FROM (
         sma_28009_cte
       ON
         DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = sma_28009_cte.metric_time__day
-    ) subq_22
+    ) subq_27
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_26
+  ) subq_31
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['__bookers', 'metric_time__month']
@@ -60,18 +61,19 @@ FROM (
       , COUNT(DISTINCT bookers) AS bookers
     FROM (
       -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['__bookers', 'metric_time__month', 'metric_time__day']
       SELECT
         metric_time__day
         , metric_time__month
         , __bookers AS bookers
       FROM sma_28009_cte
-    ) subq_27
+    ) subq_33
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_31
+  ) subq_37
   ON
-    subq_26.metric_time__month = subq_31.metric_time__month
+    subq_31.metric_time__month = subq_37.metric_time__month
   GROUP BY
     metric_time__month
-) subq_32
+) subq_38

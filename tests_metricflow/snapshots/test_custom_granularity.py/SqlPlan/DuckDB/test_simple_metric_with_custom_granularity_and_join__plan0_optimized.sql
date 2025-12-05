@@ -5,12 +5,13 @@ sql_engine: DuckDB
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['__bookings', 'listing__ds__alien_day']
+-- Pass Only Elements: ['__bookings', 'listing__ds__alien_day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_15.alien_day AS listing__ds__alien_day
-  , SUM(subq_11.__bookings) AS bookings
+  subq_16.alien_day AS listing__ds__alien_day
+  , SUM(subq_12.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -18,14 +19,14 @@ FROM (
     listing_id AS listing
     , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_11
+) subq_12
 LEFT OUTER JOIN
   ***************************.dim_listings_latest listings_latest_src_28000
 ON
-  subq_11.listing = listings_latest_src_28000.listing_id
+  subq_12.listing = listings_latest_src_28000.listing_id
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_15
+  ***************************.mf_time_spine subq_16
 ON
-  DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_15.ds
+  DATE_TRUNC('day', listings_latest_src_28000.created_at) = subq_16.ds
 GROUP BY
-  subq_15.alien_day
+  subq_16.alien_day

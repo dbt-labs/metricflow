@@ -26,18 +26,19 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day) AS metric_time__day
-    , MAX(subq_27.month_start_bookings) AS month_start_bookings
-    , MAX(subq_35.bookings_1_month_ago) AS bookings_1_month_ago
+    COALESCE(subq_33.metric_time__day, subq_43.metric_time__day) AS metric_time__day
+    , MAX(subq_33.month_start_bookings) AS month_start_bookings
+    , MAX(subq_43.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_22.__bookings AS month_start_bookings
+      , subq_27.__bookings AS month_start_bookings
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
@@ -46,19 +47,20 @@ FROM (
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
-    ) subq_22
+    ) subq_27
     ON
-      DATE_TRUNC('month', rss_28018_cte.ds__day) = subq_22.metric_time__day
-  ) subq_27
+      DATE_TRUNC('month', rss_28018_cte.ds__day) = subq_27.metric_time__day
+  ) subq_33
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_30.__bookings AS bookings_1_month_ago
+      , subq_37.__bookings AS bookings_1_month_ago
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Pass Only Elements: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
@@ -67,12 +69,12 @@ FROM (
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
-    ) subq_30
+    ) subq_37
     ON
-      rss_28018_cte.ds__day - INTERVAL 1 month = subq_30.metric_time__day
-  ) subq_35
+      rss_28018_cte.ds__day - INTERVAL 1 month = subq_37.metric_time__day
+  ) subq_43
   ON
-    subq_27.metric_time__day = subq_35.metric_time__day
+    subq_33.metric_time__day = subq_43.metric_time__day
   GROUP BY
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day)
-) subq_36
+    COALESCE(subq_33.metric_time__day, subq_43.metric_time__day)
+) subq_44

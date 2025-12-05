@@ -18,17 +18,19 @@ WITH sma_28019_cte AS (
 )
 
 SELECT
-  COALESCE(MAX(subq_27.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
+  COALESCE(MAX(subq_33.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
 FROM (
   -- Read From CTE For node_id=sma_28019
+  -- Pass Only Elements: ['__visits']
   -- Pass Only Elements: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(__visits) AS __visits
   FROM sma_28019_cte
-) subq_18
+) subq_22
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
+  -- Pass Only Elements: ['__buys_fill_nulls_with_0']
   -- Pass Only Elements: ['__buys_fill_nulls_with_0']
   -- Aggregate Inputs for Simple Metrics
   SELECT
@@ -38,30 +40,30 @@ CROSS JOIN (
     SELECT DISTINCT
       FIRST_VALUE(sma_28019_cte.__visits) OVER (
         PARTITION BY
-          subq_23.user
-          , subq_23.metric_time__day
-          , subq_23.mf_internal_uuid
+          subq_28.user
+          , subq_28.metric_time__day
+          , subq_28.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS __visits
       , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
         PARTITION BY
-          subq_23.user
-          , subq_23.metric_time__day
-          , subq_23.mf_internal_uuid
+          subq_28.user
+          , subq_28.metric_time__day
+          , subq_28.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS metric_time__day
       , FIRST_VALUE(sma_28019_cte.user) OVER (
         PARTITION BY
-          subq_23.user
-          , subq_23.metric_time__day
-          , subq_23.mf_internal_uuid
+          subq_28.user
+          , subq_28.metric_time__day
+          , subq_28.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
-      , subq_23.mf_internal_uuid AS mf_internal_uuid
-      , subq_23.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
+      , subq_28.mf_internal_uuid AS mf_internal_uuid
+      , subq_28.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
     FROM sma_28019_cte
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
@@ -73,16 +75,16 @@ CROSS JOIN (
         , 1 AS __buys_fill_nulls_with_0
         , CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR) AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
-    ) subq_23
+    ) subq_28
     ON
       (
-        sma_28019_cte.user = subq_23.user
+        sma_28019_cte.user = subq_28.user
       ) AND (
         (
-          sma_28019_cte.metric_time__day <= subq_23.metric_time__day
+          sma_28019_cte.metric_time__day <= subq_28.metric_time__day
         ) AND (
-          sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_23.metric_time__day)
+          sma_28019_cte.metric_time__day > DATEADD(day, -7, subq_28.metric_time__day)
         )
       )
-  ) subq_24
-) subq_27
+  ) subq_29
+) subq_33

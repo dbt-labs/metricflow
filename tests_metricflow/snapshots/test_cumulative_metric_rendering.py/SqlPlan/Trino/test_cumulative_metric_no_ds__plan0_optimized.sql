@@ -7,6 +7,7 @@ sql_engine: Trino
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
 -- Pass Only Elements: ['__revenue']
+-- Pass Only Elements: ['__revenue']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

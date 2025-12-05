@@ -291,3 +291,30 @@ def test_saved_query_override_order_by_and_limit(  # noqa: D103
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_semi_additive_measure_with_where_filter(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=["current_account_balance_by_user"],
+            group_by_names=["user"],
+            order_by_names=["user"],
+            where_constraints=("{{ Dimension('account__account_type') }} = 'savings'",),
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )

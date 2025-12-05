@@ -7,23 +7,33 @@ test_filename: test_dataflow_plan_builder.py
         <!-- node_id = NodeId(id_str='wrd_0') -->
         <FilterElementsNode>
             <!-- description = "Pass Only Elements: ['metric_time__day']" -->
-            <!-- node_id = NodeId(id_str='pfe_0') -->
+            <!-- node_id = NodeId(id_str='pfe_1') -->
             <!-- include_spec =                                                                  -->
             <!--   TimeDimensionSpec(                                                            -->
             <!--     element_name='metric_time',                                                 -->
             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
             <!--   )                                                                             -->
             <!-- distinct = True -->
-            <MetricTimeDimensionTransformNode>
-                <!-- description = "Metric Time Dimension 'ds'" -->
-                <!-- node_id = NodeId(id_str='sma_28006') -->
-                <!-- aggregation_time_dimension = 'ds' -->
-                <ReadSqlSourceNode>
-                    <!-- description = 'Read From SqlDataSet()' -->
-                    <!-- node_id = NodeId(id_str='rss_28018') -->
-                    <!-- data_set = SqlDataSet() -->
-                </ReadSqlSourceNode>
-            </MetricTimeDimensionTransformNode>
+            <FilterElementsNode>
+                <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                <!-- node_id = NodeId(id_str='pfe_0') -->
+                <!-- include_spec =                                                                  -->
+                <!--   TimeDimensionSpec(                                                            -->
+                <!--     element_name='metric_time',                                                 -->
+                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                <!--   )                                                                             -->
+                <!-- distinct = False -->
+                <MetricTimeDimensionTransformNode>
+                    <!-- description = "Metric Time Dimension 'ds'" -->
+                    <!-- node_id = NodeId(id_str='sma_28006') -->
+                    <!-- aggregation_time_dimension = 'ds' -->
+                    <ReadSqlSourceNode>
+                        <!-- description = 'Read From SqlDataSet()' -->
+                        <!-- node_id = NodeId(id_str='rss_28018') -->
+                        <!-- data_set = SqlDataSet() -->
+                    </ReadSqlSourceNode>
+                </MetricTimeDimensionTransformNode>
+            </FilterElementsNode>
         </FilterElementsNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

@@ -71,7 +71,7 @@ docstring:
                         <FilterElementsNode>
                             <!-- description =                                                                -->
                             <!--   "Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
-                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
                             <!-- include_spec =                                                                  -->
                             <!--   TimeDimensionSpec(                                                            -->
@@ -106,29 +106,41 @@ docstring:
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->
-                                <ConstrainTimeRangeNode>
-                                    <!-- description =                                                          -->
-                                    <!--   'Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]' -->
-                                    <!-- node_id = NodeId(id_str='ctr_0') -->
-                                    <!-- time_range_start = '2020-01-03T00:00:00' -->
-                                    <!-- time_range_end = '2020-01-05T00:00:00' -->
-                                    <MetricTimeDimensionTransformNode>
-                                        <!-- description = "Metric Time Dimension 'ds'" -->
-                                        <!-- node_id = NodeId(id_str='sma_28009') -->
-                                        <!-- aggregation_time_dimension = 'ds' -->
-                                        <ReadSqlSourceNode>
-                                            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                            <!-- node_id = NodeId(id_str='rss_28020') -->
-                                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                        </ReadSqlSourceNode>
-                                    </MetricTimeDimensionTransformNode>
-                                </ConstrainTimeRangeNode>
+                                <FilterElementsNode>
+                                    <!-- description =                                                                -->
+                                    <!--   "Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                                    <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
+                                    <!-- include_spec =                                                                  -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='metric_time',                                                 -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
+                                    <!-- distinct = False -->
+                                    <ConstrainTimeRangeNode>
+                                        <!-- description =                                                          -->
+                                        <!--   'Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]' -->
+                                        <!-- node_id = NodeId(id_str='ctr_0') -->
+                                        <!-- time_range_start = '2020-01-03T00:00:00' -->
+                                        <!-- time_range_end = '2020-01-05T00:00:00' -->
+                                        <MetricTimeDimensionTransformNode>
+                                            <!-- description = "Metric Time Dimension 'ds'" -->
+                                            <!-- node_id = NodeId(id_str='sma_28009') -->
+                                            <!-- aggregation_time_dimension = 'ds' -->
+                                            <ReadSqlSourceNode>
+                                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                                <!-- node_id = NodeId(id_str='rss_28020') -->
+                                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                            </ReadSqlSourceNode>
+                                        </MetricTimeDimensionTransformNode>
+                                    </ConstrainTimeRangeNode>
+                                </FilterElementsNode>
                             </WhereConstraintNode>
                         </FilterElementsNode>
                     </AggregateSimpleMetricInputsNode>
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['metric_time__day']" -->
-                        <!-- node_id = NodeId(id_str='pfe_1') -->
+                        <!-- node_id = NodeId(id_str='pfe_3') -->
                         <!-- include_spec =                                                                  -->
                         <!--   TimeDimensionSpec(                                                            -->
                         <!--     element_name='metric_time',                                                 -->
@@ -167,34 +179,44 @@ docstring:
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->
-                                <AliasSpecsNode>
-                                    <!-- description = 'Change Column Aliases' -->
-                                    <!-- node_id = NodeId(id_str='as_0') -->
-                                    <!-- change_specs =                                    -->
-                                    <!--   (                                               -->
-                                    <!--     SpecToAlias(                                  -->
-                                    <!--       input_spec=TimeDimensionSpec(               -->
-                                    <!--         element_name='ds',                        -->
-                                    <!--         time_granularity=ExpandedTimeGranularity( -->
-                                    <!--           name='day',                             -->
-                                    <!--           base_granularity=DAY,                   -->
-                                    <!--         ),                                        -->
-                                    <!--       ),                                          -->
-                                    <!--       output_spec=TimeDimensionSpec(              -->
-                                    <!--         element_name='metric_time',               -->
-                                    <!--         time_granularity=ExpandedTimeGranularity( -->
-                                    <!--           name='day',                             -->
-                                    <!--           base_granularity=DAY,                   -->
-                                    <!--         ),                                        -->
-                                    <!--       ),                                          -->
-                                    <!--     ),                                            -->
-                                    <!--   )                                               -->
-                                    <ReadSqlSourceNode>
-                                        <!-- description = 'Read From SqlDataSet()' -->
-                                        <!-- node_id = NodeId(id_str='rss_28018') -->
-                                        <!-- data_set = SqlDataSet() -->
-                                    </ReadSqlSourceNode>
-                                </AliasSpecsNode>
+                                <FilterElementsNode>
+                                    <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_2') -->
+                                    <!-- include_spec =                                                                  -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='metric_time',                                                 -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
+                                    <!-- distinct = False -->
+                                    <AliasSpecsNode>
+                                        <!-- description = 'Change Column Aliases' -->
+                                        <!-- node_id = NodeId(id_str='as_0') -->
+                                        <!-- change_specs =                                    -->
+                                        <!--   (                                               -->
+                                        <!--     SpecToAlias(                                  -->
+                                        <!--       input_spec=TimeDimensionSpec(               -->
+                                        <!--         element_name='ds',                        -->
+                                        <!--         time_granularity=ExpandedTimeGranularity( -->
+                                        <!--           name='day',                             -->
+                                        <!--           base_granularity=DAY,                   -->
+                                        <!--         ),                                        -->
+                                        <!--       ),                                          -->
+                                        <!--       output_spec=TimeDimensionSpec(              -->
+                                        <!--         element_name='metric_time',               -->
+                                        <!--         time_granularity=ExpandedTimeGranularity( -->
+                                        <!--           name='day',                             -->
+                                        <!--           base_granularity=DAY,                   -->
+                                        <!--         ),                                        -->
+                                        <!--       ),                                          -->
+                                        <!--     ),                                            -->
+                                        <!--   )                                               -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = 'Read From SqlDataSet()' -->
+                                            <!-- node_id = NodeId(id_str='rss_28018') -->
+                                            <!-- data_set = SqlDataSet() -->
+                                        </ReadSqlSourceNode>
+                                    </AliasSpecsNode>
+                                </FilterElementsNode>
                             </WhereConstraintNode>
                         </ConstrainTimeRangeNode>
                     </FilterElementsNode>

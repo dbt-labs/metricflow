@@ -19,25 +19,26 @@ FROM (
   FROM (
     -- Join Self Over Time Range
     -- Pass Only Elements: ['__revenue', 'metric_time__year', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__year', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      subq_14.ds AS metric_time__day
-      , DATE_TRUNC('year', subq_14.ds) AS metric_time__year
+      subq_15.ds AS metric_time__day
+      , DATE_TRUNC('year', subq_15.ds) AS metric_time__year
       , SUM(revenue_src_28000.revenue) AS __revenue
-    FROM ***************************.mf_time_spine subq_14
+    FROM ***************************.mf_time_spine subq_15
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_14.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_15.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) > subq_14.ds - MAKE_INTERVAL(months => 2)
+        DATE_TRUNC('day', revenue_src_28000.created_at) > subq_15.ds - MAKE_INTERVAL(months => 2)
       )
     GROUP BY
-      subq_14.ds
-      , DATE_TRUNC('year', subq_14.ds)
-  ) subq_17
-) subq_20
+      subq_15.ds
+      , DATE_TRUNC('year', subq_15.ds)
+  ) subq_19
+) subq_22
 GROUP BY
   metric_time__year
   , trailing_2_months_revenue

@@ -5,9 +5,9 @@ sql_engine: DuckDB
 -- Combine Aggregated Outputs
 -- Write to DataTable
 SELECT
-  COALESCE(subq_4.metric_time__day, subq_9.metric_time__day) AS metric_time__day
-  , MAX(subq_4.bookings) AS bookings
-  , MAX(subq_9.listings) AS listings
+  COALESCE(subq_5.metric_time__day, subq_11.metric_time__day) AS metric_time__day
+  , MAX(subq_5.bookings) AS bookings
+  , MAX(subq_11.listings) AS listings
 FROM (
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
@@ -18,14 +18,15 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['__bookings', 'metric_time__day']
+    -- Pass Only Elements: ['__bookings', 'metric_time__day']
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_10000
-  ) subq_2
+  ) subq_3
   GROUP BY
     metric_time__day
-) subq_4
+) subq_5
 FULL OUTER JOIN (
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
@@ -36,15 +37,16 @@ FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     -- Pass Only Elements: ['__listings', 'metric_time__day']
+    -- Pass Only Elements: ['__listings', 'metric_time__day']
     SELECT
       DATE_TRUNC('day', created_at) AS metric_time__day
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_10000
-  ) subq_7
+  ) subq_9
   GROUP BY
     metric_time__day
-) subq_9
+) subq_11
 ON
-  subq_4.metric_time__day = subq_9.metric_time__day
+  subq_5.metric_time__day = subq_11.metric_time__day
 GROUP BY
-  COALESCE(subq_4.metric_time__day, subq_9.metric_time__day)
+  COALESCE(subq_5.metric_time__day, subq_11.metric_time__day)

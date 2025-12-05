@@ -15,9 +15,10 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Pass Only Elements: ['__listings', 'user__revenue_all_time']
   SELECT
-    subq_26.user__revenue_all_time AS user__revenue_all_time
-    , subq_19.__listings AS listings
+    subq_30.user__revenue_all_time AS user__revenue_all_time
+    , subq_22.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -25,10 +26,11 @@ FROM (
       user_id AS user
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_19
+  ) subq_22
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
+    -- Pass Only Elements: ['__revenue', 'user']
     -- Pass Only Elements: ['__revenue', 'user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -40,8 +42,8 @@ FROM (
     FROM ***************************.fct_revenue revenue_src_28000
     GROUP BY
       user
-  ) subq_26
+  ) subq_30
   ON
-    subq_19.user = subq_26.user
-) subq_27
+    subq_22.user = subq_30.user
+) subq_32
 WHERE user__revenue_all_time > 1

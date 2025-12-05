@@ -24,8 +24,8 @@ FROM (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_26.booking__is_instant AS booking__is_instant
-      , subq_26.bookings_offset_once AS bookings_offset_once
+      , subq_31.booking__is_instant AS booking__is_instant
+      , subq_31.bookings_offset_once AS bookings_offset_once
     FROM rss_28018_cte
     INNER JOIN (
       -- Compute Metrics via Expressions
@@ -38,8 +38,8 @@ FROM (
         -- Compute Metrics via Expressions
         SELECT
           rss_28018_cte.ds__day AS metric_time__day
-          , subq_20.booking__is_instant AS booking__is_instant
-          , subq_20.__bookings AS bookings
+          , subq_24.booking__is_instant AS booking__is_instant
+          , subq_24.__bookings AS bookings
         FROM rss_28018_cte
         INNER JOIN (
           -- Aggregate Inputs for Simple Metrics
@@ -51,22 +51,23 @@ FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             -- Metric Time Dimension 'ds'
             -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
+            -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
             SELECT
               DATE_TRUNC('day', ds) AS metric_time__day
               , is_instant AS booking__is_instant
               , 1 AS __bookings
             FROM ***************************.fct_bookings bookings_source_src_28000
-          ) subq_19
+          ) subq_23
           GROUP BY
             metric_time__day
             , booking__is_instant
-        ) subq_20
+        ) subq_24
         ON
-          DATEADD(day, -5, rss_28018_cte.ds__day) = subq_20.metric_time__day
-      ) subq_25
-    ) subq_26
+          DATEADD(day, -5, rss_28018_cte.ds__day) = subq_24.metric_time__day
+      ) subq_30
+    ) subq_31
     ON
-      DATEADD(day, -2, rss_28018_cte.ds__day) = subq_26.metric_time__day
-  ) subq_30
+      DATEADD(day, -2, rss_28018_cte.ds__day) = subq_31.metric_time__day
+  ) subq_36
   WHERE booking__is_instant
-) subq_32
+) subq_38

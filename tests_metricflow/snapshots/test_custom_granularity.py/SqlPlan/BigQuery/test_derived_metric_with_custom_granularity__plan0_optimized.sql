@@ -11,17 +11,18 @@ FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
   -- Pass Only Elements: ['__booking_value', '__bookers', 'booking__ds__alien_day']
+  -- Pass Only Elements: ['__booking_value', '__bookers', 'booking__ds__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
-    subq_14.alien_day AS booking__ds__alien_day
+    subq_16.alien_day AS booking__ds__alien_day
     , SUM(bookings_source_src_28000.booking_value) AS booking_value
     , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
   LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_14
+    ***************************.mf_time_spine subq_16
   ON
-    DATETIME_TRUNC(bookings_source_src_28000.ds, day) = subq_14.ds
+    DATETIME_TRUNC(bookings_source_src_28000.ds, day) = subq_16.ds
   GROUP BY
     booking__ds__alien_day
-) subq_18
+) subq_21

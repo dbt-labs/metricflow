@@ -10,10 +10,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_23.metric_time__day, subq_28.metric_time__day) AS metric_time__day
-    , MAX(subq_23.non_referred) AS non_referred
-    , MAX(subq_28.instant) AS instant
-    , MAX(subq_28.bookings) AS bookings
+    COALESCE(subq_27.metric_time__day, subq_33.metric_time__day) AS metric_time__day
+    , MAX(subq_27.non_referred) AS non_referred
+    , MAX(subq_33.instant) AS instant
+    , MAX(subq_33.bookings) AS bookings
   FROM (
     -- Compute Metrics via Expressions
     SELECT
@@ -30,16 +30,17 @@ FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
         -- Pass Only Elements: ['__referred_bookings', '__bookings', 'metric_time__day']
+        -- Pass Only Elements: ['__referred_bookings', '__bookings', 'metric_time__day']
         SELECT
           DATETIME_TRUNC(ds, day) AS metric_time__day
           , 1 AS __bookings
           , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS __referred_bookings
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_20
+      ) subq_24
       GROUP BY
         metric_time__day
-    ) subq_22
-  ) subq_23
+    ) subq_26
+  ) subq_27
   FULL OUTER JOIN (
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -51,17 +52,18 @@ FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Pass Only Elements: ['__instant_bookings', '__bookings', 'metric_time__day']
+      -- Pass Only Elements: ['__instant_bookings', '__bookings', 'metric_time__day']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , 1 AS __bookings
         , CASE WHEN is_instant THEN 1 ELSE 0 END AS __instant_bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_26
+    ) subq_31
     GROUP BY
       metric_time__day
-  ) subq_28
+  ) subq_33
   ON
-    subq_23.metric_time__day = subq_28.metric_time__day
+    subq_27.metric_time__day = subq_33.metric_time__day
   GROUP BY
     metric_time__day
-) subq_29
+) subq_34

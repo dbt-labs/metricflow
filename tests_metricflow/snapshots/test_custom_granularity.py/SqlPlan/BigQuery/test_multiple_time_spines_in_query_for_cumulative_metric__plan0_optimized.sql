@@ -5,15 +5,16 @@ sql_engine: BigQuery
 -- Join Self Over Time Range
 -- Join to Custom Granularity Dataset
 -- Pass Only Elements: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
+-- Pass Only Elements: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_14.alien_day AS metric_time__alien_day
-  , subq_13.ts AS metric_time__hour
-  , SUM(subq_11.__simple_subdaily_metric_default_day) AS subdaily_cumulative_window_metric
-FROM ***************************.mf_time_spine_hour subq_13
+  subq_15.alien_day AS metric_time__alien_day
+  , subq_14.ts AS metric_time__hour
+  , SUM(subq_12.__simple_subdaily_metric_default_day) AS subdaily_cumulative_window_metric
+FROM ***************************.mf_time_spine_hour subq_14
 INNER JOIN (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
@@ -21,17 +22,17 @@ INNER JOIN (
     DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
     , 1 AS __simple_subdaily_metric_default_day
   FROM ***************************.dim_users users_ds_source_src_28000
-) subq_11
+) subq_12
 ON
   (
-    subq_11.metric_time__hour <= subq_13.ts
+    subq_12.metric_time__hour <= subq_14.ts
   ) AND (
-    subq_11.metric_time__hour > DATE_SUB(CAST(subq_13.ts AS DATETIME), INTERVAL 3 hour)
+    subq_12.metric_time__hour > DATE_SUB(CAST(subq_14.ts AS DATETIME), INTERVAL 3 hour)
   )
 LEFT OUTER JOIN
-  ***************************.mf_time_spine subq_14
+  ***************************.mf_time_spine subq_15
 ON
-  DATETIME_TRUNC(subq_13.ts, day) = subq_14.ds
+  DATETIME_TRUNC(subq_14.ts, day) = subq_15.ds
 GROUP BY
   metric_time__alien_day
   , metric_time__hour

@@ -4,680 +4,680 @@ sql_engine: BigQuery
 ---
 -- Write to DataTable
 SELECT
-  subq_12.metric_time__hour
-  , subq_12.subdaily_join_to_time_spine_metric
+  subq_15.metric_time__hour
+  , subq_15.subdaily_join_to_time_spine_metric
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_11.metric_time__hour
-    , subq_11.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
+    subq_14.metric_time__hour
+    , subq_14.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
   FROM (
     -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
     SELECT
-      subq_10.metric_time__hour
-      , subq_10.__subdaily_join_to_time_spine_metric
+      subq_13.metric_time__hour
+      , subq_13.__subdaily_join_to_time_spine_metric
     FROM (
       -- Join to Time Spine Dataset
       SELECT
-        subq_9.metric_time__hour AS metric_time__hour
-        , subq_5.__subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
+        subq_12.metric_time__hour AS metric_time__hour
+        , subq_7.__subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
       FROM (
         -- Pass Only Elements: ['metric_time__hour']
         SELECT
-          subq_8.metric_time__hour
+          subq_11.metric_time__hour
         FROM (
           -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
           SELECT
-            subq_7.metric_time__hour
-            , subq_7.ts__day
-            , subq_7.ts__week
-            , subq_7.ts__month
-            , subq_7.ts__quarter
-            , subq_7.ts__year
-            , subq_7.ts__extract_year
-            , subq_7.ts__extract_quarter
-            , subq_7.ts__extract_month
-            , subq_7.ts__extract_day
-            , subq_7.ts__extract_dow
-            , subq_7.ts__extract_doy
+            subq_10.metric_time__hour
           FROM (
-            -- Change Column Aliases
+            -- Pass Only Elements: ['metric_time__hour']
             SELECT
-              subq_6.ts__hour AS metric_time__hour
-              , subq_6.ts__day
-              , subq_6.ts__week
-              , subq_6.ts__month
-              , subq_6.ts__quarter
-              , subq_6.ts__year
-              , subq_6.ts__extract_year
-              , subq_6.ts__extract_quarter
-              , subq_6.ts__extract_month
-              , subq_6.ts__extract_day
-              , subq_6.ts__extract_dow
-              , subq_6.ts__extract_doy
+              subq_9.metric_time__hour
             FROM (
-              -- Read From Time Spine 'mf_time_spine_hour'
+              -- Change Column Aliases
               SELECT
-                time_spine_src_28005.ts AS ts__hour
-                , DATETIME_TRUNC(time_spine_src_28005.ts, day) AS ts__day
-                , DATETIME_TRUNC(time_spine_src_28005.ts, isoweek) AS ts__week
-                , DATETIME_TRUNC(time_spine_src_28005.ts, month) AS ts__month
-                , DATETIME_TRUNC(time_spine_src_28005.ts, quarter) AS ts__quarter
-                , DATETIME_TRUNC(time_spine_src_28005.ts, year) AS ts__year
-                , EXTRACT(year FROM time_spine_src_28005.ts) AS ts__extract_year
-                , EXTRACT(quarter FROM time_spine_src_28005.ts) AS ts__extract_quarter
-                , EXTRACT(month FROM time_spine_src_28005.ts) AS ts__extract_month
-                , EXTRACT(day FROM time_spine_src_28005.ts) AS ts__extract_day
-                , IF(EXTRACT(dayofweek FROM time_spine_src_28005.ts) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28005.ts) - 1) AS ts__extract_dow
-                , EXTRACT(dayofyear FROM time_spine_src_28005.ts) AS ts__extract_doy
-              FROM ***************************.mf_time_spine_hour time_spine_src_28005
-            ) subq_6
-          ) subq_7
-          WHERE subq_7.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-        ) subq_8
-      ) subq_9
+                subq_8.ts__hour AS metric_time__hour
+                , subq_8.ts__day
+                , subq_8.ts__week
+                , subq_8.ts__month
+                , subq_8.ts__quarter
+                , subq_8.ts__year
+                , subq_8.ts__extract_year
+                , subq_8.ts__extract_quarter
+                , subq_8.ts__extract_month
+                , subq_8.ts__extract_day
+                , subq_8.ts__extract_dow
+                , subq_8.ts__extract_doy
+              FROM (
+                -- Read From Time Spine 'mf_time_spine_hour'
+                SELECT
+                  time_spine_src_28005.ts AS ts__hour
+                  , DATETIME_TRUNC(time_spine_src_28005.ts, day) AS ts__day
+                  , DATETIME_TRUNC(time_spine_src_28005.ts, isoweek) AS ts__week
+                  , DATETIME_TRUNC(time_spine_src_28005.ts, month) AS ts__month
+                  , DATETIME_TRUNC(time_spine_src_28005.ts, quarter) AS ts__quarter
+                  , DATETIME_TRUNC(time_spine_src_28005.ts, year) AS ts__year
+                  , EXTRACT(year FROM time_spine_src_28005.ts) AS ts__extract_year
+                  , EXTRACT(quarter FROM time_spine_src_28005.ts) AS ts__extract_quarter
+                  , EXTRACT(month FROM time_spine_src_28005.ts) AS ts__extract_month
+                  , EXTRACT(day FROM time_spine_src_28005.ts) AS ts__extract_day
+                  , IF(EXTRACT(dayofweek FROM time_spine_src_28005.ts) = 1, 7, EXTRACT(dayofweek FROM time_spine_src_28005.ts) - 1) AS ts__extract_dow
+                  , EXTRACT(dayofyear FROM time_spine_src_28005.ts) AS ts__extract_doy
+                FROM ***************************.mf_time_spine_hour time_spine_src_28005
+              ) subq_8
+            ) subq_9
+          ) subq_10
+          WHERE subq_10.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+        ) subq_11
+      ) subq_12
       LEFT OUTER JOIN (
         -- Aggregate Inputs for Simple Metrics
         SELECT
-          subq_4.metric_time__hour
-          , SUM(subq_4.__subdaily_join_to_time_spine_metric) AS __subdaily_join_to_time_spine_metric
+          subq_6.metric_time__hour
+          , SUM(subq_6.__subdaily_join_to_time_spine_metric) AS __subdaily_join_to_time_spine_metric
         FROM (
           -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
           SELECT
-            subq_3.metric_time__hour
-            , subq_3.__subdaily_join_to_time_spine_metric
+            subq_5.metric_time__hour
+            , subq_5.__subdaily_join_to_time_spine_metric
           FROM (
-            -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
+            -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
             SELECT
-              subq_2.ds__day
-              , subq_2.ds__week
-              , subq_2.ds__month
-              , subq_2.ds__quarter
-              , subq_2.ds__year
-              , subq_2.ds__extract_year
-              , subq_2.ds__extract_quarter
-              , subq_2.ds__extract_month
-              , subq_2.ds__extract_day
-              , subq_2.ds__extract_dow
-              , subq_2.ds__extract_doy
-              , subq_2.created_at__day
-              , subq_2.created_at__week
-              , subq_2.created_at__month
-              , subq_2.created_at__quarter
-              , subq_2.created_at__year
-              , subq_2.created_at__extract_year
-              , subq_2.created_at__extract_quarter
-              , subq_2.created_at__extract_month
-              , subq_2.created_at__extract_day
-              , subq_2.created_at__extract_dow
-              , subq_2.created_at__extract_doy
-              , subq_2.ds_partitioned__day
-              , subq_2.ds_partitioned__week
-              , subq_2.ds_partitioned__month
-              , subq_2.ds_partitioned__quarter
-              , subq_2.ds_partitioned__year
-              , subq_2.ds_partitioned__extract_year
-              , subq_2.ds_partitioned__extract_quarter
-              , subq_2.ds_partitioned__extract_month
-              , subq_2.ds_partitioned__extract_day
-              , subq_2.ds_partitioned__extract_dow
-              , subq_2.ds_partitioned__extract_doy
-              , subq_2.last_profile_edit_ts__millisecond
-              , subq_2.last_profile_edit_ts__second
-              , subq_2.last_profile_edit_ts__minute
-              , subq_2.last_profile_edit_ts__hour
-              , subq_2.last_profile_edit_ts__day
-              , subq_2.last_profile_edit_ts__week
-              , subq_2.last_profile_edit_ts__month
-              , subq_2.last_profile_edit_ts__quarter
-              , subq_2.last_profile_edit_ts__year
-              , subq_2.last_profile_edit_ts__extract_year
-              , subq_2.last_profile_edit_ts__extract_quarter
-              , subq_2.last_profile_edit_ts__extract_month
-              , subq_2.last_profile_edit_ts__extract_day
-              , subq_2.last_profile_edit_ts__extract_dow
-              , subq_2.last_profile_edit_ts__extract_doy
-              , subq_2.bio_added_ts__second
-              , subq_2.bio_added_ts__minute
-              , subq_2.bio_added_ts__hour
-              , subq_2.bio_added_ts__day
-              , subq_2.bio_added_ts__week
-              , subq_2.bio_added_ts__month
-              , subq_2.bio_added_ts__quarter
-              , subq_2.bio_added_ts__year
-              , subq_2.bio_added_ts__extract_year
-              , subq_2.bio_added_ts__extract_quarter
-              , subq_2.bio_added_ts__extract_month
-              , subq_2.bio_added_ts__extract_day
-              , subq_2.bio_added_ts__extract_dow
-              , subq_2.bio_added_ts__extract_doy
-              , subq_2.last_login_ts__minute
-              , subq_2.last_login_ts__hour
-              , subq_2.last_login_ts__day
-              , subq_2.last_login_ts__week
-              , subq_2.last_login_ts__month
-              , subq_2.last_login_ts__quarter
-              , subq_2.last_login_ts__year
-              , subq_2.last_login_ts__extract_year
-              , subq_2.last_login_ts__extract_quarter
-              , subq_2.last_login_ts__extract_month
-              , subq_2.last_login_ts__extract_day
-              , subq_2.last_login_ts__extract_dow
-              , subq_2.last_login_ts__extract_doy
-              , subq_2.archived_at__hour
-              , subq_2.archived_at__day
-              , subq_2.archived_at__week
-              , subq_2.archived_at__month
-              , subq_2.archived_at__quarter
-              , subq_2.archived_at__year
-              , subq_2.archived_at__extract_year
-              , subq_2.archived_at__extract_quarter
-              , subq_2.archived_at__extract_month
-              , subq_2.archived_at__extract_day
-              , subq_2.archived_at__extract_dow
-              , subq_2.archived_at__extract_doy
-              , subq_2.user__ds__day
-              , subq_2.user__ds__week
-              , subq_2.user__ds__month
-              , subq_2.user__ds__quarter
-              , subq_2.user__ds__year
-              , subq_2.user__ds__extract_year
-              , subq_2.user__ds__extract_quarter
-              , subq_2.user__ds__extract_month
-              , subq_2.user__ds__extract_day
-              , subq_2.user__ds__extract_dow
-              , subq_2.user__ds__extract_doy
-              , subq_2.user__created_at__day
-              , subq_2.user__created_at__week
-              , subq_2.user__created_at__month
-              , subq_2.user__created_at__quarter
-              , subq_2.user__created_at__year
-              , subq_2.user__created_at__extract_year
-              , subq_2.user__created_at__extract_quarter
-              , subq_2.user__created_at__extract_month
-              , subq_2.user__created_at__extract_day
-              , subq_2.user__created_at__extract_dow
-              , subq_2.user__created_at__extract_doy
-              , subq_2.user__ds_partitioned__day
-              , subq_2.user__ds_partitioned__week
-              , subq_2.user__ds_partitioned__month
-              , subq_2.user__ds_partitioned__quarter
-              , subq_2.user__ds_partitioned__year
-              , subq_2.user__ds_partitioned__extract_year
-              , subq_2.user__ds_partitioned__extract_quarter
-              , subq_2.user__ds_partitioned__extract_month
-              , subq_2.user__ds_partitioned__extract_day
-              , subq_2.user__ds_partitioned__extract_dow
-              , subq_2.user__ds_partitioned__extract_doy
-              , subq_2.user__last_profile_edit_ts__millisecond
-              , subq_2.user__last_profile_edit_ts__second
-              , subq_2.user__last_profile_edit_ts__minute
-              , subq_2.user__last_profile_edit_ts__hour
-              , subq_2.user__last_profile_edit_ts__day
-              , subq_2.user__last_profile_edit_ts__week
-              , subq_2.user__last_profile_edit_ts__month
-              , subq_2.user__last_profile_edit_ts__quarter
-              , subq_2.user__last_profile_edit_ts__year
-              , subq_2.user__last_profile_edit_ts__extract_year
-              , subq_2.user__last_profile_edit_ts__extract_quarter
-              , subq_2.user__last_profile_edit_ts__extract_month
-              , subq_2.user__last_profile_edit_ts__extract_day
-              , subq_2.user__last_profile_edit_ts__extract_dow
-              , subq_2.user__last_profile_edit_ts__extract_doy
-              , subq_2.user__bio_added_ts__second
-              , subq_2.user__bio_added_ts__minute
-              , subq_2.user__bio_added_ts__hour
-              , subq_2.user__bio_added_ts__day
-              , subq_2.user__bio_added_ts__week
-              , subq_2.user__bio_added_ts__month
-              , subq_2.user__bio_added_ts__quarter
-              , subq_2.user__bio_added_ts__year
-              , subq_2.user__bio_added_ts__extract_year
-              , subq_2.user__bio_added_ts__extract_quarter
-              , subq_2.user__bio_added_ts__extract_month
-              , subq_2.user__bio_added_ts__extract_day
-              , subq_2.user__bio_added_ts__extract_dow
-              , subq_2.user__bio_added_ts__extract_doy
-              , subq_2.user__last_login_ts__minute
-              , subq_2.user__last_login_ts__hour
-              , subq_2.user__last_login_ts__day
-              , subq_2.user__last_login_ts__week
-              , subq_2.user__last_login_ts__month
-              , subq_2.user__last_login_ts__quarter
-              , subq_2.user__last_login_ts__year
-              , subq_2.user__last_login_ts__extract_year
-              , subq_2.user__last_login_ts__extract_quarter
-              , subq_2.user__last_login_ts__extract_month
-              , subq_2.user__last_login_ts__extract_day
-              , subq_2.user__last_login_ts__extract_dow
-              , subq_2.user__last_login_ts__extract_doy
-              , subq_2.user__archived_at__hour
-              , subq_2.user__archived_at__day
-              , subq_2.user__archived_at__week
-              , subq_2.user__archived_at__month
-              , subq_2.user__archived_at__quarter
-              , subq_2.user__archived_at__year
-              , subq_2.user__archived_at__extract_year
-              , subq_2.user__archived_at__extract_quarter
-              , subq_2.user__archived_at__extract_month
-              , subq_2.user__archived_at__extract_day
-              , subq_2.user__archived_at__extract_dow
-              , subq_2.user__archived_at__extract_doy
-              , subq_2.metric_time__hour
-              , subq_2.metric_time__day
-              , subq_2.metric_time__week
-              , subq_2.metric_time__month
-              , subq_2.metric_time__quarter
-              , subq_2.metric_time__year
-              , subq_2.metric_time__extract_year
-              , subq_2.metric_time__extract_quarter
-              , subq_2.metric_time__extract_month
-              , subq_2.metric_time__extract_day
-              , subq_2.metric_time__extract_dow
-              , subq_2.metric_time__extract_doy
-              , subq_2.user
-              , subq_2.home_state
-              , subq_2.user__home_state
-              , subq_2.__subdaily_join_to_time_spine_metric
-              , subq_2.__simple_subdaily_metric_default_day
-              , subq_2.__simple_subdaily_metric_default_hour
-              , subq_2.__archived_users_join_to_time_spine
-              , subq_2.__archived_users
+              subq_4.metric_time__hour
+              , subq_4.__subdaily_join_to_time_spine_metric
             FROM (
-              -- Metric Time Dimension 'archived_at'
+              -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
               SELECT
-                subq_1.ds__day
-                , subq_1.ds__week
-                , subq_1.ds__month
-                , subq_1.ds__quarter
-                , subq_1.ds__year
-                , subq_1.ds__extract_year
-                , subq_1.ds__extract_quarter
-                , subq_1.ds__extract_month
-                , subq_1.ds__extract_day
-                , subq_1.ds__extract_dow
-                , subq_1.ds__extract_doy
-                , subq_1.created_at__day
-                , subq_1.created_at__week
-                , subq_1.created_at__month
-                , subq_1.created_at__quarter
-                , subq_1.created_at__year
-                , subq_1.created_at__extract_year
-                , subq_1.created_at__extract_quarter
-                , subq_1.created_at__extract_month
-                , subq_1.created_at__extract_day
-                , subq_1.created_at__extract_dow
-                , subq_1.created_at__extract_doy
-                , subq_1.ds_partitioned__day
-                , subq_1.ds_partitioned__week
-                , subq_1.ds_partitioned__month
-                , subq_1.ds_partitioned__quarter
-                , subq_1.ds_partitioned__year
-                , subq_1.ds_partitioned__extract_year
-                , subq_1.ds_partitioned__extract_quarter
-                , subq_1.ds_partitioned__extract_month
-                , subq_1.ds_partitioned__extract_day
-                , subq_1.ds_partitioned__extract_dow
-                , subq_1.ds_partitioned__extract_doy
-                , subq_1.last_profile_edit_ts__millisecond
-                , subq_1.last_profile_edit_ts__second
-                , subq_1.last_profile_edit_ts__minute
-                , subq_1.last_profile_edit_ts__hour
-                , subq_1.last_profile_edit_ts__day
-                , subq_1.last_profile_edit_ts__week
-                , subq_1.last_profile_edit_ts__month
-                , subq_1.last_profile_edit_ts__quarter
-                , subq_1.last_profile_edit_ts__year
-                , subq_1.last_profile_edit_ts__extract_year
-                , subq_1.last_profile_edit_ts__extract_quarter
-                , subq_1.last_profile_edit_ts__extract_month
-                , subq_1.last_profile_edit_ts__extract_day
-                , subq_1.last_profile_edit_ts__extract_dow
-                , subq_1.last_profile_edit_ts__extract_doy
-                , subq_1.bio_added_ts__second
-                , subq_1.bio_added_ts__minute
-                , subq_1.bio_added_ts__hour
-                , subq_1.bio_added_ts__day
-                , subq_1.bio_added_ts__week
-                , subq_1.bio_added_ts__month
-                , subq_1.bio_added_ts__quarter
-                , subq_1.bio_added_ts__year
-                , subq_1.bio_added_ts__extract_year
-                , subq_1.bio_added_ts__extract_quarter
-                , subq_1.bio_added_ts__extract_month
-                , subq_1.bio_added_ts__extract_day
-                , subq_1.bio_added_ts__extract_dow
-                , subq_1.bio_added_ts__extract_doy
-                , subq_1.last_login_ts__minute
-                , subq_1.last_login_ts__hour
-                , subq_1.last_login_ts__day
-                , subq_1.last_login_ts__week
-                , subq_1.last_login_ts__month
-                , subq_1.last_login_ts__quarter
-                , subq_1.last_login_ts__year
-                , subq_1.last_login_ts__extract_year
-                , subq_1.last_login_ts__extract_quarter
-                , subq_1.last_login_ts__extract_month
-                , subq_1.last_login_ts__extract_day
-                , subq_1.last_login_ts__extract_dow
-                , subq_1.last_login_ts__extract_doy
-                , subq_1.archived_at__hour
-                , subq_1.archived_at__day
-                , subq_1.archived_at__week
-                , subq_1.archived_at__month
-                , subq_1.archived_at__quarter
-                , subq_1.archived_at__year
-                , subq_1.archived_at__extract_year
-                , subq_1.archived_at__extract_quarter
-                , subq_1.archived_at__extract_month
-                , subq_1.archived_at__extract_day
-                , subq_1.archived_at__extract_dow
-                , subq_1.archived_at__extract_doy
-                , subq_1.user__ds__day
-                , subq_1.user__ds__week
-                , subq_1.user__ds__month
-                , subq_1.user__ds__quarter
-                , subq_1.user__ds__year
-                , subq_1.user__ds__extract_year
-                , subq_1.user__ds__extract_quarter
-                , subq_1.user__ds__extract_month
-                , subq_1.user__ds__extract_day
-                , subq_1.user__ds__extract_dow
-                , subq_1.user__ds__extract_doy
-                , subq_1.user__created_at__day
-                , subq_1.user__created_at__week
-                , subq_1.user__created_at__month
-                , subq_1.user__created_at__quarter
-                , subq_1.user__created_at__year
-                , subq_1.user__created_at__extract_year
-                , subq_1.user__created_at__extract_quarter
-                , subq_1.user__created_at__extract_month
-                , subq_1.user__created_at__extract_day
-                , subq_1.user__created_at__extract_dow
-                , subq_1.user__created_at__extract_doy
-                , subq_1.user__ds_partitioned__day
-                , subq_1.user__ds_partitioned__week
-                , subq_1.user__ds_partitioned__month
-                , subq_1.user__ds_partitioned__quarter
-                , subq_1.user__ds_partitioned__year
-                , subq_1.user__ds_partitioned__extract_year
-                , subq_1.user__ds_partitioned__extract_quarter
-                , subq_1.user__ds_partitioned__extract_month
-                , subq_1.user__ds_partitioned__extract_day
-                , subq_1.user__ds_partitioned__extract_dow
-                , subq_1.user__ds_partitioned__extract_doy
-                , subq_1.user__last_profile_edit_ts__millisecond
-                , subq_1.user__last_profile_edit_ts__second
-                , subq_1.user__last_profile_edit_ts__minute
-                , subq_1.user__last_profile_edit_ts__hour
-                , subq_1.user__last_profile_edit_ts__day
-                , subq_1.user__last_profile_edit_ts__week
-                , subq_1.user__last_profile_edit_ts__month
-                , subq_1.user__last_profile_edit_ts__quarter
-                , subq_1.user__last_profile_edit_ts__year
-                , subq_1.user__last_profile_edit_ts__extract_year
-                , subq_1.user__last_profile_edit_ts__extract_quarter
-                , subq_1.user__last_profile_edit_ts__extract_month
-                , subq_1.user__last_profile_edit_ts__extract_day
-                , subq_1.user__last_profile_edit_ts__extract_dow
-                , subq_1.user__last_profile_edit_ts__extract_doy
-                , subq_1.user__bio_added_ts__second
-                , subq_1.user__bio_added_ts__minute
-                , subq_1.user__bio_added_ts__hour
-                , subq_1.user__bio_added_ts__day
-                , subq_1.user__bio_added_ts__week
-                , subq_1.user__bio_added_ts__month
-                , subq_1.user__bio_added_ts__quarter
-                , subq_1.user__bio_added_ts__year
-                , subq_1.user__bio_added_ts__extract_year
-                , subq_1.user__bio_added_ts__extract_quarter
-                , subq_1.user__bio_added_ts__extract_month
-                , subq_1.user__bio_added_ts__extract_day
-                , subq_1.user__bio_added_ts__extract_dow
-                , subq_1.user__bio_added_ts__extract_doy
-                , subq_1.user__last_login_ts__minute
-                , subq_1.user__last_login_ts__hour
-                , subq_1.user__last_login_ts__day
-                , subq_1.user__last_login_ts__week
-                , subq_1.user__last_login_ts__month
-                , subq_1.user__last_login_ts__quarter
-                , subq_1.user__last_login_ts__year
-                , subq_1.user__last_login_ts__extract_year
-                , subq_1.user__last_login_ts__extract_quarter
-                , subq_1.user__last_login_ts__extract_month
-                , subq_1.user__last_login_ts__extract_day
-                , subq_1.user__last_login_ts__extract_dow
-                , subq_1.user__last_login_ts__extract_doy
-                , subq_1.user__archived_at__hour
-                , subq_1.user__archived_at__day
-                , subq_1.user__archived_at__week
-                , subq_1.user__archived_at__month
-                , subq_1.user__archived_at__quarter
-                , subq_1.user__archived_at__year
-                , subq_1.user__archived_at__extract_year
-                , subq_1.user__archived_at__extract_quarter
-                , subq_1.user__archived_at__extract_month
-                , subq_1.user__archived_at__extract_day
-                , subq_1.user__archived_at__extract_dow
-                , subq_1.user__archived_at__extract_doy
-                , subq_1.archived_at__hour AS metric_time__hour
-                , subq_1.archived_at__day AS metric_time__day
-                , subq_1.archived_at__week AS metric_time__week
-                , subq_1.archived_at__month AS metric_time__month
-                , subq_1.archived_at__quarter AS metric_time__quarter
-                , subq_1.archived_at__year AS metric_time__year
-                , subq_1.archived_at__extract_year AS metric_time__extract_year
-                , subq_1.archived_at__extract_quarter AS metric_time__extract_quarter
-                , subq_1.archived_at__extract_month AS metric_time__extract_month
-                , subq_1.archived_at__extract_day AS metric_time__extract_day
-                , subq_1.archived_at__extract_dow AS metric_time__extract_dow
-                , subq_1.archived_at__extract_doy AS metric_time__extract_doy
-                , subq_1.user
-                , subq_1.home_state
-                , subq_1.user__home_state
-                , subq_1.__subdaily_join_to_time_spine_metric
-                , subq_1.__simple_subdaily_metric_default_day
-                , subq_1.__simple_subdaily_metric_default_hour
-                , subq_1.__archived_users_join_to_time_spine
-                , subq_1.__archived_users
+                subq_3.ds__day
+                , subq_3.ds__week
+                , subq_3.ds__month
+                , subq_3.ds__quarter
+                , subq_3.ds__year
+                , subq_3.ds__extract_year
+                , subq_3.ds__extract_quarter
+                , subq_3.ds__extract_month
+                , subq_3.ds__extract_day
+                , subq_3.ds__extract_dow
+                , subq_3.ds__extract_doy
+                , subq_3.created_at__day
+                , subq_3.created_at__week
+                , subq_3.created_at__month
+                , subq_3.created_at__quarter
+                , subq_3.created_at__year
+                , subq_3.created_at__extract_year
+                , subq_3.created_at__extract_quarter
+                , subq_3.created_at__extract_month
+                , subq_3.created_at__extract_day
+                , subq_3.created_at__extract_dow
+                , subq_3.created_at__extract_doy
+                , subq_3.ds_partitioned__day
+                , subq_3.ds_partitioned__week
+                , subq_3.ds_partitioned__month
+                , subq_3.ds_partitioned__quarter
+                , subq_3.ds_partitioned__year
+                , subq_3.ds_partitioned__extract_year
+                , subq_3.ds_partitioned__extract_quarter
+                , subq_3.ds_partitioned__extract_month
+                , subq_3.ds_partitioned__extract_day
+                , subq_3.ds_partitioned__extract_dow
+                , subq_3.ds_partitioned__extract_doy
+                , subq_3.last_profile_edit_ts__millisecond
+                , subq_3.last_profile_edit_ts__second
+                , subq_3.last_profile_edit_ts__minute
+                , subq_3.last_profile_edit_ts__hour
+                , subq_3.last_profile_edit_ts__day
+                , subq_3.last_profile_edit_ts__week
+                , subq_3.last_profile_edit_ts__month
+                , subq_3.last_profile_edit_ts__quarter
+                , subq_3.last_profile_edit_ts__year
+                , subq_3.last_profile_edit_ts__extract_year
+                , subq_3.last_profile_edit_ts__extract_quarter
+                , subq_3.last_profile_edit_ts__extract_month
+                , subq_3.last_profile_edit_ts__extract_day
+                , subq_3.last_profile_edit_ts__extract_dow
+                , subq_3.last_profile_edit_ts__extract_doy
+                , subq_3.bio_added_ts__second
+                , subq_3.bio_added_ts__minute
+                , subq_3.bio_added_ts__hour
+                , subq_3.bio_added_ts__day
+                , subq_3.bio_added_ts__week
+                , subq_3.bio_added_ts__month
+                , subq_3.bio_added_ts__quarter
+                , subq_3.bio_added_ts__year
+                , subq_3.bio_added_ts__extract_year
+                , subq_3.bio_added_ts__extract_quarter
+                , subq_3.bio_added_ts__extract_month
+                , subq_3.bio_added_ts__extract_day
+                , subq_3.bio_added_ts__extract_dow
+                , subq_3.bio_added_ts__extract_doy
+                , subq_3.last_login_ts__minute
+                , subq_3.last_login_ts__hour
+                , subq_3.last_login_ts__day
+                , subq_3.last_login_ts__week
+                , subq_3.last_login_ts__month
+                , subq_3.last_login_ts__quarter
+                , subq_3.last_login_ts__year
+                , subq_3.last_login_ts__extract_year
+                , subq_3.last_login_ts__extract_quarter
+                , subq_3.last_login_ts__extract_month
+                , subq_3.last_login_ts__extract_day
+                , subq_3.last_login_ts__extract_dow
+                , subq_3.last_login_ts__extract_doy
+                , subq_3.archived_at__hour
+                , subq_3.archived_at__day
+                , subq_3.archived_at__week
+                , subq_3.archived_at__month
+                , subq_3.archived_at__quarter
+                , subq_3.archived_at__year
+                , subq_3.archived_at__extract_year
+                , subq_3.archived_at__extract_quarter
+                , subq_3.archived_at__extract_month
+                , subq_3.archived_at__extract_day
+                , subq_3.archived_at__extract_dow
+                , subq_3.archived_at__extract_doy
+                , subq_3.user__ds__day
+                , subq_3.user__ds__week
+                , subq_3.user__ds__month
+                , subq_3.user__ds__quarter
+                , subq_3.user__ds__year
+                , subq_3.user__ds__extract_year
+                , subq_3.user__ds__extract_quarter
+                , subq_3.user__ds__extract_month
+                , subq_3.user__ds__extract_day
+                , subq_3.user__ds__extract_dow
+                , subq_3.user__ds__extract_doy
+                , subq_3.user__created_at__day
+                , subq_3.user__created_at__week
+                , subq_3.user__created_at__month
+                , subq_3.user__created_at__quarter
+                , subq_3.user__created_at__year
+                , subq_3.user__created_at__extract_year
+                , subq_3.user__created_at__extract_quarter
+                , subq_3.user__created_at__extract_month
+                , subq_3.user__created_at__extract_day
+                , subq_3.user__created_at__extract_dow
+                , subq_3.user__created_at__extract_doy
+                , subq_3.user__ds_partitioned__day
+                , subq_3.user__ds_partitioned__week
+                , subq_3.user__ds_partitioned__month
+                , subq_3.user__ds_partitioned__quarter
+                , subq_3.user__ds_partitioned__year
+                , subq_3.user__ds_partitioned__extract_year
+                , subq_3.user__ds_partitioned__extract_quarter
+                , subq_3.user__ds_partitioned__extract_month
+                , subq_3.user__ds_partitioned__extract_day
+                , subq_3.user__ds_partitioned__extract_dow
+                , subq_3.user__ds_partitioned__extract_doy
+                , subq_3.user__last_profile_edit_ts__millisecond
+                , subq_3.user__last_profile_edit_ts__second
+                , subq_3.user__last_profile_edit_ts__minute
+                , subq_3.user__last_profile_edit_ts__hour
+                , subq_3.user__last_profile_edit_ts__day
+                , subq_3.user__last_profile_edit_ts__week
+                , subq_3.user__last_profile_edit_ts__month
+                , subq_3.user__last_profile_edit_ts__quarter
+                , subq_3.user__last_profile_edit_ts__year
+                , subq_3.user__last_profile_edit_ts__extract_year
+                , subq_3.user__last_profile_edit_ts__extract_quarter
+                , subq_3.user__last_profile_edit_ts__extract_month
+                , subq_3.user__last_profile_edit_ts__extract_day
+                , subq_3.user__last_profile_edit_ts__extract_dow
+                , subq_3.user__last_profile_edit_ts__extract_doy
+                , subq_3.user__bio_added_ts__second
+                , subq_3.user__bio_added_ts__minute
+                , subq_3.user__bio_added_ts__hour
+                , subq_3.user__bio_added_ts__day
+                , subq_3.user__bio_added_ts__week
+                , subq_3.user__bio_added_ts__month
+                , subq_3.user__bio_added_ts__quarter
+                , subq_3.user__bio_added_ts__year
+                , subq_3.user__bio_added_ts__extract_year
+                , subq_3.user__bio_added_ts__extract_quarter
+                , subq_3.user__bio_added_ts__extract_month
+                , subq_3.user__bio_added_ts__extract_day
+                , subq_3.user__bio_added_ts__extract_dow
+                , subq_3.user__bio_added_ts__extract_doy
+                , subq_3.user__last_login_ts__minute
+                , subq_3.user__last_login_ts__hour
+                , subq_3.user__last_login_ts__day
+                , subq_3.user__last_login_ts__week
+                , subq_3.user__last_login_ts__month
+                , subq_3.user__last_login_ts__quarter
+                , subq_3.user__last_login_ts__year
+                , subq_3.user__last_login_ts__extract_year
+                , subq_3.user__last_login_ts__extract_quarter
+                , subq_3.user__last_login_ts__extract_month
+                , subq_3.user__last_login_ts__extract_day
+                , subq_3.user__last_login_ts__extract_dow
+                , subq_3.user__last_login_ts__extract_doy
+                , subq_3.user__archived_at__hour
+                , subq_3.user__archived_at__day
+                , subq_3.user__archived_at__week
+                , subq_3.user__archived_at__month
+                , subq_3.user__archived_at__quarter
+                , subq_3.user__archived_at__year
+                , subq_3.user__archived_at__extract_year
+                , subq_3.user__archived_at__extract_quarter
+                , subq_3.user__archived_at__extract_month
+                , subq_3.user__archived_at__extract_day
+                , subq_3.user__archived_at__extract_dow
+                , subq_3.user__archived_at__extract_doy
+                , subq_3.metric_time__hour
+                , subq_3.metric_time__day
+                , subq_3.metric_time__week
+                , subq_3.metric_time__month
+                , subq_3.metric_time__quarter
+                , subq_3.metric_time__year
+                , subq_3.metric_time__extract_year
+                , subq_3.metric_time__extract_quarter
+                , subq_3.metric_time__extract_month
+                , subq_3.metric_time__extract_day
+                , subq_3.metric_time__extract_dow
+                , subq_3.metric_time__extract_doy
+                , subq_3.user
+                , subq_3.home_state
+                , subq_3.user__home_state
+                , subq_3.__subdaily_join_to_time_spine_metric
+                , subq_3.__simple_subdaily_metric_default_day
+                , subq_3.__simple_subdaily_metric_default_hour
+                , subq_3.__archived_users_join_to_time_spine
+                , subq_3.__archived_users
               FROM (
-                -- Read Elements From Semantic Model 'users_ds_source'
+                -- Metric Time Dimension 'archived_at'
                 SELECT
-                  1 AS __subdaily_join_to_time_spine_metric
-                  , 1 AS __simple_subdaily_metric_default_day
-                  , 1 AS __simple_subdaily_metric_default_hour
-                  , 1 AS __archived_users_join_to_time_spine
-                  , 1 AS __archived_users
-                  , 1 AS __new_users
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS ds__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, isoweek) AS ds__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, month) AS ds__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, quarter) AS ds__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, year) AS ds__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.ds) AS ds__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.ds) AS ds__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.ds) AS ds__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.ds) AS ds__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) - 1) AS ds__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds) AS ds__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, day) AS created_at__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, isoweek) AS created_at__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, month) AS created_at__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, quarter) AS created_at__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, year) AS created_at__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.created_at) AS created_at__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.created_at) AS created_at__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.created_at) AS created_at__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.created_at) AS created_at__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) - 1) AS created_at__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.created_at) AS created_at__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, day) AS ds_partitioned__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, isoweek) AS ds_partitioned__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, month) AS ds_partitioned__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, quarter) AS ds_partitioned__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, year) AS ds_partitioned__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) - 1) AS ds_partitioned__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_doy
-                  , users_ds_source_src_28000.home_state
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, millisecond) AS last_profile_edit_ts__millisecond
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, second) AS last_profile_edit_ts__second
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, minute) AS last_profile_edit_ts__minute
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, hour) AS last_profile_edit_ts__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, day) AS last_profile_edit_ts__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, isoweek) AS last_profile_edit_ts__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, month) AS last_profile_edit_ts__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, quarter) AS last_profile_edit_ts__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, year) AS last_profile_edit_ts__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) - 1) AS last_profile_edit_ts__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, second) AS bio_added_ts__second
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, minute) AS bio_added_ts__minute
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, hour) AS bio_added_ts__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, day) AS bio_added_ts__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, isoweek) AS bio_added_ts__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, month) AS bio_added_ts__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, quarter) AS bio_added_ts__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, year) AS bio_added_ts__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) - 1) AS bio_added_ts__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, minute) AS last_login_ts__minute
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, hour) AS last_login_ts__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, day) AS last_login_ts__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, isoweek) AS last_login_ts__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, month) AS last_login_ts__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, quarter) AS last_login_ts__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, year) AS last_login_ts__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) - 1) AS last_login_ts__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, hour) AS archived_at__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, day) AS archived_at__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, isoweek) AS archived_at__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, month) AS archived_at__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, quarter) AS archived_at__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, year) AS archived_at__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) - 1) AS archived_at__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS user__ds__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, isoweek) AS user__ds__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, month) AS user__ds__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, quarter) AS user__ds__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds, year) AS user__ds__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.ds) AS user__ds__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.ds) AS user__ds__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.ds) AS user__ds__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.ds) AS user__ds__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) - 1) AS user__ds__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds) AS user__ds__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, day) AS user__created_at__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, isoweek) AS user__created_at__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, month) AS user__created_at__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, quarter) AS user__created_at__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.created_at, year) AS user__created_at__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) - 1) AS user__created_at__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, day) AS user__ds_partitioned__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, isoweek) AS user__ds_partitioned__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, month) AS user__ds_partitioned__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, quarter) AS user__ds_partitioned__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, year) AS user__ds_partitioned__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) - 1) AS user__ds_partitioned__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_doy
-                  , users_ds_source_src_28000.home_state AS user__home_state
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, millisecond) AS user__last_profile_edit_ts__millisecond
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, second) AS user__last_profile_edit_ts__second
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, minute) AS user__last_profile_edit_ts__minute
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, hour) AS user__last_profile_edit_ts__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, day) AS user__last_profile_edit_ts__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, isoweek) AS user__last_profile_edit_ts__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, month) AS user__last_profile_edit_ts__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, quarter) AS user__last_profile_edit_ts__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, year) AS user__last_profile_edit_ts__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) - 1) AS user__last_profile_edit_ts__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, second) AS user__bio_added_ts__second
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, minute) AS user__bio_added_ts__minute
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, hour) AS user__bio_added_ts__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, day) AS user__bio_added_ts__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, isoweek) AS user__bio_added_ts__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, month) AS user__bio_added_ts__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, quarter) AS user__bio_added_ts__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, year) AS user__bio_added_ts__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) - 1) AS user__bio_added_ts__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, minute) AS user__last_login_ts__minute
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, hour) AS user__last_login_ts__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, day) AS user__last_login_ts__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, isoweek) AS user__last_login_ts__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, month) AS user__last_login_ts__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, quarter) AS user__last_login_ts__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, year) AS user__last_login_ts__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) - 1) AS user__last_login_ts__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_doy
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, hour) AS user__archived_at__hour
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, day) AS user__archived_at__day
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, isoweek) AS user__archived_at__week
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, month) AS user__archived_at__month
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, quarter) AS user__archived_at__quarter
-                  , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, year) AS user__archived_at__year
-                  , EXTRACT(year FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_year
-                  , EXTRACT(quarter FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_quarter
-                  , EXTRACT(month FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_month
-                  , EXTRACT(day FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_day
-                  , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) - 1) AS user__archived_at__extract_dow
-                  , EXTRACT(dayofyear FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_doy
-                  , users_ds_source_src_28000.user_id AS user
-                FROM ***************************.dim_users users_ds_source_src_28000
-              ) subq_1
-            ) subq_2
-            WHERE subq_2.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-          ) subq_3
-        ) subq_4
+                  subq_2.ds__day
+                  , subq_2.ds__week
+                  , subq_2.ds__month
+                  , subq_2.ds__quarter
+                  , subq_2.ds__year
+                  , subq_2.ds__extract_year
+                  , subq_2.ds__extract_quarter
+                  , subq_2.ds__extract_month
+                  , subq_2.ds__extract_day
+                  , subq_2.ds__extract_dow
+                  , subq_2.ds__extract_doy
+                  , subq_2.created_at__day
+                  , subq_2.created_at__week
+                  , subq_2.created_at__month
+                  , subq_2.created_at__quarter
+                  , subq_2.created_at__year
+                  , subq_2.created_at__extract_year
+                  , subq_2.created_at__extract_quarter
+                  , subq_2.created_at__extract_month
+                  , subq_2.created_at__extract_day
+                  , subq_2.created_at__extract_dow
+                  , subq_2.created_at__extract_doy
+                  , subq_2.ds_partitioned__day
+                  , subq_2.ds_partitioned__week
+                  , subq_2.ds_partitioned__month
+                  , subq_2.ds_partitioned__quarter
+                  , subq_2.ds_partitioned__year
+                  , subq_2.ds_partitioned__extract_year
+                  , subq_2.ds_partitioned__extract_quarter
+                  , subq_2.ds_partitioned__extract_month
+                  , subq_2.ds_partitioned__extract_day
+                  , subq_2.ds_partitioned__extract_dow
+                  , subq_2.ds_partitioned__extract_doy
+                  , subq_2.last_profile_edit_ts__millisecond
+                  , subq_2.last_profile_edit_ts__second
+                  , subq_2.last_profile_edit_ts__minute
+                  , subq_2.last_profile_edit_ts__hour
+                  , subq_2.last_profile_edit_ts__day
+                  , subq_2.last_profile_edit_ts__week
+                  , subq_2.last_profile_edit_ts__month
+                  , subq_2.last_profile_edit_ts__quarter
+                  , subq_2.last_profile_edit_ts__year
+                  , subq_2.last_profile_edit_ts__extract_year
+                  , subq_2.last_profile_edit_ts__extract_quarter
+                  , subq_2.last_profile_edit_ts__extract_month
+                  , subq_2.last_profile_edit_ts__extract_day
+                  , subq_2.last_profile_edit_ts__extract_dow
+                  , subq_2.last_profile_edit_ts__extract_doy
+                  , subq_2.bio_added_ts__second
+                  , subq_2.bio_added_ts__minute
+                  , subq_2.bio_added_ts__hour
+                  , subq_2.bio_added_ts__day
+                  , subq_2.bio_added_ts__week
+                  , subq_2.bio_added_ts__month
+                  , subq_2.bio_added_ts__quarter
+                  , subq_2.bio_added_ts__year
+                  , subq_2.bio_added_ts__extract_year
+                  , subq_2.bio_added_ts__extract_quarter
+                  , subq_2.bio_added_ts__extract_month
+                  , subq_2.bio_added_ts__extract_day
+                  , subq_2.bio_added_ts__extract_dow
+                  , subq_2.bio_added_ts__extract_doy
+                  , subq_2.last_login_ts__minute
+                  , subq_2.last_login_ts__hour
+                  , subq_2.last_login_ts__day
+                  , subq_2.last_login_ts__week
+                  , subq_2.last_login_ts__month
+                  , subq_2.last_login_ts__quarter
+                  , subq_2.last_login_ts__year
+                  , subq_2.last_login_ts__extract_year
+                  , subq_2.last_login_ts__extract_quarter
+                  , subq_2.last_login_ts__extract_month
+                  , subq_2.last_login_ts__extract_day
+                  , subq_2.last_login_ts__extract_dow
+                  , subq_2.last_login_ts__extract_doy
+                  , subq_2.archived_at__hour
+                  , subq_2.archived_at__day
+                  , subq_2.archived_at__week
+                  , subq_2.archived_at__month
+                  , subq_2.archived_at__quarter
+                  , subq_2.archived_at__year
+                  , subq_2.archived_at__extract_year
+                  , subq_2.archived_at__extract_quarter
+                  , subq_2.archived_at__extract_month
+                  , subq_2.archived_at__extract_day
+                  , subq_2.archived_at__extract_dow
+                  , subq_2.archived_at__extract_doy
+                  , subq_2.user__ds__day
+                  , subq_2.user__ds__week
+                  , subq_2.user__ds__month
+                  , subq_2.user__ds__quarter
+                  , subq_2.user__ds__year
+                  , subq_2.user__ds__extract_year
+                  , subq_2.user__ds__extract_quarter
+                  , subq_2.user__ds__extract_month
+                  , subq_2.user__ds__extract_day
+                  , subq_2.user__ds__extract_dow
+                  , subq_2.user__ds__extract_doy
+                  , subq_2.user__created_at__day
+                  , subq_2.user__created_at__week
+                  , subq_2.user__created_at__month
+                  , subq_2.user__created_at__quarter
+                  , subq_2.user__created_at__year
+                  , subq_2.user__created_at__extract_year
+                  , subq_2.user__created_at__extract_quarter
+                  , subq_2.user__created_at__extract_month
+                  , subq_2.user__created_at__extract_day
+                  , subq_2.user__created_at__extract_dow
+                  , subq_2.user__created_at__extract_doy
+                  , subq_2.user__ds_partitioned__day
+                  , subq_2.user__ds_partitioned__week
+                  , subq_2.user__ds_partitioned__month
+                  , subq_2.user__ds_partitioned__quarter
+                  , subq_2.user__ds_partitioned__year
+                  , subq_2.user__ds_partitioned__extract_year
+                  , subq_2.user__ds_partitioned__extract_quarter
+                  , subq_2.user__ds_partitioned__extract_month
+                  , subq_2.user__ds_partitioned__extract_day
+                  , subq_2.user__ds_partitioned__extract_dow
+                  , subq_2.user__ds_partitioned__extract_doy
+                  , subq_2.user__last_profile_edit_ts__millisecond
+                  , subq_2.user__last_profile_edit_ts__second
+                  , subq_2.user__last_profile_edit_ts__minute
+                  , subq_2.user__last_profile_edit_ts__hour
+                  , subq_2.user__last_profile_edit_ts__day
+                  , subq_2.user__last_profile_edit_ts__week
+                  , subq_2.user__last_profile_edit_ts__month
+                  , subq_2.user__last_profile_edit_ts__quarter
+                  , subq_2.user__last_profile_edit_ts__year
+                  , subq_2.user__last_profile_edit_ts__extract_year
+                  , subq_2.user__last_profile_edit_ts__extract_quarter
+                  , subq_2.user__last_profile_edit_ts__extract_month
+                  , subq_2.user__last_profile_edit_ts__extract_day
+                  , subq_2.user__last_profile_edit_ts__extract_dow
+                  , subq_2.user__last_profile_edit_ts__extract_doy
+                  , subq_2.user__bio_added_ts__second
+                  , subq_2.user__bio_added_ts__minute
+                  , subq_2.user__bio_added_ts__hour
+                  , subq_2.user__bio_added_ts__day
+                  , subq_2.user__bio_added_ts__week
+                  , subq_2.user__bio_added_ts__month
+                  , subq_2.user__bio_added_ts__quarter
+                  , subq_2.user__bio_added_ts__year
+                  , subq_2.user__bio_added_ts__extract_year
+                  , subq_2.user__bio_added_ts__extract_quarter
+                  , subq_2.user__bio_added_ts__extract_month
+                  , subq_2.user__bio_added_ts__extract_day
+                  , subq_2.user__bio_added_ts__extract_dow
+                  , subq_2.user__bio_added_ts__extract_doy
+                  , subq_2.user__last_login_ts__minute
+                  , subq_2.user__last_login_ts__hour
+                  , subq_2.user__last_login_ts__day
+                  , subq_2.user__last_login_ts__week
+                  , subq_2.user__last_login_ts__month
+                  , subq_2.user__last_login_ts__quarter
+                  , subq_2.user__last_login_ts__year
+                  , subq_2.user__last_login_ts__extract_year
+                  , subq_2.user__last_login_ts__extract_quarter
+                  , subq_2.user__last_login_ts__extract_month
+                  , subq_2.user__last_login_ts__extract_day
+                  , subq_2.user__last_login_ts__extract_dow
+                  , subq_2.user__last_login_ts__extract_doy
+                  , subq_2.user__archived_at__hour
+                  , subq_2.user__archived_at__day
+                  , subq_2.user__archived_at__week
+                  , subq_2.user__archived_at__month
+                  , subq_2.user__archived_at__quarter
+                  , subq_2.user__archived_at__year
+                  , subq_2.user__archived_at__extract_year
+                  , subq_2.user__archived_at__extract_quarter
+                  , subq_2.user__archived_at__extract_month
+                  , subq_2.user__archived_at__extract_day
+                  , subq_2.user__archived_at__extract_dow
+                  , subq_2.user__archived_at__extract_doy
+                  , subq_2.archived_at__hour AS metric_time__hour
+                  , subq_2.archived_at__day AS metric_time__day
+                  , subq_2.archived_at__week AS metric_time__week
+                  , subq_2.archived_at__month AS metric_time__month
+                  , subq_2.archived_at__quarter AS metric_time__quarter
+                  , subq_2.archived_at__year AS metric_time__year
+                  , subq_2.archived_at__extract_year AS metric_time__extract_year
+                  , subq_2.archived_at__extract_quarter AS metric_time__extract_quarter
+                  , subq_2.archived_at__extract_month AS metric_time__extract_month
+                  , subq_2.archived_at__extract_day AS metric_time__extract_day
+                  , subq_2.archived_at__extract_dow AS metric_time__extract_dow
+                  , subq_2.archived_at__extract_doy AS metric_time__extract_doy
+                  , subq_2.user
+                  , subq_2.home_state
+                  , subq_2.user__home_state
+                  , subq_2.__subdaily_join_to_time_spine_metric
+                  , subq_2.__simple_subdaily_metric_default_day
+                  , subq_2.__simple_subdaily_metric_default_hour
+                  , subq_2.__archived_users_join_to_time_spine
+                  , subq_2.__archived_users
+                FROM (
+                  -- Read Elements From Semantic Model 'users_ds_source'
+                  SELECT
+                    1 AS __subdaily_join_to_time_spine_metric
+                    , 1 AS __simple_subdaily_metric_default_day
+                    , 1 AS __simple_subdaily_metric_default_hour
+                    , 1 AS __archived_users_join_to_time_spine
+                    , 1 AS __archived_users
+                    , 1 AS __new_users
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS ds__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, isoweek) AS ds__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, month) AS ds__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, quarter) AS ds__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, year) AS ds__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.ds) AS ds__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.ds) AS ds__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.ds) AS ds__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.ds) AS ds__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) - 1) AS ds__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds) AS ds__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, day) AS created_at__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, isoweek) AS created_at__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, month) AS created_at__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, quarter) AS created_at__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, year) AS created_at__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.created_at) AS created_at__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.created_at) AS created_at__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.created_at) AS created_at__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.created_at) AS created_at__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) - 1) AS created_at__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.created_at) AS created_at__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, day) AS ds_partitioned__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, isoweek) AS ds_partitioned__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, month) AS ds_partitioned__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, quarter) AS ds_partitioned__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, year) AS ds_partitioned__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) - 1) AS ds_partitioned__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_doy
+                    , users_ds_source_src_28000.home_state
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, millisecond) AS last_profile_edit_ts__millisecond
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, second) AS last_profile_edit_ts__second
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, minute) AS last_profile_edit_ts__minute
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, hour) AS last_profile_edit_ts__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, day) AS last_profile_edit_ts__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, isoweek) AS last_profile_edit_ts__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, month) AS last_profile_edit_ts__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, quarter) AS last_profile_edit_ts__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, year) AS last_profile_edit_ts__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) - 1) AS last_profile_edit_ts__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, second) AS bio_added_ts__second
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, minute) AS bio_added_ts__minute
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, hour) AS bio_added_ts__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, day) AS bio_added_ts__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, isoweek) AS bio_added_ts__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, month) AS bio_added_ts__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, quarter) AS bio_added_ts__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, year) AS bio_added_ts__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) - 1) AS bio_added_ts__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, minute) AS last_login_ts__minute
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, hour) AS last_login_ts__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, day) AS last_login_ts__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, isoweek) AS last_login_ts__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, month) AS last_login_ts__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, quarter) AS last_login_ts__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, year) AS last_login_ts__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) - 1) AS last_login_ts__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, hour) AS archived_at__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, day) AS archived_at__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, isoweek) AS archived_at__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, month) AS archived_at__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, quarter) AS archived_at__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, year) AS archived_at__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) - 1) AS archived_at__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.archived_at) AS archived_at__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, day) AS user__ds__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, isoweek) AS user__ds__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, month) AS user__ds__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, quarter) AS user__ds__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds, year) AS user__ds__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.ds) AS user__ds__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.ds) AS user__ds__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.ds) AS user__ds__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.ds) AS user__ds__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds) - 1) AS user__ds__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds) AS user__ds__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, day) AS user__created_at__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, isoweek) AS user__created_at__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, month) AS user__created_at__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, quarter) AS user__created_at__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.created_at, year) AS user__created_at__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.created_at) - 1) AS user__created_at__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.created_at) AS user__created_at__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, day) AS user__ds_partitioned__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, isoweek) AS user__ds_partitioned__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, month) AS user__ds_partitioned__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, quarter) AS user__ds_partitioned__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.ds_partitioned, year) AS user__ds_partitioned__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.ds_partitioned) - 1) AS user__ds_partitioned__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_doy
+                    , users_ds_source_src_28000.home_state AS user__home_state
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, millisecond) AS user__last_profile_edit_ts__millisecond
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, second) AS user__last_profile_edit_ts__second
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, minute) AS user__last_profile_edit_ts__minute
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, hour) AS user__last_profile_edit_ts__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, day) AS user__last_profile_edit_ts__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, isoweek) AS user__last_profile_edit_ts__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, month) AS user__last_profile_edit_ts__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, quarter) AS user__last_profile_edit_ts__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_profile_edit_ts, year) AS user__last_profile_edit_ts__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_profile_edit_ts) - 1) AS user__last_profile_edit_ts__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, second) AS user__bio_added_ts__second
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, minute) AS user__bio_added_ts__minute
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, hour) AS user__bio_added_ts__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, day) AS user__bio_added_ts__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, isoweek) AS user__bio_added_ts__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, month) AS user__bio_added_ts__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, quarter) AS user__bio_added_ts__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.bio_added_ts, year) AS user__bio_added_ts__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.bio_added_ts) - 1) AS user__bio_added_ts__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, minute) AS user__last_login_ts__minute
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, hour) AS user__last_login_ts__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, day) AS user__last_login_ts__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, isoweek) AS user__last_login_ts__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, month) AS user__last_login_ts__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, quarter) AS user__last_login_ts__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.last_login_ts, year) AS user__last_login_ts__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.last_login_ts) - 1) AS user__last_login_ts__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_doy
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, hour) AS user__archived_at__hour
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, day) AS user__archived_at__day
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, isoweek) AS user__archived_at__week
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, month) AS user__archived_at__month
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, quarter) AS user__archived_at__quarter
+                    , DATETIME_TRUNC(users_ds_source_src_28000.archived_at, year) AS user__archived_at__year
+                    , EXTRACT(year FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_year
+                    , EXTRACT(quarter FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_quarter
+                    , EXTRACT(month FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_month
+                    , EXTRACT(day FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_day
+                    , IF(EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) = 1, 7, EXTRACT(dayofweek FROM users_ds_source_src_28000.archived_at) - 1) AS user__archived_at__extract_dow
+                    , EXTRACT(dayofyear FROM users_ds_source_src_28000.archived_at) AS user__archived_at__extract_doy
+                    , users_ds_source_src_28000.user_id AS user
+                  FROM ***************************.dim_users users_ds_source_src_28000
+                ) subq_2
+              ) subq_3
+              WHERE subq_3.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+            ) subq_4
+          ) subq_5
+        ) subq_6
         GROUP BY
           metric_time__hour
-      ) subq_5
+      ) subq_7
       ON
-        subq_9.metric_time__hour = subq_5.metric_time__hour
-    ) subq_10
-    WHERE subq_10.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-  ) subq_11
-) subq_12
+        subq_12.metric_time__hour = subq_7.metric_time__hour
+    ) subq_13
+    WHERE subq_13.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+  ) subq_14
+) subq_15

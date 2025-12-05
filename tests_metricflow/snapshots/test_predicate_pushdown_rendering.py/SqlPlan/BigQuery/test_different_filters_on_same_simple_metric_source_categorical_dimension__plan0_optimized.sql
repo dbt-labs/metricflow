@@ -31,9 +31,9 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_17.metric_time__day, subq_21.metric_time__day) AS metric_time__day
-    , MAX(subq_17.average_booking_value) AS average_booking_value
-    , MAX(subq_21.max_booking_value) AS max_booking_value
+    COALESCE(subq_20.metric_time__day, subq_25.metric_time__day) AS metric_time__day
+    , MAX(subq_20.average_booking_value) AS average_booking_value
+    , MAX(subq_25.max_booking_value) AS max_booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Pass Only Elements: ['__average_booking_value', 'metric_time__day']
@@ -44,18 +44,20 @@ FROM (
       , AVG(average_booking_value) AS average_booking_value
     FROM (
       -- Read From CTE For node_id=sma_28009
+      -- Pass Only Elements: ['__average_booking_value', 'booking__is_instant', 'metric_time__day']
       SELECT
         metric_time__day
         , booking__is_instant
         , __average_booking_value AS average_booking_value
       FROM sma_28009_cte
-    ) subq_13
+    ) subq_16
     WHERE booking__is_instant
     GROUP BY
       metric_time__day
-  ) subq_17
+  ) subq_20
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
+    -- Pass Only Elements: ['__max_booking_value', 'metric_time__day']
     -- Pass Only Elements: ['__max_booking_value', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
@@ -65,9 +67,9 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       metric_time__day
-  ) subq_21
+  ) subq_25
   ON
-    subq_17.metric_time__day = subq_21.metric_time__day
+    subq_20.metric_time__day = subq_25.metric_time__day
   GROUP BY
     metric_time__day
-) subq_22
+) subq_26

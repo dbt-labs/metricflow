@@ -4,12 +4,13 @@ sql_engine: Trino
 ---
 -- Join Standard Outputs
 -- Pass Only Elements: ['__bookings', 'listing__user__bio_added_ts__minute']
+-- Pass Only Elements: ['__bookings', 'listing__user__bio_added_ts__minute']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_33.user__bio_added_ts__minute AS listing__user__bio_added_ts__minute
-  , SUM(subq_26.__bookings) AS bookings
+  subq_34.user__bio_added_ts__minute AS listing__user__bio_added_ts__minute
+  , SUM(subq_27.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -18,7 +19,7 @@ FROM (
     , listing_id AS listing
     , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_26
+) subq_27
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Pass Only Elements: ['user__ds_partitioned__day', 'user__bio_added_ts__minute', 'listing']
@@ -31,12 +32,12 @@ LEFT OUTER JOIN (
     ***************************.dim_users users_ds_source_src_28000
   ON
     listings_latest_src_28000.user_id = users_ds_source_src_28000.user_id
-) subq_33
+) subq_34
 ON
   (
-    subq_26.listing = subq_33.listing
+    subq_27.listing = subq_34.listing
   ) AND (
-    subq_26.ds_partitioned__day = subq_33.user__ds_partitioned__day
+    subq_27.ds_partitioned__day = subq_34.user__ds_partitioned__day
   )
 GROUP BY
-  subq_33.user__bio_added_ts__minute
+  subq_34.user__bio_added_ts__minute
