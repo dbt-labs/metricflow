@@ -56,6 +56,9 @@ class SqlTableSnapshotTypeException(Exception):  # noqa: D101
     pass
 
 
+DEFAULT_SCHEMA = "default_schema"
+
+
 class SqlTableSnapshot(FrozenBaseModel):
     """Pydantic class to help parse table snapshots that are defined in YAML."""
 
@@ -67,7 +70,7 @@ class SqlTableSnapshot(FrozenBaseModel):
     column_definitions: Tuple[SqlTableColumnDefinition, ...]
     rows: Tuple[Tuple[Optional[str], ...], ...]
     file_path: Optional[Path]
-    schema_name: Optional[str]
+    schema_name: str
 
     @staticmethod
     def create(  # noqa: D102
@@ -82,6 +85,15 @@ class SqlTableSnapshot(FrozenBaseModel):
             column_definitions=tuple(column_definitions),
             rows=tuple(tuple(row) for row in rows),
             file_path=file_path,
+            schema_name=schema_name if schema_name is not None else "DEFAULT_SCHEMA",
+        )
+
+    def with_schema_name(self, schema_name: str) -> SqlTableSnapshot:  # noqa: D102
+        return SqlTableSnapshot(
+            table_name=self.table_name,
+            column_definitions=self.column_definitions,
+            rows=self.rows,
+            file_path=self.file_path,
             schema_name=schema_name,
         )
 
@@ -142,12 +154,11 @@ class SqlTableSnapshot(FrozenBaseModel):
 class SqlTableSnapshotLoader:
     """Loads a snapshot of a table into the SQL engine."""
 
-    def __init__(self, ddl_sql_client: SqlClientWithDDLMethods, schema_name: str) -> None:  # noqa: D107
+    def __init__(self, ddl_sql_client: SqlClientWithDDLMethods) -> None:  # noqa: D107
         self._ddl_sql_client = ddl_sql_client
-        self._schema_name = schema_name
 
     def load(self, table_snapshot: SqlTableSnapshot) -> None:  # noqa: D102
-        sql_table = SqlTable(schema_name=self._schema_name, table_name=table_snapshot.table_name)
+        sql_table = SqlTable(schema_name=table_snapshot.schema_name, table_name=table_snapshot.table_name)
 
         self._ddl_sql_client.create_table_from_data_table(
             sql_table=sql_table,

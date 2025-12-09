@@ -67,8 +67,8 @@ def test_load(
     try:
         ddl_sql_client.create_schema(schema_name)
 
-        snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client, schema_name=schema_name)
-        snapshot_loader.load(table_snapshot)
+        snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client)
+        snapshot_loader.load(table_snapshot.with_schema_name(schema_name))
 
         actual = ddl_sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
         assert_data_tables_equal(
