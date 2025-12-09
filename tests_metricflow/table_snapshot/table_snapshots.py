@@ -6,7 +6,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple
+from typing import Iterable, List, Optional, Sequence, Tuple
 
 import dateutil.parser
 import yaml
@@ -66,7 +66,24 @@ class SqlTableSnapshot(FrozenBaseModel):
     table_name: str
     column_definitions: Tuple[SqlTableColumnDefinition, ...]
     rows: Tuple[Tuple[Optional[str], ...], ...]
-    file_path: Path
+    file_path: Optional[Path]
+    schema_name: Optional[str]
+
+    @staticmethod
+    def create(  # noqa: D102
+        table_name: str,
+        column_definitions: Iterable[SqlTableColumnDefinition],
+        rows: Iterable[Iterable[Optional[str]]],
+        file_path: Optional[Path] = None,
+        schema_name: Optional[str] = None,
+    ) -> SqlTableSnapshot:
+        return SqlTableSnapshot(
+            table_name=table_name,
+            column_definitions=tuple(column_definitions),
+            rows=tuple(tuple(row) for row in rows),
+            file_path=file_path,
+            schema_name=schema_name,
+        )
 
     @property
     def snapshot_hash(self) -> SqlTableSnapshotHash:
@@ -203,7 +220,7 @@ class SqlTableSnapshotRepository:
                 object_cfg = config_document[document_type]
                 if document_type == SqlTableSnapshotRepository.TABLE_SNAPSHOT_DOCUMENT_KEY:
                     try:
-                        results.append(SqlTableSnapshot(**object_cfg, file_path=Path(file_path)))
+                        results.append(SqlTableSnapshot.create(**object_cfg, file_path=Path(file_path)))
                     except Exception as e:
                         logger.exception(f"Error while parsing: {file_path}")
                         raise TableSnapshotParseException(f"Error while parsing: {file_path}") from e

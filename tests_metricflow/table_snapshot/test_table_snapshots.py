@@ -28,7 +28,7 @@ def table_snapshot() -> SqlTableSnapshot:  # noqa: D103
         ("false", "-1", "-1.0", "2020-03-04 05:06:07", "bye"),
     )
 
-    return SqlTableSnapshot(
+    return SqlTableSnapshot.create(
         table_name="example_snapshot",
         column_definitions=(
             SqlTableColumnDefinition(name="col0", type=SqlTableColumnType.BOOLEAN),
@@ -89,14 +89,14 @@ def test_snapshot_repository() -> None:
     # Replace the filepath so it can be compared consistently between hosts.
     example_snapshot = repo.table_snapshots[0]
     dummy_file_path = Path("/a/b/c")
-    snapshot_to_check = SqlTableSnapshot(
+    snapshot_to_check = SqlTableSnapshot.create(
         table_name=example_snapshot.table_name,
         column_definitions=example_snapshot.column_definitions,
         rows=example_snapshot.rows,
         file_path=dummy_file_path,
     )
 
-    assert snapshot_to_check == SqlTableSnapshot(
+    assert snapshot_to_check == SqlTableSnapshot.create(
         table_name="example_table",
         column_definitions=(
             SqlTableColumnDefinition(name="user_id", type=SqlTableColumnType.INT),
