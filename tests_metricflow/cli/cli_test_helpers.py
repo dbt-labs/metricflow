@@ -13,12 +13,10 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 )
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
-from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.cli_string import CLIString
 from dbt_metricflow.cli.tutorial import dbtMetricFlowTutorialHelper
 from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
 from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
-from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
 
 logger = logging.getLogger(__name__)
 
@@ -101,12 +99,3 @@ def run_dbt_build(cli_command_runner: IsolatedCliCommandRunner) -> None:
     )
     dbt_build_result.raise_exception_on_failure()
     logger.debug(LazyFormat("`dbt build` successful"))
-
-
-def create_cli_runner(dbt_project_path: Path) -> MetricFlowCliRunner:
-    """Return a CLI runner that is based on the dbt project at the given path."""
-    cli_configuration = CLIConfiguration()
-    cli_configuration.setup(
-        dbt_profiles_path=dbt_project_path, dbt_project_path=dbt_project_path, configure_file_logging=False
-    )
-    return MetricFlowCliRunner(cli_configuration, str(dbt_project_path))

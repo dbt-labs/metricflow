@@ -23,7 +23,6 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 )
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
-from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from tests_metricflow.cli.cli_test_helpers import (
     create_tutorial_project_files,
     run_and_check_cli_command,
@@ -108,7 +107,6 @@ def create_directory(directory_path: str) -> Iterator[None]:
 def test_validate_configs(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
-    cli_context: CLIConfiguration,
 ) -> None:
     """Tests configuration validation by adding a semantic model file with errors."""
     yaml_contents = textwrap.dedent(
