@@ -17,6 +17,10 @@ from typing import Iterator
 import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    assert_snapshot_text_equal,
+    make_schema_replacement_function,
+)
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
@@ -27,7 +31,6 @@ from tests_metricflow.cli.cli_test_helpers import (
 )
 from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
 from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
-from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -360,10 +363,16 @@ def test_csv(
             csv_file_path = (working_directory_path / csv_filename).absolute()
             with open(csv_file_path, "r") as csv_file:
                 csv_file_contents = csv_file.read()
-                assert_str_snapshot_equal(
+                assert_snapshot_text_equal(
                     request=request,
-                    mf_test_configuration=mf_test_configuration,
+                    snapshot_configuration=mf_test_configuration,
+                    group_id="str",
                     snapshot_id="result",
-                    snapshot_str=csv_file_contents,
+                    snapshot_text=csv_file_contents,
+                    snapshot_file_extension=".txt",
                     expectation_description="A CSV file containing the values for 2 metrics.",
+                    incomparable_strings_replacement_function=make_schema_replacement_function(
+                        system_schema=mf_test_configuration.mf_system_schema,
+                        source_schema=mf_test_configuration.mf_source_schema,
+                    ),
                 )

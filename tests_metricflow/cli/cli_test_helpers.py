@@ -7,16 +7,18 @@ from typing import Optional, Sequence
 
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    assert_snapshot_text_equal,
+    make_schema_replacement_function,
+)
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.cli_string import CLIString
 from dbt_metricflow.cli.tutorial import dbtMetricFlowTutorialHelper
-from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
 from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 from tests_metricflow.fixtures.cli_fixtures import MetricFlowCliRunner
-from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +29,6 @@ def run_and_check_cli_command(
     cli_runner: IsolatedCliCommandRunner,
     command_enum: IsolatedCliCommandEnum,
     args: Sequence[str],
-    sql_client: Optional[SqlClient] = None,
     expected_exit_code: int = 0,
     expectation_description: Optional[str] = None,
 ) -> None:
@@ -55,13 +56,18 @@ def run_and_check_cli_command(
         regex_parts = (r"(?P<prefix>", prefix, r").*")
         snapshot_str = re.sub("".join(regex_parts), repl=r"\g<prefix> ***", string=snapshot_str)
 
-    assert_str_snapshot_equal(
+    assert_snapshot_text_equal(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        snapshot_configuration=mf_test_configuration,
+        group_id="str",
         snapshot_id="result",
-        snapshot_str=snapshot_str,
-        sql_engine=sql_client.sql_engine_type if sql_client else None,
+        snapshot_text=snapshot_str,
+        snapshot_file_extension=".txt",
         expectation_description=expectation_description,
+        incomparable_strings_replacement_function=make_schema_replacement_function(
+            system_schema=mf_test_configuration.mf_system_schema,
+            source_schema=mf_test_configuration.mf_source_schema,
+        ),
     )
     assert result.exit_code == expected_exit_code
 
