@@ -12,9 +12,9 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     OVERWRITE_SNAPSHOTS_CLI_FLAG,
 )
 
-from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
-from tests_metricflow.cli.cli_test_helpers import create_tutorial_project_files, run_dbt_build
-from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+from tests_dbt_metricflow import TESTS_DBT_METRICFLOW_DIRECTORY_ANCHOR
+from tests_dbt_metricflow.cli.cli_test_helpers import create_tutorial_project_files, run_dbt_build
+from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 
 
 @pytest.fixture(scope="session")
@@ -28,8 +28,8 @@ def cli_test_configuration(request: FixtureRequest) -> MetricFlowTestConfigurati
         display_graphs=False,
         overwrite_snapshots=bool(request.config.getoption(OVERWRITE_SNAPSHOTS_CLI_FLAG, default=False)),
         use_persistent_source_schema=False,
-        snapshot_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory.joinpath("snapshots"),
-        tests_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory,
+        snapshot_directory=TESTS_DBT_METRICFLOW_DIRECTORY_ANCHOR.directory.joinpath("snapshots"),
+        tests_directory=TESTS_DBT_METRICFLOW_DIRECTORY_ANCHOR.directory,
     )
 
 

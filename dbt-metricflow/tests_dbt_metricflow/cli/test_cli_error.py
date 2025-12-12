@@ -14,12 +14,12 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from tests_metricflow.cli.cli_test_helpers import (
+from tests_dbt_metricflow.cli.cli_test_helpers import (
     create_tutorial_project_files,
     run_and_check_cli_command,
 )
-from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
-from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+from tests_dbt_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
+from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 
 logger = logging.getLogger(__name__)
 

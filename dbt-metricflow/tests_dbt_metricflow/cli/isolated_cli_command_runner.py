@@ -15,8 +15,8 @@ from typing import Iterator, Mapping, Optional, Sequence
 
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
-from tests_metricflow.cli.executor_process_main_function import ExecutorProcessMainFunction
-from tests_metricflow.cli.isolated_cli_command_interface import (
+from tests_dbt_metricflow.cli.executor_process_main_function import ExecutorProcessMainFunction
+from tests_dbt_metricflow.cli.isolated_cli_command_interface import (
     CommandParameterSet,
     ExecutorProcessStartingParameterSet,
     IsolatedCliCommandEnum,

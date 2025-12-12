@@ -15,8 +15,8 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from dbt_metricflow.cli.cli_string import CLIString
 from dbt_metricflow.cli.tutorial import dbtMetricFlowTutorialHelper
-from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
-from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+from tests_dbt_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
+from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 
 logger = logging.getLogger(__name__)
 

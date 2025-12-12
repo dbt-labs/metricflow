@@ -23,13 +23,13 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 )
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
-from tests_metricflow.cli.cli_test_helpers import (
+from tests_dbt_metricflow.cli.cli_test_helpers import (
     create_tutorial_project_files,
     run_and_check_cli_command,
     run_dbt_build,
 )
-from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
-from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+from tests_dbt_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
+from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 
 logger = logging.getLogger(__name__)
 

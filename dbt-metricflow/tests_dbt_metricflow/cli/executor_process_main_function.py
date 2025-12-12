@@ -27,7 +27,7 @@ from dbt_metricflow.cli.main import (
     tutorial,
     validate_configs,
 )
-from tests_metricflow.cli.isolated_cli_command_interface import (
+from tests_dbt_metricflow.cli.isolated_cli_command_interface import (
     CommandParameterSet,
     ExecutorProcessStartingParameterSet,
     IsolatedCliCommandEnum,
