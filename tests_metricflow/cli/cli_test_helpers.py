@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def run_and_check_cli_command(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
     command_enum: IsolatedCliCommandEnum,
     args: Sequence[str],
@@ -56,15 +56,15 @@ def run_and_check_cli_command(
 
     assert_snapshot_text_equal(
         request=request,
-        snapshot_configuration=mf_test_configuration,
+        snapshot_configuration=cli_test_configuration,
         group_id="str",
         snapshot_id="result",
         snapshot_text=snapshot_str,
         snapshot_file_extension=".txt",
         expectation_description=expectation_description,
         incomparable_strings_replacement_function=make_schema_replacement_function(
-            system_schema=mf_test_configuration.mf_system_schema,
-            source_schema=mf_test_configuration.mf_source_schema,
+            system_schema=cli_test_configuration.mf_system_schema,
+            source_schema=cli_test_configuration.mf_source_schema,
         ),
     )
     assert result.exit_code == expected_exit_code

@@ -37,12 +37,12 @@ logger = logging.getLogger(__name__)
 @pytest.mark.slow
 def test_query(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=["--metrics", "transactions", "--group-by", "metric_time", "--order", "metric_time,transactions"],
@@ -52,12 +52,12 @@ def test_query(  # noqa: D103
 @pytest.mark.slow
 def test_list_dimensions(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_DIMENSIONS,
         args=["--metrics", "transactions"],
@@ -67,12 +67,12 @@ def test_list_dimensions(  # noqa: D103
 @pytest.mark.slow
 def test_list_metrics(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_METRICS,
         args=[],
@@ -82,12 +82,12 @@ def test_list_metrics(  # noqa: D103
 @pytest.mark.slow
 def test_get_dimension_values(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_DIMENSION_VALUES,
         args=["--metrics", "transactions", "--dimension", "customer__customer_country"],
@@ -106,7 +106,7 @@ def create_directory(directory_path: str) -> Iterator[None]:
 @pytest.mark.slow
 def test_validate_configs(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests configuration validation by adding a semantic model file with errors."""
     yaml_contents = textwrap.dedent(
@@ -140,7 +140,7 @@ def test_validate_configs(  # noqa: D103
 
             run_and_check_cli_command(
                 request=request,
-                mf_test_configuration=mf_test_configuration,
+                cli_test_configuration=cli_test_configuration,
                 cli_runner=cli_runner,
                 command_enum=IsolatedCliCommandEnum.MF_VALIDATE_CONFIGS,
                 args=[],
@@ -152,12 +152,12 @@ def test_validate_configs(  # noqa: D103
 @pytest.mark.slow
 def test_health_checks(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_HEALTH_CHECKS,
         args=[],
@@ -167,7 +167,7 @@ def test_health_checks(  # noqa: D103
 @pytest.mark.slow
 def test_tutorial_message(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the message output of the tutorial.
@@ -182,7 +182,7 @@ def test_tutorial_message(  # noqa: D103
     """
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_TUTORIAL,
         args=["-m"],
@@ -192,12 +192,12 @@ def test_tutorial_message(  # noqa: D103
 @pytest.mark.slow
 def test_list_entities(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_ENTITIES,
         args=["--metrics", "transactions"],
@@ -207,12 +207,12 @@ def test_list_entities(  # noqa: D103
 @pytest.mark.slow
 def test_list_saved_queries(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_SAVED_QUERIES,
         args=[],
@@ -222,12 +222,12 @@ def test_list_saved_queries(  # noqa: D103
 @pytest.mark.slow
 def test_saved_query(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -242,7 +242,7 @@ def test_saved_query(  # noqa: D103
 @pytest.mark.slow
 def test_saved_query_with_where(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     where_argument_value = (
@@ -250,7 +250,7 @@ def test_saved_query_with_where(  # noqa: D103
     )
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -267,12 +267,12 @@ def test_saved_query_with_where(  # noqa: D103
 @pytest.mark.slow
 def test_saved_query_with_limit(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -289,12 +289,12 @@ def test_saved_query_with_limit(  # noqa: D103
 @pytest.mark.slow
 def test_saved_query_explain(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=["--explain", "--saved-query", "core_transaction_metrics"],
@@ -304,12 +304,12 @@ def test_saved_query_explain(  # noqa: D103
 @pytest.mark.slow
 def test_saved_query_with_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -328,7 +328,7 @@ def test_saved_query_with_cumulative_metric(  # noqa: D103
 @pytest.mark.slow
 def test_csv(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests writing the results of a query to a file."""
     with tempfile.TemporaryDirectory() as working_directory:
@@ -363,14 +363,14 @@ def test_csv(
                 csv_file_contents = csv_file.read()
                 assert_snapshot_text_equal(
                     request=request,
-                    snapshot_configuration=mf_test_configuration,
+                    snapshot_configuration=cli_test_configuration,
                     group_id="str",
                     snapshot_id="result",
                     snapshot_text=csv_file_contents,
                     snapshot_file_extension=".txt",
                     expectation_description="A CSV file containing the values for 2 metrics.",
                     incomparable_strings_replacement_function=make_schema_replacement_function(
-                        system_schema=mf_test_configuration.mf_system_schema,
-                        source_schema=mf_test_configuration.mf_source_schema,
+                        system_schema=cli_test_configuration.mf_system_schema,
+                        source_schema=cli_test_configuration.mf_source_schema,
                     ),
                 )

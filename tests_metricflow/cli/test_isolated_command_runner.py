@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.slow
 def test_isolated_query(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests running an MF query using the isolated runner."""
     with tempfile.TemporaryDirectory() as tmp_directory:
@@ -55,15 +55,15 @@ def test_isolated_query(
         result.raise_exception_on_failure()
         assert_snapshot_text_equal(
             request=request,
-            snapshot_configuration=mf_test_configuration,
+            snapshot_configuration=cli_test_configuration,
             group_id="str",
             snapshot_id="result",
             snapshot_text=result.output,
             snapshot_file_extension=".txt",
             expectation_description="A table showing the `transactions` metric.",
             incomparable_strings_replacement_function=make_schema_replacement_function(
-                system_schema=mf_test_configuration.mf_system_schema,
-                source_schema=mf_test_configuration.mf_source_schema,
+                system_schema=cli_test_configuration.mf_system_schema,
+                source_schema=cli_test_configuration.mf_source_schema,
             ),
         )
 
@@ -71,7 +71,7 @@ def test_isolated_query(
 @pytest.mark.slow
 def test_multiple_queries(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests running multiple sequential MF queries using a single runner."""
     with tempfile.TemporaryDirectory() as tmp_directory:
@@ -108,7 +108,7 @@ def test_multiple_queries(
 
         assert_snapshot_text_equal(
             request=request,
-            snapshot_configuration=mf_test_configuration,
+            snapshot_configuration=cli_test_configuration,
             group_id="str",
             snapshot_id="result",
             snapshot_text=mf_pformat_dict(
@@ -117,8 +117,8 @@ def test_multiple_queries(
             snapshot_file_extension=".txt",
             expectation_description="2 results showing the`transactions` and `quick_buy_transactions` metrics.",
             incomparable_strings_replacement_function=make_schema_replacement_function(
-                system_schema=mf_test_configuration.mf_system_schema,
-                source_schema=mf_test_configuration.mf_source_schema,
+                system_schema=cli_test_configuration.mf_system_schema,
+                source_schema=cli_test_configuration.mf_source_schema,
             ),
         )
 
@@ -126,7 +126,7 @@ def test_multiple_queries(
 @pytest.mark.slow
 def test_environment_variables(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests running an MF CLI command that configures the profile / project location using environment variables."""
     with tempfile.TemporaryDirectory() as tmp_directory:
@@ -166,14 +166,14 @@ def test_environment_variables(
         result.raise_exception_on_failure()
         assert_snapshot_text_equal(
             request=request,
-            snapshot_configuration=mf_test_configuration,
+            snapshot_configuration=cli_test_configuration,
             group_id="str",
             snapshot_id="result",
             snapshot_text=result.output,
             snapshot_file_extension=".txt",
             expectation_description="A table showing the `transactions` metric.",
             incomparable_strings_replacement_function=make_schema_replacement_function(
-                system_schema=mf_test_configuration.mf_system_schema,
-                source_schema=mf_test_configuration.mf_source_schema,
+                system_schema=cli_test_configuration.mf_system_schema,
+                source_schema=cli_test_configuration.mf_source_schema,
             ),
         )
