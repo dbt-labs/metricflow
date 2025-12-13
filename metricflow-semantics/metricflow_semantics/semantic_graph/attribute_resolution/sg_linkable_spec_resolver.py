@@ -7,7 +7,7 @@ from typing import Iterable, Optional
 from dbt_semantic_interfaces.references import ElementReference, MetricReference
 from typing_extensions import override
 
-from metricflow_semantics.errors.error_classes import MetricFlowInternalError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError, UnknownMetricError
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
@@ -139,7 +139,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         If `joins_disallowed` is set, then only group-by items that can be resolved using the semantic models where the
         simple metrics are defined will be returned.
         """
-        label_to_references: defaultdict[MetricFlowGraphLabel, set[ElementReference]] = defaultdict(set)
+        label_to_references: defaultdict[MetricLabel, set[ElementReference]] = defaultdict(set)
         for metric_reference in metric_references:
             label_to_references[MetricLabel.get_instance(metric_reference.element_name)].add(metric_reference)
 
@@ -154,7 +154,7 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         if len(label_to_references) == 0:
             return GroupByItemSet()
 
-        node_labels: FrozenOrderedSet[MetricFlowGraphLabel] = FrozenOrderedSet(sorted(label_to_references))
+        node_labels: FrozenOrderedSet[MetricLabel] = FrozenOrderedSet(sorted(label_to_references))
         cache_key = _CommonSetCacheKey(
             node_labels=node_labels, set_filter=set_filter, joins_disallowed=joins_disallowed
         )
@@ -164,20 +164,28 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
         source_nodes: MutableOrderedSet[SemanticGraphNode] = MutableOrderedSet()
 
+        invalid_metric_names: list[str] = []
         for label in node_labels:
             matching_nodes = self._semantic_graph.nodes_with_labels(label)
-            if len(matching_nodes) != 1:
+            matching_node_count = len(matching_nodes)
+            if matching_node_count == 0:
+                assert label.metric_name is not None, "Labels were generated for specific metrics"
+                invalid_metric_names.append(label.metric_name)
+                continue
+            elif matching_node_count > 1:
                 raise MetricFlowInternalError(
                     LazyFormat(
-                        "Did not find exactly 1 node in the semantic graph for the given label",
+                        "Found multiple nodes in the semantic graph for the given label when at most 1 was expected",
                         label=label,
                         associated_references=label_to_references.get(label),
                         matching_nodes=matching_nodes,
                         metric_nodes=lambda: self._semantic_graph.nodes_with_labels(MetricLabel.get_instance()),
                     )
                 )
-
             source_nodes.add(mf_first_item(matching_nodes))
+
+        if invalid_metric_names:
+            raise UnknownMetricError(invalid_metric_names)
 
         if joins_disallowed:
             simple_trie = self._simple_resolver_limit_one_model.resolve_trie(source_nodes, set_filter).dunder_name_trie
