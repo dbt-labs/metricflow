@@ -1,0 +1,11 @@
+test_name: test_metadata_methods_with_invalid_metics
+test_filename: test_errors.py
+docstring:
+  Check the exception raised when invalid metric names are provided to metadata methods in `MetricFlowEngine.
+---
+{
+  'entities_for_metrics': "Unknown metrics: ['invalid_metric_0', 'invalid_metric_1']",
+  'list_dimensions': "Unknown metrics: ['invalid_metric_0', 'invalid_metric_1']",
+  'list_group_bys': "Unknown metrics: ['invalid_metric_0', 'invalid_metric_1']",
+  'simple_dimensions_for_metrics': "Unknown metrics: ['invalid_metric_0', 'invalid_metric_1']",
+}
