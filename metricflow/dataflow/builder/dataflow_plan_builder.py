@@ -423,11 +423,21 @@ class DataflowPlanBuilder:
         metric = self._metric_lookup.get_metric(metric_reference)
         conversion_type_params = metric.type_params.conversion_type_params
         assert conversion_type_params, "A conversion metric should have type_params.conversion_type_params defined."
+
+        # This is the filter that's defined for the conversion metric in the configs.
+        metric_definition_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=WhereFilterLocation.for_metric(metric_spec.reference),
+            filter_intersection=metric.filter,
+        )
+        conversion_metric_filter_spec_set = WhereFilterSpecSet(
+            metric_level_filter_specs=tuple(metric_definition_filter_specs),
+        ).merge(metric_spec.filter_spec_set)
+
         base_metric_recipe, conversion_metric_recipe = self._build_input_recipes_for_conversion_metric(
             metric_reference=metric_spec.reference,
             conversion_type_params=conversion_type_params,
             filter_spec_factory=filter_spec_factory,
-            descendant_filter_spec_set=metric_spec.filter_spec_set,
+            descendant_filter_spec_set=conversion_metric_filter_spec_set,
             queried_linkable_specs=queried_linkable_specs,
         )
         # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
@@ -536,6 +546,15 @@ class DataflowPlanBuilder:
                 )
             )
 
+        # This is the filter that's defined for the cumulative metric in the configs.
+        metric_definition_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=WhereFilterLocation.for_metric(metric_spec.reference),
+            filter_intersection=metric.filter,
+        )
+        cumulative_metric_filter_spec_set = WhereFilterSpecSet(
+            metric_level_filter_specs=tuple(metric_definition_filter_specs),
+        ).merge(metric_spec.filter_spec_set)
+
         simple_metric_recipe = self._build_simple_metric_recipe(
             simple_metric_input=self._manifest_object_lookup.simple_metric_name_to_input[cumulative_metric_input.name],
             queried_linkable_specs=queried_linkable_specs,
@@ -549,7 +568,7 @@ class DataflowPlanBuilder:
                 ),
                 cumulative_grain_to_date=cumulative_grain_to_date,
             ),
-            additional_filter_spec_set=metric_spec.filter_spec_set,
+            additional_filter_spec_set=cumulative_metric_filter_spec_set,
             filter_spec_factory=filter_spec_factory,
         )
         aggregated_node = self.build_aggregated_simple_metric_input(
