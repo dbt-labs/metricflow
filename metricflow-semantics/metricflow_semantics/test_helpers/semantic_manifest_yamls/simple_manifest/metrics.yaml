@@ -1023,3 +1023,26 @@ metric:
         alias: alias_3
       - name: booking_value
         alias: alias_4
+---
+metric:
+  name: trailing_2_months_revenue_with_filter
+  description: Cumulative metric with a filter defined in the YAML
+  type: cumulative
+  filter: "{{ Dimension('user__home_state_latest') }} = 'CA'"
+  type_params:
+    measure: txn_revenue
+    cumulative_type_params:
+      window: 2 month
+---
+metric:
+  name: visit_buy_conversion_rate_with_filter
+  description: Conversion metric with a filter defined in the YAML
+  type: conversion
+  filter: "{{ Dimension('visit__referrer_id') }} = 'fb_ad_1'"
+  type_params:
+    conversion_type_params:
+      base_measure: visits
+      conversion_measure: buys
+      window: 7 days
+      entity: user
+      calculation: conversion_rate

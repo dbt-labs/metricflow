@@ -615,6 +615,32 @@ def test_derived_cumulative_metric_with_non_default_grains(
     )
 
 
+@pytest.mark.sql_engine_snapshot
+def test_cumulative_metric_with_metric_definition_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests rendering a cumulative metric that has a filter defined in the YAML metric definition."""
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("trailing_2_months_revenue_with_filter",),
+        group_by_names=("metric_time__day",),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )
+
+
 # TODO: write the following tests when unblocked
 # - Query cumulative metric with non-day default_grain (using default grain and non-default grain)
 # - Query 2 metrics with different default_grains using metric_time (no grain specified)
