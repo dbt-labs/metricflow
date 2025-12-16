@@ -245,3 +245,29 @@ def test_conversion_metric_with_different_time_dimension_grains(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=parsed_query.query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_with_metric_definition_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test rendering a query against a conversion metric with a filter defined in the YAML metric definition."""
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("visit_buy_conversion_rate_with_filter",),
+        group_by_names=("metric_time__day",),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )

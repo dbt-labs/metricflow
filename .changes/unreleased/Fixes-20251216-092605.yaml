@@ -1,0 +1,7 @@
+kind: Fixes
+body: Fixes an issue where metric-level YAML filters are not applied for cumulative
+  & conversion metrics.
+time: 2025-12-16T09:26:05.962328-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1950"

@@ -104,6 +104,7 @@ docstring:
   'total_account_balance_first_day_of_month',
   'trailing_2_months_revenue',
   'trailing_2_months_revenue_sub_10',
+  'trailing_2_months_revenue_with_filter',
   'trailing_7_days_bookings',
   'trailing_7_days_bookings_offset_1_week',
   'twice_bookings_fill_nulls_with_0_without_time_spine',
@@ -113,6 +114,7 @@ docstring:
   'visit_buy_conversion_rate_7days',
   'visit_buy_conversion_rate_7days_fill_nulls_with_0',
   'visit_buy_conversion_rate_by_session',
+  'visit_buy_conversion_rate_with_filter',
   'visit_buy_conversion_rate_with_monthly_conversion',
   'visit_buy_conversions',
 ]

@@ -200,3 +200,30 @@ def test_conversion_metric_with_different_time_dimension_grains(
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.duckdb_only
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_with_metric_definition_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """Test query against a conversion metric that has a filter defined in the YAML metric definition."""
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create_with_random_request_id(
+            metric_names=("visit_buy_conversion_rate_with_filter",),
+            group_by_names=("metric_time",),
+            order_by_names=("metric_time",),
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
