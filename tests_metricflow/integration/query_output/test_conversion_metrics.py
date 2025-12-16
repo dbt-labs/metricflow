@@ -202,6 +202,7 @@ def test_conversion_metric_with_different_time_dimension_grains(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_conversion_metric_with_metric_definition_filter(
     request: FixtureRequest,

@@ -159,6 +159,7 @@ def test_cumulative_metric_with_non_adjustable_filter(
     )
 
 
+@pytest.mark.duckdb_only
 @pytest.mark.sql_engine_snapshot
 def test_cumulative_metric_with_metric_definition_filter(
     request: FixtureRequest,
