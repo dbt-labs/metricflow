@@ -1,0 +1,10 @@
+test_name: test_home_profiles_dir
+test_filename: test_isolated_command_runner.py
+docstring:
+  Tests running an MF CLI command with the profiles file in the home directory.
+expectation_description:
+  A table showing the `transactions` metric.
+---
+  transactions
+--------------
+            50
