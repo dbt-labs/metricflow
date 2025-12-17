@@ -130,6 +130,7 @@ testx-snap:
 
 .PHONY: test-snap-slow
 test-snap-slow:
+	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_DBT_METRICFLOW)/
 	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW)/
 
