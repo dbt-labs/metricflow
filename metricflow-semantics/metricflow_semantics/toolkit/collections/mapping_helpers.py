@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping, Sequence, Set
-from typing import Iterable
+from typing import Iterable, TypeVar
 
+from metricflow_semantics.toolkit.comparison_helpers import SupportsLessThan
 from metricflow_semantics.toolkit.mf_type_aliases import (
     KeyT,
     MappingItemsTuple,
@@ -31,3 +32,11 @@ def mf_common_keys(dicts: Sequence[Mapping[KeyT, object]]) -> Set[KeyT]:
 
     first_dict = dicts[0]
     return set(first_dict).intersection(*[other_dict for other_dict in dicts[1:]])
+
+
+OrderedKeyT = TypeVar("OrderedKeyT", bound=SupportsLessThan)
+
+
+def mf_sort_by_key(mapping: Mapping[OrderedKeyT, ValueT]) -> dict[OrderedKeyT, ValueT]:
+    """Return the given mapping as a dict sorted by key."""
+    return {key: mapping[key] for key in sorted(mapping)}
