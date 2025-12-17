@@ -27,7 +27,6 @@ from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliComm
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.slow
 def test_isolated_query(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -68,7 +67,6 @@ def test_isolated_query(
         )
 
 
-@pytest.mark.slow
 def test_multiple_queries(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -123,7 +121,6 @@ def test_multiple_queries(
         )
 
 
-@pytest.mark.slow
 def test_environment_variables(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,

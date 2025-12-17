@@ -13,7 +13,6 @@ from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliComm
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.slow
 def test_query(
     cli_test_configuration: MetricFlowTestConfiguration,
     request: FixtureRequest,
@@ -29,7 +28,6 @@ def test_query(
     )
 
 
-@pytest.mark.slow
 def test_explain(
     cli_test_configuration: MetricFlowTestConfiguration,
     request: FixtureRequest,

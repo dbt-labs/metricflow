@@ -24,7 +24,6 @@ from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliComm
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.slow
 def test_missing_semantic_manifest(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -49,7 +48,6 @@ def test_missing_semantic_manifest(
             )
 
 
-@pytest.mark.slow
 def test_invalid_metric(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -66,7 +64,6 @@ def test_invalid_metric(
     )
 
 
-@pytest.mark.slow
 @pytest.mark.skip("Need to sanitize the snapshot output for temporary paths.")
 def test_csv_non_writeable_file(
     request: FixtureRequest,
@@ -89,7 +86,6 @@ def test_csv_non_writeable_file(
         )
 
 
-@pytest.mark.slow
 @pytest.mark.skip("Need to sanitize the snapshot output for temporary paths.")
 def test_csv_directory(
     request: FixtureRequest,

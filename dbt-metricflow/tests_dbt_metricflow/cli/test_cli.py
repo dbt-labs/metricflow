@@ -34,7 +34,6 @@ from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliComm
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.slow
 def test_query(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -49,7 +48,6 @@ def test_query(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_list_dimensions(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -64,7 +62,6 @@ def test_list_dimensions(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_list_metrics(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -79,7 +76,6 @@ def test_list_metrics(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_get_dimension_values(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -103,7 +99,6 @@ def create_directory(directory_path: str) -> Iterator[None]:
     shutil.rmtree(path)
 
 
-@pytest.mark.slow
 def test_validate_configs(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -149,7 +144,6 @@ def test_validate_configs(  # noqa: D103
             )
 
 
-@pytest.mark.slow
 def test_health_checks(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -164,7 +158,6 @@ def test_health_checks(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_tutorial_message(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -189,7 +182,6 @@ def test_tutorial_message(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_list_entities(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -204,7 +196,6 @@ def test_list_entities(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_list_saved_queries(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -219,7 +210,6 @@ def test_list_saved_queries(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_saved_query(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -239,7 +229,6 @@ def test_saved_query(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_saved_query_with_where(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -264,7 +253,6 @@ def test_saved_query_with_where(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_saved_query_with_limit(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -286,7 +274,6 @@ def test_saved_query_with_limit(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_saved_query_explain(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -301,7 +288,6 @@ def test_saved_query_explain(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_saved_query_with_cumulative_metric(  # noqa: D103
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -325,7 +311,6 @@ def test_saved_query_with_cumulative_metric(  # noqa: D103
     )
 
 
-@pytest.mark.slow
 def test_csv(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
