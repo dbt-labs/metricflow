@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 
 import _pytest.config
-
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_display_snapshots_cli_flag,
     add_overwrite_snapshots_cli_flag,

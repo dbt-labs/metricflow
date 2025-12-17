@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 
-import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
