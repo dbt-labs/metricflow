@@ -7,7 +7,6 @@ import tempfile
 from pathlib import Path
 from typing import Dict
 
-import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
@@ -17,17 +16,16 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
 
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
-from tests_metricflow.cli.cli_test_helpers import (
+from tests_dbt_metricflow.cli.cli_test_helpers import (
     create_tutorial_project_files,
     run_dbt_build,
 )
-from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
-from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+from tests_dbt_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
+from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.slow
 def test_isolated_query(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -68,7 +66,6 @@ def test_isolated_query(
         )
 
 
-@pytest.mark.slow
 def test_multiple_queries(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -123,7 +120,6 @@ def test_multiple_queries(
         )
 
 
-@pytest.mark.slow
 def test_environment_variables(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,

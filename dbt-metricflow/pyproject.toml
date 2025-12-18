@@ -66,6 +66,27 @@ dbt-snowflake = [
 dbt-trino = [
   "requirements-files/requirements-dbt-trino.txt"
 ]
+dev-env-requirements = [
+  "../metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "requirements-files/dev-env-requirements.txt"
+]
+
+
+# Environment setup
+[tool.hatch.envs.dev-env]
+description = "Environment for package + CLI development and testing against local MetricFlow code."
+run = "run-coverage --no-cov"
+
+features = ["dev-env-requirements"]
+
+# In order to use the local packages we have to do post-installs of editable versions to clobber the package installs.
+# If we do not do this, then the tests will break on broken imports whenever someone moves things around in
+# metricflow or metricflow-semantics between the latest dbt-metricflow release and test runtime.
+# TODO: switch to workspaces if removal of mf (e.g., after integration with dbt-core) will not happen in a timely fashion.
+post-install-commands = [
+  "pip install -e ../",
+]
+
 
 [tool.hatch.build.targets.sdist]
 exclude = [

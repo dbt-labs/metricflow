@@ -15,6 +15,7 @@ TESTS_PERFORMANCE = tests_metricflow/performance
 
 # Pytest that can populate the persistent source schema
 USE_PERSISTENT_SOURCE_SCHEMA = --use-persistent-source-schema
+TESTS_DBT_METRICFLOW = tests_dbt_metricflow
 TESTS_METRICFLOW = tests_metricflow
 TESTS_METRICFLOW_SEMANTICS = tests_metricflow_semantics
 POPULATE_PERSISTENT_SOURCE_SCHEMA = $(TESTS_METRICFLOW)/source_schema_tools.py::populate_source_schema
@@ -40,6 +41,7 @@ test:
 
 .PHONY: test-include-slow
 test-include-slow:
+	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_DBT_METRICFLOW)/
 	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
@@ -128,6 +130,7 @@ testx-snap:
 
 .PHONY: test-snap-slow
 test-snap-slow:
+	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_DBT_METRICFLOW)/
 	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW)/
 

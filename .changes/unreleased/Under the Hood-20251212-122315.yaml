@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Move CLI tests to dbt-metricflow package. Developers will need to run `make test-include-slow` to execute CLI tests locally, and will need to run `hatch -v run dev-env:pre-commit clean` to pick up the relevant config changes for linting.
+time: 2025-12-12T12:23:15.386854-08:00
+custom:
+    Author: tlento
+    Issue: "1948"

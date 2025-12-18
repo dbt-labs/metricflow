@@ -12,13 +12,13 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from dbt_metricflow.cli.tutorial import dbtMetricFlowTutorialHelper
-from tests_metricflow.cli.cli_test_helpers import (
+from tests_dbt_metricflow.cli.cli_test_helpers import (
     run_and_check_cli_command,
     run_dbt_build,
 )
-from tests_metricflow.cli.demo_data_types_project_add_on import DEMO_DATA_TYPES_ADD_ON_PATH_ANCHOR
-from tests_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
-from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+from tests_dbt_metricflow.cli.demo_data_types_project_add_on import DEMO_DATA_TYPES_ADD_ON_PATH_ANCHOR
+from tests_dbt_metricflow.cli.isolated_cli_command_interface import IsolatedCliCommandEnum
+from tests_dbt_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,6 @@ def cli_runner() -> Iterator[IsolatedCliCommandRunner]:
             yield cli_runner
 
 
-@pytest.mark.slow
 def test_print_numeric_types(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -81,7 +80,6 @@ def test_print_numeric_types(
     )
 
 
-@pytest.mark.slow
 def test_print_string(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -106,7 +104,6 @@ def test_print_string(
     )
 
 
-@pytest.mark.slow
 def test_print_null(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -131,7 +128,6 @@ def test_print_null(
     )
 
 
-@pytest.mark.slow
 def test_decimals_option(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -159,7 +155,6 @@ def test_decimals_option(
     )
 
 
-@pytest.mark.slow
 def test_decimals_option_invalid(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -188,7 +183,6 @@ def test_decimals_option_invalid(
     )
 
 
-@pytest.mark.slow
 def test_decimals_option_zero(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -216,7 +210,6 @@ def test_decimals_option_zero(
     )
 
 
-@pytest.mark.slow
 def test_decimals_option_negative(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
@@ -245,7 +238,6 @@ def test_decimals_option_negative(
     )
 
 
-@pytest.mark.slow
 def test_single_large_number_with_decimals_option(
     request: FixtureRequest,
     cli_test_configuration: MetricFlowTestConfiguration,
