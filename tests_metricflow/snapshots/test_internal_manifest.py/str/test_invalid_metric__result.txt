@@ -1,0 +1,28 @@
+test_name: test_invalid_metric
+test_filename: test_internal_manifest.py
+docstring:
+  Test that an invalid metric is detected.
+---
+query_79239747:
+  status: MF_EXCEPTION
+  mf_exception:
+    Got error(s) during query resolution.
+
+    Error #1:
+      Message:
+
+        The given input does not exactly match any known metrics.
+
+        Suggestions:
+          [
+            'test_simple_derived_metric',
+            'subdaily_offset_window_metric',
+            'booking_value_per_view',
+            'subdaily_cumulative_window_metric',
+            'bookings_all_time',
+            'booking_value',
+          ]
+
+      Query Input:
+
+        invalid_metric
