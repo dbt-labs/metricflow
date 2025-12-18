@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix logging setup in the CLI
+time: 2025-12-18T09:24:03.655615-08:00
+custom:
+  Author: plypaul
+  Issue: "1932"
