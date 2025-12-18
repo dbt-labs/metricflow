@@ -59,13 +59,13 @@ def cli_runner() -> Iterator[IsolatedCliCommandRunner]:
 @pytest.mark.slow
 def test_print_numeric_types(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the default display of numeric types in the output of `mf query`."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -84,13 +84,13 @@ def test_print_numeric_types(
 @pytest.mark.slow
 def test_print_string(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the default display of strings in the output of `mf query`."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -109,13 +109,13 @@ def test_print_string(
 @pytest.mark.slow
 def test_print_null(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the default display of `NULL` in the output of `mf query`."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -134,13 +134,13 @@ def test_print_null(
 @pytest.mark.slow
 def test_decimals_option(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the output of `mf query --decimals 1 ...`."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -162,13 +162,13 @@ def test_decimals_option(
 @pytest.mark.slow
 def test_decimals_option_invalid(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the output of `mf query --decimals invalid_value ...`."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -191,13 +191,13 @@ def test_decimals_option_invalid(
 @pytest.mark.slow
 def test_decimals_option_zero(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the output of `mf query --decimals 0 ...`."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -219,13 +219,13 @@ def test_decimals_option_zero(
 @pytest.mark.slow
 def test_decimals_option_negative(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests the output of `mf query --decimals -1 ...`."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[
@@ -248,7 +248,7 @@ def test_decimals_option_negative(
 @pytest.mark.slow
 def test_single_large_number_with_decimals_option(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests how a large number in a single row is displayed as the result of `mf query`.
@@ -257,7 +257,7 @@ def test_single_large_number_with_decimals_option(
     """
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[

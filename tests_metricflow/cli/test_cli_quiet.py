@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 
 @pytest.mark.slow
 def test_query(
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     request: FixtureRequest,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Test that the `--quiet` flag only shows the table when running a query."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=["--metrics", "transactions", "--group-by", "metric_time", "--order", "metric_time", "--quiet"],
@@ -31,14 +31,14 @@ def test_query(
 
 @pytest.mark.slow
 def test_explain(
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     request: FixtureRequest,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Test that the `--quiet` flag only shows the SQL when explaining a query."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=[

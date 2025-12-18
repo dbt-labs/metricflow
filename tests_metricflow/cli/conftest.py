@@ -5,9 +5,32 @@ from pathlib import Path
 from typing import Iterator
 
 import pytest
+from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    DISPLAY_SNAPSHOTS_CLI_FLAG,
+    OVERWRITE_SNAPSHOTS_CLI_FLAG,
+)
 
+from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
 from tests_metricflow.cli.cli_test_helpers import create_tutorial_project_files, run_dbt_build
 from tests_metricflow.cli.isolated_cli_command_runner import IsolatedCliCommandRunner
+
+
+@pytest.fixture(scope="session")
+def cli_test_configuration(request: FixtureRequest) -> MetricFlowTestConfiguration:  # noqa: D103
+    return MetricFlowTestConfiguration(
+        sql_engine_url="N/A",
+        sql_engine_password="N/A",
+        mf_system_schema="N/A",
+        mf_source_schema="N/A",
+        display_snapshots=bool(request.config.getoption(DISPLAY_SNAPSHOTS_CLI_FLAG, default=False)),
+        display_graphs=False,
+        overwrite_snapshots=bool(request.config.getoption(OVERWRITE_SNAPSHOTS_CLI_FLAG, default=False)),
+        use_persistent_source_schema=False,
+        snapshot_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory.joinpath("snapshots"),
+        tests_directory=TESTS_METRICFLOW_DIRECTORY_ANCHOR.directory,
+    )
 
 
 @pytest.fixture(scope="session")

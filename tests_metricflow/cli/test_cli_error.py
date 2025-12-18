@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.slow
 def test_missing_semantic_manifest(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
 ) -> None:
     """Tests a case where a semantic manifest is not found."""
     with tempfile.TemporaryDirectory() as tmp_directory:
@@ -41,7 +41,7 @@ def test_missing_semantic_manifest(
         with cli_runner.running_context():
             run_and_check_cli_command(
                 request=request,
-                mf_test_configuration=mf_test_configuration,
+                cli_test_configuration=cli_test_configuration,
                 cli_runner=cli_runner,
                 command_enum=IsolatedCliCommandEnum.MF_QUERY,
                 args=["--metrics", "transactions"],
@@ -52,13 +52,13 @@ def test_missing_semantic_manifest(
 @pytest.mark.slow
 def test_invalid_metric(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Tests a case where a semantic manifest is not found."""
     run_and_check_cli_command(
         request=request,
-        mf_test_configuration=mf_test_configuration,
+        cli_test_configuration=cli_test_configuration,
         cli_runner=cli_runner,
         command_enum=IsolatedCliCommandEnum.MF_QUERY,
         args=["--metrics", "invalid_metric_0,invalid_metric_1"],
@@ -70,7 +70,7 @@ def test_invalid_metric(
 @pytest.mark.skip("Need to sanitize the snapshot output for temporary paths.")
 def test_csv_non_writeable_file(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Test the error message when a read-only is passed in for the CSV file path."""
@@ -81,7 +81,7 @@ def test_csv_non_writeable_file(
 
         run_and_check_cli_command(
             request=request,
-            mf_test_configuration=mf_test_configuration,
+            cli_test_configuration=cli_test_configuration,
             cli_runner=cli_runner,
             command_enum=IsolatedCliCommandEnum.MF_QUERY,
             args=["--metrics", "transactions", "--csv", str(read_only_file_path)],
@@ -93,7 +93,7 @@ def test_csv_non_writeable_file(
 @pytest.mark.skip("Need to sanitize the snapshot output for temporary paths.")
 def test_csv_directory(
     request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
+    cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
     """Test the error message when a directory is passed in for the CSV file path."""
@@ -101,7 +101,7 @@ def test_csv_directory(
         tmp_directory_path = Path(tmp_directory)
         run_and_check_cli_command(
             request=request,
-            mf_test_configuration=mf_test_configuration,
+            cli_test_configuration=cli_test_configuration,
             cli_runner=cli_runner,
             command_enum=IsolatedCliCommandEnum.MF_QUERY,
             args=["--metrics", "transactions", "--csv", str(tmp_directory_path)],
