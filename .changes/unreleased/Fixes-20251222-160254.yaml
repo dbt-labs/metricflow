@@ -1,0 +1,7 @@
+kind: Fixes
+body: Fixes a bug where time dimensions utilizing the default time grain raise an
+  error.
+time: 2025-12-22T16:02:54.165898-08:00
+custom:
+  Author: courtneyholcomb
+  Issue: "1955"

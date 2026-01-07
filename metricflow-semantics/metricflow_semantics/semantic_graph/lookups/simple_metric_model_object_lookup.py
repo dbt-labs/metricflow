@@ -149,9 +149,13 @@ class SimpleMetricModelObjectLookup(ModelObjectLookup):
     @cached_property
     def _time_dimension_name_to_grain(self) -> Mapping[str, TimeGranularity]:
         return {
-            dimension.name: dimension.type_params.time_granularity
+            dimension.name: (
+                dimension.type_params.time_granularity
+                if dimension.type_params is not None and dimension.type_params.time_granularity is not None
+                else TimeGranularity.DAY
+            )
             for dimension in self._semantic_model.dimensions
-            if (dimension.type is DimensionType.TIME and dimension.type_params is not None)
+            if dimension.type is DimensionType.TIME
         }
 
     @cached_property
