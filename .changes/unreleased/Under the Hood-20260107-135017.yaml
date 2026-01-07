@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add explain-SQL test using all metric / group-by item pairs
+time: 2026-01-07T13:50:17.811893-08:00
+custom:
+  Author: plypaul
+  Issue: "1953"
