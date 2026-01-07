@@ -15,8 +15,8 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_display_snapshots_cli_flag,
     add_overwrite_snapshots_cli_flag,
 )
+from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.toolkit.random_id import mf_random_id
 from tests_metricflow_semantics.fixtures.setup_fixtures import mf_add_slow_marker
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine

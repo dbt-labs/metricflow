@@ -9,8 +9,8 @@ from dbt_common.exceptions.base import DbtDatabaseError
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.toolkit.random_id import mf_random_id
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine

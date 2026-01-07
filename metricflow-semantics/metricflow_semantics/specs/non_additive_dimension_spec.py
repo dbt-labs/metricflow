@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from hashlib import sha1
 from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
@@ -13,22 +12,14 @@ from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.sql.sql_column_type import SqlColumnType
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 if TYPE_CHECKING:
     from metricflow.dataflow.builder.simple_metric_input_spec_properties import SimpleMetricInputSpecProperties
 
 logger = logging.getLogger(__file__)
-
-
-def hash_items(items: Sequence[SqlColumnType]) -> str:
-    """Produces a hash from a list of strings."""
-    hash_builder = sha1()
-    for item in items:
-        hash_builder.update(str(item).encode("utf-8"))
-    return hash_builder.hexdigest()
 
 
 @dataclass(frozen=True)
@@ -70,9 +61,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
     @property
     def bucket_hash(self) -> str:
         """Returns the hash value used for grouping equivalent params."""
-        values = [self.window_choice.name, self.name]
-        values.extend(sorted(self.window_groupings))
-        return hash_items(values)
+        return mf_sha1_iterables([self.window_choice.name, self.name], sorted(self.window_groupings))
 
     def linkable_specs(self, non_additive_dimension_grain: TimeGranularity) -> Sequence[LinkableInstanceSpec]:
         """Return the set of linkable specs referenced by the NonAdditiveDimensionSpec.

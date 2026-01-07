@@ -12,11 +12,13 @@ from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyForma
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_DECIMAL_COUNT = 2
+
 
 class PrettyDuration(MetricFlowPrettyFormattable):
     """Wrapper to format durations using the MF pretty-printer."""
 
-    def __init__(self, seconds: float, decimals: int = 2) -> None:  # noqa: D107
+    def __init__(self, seconds: float, decimals: int = DEFAULT_DECIMAL_COUNT) -> None:  # noqa: D107
         self.seconds: Final[float] = seconds
         if decimals < 0:
             logger.error(LazyFormat("`decimals` argument must not be negative. Using 0 instead.", decimals=decimals))
@@ -38,6 +40,6 @@ class PrettyDuration(MetricFlowPrettyFormattable):
     @staticmethod
     def sum(durations: Iterable[PrettyDuration]) -> PrettyDuration:  # noqa: D102
         return PrettyDuration(
-            sum(duration.seconds for duration in durations),
-            max(duration._decimals for duration in durations),
+            sum((duration.seconds for duration in durations), start=0.0),
+            max((duration._decimals for duration in durations), default=DEFAULT_DECIMAL_COUNT),
         )

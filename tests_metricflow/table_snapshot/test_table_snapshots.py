@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.toolkit.random_id import mf_random_id
+from metricflow_semantics.toolkit.id_helpers import mf_random_id
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
@@ -28,7 +28,7 @@ def table_snapshot() -> SqlTableSnapshot:  # noqa: D103
         ("false", "-1", "-1.0", "2020-03-04 05:06:07", "bye"),
     )
 
-    return SqlTableSnapshot(
+    return SqlTableSnapshot.create(
         table_name="example_snapshot",
         column_definitions=(
             SqlTableColumnDefinition(name="col0", type=SqlTableColumnType.BOOLEAN),
@@ -67,8 +67,8 @@ def test_load(
     try:
         ddl_sql_client.create_schema(schema_name)
 
-        snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client, schema_name=schema_name)
-        snapshot_loader.load(table_snapshot)
+        snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client)
+        snapshot_loader.load(table_snapshot.with_schema_name(schema_name))
 
         actual = ddl_sql_client.query(f"SELECT * FROM {schema_name}.{table_snapshot.table_name}")
         assert_data_tables_equal(
@@ -89,14 +89,14 @@ def test_snapshot_repository() -> None:
     # Replace the filepath so it can be compared consistently between hosts.
     example_snapshot = repo.table_snapshots[0]
     dummy_file_path = Path("/a/b/c")
-    snapshot_to_check = SqlTableSnapshot(
+    snapshot_to_check = SqlTableSnapshot.create(
         table_name=example_snapshot.table_name,
         column_definitions=example_snapshot.column_definitions,
         rows=example_snapshot.rows,
         file_path=dummy_file_path,
     )
 
-    assert snapshot_to_check == SqlTableSnapshot(
+    assert snapshot_to_check == SqlTableSnapshot.create(
         table_name="example_table",
         column_definitions=(
             SqlTableColumnDefinition(name="user_id", type=SqlTableColumnType.INT),

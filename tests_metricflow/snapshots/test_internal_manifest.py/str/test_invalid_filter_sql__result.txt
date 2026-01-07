@@ -1,0 +1,35 @@
+test_name: test_invalid_filter_sql
+test_filename: test_internal_manifest.py
+docstring:
+  Test that invalid SQL in a filter is detected.
+---
+query_56a97413:
+  status: SQL_EXCEPTION
+  explain_sql:
+    -- Constrain Output with WHERE
+    -- Pass Only Elements: ['__bookings', 'metric_time__day']
+    -- Aggregate Inputs for Simple Metrics
+    -- Compute Metrics via Expressions
+    -- Write to DataTable
+    SELECT
+      metric_time__day
+      , SUM(bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS bookings
+      FROM default_schema.fct_bookings bookings_source_src_10000
+    ) subq_2
+    WHERE invalid_column > 1
+    GROUP BY
+      metric_time__day
+  sql_exception:
+    Runtime Error
+      Binder Error: Referenced column "invalid_column" not found in FROM clause!
+      Candidate bindings: "metric_time__day"
+  
+      LINE 18: WHERE invalid_column > 1
+                     ^

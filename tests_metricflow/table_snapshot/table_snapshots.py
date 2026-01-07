@@ -6,14 +6,14 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple
+from typing import Iterable, List, Optional, Sequence, Tuple
 
 import dateutil.parser
 import yaml
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
-from metricflow_semantics.specs.non_additive_dimension_spec import hash_items
 from metricflow_semantics.sql.sql_table import SqlTable
+from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 
 from metricflow.data_table.column_types import CellValue
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -30,7 +30,7 @@ class SqlTableSnapshotHash:
 
     @staticmethod
     def create_from_hashes(hashes: Sequence[SqlTableSnapshotHash]) -> SqlTableSnapshotHash:  # noqa: D102
-        return SqlTableSnapshotHash(hash_items(tuple(one_hash.str_value for one_hash in hashes)))
+        return SqlTableSnapshotHash(mf_sha1_iterables((one_hash.str_value for one_hash in hashes)))
 
 
 class SqlTableColumnType(Enum):  # noqa: D101
@@ -56,6 +56,9 @@ class SqlTableSnapshotTypeException(Exception):  # noqa: D101
     pass
 
 
+DEFAULT_SCHEMA = "default_schema"
+
+
 class SqlTableSnapshot(FrozenBaseModel):
     """Pydantic class to help parse table snapshots that are defined in YAML."""
 
@@ -66,17 +69,43 @@ class SqlTableSnapshot(FrozenBaseModel):
     table_name: str
     column_definitions: Tuple[SqlTableColumnDefinition, ...]
     rows: Tuple[Tuple[Optional[str], ...], ...]
-    file_path: Path
+    file_path: Optional[Path]
+    schema_name: str
+
+    @staticmethod
+    def create(  # noqa: D102
+        table_name: str,
+        column_definitions: Iterable[SqlTableColumnDefinition],
+        rows: Iterable[Iterable[Optional[str]]],
+        file_path: Optional[Path] = None,
+        schema_name: Optional[str] = None,
+    ) -> SqlTableSnapshot:
+        return SqlTableSnapshot(
+            table_name=table_name,
+            column_definitions=tuple(column_definitions),
+            rows=tuple(tuple(row) for row in rows),
+            file_path=file_path,
+            schema_name=schema_name if schema_name is not None else "DEFAULT_SCHEMA",
+        )
+
+    def with_schema_name(self, schema_name: str) -> SqlTableSnapshot:  # noqa: D102
+        return SqlTableSnapshot(
+            table_name=self.table_name,
+            column_definitions=self.column_definitions,
+            rows=self.rows,
+            file_path=self.file_path,
+            schema_name=schema_name,
+        )
 
     @property
     def snapshot_hash(self) -> SqlTableSnapshotHash:
         """Return a hash that can be used to summarize the schema and data of the snapshot."""
         return SqlTableSnapshotHash(
-            hash_items(
-                (self.table_name,)
-                + tuple(column_definition.name for column_definition in self.column_definitions)
-                + tuple(column_definition.type.name for column_definition in self.column_definitions)
-                + tuple(cell or "" for row in self.rows for cell in row)
+            mf_sha1_iterables(
+                (self.table_name,),
+                (column_definition.name for column_definition in self.column_definitions),
+                (column_definition.type.name for column_definition in self.column_definitions),
+                (cell or "" for row in self.rows for cell in row),
             )
         )
 
@@ -125,12 +154,11 @@ class SqlTableSnapshot(FrozenBaseModel):
 class SqlTableSnapshotLoader:
     """Loads a snapshot of a table into the SQL engine."""
 
-    def __init__(self, ddl_sql_client: SqlClientWithDDLMethods, schema_name: str) -> None:  # noqa: D107
+    def __init__(self, ddl_sql_client: SqlClientWithDDLMethods) -> None:  # noqa: D107
         self._ddl_sql_client = ddl_sql_client
-        self._schema_name = schema_name
 
     def load(self, table_snapshot: SqlTableSnapshot) -> None:  # noqa: D102
-        sql_table = SqlTable(schema_name=self._schema_name, table_name=table_snapshot.table_name)
+        sql_table = SqlTable(schema_name=table_snapshot.schema_name, table_name=table_snapshot.table_name)
 
         self._ddl_sql_client.create_table_from_data_table(
             sql_table=sql_table,
@@ -203,7 +231,7 @@ class SqlTableSnapshotRepository:
                 object_cfg = config_document[document_type]
                 if document_type == SqlTableSnapshotRepository.TABLE_SNAPSHOT_DOCUMENT_KEY:
                     try:
-                        results.append(SqlTableSnapshot(**object_cfg, file_path=Path(file_path)))
+                        results.append(SqlTableSnapshot.create(**object_cfg, file_path=Path(file_path)))
                     except Exception as e:
                         logger.exception(f"Error while parsing: {file_path}")
                         raise TableSnapshotParseException(f"Error while parsing: {file_path}") from e

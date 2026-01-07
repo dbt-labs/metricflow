@@ -49,9 +49,9 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
-from metricflow_semantics.toolkit.random_id import mf_random_id
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 from typing_extensions import TypeVar
 
@@ -165,7 +165,7 @@ class MetricFlowQueryRequest:
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         group_by_names: Optional[Sequence[str]] = None,
-        group_by: Optional[Tuple[GroupByQueryParameter, ...]] = None,
+        group_by: Optional[Sequence[GroupByQueryParameter]] = None,
         limit: Optional[int] = None,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
@@ -187,7 +187,7 @@ class MetricFlowQueryRequest:
             metric_names=metric_names,
             metrics=metrics,
             group_by_names=group_by_names,
-            group_by=group_by,
+            group_by=tuple(group_by) if group_by is not None else None,
             limit=limit,
             time_constraint_start=time_constraint_start,
             time_constraint_end=time_constraint_end,
@@ -200,6 +200,28 @@ class MetricFlowQueryRequest:
             min_max_only=min_max_only,
             apply_group_by=apply_group_by,
             order_output_columns_by_input_order=order_output_columns_by_input_order,
+        )
+
+    def with_request_id(self, request_id: MetricFlowRequestId) -> MetricFlowQueryRequest:  # noqa: D102
+        return MetricFlowQueryRequest(
+            request_id=request_id,
+            saved_query_name=self.saved_query_name,
+            metric_names=self.metric_names,
+            metrics=self.metrics,
+            group_by_names=self.group_by_names,
+            group_by=self.group_by,
+            limit=self.limit,
+            time_constraint_start=self.time_constraint_start,
+            time_constraint_end=self.time_constraint_end,
+            where_constraints=self.where_constraints,
+            order_by_names=self.order_by_names,
+            order_by=self.order_by,
+            min_max_only=self.min_max_only,
+            apply_group_by=self.apply_group_by,
+            sql_optimization_level=self.sql_optimization_level,
+            dataflow_plan_optimizations=self.dataflow_plan_optimizations,
+            query_type=self.query_type,
+            order_output_columns_by_input_order=self.order_output_columns_by_input_order,
         )
 
 
