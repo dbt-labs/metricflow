@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix time period end boundaries to include the full end date
+time: 2026-01-07T16:35:37.657489-07:00
+custom:
+    Author: akuttig-block
+    Issue: "1957"
