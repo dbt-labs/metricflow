@@ -1,0 +1,311 @@
+test_name: test_explain_all_saved_queries_from_external_manifest
+test_filename: test_external_manifest.py
+docstring:
+  Test generated SQL for all saved queries in a JSON-serialized manifest.
+---
+query_0b295dd4:
+  status: PASS
+  explain_sql:
+    -- Constrain Output with WHERE
+    -- Pass Only Elements: ['__bookings', '__instant_bookings', 'listing__capacity_latest', 'metric_time__day']
+    -- Aggregate Inputs for Simple Metrics
+    -- Compute Metrics via Expressions
+    -- Write to DataTable
+    SELECT
+      metric_time__day
+      , listing__capacity_latest
+      , SUM(bookings) AS bookings
+      , SUM(instant_bookings) AS instant_bookings
+    FROM (
+      -- Join Standard Outputs
+      -- Pass Only Elements: ['__bookings', '__instant_bookings', 'listing__capacity_latest', 'metric_time__day']
+      SELECT
+        subq_1.metric_time__day AS metric_time__day
+        , subq_4.capacity_latest AS listing__capacity_latest
+        , subq_1.__bookings AS bookings
+        , subq_1.__instant_bookings AS instant_bookings
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', CAST('2020-01-01' AS TIMESTAMP)) AS metric_time__day
+          , 1 AS listing
+          , 1 AS __bookings
+          , 1 AS __instant_bookings
+        FROM simple_semantic_manifest.dummy_table bookings_source_src_10000
+      ) subq_1
+      LEFT OUTER JOIN (
+        -- Read Elements From Semantic Model 'listings_latest'
+        -- Metric Time Dimension 'ds'
+        -- Pass Only Elements: ['capacity_latest', 'listing']
+        SELECT
+          1 AS listing
+          , '1' AS capacity_latest
+        FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
+      ) subq_4
+      ON
+        subq_1.listing = subq_4.listing
+    ) subq_6
+    WHERE (listing__capacity_latest IS NOT NULL)
+    GROUP BY
+      metric_time__day
+      , listing__capacity_latest
+
+query_1ee34d0e:
+  status: PASS
+  explain_sql:
+    -- Combine Aggregated Outputs
+    -- Write to DataTable
+    WITH cm_3_cte AS (
+      -- Constrain Output with WHERE
+      -- Pass Only Elements: ['__bookings', 'listing__capacity_latest']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        listing__capacity_latest
+        , SUM(bookings) AS bookings
+      FROM (
+        -- Join Standard Outputs
+        -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+        SELECT
+          subq_1.metric_time__day AS metric_time__day
+          , subq_4.is_lux_latest AS listing__is_lux_latest
+          , subq_4.capacity_latest AS listing__capacity_latest
+          , subq_1.__bookings AS bookings
+        FROM (
+          -- Read Elements From Semantic Model 'bookings_source'
+          -- Metric Time Dimension 'ds'
+          SELECT
+            DATE_TRUNC('day', CAST('2020-01-01' AS TIMESTAMP)) AS metric_time__day
+            , 1 AS listing
+            , 1 AS __bookings
+          FROM simple_semantic_manifest.dummy_table bookings_source_src_10000
+        ) subq_1
+        LEFT OUTER JOIN (
+          -- Read Elements From Semantic Model 'listings_latest'
+          -- Metric Time Dimension 'ds'
+          -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+          SELECT
+            1 AS listing
+            , '1' AS is_lux_latest
+            , '1' AS capacity_latest
+          FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
+        ) subq_4
+        ON
+          subq_1.listing = subq_4.listing
+      ) subq_6
+      WHERE ((listing__is_lux_latest IS NOT NULL)) AND ((metric_time__day IS NOT NULL))
+      GROUP BY
+        listing__capacity_latest
+    )
+
+    , cm_4_cte AS (
+      -- Constrain Output with WHERE
+      -- Pass Only Elements: ['__views', 'listing__capacity_latest']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        listing__capacity_latest
+        , SUM(views) AS views
+      FROM (
+        -- Join Standard Outputs
+        -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+        SELECT
+          subq_12.metric_time__day AS metric_time__day
+          , subq_14.is_lux_latest AS listing__is_lux_latest
+          , subq_14.capacity_latest AS listing__capacity_latest
+          , subq_12.__views AS views
+        FROM (
+          -- Read Elements From Semantic Model 'views_source'
+          -- Metric Time Dimension 'ds'
+          SELECT
+            DATE_TRUNC('day', CAST('2020-01-01' AS TIMESTAMP)) AS metric_time__day
+            , 1 AS listing
+            , 1 AS __views
+          FROM simple_semantic_manifest.dummy_table views_source_src_10000
+        ) subq_12
+        LEFT OUTER JOIN (
+          -- Read Elements From Semantic Model 'listings_latest'
+          -- Metric Time Dimension 'ds'
+          -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+          SELECT
+            1 AS listing
+            , '1' AS is_lux_latest
+            , '1' AS capacity_latest
+          FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
+        ) subq_14
+        ON
+          subq_12.listing = subq_14.listing
+      ) subq_16
+      WHERE ((listing__is_lux_latest IS NOT NULL)) AND ((metric_time__day IS NOT NULL))
+      GROUP BY
+        listing__capacity_latest
+    )
+
+    SELECT
+      COALESCE(cm_3_cte.listing__capacity_latest, cm_4_cte.listing__capacity_latest, subq_23.listing__capacity_latest) AS listing__capacity_latest
+      , MAX(cm_3_cte.bookings) AS bookings
+      , MAX(cm_4_cte.views) AS views
+      , MAX(CAST(subq_23.bookings AS DOUBLE) / CAST(NULLIF(subq_23.views, 0) AS DOUBLE)) AS bookings_per_view
+    FROM cm_3_cte
+    FULL OUTER JOIN
+      cm_4_cte
+    ON
+      cm_3_cte.listing__capacity_latest = cm_4_cte.listing__capacity_latest
+    FULL OUTER JOIN (
+      -- Combine Aggregated Outputs
+      SELECT
+        COALESCE(cm_3_cte.listing__capacity_latest, cm_4_cte.listing__capacity_latest) AS listing__capacity_latest
+        , MAX(cm_3_cte.bookings) AS bookings
+        , MAX(cm_4_cte.views) AS views
+      FROM cm_3_cte
+      FULL OUTER JOIN
+        cm_4_cte
+      ON
+        cm_3_cte.listing__capacity_latest = cm_4_cte.listing__capacity_latest
+      GROUP BY
+        COALESCE(cm_3_cte.listing__capacity_latest, cm_4_cte.listing__capacity_latest)
+    ) subq_23
+    ON
+      COALESCE(cm_3_cte.listing__capacity_latest, cm_4_cte.listing__capacity_latest) = subq_23.listing__capacity_latest
+    GROUP BY
+      COALESCE(cm_3_cte.listing__capacity_latest, cm_4_cte.listing__capacity_latest, subq_23.listing__capacity_latest)
+
+query_25c402a1:
+  status: PASS
+  explain_sql:
+    -- Combine Aggregated Outputs
+    -- Order By ['metric_time__day', 'listing__capacity_latest', 'bookings', 'views'] Limit 10
+    -- Write to DataTable
+    WITH sma_10014_cte AS (
+      -- Read Elements From Semantic Model 'listings_latest'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        1 AS listing
+        , '1' AS capacity_latest
+      FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
+    )
+
+    SELECT
+      COALESCE(subq_9.metric_time__day, subq_18.metric_time__day) AS metric_time__day
+      , COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest) AS listing__capacity_latest
+      , MAX(subq_9.bookings) AS bookings
+      , MAX(subq_18.views) AS views
+    FROM (
+      -- Join Standard Outputs
+      -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
+      -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        subq_1.metric_time__day AS metric_time__day
+        , sma_10014_cte.capacity_latest AS listing__capacity_latest
+        , SUM(subq_1.__bookings) AS bookings
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', CAST('2020-01-01' AS TIMESTAMP)) AS metric_time__day
+          , 1 AS listing
+          , 1 AS __bookings
+        FROM simple_semantic_manifest.dummy_table bookings_source_src_10000
+      ) subq_1
+      LEFT OUTER JOIN
+        sma_10014_cte
+      ON
+        subq_1.listing = sma_10014_cte.listing
+      GROUP BY
+        subq_1.metric_time__day
+        , sma_10014_cte.capacity_latest
+    ) subq_9
+    FULL OUTER JOIN (
+      -- Join Standard Outputs
+      -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'metric_time__day']
+      -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        subq_11.metric_time__day AS metric_time__day
+        , sma_10014_cte.capacity_latest AS listing__capacity_latest
+        , SUM(subq_11.__views) AS views
+      FROM (
+        -- Read Elements From Semantic Model 'views_source'
+        -- Metric Time Dimension 'ds'
+        SELECT
+          DATE_TRUNC('day', CAST('2020-01-01' AS TIMESTAMP)) AS metric_time__day
+          , 1 AS listing
+          , 1 AS __views
+        FROM simple_semantic_manifest.dummy_table views_source_src_10000
+      ) subq_11
+      LEFT OUTER JOIN
+        sma_10014_cte
+      ON
+        subq_11.listing = sma_10014_cte.listing
+      GROUP BY
+        subq_11.metric_time__day
+        , sma_10014_cte.capacity_latest
+    ) subq_18
+    ON
+      (
+        subq_9.listing__capacity_latest = subq_18.listing__capacity_latest
+      ) AND (
+        subq_9.metric_time__day = subq_18.metric_time__day
+      )
+    GROUP BY
+      COALESCE(subq_9.metric_time__day, subq_18.metric_time__day)
+      , COALESCE(subq_9.listing__capacity_latest, subq_18.listing__capacity_latest)
+    ORDER BY metric_time__day DESC, listing__capacity_latest, bookings DESC, views
+    LIMIT 10
+
+query_788497ac:
+  status: PASS
+  explain_sql:
+    -- Join Self Over Time Range
+    -- Pass Only Elements: ['__revenue', 'metric_time__day']
+    -- Pass Only Elements: ['__revenue', 'metric_time__day']
+    -- Aggregate Inputs for Simple Metrics
+    -- Compute Metrics via Expressions
+    -- Compute Metrics via Expressions
+    -- Write to DataTable
+    SELECT
+      subq_3.ds AS metric_time__day
+      , SUM(subq_1.__revenue) AS trailing_2_months_revenue
+    FROM simple_semantic_manifest.time_spine subq_3
+    INNER JOIN (
+      -- Read Elements From Semantic Model 'revenue'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        DATE_TRUNC('day', CAST('2020-01-01' AS TIMESTAMP)) AS metric_time__day
+        , 1 AS __revenue
+      FROM simple_semantic_manifest.dummy_table revenue_src_10000
+    ) subq_1
+    ON
+      (
+        subq_1.metric_time__day <= subq_3.ds
+      ) AND (
+        subq_1.metric_time__day > subq_3.ds - INTERVAL 2 month
+      )
+    GROUP BY
+      subq_3.ds
+
+query_d4073379:
+  status: PASS
+  explain_sql:
+    -- Join Standard Outputs
+    -- Pass Only Elements: ['listing__capacity_latest', 'metric_time__month']
+    -- Pass Only Elements: ['listing__capacity_latest', 'metric_time__month']
+    -- Write to DataTable
+    SELECT
+      DATE_TRUNC('month', time_spine_src_10006.ds) AS metric_time__month
+      , subq_0.listing__capacity_latest AS listing__capacity_latest
+    FROM (
+      -- Read Elements From Semantic Model 'listings_latest'
+      SELECT
+        '1' AS listing__capacity_latest
+      FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
+    ) subq_0
+    CROSS JOIN
+      simple_semantic_manifest.time_spine time_spine_src_10006
+    GROUP BY
+      DATE_TRUNC('month', time_spine_src_10006.ds)
+      , subq_0.listing__capacity_latest

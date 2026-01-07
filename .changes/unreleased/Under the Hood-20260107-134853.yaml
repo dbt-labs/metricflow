@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Support explain-SQL tests using external manifests
+time: 2026-01-07T13:48:53.725182-08:00
+custom:
+  Author: plypaul
+  Issue: "1952"
