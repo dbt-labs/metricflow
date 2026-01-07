@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: 'Add a test for a query that includes a time-offset metric and `metric_time__alien_day` '
+time: 2026-01-07T13:50:54.0029-08:00
+custom:
+  Author: plypaul
+  Issue: "1954"
