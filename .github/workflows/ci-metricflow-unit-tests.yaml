@@ -92,4 +92,5 @@ jobs:
             }
 
       - name: Run Package-Build Tests
+        shell: bash
         run: "make test-build-packages"
