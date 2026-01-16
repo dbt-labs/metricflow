@@ -34,6 +34,9 @@ from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snaps
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataset.dataset_classes import DataSet
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
@@ -1308,6 +1311,40 @@ def test_metric_in_query_where_filter(
         mf_test_configuration=mf_test_configuration,
         dag_graph=dataflow_plan,
     )
+
+
+def test_metric_in_query_where_filter_with_metric_time(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test querying a metric filter with metric_time included in group by."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        group_by_names=("metric_time__day",),
+        where_constraint_strs=["{{ Metric('bookings', ['listing', 'metric_time'])}} > 2"],
+    ).query_spec
+    dataflow_plan = dataflow_plan_builder.build_plan(query_spec)
+
+    join_metric_time_specs = []
+
+    def visit(node: DataflowPlanNode) -> None:
+        if isinstance(node, JoinOnEntitiesNode):
+            for join_target in node.join_targets:
+                for time_join in join_target.join_on_partition_time_dimensions:
+                    if time_join.start_node_time_dimension_spec.element_name == DataSet.metric_time_dimension_name():
+                        join_metric_time_specs.append(time_join.start_node_time_dimension_spec)
+        for parent in node.parent_nodes:
+            visit(parent)
+
+    visit(dataflow_plan.sink_node)
+
+    assert join_metric_time_specs, "Expected a join on metric_time for metric filter."
+    assert any(
+        spec.base_granularity == TimeGranularity.DAY for spec in join_metric_time_specs
+    ), "Expected metric_time join to match the query granularity."
 
 
 def test_metric_in_metric_where_filter(

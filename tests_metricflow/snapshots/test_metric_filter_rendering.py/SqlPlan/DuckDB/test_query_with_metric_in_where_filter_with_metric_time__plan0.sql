@@ -1,38 +1,45 @@
-test_name: test_query_with_simple_metric_in_where_filter
+test_name: test_query_with_metric_in_where_filter_with_metric_time
 test_filename: test_metric_filter_rendering.py
 docstring:
-  Tests a query with a simple metric in the query-level where filter.
+  Tests a query with a metric in the query-level where filter using metric_time.
 sql_engine: DuckDB
 ---
 -- Write to DataTable
 SELECT
-  subq_18.listings
+  subq_18.metric_time__day
+  , subq_18.listings
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_17.__listings AS listings
+    subq_17.metric_time__day
+    , subq_17.__listings AS listings
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      SUM(subq_16.__listings) AS __listings
+      subq_16.metric_time__day
+      , SUM(subq_16.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Pass Only Elements: ['__listings', 'metric_time__day']
       SELECT
-        subq_15.__listings
+        subq_15.metric_time__day
+        , subq_15.__listings
       FROM (
         -- Constrain Output with WHERE
         SELECT
           subq_14.listings AS __listings
+          , subq_14.metric_time__day
           , subq_14.listing__bookings
         FROM (
-          -- Pass Only Elements: ['__listings', 'listing__bookings']
+          -- Pass Only Elements: ['__listings', 'metric_time__day', 'listing__bookings']
           SELECT
-            subq_13.listing__bookings
+            subq_13.metric_time__day
+            , subq_13.listing__bookings
             , subq_13.__listings AS listings
           FROM (
             -- Join Standard Outputs
             SELECT
-              subq_12.listing__bookings AS listing__bookings
+              subq_12.metric_time__day AS listing__metric_time__day
+              , subq_12.listing__bookings AS listing__bookings
               , subq_5.ds__day AS ds__day
               , subq_5.ds__week AS ds__week
               , subq_5.ds__month AS ds__month
@@ -242,29 +249,34 @@ FROM (
               ) subq_4
             ) subq_5
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['listing', 'listing__bookings']
+              -- Pass Only Elements: ['metric_time__day', 'listing', 'listing__bookings']
               SELECT
-                subq_11.listing
+                subq_11.metric_time__day
+                , subq_11.listing
                 , subq_11.listing__bookings
               FROM (
                 -- Compute Metrics via Expressions
                 SELECT
-                  subq_10.listing
+                  subq_10.metric_time__day
+                  , subq_10.listing
                   , subq_10.__bookings AS listing__bookings
                 FROM (
                   -- Aggregate Inputs for Simple Metrics
                   SELECT
-                    subq_9.listing
+                    subq_9.metric_time__day
+                    , subq_9.listing
                     , SUM(subq_9.__bookings) AS __bookings
                   FROM (
-                    -- Pass Only Elements: ['__bookings', 'listing']
+                    -- Pass Only Elements: ['__bookings', 'metric_time__day', 'listing']
                     SELECT
-                      subq_8.listing
+                      subq_8.metric_time__day
+                      , subq_8.listing
                       , subq_8.__bookings
                     FROM (
-                      -- Pass Only Elements: ['__bookings', 'listing']
+                      -- Pass Only Elements: ['__bookings', 'metric_time__day', 'listing']
                       SELECT
-                        subq_7.listing
+                        subq_7.metric_time__day
+                        , subq_7.listing
                         , subq_7.__bookings
                       FROM (
                         -- Metric Time Dimension 'ds'
@@ -482,16 +494,23 @@ FROM (
                     ) subq_8
                   ) subq_9
                   GROUP BY
-                    subq_9.listing
+                    subq_9.metric_time__day
+                    , subq_9.listing
                 ) subq_10
               ) subq_11
             ) subq_12
             ON
-              subq_5.listing = subq_12.listing
+              (
+                subq_5.listing = subq_12.listing
+              ) AND (
+                subq_5.metric_time__day = subq_12.metric_time__day
+              )
           ) subq_13
         ) subq_14
         WHERE listing__bookings > 2
       ) subq_15
     ) subq_16
+    GROUP BY
+      subq_16.metric_time__day
   ) subq_17
 ) subq_18

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple, Union
 
@@ -21,16 +22,20 @@ from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_
 from metricflow_semantics.errors.error_classes import InvalidManifestException, UnableToSatisfyQueryError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
+from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
 )
+from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import GroupByItemSet
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
@@ -286,6 +291,26 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             filter_specs=base_simple_metric_recipe.combined_filter_spec_set.all_filter_specs,
         )
+        queried_agg_time_dimension_specs = tuple(
+            FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
+                self._metric_lookup.get_aggregation_time_dimension_specs(
+                    metric_reference=MetricReference(base_simple_metric_recipe.simple_metric_input.name),
+                )
+            )
+        )
+        metric_time_specs_for_group_by_metrics = (
+            tuple(queried_linkable_specs.metric_time_specs)
+            if queried_linkable_specs.metric_time_specs
+            else tuple(queried_agg_time_dimension_specs)
+        )
+        metric_time_spec_for_group_by_metrics = self._metric_time_spec_for_group_by_metrics(
+            metric_time_specs_for_group_by_metrics
+        )
+        group_by_metric_specs_with_metric_time: Tuple[GroupByMetricSpec, ...] = ()
+        if metric_time_spec_for_group_by_metrics is not None:
+            group_by_metric_specs_with_metric_time = self._group_by_metric_specs_requiring_metric_time(
+                base_simple_metric_recipe.combined_filter_spec_set.all_filter_specs
+            )
         base_spec = SimpleMetricInputSpec(
             element_name=base_simple_metric_recipe.simple_metric_input.name,
         )
@@ -296,6 +321,8 @@ class DataflowPlanBuilder:
                 ),
                 predicate_pushdown_state=time_range_only_pushdown_state,
                 linkable_spec_set=base_required_linkable_specs,
+                group_by_metric_specs_with_metric_time=group_by_metric_specs_with_metric_time,
+                metric_time_spec_for_group_by_metrics=metric_time_spec_for_group_by_metrics,
             )
         )
         logger.debug(
@@ -1047,6 +1074,96 @@ class DataflowPlanBuilder:
         ), "Non-additive dimension can only be a time dimension, if specified."
         return queried_time_dimension_spec
 
+    @staticmethod
+    def _where_sql_references_column(where_sql: str, column_name: str) -> bool:
+        """Return True if the rendered SQL references the column alias."""
+        return re.search(rf"\b{re.escape(column_name)}\b", where_sql) is not None
+
+    def _unreferenced_metric_time_specs(self, filter_spec: WhereFilterSpec) -> Tuple[TimeDimensionSpec, ...]:
+        """Return metric_time specs that are present but not referenced in the SQL."""
+        unreferenced_specs: List[TimeDimensionSpec] = []
+        for time_dimension_spec in filter_spec.linkable_spec_set.metric_time_specs:
+            column_name = self._column_association_resolver.resolve_spec(time_dimension_spec).column_name
+            if not self._where_sql_references_column(filter_spec.where_sql, column_name):
+                unreferenced_specs.append(time_dimension_spec)
+        return tuple(unreferenced_specs)
+
+    def _metric_time_spec_for_group_by_metrics(
+        self, queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
+    ) -> Optional[TimeDimensionSpec]:
+        """Return the metric_time spec to use for group by metrics, if query time granularity is available."""
+        if not queried_agg_time_dimension_specs:
+            return None
+        target_spec = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0]
+        return DataSet.metric_time_dimension_spec(
+            time_granularity=target_spec.time_granularity, date_part=target_spec.date_part
+        )
+
+    def _align_metric_time_in_filter_spec(
+        self, filter_spec: WhereFilterSpec, target_metric_time_spec: Optional[TimeDimensionSpec]
+    ) -> WhereFilterSpec:
+        """Align unreferenced metric_time specs to the target granularity or remove them if unavailable."""
+        unreferenced_metric_time_specs = set(self._unreferenced_metric_time_specs(filter_spec))
+        if not unreferenced_metric_time_specs:
+            return filter_spec
+
+        updated_annotated_specs: List[AnnotatedSpec] = []
+        for annotated_spec in filter_spec.element_set.annotated_specs:
+            if annotated_spec.spec in unreferenced_metric_time_specs:
+                if target_metric_time_spec is None:
+                    continue
+                updated_annotated_specs.append(
+                    AnnotatedSpec.create(
+                        element_type=LinkableElementType.TIME_DIMENSION,
+                        element_name=annotated_spec.element_name,
+                        properties=annotated_spec.property_set,
+                        origin_model_ids=annotated_spec.origin_model_ids,
+                        derived_from_semantic_models=annotated_spec.derived_from_semantic_models,
+                        entity_links=annotated_spec.spec.entity_links,
+                        metric_subquery_entity_links=None,
+                        time_grain=target_metric_time_spec.time_granularity,
+                        date_part=target_metric_time_spec.date_part,
+                    )
+                )
+            else:
+                updated_annotated_specs.append(annotated_spec)
+
+        return WhereFilterSpec(
+            where_sql=filter_spec.where_sql,
+            bind_parameters=filter_spec.bind_parameters,
+            element_set=GroupByItemSet.create(*updated_annotated_specs),
+        )
+
+    def _align_metric_time_in_filter_spec_set(
+        self,
+        filter_spec_set: WhereFilterSpecSet,
+        queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
+    ) -> WhereFilterSpecSet:
+        """Align metric_time group-by specs in filters to the query granularity."""
+        target_metric_time_spec = self._metric_time_spec_for_group_by_metrics(queried_agg_time_dimension_specs)
+        return WhereFilterSpecSet(
+            metric_level_filter_specs=tuple(
+                self._align_metric_time_in_filter_spec(filter_spec, target_metric_time_spec)
+                for filter_spec in filter_spec_set.metric_level_filter_specs
+            ),
+            query_level_filter_specs=tuple(
+                self._align_metric_time_in_filter_spec(filter_spec, target_metric_time_spec)
+                for filter_spec in filter_spec_set.query_level_filter_specs
+            ),
+        )
+
+    def _group_by_metric_specs_requiring_metric_time(
+        self, filter_specs: Sequence[WhereFilterSpec]
+    ) -> Tuple[GroupByMetricSpec, ...]:
+        """Return group-by metric specs that should be joined on metric_time."""
+        metric_specs: Dict[GroupByMetricSpec, None] = {}
+        for filter_spec in filter_specs:
+            if not self._unreferenced_metric_time_specs(filter_spec):
+                continue
+            for group_by_metric_spec in filter_spec.linkable_spec_set.group_by_metric_specs:
+                metric_specs[group_by_metric_spec] = None
+        return tuple(metric_specs.keys())
+
     def _find_source_node_recipe(self, parameter_set: FindSourceNodeRecipeParameterSet) -> Optional[SourceNodeRecipe]:
         """Find the most suitable source nodes to satisfy the requested specs, as well as how to join them."""
         result = self._cache.get_find_source_node_recipe_result(parameter_set)
@@ -1162,9 +1279,19 @@ class DataflowPlanBuilder:
                 lambda: f"Building source nodes for group by metrics: {linkable_specs_to_satisfy.group_by_metric_specs}"
             )
         )
+        group_by_metric_specs_with_metric_time = set(parameter_set.group_by_metric_specs_with_metric_time)
+        metric_time_spec_for_group_by_metrics = parameter_set.metric_time_spec_for_group_by_metrics
         candidate_nodes_for_right_side_of_join += [
             self._build_query_output_node(
-                query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
+                query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(
+                    group_by_metric_spec,
+                    time_dimension_specs=(
+                        (metric_time_spec_for_group_by_metrics,)
+                        if metric_time_spec_for_group_by_metrics
+                        and group_by_metric_spec in group_by_metric_specs_with_metric_time
+                        else ()
+                    ),
+                ),
                 for_group_by_source_node=True,
             )
             for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs
@@ -1368,6 +1495,11 @@ class DataflowPlanBuilder:
                 metric_reference=MetricReference(simple_metric_input.name),
             )
         )
+        metric_time_alignment_specs = (
+            tuple(queried_linkable_specs.metric_time_specs)
+            if queried_linkable_specs.metric_time_specs
+            else tuple(queried_agg_time_dimension_specs)
+        )
 
         before_aggregation_time_spine_join_description = None
         after_aggregation_time_spine_join_description = None
@@ -1456,6 +1588,15 @@ class DataflowPlanBuilder:
             )
         else:
             metric_filter_spec_set = WhereFilterSpecSet()
+
+        metric_filter_spec_set = self._align_metric_time_in_filter_spec_set(
+            filter_spec_set=metric_filter_spec_set,
+            queried_agg_time_dimension_specs=metric_time_alignment_specs,
+        )
+        additional_filter_spec_set = self._align_metric_time_in_filter_spec_set(
+            filter_spec_set=additional_filter_spec_set,
+            queried_agg_time_dimension_specs=metric_time_alignment_specs,
+        )
 
         return SimpleMetricRecipe(
             simple_metric_input=simple_metric_input,
@@ -1843,6 +1984,27 @@ class DataflowPlanBuilder:
             after_aggregation_time_spine_join_description and after_aggregation_time_spine_join_description.uses_offset
         )
 
+        queried_agg_time_dimension_specs = tuple(
+            FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
+                self._metric_lookup.get_aggregation_time_dimension_specs(
+                    metric_reference=MetricReference(simple_metric_input.name),
+                )
+            )
+        )
+        metric_time_specs_for_group_by_metrics = (
+            tuple(queried_linkable_specs.metric_time_specs)
+            if queried_linkable_specs.metric_time_specs
+            else tuple(queried_agg_time_dimension_specs)
+        )
+        metric_time_spec_for_group_by_metrics = self._metric_time_spec_for_group_by_metrics(
+            metric_time_specs_for_group_by_metrics
+        )
+        group_by_metric_specs_with_metric_time: Tuple[GroupByMetricSpec, ...] = ()
+        if metric_time_spec_for_group_by_metrics is not None:
+            group_by_metric_specs_with_metric_time = self._group_by_metric_specs_requiring_metric_time(
+                simple_metric_recipe.combined_filter_spec_set.all_filter_specs
+            )
+
         if source_node_recipe is None:
             logger.debug(
                 LazyFormat(
@@ -1873,6 +2035,8 @@ class DataflowPlanBuilder:
                         spec_properties=spec_properties,
                         predicate_pushdown_state=simple_metric_input_ppd_state,
                         linkable_spec_set=required_linkable_specs,
+                        group_by_metric_specs_with_metric_time=group_by_metric_specs_with_metric_time,
+                        metric_time_spec_for_group_by_metrics=metric_time_spec_for_group_by_metrics,
                     )
                 )
 
@@ -1895,13 +2059,6 @@ class DataflowPlanBuilder:
                 ).evaluated_value
             )
 
-        queried_agg_time_dimension_specs = tuple(
-            FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
-                self._metric_lookup.get_aggregation_time_dimension_specs(
-                    metric_reference=MetricReference(simple_metric_input.name),
-                )
-            )
-        )
         required_agg_time_dimension_specs = tuple(
             FrozenOrderedSet(required_linkable_specs.time_dimension_specs).intersection(
                 self._metric_lookup.get_aggregation_time_dimension_specs(

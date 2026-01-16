@@ -35,6 +35,7 @@ class ObjectBuilderNameConverter:
             element_name=parameter_set.entity_reference.element_name,
             entity_links=parameter_set.entity_path,
             group_by=(),
+            group_by_names=None,
             time_granularity_name=None,
             date_part=None,
         )
@@ -42,12 +43,18 @@ class ObjectBuilderNameConverter:
 
     @staticmethod
     def input_str_from_metric_call_parameter_set(parameter_set: MetricCallParameterSet) -> str:  # noqa: D102
+        group_by_names = []
+        for group_by_ref in parameter_set.group_by:
+            group_by_parts = [entity_link.element_name for entity_link in group_by_ref.entity_links]
+            group_by_parts.append(group_by_ref.element_name)
+            if group_by_ref.time_granularity_name is not None:
+                group_by_parts.append(group_by_ref.time_granularity_name)
+            group_by_names.append(DUNDER.join(group_by_parts))
         initializer_parameter_str = ObjectBuilderNameConverter.initializer_parameter_str(
             element_name=parameter_set.metric_reference.element_name,
             entity_links=(),
-            group_by=tuple(
-                EntityReference(element_name=group_by_ref.element_name) for group_by_ref in parameter_set.group_by
-            ),
+            group_by=(),
+            group_by_names=tuple(group_by_names),
             time_granularity_name=None,
             date_part=None,
         )
@@ -58,6 +65,7 @@ class ObjectBuilderNameConverter:
         element_name: str,
         entity_links: Sequence[EntityReference],
         group_by: Sequence[EntityReference],
+        group_by_names: Optional[Sequence[str]],
         time_granularity_name: Optional[str],
         date_part: Optional[DatePart],
     ) -> str:
@@ -79,8 +87,11 @@ class ObjectBuilderNameConverter:
             initializer_parameters.append(f"date_part_name={repr(date_part.value)}")
         if len(entity_link_names) > 1:
             initializer_parameters.append(f"entity_path={repr(entity_link_names[:-1])}")
-        if group_by:
-            initializer_parameters.append(f"group_by={[group_by_ref.element_name for group_by_ref in group_by]}")
+        if group_by or group_by_names:
+            rendered_group_by_names = (
+                tuple(group_by_names) if group_by_names is not None else tuple(ref.element_name for ref in group_by)
+            )
+            initializer_parameters.append(f"group_by={list(rendered_group_by_names)}")
 
         return ", ".join(initializer_parameters)
 
@@ -96,6 +107,7 @@ class ObjectBuilderNameConverter:
                     element_name=entity_spec.element_name,
                     entity_links=entity_spec.entity_links,
                     group_by=(),
+                    group_by_names=None,
                     time_granularity_name=None,
                     date_part=None,
                 )
@@ -106,6 +118,7 @@ class ObjectBuilderNameConverter:
                     element_name=dimension_spec.element_name,
                     entity_links=dimension_spec.entity_links,
                     group_by=(),
+                    group_by_names=None,
                     time_granularity_name=None,
                     date_part=None,
                 )
@@ -116,6 +129,7 @@ class ObjectBuilderNameConverter:
                     element_name=time_dimension_spec.element_name,
                     entity_links=time_dimension_spec.entity_links,
                     group_by=(),
+                    group_by_names=None,
                     time_granularity_name=time_dimension_spec.time_granularity_name,
                     date_part=time_dimension_spec.date_part,
                 )
@@ -126,6 +140,7 @@ class ObjectBuilderNameConverter:
                     element_name=group_by_metric_spec.element_name,
                     entity_links=(),
                     group_by=group_by_metric_spec.entity_links,
+                    group_by_names=None,
                     time_granularity_name=None,
                     date_part=None,
                 )
@@ -150,6 +165,7 @@ class ObjectBuilderNameConverter:
             element_name=parameter_set.dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
             group_by=(),
+            group_by_names=None,
             time_granularity_name=None,
             date_part=None,
         )
@@ -163,6 +179,7 @@ class ObjectBuilderNameConverter:
             element_name=parameter_set.time_dimension_reference.element_name,
             entity_links=parameter_set.entity_path,
             group_by=(),
+            group_by_names=None,
             time_granularity_name=None,
             date_part=None,
         )

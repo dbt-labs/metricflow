@@ -6,6 +6,7 @@ docstring:
 [
   'account_balance',
   'active_listings',
+  'active_listings_with_metric_time',
   'approximate_continuous_booking_value_p99',
   'approximate_discrete_booking_value_p99',
   'archived_users',

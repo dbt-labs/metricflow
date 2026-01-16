@@ -1,34 +1,34 @@
-test_name: test_query_with_simple_metric_in_where_filter
-test_filename: test_metric_filter_rendering.py
+test_name: test_metric_time_filter_ignored_without_query_time
+test_filename: test_query_rendering.py
 docstring:
-  Tests a query with a simple metric in the query-level where filter.
+  Tests metric_time in a metric filter when the query has no time dimension.
 sql_engine: DuckDB
 ---
 -- Write to DataTable
 SELECT
-  subq_18.listings
+  subq_18.active_listings_with_metric_time
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_17.__listings AS listings
+    subq_17.__active_listings_with_metric_time AS active_listings_with_metric_time
   FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      SUM(subq_16.__listings) AS __listings
+      SUM(subq_16.__active_listings_with_metric_time) AS __active_listings_with_metric_time
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Pass Only Elements: ['__active_listings_with_metric_time']
       SELECT
-        subq_15.__listings
+        subq_15.__active_listings_with_metric_time
       FROM (
         -- Constrain Output with WHERE
         SELECT
-          subq_14.listings AS __listings
+          subq_14.active_listings_with_metric_time AS __active_listings_with_metric_time
           , subq_14.listing__bookings
         FROM (
-          -- Pass Only Elements: ['__listings', 'listing__bookings']
+          -- Pass Only Elements: ['__active_listings_with_metric_time', 'listing__bookings']
           SELECT
             subq_13.listing__bookings
-            , subq_13.__listings AS listings
+            , subq_13.__active_listings_with_metric_time AS active_listings_with_metric_time
           FROM (
             -- Join Standard Outputs
             SELECT
