@@ -28,6 +28,5 @@ def test_metrics_with_and_without_null_fill_values(
             group_by_names=["metric_time"],
         ).query_spec,
         expected_num_sources_in_unoptimized=2,
-        # `expected_num_sources_in_optimized` will be updated after the fix.
-        expected_num_sources_in_optimized=2,
+        expected_num_sources_in_optimized=1,
     )
