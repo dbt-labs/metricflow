@@ -124,6 +124,15 @@ class NullFillValueMapping(Mergeable, SerializableDataclass):
             fill_nulls_with=null_fill_value,
         )
 
+    def has_conflict(self, other: NullFillValueMapping) -> bool:
+        """Returns true if this and the other mapping set different null-fill values for the same element."""
+        other_element_name_to_null_fill_value = other.element_name_to_null_fill_value
+        for element_name, null_fill_value in self.element_name_to_null_fill_value.items():
+            other_null_fill_value = other_element_name_to_null_fill_value.get(element_name)
+            if other_null_fill_value is not None and null_fill_value != other_null_fill_value:
+                return True
+        return False
+
     @override
     def merge(self, other: NullFillValueMapping) -> NullFillValueMapping:
         element_name_to_null_fill_value: dict[str, int] = {**self.element_name_to_null_fill_value}
@@ -132,7 +141,8 @@ class NullFillValueMapping(Mergeable, SerializableDataclass):
             if current_null_fill_value is not None and current_null_fill_value != other_null_fill_value:
                 raise RuntimeError(
                     LazyFormat(
-                        "Can't merge fill value mappings with conflicting items.",
+                        "Can't merge fill value mappings with conflicting items."
+                        " Conflicts should have been checked before merging.",
                         element_name=element_name,
                         current_null_fill_value=current_null_fill_value,
                         other_null_fill_value=other_null_fill_value,

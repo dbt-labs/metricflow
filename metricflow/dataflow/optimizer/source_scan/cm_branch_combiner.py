@@ -251,7 +251,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         assert len(combined_parent_nodes) == 1
         combined_parent_node = combined_parent_nodes[0]
 
-        if self._current_left_node.null_fill_value_mapping != current_right_node.null_fill_value_mapping:
+        if self._current_left_node.null_fill_value_mapping.has_conflict(current_right_node.null_fill_value_mapping):
             self._log_combine_failure(
                 left_node=self._current_left_node,
                 right_node=current_right_node,
@@ -265,6 +265,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
                 current_right_node.null_fill_value_mapping
             ),
         )
+
         self._log_combine_success(
             left_node=self._current_left_node,
             right_node=current_right_node,
