@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 
-import pytest
 from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import EntityReference
@@ -20,7 +19,6 @@ from tests_metricflow.dataflow.optimizer.source_scan.source_scan_optimizer_helpe
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.sql_engine_snapshot
 def test_2_metrics_from_1_semantic_model(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -46,7 +44,6 @@ def test_2_metrics_from_1_semantic_model(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_2_metrics_from_2_semantic_models(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -66,7 +63,6 @@ def test_2_metrics_from_2_semantic_models(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_3_metrics_from_2_semantic_models(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -90,7 +86,6 @@ def test_3_metrics_from_2_semantic_models(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_constrained_metric_not_combined(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -117,7 +112,6 @@ def test_constrained_metric_not_combined(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_derived_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -140,7 +134,6 @@ def test_derived_metric(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_nested_derived_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -164,7 +157,6 @@ def test_nested_derived_metric(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_derived_metric_with_non_derived_metric(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -196,7 +188,6 @@ def test_derived_metric_with_non_derived_metric(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_derived_metric_same_alias_components_combined(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -223,7 +214,6 @@ def test_derived_metric_same_alias_components_combined(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_derived_metric_same_alias_components_not_combined(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -250,7 +240,6 @@ def test_derived_metric_same_alias_components_not_combined(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_2_ratio_metrics_from_1_semantic_model(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -273,7 +262,6 @@ def test_2_ratio_metrics_from_1_semantic_model(
     )
 
 
-@pytest.mark.sql_engine_snapshot
 def test_duplicate_simple_metrics(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
