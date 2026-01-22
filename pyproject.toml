@@ -44,6 +44,36 @@ dev-env-requirements = [
   "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
 ]
+postgres-env-requirements = [
+  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-postgres.txt",
+]
+bigquery-env-requirements = [
+  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-bigquery.txt",
+]
+databricks-env-requirements = [
+  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-databricks.txt",
+]
+redshift-env-requirements = [
+  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-redshift.txt",
+]
+snowflake-env-requirements = [
+  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-snowflake.txt",
+]
+trino-env-requirements = [
+  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-trino.txt",
+]
 
 
 [project.urls]
@@ -90,8 +120,9 @@ MF_SQL_ENGINE_PASSWORD="metricflowing"
 MF_TEST_ADAPTER_TYPE="postgres"
 
 [tool.hatch.envs.postgres-env]
-description = "Dev environment for working with Postgres adapter"
+description = "Dev environment for working with PostgreSQL"
 template = "dev-env"
+features = ["postgres-env-requirements"]
 extra-dependencies = ["dbt-postgres>=1.8.0, <1.9.0"]
 
 
@@ -103,8 +134,9 @@ PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="bigquery"
 
 [tool.hatch.envs.bigquery-env]
-description = "Dev environment for working with the BigQuery adapter"
+description = "Dev environment for working with BigQuery"
 template = "dev-env"
+features = ["bigquery-env-requirements"]
 extra-dependencies = ["dbt-bigquery>=1.8.0, <1.9.0"]
 
 [tool.hatch.envs.databricks-env.env-vars]
@@ -113,8 +145,9 @@ MF_TEST_ADAPTER_TYPE="databricks"
 
 
 [tool.hatch.envs.databricks-env]
-description = "Dev environment for working with the Databricks adapter"
+description = "Dev environment for working with Databricks"
 template = "dev-env"
+features = ["databricks-env-requirements"]
 
 # Needed as dbt-databricks 1.8.1 depends on dbt-core~=1.8.0 while this uses dbt-core 1.9.0a1
 pre-install-commands = [
@@ -127,8 +160,9 @@ PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="redshift"
 
 [tool.hatch.envs.redshift-env]
-description = "Dev environment for working with the Redshift adapter"
+description = "Dev environment for working with Redshift"
 template = "dev-env"
+features = ["redshift-env-requirements"]
 extra-dependencies = ["dbt-redshift>=1.8.0, <1.9.0"]
 
 
@@ -137,8 +171,9 @@ PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="snowflake"
 
 [tool.hatch.envs.snowflake-env]
-description = "Dev environment for working with Snowflake adapter"
+description = "Dev environment for working with Snowflake"
 template = "dev-env"
+features = ["snowflake-env-requirements"]
 extra-dependencies = ["dbt-snowflake>=1.8.0, <1.9.0"]
 
 
@@ -149,9 +184,10 @@ MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/"
 DBT_ENV_SECRET_CATALOG="memory"
 
 [tool.hatch.envs.trino-env]
-description = "Dev environment for working with the Trino adapter"
+description = "Dev environment for working with Trino"
 template = "dev-env"
-extra-dependencies = ["trino>=0.328.0, <0.329.0", "dbt-trino>=1.8.0, <1.9.0"]
+features = ["trino-env-requirements"]
+extra-dependencies = ["dbt-trino>=1.8.0, <1.9.0"]
 
 
 [tool.black]

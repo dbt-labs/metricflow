@@ -12,13 +12,23 @@ from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from sqlalchemy import create_engine
 
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
+from metricflow.sql.render.databricks import DatabricksSqlPlanRenderer
+from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
+from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
+from metricflow.sql.render.redshift import RedshiftSqlPlanRenderer
+from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
+from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir
 from tests_metricflow.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
+from tests_metricflow.fixtures.sql_clients.sqlalchemy_ddl_client import SqlAlchemyDDLSqlClient
+from tests_metricflow.fixtures.sql_clients.sqlalchemy_url_builder import SqlAlchemyUrlBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -134,6 +144,48 @@ def __initialize_dbt() -> None:
     triggering a failure with reasonable error messages in the event the dbt configs are not set up correctly.
     """
     dbtRunner().invoke(["debug"], project_dir=dbt_project_dir(), PROFILES_DIR=dbt_project_dir())
+
+
+def make_sqlalchemy_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
+    """Build SqlAlchemy-based SQL client.
+
+    This is the new implementation that will replace the dbt-based client.
+    It is currently not used by default but can be used for testing.
+    """
+    connection_params = SqlEngineConnectionParameterSet.create_from_url(url)
+    dialect = SqlDialect(connection_params.dialect)
+
+    # Build SqlAlchemy URL
+    sqlalchemy_url = SqlAlchemyUrlBuilder.build_url(connection_params, password, schema)
+
+    # Create engine with connection pooling
+    engine = create_engine(
+        sqlalchemy_url,
+        pool_pre_ping=True,  # Verify connections before using
+        echo=False,  # Set to True for SQL logging
+    )
+
+    # Map dialect to engine type and renderer
+    dialect_mapping = {
+        SqlDialect.DUCKDB: (SqlEngine.DUCKDB, DuckDbSqlPlanRenderer()),
+        SqlDialect.DATABRICKS: (SqlEngine.DATABRICKS, DatabricksSqlPlanRenderer()),
+        SqlDialect.POSTGRESQL: (SqlEngine.POSTGRES, PostgresSQLSqlPlanRenderer()),
+        SqlDialect.SNOWFLAKE: (SqlEngine.SNOWFLAKE, SnowflakeSqlPlanRenderer()),
+        SqlDialect.REDSHIFT: (SqlEngine.REDSHIFT, RedshiftSqlPlanRenderer()),
+        SqlDialect.BIGQUERY: (SqlEngine.BIGQUERY, BigQuerySqlPlanRenderer()),
+        SqlDialect.TRINO: (SqlEngine.TRINO, TrinoSqlPlanRenderer()),
+    }
+
+    if dialect not in dialect_mapping:
+        raise ValueError(f"Unsupported dialect: {dialect}")
+
+    sql_engine_type, sql_plan_renderer = dialect_mapping[dialect]
+
+    return SqlAlchemyDDLSqlClient(
+        engine=engine,
+        sql_engine_type=sql_engine_type,
+        sql_plan_renderer=sql_plan_renderer,
+    )
 
 
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:

@@ -1,0 +1,4 @@
+# SqlAlchemy BigQuery connector
+sqlalchemy-bigquery>=1.9.0, <2.0.0
+# BigQuery Python client (required by sqlalchemy-bigquery)
+google-cloud-bigquery>=3.10.0, <4.0.0
