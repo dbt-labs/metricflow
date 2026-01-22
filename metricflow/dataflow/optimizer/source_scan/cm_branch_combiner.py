@@ -230,9 +230,46 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_aggregate_simple_metric_inputs_node(  # noqa: D102
+    def visit_aggregate_simple_metric_inputs_node(
         self, node: AggregateSimpleMetricInputsNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
+        """Combine two branches where the leaf node is an `AggregateSimpleMetricInputsNode`.
+
+        The `AggregateSimpleMetricInputsNode` outputs aggregated forms of its simple-metric inputs. It
+        also produces output instances with the `fill_nulls_with` context.
+
+        If the parent branches of the left and right nodes can be combined, it means that the left and right
+        branches have similar structure (e.g. select from the same semantic model / have the same joins) but aggregate
+        different simple-metric inputs. The cases to consider are:
+
+        * Both the left and right `AggregateSimpleMetricInputsNodes` specify the same null-fill value mapping. Then the
+        left and right branches can be combined as the default case.
+
+        * The left and right branches have a null-fill value mapping that contains no common simple-metric inputs.
+
+        e.g.
+            left:
+                null_fill_value_mapping = {"bookings": 0}
+            right:
+                null_fill_value_mapping = {"booking_value": 0}
+
+        Since different instances are represented with different columns, there are no issues using different null-fill
+        values and the branches can be combined.
+
+        * The left and right branches have a conflicting null-fill value for the same simple-metric input. After the
+        measure -> simple-metric migration, this case should not be possible as each simple metric is only allowed a
+        single `fill_nulls_with` value in the configuration. However, if allowed:
+
+        e.g.
+            left:
+                null_fill_value_mapping = {"bookings": 0, "booking_value": None}
+            right:
+                null_fill_value_mapping = {"bookings": 0, "booking_value": 1}
+
+        The output of the combined branch would need to represent `booking_value` with no null-fill and a null-fill
+        value of 1. This would require the output to contain different columns for each case, so we can't combine the
+        branches.
+        """
         self._log_visit_node_type(node)
         current_right_node = node
 
