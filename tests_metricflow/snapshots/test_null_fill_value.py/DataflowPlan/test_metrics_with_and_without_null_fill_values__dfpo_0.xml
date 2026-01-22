@@ -15,7 +15,8 @@ docstring:
             <AggregateSimpleMetricInputsNode>
                 <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='am_2') -->
-                <!-- null_fill_value_mapping = {'bookings_fill_nulls_with_0_without_time_spine': 0} -->
+                <!-- null_fill_value_mapping =                                                     -->
+                <!--   {'booking_value': None, 'bookings_fill_nulls_with_0_without_time_spine': 0} -->
                 <FilterElementsNode>
                     <!-- description =                                                                                    -->
                     <!--   ("Pass Only Elements: ['__booking_value', '__bookings_fill_nulls_with_0_without_time_spine', " -->
