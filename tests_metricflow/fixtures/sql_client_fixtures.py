@@ -211,9 +211,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("bigquery"))
     elif dialect is SqlDialect.POSTGRESQL:
-        __configure_test_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.DUCKDB:
         return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.DATABRICKS:
