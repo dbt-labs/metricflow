@@ -215,9 +215,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
     elif dialect is SqlDialect.DUCKDB:
-        __configure_test_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("duckdb"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.DATABRICKS:
         __configure_databricks_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()
