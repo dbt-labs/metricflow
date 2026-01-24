@@ -16,8 +16,16 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 @dataclass(frozen=True, eq=False)
 class AggregateSimpleMetricInputsNode(DataflowPlanNode):
-    """A node that aggregates the simple-metric inputs by the associated group by elements."""
+    """A node that aggregates the simple-metric inputs by the associated group-by elements.
 
+    The output instances of this node contain context on the appropriate null-fill value. The `ComputeMetricsNode` uses
+    this context to render the appropriate `COALESCE` expressions.
+
+    # TODO: Verify `COALESCE` is rendered in `ComputeMetricsNode` to handle `WHERE` filter behavior.
+    """
+
+    # The `null_fill_value_mapping` should contain an entry for each simple-metric input to support
+    # `ComputeMetricsBranchCombiner`.
     null_fill_value_mapping: NullFillValueMapping
 
     def __post_init__(self) -> None:  # noqa: D105

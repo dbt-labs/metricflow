@@ -18,7 +18,7 @@ docstring:
                 <AggregateSimpleMetricInputsNode>
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_3') -->
-                    <!-- null_fill_value_mapping = {} -->
+                    <!-- null_fill_value_mapping = {'bookings': None, 'booking_value': None} -->
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['__bookings', '__booking_value', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_7') -->
@@ -63,7 +63,7 @@ docstring:
                 <AggregateSimpleMetricInputsNode>
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_2') -->
-                    <!-- null_fill_value_mapping = {} -->
+                    <!-- null_fill_value_mapping = {'listings': None} -->
                     <FilterElementsNode>
                         <!-- description = "Pass Only Elements: ['__listings', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_5') -->
