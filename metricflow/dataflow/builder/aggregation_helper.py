@@ -11,6 +11,8 @@ from metricflow_semantics.toolkit.collections.mapping_helpers import mf_common_k
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
+from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 from typing_extensions import override
 
 logger = logging.getLogger(__name__)
@@ -78,7 +80,7 @@ class InstanceAliasMapping(Mergeable, SerializableDataclass):
 
 
 @fast_frozen_dataclass()
-class NullFillValueMapping(Mergeable, SerializableDataclass):
+class NullFillValueMapping(Mergeable, MetricFlowPrettyFormattable, SerializableDataclass):
     """Stores the mapping for which instances should have null values set to a configured value."""
 
     _element_name_and_null_fill_value_items: Tuple[Tuple[str, Optional[int]], ...]
@@ -167,3 +169,10 @@ class NullFillValueMapping(Mergeable, SerializableDataclass):
     @override
     def empty_instance(cls) -> NullFillValueMapping:
         return NullFillValueMapping(_element_name_and_null_fill_value_items=())
+
+    @override
+    def pretty_format(self, format_context: PrettyFormatContext) -> Optional[str]:
+        return format_context.formatter.pretty_format_object_by_parts(
+            class_name=self.__class__.__name__,
+            field_mapping={"element_name_to_null_fill_value": self.element_name_to_null_fill_value},
+        )
