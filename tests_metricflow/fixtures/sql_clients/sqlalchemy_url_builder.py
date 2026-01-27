@@ -223,13 +223,14 @@ class SqlAlchemyUrlBuilder:
         password: str,
         schema: Optional[str] = None,
     ) -> SqlAlchemyURL:
-        """Build Trino URL."""
-        query_params = {}
+        """Build Trino URL.
 
-        # Trino uses catalog parameter
-        catalog_values = connection_params.get_query_field_values("catalog")
-        if catalog_values:
-            query_params["catalog"] = catalog_values[0]
+        Note - Trino has a "catalog" property in its URL that requires custom handling.
+        However, it is currently encoded in their URL format in the same path location as the
+        standard database value, so we simply use that the same way we would with a database that
+        conforms to the standard SqlAlchemy URL format.
+        """
+        query_params = {}
 
         if schema:
             query_params["schema"] = schema

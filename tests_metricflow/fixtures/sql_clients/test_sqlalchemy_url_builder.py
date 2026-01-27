@@ -77,9 +77,9 @@ def test_snowflake_url_with_warehouse() -> None:
     assert url.query["schema"] == "schema1"
 
 
-def test_trino_url_with_catalog() -> None:
-    """Test Trino URL with catalog parameter."""
-    params = SqlEngineConnectionParameterSet.create_from_url("trino://user@localhost:8080/memory?catalog=memory")
+def test_trino_url_with_database_as_catalog() -> None:
+    """Test Trino URL with catalog value in the database path location."""
+    params = SqlEngineConnectionParameterSet.create_from_url("trino://user@localhost:8080/memory")
     url = SqlAlchemyUrlBuilder.build_url(params, password="", schema="default")
 
     assert url.drivername == "trino"
@@ -87,7 +87,6 @@ def test_trino_url_with_catalog() -> None:
     assert url.host == "localhost"
     assert url.port == 8080
     assert url.database == "memory"
-    assert url.query["catalog"] == "memory"
     assert url.query["schema"] == "default"
 
 

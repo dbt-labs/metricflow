@@ -1,3 +1,2 @@
-# SqlAlchemy Trino connector
-trino>=0.328.0, <0.329.0
-sqlalchemy-trino>=0.5.0, <0.6.0
+# Trino connector, ships with sqlalchemy dialect support
+trino>=0.336.0, <0.337.0

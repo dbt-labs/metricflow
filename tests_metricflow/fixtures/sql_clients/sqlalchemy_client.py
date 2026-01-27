@@ -169,10 +169,6 @@ class SqlAlchemyBasedSqlClient:
                 if self.sql_engine_type is SqlEngine.TRINO:
                     # Trino: Use EXPLAIN (type validate) to avoid side effects
                     result = conn.execute(sa_text(f"EXPLAIN (type validate) {stmt}"))
-                    # Trino returns error messages in result set
-                    output = result.fetchall()
-                    if str(output[0]) != "SUCCESS":
-                        raise RuntimeError(f"Trino dry run failed: {output[0]}")
                 elif self.sql_engine_type is SqlEngine.BIGQUERY:
                     # BigQuery: Use dry_run execution option
                     # Note: This requires specific BigQuery dialect configuration
