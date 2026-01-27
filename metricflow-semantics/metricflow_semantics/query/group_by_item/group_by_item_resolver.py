@@ -90,6 +90,8 @@ class GroupByItemResolver:
     ) -> None:
         self._manifest_lookup = manifest_lookup
         self._resolution_dag = resolution_dag
+        # Cache for resolve_available_items to avoid repeated expensive DAG traversals
+        self._available_items_cache: dict[Tuple[int, Tuple[int, ...]], AvailableGroupByItemsResolution] = {}
 
     def resolve_matching_item_for_querying(
         self,
@@ -226,9 +228,17 @@ class GroupByItemResolver:
 
         By default, the query node is used, so this will return the available group-by-items that can be used in a
         query.
+
+        Results are cached to avoid repeated expensive DAG traversals when called multiple times
+        with the same arguments during a single query resolution.
         """
         if resolution_node is None:
             resolution_node = self._resolution_dag.sink_node
+
+        # Create cache key from node id and pattern ids
+        cache_key = (id(resolution_node), tuple(id(p) for p in source_spec_patterns))
+        if cache_key in self._available_items_cache:
+            return self._available_items_cache[cache_key]
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
@@ -239,10 +249,13 @@ class GroupByItemResolver:
 
         push_down_result: PushDownResult = resolution_node.accept(push_down_visitor)
 
-        return AvailableGroupByItemsResolution(
+        result = AvailableGroupByItemsResolution(
             specs=tuple(push_down_result.candidate_set.specs),
             issue_set=push_down_result.issue_set,
         )
+
+        self._available_items_cache[cache_key] = result
+        return result
 
     def resolve_min_metric_time_grain(self) -> TimeGranularity:
         """Returns the finest base time grain of metric_time for querying."""
