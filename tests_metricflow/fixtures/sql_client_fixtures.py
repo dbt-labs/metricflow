@@ -199,14 +199,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("redshift"))
     elif dialect is SqlDialect.SNOWFLAKE:
-        connection_parameters = __configure_test_env_from_url(url, password=password, schema=schema)
-        warehouse_names = connection_parameters.get_query_field_values("warehouse")
-        assert (
-            len(warehouse_names) == 1
-        ), f"SQL engine URL did not specify exactly 1 Snowflake warehouse! Got {warehouse_names}"
-        os.environ[DBT_ENV_SECRET_WAREHOUSE] = warehouse_names[0]
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("snowflake"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.BIGQUERY:
         __configure_bigquery_env_from_credential_string(password=password, schema=schema)
         __initialize_dbt()

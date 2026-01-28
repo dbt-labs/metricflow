@@ -1,4 +1,2 @@
-# SqlAlchemy Snowflake connector
+# SqlAlchemy Snowflake connector, includes compatible snowflake-connector-python
 snowflake-sqlalchemy>=1.5.0, <2.0.0
-# Snowflake connector (required by snowflake-sqlalchemy)
-snowflake-connector-python>=3.0.0, <4.0.0

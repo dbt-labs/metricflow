@@ -3,7 +3,7 @@ test_filename: test_cumulative_metrics.py
 docstring:
   Tests a month to date cumulative metric with a constraint to ensure all necessary input data is included.
 ---
-METRIC_TIME__DAY       REVENUE_MTD
+metric_time__day       revenue_mtd
 -------------------  -------------
 2021-01-03T00:00:00           3000
 2021-01-04T00:00:00           4000

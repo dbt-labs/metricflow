@@ -168,7 +168,6 @@ MF_TEST_ADAPTER_TYPE="snowflake"
 description = "Dev environment for working with Snowflake"
 template = "dev-env"
 features = ["snowflake-env-requirements"]
-extra-dependencies = ["dbt-snowflake>=1.8.0, <1.9.0"]
 
 
 [tool.hatch.envs.trino-env.env-vars]

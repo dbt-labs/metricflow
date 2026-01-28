@@ -3,7 +3,7 @@ test_filename: test_name_edge_cases.py
 docstring:
   Check a soon-to-be-deprecated use case of filtering by a metric name with 2 metrics from the same source node.
 ---
-METRIC_TIME__DAY       HOMONYMOUS_METRIC_AND_ENTITY    HOMONYMOUS_METRIC_AND_DIMENSION
+metric_time__day       homonymous_metric_and_entity    homonymous_metric_and_dimension
 -------------------  ------------------------------  ---------------------------------
 2019-12-01T00:00:00                          951.23                             951.23
 2019-12-18T00:00:00                         5698.58                            5698.58

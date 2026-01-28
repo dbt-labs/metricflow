@@ -3,7 +3,7 @@ test_filename: test_name_edge_cases.py
 docstring:
   Check a soon-to-be-deprecated use case where a manifest contains a metric with the same name as an entity.
 ---
-METRIC_TIME__DAY       HOMONYMOUS_METRIC_AND_ENTITY
+metric_time__day       homonymous_metric_and_entity
 -------------------  ------------------------------
 2019-12-01T00:00:00                          951.23
 2019-12-18T00:00:00                         5698.58
