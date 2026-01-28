@@ -37,6 +37,7 @@ from metricflow_semantics.specs.patterns.no_group_by_metric import NoGroupByMetr
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
+from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
@@ -80,6 +81,10 @@ class AvailableGroupByItemsResolution:
     issue_set: MetricFlowQueryResolutionIssueSet
 
 
+# Cache key type for resolve_available_items: (resolution_node_id, tuple of pattern_ids)
+_AvailableItemsCacheKey = Tuple[int, Tuple[int, ...]]
+
+
 class GroupByItemResolver:
     """Resolves group-by items for potentially ambiguous inputs that are specified in queries / filters."""
 
@@ -90,6 +95,10 @@ class GroupByItemResolver:
     ) -> None:
         self._manifest_lookup = manifest_lookup
         self._resolution_dag = resolution_dag
+        # Cache for resolve_available_items to avoid repeated expensive DAG traversals
+        self._available_items_cache: ResultCache[
+            _AvailableItemsCacheKey, AvailableGroupByItemsResolution
+        ] = ResultCache()
 
     def resolve_matching_item_for_querying(
         self,
@@ -226,9 +235,18 @@ class GroupByItemResolver:
 
         By default, the query node is used, so this will return the available group-by-items that can be used in a
         query.
+
+        Results are cached to avoid repeated expensive DAG traversals when called multiple times
+        with the same arguments during a single query resolution.
         """
         if resolution_node is None:
             resolution_node = self._resolution_dag.sink_node
+
+        # Create cache key from node id and pattern ids
+        cache_key: _AvailableItemsCacheKey = (id(resolution_node), tuple(id(p) for p in source_spec_patterns))
+        cache_result = self._available_items_cache.get(cache_key)
+        if cache_result:
+            return cache_result.value
 
         push_down_visitor = _PushDownGroupByItemCandidatesVisitor(
             manifest_lookup=self._manifest_lookup,
@@ -239,10 +257,12 @@ class GroupByItemResolver:
 
         push_down_result: PushDownResult = resolution_node.accept(push_down_visitor)
 
-        return AvailableGroupByItemsResolution(
+        result = AvailableGroupByItemsResolution(
             specs=tuple(push_down_result.candidate_set.specs),
             issue_set=push_down_result.issue_set,
         )
+
+        return self._available_items_cache.set_and_get(cache_key, result)
 
     def resolve_min_metric_time_grain(self) -> TimeGranularity:
         """Returns the finest base time grain of metric_time for querying."""
