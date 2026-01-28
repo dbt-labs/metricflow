@@ -148,11 +148,6 @@ description = "Dev environment for working with Databricks"
 template = "dev-env"
 features = ["databricks-env-requirements"]
 
-# Needed as dbt-databricks 1.8.1 depends on dbt-core~=1.8.0 while this uses dbt-core 1.9.0a1
-pre-install-commands = [
-  "pip install dbt-databricks"
-]
-
 
 [tool.hatch.envs.redshift-env.env-vars]
 PYTHONPATH="metricflow-semantics:dbt-metricflow"
