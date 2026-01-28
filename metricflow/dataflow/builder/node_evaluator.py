@@ -26,7 +26,8 @@ from metricflow_semantics.model.semantics.semantic_model_join_evaluator import S
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
-from metricflow_semantics.specs.spec_set import group_specs_by_type
+from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
@@ -190,6 +191,28 @@ class NodeEvaluatorForLinkableInstances:
         self._join_evaluator = SemanticModelJoinEvaluator(self._semantic_model_lookup)
         self._time_spine_metric_time_nodes = time_spine_metric_time_nodes
 
+    def _resolve_metric_time_joins(
+        self,
+        left_node_spec_set: InstanceSpecSet,
+        node_to_join_spec_set: InstanceSpecSet,
+    ) -> Tuple[PartitionTimeDimensionJoinDescription, ...]:
+        """Return metric_time joins needed for group-by metric filters."""
+        if not node_to_join_spec_set.group_by_metric_specs:
+            return ()
+
+        metric_time_specs_to_join: List[TimeDimensionSpec] = []
+        for metric_time_spec in left_node_spec_set.metric_time_specs:
+            if metric_time_spec in node_to_join_spec_set.metric_time_specs:
+                metric_time_specs_to_join.append(metric_time_spec)
+
+        return tuple(
+            PartitionTimeDimensionJoinDescription(
+                start_node_time_dimension_spec=metric_time_spec,
+                node_to_join_time_dimension_spec=metric_time_spec,
+            )
+            for metric_time_spec in metric_time_specs_to_join
+        )
+
     def _find_joinable_candidate_nodes_that_can_satisfy_linkable_specs(
         self,
         left_node_instance_set: InstanceSet,
@@ -265,9 +288,16 @@ class NodeEvaluatorForLinkableInstances:
                 assert len(entity_instance_in_left_node.defined_from) == 1
                 assert len(entity_instance_in_right_node.defined_from) == 1
 
-                entity_spec_matches_aggregated_specs = {
-                    spec.reference for spec in right_node.aggregated_to_elements
-                } == {entity_spec_in_right_node.reference}
+                aggregated_spec_references = {spec.reference for spec in right_node.aggregated_to_elements}
+                aggregated_spec_references_without_metric_time = {
+                    reference
+                    for reference in aggregated_spec_references
+                    if reference != DataSet.metric_time_dimension_reference()
+                }
+                entity_spec_matches_aggregated_specs = (
+                    aggregated_spec_references_without_metric_time == {entity_spec_in_right_node.reference}
+                    and len(aggregated_spec_references_without_metric_time) == 1
+                )
                 if not (
                     self._join_evaluator.is_valid_semantic_model_join(
                         left_semantic_model_reference=entity_instance_in_left_node.defined_from[
@@ -327,6 +357,10 @@ class NodeEvaluatorForLinkableInstances:
                         node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )
                     join_on_partition_time_dimensions = self._partition_resolver.resolve_partition_time_dimension_joins(
+                        left_node_spec_set=left_node_spec_set,
+                        node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
+                    )
+                    join_on_partition_time_dimensions += self._resolve_metric_time_joins(
                         left_node_spec_set=left_node_spec_set,
                         node_to_join_spec_set=data_set_in_right_node.instance_set.spec_set,
                     )

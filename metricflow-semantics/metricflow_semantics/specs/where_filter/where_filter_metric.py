@@ -2,12 +2,16 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    MetricCallParameterSet,
-)
+from dbt_semantic_interfaces.call_parameter_sets import MetricCallParameterSet, TimeDimensionCallParameterSet
+from dbt_semantic_interfaces.naming.dundered import StructuredDunderedName
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
 from dbt_semantic_interfaces.protocols.query_interface import QueryInterfaceMetric, QueryInterfaceMetricFactory
-from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference, MetricReference
+from dbt_semantic_interfaces.references import (
+    GroupByItemReference,
+    MetricReference,
+    TimeDimensionReference,
+)
 from typing_extensions import override
 
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
@@ -34,7 +38,7 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
         where_filter_location: WhereFilterLocation,
         rendered_spec_tracker: RenderedSpecTracker,
         element_name: str,
-        group_by: Sequence[LinkableElementReference],
+        group_by: Sequence[GroupByItemReference],
     ) -> None:
         self._column_association_resolver = column_association_resolver
         self._resolved_spec_lookup = resolved_spec_lookup
@@ -55,7 +59,7 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
         Important in the Jinja sandbox.
         """
         call_parameter_set = MetricCallParameterSet(
-            group_by=tuple(EntityReference(element_name=group_by_ref.element_name) for group_by_ref in self._group_by),
+            group_by=tuple(self._group_by),
             metric_reference=MetricReference(self._element_name),
         )
 
@@ -67,6 +71,21 @@ class WhereFilterMetric(ProtocolHint[QueryInterfaceMetric]):
         resolved_spec = self._resolved_spec_lookup.checked_resolved_spec(resolved_spec_key)
         self._rendered_spec_tracker.record_rendered_spec(resolved_spec)
         column_association = self._column_association_resolver.resolve_spec(resolved_spec.spec)
+
+        if any(group_by_ref.element_name == METRIC_TIME_ELEMENT_NAME for group_by_ref in self._group_by):
+            metric_time_call_parameter_set = TimeDimensionCallParameterSet(
+                entity_path=(),
+                time_dimension_reference=TimeDimensionReference(METRIC_TIME_ELEMENT_NAME),
+                time_granularity_name=None,
+                date_part=None,
+            )
+            metric_time_spec_key = ResolvedSpecLookUpKey(
+                filter_location=self._where_filter_location,
+                call_parameter_set=metric_time_call_parameter_set,
+            )
+            if self._resolved_spec_lookup.spec_resolution_exists(metric_time_spec_key):
+                metric_time_spec = self._resolved_spec_lookup.checked_resolved_spec(metric_time_spec_key)
+                self._rendered_spec_tracker.record_rendered_spec(metric_time_spec)
 
         return column_association.column_name
 
@@ -87,19 +106,33 @@ class WhereFilterMetricFactory(ProtocolHint[QueryInterfaceMetricFactory]):
         spec_resolution_lookup: FilterSpecResolutionLookUp,
         where_filter_location: WhereFilterLocation,
         rendered_spec_tracker: RenderedSpecTracker,
-    ):
+        custom_granularity_names: Sequence[str],
+    ) -> None:
         self._column_association_resolver = column_association_resolver
         self._resolved_spec_lookup = spec_resolution_lookup
         self._where_filter_location = where_filter_location
         self._rendered_spec_tracker = rendered_spec_tracker
+        self._custom_granularity_names = tuple(custom_granularity_names)
 
     def create(self, metric_name: str, group_by: Sequence[str] = ()) -> WhereFilterMetric:
         """Create a WhereFilterMetric."""
+        group_by_references = []
+        for group_by_name in group_by:
+            structured_name = StructuredDunderedName.parse_name(
+                name=group_by_name.lower(), custom_granularity_names=self._custom_granularity_names
+            )
+            group_by_references.append(
+                GroupByItemReference(
+                    element_name=structured_name.element_name,
+                    entity_links=structured_name.entity_links,
+                    time_granularity_name=structured_name.time_granularity,
+                )
+            )
         return WhereFilterMetric(
             column_association_resolver=self._column_association_resolver,
             resolved_spec_lookup=self._resolved_spec_lookup,
             where_filter_location=self._where_filter_location,
             rendered_spec_tracker=self._rendered_spec_tracker,
             element_name=metric_name,
-            group_by=tuple(LinkableElementReference(group_by_name.lower()) for group_by_name in group_by),
+            group_by=tuple(group_by_references),
         )

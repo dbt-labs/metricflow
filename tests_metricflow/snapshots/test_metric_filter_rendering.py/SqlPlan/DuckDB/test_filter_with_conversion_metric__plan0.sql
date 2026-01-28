@@ -100,6 +100,7 @@ FROM (
               , subq_16.__smallest_listing AS __smallest_listing
               , subq_16.__largest_listing AS __largest_listing
               , subq_16.__active_listings AS __active_listings
+              , subq_16.__active_listings_with_metric_time AS __active_listings_with_metric_time
             FROM (
               -- Metric Time Dimension 'ds'
               SELECT
@@ -172,6 +173,7 @@ FROM (
                 , subq_15.__smallest_listing
                 , subq_15.__largest_listing
                 , subq_15.__active_listings
+                , subq_15.__active_listings_with_metric_time
               FROM (
                 -- Read Elements From Semantic Model 'listings_latest'
                 SELECT
@@ -180,6 +182,7 @@ FROM (
                   , listings_latest_src_28000.capacity AS __smallest_listing
                   , listings_latest_src_28000.capacity AS __largest_listing
                   , 1 AS __active_listings
+                  , 1 AS __active_listings_with_metric_time
                   , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
                   , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
                   , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month

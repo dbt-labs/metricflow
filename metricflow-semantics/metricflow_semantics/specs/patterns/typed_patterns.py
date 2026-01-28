@@ -9,6 +9,7 @@ from dbt_semantic_interfaces.call_parameter_sets import (
     MetricCallParameterSet,
     TimeDimensionCallParameterSet,
 )
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from typing_extensions import override
@@ -16,7 +17,6 @@ from typing_extensions import override
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
-from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.entity_link_pattern import (
     EntityLinkPattern,
@@ -176,19 +176,24 @@ class GroupByMetricPattern(EntityLinkPattern):
     def from_call_parameter_set(  # noqa: D102
         metric_call_parameter_set: MetricCallParameterSet,
     ) -> GroupByMetricPattern:
-        # This looks hacky because the typing for the interface does not match the implementation, but that's temporary!
-        # This will get a lot less hacky once we enable multiple entities and dimensions in the group by.
-        if len(metric_call_parameter_set.group_by) != 1:
-            raise UnableToSatisfyQueryError("Currently only one group by item is allowed for Metric filters.")
-        group_by = metric_call_parameter_set.group_by[0]
-        # custom_granularity_names is empty because we are not parsing any dimensions here with grain
-        structured_name = StructuredLinkableSpecName.from_name(
-            qualified_name=group_by.element_name, custom_granularity_names=()
+        metric_time_group_bys = tuple(
+            group_by_ref
+            for group_by_ref in metric_call_parameter_set.group_by
+            if group_by_ref.element_name == METRIC_TIME_ELEMENT_NAME
         )
-        metric_subquery_entity_links = tuple(
-            EntityReference(entity_name)
-            for entity_name in (structured_name.entity_link_names + (structured_name.element_name,))
+        non_metric_time_group_bys = tuple(
+            group_by_ref
+            for group_by_ref in metric_call_parameter_set.group_by
+            if group_by_ref.element_name != METRIC_TIME_ELEMENT_NAME
         )
+        if len(metric_time_group_bys) > 1 or len(non_metric_time_group_bys) != 1:
+            raise UnableToSatisfyQueryError(
+                "Metric filters require exactly one non-metric_time group by item, with optional metric_time."
+            )
+        group_by = non_metric_time_group_bys[0]
+        if group_by.time_granularity_name is not None:
+            raise UnableToSatisfyQueryError("Metric filters only support metric_time as a time dimension in group_by.")
+        metric_subquery_entity_links = group_by.entity_links + (EntityReference(group_by.element_name),)
         # Temp: we don't have a parameter to specify the join path from the outer query to the metric subquery,
         # so just use the last entity. Will need to add another param for that later.
         entity_links = metric_subquery_entity_links[-1:]

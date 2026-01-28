@@ -102,6 +102,30 @@ def test_filter_with_where_constraint_on_join_dim(
 
 
 @pytest.mark.sql_engine_snapshot
+def test_metric_time_filter_ignored_without_query_time(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests metric_time in a metric filter when the query has no time dimension."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("active_listings_with_metric_time",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
 def test_partitioned_join(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
