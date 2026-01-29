@@ -1,5 +1,3 @@
-# SqlAlchemy Redshift connector
-# Using psycopg2 as the base driver works well for Redshift
+# Note - as of 2026-01-29 there is no native redshift dialect for SqlAlchemy 2.x
+# Using psycopg2 as the base driver because there's an existing dialect we can override.
 psycopg2-binary>=2.9.0, <3.0.0
-# Alternative: redshift-connector>=2.0.0, <3.0.0
-# Alternative: sqlalchemy-redshift>=0.8.0, <0.9.0

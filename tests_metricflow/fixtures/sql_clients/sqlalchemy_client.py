@@ -8,6 +8,8 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from sqlalchemy import Engine
 from sqlalchemy import text as sa_text
+from sqlalchemy.dialects import registry
+from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
 from sqlalchemy.exc import SQLAlchemyError
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -15,6 +17,36 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 
 logger = logging.getLogger(__name__)
+
+
+class MFRedshiftDialect(PGDialect_psycopg2):
+    """Custom dialect for Redshift.
+
+    The sqlalchemy-redshift package does not support SqlAlchemy 2.x natively, so we include this simple custom
+    dialect that allows for connection via SqlAlchemy's create_engine API. Note this will not support all
+    SqlAlchemy features, but since we only use the engine connection and direct execution of sql text statements
+    this is sufficient for our purposes.
+
+    A full-featured redshift SqlClient would need to instead use something like redshift-connector, or fall back
+    to sqlalchemy-redshift with sqlalchemy < 2.0.
+
+    Note - none of the upstream base classe are typed, so we just override everything here for mypy.
+    """
+
+    name = "mf_redshift_psycopg2"
+    supports_statement_cache: bool = False  # type: ignore  # noqa
+
+    def _set_backslash_escapes(self, connection):  # type: ignore  # noqa
+        """Override for problematic method in SqlAlchemy 2.x.
+
+        This is a method returning a value that overrides a boolean property in the base class.
+        Without this override the default Postgres dialect will execute a statement that redshift does not support.
+        """
+        return False  # type: ignore  # noqa
+
+
+# Make our custom redshift dialect available to SqlAlchemy.
+registry.register("mf_redshift_psycopg2", __name__, "MFRedshiftDialect")
 
 
 class SqlAlchemyBasedSqlClient:

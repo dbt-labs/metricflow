@@ -195,9 +195,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     dialect = SqlDialect(SqlEngineConnectionParameterSet.create_from_url(url).dialect)
 
     if dialect is SqlDialect.REDSHIFT:
-        __configure_test_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("redshift"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.SNOWFLAKE:
         return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.BIGQUERY:

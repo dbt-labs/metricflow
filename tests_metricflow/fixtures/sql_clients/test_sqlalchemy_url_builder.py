@@ -95,13 +95,12 @@ def test_redshift_url() -> None:
     params = SqlEngineConnectionParameterSet.create_from_url("redshift://user@host.redshift.amazonaws.com:5439/dev")
     url = SqlAlchemyUrlBuilder.build_url(params, password="secret", schema="analytics")
 
-    assert url.drivername == "redshift+psycopg2"
+    assert url.drivername == "mf_redshift_psycopg2"
     assert url.username == "user"
     assert url.password == "secret"
     assert url.host == "host.redshift.amazonaws.com"
     assert url.port == 5439
     assert url.database == "dev"
-    assert "search_path=analytics" in url.query.get("options", "")
 
 
 def test_bigquery_url() -> None:

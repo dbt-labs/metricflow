@@ -23,7 +23,8 @@ class SqlAlchemyUrlBuilder:
         Args:
             connection_params: Parsed MetricFlow connection parameters
             password: Database password (from separate env var)
-            schema: Default schema to use
+            schema: Default schema to use. Ignored for Redshift as Redshift does not support setting schemas at
+              connection time. Instead, all queries have to use schema-qualified relation names.
 
         Returns:
             SqlAlchemy URL object
@@ -39,7 +40,7 @@ class SqlAlchemyUrlBuilder:
         elif dialect is SqlDialect.SNOWFLAKE:
             return SqlAlchemyUrlBuilder._build_snowflake_url(connection_params, password, schema)
         elif dialect is SqlDialect.REDSHIFT:
-            return SqlAlchemyUrlBuilder._build_redshift_url(connection_params, password, schema)
+            return SqlAlchemyUrlBuilder._build_redshift_url(connection_params, password)
         elif dialect is SqlDialect.BIGQUERY:
             return SqlAlchemyUrlBuilder._build_bigquery_url(connection_params, password, schema)
         elif dialect is SqlDialect.TRINO:
@@ -168,22 +169,15 @@ class SqlAlchemyUrlBuilder:
     def _build_redshift_url(
         connection_params: SqlEngineConnectionParameterSet,
         password: str,
-        schema: Optional[str] = None,
     ) -> SqlAlchemyURL:
         """Build Redshift URL."""
-        query_params = {}
-        if schema:
-            query_params["options"] = f"-c search_path={schema}"
-
-        # Redshift can use redshift+psycopg2 or redshift_connector
         return SqlAlchemyURL.create(
-            drivername="redshift+psycopg2",
+            drivername="mf_redshift_psycopg2",
             username=connection_params.username,
             password=password,
             host=connection_params.hostname,
             port=connection_params.port or 5439,
             database=connection_params.database,
-            query=query_params,
         )
 
     @staticmethod
