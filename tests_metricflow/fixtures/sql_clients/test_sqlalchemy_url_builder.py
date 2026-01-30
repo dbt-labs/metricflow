@@ -106,10 +106,9 @@ def test_redshift_url() -> None:
 def test_bigquery_url() -> None:
     """Test BigQuery URL with JSON credentials."""
     credentials_json = '{"type": "service_account", "project_id": "my-project", "client_email": "test@test.com"}'
-    params = SqlEngineConnectionParameterSet.create_from_url("bigquery://my-project/my-dataset")
+    params = SqlEngineConnectionParameterSet.create_from_url("bigquery://")
     url = SqlAlchemyUrlBuilder.build_url(params, password=credentials_json, schema="my_dataset")
 
     assert url.drivername == "bigquery"
     assert url.host == "my-project"
-    assert url.query["dataset_id"] == "my_dataset"
-    assert url.query["credentials_info"] == credentials_json
+    assert url.database == "my_dataset"

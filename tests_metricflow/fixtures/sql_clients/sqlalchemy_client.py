@@ -53,10 +53,7 @@ class SqlAlchemyBasedSqlClient:
     """SqlClient implementation using SqlAlchemy Engine for database operations."""
 
     def __init__(
-        self,
-        engine: Engine,
-        sql_engine_type: SqlEngine,
-        sql_plan_renderer: SqlPlanRenderer,
+        self, engine: Engine, sql_engine_type: SqlEngine, sql_plan_renderer: SqlPlanRenderer, dry_run_engine: Engine
     ) -> None:
         """Initialize with a SqlAlchemy Engine.
 
@@ -64,8 +61,11 @@ class SqlAlchemyBasedSqlClient:
             engine: SqlAlchemy Engine instance (already configured)
             sql_engine_type: MetricFlow SqlEngine enum value
             sql_plan_renderer: Dialect-specific SQL plan renderer
+            dry_run_engine: SqlAlchemy Engine instance for dry run operations.
+              This exists because BigQuery requires a different engine configuration for dry run operations.
         """
         self._engine = engine
+        self._dry_run_engine = engine if dry_run_engine is None else dry_run_engine
         self._sql_engine_type = sql_engine_type
         self._sql_plan_renderer = sql_plan_renderer
         logger.debug(f"Initialized SqlAlchemyBasedSqlClient with engine type `{sql_engine_type.value}`")
@@ -197,15 +197,13 @@ class SqlAlchemyBasedSqlClient:
         )
 
         try:
-            with self._engine.connect() as conn:
+            with self._dry_run_engine.connect() as conn:
                 if self.sql_engine_type is SqlEngine.TRINO:
                     # Trino: Use EXPLAIN (type validate) to avoid side effects
                     result = conn.execute(sa_text(f"EXPLAIN (type validate) {stmt}"))
                 elif self.sql_engine_type is SqlEngine.BIGQUERY:
-                    # BigQuery: Use dry_run execution option
-                    # Note: This requires specific BigQuery dialect configuration
-                    # For now, use EXPLAIN as fallback
-                    conn.execute(sa_text(f"EXPLAIN {stmt}"))
+                    # BigQuery uses an engine configured in dry_run mode
+                    conn.execute(sa_text(f"{stmt}"))
 
                 elif self.sql_engine_type is SqlEngine.DATABRICKS:
                     # Databricks: EXPLAIN returns plan, check for error markers

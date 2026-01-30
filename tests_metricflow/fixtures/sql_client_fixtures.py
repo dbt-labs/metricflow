@@ -8,11 +8,10 @@ from typing import Generator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, make_url
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
@@ -24,7 +23,6 @@ from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir
-from tests_metricflow.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.fixtures.sql_clients.sqlalchemy_ddl_client import SqlAlchemyDDLSqlClient
@@ -150,21 +148,43 @@ def __initialize_dbt() -> None:
 def make_sqlalchemy_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
     """Build SqlAlchemy-based SQL client.
 
-    This is the new implementation that will replace the dbt-based client.
-    It is currently not used by default but can be used for testing.
+    Apart from BigQuery, these all have the same basic API, differing only in how the URL object is constructed.
+    BigQuery is in its own branch here because of the way it handles credentials and engine configuration properties.
+
+    This is the standard implementation for our test runners, and all engines should use this unless there is no
+    way to use SqlAlchemy with that engine type.
     """
     connection_params = SqlEngineConnectionParameterSet.create_from_url(url)
     dialect = SqlDialect(connection_params.dialect)
-
     # Build SqlAlchemy URL
     sqlalchemy_url = SqlAlchemyUrlBuilder.build_url(connection_params, password, schema)
 
-    # Create engine with connection pooling
-    engine = create_engine(
-        sqlalchemy_url,
-        pool_pre_ping=True,  # Verify connections before using
-        echo=False,  # Set to True for SQL logging
-    )
+    if dialect is SqlDialect.BIGQUERY:
+        bq_credential_string = password.replace("'", "")
+        # `strict=False` required to work with BQ password characters.
+        bq_credentials = json.loads(bq_credential_string, strict=False)
+        engine = create_engine(
+            sqlalchemy_url,
+            pool_pre_ping=True,  # Verify connections before using
+            echo=False,  # Set to True for SQL logging
+            credentials_info=bq_credentials,
+        )
+        # copy and update the base URL to add the dry_run query parameter
+        dry_run_url = make_url(sqlalchemy_url).update_query_dict({"dry_run": "true"})
+        dry_run_engine = create_engine(
+            dry_run_url,
+            pool_pre_ping=True,  # Verify connections before using
+            echo=False,  # Set to True for SQL logging
+            credentials_info=bq_credentials,
+        )
+    else:
+        # Create engine with connection pooling
+        engine = create_engine(
+            sqlalchemy_url,
+            pool_pre_ping=True,  # Verify connections before using
+            echo=False,  # Set to True for SQL logging
+        )
+        dry_run_engine = engine
 
     # Map dialect to engine type and renderer
     dialect_mapping = {
@@ -186,6 +206,7 @@ def make_sqlalchemy_test_sql_client(url: str, password: str, schema: str) -> Sql
         engine=engine,
         sql_engine_type=sql_engine_type,
         sql_plan_renderer=sql_plan_renderer,
+        dry_run_engine=dry_run_engine,
     )
 
 
@@ -199,9 +220,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     elif dialect is SqlDialect.SNOWFLAKE:
         return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.BIGQUERY:
-        __configure_bigquery_env_from_credential_string(password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("bigquery"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.POSTGRESQL:
         return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.DUCKDB:

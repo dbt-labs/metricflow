@@ -136,7 +136,6 @@ MF_TEST_ADAPTER_TYPE="bigquery"
 description = "Dev environment for working with BigQuery"
 template = "dev-env"
 features = ["bigquery-env-requirements"]
-extra-dependencies = ["dbt-bigquery>=1.8.0, <1.9.0"]
 
 [tool.hatch.envs.databricks-env.env-vars]
 PYTHONPATH="metricflow-semantics:dbt-metricflow"

@@ -42,7 +42,10 @@ class SqlAlchemyUrlBuilder:
         elif dialect is SqlDialect.REDSHIFT:
             return SqlAlchemyUrlBuilder._build_redshift_url(connection_params, password)
         elif dialect is SqlDialect.BIGQUERY:
-            return SqlAlchemyUrlBuilder._build_bigquery_url(connection_params, password, schema)
+            assert (
+                connection_params.url_str == "bigquery://"
+            ), "All BigQuery URL properties should be in the credentials JSON string."
+            return SqlAlchemyUrlBuilder._build_bigquery_url(password, schema)
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
         else:
@@ -182,7 +185,6 @@ class SqlAlchemyUrlBuilder:
 
     @staticmethod
     def _build_bigquery_url(
-        connection_params: SqlEngineConnectionParameterSet,
         password: str,  # JSON credentials string
         schema: Optional[str] = None,
     ) -> SqlAlchemyURL:
@@ -196,19 +198,13 @@ class SqlAlchemyUrlBuilder:
         project_id = credentials.get("project_id")
 
         # BigQuery URL format: bigquery://project_id/dataset_id
-        query_params = {}
-        if schema:
-            # In BigQuery, schema is the dataset
-            query_params["dataset_id"] = schema
-
-        # Credentials are typically passed via application default credentials
-        # or via credentials_info query parameter
-        query_params["credentials_info"] = password
-
+        # This means the dataset_id, which is the schema value passed in here,
+        # maps to the database value in a standard SqlAlchemy URL.
+        database_value = schema if schema else None
         return SqlAlchemyURL.create(
             drivername="bigquery",
             host=project_id,
-            query=query_params,
+            database=database_value,
         )
 
     @staticmethod
