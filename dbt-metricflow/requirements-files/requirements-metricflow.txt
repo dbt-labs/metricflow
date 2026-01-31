@@ -1,1 +1,4 @@
-metricflow==0.209.0
+# Using the root so tests in `dbt-metricflow` run using the current code in `metricflow`.
+# This ensures that breaking changes are resolved in the PR that makes the breaking change.
+# This should be updated to the correct version before release.
+metricflow @ {root:parent:uri}
