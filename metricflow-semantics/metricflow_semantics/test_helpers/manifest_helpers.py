@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.implementations.semantic_model import PydanticSeman
 from dbt_semantic_interfaces.parsing.dir_to_model import (
     parse_directory_of_yaml_files_to_semantic_manifest,
 )
+from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
@@ -37,11 +38,17 @@ def mf_load_manifest_from_yaml_directory(
 
 
 def mf_load_manifest_from_json_file(
-    json_file_path: Path, override_project_configuration: Optional[PydanticProjectConfiguration] = None
+    json_file_path: Path,
+    override_project_configuration: Optional[PydanticProjectConfiguration] = None,
+    apply_transforms: bool = False,
 ) -> PydanticSemanticManifest:
     """Load a manifest from a file containing the JSON-serialized form of a `PydanticSemanticManifest`.
 
-    A project configuration can be provided to override the one in the manifest.
+    Args:
+        json_file_path: The path to the semantic-manifest JSON file.
+        override_project_configuration: If set, use this project configuration instead of the one in the manifest.
+        apply_transforms: Apply transformations that are typically applied after deserializing from YAML files.
+    Returns: The deserialized semantic manifest.
     """
     try:
         with open(json_file_path) as fp:
@@ -59,12 +66,16 @@ def mf_load_manifest_from_json_file(
             manifest_json["project_configuration"]
         )
 
-        return PydanticSemanticManifest(
+        semantic_manifest = PydanticSemanticManifest(
             semantic_models=semantic_models,
             metrics=metrics,
             saved_queries=saved_queries,
             project_configuration=project_configuration,
         )
+
+        if apply_transforms:
+            return PydanticSemanticManifestTransformer.transform(semantic_manifest)
+        return semantic_manifest
 
     except Exception as e:
         raise RuntimeError(LazyFormat("Error while loading semantic manifest", json_file_path=json_file_path)) from e
