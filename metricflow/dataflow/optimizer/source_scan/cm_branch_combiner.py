@@ -312,6 +312,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_node = ComputeMetricsNode.create(
             parent_node=combined_parent_node,
             computed_metric_specs=unique_metric_specs,
+            passed_metric_specs=(),
             aggregated_to_elements=current_right_node.aggregated_to_elements,
             for_group_by_source_node=current_right_node.for_group_by_source_node,
         )

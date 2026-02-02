@@ -472,6 +472,7 @@ def test_compute_metrics_node(
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         computed_metric_specs=[metric_spec],
+        passed_metric_specs=(),
         aggregated_to_elements={entity_spec, dimension_spec},
     )
 
@@ -544,6 +545,7 @@ def test_compute_metrics_node_simple_expr(
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         computed_metric_specs=[metric_spec],
+        passed_metric_specs=(),
         aggregated_to_elements={entity_spec, dimension_spec},
     )
 
@@ -635,6 +637,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         computed_metric_specs=[metric_spec],
+        passed_metric_specs=(),
         aggregated_to_elements={entity_spec, dimension_spec},
     )
 
@@ -693,6 +696,7 @@ def test_order_by_node(
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         computed_metric_specs=[metric_spec],
+        passed_metric_specs=(),
         aggregated_to_elements={dimension_spec, time_dimension_spec},
     )
 

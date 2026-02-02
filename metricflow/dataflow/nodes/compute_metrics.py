@@ -26,6 +26,7 @@ class ComputeMetricsNode(DataflowPlanNode):
     """
 
     computed_metric_specs: Tuple[MetricSpec, ...]
+    passed_metric_specs: Tuple[MetricSpec, ...]
     for_group_by_source_node: bool
     _aggregated_to_elements: Tuple[LinkableInstanceSpec, ...]
 
@@ -38,12 +39,14 @@ class ComputeMetricsNode(DataflowPlanNode):
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         computed_metric_specs: Sequence[MetricSpec],
+        passed_metric_specs: Sequence[MetricSpec],
         aggregated_to_elements: Set[LinkableInstanceSpec],
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         return ComputeMetricsNode(
             parent_nodes=(parent_node,),
             computed_metric_specs=tuple(computed_metric_specs),
+            passed_metric_specs=tuple(passed_metric_specs),
             _aggregated_to_elements=tuple(aggregated_to_elements),
             for_group_by_source_node=for_group_by_source_node,
         )
@@ -118,6 +121,7 @@ class ComputeMetricsNode(DataflowPlanNode):
         return ComputeMetricsNode.create(
             parent_node=new_parent_nodes[0],
             computed_metric_specs=self.computed_metric_specs,
+            passed_metric_specs=self.passed_metric_specs,
             for_group_by_source_node=self.for_group_by_source_node,
             aggregated_to_elements=self.aggregated_to_elements,
         )
