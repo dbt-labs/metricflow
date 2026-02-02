@@ -693,6 +693,15 @@ metric:
       fill_nulls_with: 0
 ---
 metric:
+  name: bookings_fill_nulls_derived
+  description: Derived metric based on bookings_fill_nulls_with_0_without_time_spine.
+  type: derived
+  type_params:
+    expr: bookings_fill_nulls_with_0_without_time_spine + 1
+    metrics:
+      - name: bookings_fill_nulls_with_0_without_time_spine
+---
+metric:
   name: bookings_fill_nulls_with_0
   description: simple metric filling nulls with 0 and joining to time spine
   type: simple
