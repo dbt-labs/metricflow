@@ -21,11 +21,11 @@ class ComputeMetricsNode(DataflowPlanNode):
     """A node that computes metrics from input simple-metric inputs. Dimensions / entities are passed through.
 
     Attributes:
-        metric_specs: The specs for the metrics that this should compute.
+        computed_metric_specs: The specs for the metrics that this should compute.
         for_group_by_source_node: Whether the node is part of a dataflow plan used for a group by source node.
     """
 
-    metric_specs: Tuple[MetricSpec, ...]
+    computed_metric_specs: Tuple[MetricSpec, ...]
     for_group_by_source_node: bool
     _aggregated_to_elements: Tuple[LinkableInstanceSpec, ...]
 
@@ -37,13 +37,13 @@ class ComputeMetricsNode(DataflowPlanNode):
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
-        metric_specs: Sequence[MetricSpec],
+        computed_metric_specs: Sequence[MetricSpec],
         aggregated_to_elements: Set[LinkableInstanceSpec],
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         return ComputeMetricsNode(
             parent_nodes=(parent_node,),
-            metric_specs=tuple(metric_specs),
+            computed_metric_specs=tuple(computed_metric_specs),
             _aggregated_to_elements=tuple(aggregated_to_elements),
             for_group_by_source_node=for_group_by_source_node,
         )
@@ -62,7 +62,7 @@ class ComputeMetricsNode(DataflowPlanNode):
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
         displayed_properties = tuple(super().displayed_properties) + tuple(
-            DisplayedProperty("metric_spec", metric_spec) for metric_spec in self.metric_specs
+            DisplayedProperty("metric_spec", metric_spec) for metric_spec in self.computed_metric_specs
         )
         if self.for_group_by_source_node:
             displayed_properties += (DisplayedProperty("for_group_by_source_node", self.for_group_by_source_node),)
@@ -76,12 +76,12 @@ class ComputeMetricsNode(DataflowPlanNode):
         if not isinstance(other_node, self.__class__):
             return False
 
-        if other_node.metric_specs != self.metric_specs:
+        if other_node.computed_metric_specs != self.computed_metric_specs:
             return False
 
         return (
             isinstance(other_node, self.__class__)
-            and other_node.metric_specs == self.metric_specs
+            and other_node.computed_metric_specs == self.computed_metric_specs
             and other_node.aggregated_to_elements == self.aggregated_to_elements
             and other_node.for_group_by_source_node == self.for_group_by_source_node
         )
@@ -98,9 +98,9 @@ class ComputeMetricsNode(DataflowPlanNode):
         if other_node.for_group_by_source_node != self.for_group_by_source_node:
             return False, "one node is a group by metric source node"
 
-        alias_to_metric_spec = {spec.alias: spec for spec in self.metric_specs if spec.alias is not None}
+        alias_to_metric_spec = {spec.alias: spec for spec in self.computed_metric_specs if spec.alias is not None}
 
-        for spec in other_node.metric_specs:
+        for spec in other_node.computed_metric_specs:
             if (
                 spec.alias is not None
                 and spec.alias in alias_to_metric_spec
@@ -117,7 +117,7 @@ class ComputeMetricsNode(DataflowPlanNode):
         assert len(new_parent_nodes) == 1
         return ComputeMetricsNode.create(
             parent_node=new_parent_nodes[0],
-            metric_specs=self.metric_specs,
+            computed_metric_specs=self.computed_metric_specs,
             for_group_by_source_node=self.for_group_by_source_node,
             aggregated_to_elements=self.aggregated_to_elements,
         )

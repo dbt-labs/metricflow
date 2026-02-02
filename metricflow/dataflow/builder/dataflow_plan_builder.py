@@ -722,7 +722,7 @@ class DataflowPlanBuilder:
         )
         output_node: DataflowPlanNode = ComputeMetricsNode.create(
             parent_node=parent_node,
-            metric_specs=[metric_spec],
+            computed_metric_specs=[metric_spec],
             for_group_by_source_node=for_group_by_source_node,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
@@ -1305,7 +1305,7 @@ class DataflowPlanBuilder:
         """Builds a ComputeMetricsNode from aggregated inputs."""
         return ComputeMetricsNode.create(
             parent_node=aggregated_node,
-            metric_specs=[metric_spec],
+            computed_metric_specs=[metric_spec],
             for_group_by_source_node=for_group_by_source_node,
             aggregated_to_elements=aggregated_to_elements,
         )
