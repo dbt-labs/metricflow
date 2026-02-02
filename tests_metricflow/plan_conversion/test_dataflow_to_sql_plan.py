@@ -471,7 +471,7 @@ def test_compute_metrics_node(
     metric_spec = MetricSpec(element_name="bookings")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
-        metric_specs=[metric_spec],
+        computed_metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, dimension_spec},
     )
 
@@ -543,7 +543,7 @@ def test_compute_metrics_node_simple_expr(
     metric_spec = MetricSpec(element_name="booking_fees")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
-        metric_specs=[metric_spec],
+        computed_metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, dimension_spec},
     )
 
@@ -634,7 +634,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     metric_spec = MetricSpec(element_name="bookings_per_booker")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
-        metric_specs=[metric_spec],
+        computed_metric_specs=[metric_spec],
         aggregated_to_elements={entity_spec, dimension_spec},
     )
 
@@ -692,7 +692,7 @@ def test_order_by_node(
     metric_spec = MetricSpec(element_name="bookings")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
-        metric_specs=[metric_spec],
+        computed_metric_specs=[metric_spec],
         aggregated_to_elements={dimension_spec, time_dimension_spec},
     )
 
