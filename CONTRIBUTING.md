@@ -56,7 +56,7 @@ When running any one of the hatch commands, the environment is automatically set
     - Run the following commands in your shell, replacing the tags with the appropriate values:
         - `export MF_SQL_ENGINE_URL=<YOUR_WAREHOUSE_CONNECTION_URL>`
         - `export MF_SQL_ENGINE_PASSWORD=<YOUR_WAREHOUSE_PASSWORD>`
-    - Run `make test-<engine>` to execute the entire test suite against the target engine. This will also set the `MF_TEST_ADAPTER_TYPE` to the proper engine identifier and pull in and configure the necessary dbt adapter dependencies for query execution. For example, to run tests against BigQuery, run `make test-bigquery`
+    - Run `make test-<engine>` to execute the entire test suite against the target engine. This will pull in and configure the necessary dependencies for query execution. For example, to run tests against BigQuery, run `make test-bigquery`
     - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against DuckDB.
 4. Run the linters with `make lint` at any time, but especially before submitting a PR. We use:
     - `Black` for formatting

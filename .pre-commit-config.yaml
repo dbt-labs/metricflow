@@ -33,6 +33,9 @@ repos:
     rev: v1.3.0
     hooks:
       - id: mypy
+        # dbt-metricflow requires dbt-core, which is not installed in the main metricflow dev environment.
+        # We typecheck dbt-metricflow separately via direct invocation inside the `make lint` command
+        exclude: "^dbt-metricflow/"
         args: [--show-error-codes]
         verbose: true
         # "system" means that the current environment will be used to run the hook, not the environment installed by

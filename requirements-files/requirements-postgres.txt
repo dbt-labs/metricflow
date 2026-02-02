@@ -1,2 +1,2 @@
-# SqlAlchemy PostgreSQL connector
+# SqlALchemy includes a dialect for PostgreSQL compatible with psycopg2
 psycopg2-binary>=2.9.0, <3.0.0

@@ -1,3 +1,2 @@
-# SqlAlchemy Databricks connector
-databricks-sql-connector>=3.0.0, <4.0.0
+# SqlAlchemy Databricks connector, includes databricks-sql-connector
 databricks-sqlalchemy>=2.0.0, <3.0.0
