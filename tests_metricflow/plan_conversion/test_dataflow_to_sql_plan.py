@@ -1103,3 +1103,54 @@ def test_dimension_with_joined_where_constraint(
         sql_client=sql_client,
         node=dataflow_plan.sink_node,
     )
+
+
+@pytest.mark.duckdb_only
+@pytest.mark.sql_engine_snapshot
+def test_compute_metrics_node_with_passed_metrics(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    sql_client: SqlClient,
+) -> None:
+    """Tests SQL for a `ComputeMetricsNode` that passes a previously computed metric from the source subquery."""
+    simple_metric_input_spec = SimpleMetricInputSpec(
+        element_name="booking_value",
+    )
+    simple_metric_input_source_node = mf_engine_test_fixture_mapping[
+        SemanticManifestSetup.SIMPLE_MANIFEST
+    ].read_node_mapping["bookings_source"]
+    filtered_node = FilterElementsNode.create(
+        parent_node=simple_metric_input_source_node,
+        include_specs=InstanceSpecSet(
+            simple_metric_input_specs=(simple_metric_input_spec,),
+        ),
+    )
+
+    aggregation_node = AggregateSimpleMetricInputsNode.create(
+        parent_node=filtered_node,
+        null_fill_value_mapping=NullFillValueMapping.create(),
+    )
+
+    compute_metrics_node_0 = ComputeMetricsNode.create(
+        parent_node=aggregation_node,
+        computed_metric_specs=(MetricSpec(element_name="booking_value"),),
+        passed_metric_specs=(),
+        aggregated_to_elements=set(),
+    )
+
+    compute_metrics_node_1 = ComputeMetricsNode.create(
+        parent_node=compute_metrics_node_0,
+        computed_metric_specs=(MetricSpec(element_name="booking_fees"),),
+        passed_metric_specs=(MetricSpec(element_name="booking_value"),),
+        aggregated_to_elements=set(),
+    )
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=compute_metrics_node_1,
+    )
