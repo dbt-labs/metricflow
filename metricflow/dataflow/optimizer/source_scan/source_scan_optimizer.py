@@ -172,6 +172,7 @@ class SourceScanOptimizer(
                 optimized_branch=ComputeMetricsNode.create(
                     parent_node=optimized_parent_result.optimized_branch,
                     computed_metric_specs=node.computed_metric_specs,
+                    passthrough_metric_specs=(),
                     for_group_by_source_node=node.for_group_by_source_node,
                     aggregated_to_elements=node.aggregated_to_elements,
                 )

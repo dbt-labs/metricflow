@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Sequence, Set, Tuple
 
@@ -22,10 +23,12 @@ class ComputeMetricsNode(DataflowPlanNode):
 
     Attributes:
         computed_metric_specs: The specs for the metrics that this should compute.
+        passthrough_metric_specs: The specs that should be passed unchanged from the input to the output.
         for_group_by_source_node: Whether the node is part of a dataflow plan used for a group by source node.
     """
 
     computed_metric_specs: Tuple[MetricSpec, ...]
+    passthrough_metric_specs: Tuple[MetricSpec, ...]
     for_group_by_source_node: bool
     _aggregated_to_elements: Tuple[LinkableInstanceSpec, ...]
 
@@ -37,13 +40,15 @@ class ComputeMetricsNode(DataflowPlanNode):
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
-        computed_metric_specs: Sequence[MetricSpec],
+        computed_metric_specs: Iterable[MetricSpec],
+        passthrough_metric_specs: Iterable[MetricSpec],
         aggregated_to_elements: Set[LinkableInstanceSpec],
         for_group_by_source_node: bool = False,
     ) -> ComputeMetricsNode:
         return ComputeMetricsNode(
             parent_nodes=(parent_node,),
             computed_metric_specs=tuple(computed_metric_specs),
+            passthrough_metric_specs=tuple(passthrough_metric_specs),
             _aggregated_to_elements=tuple(aggregated_to_elements),
             for_group_by_source_node=for_group_by_source_node,
         )
@@ -118,6 +123,7 @@ class ComputeMetricsNode(DataflowPlanNode):
         return ComputeMetricsNode.create(
             parent_node=new_parent_nodes[0],
             computed_metric_specs=self.computed_metric_specs,
+            passthrough_metric_specs=self.passthrough_metric_specs,
             for_group_by_source_node=self.for_group_by_source_node,
             aggregated_to_elements=self.aggregated_to_elements,
         )
