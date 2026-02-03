@@ -120,7 +120,7 @@ def mf_test_configuration(  # noqa: D103
         )
         # Since the source schema is used in the SQL output snapshots (but replaced with *'s), make the name of the
         # schema to be the same length so that the SQL output snapshots don't change.
-        persistent_source_schema_prefix = "mf_test_src_"
+        persistent_source_schema_prefix = "tl_test_src_"
 
         # Ensure that there are a reasonable number of hash digits in the schema so that we don't get collisions.
         available_hash_digits = max(len(default_source_schema) - len(persistent_source_schema_prefix), 0)
