@@ -144,8 +144,8 @@ class NullFillValueMapping(Mergeable, MetricFlowPrettyFormattable, SerializableD
 
     @override
     def merge(self, other: NullFillValueMapping) -> NullFillValueMapping:
-        conflicting_element_names = self._conflicting_element_names(other)
-        if len(conflicting_element_names) != 0:
+        if self.has_conflict(other):
+            conflicting_element_names = self._conflicting_element_names(other)
             raise RuntimeError(
                 LazyFormat(
                     "Can't merge fill value mappings with conflicting items."
