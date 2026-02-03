@@ -24,7 +24,7 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_0') -->
-                            <!-- null_fill_value_mapping = {} -->
+                            <!-- null_fill_value_mapping = {'bookings': None} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_1') -->
@@ -66,7 +66,7 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_1') -->
-                            <!-- null_fill_value_mapping = {} -->
+                            <!-- null_fill_value_mapping = {'bookers': None} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['__bookers', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_3') -->
@@ -117,7 +117,7 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_0') -->
-                            <!-- null_fill_value_mapping = {} -->
+                            <!-- null_fill_value_mapping = {'bookings': None} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_1') -->
@@ -159,7 +159,7 @@ docstring:
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_2') -->
-                            <!-- null_fill_value_mapping = {} -->
+                            <!-- null_fill_value_mapping = {'booking_value': None} -->
                             <FilterElementsNode>
                                 <!-- description = "Pass Only Elements: ['__booking_value', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_5') -->
