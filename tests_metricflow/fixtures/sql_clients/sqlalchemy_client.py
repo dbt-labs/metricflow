@@ -19,7 +19,7 @@ from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 logger = logging.getLogger(__name__)
 
 
-class MFRedshiftDialect(PGDialect_psycopg2):
+class MetricFlowRedshiftDialect(PGDialect_psycopg2):
     """Custom dialect for Redshift.
 
     The sqlalchemy-redshift package does not support SqlAlchemy 2.x natively, so we include this simple custom
@@ -33,20 +33,21 @@ class MFRedshiftDialect(PGDialect_psycopg2):
     Note - none of the upstream base classe are typed, so we just override everything here for mypy.
     """
 
+    # These properties are set at class level in the built in dialect classes, so we follow that standard here.
     name = "mf_redshift_psycopg2"
-    supports_statement_cache: bool = False  # type: ignore  # noqa
+    supports_statement_cache = False
 
-    def _set_backslash_escapes(self, connection):  # type: ignore  # noqa
+    def _set_backslash_escapes(self, connection):  # type: ignore
         """Override for problematic method in SqlAlchemy 2.x.
 
         This is a method returning a value that overrides a boolean property in the base class.
         Without this override the default Postgres dialect will execute a statement that redshift does not support.
         """
-        return False  # type: ignore  # noqa
+        return False
 
 
 # Make our custom redshift dialect available to SqlAlchemy.
-registry.register("mf_redshift_psycopg2", __name__, "MFRedshiftDialect")
+registry.register("mf_redshift_psycopg2", __name__, "MetricFlowRedshiftDialect")
 
 
 class SqlAlchemyBasedSqlClient:
@@ -68,7 +69,7 @@ class SqlAlchemyBasedSqlClient:
         self._dry_run_engine = engine if dry_run_engine is None else dry_run_engine
         self._sql_engine_type = sql_engine_type
         self._sql_plan_renderer = sql_plan_renderer
-        logger.debug(f"Initialized SqlAlchemyBasedSqlClient with engine type `{sql_engine_type.value}`")
+        logger.debug(LazyFormat("Initialized SqlAlchemyBasedSqlClient.", engine_type=f"{sql_engine_type.value}"))
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -126,7 +127,7 @@ class SqlAlchemyBasedSqlClient:
                 # (appropriate for SELECT queries)
 
         except SQLAlchemyError as e:
-            logger.error(f"Query failed: {e}")
+            logger.error(LazyFormat("Query failed:", error=f"{e}"))
             raise
 
         stop = time.perf_counter()
@@ -172,11 +173,11 @@ class SqlAlchemyBasedSqlClient:
                 conn.commit()
 
         except SQLAlchemyError as e:
-            logger.error(f"Execute failed: {e}")
+            logger.error(LazyFormat("Execute failed:", error=f"{e}"))
             raise
 
         stop = time.perf_counter()
-        logger.info(f"Finished execute() in {stop - start:.2f}s")
+        logger.info(LazyFormat("Finished execute()", runtime=f"{stop - start:.2f}s"))
 
     def dry_run(
         self,
@@ -224,11 +225,11 @@ class SqlAlchemyBasedSqlClient:
                 # No commit needed for dry run - transaction rolls back
 
         except SQLAlchemyError as e:
-            logger.error(f"Dry run failed: {e}")
+            logger.error(LazyFormat("Dry run failed:", error=f"{e}"))
             raise
 
         stop = time.perf_counter()
-        logger.info(f"Finished dry run in {stop - start:.2f}s")
+        logger.info(LazyFormat("Finished dry run", runtime=f"{stop - start:.2f}s"))
 
     def close(self) -> None:
         """Close the SqlAlchemy engine and all connections."""

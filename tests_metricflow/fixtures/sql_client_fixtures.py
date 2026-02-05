@@ -160,9 +160,8 @@ def make_sqlalchemy_test_sql_client(url: str, password: str, schema: str) -> Sql
     sqlalchemy_url = SqlAlchemyUrlBuilder.build_url(connection_params, password, schema)
 
     if dialect is SqlDialect.BIGQUERY:
-        bq_credential_string = password.replace("'", "")
         # `strict=False` required to work with BQ password characters.
-        bq_credentials = json.loads(bq_credential_string, strict=False)
+        bq_credentials = json.loads(password, strict=False)
         engine = create_engine(
             sqlalchemy_url,
             pool_pre_ping=True,  # Verify connections before using
