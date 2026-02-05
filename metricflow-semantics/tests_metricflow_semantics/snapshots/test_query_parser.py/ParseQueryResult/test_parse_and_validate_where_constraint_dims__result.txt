@@ -14,7 +14,7 @@ ParseQueryResult(
     ),
     time_range_constraint=TimeRangeConstraint(
       start_time=datetime.datetime(2020, 1, 15, 0, 0),
-      end_time=datetime.datetime(2020, 2, 15, 0, 0),
+      end_time=datetime.datetime(2020, 2, 15, 23, 59, 59),
     ),
     filter_intersection=PydanticWhereFilterIntersection(
       where_filters=[

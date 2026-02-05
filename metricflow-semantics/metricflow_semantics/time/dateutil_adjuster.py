@@ -127,7 +127,7 @@ class DateutilTimePeriodAdjuster(TimePeriodAdjuster):
         # Strip time data that is irrelevant to avoid rendering an unnecessarily complex time constraint.
         date_to_adjust = date_to_adjust.replace(microsecond=0)
         if time_granularity.to_int() >= TimeGranularity.DAY.to_int():
-            date_to_adjust = date_to_adjust.replace(hour=0, minute=0, second=0)
+            date_to_adjust = date_to_adjust.replace(hour=23, minute=59, second=59)
 
         if (
             time_granularity is TimeGranularity.NANOSECOND
