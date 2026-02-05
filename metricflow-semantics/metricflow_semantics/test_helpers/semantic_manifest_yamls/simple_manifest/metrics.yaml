@@ -923,6 +923,14 @@ metric:
   filter: "{{ Metric('bookings', ['listing']) }} > 2"
 ---
 metric:
+  name: active_listings_with_metric_time
+  description: Listings with at least 2 bookings in the same period
+  type: simple
+  type_params:
+    measure: listings
+  filter: "{{ Metric('bookings', ['listing', 'metric_time']) }} > 2"
+---
+metric:
   name: popular_listing_bookings_per_booker
   description: bookings per booker for listings with at least 10 views
   type: ratio

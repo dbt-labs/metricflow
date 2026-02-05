@@ -88,6 +88,7 @@ class WhereSpecFactory:
                 spec_resolution_lookup=self._spec_resolution_lookup,
                 where_filter_location=filter_location,
                 rendered_spec_tracker=rendered_spec_tracker,
+                custom_granularity_names=self._semantic_model_lookup.custom_granularity_names,
             )
             try:
                 # If there was an error with the template, it should have been caught while resolving the specs for

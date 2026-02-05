@@ -13,11 +13,13 @@ from dbt_semantic_interfaces.call_parameter_sets import (
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
+    GroupByItemReference,
     MetricReference,
     TimeDimensionReference,
 )
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -142,7 +144,7 @@ def test_entity_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa:
 def test_group_by_metric_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
     pattern = GroupByMetricPattern.from_call_parameter_set(
         MetricCallParameterSet(
-            group_by=(EntityReference("listing"),),
+            group_by=(GroupByItemReference("listing"),),
             metric_reference=MetricReference(element_name="bookings"),
         )
     )
@@ -154,3 +156,30 @@ def test_group_by_metric_pattern(specs: Sequence[LinkableInstanceSpec]) -> None:
             metric_subquery_entity_links=(EntityReference("listing"),),
         ),
     )
+
+
+def test_group_by_metric_pattern_with_metric_time(specs: Sequence[LinkableInstanceSpec]) -> None:  # noqa: D103
+    pattern = GroupByMetricPattern.from_call_parameter_set(
+        MetricCallParameterSet(
+            group_by=(GroupByItemReference("listing"), GroupByItemReference("metric_time")),
+            metric_reference=MetricReference(element_name="bookings"),
+        )
+    )
+
+    assert tuple(pattern.match(specs)) == (
+        GroupByMetricSpec(
+            element_name="bookings",
+            entity_links=(EntityReference("listing"),),
+            metric_subquery_entity_links=(EntityReference("listing"),),
+        ),
+    )
+
+
+def test_group_by_metric_pattern_rejects_non_metric_time_grain() -> None:  # noqa: D103
+    with pytest.raises(UnableToSatisfyQueryError, match="Metric filters only support metric_time"):
+        GroupByMetricPattern.from_call_parameter_set(
+            MetricCallParameterSet(
+                group_by=(GroupByItemReference("listing", time_granularity_name=TimeGranularity.DAY.value),),
+                metric_reference=MetricReference(element_name="bookings"),
+            )
+        )

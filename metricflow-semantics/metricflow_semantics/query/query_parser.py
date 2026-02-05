@@ -56,7 +56,11 @@ from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
-from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
+from metricflow_semantics.specs.query_param_implementations import (
+    DimensionOrEntityParameter,
+    MetricParameter,
+    TimeDimensionParameter,
+)
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -639,12 +643,24 @@ class MetricFlowQueryParser:
         )
 
     def build_query_spec_for_group_by_metric_source_node(
-        self, group_by_metric_spec: GroupByMetricSpec
+        self, group_by_metric_spec: GroupByMetricSpec, time_dimension_specs: Sequence[TimeDimensionSpec] = ()
     ) -> MetricFlowQuerySpec:
         """Query spec that can be used to build a source node for this spec in the DataflowPlanBuilder."""
+        group_by_params: List[GroupByQueryParameter] = [
+            DimensionOrEntityParameter(group_by_metric_spec.metric_subquery_entity_spec.dunder_name)
+        ]
+        for time_dimension_spec in time_dimension_specs:
+            group_by_params.append(
+                TimeDimensionParameter(
+                    name=time_dimension_spec.element_name,
+                    grain=time_dimension_spec.time_granularity_name,
+                    date_part=time_dimension_spec.date_part,
+                )
+            )
+
         return self.parse_and_validate_query(
             metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
-            group_by=(DimensionOrEntityParameter(group_by_metric_spec.metric_subquery_entity_spec.dunder_name),),
+            group_by=tuple(group_by_params),
         ).query_spec
 
 

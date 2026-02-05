@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
+from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.toolkit.cache.lru_cache import LruCache
 
@@ -21,6 +23,8 @@ class FindSourceNodeRecipeParameterSet:
     linkable_spec_set: LinkableSpecSet
     predicate_pushdown_state: PredicatePushdownState
     spec_properties: Optional[SimpleMetricInputSpecProperties]
+    group_by_metric_specs_with_metric_time: Tuple[GroupByMetricSpec, ...] = ()
+    metric_time_spec_for_group_by_metrics: Optional[TimeDimensionSpec] = None
 
 
 @dataclass(frozen=True)

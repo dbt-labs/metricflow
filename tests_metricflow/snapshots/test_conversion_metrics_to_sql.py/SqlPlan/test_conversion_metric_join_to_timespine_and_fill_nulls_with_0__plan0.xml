@@ -521,12 +521,12 @@ docstring:
                                         <!-- node_id = NodeId(id_str='ss_194') -->
                                         <!-- col0 =                                                      -->
                                         <!--   SqlSelectColumn(                                          -->
-                                        <!--     expr=SqlStringExpression(node_id=str_28023 sql_expr=1), -->
+                                        <!--     expr=SqlStringExpression(node_id=str_28024 sql_expr=1), -->
                                         <!--     column_alias='__visits',                                -->
                                         <!--   )                                                         -->
                                         <!-- col1 =                                                           -->
                                         <!--   SqlSelectColumn(                                               -->
-                                        <!--     expr=SqlStringExpression(node_id=str_28024 sql_expr=1),      -->
+                                        <!--     expr=SqlStringExpression(node_id=str_28025 sql_expr=1),      -->
                                         <!--     column_alias='__visits_fill_nulls_with_0_join_to_timespine', -->
                                         <!--   )                                                              -->
                                         <!-- col2 =                                             -->
@@ -1256,12 +1256,12 @@ docstring:
                                                         <!-- node_id = NodeId(id_str='ss_204') -->
                                                         <!-- col0 =                                                      -->
                                                         <!--   SqlSelectColumn(                                          -->
-                                                        <!--     expr=SqlStringExpression(node_id=str_28023 sql_expr=1), -->
+                                                        <!--     expr=SqlStringExpression(node_id=str_28024 sql_expr=1), -->
                                                         <!--     column_alias='__visits',                                -->
                                                         <!--   )                                                         -->
                                                         <!-- col1 =                                                           -->
                                                         <!--   SqlSelectColumn(                                               -->
-                                                        <!--     expr=SqlStringExpression(node_id=str_28024 sql_expr=1),      -->
+                                                        <!--     expr=SqlStringExpression(node_id=str_28025 sql_expr=1),      -->
                                                         <!--     column_alias='__visits_fill_nulls_with_0_join_to_timespine', -->
                                                         <!--   )                                                              -->
                                                         <!-- col2 =                                             -->
