@@ -1,7 +1,7 @@
 test_name: test_metric_with_metric_in_where_filter
 test_filename: test_metric_filter_output.py
 ---
-LISTING                ACTIVE_LISTINGS    BOOKINGS
+listing                active_listings    bookings
 -------------------  -----------------  ----------
 l1234567                                        32
 l2718281                             1          53

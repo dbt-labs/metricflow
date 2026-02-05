@@ -3,7 +3,7 @@ test_filename: test_offset_metrics.py
 docstring:
   Gives a side by side comparison of bookings and bookings_offset_one_alien_day.
 ---
-METRIC_TIME__ALIEN_DAY    METRIC_TIME__DAY       BOOKINGS    BOOKINGS_OFFSET_ONE_ALIEN_DAY
+metric_time__alien_day    metric_time__day       bookings    bookings_offset_one_alien_day
 ------------------------  -------------------  ----------  -------------------------------
 2020-01-02T00:00:00       2019-12-01T00:00:00           1
 2020-01-02T00:00:00       2019-12-18T00:00:00          10

@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Add SqlAlchemy based SqlClient for test execution. This alters the developer environment to include SqlAlchemy dependencies.
+time: 2026-02-02T13:10:59.654503-05:00
+custom:
+    Author: tlento
+    Issue: "1966"

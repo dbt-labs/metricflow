@@ -8,17 +8,25 @@ from typing import Generator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt.adapters.factory import get_adapter_by_type
 from dbt.cli.main import dbtRunner
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from sqlalchemy import create_engine, make_url
 
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
+from metricflow.sql.render.databricks import DatabricksSqlPlanRenderer
+from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
+from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
+from metricflow.sql.render.redshift import RedshiftSqlPlanRenderer
+from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
+from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir
-from tests_metricflow.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
+from tests_metricflow.fixtures.sql_clients.sqlalchemy_ddl_client import SqlAlchemyDDLSqlClient
+from tests_metricflow.fixtures.sql_clients.sqlalchemy_url_builder import SqlAlchemyUrlBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +55,7 @@ DBT_ENV_SECRET_PROJECT_ID = "DBT_ENV_SECRET_PROJECT_ID"
 DBT_ENV_SECRET_TOKEN_URI = "DBT_ENV_SECRET_TOKEN_URI"
 
 # Trino is special, so it gets its own set of env vars. Keeping them split out here for consistency.
+# TODO: Remove this once we eliminate the dbt adapter as an execution option.
 DBT_ENV_SECRET_CATALOG = "DBT_ENV_SECRET_CATALOG"
 
 
@@ -136,44 +145,89 @@ def __initialize_dbt() -> None:
     dbtRunner().invoke(["debug"], project_dir=dbt_project_dir(), PROFILES_DIR=dbt_project_dir())
 
 
+def make_sqlalchemy_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
+    """Build SqlAlchemy-based SQL client.
+
+    Apart from BigQuery, these all have the same basic API, differing only in how the URL object is constructed.
+    BigQuery is in its own branch here because of the way it handles credentials and engine configuration properties.
+
+    This is the standard implementation for our test runners, and all engines should use this unless there is no
+    way to use SqlAlchemy with that engine type.
+    """
+    connection_params = SqlEngineConnectionParameterSet.create_from_url(url)
+    dialect = SqlDialect(connection_params.dialect)
+    # Build SqlAlchemy URL
+    sqlalchemy_url = SqlAlchemyUrlBuilder.build_url(connection_params, password, schema)
+
+    if dialect is SqlDialect.BIGQUERY:
+        # `strict=False` required to work with BQ password characters.
+        bq_credentials = json.loads(password, strict=False)
+        engine = create_engine(
+            sqlalchemy_url,
+            pool_pre_ping=True,  # Verify connections before using
+            echo=False,  # Set to True for SQL logging
+            credentials_info=bq_credentials,
+        )
+        # copy and update the base URL to add the dry_run query parameter
+        dry_run_url = make_url(sqlalchemy_url).update_query_dict({"dry_run": "true"})
+        dry_run_engine = create_engine(
+            dry_run_url,
+            pool_pre_ping=True,  # Verify connections before using
+            echo=False,  # Set to True for SQL logging
+            credentials_info=bq_credentials,
+        )
+    else:
+        # Create engine with connection pooling
+        engine = create_engine(
+            sqlalchemy_url,
+            pool_pre_ping=True,  # Verify connections before using
+            echo=False,  # Set to True for SQL logging
+        )
+        dry_run_engine = engine
+
+    # Map dialect to engine type and renderer
+    dialect_mapping = {
+        SqlDialect.DUCKDB: (SqlEngine.DUCKDB, DuckDbSqlPlanRenderer()),
+        SqlDialect.DATABRICKS: (SqlEngine.DATABRICKS, DatabricksSqlPlanRenderer()),
+        SqlDialect.POSTGRESQL: (SqlEngine.POSTGRES, PostgresSQLSqlPlanRenderer()),
+        SqlDialect.SNOWFLAKE: (SqlEngine.SNOWFLAKE, SnowflakeSqlPlanRenderer()),
+        SqlDialect.REDSHIFT: (SqlEngine.REDSHIFT, RedshiftSqlPlanRenderer()),
+        SqlDialect.BIGQUERY: (SqlEngine.BIGQUERY, BigQuerySqlPlanRenderer()),
+        SqlDialect.TRINO: (SqlEngine.TRINO, TrinoSqlPlanRenderer()),
+    }
+
+    if dialect not in dialect_mapping:
+        raise ValueError(f"Unsupported dialect: {dialect}")
+
+    sql_engine_type, sql_plan_renderer = dialect_mapping[dialect]
+
+    return SqlAlchemyDDLSqlClient(
+        engine=engine,
+        sql_engine_type=sql_engine_type,
+        sql_plan_renderer=sql_plan_renderer,
+        dry_run_engine=dry_run_engine,
+    )
+
+
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
     """Build SQL client based on env configs."""
     # TODO: Switch on an enum of adapter type when all engines are cut over
     dialect = SqlDialect(SqlEngineConnectionParameterSet.create_from_url(url).dialect)
 
     if dialect is SqlDialect.REDSHIFT:
-        __configure_test_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("redshift"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.SNOWFLAKE:
-        connection_parameters = __configure_test_env_from_url(url, password=password, schema=schema)
-        warehouse_names = connection_parameters.get_query_field_values("warehouse")
-        assert (
-            len(warehouse_names) == 1
-        ), f"SQL engine URL did not specify exactly 1 Snowflake warehouse! Got {warehouse_names}"
-        os.environ[DBT_ENV_SECRET_WAREHOUSE] = warehouse_names[0]
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("snowflake"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.BIGQUERY:
-        __configure_bigquery_env_from_credential_string(password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("bigquery"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.POSTGRESQL:
-        __configure_test_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("postgres"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.DUCKDB:
-        __configure_test_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("duckdb"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.DATABRICKS:
-        __configure_databricks_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("databricks"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     elif dialect is SqlDialect.TRINO:
-        __configure_test_env_from_url(url, password=password, schema=schema)
-        __initialize_dbt()
-        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("trino"))
+        return make_sqlalchemy_test_sql_client(url, password, schema)
     else:
         raise ValueError(f"Unknown dialect: `{dialect}` in URL {url}")
 

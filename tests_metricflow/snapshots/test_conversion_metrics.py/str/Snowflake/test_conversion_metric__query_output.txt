@@ -3,7 +3,7 @@ test_filename: test_conversion_metrics.py
 docstring:
   Test query against a conversion metric.
 ---
-METRIC_TIME__DAY       VISIT_BUY_CONVERSION_RATE
+metric_time__day       visit_buy_conversion_rate
 -------------------  ---------------------------
 2020-01-01T00:00:00                     0.5
 2020-01-02T00:00:00                     0.5
