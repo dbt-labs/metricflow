@@ -106,18 +106,14 @@ features = ["dev-env-requirements"]
 
 
 [tool.hatch.envs.dev-env.env-vars]
-MF_TEST_ADAPTER_TYPE="duckdb"
 MF_SQL_ENGINE_URL="duckdb://"
-# This allows us to use the classes in the `dbt-metricflow` package for tests without installing the package.
-# `dbt-metricflow` can't be installed as it has `metricflow` as a dependency.
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
+PYTHONPATH="metricflow-semantics"
 
 
 [tool.hatch.envs.postgres-env.env-vars]
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
+PYTHONPATH="metricflow-semantics"
 MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
 MF_SQL_ENGINE_PASSWORD="metricflowing"
-MF_TEST_ADAPTER_TYPE="postgres"
 
 [tool.hatch.envs.postgres-env]
 description = "Dev environment for working with PostgreSQL"
@@ -129,8 +125,7 @@ features = ["postgres-env-requirements"]
 ## configured independently of the hatch env construction
 
 [tool.hatch.envs.bigquery-env.env-vars]
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
-MF_TEST_ADAPTER_TYPE="bigquery"
+PYTHONPATH="metricflow-semantics"
 
 [tool.hatch.envs.bigquery-env]
 description = "Dev environment for working with BigQuery"
@@ -138,8 +133,7 @@ template = "dev-env"
 features = ["bigquery-env-requirements"]
 
 [tool.hatch.envs.databricks-env.env-vars]
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
-MF_TEST_ADAPTER_TYPE="databricks"
+PYTHONPATH="metricflow-semantics"
 
 
 [tool.hatch.envs.databricks-env]
@@ -149,19 +143,16 @@ features = ["databricks-env-requirements"]
 
 
 [tool.hatch.envs.redshift-env.env-vars]
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
-MF_TEST_ADAPTER_TYPE="redshift"
+PYTHONPATH="metricflow-semantics"
 
 [tool.hatch.envs.redshift-env]
 description = "Dev environment for working with Redshift"
 template = "dev-env"
 features = ["redshift-env-requirements"]
-extra-dependencies = ["dbt-redshift>=1.8.0, <1.9.0"]
 
 
 [tool.hatch.envs.snowflake-env.env-vars]
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
-MF_TEST_ADAPTER_TYPE="snowflake"
+PYTHONPATH="metricflow-semantics"
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake"
@@ -170,8 +161,7 @@ features = ["snowflake-env-requirements"]
 
 
 [tool.hatch.envs.trino-env.env-vars]
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
-MF_TEST_ADAPTER_TYPE = "trino"
+PYTHONPATH="metricflow-semantics"
 MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/memory"
 MF_SQL_ENGINE_PASSWORD=""
 

@@ -156,7 +156,6 @@ def run_tests(test_configuration: MetricFlowEngineConfiguration) -> None:  # noq
         or test_configuration.engine is SqlEngine.TRINO
     ):
         engine_name = test_configuration.engine.value.lower()
-        os.environ["MF_TEST_ADAPTER_TYPE"] = engine_name
         hatch_env = f"{engine_name}-env"
         use_persistent_source_schema = (
             test_configuration.engine != SqlEngine.POSTGRES and test_configuration.engine != SqlEngine.TRINO
