@@ -10,7 +10,7 @@ integration_test:
       SUM(booking_value) * 0.05 AS booking_fees
       , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY ds;
+    GROUP BY ds
 ---
 integration_test:
   name: single_data_source_expr_metric
@@ -23,7 +23,7 @@ integration_test:
       SUM(booking_value) * 0.05 / COUNT(DISTINCT guest_id) AS booking_fees_per_booker
       , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY ds;
+    GROUP BY ds
 ---
 integration_test:
   name: expr_metric
@@ -1084,38 +1084,39 @@ integration_test:
   description: Test query using date_part
   model: SIMPLE_MODEL
   metrics: ["bookings"]
-  group_by_objs: [{"name": "metric_time", "date_part": "year"}]
+  group_by_objs: [{ "name": "metric_time", "date_part": "year" }]
   check_query: |
     SELECT
       SUM(1) AS bookings
       , {{ render_extract("ds", DatePart.YEAR) }} AS metric_time__extract_year
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY {{ render_extract("ds", DatePart.YEAR) }};
+    GROUP BY {{ render_extract("ds", DatePart.YEAR) }}
 ---
 integration_test:
   name: simple_query_with_date_part_not_metric_time
   description: Test query using date_part
   model: SIMPLE_MODEL
   metrics: ["bookings"]
-  group_by_objs: [{"name": "booking__ds", "date_part": "year"}]
+  group_by_objs: [{ "name": "booking__ds", "date_part": "year" }]
   check_query: |
     SELECT
       SUM(1) AS bookings
       , {{ render_extract("ds", DatePart.YEAR) }} AS booking__ds__extract_year
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY {{ render_extract("ds", DatePart.YEAR) }};
+    GROUP BY {{ render_extract("ds", DatePart.YEAR) }}
 ---
 integration_test:
   name: simple_query_with_multiple_date_parts
   description: Test query using multiple date_parts
   model: SIMPLE_MODEL
   metrics: ["bookings"]
-  group_by_objs: [
-    {"name": "metric_time", "date_part": "quarter"},
-    {"name": "metric_time", "date_part": "dow"},
-    {"name": "metric_time", "date_part": "doy"},
-    {"name": "metric_time", "date_part": "day"},
-  ]
+  group_by_objs:
+    [
+      { "name": "metric_time", "date_part": "quarter" },
+      { "name": "metric_time", "date_part": "dow" },
+      { "name": "metric_time", "date_part": "doy" },
+      { "name": "metric_time", "date_part": "day" },
+    ]
   check_query: |
     SELECT
       SUM(1) AS bookings
@@ -1135,7 +1136,7 @@ integration_test:
   description: Tests a derived metric offset query with window and date_part
   model: SIMPLE_MODEL
   metrics: ["bookings_5_day_lag"]
-  group_by_objs: [{"name": "metric_time", "date_part": "month"}]
+  group_by_objs: [{ "name": "metric_time", "date_part": "month" }]
   check_query: |
     SELECT
       {{ render_extract("a.ds", DatePart.MONTH) }} AS metric_time__extract_month
@@ -1155,20 +1156,20 @@ integration_test:
   description: Test count distinct query using date_part
   model: SIMPLE_MODEL
   metrics: ["bookers"]
-  group_by_objs: [{"name": "metric_time", "date_part": "dow"}]
+  group_by_objs: [{ "name": "metric_time", "date_part": "dow" }]
   check_query: |
     SELECT
       COUNT(DISTINCT guest_id) AS bookers
       , {{ render_extract("ds", DatePart.DOW) }} AS metric_time__extract_dow
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY {{ render_extract("ds", DatePart.DOW) }};
+    GROUP BY {{ render_extract("ds", DatePart.DOW) }}
 ---
 integration_test:
   name: simple_fill_nulls_with_0_metric_time
   description: Test a simple query that joins to time spine and fills nulls
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       subq_4.metric_time__week
@@ -1193,7 +1194,7 @@ integration_test:
   description: Test a simple query that joins to time spine and fills nulls, with non-default granularity
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0"]
-  group_by_objs: [{"name": "metric_time", "grain": "month"}]
+  group_by_objs: [{ "name": "metric_time", "grain": "month" }]
   check_query: |
     SELECT
       subq_4.metric_time__month AS metric_time__month
@@ -1218,7 +1219,7 @@ integration_test:
   description: Test simple query that fills nulls but doesn't join to time spine (non-metric time dimension)
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0"]
-  group_by_objs: [{"name": "booking__paid_at"}]
+  group_by_objs: [{ "name": "booking__paid_at" }]
   check_query: |
     SELECT
       {{ render_date_trunc("paid_at", TimeGranularity.DAY) }} AS booking__paid_at__day
@@ -1232,7 +1233,7 @@ integration_test:
   description: Test a simple query that joins to time spine and fills nulls, with agg_time_dimension
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0"]
-  group_by_objs: [{"name": "booking__ds__day"}]
+  group_by_objs: [{ "name": "booking__ds__day" }]
   check_query: |
     SELECT
       subq_5.ds AS booking__ds__day
@@ -1252,7 +1253,7 @@ integration_test:
   description: Test simple query that fills nulls but doesn't join to time spine (categorical dimension)
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0"]
-  group_by_objs: [{"name": "booking__is_instant"}]
+  group_by_objs: [{ "name": "booking__is_instant" }]
   check_query: |
     SELECT
       is_instant AS booking__is_instant
@@ -1265,7 +1266,7 @@ integration_test:
   description: Test a simple metric that joins to time spine, but doesn't fill nulls
   model: SIMPLE_MODEL
   metrics: ["bookings_join_to_time_spine"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       subq_5.ds AS metric_time__day
@@ -1287,7 +1288,7 @@ integration_test:
   description: Test a simple query that fills nulls, but doesn't join to time spine (even for metric time)
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0_without_time_spine"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
@@ -1300,7 +1301,7 @@ integration_test:
   description: Test a cumulative metric that fills nulls
   model: SIMPLE_MODEL
   metrics: ["every_two_days_bookers_fill_nulls_with_0"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       subq_8.ds AS metric_time__day
@@ -1325,7 +1326,7 @@ integration_test:
   description: Test a derived metric that fills nulls on one input metric but not the other
   model: SIMPLE_MODEL
   metrics: ["bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       metric_time__day
@@ -1373,7 +1374,7 @@ integration_test:
   description: Test a multi-metric query that fills nulls
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0", "views"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       COALESCE(subq_7.metric_time__week, subq_12.metric_time__week) AS metric_time__week
@@ -1407,8 +1408,12 @@ integration_test:
   name: fill_nulls_with_0_multi_metric_query_with_nesting
   description: Test a multi-metric query with a nested join that fills nulls
   model: SIMPLE_MODEL
-  metrics: ["bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset", "booking_value"]
-  group_by_objs: [{"name": "metric_time"}]
+  metrics:
+    [
+      "bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset",
+      "booking_value",
+    ]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       COALESCE(subq_17.metric_time__day, subq_22.metric_time__day) AS metric_time__day
@@ -1475,7 +1480,8 @@ integration_test:
   description: Test a multi-metric query that fills nulls
   model: SIMPLE_MODEL
   metrics: ["bookings_fill_nulls_with_0_without_time_spine", "views"]
-  group_by_objs: [{"name": "metric_time"}, {"name": "listing__is_lux_latest"}]
+  group_by_objs:
+    [{ "name": "metric_time" }, { "name": "listing__is_lux_latest" }]
   check_query: |
     SELECT
       COALESCE(subq_9.metric_time__day, subq_19.metric_time__day) AS metric_time__day
@@ -1527,7 +1533,7 @@ integration_test:
   description: Tests a nested derived metric where the outer metric has an input metric with offset_window.
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       subq_9.ds AS metric_time__day
@@ -1562,7 +1568,7 @@ integration_test:
   description: Tests a nested derived metric where the outer metric has one input metric with offset_to_grain and another with no offset.
   model: SIMPLE_MODEL
   metrics: ["booking_fees_since_start_of_month"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   check_query: |
     SELECT
       metric_time__day
@@ -1617,7 +1623,7 @@ integration_test:
   description: Tests a nested derived metric where the outer metric has an offset and a constraint is applied to metric_time via where clause.
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
-  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  group_by_objs: [{ "name": "metric_time", "grain": "day" }]
   where_filter: "{{ render_time_constraint('metric_time__day', '2020-01-08', '2020-01-09') }}"
   check_query: |
     SELECT
@@ -1654,7 +1660,7 @@ integration_test:
   description: Tests a nested derived metric where the outer metric has an offset and a constraint is applied to metric_time via time constraint params.
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
-  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  group_by_objs: [{ "name": "metric_time", "grain": "day" }]
   time_constraint: ["2020-01-08", "2020-01-09"]
   check_query: |
     SELECT
@@ -1691,7 +1697,7 @@ integration_test:
   description: Tests a derived offset metric with a time constraint
   model: SIMPLE_MODEL
   metrics: ["bookings_5_day_lag"]
-  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  group_by_objs: [{ "name": "metric_time", "grain": "day" }]
   time_constraint: ["2019-12-19", "2020-01-02"]
   check_query: |
     SELECT
@@ -1722,7 +1728,7 @@ integration_test:
   description: Tests a cumulative derived offset metric with a time constraint
   model: SIMPLE_MODEL
   metrics: ["every_2_days_bookers_2_days_ago"]
-  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  group_by_objs: [{ "name": "metric_time", "grain": "day" }]
   time_constraint: ["2019-12-19", "2020-01-02"]
   check_query: |
     SELECT
@@ -1754,7 +1760,7 @@ integration_test:
   description: Tests a nested derived metric where the outer metric has an offset and where constraint that requires an additional join, and is not used in the select statement.
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
-  group_by_objs: [{"name": "metric_time", "grain": "day"}]
+  group_by_objs: [{ "name": "metric_time", "grain": "day" }]
   where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT
@@ -1874,7 +1880,7 @@ integration_test:
   description: Tests a nested derived metric where the outer metric has an input metric with offset_window, queried with agg_time_dimension.
   model: SIMPLE_MODEL
   metrics: ["bookings_offset_twice"]
-  group_by_objs: [{"name": "booking__ds__day"}]
+  group_by_objs: [{ "name": "booking__ds__day" }]
   check_query: |
     SELECT
       subq_9.ds AS booking__ds__day
@@ -1909,7 +1915,7 @@ integration_test:
   description: Tests a derived metric query with an offset and agg_time_dimension with date part.
   model: SIMPLE_MODEL
   metrics: ["bookings_5_day_lag"]
-  group_by_objs: [{"name": "booking__ds", "date_part": "doy"}]
+  group_by_objs: [{ "name": "booking__ds", "date_part": "doy" }]
   check_query: |
     SELECT
       {{ render_extract("a.ds", DatePart.DOY) }} AS booking__ds__extract_doy
@@ -2166,8 +2172,8 @@ integration_test:
   description: Test a simple metric that joins to time spine, but doesn't fill nulls, filtered by a dimension that's not in the group by. Should apply constraint only once.
   model: SIMPLE_MODEL
   metrics: ["bookings_join_to_time_spine"]
-  group_by_objs: [{"name": "metric_time"}]
-  where_filter:  "{{ render_dimension_template('booking__is_instant') }}"
+  group_by_objs: [{ "name": "metric_time" }]
+  where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT
       b.ds AS metric_time__day
@@ -2187,8 +2193,8 @@ integration_test:
   description: Test a simple metric that joins to time spine, but doesn't fill nulls, filtered by a dimension that is in the group by. Should apply constraint twice.
   model: SIMPLE_MODEL
   metrics: ["bookings_join_to_time_spine"]
-  group_by_objs: [{"name": "metric_time"}, {"name": "booking__is_instant"}]
-  where_filter:  "{{ render_dimension_template('booking__is_instant') }}"
+  group_by_objs: [{ "name": "metric_time" }, { "name": "booking__is_instant" }]
+  where_filter: "{{ render_dimension_template('booking__is_instant') }}"
   check_query: |
     SELECT
       b.ds AS metric_time__day
@@ -2223,7 +2229,7 @@ integration_test:
   description: Test join to time spine with time constraint that is in group by. Should apply constraint twice.
   model: SIMPLE_MODEL
   metrics: ["bookings_join_to_time_spine"]
-  group_by_objs: [{"name": "metric_time"}]
+  group_by_objs: [{ "name": "metric_time" }]
   time_constraint: ["2020-01-03", "2020-01-03"]
   check_query: |
     SELECT

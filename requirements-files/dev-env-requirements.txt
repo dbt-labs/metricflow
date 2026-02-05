@@ -1,6 +1,8 @@
-dbt-core>=1.10.4, <1.11.0
-dbt-duckdb>=1.8.0, <1.9.0
-# Excluding 1.2.1 due to window functions returning incorrect results:
+# Test SqlClients depend on SqlAlchemy 2.x
+sqlalchemy>=2.0.0, <2.1.0
+# DuckDB engine for DuckDB-backed, SqlAlchemy-based client
+duckdb-engine>=0.13.0, <0.14.0
+# Excluding duckdb 1.2.1 due to window functions returning incorrect results:
 # https://github.com/duckdb/duckdb/issues/16617
 # Version 1.4.0 seems to have issues as well, so pinning to <1.4.0 until those are resolved.
 duckdb !=1.2.1, <1.4.0

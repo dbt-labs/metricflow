@@ -1,0 +1,63 @@
+test_name: test_metrics_with_and_without_null_fill_values
+test_filename: test_null_fill_value.py
+docstring:
+  Tests combining 2 metrics from a single source where one uses a null-fill value.
+---
+<DataflowPlan>
+    <WriteToResultDataTableNode>
+        <!-- description = 'Write to DataTable' -->
+        <!-- node_id = NodeId(id_str='wrd_1') -->
+        <ComputeMetricsNode>
+            <!-- description = 'Compute Metrics via Expressions' -->
+            <!-- node_id = NodeId(id_str='cm_4') -->
+            <!-- metric_spec = MetricSpec(element_name='booking_value') -->
+            <!-- metric_spec = MetricSpec(element_name='bookings_fill_nulls_with_0_without_time_spine') -->
+            <AggregateSimpleMetricInputsNode>
+                <!-- description = 'Aggregate Inputs for Simple Metrics' -->
+                <!-- node_id = NodeId(id_str='am_2') -->
+                <!-- null_fill_value_mapping =                                                     -->
+                <!--   {'booking_value': None, 'bookings_fill_nulls_with_0_without_time_spine': 0} -->
+                <FilterElementsNode>
+                    <!-- description =                                                                                    -->
+                    <!--   ("Pass Only Elements: ['__booking_value', '__bookings_fill_nulls_with_0_without_time_spine', " -->
+                    <!--    "'metric_time__day']")                                                                        -->
+                    <!-- node_id = NodeId(id_str='pfe_5') -->
+                    <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
+                    <!-- include_spec =                                                                        -->
+                    <!--   SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0_without_time_spine') -->
+                    <!-- include_spec =                                                                  -->
+                    <!--   TimeDimensionSpec(                                                            -->
+                    <!--     element_name='metric_time',                                                 -->
+                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                    <!--   )                                                                             -->
+                    <!-- distinct = False -->
+                    <FilterElementsNode>
+                        <!-- description =                                                                -->
+                        <!--   ("Pass Only Elements: ['__booking_value', "                                -->
+                        <!--    "'__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']") -->
+                        <!-- node_id = NodeId(id_str='pfe_4') -->
+                        <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
+                        <!-- include_spec =                                                                        -->
+                        <!--   SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0_without_time_spine') -->
+                        <!-- include_spec =                                                                  -->
+                        <!--   TimeDimensionSpec(                                                            -->
+                        <!--     element_name='metric_time',                                                 -->
+                        <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                        <!--   )                                                                             -->
+                        <!-- distinct = False -->
+                        <MetricTimeDimensionTransformNode>
+                            <!-- description = "Metric Time Dimension 'ds'" -->
+                            <!-- node_id = NodeId(id_str='sma_0') -->
+                            <!-- aggregation_time_dimension = 'ds' -->
+                            <ReadSqlSourceNode>
+                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                <!-- node_id = NodeId(id_str='rss_0') -->
+                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                            </ReadSqlSourceNode>
+                        </MetricTimeDimensionTransformNode>
+                    </FilterElementsNode>
+                </FilterElementsNode>
+            </AggregateSimpleMetricInputsNode>
+        </ComputeMetricsNode>
+    </WriteToResultDataTableNode>
+</DataflowPlan>

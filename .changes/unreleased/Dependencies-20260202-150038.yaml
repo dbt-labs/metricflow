@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Remove dbt dependencies from Metricflow development packages. This will require an environment refresh across metricflow and dbt-metricflow.
+time: 2026-02-02T15:00:38.874789-05:00
+custom:
+    Author: tlento
+    Issue: "1967"

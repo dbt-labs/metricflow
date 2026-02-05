@@ -3,6 +3,6 @@ test_filename: test_name_edge_cases.py
 docstring:
   Check a soon-to-be-deprecated use case where a manifest contains a metric with the same name as a dimension.
 ---
-BOOKING__HOMONYMOUS_METRIC_AND_DIMENSION      HOMONYMOUS_METRIC_AND_DIMENSION
+booking__homonymous_metric_and_dimension      homonymous_metric_and_dimension
 ------------------------------------------  ---------------------------------
 dummy_dimension_value                                                  223070
