@@ -105,7 +105,7 @@ class JoinedModelNode(SemanticGraphNode, Singleton):
     can be queried with the associated primary entity name as the entity link even when the query does not require
     joining semantic models.
 
-    To capture this behavior, semantic models are represented with 2 seperate nodes.
+    To capture this behavior, semantic models are represented with 2 separate nodes.
     """
 
     model_id: SemanticModelId
