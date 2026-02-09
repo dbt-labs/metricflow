@@ -32,6 +32,10 @@ export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
         "engine_url": trino://...",
         "engine_password": "..."
     },
+    "athena": {
+        "engine_url": athena://...",
+        "engine_password": "..."
+    },
 }
 EOF
 )
@@ -77,6 +81,7 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
     databricks: MetricFlowTestCredentialSet
     postgres: MetricFlowTestCredentialSet
     trino: MetricFlowTestCredentialSet
+    athena: MetricFlowTestCredentialSet
 
     @property
     def as_configurations(self) -> Sequence[MetricFlowEngineConfiguration]:  # noqa: D102
@@ -108,6 +113,10 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
             MetricFlowEngineConfiguration(
                 engine=SqlEngine.TRINO,
                 credential_set=self.trino,
+            ),
+            MetricFlowEngineConfiguration(
+                engine=SqlEngine.ATHENA,
+                credential_set=self.athena,
             ),
         )
 
@@ -154,11 +163,14 @@ def run_tests(test_configuration: MetricFlowEngineConfiguration) -> None:  # noq
         or test_configuration.engine is SqlEngine.DATABRICKS
         or test_configuration.engine is SqlEngine.POSTGRES
         or test_configuration.engine is SqlEngine.TRINO
+        or test_configuration.engine is SqlEngine.ATHENA
     ):
         engine_name = test_configuration.engine.value.lower()
         hatch_env = f"{engine_name}-env"
         use_persistent_source_schema = (
-            test_configuration.engine != SqlEngine.POSTGRES and test_configuration.engine != SqlEngine.TRINO
+            test_configuration.engine != SqlEngine.POSTGRES
+            and test_configuration.engine != SqlEngine.TRINO
+            and test_configuration.engine != SqlEngine.ATHENA
         )
         run_command(
             f"hatch -v run {hatch_env}:pytest -x -vv -n 4 "
