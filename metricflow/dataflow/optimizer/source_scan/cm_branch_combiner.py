@@ -352,7 +352,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
             computed_metric_specs=unique_metric_specs,
             passthrough_metric_specs=(),
             aggregated_to_elements=current_right_node.aggregated_to_elements,
-            for_group_by_source_node=current_right_node.for_group_by_source_node,
+            output_group_by_metric_instances=current_right_node.output_group_by_metric_instances,
         )
         self._log_combine_success(
             left_node=self._current_left_node,

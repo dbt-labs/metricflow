@@ -579,7 +579,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             RemoveMetrics(retained_metric_specs=node.passthrough_metric_specs)
         )
 
-        if node.for_group_by_source_node:
+        if node.output_group_by_metric_instances:
             assert (
                 len(node.computed_metric_specs) == 1 and len(output_instance_set.entity_instances) == 1
             ), "Group by metrics currently only support exactly one metric grouped by exactly one entity."
@@ -716,7 +716,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
             defined_from = MetricModelReference(metric_name=metric_spec.element_name)
 
-            if node.for_group_by_source_node:
+            if node.output_group_by_metric_instances:
                 entity_spec = output_instance_set.entity_instances[0].spec
                 group_by_metric_spec = GroupByMetricSpec(
                     element_name=metric_spec.element_name,
