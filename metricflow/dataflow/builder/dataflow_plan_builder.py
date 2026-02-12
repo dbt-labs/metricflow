@@ -63,9 +63,9 @@ from metricflow_semantics.toolkit.string_helpers import mf_indent
 
 from metricflow.dataflow.builder.aggregation_helper import NullFillValueMapping
 from metricflow.dataflow.builder.builder_cache import (
-    BuildAnyMetricOutputNodeParameterSet,
+    BuildAnyMetricOutputNodeInput,
     DataflowPlanBuilderCache,
-    FindSourceNodeRecipeParameterSet,
+    FindSourceNodeRecipeInput,
     FindSourceNodeRecipeResult,
 )
 from metricflow.dataflow.builder.node_evaluator import (
@@ -291,7 +291,7 @@ class DataflowPlanBuilder:
         )
 
         base_source_node_recipe = self._find_source_node_recipe(
-            FindSourceNodeRecipeParameterSet(
+            FindSourceNodeRecipeInput(
                 simple_metric_input_specs=(
                     SimpleMetricInputSpec(
                         element_name=base_simple_metric_recipe.simple_metric_input.name,
@@ -308,7 +308,7 @@ class DataflowPlanBuilder:
             element_name=conversion_simple_metric_recipe.simple_metric_input.name,
         )
         conversion_source_node_recipe = self._find_source_node_recipe(
-            FindSourceNodeRecipeParameterSet(
+            FindSourceNodeRecipeInput(
                 simple_metric_input_specs=(
                     SimpleMetricInputSpec(
                         element_name=conversion_simple_metric_recipe.simple_metric_input.name,
@@ -702,7 +702,7 @@ class DataflowPlanBuilder:
 
             parent_nodes.append(
                 self._build_any_metric_output_node(
-                    BuildAnyMetricOutputNodeParameterSet(
+                    BuildAnyMetricOutputNodeInput(
                         metric_spec=MetricSpec(
                             element_name=metric_input_spec.element_name,
                             filter_spec_set=where_filter_spec_set,
@@ -752,25 +752,27 @@ class DataflowPlanBuilder:
 
         return output_node
 
-    def _build_any_metric_output_node(self, parameter_set: BuildAnyMetricOutputNodeParameterSet) -> DataflowPlanNode:
+    def _build_any_metric_output_node(
+        self, build_any_metric_output_node_input: BuildAnyMetricOutputNodeInput
+    ) -> DataflowPlanNode:
         """Builds a node to compute a metric of any type."""
-        result = self._cache.get_build_any_metric_output_node_result(parameter_set)
+        result = self._cache.get_build_any_metric_output_node_result(build_any_metric_output_node_input)
         if result is not None:
             return result
 
-        result = self._build_any_metric_output_node_non_cached(parameter_set)
-        self._cache.set_build_any_metric_output_node_result(parameter_set, result)
+        result = self._build_any_metric_output_node_non_cached(build_any_metric_output_node_input)
+        self._cache.set_build_any_metric_output_node_result(build_any_metric_output_node_input, result)
         return result
 
     def _build_any_metric_output_node_non_cached(
-        self, parameter_set: BuildAnyMetricOutputNodeParameterSet
+        self, build_any_metric_output_node_input: BuildAnyMetricOutputNodeInput
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric of any type."""
-        metric_spec = parameter_set.metric_spec
-        queried_linkable_specs = parameter_set.queried_linkable_specs
-        filter_spec_factory = parameter_set.filter_spec_factory
-        predicate_pushdown_state = parameter_set.predicate_pushdown_state
-        for_group_by_source_node = parameter_set.for_group_by_source_node
+        metric_spec = build_any_metric_output_node_input.metric_spec
+        queried_linkable_specs = build_any_metric_output_node_input.queried_linkable_specs
+        filter_spec_factory = build_any_metric_output_node_input.filter_spec_factory
+        predicate_pushdown_state = build_any_metric_output_node_input.predicate_pushdown_state
+        for_group_by_source_node = build_any_metric_output_node_input.for_group_by_source_node
 
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -839,7 +841,7 @@ class DataflowPlanBuilder:
 
             output_nodes.append(
                 self._build_any_metric_output_node(
-                    BuildAnyMetricOutputNodeParameterSet(
+                    BuildAnyMetricOutputNodeInput(
                         metric_spec=metric_spec,
                         queried_linkable_specs=queried_linkable_specs,
                         filter_spec_factory=filter_spec_factory,
@@ -899,7 +901,7 @@ class DataflowPlanBuilder:
             where_filter_specs=tuple(query_level_filter_specs),
         )
         dataflow_recipe = self._find_source_node_recipe(
-            FindSourceNodeRecipeParameterSet(
+            FindSourceNodeRecipeInput(
                 simple_metric_input_specs=None,
                 linkable_spec_set=required_linkable_specs,
                 predicate_pushdown_state=predicate_pushdown_state,
@@ -1053,21 +1055,25 @@ class DataflowPlanBuilder:
         ), "Non-additive dimension can only be a time dimension, if specified."
         return queried_time_dimension_spec
 
-    def _find_source_node_recipe(self, parameter_set: FindSourceNodeRecipeParameterSet) -> Optional[SourceNodeRecipe]:
+    def _find_source_node_recipe(
+        self, find_source_node_recipe_input: FindSourceNodeRecipeInput
+    ) -> Optional[SourceNodeRecipe]:
         """Find the most suitable source nodes to satisfy the requested specs, as well as how to join them."""
-        result = self._cache.get_find_source_node_recipe_result(parameter_set)
+        result = self._cache.get_find_source_node_recipe_result(find_source_node_recipe_input)
         if result is not None:
             return result.source_node_recipe
-        source_node_recipe = self._find_source_node_recipe_non_cached(parameter_set)
-        self._cache.set_find_source_node_recipe_result(parameter_set, FindSourceNodeRecipeResult(source_node_recipe))
+        source_node_recipe = self._find_source_node_recipe_non_cached(find_source_node_recipe_input)
+        self._cache.set_find_source_node_recipe_result(
+            find_source_node_recipe_input, FindSourceNodeRecipeResult(source_node_recipe)
+        )
         return source_node_recipe
 
     def _find_source_node_recipe_non_cached(
-        self, parameter_set: FindSourceNodeRecipeParameterSet
+        self, find_source_node_recipe_input: FindSourceNodeRecipeInput
     ) -> Optional[SourceNodeRecipe]:
-        linkable_spec_set = parameter_set.linkable_spec_set
-        predicate_pushdown_state = parameter_set.predicate_pushdown_state
-        simple_metric_input_specs = parameter_set.simple_metric_input_specs
+        linkable_spec_set = find_source_node_recipe_input.linkable_spec_set
+        predicate_pushdown_state = find_source_node_recipe_input.predicate_pushdown_state
+        simple_metric_input_specs = find_source_node_recipe_input.simple_metric_input_specs
 
         candidate_nodes_for_left_side_of_join: List[DataflowPlanNode] = []
         candidate_nodes_for_right_side_of_join: List[DataflowPlanNode] = []
@@ -1873,7 +1879,7 @@ class DataflowPlanBuilder:
 
             with ExecutionTimer() as execution_timer:
                 source_node_recipe = self._find_source_node_recipe(
-                    FindSourceNodeRecipeParameterSet(
+                    FindSourceNodeRecipeInput(
                         simple_metric_input_specs=spec_properties.simple_metric_input_specs,
                         predicate_pushdown_state=simple_metric_input_ppd_state,
                         linkable_spec_set=required_linkable_specs,
