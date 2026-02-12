@@ -573,7 +573,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Also, the output columns should always follow the resolver format.
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
-        output_instance_set = output_instance_set.transform(RemoveMetrics())
+        output_instance_set = output_instance_set.transform(
+            RemoveMetrics(retained_metric_specs=node.passthrough_metric_specs)
+        )
 
         if node.for_group_by_source_node:
             assert (
