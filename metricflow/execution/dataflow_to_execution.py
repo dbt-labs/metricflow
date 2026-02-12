@@ -18,7 +18,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -172,7 +172,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         raise NotImplementedError
 
     @override
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> ConvertToExecutionPlanResult:
+    def visit_selector_node(self, node: SelectorNode) -> ConvertToExecutionPlanResult:
         raise NotImplementedError
 
     @override

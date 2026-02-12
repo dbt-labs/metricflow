@@ -18,7 +18,7 @@ from metricflow.plan_conversion.instance_set_transforms.aggregated_simple_metric
     CreateAggregatedSimpleMetricInputsTransform,
 )
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import (
-    FilterElements,
+    SelectElementsTransform,
 )
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
@@ -41,7 +41,7 @@ def __get_filtered_simple_metric_input_instance_set(
         for instance in instance_set.simple_metric_input_instances
         if instance.spec.element_name == simple_metric_input_name
     )
-    return FilterElements(include_specs=InstanceSpecSet(simple_metric_input_specs=include_specs)).transform(
+    return SelectElementsTransform(include_specs=InstanceSpecSet(simple_metric_input_specs=include_specs)).transform(
         instance_set
     )
 

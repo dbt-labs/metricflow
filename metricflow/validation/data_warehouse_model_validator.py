@@ -38,7 +38,7 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.dataflow.builder.source_node import SourceNodeBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
@@ -120,7 +120,7 @@ class DataWarehouseTaskBuilder:
 
     @staticmethod
     def renderize(
-        sql_client: SqlClient, plan_converter: DataflowToSqlPlanConverter, plan_id: str, nodes: FilterElementsNode
+        sql_client: SqlClient, plan_converter: DataflowToSqlPlanConverter, plan_id: str, nodes: SelectorNode
     ) -> Tuple[str, SqlBindParameterSet]:
         """Generates a sql query plan and returns the rendered sql and bind_parameter_set."""
         conversion_result = plan_converter.convert_to_sql_plan(
@@ -200,7 +200,7 @@ class DataWarehouseTaskBuilder:
                 spec_filter_tuples.append(
                     (
                         spec,
-                        FilterElementsNode.create(
+                        SelectorNode.create(
                             parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
                         ),
                     )
@@ -213,7 +213,7 @@ class DataWarehouseTaskBuilder:
                 spec_filter_tuples.append(
                     (
                         spec,
-                        FilterElementsNode.create(
+                        SelectorNode.create(
                             parent_node=source_node, include_specs=InstanceSpecSet(time_dimension_specs=(spec,))
                         ),
                     )
@@ -241,7 +241,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode.create(
+            filter_elements_node = SelectorNode.create(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
                     dimension_specs=dimension_specs,
@@ -301,7 +301,7 @@ class DataWarehouseTaskBuilder:
                 dataset.instance_set.spec_set.entity_specs
             )
             for spec in semantic_model_specs:
-                filter_elements_node = FilterElementsNode.create(
+                filter_elements_node = SelectorNode.create(
                     parent_node=source_node, include_specs=InstanceSpecSet(entity_specs=(spec,))
                 )
                 semantic_model_sub_tasks.append(
@@ -325,7 +325,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode.create(
+            filter_elements_node = SelectorNode.create(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
                     entity_specs=tuple(semantic_model_specs),
@@ -401,7 +401,7 @@ class DataWarehouseTaskBuilder:
                     obtained_source_node
                 ), f"Unable to find generated source node for simple-metric input: {spec.element_name}"
 
-                filter_elements_node = FilterElementsNode.create(
+                filter_elements_node = SelectorNode.create(
                     parent_node=obtained_source_node,
                     include_specs=InstanceSpecSet(
                         simple_metric_input_specs=(spec,),
@@ -429,7 +429,7 @@ class DataWarehouseTaskBuilder:
                 )
 
             for simple_metric_input_specs, source_node in simple_metric_specs_and_source_node_pair:
-                filter_elements_node = FilterElementsNode.create(
+                filter_elements_node = SelectorNode.create(
                     parent_node=source_node,
                     include_specs=InstanceSpecSet(simple_metric_input_specs=simple_metric_input_specs),
                 )

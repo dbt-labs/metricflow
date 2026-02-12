@@ -37,7 +37,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataset.dataset_classes import DataSet
@@ -120,7 +120,7 @@ class JoinLinkableInstancesRecipe:
             ]
         )
 
-        filtered_node_to_join = FilterElementsNode.create(
+        filtered_node_to_join = SelectorNode.create(
             parent_node=self.node_to_join, include_specs=group_specs_by_type(include_specs).dedupe()
         )
 
