@@ -5,10 +5,11 @@ from typing import Optional
 
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.toolkit.cache.lru_cache import LruCache
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
-from metricflow.dataflow.builder.simple_metric_input_spec_properties import SimpleMetricInputSpecProperties
 from metricflow.dataflow.builder.source_node_recipe import SourceNodeRecipe
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.plan_conversion.node_processor import PredicatePushdownState
@@ -18,9 +19,9 @@ from metricflow.plan_conversion.node_processor import PredicatePushdownState
 class FindSourceNodeRecipeParameterSet:
     """Parameters for `DataflowPlanBuilder._find_source_node_recipe()`."""
 
+    simple_metric_input_specs: Optional[AnyLengthTuple[SimpleMetricInputSpec]]
     linkable_spec_set: LinkableSpecSet
     predicate_pushdown_state: PredicatePushdownState
-    spec_properties: Optional[SimpleMetricInputSpecProperties]
 
 
 @dataclass(frozen=True)
