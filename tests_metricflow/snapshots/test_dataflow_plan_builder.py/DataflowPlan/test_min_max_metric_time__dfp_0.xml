@@ -10,8 +10,8 @@ docstring:
         <MinMaxNode>
             <!-- description = 'Calculate min and max' -->
             <!-- node_id = NodeId(id_str='mm_0') -->
-            <FilterElementsNode>
-                <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+            <SelectorNode>
+                <!-- description = "Select: ['metric_time__day']" -->
                 <!-- node_id = NodeId(id_str='pfe_1') -->
                 <!-- include_spec =                                                                  -->
                 <!--   TimeDimensionSpec(                                                            -->
@@ -19,8 +19,8 @@ docstring:
                 <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                 <!--   )                                                                             -->
                 <!-- distinct = True -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                <SelectorNode>
+                    <!-- description = "Select: ['metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='pfe_0') -->
                     <!-- include_spec =                                                                  -->
                     <!--   TimeDimensionSpec(                                                            -->
@@ -38,8 +38,8 @@ docstring:
                             <!-- data_set = SqlDataSet() -->
                         </ReadSqlSourceNode>
                     </MetricTimeDimensionTransformNode>
-                </FilterElementsNode>
-            </FilterElementsNode>
+                </SelectorNode>
+            </SelectorNode>
         </MinMaxNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

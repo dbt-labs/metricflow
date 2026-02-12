@@ -41,7 +41,7 @@ FROM (
     , MAX(subq_51.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -50,7 +50,7 @@ FROM (
       , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
       SELECT
         sma_28009_cte.metric_time__day AS metric_time__day
         , sma_28009_cte.booking__is_instant AS booking__is_instant
@@ -77,7 +77,7 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
@@ -85,7 +85,7 @@ FROM (
         , SUM(bookings) AS __bookings
       FROM (
         -- Join Standard Outputs
-        -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+        -- Select: ['__bookings', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
         SELECT
           sma_28009_cte.metric_time__day AS metric_time__day
           , sma_28009_cte.booking__is_instant AS booking__is_instant

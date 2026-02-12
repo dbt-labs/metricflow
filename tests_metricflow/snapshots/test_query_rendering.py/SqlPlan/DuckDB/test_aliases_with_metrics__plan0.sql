@@ -39,7 +39,7 @@ FROM (
           , subq_20.listing__capacity_latest
           , SUM(subq_20.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing']
+          -- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing']
           SELECT
             subq_19.metric_time__day
             , subq_19.listing
@@ -54,7 +54,7 @@ FROM (
               , subq_18.listing
               , subq_18.listing__booking_fees
             FROM (
-              -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing', 'listing__booking_fees']
+              -- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing', 'listing__booking_fees']
               SELECT
                 subq_17.metric_time__day
                 , subq_17.listing
@@ -387,7 +387,7 @@ FROM (
                   ) subq_5
                 ) subq_6
                 LEFT OUTER JOIN (
-                  -- Pass Only Elements: ['listing', 'listing__booking_fees']
+                  -- Select: ['listing', 'listing__booking_fees']
                   SELECT
                     subq_12.listing
                     , subq_12.listing__booking_fees
@@ -407,12 +407,12 @@ FROM (
                           subq_9.listing
                           , SUM(subq_9.__booking_value) AS __booking_value
                         FROM (
-                          -- Pass Only Elements: ['__booking_value', 'listing']
+                          -- Select: ['__booking_value', 'listing']
                           SELECT
                             subq_8.listing
                             , subq_8.__booking_value
                           FROM (
-                            -- Pass Only Elements: ['__booking_value', 'listing']
+                            -- Select: ['__booking_value', 'listing']
                             SELECT
                               subq_7.listing
                               , subq_7.__booking_value
@@ -640,7 +640,7 @@ FROM (
                 ON
                   subq_6.listing = subq_13.listing
                 LEFT OUTER JOIN (
-                  -- Pass Only Elements: ['capacity_latest', 'listing']
+                  -- Select: ['capacity_latest', 'listing']
                   SELECT
                     subq_15.listing
                     , subq_15.capacity_latest

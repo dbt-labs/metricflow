@@ -9,7 +9,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__bookers', 'metric_time__day']
+-- Select: ['__bookers', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
@@ -19,7 +19,7 @@ SELECT
   , COUNT(DISTINCT bookers) AS every_two_days_bookers
 FROM (
   -- Join Self Over Time Range
-  -- Pass Only Elements: ['__bookers', 'metric_time__day']
+  -- Select: ['__bookers', 'metric_time__day']
   SELECT
     subq_14.ds AS metric_time__day
     , bookings_source_src_28000.guest_id AS bookers

@@ -5,10 +5,10 @@ test_filename: test_dataflow_plan_builder.py
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
-        <FilterElementsNode>
-            <!-- description =                                                                                       -->
-            <!--   ("Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day', " -->
-            <!--    "'metric_time__month']")                                                                         -->
+        <SelectorNode>
+            <!-- description =                                                                           -->
+            <!--   ("Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day', " -->
+            <!--    "'metric_time__month']")                                                             -->
             <!-- node_id = NodeId(id_str='pfe_3') -->
             <!-- include_spec =                                                                                          -->
             <!--   DimensionSpec(element_name='home_state_latest', entity_links=(EntityReference(element_name='user'),)) -->
@@ -25,10 +25,10 @@ test_filename: test_dataflow_plan_builder.py
             <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
             <!--   )                                                                                 -->
             <!-- distinct = True -->
-            <FilterElementsNode>
-                <!-- description =                                                                                       -->
-                <!--   ("Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day', " -->
-                <!--    "'metric_time__month']")                                                                         -->
+            <SelectorNode>
+                <!-- description =                                                                           -->
+                <!--   ("Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day', " -->
+                <!--    "'metric_time__month']")                                                             -->
                 <!-- node_id = NodeId(id_str='pfe_2') -->
                 <!-- include_spec =                                            -->
                 <!--   DimensionSpec(                                          -->
@@ -54,11 +54,11 @@ test_filename: test_dataflow_plan_builder.py
                 <JoinOnEntitiesNode>
                     <!-- description = 'Join Standard Outputs' -->
                     <!-- node_id = NodeId(id_str='jso_0') -->
-                    <!-- join0_for_node_id_pfe_0 =                                                            -->
-                    <!--   JoinDescription(join_node=FilterElementsNode(node_id=pfe_0), join_type=CROSS_JOIN) -->
+                    <!-- join0_for_node_id_pfe_0 =                                                      -->
+                    <!--   JoinDescription(join_node=SelectorNode(node_id=pfe_0), join_type=CROSS_JOIN) -->
                     <!-- join1_for_node_id_pfe_1 =                                   -->
                     <!--   JoinDescription(                                          -->
-                    <!--     join_node=FilterElementsNode(node_id=pfe_1),            -->
+                    <!--     join_node=SelectorNode(node_id=pfe_1),                  -->
                     <!--     join_on_entity=LinklessEntitySpec(element_name='user'), -->
                     <!--     join_type=FULL_OUTER,                                   -->
                     <!--   )                                                         -->
@@ -67,8 +67,8 @@ test_filename: test_dataflow_plan_builder.py
                         <!-- node_id = NodeId(id_str='rss_28024') -->
                         <!-- data_set = SemanticModelDataSet('listings_latest') -->
                     </ReadSqlSourceNode>
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['metric_time__day', 'metric_time__month']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['metric_time__day', 'metric_time__month']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec =                                                                  -->
                         <!--   TimeDimensionSpec(                                                            -->
@@ -91,9 +91,9 @@ test_filename: test_dataflow_plan_builder.py
                                 <!-- data_set = SqlDataSet() -->
                             </ReadSqlSourceNode>
                         </MetricTimeDimensionTransformNode>
-                    </FilterElementsNode>
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
+                    </SelectorNode>
+                    <SelectorNode>
+                        <!-- description = "Select: ['home_state_latest', 'user']" -->
                         <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec = DimensionSpec(element_name='home_state_latest') -->
                         <!-- include_spec = LinklessEntitySpec(element_name='user') -->
@@ -103,9 +103,9 @@ test_filename: test_dataflow_plan_builder.py
                             <!-- node_id = NodeId(id_str='rss_28028') -->
                             <!-- data_set = SemanticModelDataSet('users_latest') -->
                         </ReadSqlSourceNode>
-                    </FilterElementsNode>
+                    </SelectorNode>
                 </JoinOnEntitiesNode>
-            </FilterElementsNode>
-        </FilterElementsNode>
+            </SelectorNode>
+        </SelectorNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

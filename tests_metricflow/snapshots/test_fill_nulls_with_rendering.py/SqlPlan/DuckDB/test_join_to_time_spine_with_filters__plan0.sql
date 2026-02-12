@@ -22,7 +22,7 @@ FROM (
         subq_14.metric_time__day AS metric_time__day
         , subq_8.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
       FROM (
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           subq_13.metric_time__day
         FROM (
@@ -36,7 +36,7 @@ FROM (
               subq_11.metric_time__day
               , subq_11.metric_time__week
             FROM (
-              -- Pass Only Elements: ['metric_time__day', 'metric_time__week']
+              -- Select: ['metric_time__day', 'metric_time__week']
               SELECT
                 subq_10.metric_time__day
                 , subq_10.metric_time__week
@@ -85,7 +85,7 @@ FROM (
           subq_7.metric_time__day
           , SUM(subq_7.__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
-          -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']
+          -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
           SELECT
             subq_6.metric_time__day
             , subq_6.__bookings_fill_nulls_with_0
@@ -96,7 +96,7 @@ FROM (
               , subq_5.metric_time__day
               , subq_5.metric_time__week
             FROM (
-              -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day', 'metric_time__week']
+              -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day', 'metric_time__week']
               SELECT
                 subq_4.metric_time__day
                 , subq_4.metric_time__week

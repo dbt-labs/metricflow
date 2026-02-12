@@ -112,8 +112,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description =                                                                -->
-                            <!--   "Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']" -->
+                            <!-- description = "Select: ['__bookings', 'listing__country_latest', 'ds__day']" -->
                             <!-- node_id = NodeId(id_str='ss_243') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
@@ -134,8 +133,7 @@ docstring:
                             <!-- where = None -->
                             <!-- distinct = False -->
                             <SqlSelectStatementNode>
-                                <!-- description =                                                                -->
-                                <!--   "Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']" -->
+                                <!-- description = "Select: ['__bookings', 'listing__country_latest', 'ds__day']" -->
                                 <!-- node_id = NodeId(id_str='ss_242') -->
                                 <!-- col0 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
@@ -1748,7 +1746,7 @@ docstring:
                                         </SqlSelectStatementNode>
                                     </SqlSelectStatementNode>
                                     <SqlSelectStatementNode>
-                                        <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                                        <!-- description = "Select: ['country_latest', 'listing']" -->
                                         <!-- node_id = NodeId(id_str='ss_240') -->
                                         <!-- col0 =                                                 -->
                                         <!--   SqlSelectColumn(                                     -->
@@ -2464,7 +2462,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']" -->
+                            <!-- description = "Select: ['__views', 'listing__country_latest', 'ds__day']" -->
                             <!-- node_id = NodeId(id_str='ss_253') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
@@ -2485,8 +2483,7 @@ docstring:
                             <!-- where = None -->
                             <!-- distinct = False -->
                             <SqlSelectStatementNode>
-                                <!-- description =                                                             -->
-                                <!--   "Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']" -->
+                                <!-- description = "Select: ['__views', 'listing__country_latest', 'ds__day']" -->
                                 <!-- node_id = NodeId(id_str='ss_252') -->
                                 <!-- col0 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
@@ -3389,7 +3386,7 @@ docstring:
                                         </SqlSelectStatementNode>
                                     </SqlSelectStatementNode>
                                     <SqlSelectStatementNode>
-                                        <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                                        <!-- description = "Select: ['country_latest', 'listing']" -->
                                         <!-- node_id = NodeId(id_str='ss_250') -->
                                         <!-- col0 =                                                 -->
                                         <!--   SqlSelectColumn(                                     -->

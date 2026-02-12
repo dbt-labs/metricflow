@@ -16,7 +16,7 @@ FROM (
     subq_1.is_instant
     , SUM(subq_1.__bookings) AS __bookings
   FROM (
-    -- Pass Only Elements: ['__bookings', 'is_instant']
+    -- Select: ['__bookings', 'is_instant']
     SELECT
       subq_0.is_instant
       , subq_0.__bookings
@@ -133,7 +133,7 @@ FULL OUTER JOIN (
     , SUM(subq_4.__instant_bookings) AS __instant_bookings
     , COUNT(DISTINCT subq_4.__bookers) AS __bookers
   FROM (
-    -- Pass Only Elements: ['__instant_bookings', '__bookers', 'is_instant']
+    -- Select: ['__instant_bookings', '__bookers', 'is_instant']
     SELECT
       subq_3.is_instant
       , subq_3.__instant_bookings

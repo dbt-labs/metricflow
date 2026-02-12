@@ -16,7 +16,7 @@ FROM (
     , subq_1.ds__day AS metric_time__day
     , subq_1.__bookings
   FROM (
-    -- Pass Only Elements: ['__bookings', 'ds__day']
+    -- Select: ['__bookings', 'ds__day']
     SELECT
       subq_0.ds__day
       , subq_0.__bookings

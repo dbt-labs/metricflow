@@ -5,13 +5,13 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['user__home_state_latest']
+-- Select: ['user__home_state_latest']
 -- Write to DataTable
 SELECT
   user__home_state_latest
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['user__home_state_latest', 'listing__country_latest']
+  -- Select: ['user__home_state_latest', 'listing__country_latest']
   SELECT
     listings_latest_src_28000.country AS listing__country_latest
     , users_latest_src_28000.home_state_latest AS user__home_state_latest

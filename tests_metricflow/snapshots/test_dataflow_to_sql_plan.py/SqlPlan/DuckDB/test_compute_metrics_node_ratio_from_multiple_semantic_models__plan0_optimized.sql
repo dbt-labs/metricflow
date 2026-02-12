@@ -28,8 +28,8 @@ FROM (
     , MAX(subq_39.views) AS views
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']
-    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']
+    -- Select: ['__bookings', 'listing__country_latest', 'ds__day']
+    -- Select: ['__bookings', 'listing__country_latest', 'ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -55,8 +55,8 @@ FROM (
   ) subq_30
   FULL OUTER JOIN (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']
-    -- Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']
+    -- Select: ['__views', 'listing__country_latest', 'ds__day']
+    -- Select: ['__views', 'listing__country_latest', 'ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

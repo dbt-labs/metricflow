@@ -16,7 +16,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: [
+  -- Select: [
   --   '__bookings',
   --   'metric_time__extract_day',
   --   'metric_time__extract_dow',
@@ -25,7 +25,7 @@ FROM (
   --   'metric_time__extract_quarter',
   --   'metric_time__extract_year',
   -- ]
-  -- Pass Only Elements: [
+  -- Select: [
   --   '__bookings',
   --   'metric_time__extract_day',
   --   'metric_time__extract_dow',

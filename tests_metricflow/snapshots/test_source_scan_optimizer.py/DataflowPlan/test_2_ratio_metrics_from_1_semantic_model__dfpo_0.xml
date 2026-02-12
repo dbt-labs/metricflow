@@ -22,9 +22,8 @@ docstring:
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_5') -->
                     <!-- null_fill_value_mapping = {'bookings': None, 'bookers': None, 'booking_value': None} -->
-                    <FilterElementsNode>
-                        <!-- description =                                                                              -->
-                        <!--   "Pass Only Elements: ['__bookings', '__bookers', '__booking_value', 'metric_time__day']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['__bookings', '__bookers', '__booking_value', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_11') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
@@ -35,10 +34,9 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <FilterElementsNode>
-                            <!-- description =                                                            -->
-                            <!--   ("Pass Only Elements: ['__bookings', '__bookers', '__booking_value', " -->
-                            <!--    "'metric_time__day']")                                                -->
+                        <SelectorNode>
+                            <!-- description =                                                                  -->
+                            <!--   "Select: ['__bookings', '__bookers', '__booking_value', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_10') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
@@ -59,8 +57,8 @@ docstring:
                                     <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
-                    </FilterElementsNode>
+                        </SelectorNode>
+                    </SelectorNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
         </ComputeMetricsNode>

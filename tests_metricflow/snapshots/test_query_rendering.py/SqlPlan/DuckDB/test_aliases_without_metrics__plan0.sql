@@ -19,7 +19,7 @@ FROM (
       subq_3.listing
       , subq_3.listing__capacity_latest
     FROM (
-      -- Pass Only Elements: ['listing__capacity_latest', 'listing']
+      -- Select: ['listing__capacity_latest', 'listing']
       SELECT
         subq_2.listing
         , subq_2.listing__capacity_latest
@@ -29,7 +29,7 @@ FROM (
           subq_1.listing__capacity_latest
           , subq_1.listing
         FROM (
-          -- Pass Only Elements: ['listing__capacity_latest', 'listing']
+          -- Select: ['listing__capacity_latest', 'listing']
           SELECT
             subq_0.listing
             , subq_0.listing__capacity_latest

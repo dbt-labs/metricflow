@@ -10,7 +10,7 @@ SELECT
   , subq_5.__bookings AS __bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['__bookings', 'listing']
+  -- Select: ['__bookings', 'listing']
   SELECT
     listing_id AS listing
     , 1 AS __bookings

@@ -36,9 +36,8 @@ test_filename: test_dataflow_plan_builder.py
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_0') -->
                             <!-- null_fill_value_mapping = {'bookings_fill_nulls_with_0': 0} -->
-                            <FilterElementsNode>
-                                <!-- description =                                                                -->
-                                <!--   "Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_1') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
                                 <!-- include_spec =                                                                  -->
@@ -47,9 +46,8 @@ test_filename: test_dataflow_plan_builder.py
                                 <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                 <!--   )                                                                             -->
                                 <!-- distinct = False -->
-                                <FilterElementsNode>
-                                    <!-- description =                                                                -->
-                                    <!--   "Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
+                                <SelectorNode>
+                                    <!-- description = "Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
                                     <!-- node_id = NodeId(id_str='pfe_0') -->
                                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
                                     <!-- include_spec =                                                                  -->
@@ -68,11 +66,11 @@ test_filename: test_dataflow_plan_builder.py
                                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
-                                </FilterElementsNode>
-                            </FilterElementsNode>
+                                </SelectorNode>
+                            </SelectorNode>
                         </AggregateSimpleMetricInputsNode>
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_3') -->
                             <!-- include_spec =                                                                  -->
                             <!--   TimeDimensionSpec(                                                            -->
@@ -80,8 +78,8 @@ test_filename: test_dataflow_plan_builder.py
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- distinct = False -->
-                            <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_2') -->
                                 <!-- include_spec =                                                                  -->
                                 <!--   TimeDimensionSpec(                                                            -->
@@ -117,8 +115,8 @@ test_filename: test_dataflow_plan_builder.py
                                         <!-- data_set = SqlDataSet() -->
                                     </ReadSqlSourceNode>
                                 </AliasSpecsNode>
-                            </FilterElementsNode>
-                        </FilterElementsNode>
+                            </SelectorNode>
+                        </SelectorNode>
                     </JoinToTimeSpineNode>
                 </ComputeMetricsNode>
                 <ComputeMetricsNode>
@@ -151,9 +149,8 @@ test_filename: test_dataflow_plan_builder.py
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_1') -->
                             <!-- null_fill_value_mapping = {'bookings_fill_nulls_with_0': 0} -->
-                            <FilterElementsNode>
-                                <!-- description =                                                                -->
-                                <!--   "Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_5') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
                                 <!-- include_spec =                                                                  -->
@@ -162,9 +159,8 @@ test_filename: test_dataflow_plan_builder.py
                                 <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                 <!--   )                                                                             -->
                                 <!-- distinct = False -->
-                                <FilterElementsNode>
-                                    <!-- description =                                                                -->
-                                    <!--   "Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
+                                <SelectorNode>
+                                    <!-- description = "Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']" -->
                                     <!-- node_id = NodeId(id_str='pfe_4') -->
                                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings_fill_nulls_with_0') -->
                                     <!-- include_spec =                                                                  -->
@@ -183,11 +179,11 @@ test_filename: test_dataflow_plan_builder.py
                                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
-                                </FilterElementsNode>
-                            </FilterElementsNode>
+                                </SelectorNode>
+                            </SelectorNode>
                         </AggregateSimpleMetricInputsNode>
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_7') -->
                             <!-- include_spec =                                                                  -->
                             <!--   TimeDimensionSpec(                                                            -->
@@ -195,8 +191,8 @@ test_filename: test_dataflow_plan_builder.py
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- distinct = False -->
-                            <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_6') -->
                                 <!-- include_spec =                                                                  -->
                                 <!--   TimeDimensionSpec(                                                            -->
@@ -232,8 +228,8 @@ test_filename: test_dataflow_plan_builder.py
                                         <!-- data_set = SqlDataSet() -->
                                     </ReadSqlSourceNode>
                                 </AliasSpecsNode>
-                            </FilterElementsNode>
-                        </FilterElementsNode>
+                            </SelectorNode>
+                        </SelectorNode>
                     </JoinToTimeSpineNode>
                 </ComputeMetricsNode>
             </CombineAggregatedOutputsNode>

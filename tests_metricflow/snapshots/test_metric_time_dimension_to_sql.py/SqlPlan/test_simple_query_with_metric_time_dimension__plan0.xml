@@ -77,7 +77,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                        <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='ss_131') -->
                         <!-- col0 =                                                 -->
                         <!--   SqlSelectColumn(                                     -->
@@ -93,7 +93,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                            <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_130') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
@@ -1183,7 +1183,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['__booking_payments', 'metric_time__day']" -->
+                        <!-- description = "Select: ['__booking_payments', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='ss_137') -->
                         <!-- col0 =                                                 -->
                         <!--   SqlSelectColumn(                                     -->
@@ -1199,7 +1199,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['__booking_payments', 'metric_time__day']" -->
+                            <!-- description = "Select: ['__booking_payments', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_136') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->

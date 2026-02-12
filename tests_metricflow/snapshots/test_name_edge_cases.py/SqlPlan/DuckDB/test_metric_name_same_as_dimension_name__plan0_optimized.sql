@@ -13,8 +13,8 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
-  -- Pass Only Elements: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
+  -- Select: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
+  -- Select: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
   SELECT
     'dummy_dimension_value' AS booking__homonymous_metric_and_dimension
     , booking_value AS __homonymous_metric_and_dimension

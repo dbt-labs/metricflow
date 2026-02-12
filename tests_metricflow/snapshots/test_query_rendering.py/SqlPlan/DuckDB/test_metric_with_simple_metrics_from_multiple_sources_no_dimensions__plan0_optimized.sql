@@ -10,8 +10,8 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['__bookings']
-  -- Pass Only Elements: ['__bookings']
+  -- Select: ['__bookings']
+  -- Select: ['__bookings']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
@@ -21,8 +21,8 @@ FROM (
 CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['__listings']
-  -- Pass Only Elements: ['__listings']
+  -- Select: ['__listings']
+  -- Select: ['__listings']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT

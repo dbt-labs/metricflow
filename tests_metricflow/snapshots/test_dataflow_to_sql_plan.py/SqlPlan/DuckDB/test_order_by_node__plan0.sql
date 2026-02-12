@@ -22,7 +22,7 @@ FROM (
       , subq_1.is_instant
       , SUM(subq_1.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings', 'is_instant', 'ds__day']
+      -- Select: ['__bookings', 'is_instant', 'ds__day']
       SELECT
         subq_0.ds__day
         , subq_0.is_instant

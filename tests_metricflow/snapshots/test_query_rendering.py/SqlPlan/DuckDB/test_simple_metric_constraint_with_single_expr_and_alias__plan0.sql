@@ -22,7 +22,7 @@ FROM (
         subq_4.metric_time__day
         , SUM(subq_4.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'metric_time__day']
+        -- Select: ['__bookings', 'metric_time__day']
         SELECT
           subq_3.metric_time__day
           , subq_3.__bookings
@@ -33,7 +33,7 @@ FROM (
             , subq_2.booking__is_instant
             , subq_2.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
+            -- Select: ['__bookings', 'booking__is_instant', 'metric_time__day']
             SELECT
               subq_1.metric_time__day
               , subq_1.booking__is_instant

@@ -28,12 +28,12 @@ FROM (
           subq_4.booking__ds__alien_day
           , SUM(subq_4.__booking_value) AS __booking_value
         FROM (
-          -- Pass Only Elements: ['__booking_value', 'booking__ds__alien_day']
+          -- Select: ['__booking_value', 'booking__ds__alien_day']
           SELECT
             subq_3.booking__ds__alien_day
             , subq_3.__booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value', 'booking__ds__alien_day']
+            -- Select: ['__booking_value', 'booking__ds__alien_day']
             SELECT
               subq_2.booking__ds__alien_day
               , subq_2.__booking_value
@@ -273,12 +273,12 @@ FROM (
           subq_10.booking__ds__alien_day
           , COUNT(DISTINCT subq_10.__bookers) AS __bookers
         FROM (
-          -- Pass Only Elements: ['__bookers', 'booking__ds__alien_day']
+          -- Select: ['__bookers', 'booking__ds__alien_day']
           SELECT
             subq_9.booking__ds__alien_day
             , subq_9.__bookers
           FROM (
-            -- Pass Only Elements: ['__bookers', 'booking__ds__alien_day']
+            -- Select: ['__bookers', 'booking__ds__alien_day']
             SELECT
               subq_8.booking__ds__alien_day
               , subq_8.__bookers

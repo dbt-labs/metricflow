@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__listings', 'user__home_state_latest']
+-- Select: ['__listings', 'user__home_state_latest']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,7 +14,7 @@ SELECT
   , SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
+  -- Select: ['__listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
   SELECT
     subq_11.listing__is_lux_latest AS listing__is_lux_latest
     , subq_11.listing__capacity_latest AS listing__capacity_latest

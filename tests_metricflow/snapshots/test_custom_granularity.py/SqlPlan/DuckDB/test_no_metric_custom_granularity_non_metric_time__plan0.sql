@@ -6,11 +6,11 @@ sql_engine: DuckDB
 SELECT
   subq_3.booking__ds__alien_day
 FROM (
-  -- Pass Only Elements: ['booking__ds__alien_day']
+  -- Select: ['booking__ds__alien_day']
   SELECT
     subq_2.booking__ds__alien_day
   FROM (
-    -- Pass Only Elements: ['booking__ds__alien_day']
+    -- Select: ['booking__ds__alien_day']
     SELECT
       subq_1.booking__ds__alien_day
     FROM (

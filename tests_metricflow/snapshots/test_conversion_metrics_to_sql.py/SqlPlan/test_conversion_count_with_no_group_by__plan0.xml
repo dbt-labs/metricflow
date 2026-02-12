@@ -57,7 +57,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['__visits']" -->
+                        <!-- description = "Select: ['__visits']" -->
                         <!-- node_id = NodeId(id_str='ss_195') -->
                         <!-- col0 =                                                                                       -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_42), column_alias='__visits') -->
@@ -65,7 +65,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['__visits']" -->
+                            <!-- description = "Select: ['__visits']" -->
                             <!-- node_id = NodeId(id_str='ss_194') -->
                             <!-- col0 =                                                -->
                             <!--   SqlSelectColumn(                                    -->
@@ -464,7 +464,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['__buys_fill_nulls_with_0']" -->
+                        <!-- description = "Select: ['__buys_fill_nulls_with_0']" -->
                         <!-- node_id = NodeId(id_str='ss_207') -->
                         <!-- col0 =                                                 -->
                         <!--   SqlSelectColumn(                                     -->
@@ -475,7 +475,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['__buys_fill_nulls_with_0']" -->
+                            <!-- description = "Select: ['__buys_fill_nulls_with_0']" -->
                             <!-- node_id = NodeId(id_str='ss_206') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
@@ -551,8 +551,7 @@ docstring:
                                     <!-- where = None -->
                                     <!-- distinct = True -->
                                     <SqlSelectStatementNode>
-                                        <!-- description =                                                    -->
-                                        <!--   "Pass Only Elements: ['__visits', 'metric_time__day', 'user']" -->
+                                        <!-- description = "Select: ['__visits', 'metric_time__day', 'user']" -->
                                         <!-- node_id = NodeId(id_str='ss_200') -->
                                         <!-- col0 =                                                -->
                                         <!--   SqlSelectColumn(                                    -->
@@ -573,8 +572,7 @@ docstring:
                                         <!-- where = None -->
                                         <!-- distinct = False -->
                                         <SqlSelectStatementNode>
-                                            <!-- description =                                                    -->
-                                            <!--   "Pass Only Elements: ['__visits', 'metric_time__day', 'user']" -->
+                                            <!-- description = "Select: ['__visits', 'metric_time__day', 'user']" -->
                                             <!-- node_id = NodeId(id_str='ss_199') -->
                                             <!-- col0 =                                                -->
                                             <!--   SqlSelectColumn(                                    -->

@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__homonymous_metric_and_entity', 'metric_time__day']
+-- Select: ['__homonymous_metric_and_entity', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -15,7 +15,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['__homonymous_metric_and_entity', 'metric_time__day']
+  -- Select: ['__homonymous_metric_and_entity', 'metric_time__day']
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , booking_value AS homonymous_metric_and_entity

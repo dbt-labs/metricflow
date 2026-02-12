@@ -18,8 +18,8 @@ docstring:
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_0') -->
                     <!-- null_fill_value_mapping = {'bookings': None} -->
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                         <!-- include_spec =                                                                  -->
@@ -28,8 +28,8 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_0') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                             <!-- include_spec =                                                                  -->
@@ -48,8 +48,8 @@ docstring:
                                     <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
-                    </FilterElementsNode>
+                        </SelectorNode>
+                    </SelectorNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
             <ComputeMetricsNode>
@@ -60,8 +60,8 @@ docstring:
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_1') -->
                     <!-- null_fill_value_mapping = {'listings': None} -->
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['__listings', 'metric_time__day']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['__listings', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_3') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='listings') -->
                         <!-- include_spec =                                                                  -->
@@ -70,8 +70,8 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['__listings', 'metric_time__day']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__listings', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_2') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='listings') -->
                             <!-- include_spec =                                                                  -->
@@ -90,8 +90,8 @@ docstring:
                                     <!-- data_set = SemanticModelDataSet('listings_latest') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
-                    </FilterElementsNode>
+                        </SelectorNode>
+                    </SelectorNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
         </CombineAggregatedOutputsNode>

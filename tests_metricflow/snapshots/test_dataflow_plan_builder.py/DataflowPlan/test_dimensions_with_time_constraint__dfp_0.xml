@@ -5,8 +5,8 @@ test_filename: test_dataflow_plan_builder.py
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
-        <FilterElementsNode>
-            <!-- description = "Pass Only Elements: ['listing__is_lux_latest', 'metric_time__month']" -->
+        <SelectorNode>
+            <!-- description = "Select: ['listing__is_lux_latest', 'metric_time__month']" -->
             <!-- node_id = NodeId(id_str='pfe_2') -->
             <!-- include_spec =                                                                                         -->
             <!--   DimensionSpec(element_name='is_lux_latest', entity_links=(EntityReference(element_name='listing'),)) -->
@@ -21,8 +21,8 @@ test_filename: test_dataflow_plan_builder.py
                 <!-- node_id = NodeId(id_str='ctr_0') -->
                 <!-- time_range_start = '2020-01-01T00:00:00' -->
                 <!-- time_range_end = '2020-01-03T00:00:00' -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['listing__is_lux_latest', 'metric_time__month']" -->
+                <SelectorNode>
+                    <!-- description = "Select: ['listing__is_lux_latest', 'metric_time__month']" -->
                     <!-- node_id = NodeId(id_str='pfe_1') -->
                     <!-- include_spec =                                               -->
                     <!--   DimensionSpec(                                             -->
@@ -38,15 +38,15 @@ test_filename: test_dataflow_plan_builder.py
                     <JoinOnEntitiesNode>
                         <!-- description = 'Join Standard Outputs' -->
                         <!-- node_id = NodeId(id_str='jso_0') -->
-                        <!-- join0_for_node_id_pfe_0 =                                                            -->
-                        <!--   JoinDescription(join_node=FilterElementsNode(node_id=pfe_0), join_type=CROSS_JOIN) -->
+                        <!-- join0_for_node_id_pfe_0 =                                                      -->
+                        <!--   JoinDescription(join_node=SelectorNode(node_id=pfe_0), join_type=CROSS_JOIN) -->
                         <ReadSqlSourceNode>
                             <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
                             <!-- node_id = NodeId(id_str='rss_28024') -->
                             <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['metric_time__month']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['metric_time__month']" -->
                             <!-- node_id = NodeId(id_str='pfe_0') -->
                             <!-- include_spec =                                                                      -->
                             <!--   TimeDimensionSpec(                                                                -->
@@ -64,10 +64,10 @@ test_filename: test_dataflow_plan_builder.py
                                     <!-- data_set = SqlDataSet() -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
+                        </SelectorNode>
                     </JoinOnEntitiesNode>
-                </FilterElementsNode>
+                </SelectorNode>
             </ConstrainTimeRangeNode>
-        </FilterElementsNode>
+        </SelectorNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

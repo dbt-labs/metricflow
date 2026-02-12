@@ -4,8 +4,8 @@ sql_engine: DuckDB
 ---
 -- Read From Time Spine 'mf_time_spine'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements: ['metric_time__quarter']
--- Pass Only Elements: ['metric_time__quarter']
+-- Select: ['metric_time__quarter']
+-- Select: ['metric_time__quarter']
 -- Write to DataTable
 SELECT
   DATE_TRUNC('quarter', ds) AS metric_time__quarter

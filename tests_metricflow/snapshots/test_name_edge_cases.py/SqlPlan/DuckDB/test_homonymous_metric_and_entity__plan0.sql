@@ -19,7 +19,7 @@ FROM (
       subq_4.metric_time__day
       , SUM(subq_4.__homonymous_metric_and_entity) AS __homonymous_metric_and_entity
     FROM (
-      -- Pass Only Elements: ['__homonymous_metric_and_entity', 'metric_time__day']
+      -- Select: ['__homonymous_metric_and_entity', 'metric_time__day']
       SELECT
         subq_3.metric_time__day
         , subq_3.__homonymous_metric_and_entity
@@ -29,7 +29,7 @@ FROM (
           subq_2.homonymous_metric_and_entity AS __homonymous_metric_and_entity
           , subq_2.metric_time__day
         FROM (
-          -- Pass Only Elements: ['__homonymous_metric_and_entity', 'metric_time__day']
+          -- Select: ['__homonymous_metric_and_entity', 'metric_time__day']
           SELECT
             subq_1.metric_time__day
             , subq_1.__homonymous_metric_and_entity AS homonymous_metric_and_entity

@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__bookings']
+-- Select: ['__bookings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,7 +14,7 @@ SELECT
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['__bookings', 'metric_time__alien_day']
+  -- Select: ['__bookings', 'metric_time__alien_day']
   SELECT
     subq_9.alien_day AS metric_time__alien_day
     , subq_8.__bookings AS bookings
