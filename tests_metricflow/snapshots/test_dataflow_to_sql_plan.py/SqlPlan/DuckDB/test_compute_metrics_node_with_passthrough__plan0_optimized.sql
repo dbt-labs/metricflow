@@ -10,7 +10,7 @@ SELECT
   , booking_value * 0.05 AS booking_fees
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['__booking_value']
+  -- Select: ['__booking_value']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT

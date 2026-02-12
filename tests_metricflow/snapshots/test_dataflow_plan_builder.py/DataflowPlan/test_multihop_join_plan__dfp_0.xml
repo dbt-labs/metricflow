@@ -15,8 +15,8 @@ docstring:
                 <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='am_0') -->
                 <!-- null_fill_value_mapping = {'txn_count': None} -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']" -->
+                <SelectorNode>
+                    <!-- description = "Select: ['__txn_count', 'account_id__customer_id__customer_name']" -->
                     <!-- node_id = NodeId(id_str='pfe_3') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='txn_count') -->
                     <!-- include_spec =                                     -->
@@ -28,9 +28,8 @@ docstring:
                     <!--     ),                                             -->
                     <!--   )                                                -->
                     <!-- distinct = False -->
-                    <FilterElementsNode>
-                        <!-- description =                                                                     -->
-                        <!--   "Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['__txn_count', 'account_id__customer_id__customer_name']" -->
                         <!-- node_id = NodeId(id_str='pfe_2') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='txn_count') -->
                         <!-- include_spec =                                     -->
@@ -47,7 +46,7 @@ docstring:
                             <!-- node_id = NodeId(id_str='jso_1') -->
                             <!-- join0_for_node_id_pfe_1 =                                         -->
                             <!--   JoinDescription(                                                -->
-                            <!--     join_node=FilterElementsNode(node_id=pfe_1),                  -->
+                            <!--     join_node=SelectorNode(node_id=pfe_1),                        -->
                             <!--     join_on_entity=LinklessEntitySpec(element_name='account_id'), -->
                             <!--     join_type=LEFT_OUTER,                                         -->
                             <!--     join_on_partition_time_dimensions=(                           -->
@@ -79,10 +78,9 @@ docstring:
                                     <!-- data_set = SemanticModelDataSet('account_month_txns') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
-                            <FilterElementsNode>
+                            <SelectorNode>
                                 <!-- description =                                                                   -->
-                                <!--   ("Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', " -->
-                                <!--    "'account_id']")                                                             -->
+                                <!--   "Select: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']" -->
                                 <!-- node_id = NodeId(id_str='pfe_1') -->
                                 <!-- include_spec =                                                   -->
                                 <!--   DimensionSpec(                                                 -->
@@ -101,7 +99,7 @@ docstring:
                                     <!-- node_id = NodeId(id_str='jso_0') -->
                                     <!-- join0_for_node_id_pfe_0 =                                          -->
                                     <!--   JoinDescription(                                                 -->
-                                    <!--     join_node=FilterElementsNode(node_id=pfe_0),                   -->
+                                    <!--     join_node=SelectorNode(node_id=pfe_0),                         -->
                                     <!--     join_on_entity=LinklessEntitySpec(element_name='customer_id'), -->
                                     <!--     join_type=LEFT_OUTER,                                          -->
                                     <!--     join_on_partition_time_dimensions=(                            -->
@@ -133,9 +131,9 @@ docstring:
                                             <!-- data_set = SemanticModelDataSet('bridge_table') -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
-                                    <FilterElementsNode>
+                                    <SelectorNode>
                                         <!-- description =                                            -->
-                                        <!--   ('Pass Only Elements: [\n'                             -->
+                                        <!--   ('Select: [\n'                                         -->
                                         <!--    "  'customer_name',\n"                                -->
                                         <!--    "  'customer_atomic_weight',\n"                       -->
                                         <!--    "  'customer_id__customer_name',\n"                   -->
@@ -382,12 +380,12 @@ docstring:
                                                 <!-- data_set = SemanticModelDataSet('customer_table') -->
                                             </ReadSqlSourceNode>
                                         </MetricTimeDimensionTransformNode>
-                                    </FilterElementsNode>
+                                    </SelectorNode>
                                 </JoinOnEntitiesNode>
-                            </FilterElementsNode>
+                            </SelectorNode>
                         </JoinOnEntitiesNode>
-                    </FilterElementsNode>
-                </FilterElementsNode>
+                    </SelectorNode>
+                </SelectorNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataTableNode>

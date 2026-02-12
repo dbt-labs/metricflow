@@ -10,13 +10,13 @@ SELECT
   , subq_18.__archived_users_join_to_time_spine AS archived_users_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day']
+  -- Select: ['metric_time__day']
   SELECT
     metric_time__day
   FROM (
     -- Read From Time Spine 'mf_time_spine_hour'
     -- Change Column Aliases
-    -- Pass Only Elements: ['metric_time__day', 'metric_time__hour']
+    -- Select: ['metric_time__day', 'metric_time__hour']
     SELECT
       ts AS metric_time__hour
       , DATE_TRUNC('day', ts) AS metric_time__day
@@ -28,7 +28,7 @@ FROM (
 ) subq_23
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__archived_users_join_to_time_spine', 'metric_time__day']
+  -- Select: ['__archived_users_join_to_time_spine', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
@@ -36,7 +36,7 @@ LEFT OUTER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
-    -- Pass Only Elements: ['__archived_users_join_to_time_spine', 'metric_time__day', 'metric_time__hour']
+    -- Select: ['__archived_users_join_to_time_spine', 'metric_time__day', 'metric_time__hour']
     SELECT
       DATE_TRUNC('hour', archived_at) AS metric_time__hour
       , DATE_TRUNC('day', archived_at) AS metric_time__day

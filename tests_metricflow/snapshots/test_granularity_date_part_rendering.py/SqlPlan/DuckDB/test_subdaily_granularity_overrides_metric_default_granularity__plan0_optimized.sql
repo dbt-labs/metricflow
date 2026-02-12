@@ -17,8 +17,8 @@ LEFT OUTER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
-    -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
-    -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
+    -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
+    -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
     SELECT
       DATE_TRUNC('hour', archived_at) AS metric_time__hour
       , 1 AS __subdaily_join_to_time_spine_metric

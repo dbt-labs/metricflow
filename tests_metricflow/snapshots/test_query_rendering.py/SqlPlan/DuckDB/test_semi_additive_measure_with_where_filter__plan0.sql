@@ -19,7 +19,7 @@ FROM (
       subq_7.user
       , SUM(subq_7.__current_account_balance_by_user) AS __current_account_balance_by_user
     FROM (
-      -- Pass Only Elements: ['__current_account_balance_by_user', 'user']
+      -- Select: ['__current_account_balance_by_user', 'user']
       SELECT
         subq_6.user
         , subq_6.__current_account_balance_by_user
@@ -38,7 +38,7 @@ FROM (
             , subq_2.ds__day
             , subq_2.user
           FROM (
-            -- Pass Only Elements: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
+            -- Select: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
             SELECT
               subq_1.ds__day
               , subq_1.user
@@ -163,7 +163,7 @@ FROM (
               , subq_2.ds__day
               , subq_2.user
             FROM (
-              -- Pass Only Elements: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
+              -- Select: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
               SELECT
                 subq_1.ds__day
                 , subq_1.user

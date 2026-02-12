@@ -3,8 +3,8 @@ test_filename: test_metric_time_without_metrics.py
 sql_engine: DuckDB
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
--- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
+-- Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
+-- Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
 -- Write to DataTable
 SELECT
   time_spine_src_28006.ds AS metric_time__day

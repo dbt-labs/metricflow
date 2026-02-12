@@ -102,8 +102,8 @@ docstring:
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
                         <!-- null_fill_value_mapping = {'bookings': None} -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__month']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__bookings', 'metric_time__month']" -->
                             <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                             <!-- include_spec =                                                                      -->
@@ -139,9 +139,9 @@ docstring:
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->
-                                <FilterElementsNode>
-                                    <!-- description =                                                                    -->
-                                    <!--   "Pass Only Elements: ['__bookings', 'metric_time__month', 'metric_time__day']" -->
+                                <SelectorNode>
+                                    <!-- description =                                                        -->
+                                    <!--   "Select: ['__bookings', 'metric_time__month', 'metric_time__day']" -->
                                     <!-- node_id = NodeId(id_str='pfe_0') -->
                                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                     <!-- include_spec =                                -->
@@ -168,12 +168,12 @@ docstring:
                                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
-                                </FilterElementsNode>
+                                </SelectorNode>
                             </WhereConstraintNode>
-                        </FilterElementsNode>
+                        </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['metric_time__month']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['metric_time__month']" -->
                         <!-- node_id = NodeId(id_str='pfe_3') -->
                         <!-- include_spec =                                                                      -->
                         <!--   TimeDimensionSpec(                                                                -->
@@ -206,8 +206,8 @@ docstring:
                             <!--       ),                                                    -->
                             <!--     ),                                                      -->
                             <!--   )                                                         -->
-                            <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['metric_time__month', 'metric_time__day']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['metric_time__month', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_2') -->
                                 <!-- include_spec =                                                                      -->
                                 <!--   TimeDimensionSpec(                                                                -->
@@ -264,9 +264,9 @@ docstring:
                                         <!-- data_set = SqlDataSet() -->
                                     </ReadSqlSourceNode>
                                 </AliasSpecsNode>
-                            </FilterElementsNode>
+                            </SelectorNode>
                         </WhereConstraintNode>
-                    </FilterElementsNode>
+                    </SelectorNode>
                 </JoinToTimeSpineNode>
             </ComputeMetricsNode>
         </ComputeMetricsNode>

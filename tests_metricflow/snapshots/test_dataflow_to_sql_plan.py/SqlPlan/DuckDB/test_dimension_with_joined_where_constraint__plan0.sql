@@ -8,7 +8,7 @@ sql_engine: DuckDB
 SELECT
   subq_6.user__home_state_latest
 FROM (
-  -- Pass Only Elements: ['user__home_state_latest']
+  -- Select: ['user__home_state_latest']
   SELECT
     subq_5.user__home_state_latest
   FROM (
@@ -17,7 +17,7 @@ FROM (
       subq_4.listing__country_latest
       , subq_4.user__home_state_latest
     FROM (
-      -- Pass Only Elements: ['user__home_state_latest', 'listing__country_latest']
+      -- Select: ['user__home_state_latest', 'listing__country_latest']
       SELECT
         subq_3.listing__country_latest
         , subq_3.user__home_state_latest
@@ -147,7 +147,7 @@ FROM (
           FROM ***************************.dim_listings_latest listings_latest_src_28000
         ) subq_0
         FULL OUTER JOIN (
-          -- Pass Only Elements: ['home_state_latest', 'user']
+          -- Select: ['home_state_latest', 'user']
           SELECT
             subq_1.user
             , subq_1.home_state_latest

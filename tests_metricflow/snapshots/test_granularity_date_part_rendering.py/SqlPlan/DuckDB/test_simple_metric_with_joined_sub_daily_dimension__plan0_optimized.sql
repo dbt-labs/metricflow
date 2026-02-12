@@ -3,8 +3,8 @@ test_filename: test_granularity_date_part_rendering.py
 sql_engine: DuckDB
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['__bookings', 'listing__user__bio_added_ts__minute']
--- Pass Only Elements: ['__bookings', 'listing__user__bio_added_ts__minute']
+-- Select: ['__bookings', 'listing__user__bio_added_ts__minute']
+-- Select: ['__bookings', 'listing__user__bio_added_ts__minute']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -22,7 +22,7 @@ FROM (
 ) subq_27
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['user__ds_partitioned__day', 'user__bio_added_ts__minute', 'listing']
+  -- Select: ['user__ds_partitioned__day', 'user__bio_added_ts__minute', 'listing']
   SELECT
     DATE_TRUNC('day', users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__day
     , DATE_TRUNC('minute', users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__minute

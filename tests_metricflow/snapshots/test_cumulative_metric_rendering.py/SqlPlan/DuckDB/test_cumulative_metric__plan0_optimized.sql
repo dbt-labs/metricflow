@@ -6,8 +6,8 @@ sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements: ['__revenue', 'ds__day']
--- Pass Only Elements: ['__revenue', 'ds__day']
+-- Select: ['__revenue', 'ds__day']
+-- Select: ['__revenue', 'ds__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

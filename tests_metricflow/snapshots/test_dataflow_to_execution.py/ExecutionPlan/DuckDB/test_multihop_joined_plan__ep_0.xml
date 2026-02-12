@@ -9,8 +9,8 @@ docstring:
         <!-- node_id = NodeId(id_str='rsq_0') -->
         <!-- sql =                                                                                                   -->
         <!--   ('-- Join Standard Outputs\n'                                                                         -->
-        <!--    "-- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']\n"                 -->
-        <!--    "-- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']\n"                 -->
+        <!--    "-- Select: ['__txn_count', 'account_id__customer_id__customer_name']\n"                             -->
+        <!--    "-- Select: ['__txn_count', 'account_id__customer_id__customer_name']\n"                             -->
         <!--    '-- Aggregate Inputs for Simple Metrics\n'                                                           -->
         <!--    '-- Compute Metrics via Expressions\n'                                                               -->
         <!--    '-- Write to DataTable\n'                                                                            -->
@@ -20,7 +20,7 @@ docstring:
         <!--    'FROM ***************************.account_month_txns account_month_txns_src_22000\n'                 -->
         <!--    'LEFT OUTER JOIN (\n'                                                                                -->
         <!--    '  -- Join Standard Outputs\n'                                                                       -->
-        <!--    "  -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']\n"     -->
+        <!--    "  -- Select: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']\n"                 -->
         <!--    '  SELECT\n'                                                                                         -->
         <!--    "    DATE_TRUNC('day', bridge_table_src_22000.ds_partitioned) AS ds_partitioned__day\n"              -->
         <!--    '    , bridge_table_src_22000.account_id AS account_id\n'                                            -->

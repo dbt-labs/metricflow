@@ -23,11 +23,11 @@ FROM (
         SELECT
           SUM(subq_3.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings']
+          -- Select: ['__bookings']
           SELECT
             subq_2.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings']
+            -- Select: ['__bookings']
             SELECT
               subq_1.__bookings
             FROM (
@@ -256,11 +256,11 @@ FROM (
         SELECT
           SUM(subq_9.__listings) AS __listings
         FROM (
-          -- Pass Only Elements: ['__listings']
+          -- Select: ['__listings']
           SELECT
             subq_8.__listings
           FROM (
-            -- Pass Only Elements: ['__listings']
+            -- Select: ['__listings']
             SELECT
               subq_7.__listings
             FROM (

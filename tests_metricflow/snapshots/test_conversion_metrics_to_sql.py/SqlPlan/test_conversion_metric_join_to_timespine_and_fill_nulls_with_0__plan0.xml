@@ -86,7 +86,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                        <!-- description = "Select: ['metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='ss_202') -->
                         <!-- col0 =                                                -->
                         <!--   SqlSelectColumn(                                    -->
@@ -97,7 +97,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                            <!-- description = "Select: ['metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_201') -->
                             <!-- col0 =                                                -->
                             <!--   SqlSelectColumn(                                    -->
@@ -270,9 +270,8 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description =                                                              -->
-                            <!--   ("Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', " -->
-                            <!--    "'metric_time__day']")                                                  -->
+                            <!-- description =                                                                    -->
+                            <!--   "Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_197') -->
                             <!-- col0 =                                                -->
                             <!--   SqlSelectColumn(                                    -->
@@ -288,9 +287,8 @@ docstring:
                             <!-- where = None -->
                             <!-- distinct = False -->
                             <SqlSelectStatementNode>
-                                <!-- description =                                                              -->
-                                <!--   ("Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', " -->
-                                <!--    "'metric_time__day']")                                                  -->
+                                <!-- description =                                                                    -->
+                                <!--   "Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='ss_196') -->
                                 <!-- col0 =                                                -->
                                 <!--   SqlSelectColumn(                                    -->
@@ -707,7 +705,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                        <!-- description = "Select: ['metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='ss_219') -->
                         <!-- col0 =                                                 -->
                         <!--   SqlSelectColumn(                                     -->
@@ -718,7 +716,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                            <!-- description = "Select: ['metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_218') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
@@ -891,9 +889,8 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description =                                                            -->
-                            <!--   ("Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', " -->
-                            <!--    "'metric_time__day']")                                                -->
+                            <!-- description =                                                                  -->
+                            <!--   "Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_214') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
@@ -909,9 +906,8 @@ docstring:
                             <!-- where = None -->
                             <!-- distinct = False -->
                             <SqlSelectStatementNode>
-                                <!-- description =                                                            -->
-                                <!--   ("Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', " -->
-                                <!--    "'metric_time__day']")                                                -->
+                                <!-- description =                                                                  -->
+                                <!--   "Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='ss_213') -->
                                 <!-- col0 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
@@ -992,10 +988,9 @@ docstring:
                                         <!-- where = None -->
                                         <!-- distinct = True -->
                                         <SqlSelectStatementNode>
-                                            <!-- description =                                          -->
-                                            <!--   ('Pass Only Elements: '                              -->
-                                            <!--    "['__visits_fill_nulls_with_0_join_to_timespine', " -->
-                                            <!--    "'metric_time__day', 'user']")                      -->
+                                            <!-- description =                                                  -->
+                                            <!--   ("Select: ['__visits_fill_nulls_with_0_join_to_timespine', " -->
+                                            <!--    "'metric_time__day', 'user']")                              -->
                                             <!-- node_id = NodeId(id_str='ss_207') -->
                                             <!-- col0 =                                                -->
                                             <!--   SqlSelectColumn(                                    -->
@@ -1016,10 +1011,9 @@ docstring:
                                             <!-- where = None -->
                                             <!-- distinct = False -->
                                             <SqlSelectStatementNode>
-                                                <!-- description =                                          -->
-                                                <!--   ('Pass Only Elements: '                              -->
-                                                <!--    "['__visits_fill_nulls_with_0_join_to_timespine', " -->
-                                                <!--    "'metric_time__day', 'user']")                      -->
+                                                <!-- description =                                                  -->
+                                                <!--   ("Select: ['__visits_fill_nulls_with_0_join_to_timespine', " -->
+                                                <!--    "'metric_time__day', 'user']")                              -->
                                                 <!-- node_id = NodeId(id_str='ss_206') -->
                                                 <!-- col0 =                                                -->
                                                 <!--   SqlSelectColumn(                                    -->

@@ -23,7 +23,7 @@ FROM (
         subq_5.metric_time__alien_day
         , SUM(subq_5.__visits) AS __visits
       FROM (
-        -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
+        -- Select: ['__visits', 'metric_time__alien_day']
         SELECT
           subq_4.metric_time__alien_day
           , subq_4.__visits
@@ -33,7 +33,7 @@ FROM (
             subq_3.visits AS __visits
             , subq_3.metric_time__alien_day
           FROM (
-            -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
+            -- Select: ['__visits', 'metric_time__alien_day']
             SELECT
               subq_2.metric_time__alien_day
               , subq_2.__visits AS visits
@@ -136,12 +136,12 @@ FROM (
         subq_18.metric_time__alien_day
         , SUM(subq_18.__buys) AS __buys
       FROM (
-        -- Pass Only Elements: ['__buys', 'metric_time__alien_day']
+        -- Select: ['__buys', 'metric_time__alien_day']
         SELECT
           subq_17.metric_time__alien_day
           , subq_17.__buys
         FROM (
-          -- Pass Only Elements: ['__buys', 'metric_time__alien_day']
+          -- Select: ['__buys', 'metric_time__alien_day']
           SELECT
             subq_16.metric_time__alien_day
             , subq_16.__buys
@@ -191,7 +191,7 @@ FROM (
                 , subq_14.mf_internal_uuid AS mf_internal_uuid
                 , subq_14.__buys AS __buys
               FROM (
-                -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+                -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
                 SELECT
                   subq_10.metric_time__alien_day
                   , subq_10.metric_time__day
@@ -205,7 +205,7 @@ FROM (
                     , subq_9.metric_time__day
                     , subq_9.user
                   FROM (
-                    -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+                    -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
                     SELECT
                       subq_8.metric_time__alien_day
                       , subq_8.metric_time__day

@@ -14,7 +14,7 @@ FROM (
     SELECT
       SUM(subq_39.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Select: ['__listings']
       SELECT
         subq_38.__listings
       FROM (
@@ -23,7 +23,7 @@ FROM (
           subq_37.listings AS __listings
           , subq_37.user__visit_buy_conversion_rate
         FROM (
-          -- Pass Only Elements: ['__listings', 'user__visit_buy_conversion_rate']
+          -- Select: ['__listings', 'user__visit_buy_conversion_rate']
           SELECT
             subq_36.user__visit_buy_conversion_rate
             , subq_36.__listings AS listings
@@ -237,7 +237,7 @@ FROM (
               ) subq_15
             ) subq_16
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['user', 'user__visit_buy_conversion_rate']
+              -- Select: ['user', 'user__visit_buy_conversion_rate']
               SELECT
                 subq_34.user
                 , subq_34.user__visit_buy_conversion_rate
@@ -258,12 +258,12 @@ FROM (
                       subq_20.user
                       , SUM(subq_20.__visits) AS __visits
                     FROM (
-                      -- Pass Only Elements: ['__visits', 'user']
+                      -- Select: ['__visits', 'user']
                       SELECT
                         subq_19.user
                         , subq_19.__visits
                       FROM (
-                        -- Pass Only Elements: ['__visits', 'user']
+                        -- Select: ['__visits', 'user']
                         SELECT
                           subq_18.user
                           , subq_18.__visits
@@ -358,12 +358,12 @@ FROM (
                       subq_31.user
                       , SUM(subq_31.__buys) AS __buys
                     FROM (
-                      -- Pass Only Elements: ['__buys', 'user']
+                      -- Select: ['__buys', 'user']
                       SELECT
                         subq_30.user
                         , subq_30.__buys
                       FROM (
-                        -- Pass Only Elements: ['__buys', 'user']
+                        -- Select: ['__buys', 'user']
                         SELECT
                           subq_29.user
                           , subq_29.__buys
@@ -404,13 +404,13 @@ FROM (
                               , subq_27.mf_internal_uuid AS mf_internal_uuid
                               , subq_27.__buys AS __buys
                             FROM (
-                              -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
+                              -- Select: ['__visits', 'metric_time__day', 'user']
                               SELECT
                                 subq_23.metric_time__day
                                 , subq_23.user
                                 , subq_23.__visits
                               FROM (
-                                -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
+                                -- Select: ['__visits', 'metric_time__day', 'user']
                                 SELECT
                                   subq_22.metric_time__day
                                   , subq_22.user

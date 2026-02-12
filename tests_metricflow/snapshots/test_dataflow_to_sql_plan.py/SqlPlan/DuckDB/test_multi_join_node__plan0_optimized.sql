@@ -7,7 +7,7 @@ sql_engine: DuckDB
 -- Join Standard Outputs
 WITH pfe_1_cte AS (
   -- Read Elements From Semantic Model 'listings_latest'
-  -- Pass Only Elements: ['country_latest', 'listing']
+  -- Select: ['country_latest', 'listing']
   SELECT
     listing_id AS listing
     , country AS country_latest
@@ -21,7 +21,7 @@ SELECT
   , subq_6.__bookings AS __bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['__bookings', 'listing']
+  -- Select: ['__bookings', 'listing']
   SELECT
     listing_id AS listing
     , 1 AS __bookings

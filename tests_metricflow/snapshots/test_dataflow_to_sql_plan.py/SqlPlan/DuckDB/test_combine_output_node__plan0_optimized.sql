@@ -22,7 +22,7 @@ SELECT
   , COALESCE(MAX(subq_11.__bookers), 1) AS __bookers
 FROM (
   -- Read From CTE For node_id=rss_28001
-  -- Pass Only Elements: ['__bookings', 'is_instant']
+  -- Select: ['__bookings', 'is_instant']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     is_instant
@@ -33,7 +33,7 @@ FROM (
 ) subq_8
 FULL OUTER JOIN (
   -- Read From CTE For node_id=rss_28001
-  -- Pass Only Elements: ['__instant_bookings', '__bookers', 'is_instant']
+  -- Select: ['__instant_bookings', '__bookers', 'is_instant']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     is_instant

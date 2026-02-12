@@ -17,13 +17,13 @@ test_filename: test_dataflow_plan_builder.py
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                     <!-- node_id = NodeId(id_str='am_0') -->
                     <!-- null_fill_value_mapping = {'revenue': None} -->
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['__revenue']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['__revenue']" -->
                         <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='revenue') -->
                         <!-- distinct = False -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['__revenue']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__revenue']" -->
                             <!-- node_id = NodeId(id_str='pfe_0') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='revenue') -->
                             <!-- distinct = False -->
@@ -37,8 +37,8 @@ test_filename: test_dataflow_plan_builder.py
                                     <!-- data_set = SemanticModelDataSet('revenue') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
-                    </FilterElementsNode>
+                        </SelectorNode>
+                    </SelectorNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>
         </ComputeMetricsNode>

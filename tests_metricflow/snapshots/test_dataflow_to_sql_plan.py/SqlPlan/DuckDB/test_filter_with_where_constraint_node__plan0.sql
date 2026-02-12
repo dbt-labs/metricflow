@@ -9,7 +9,7 @@ SELECT
   subq_1.bookings AS __bookings
   , subq_1.ds__day
 FROM (
-  -- Pass Only Elements: ['__bookings', 'ds__day']
+  -- Select: ['__bookings', 'ds__day']
   SELECT
     subq_0.ds__day
     , subq_0.__bookings AS bookings

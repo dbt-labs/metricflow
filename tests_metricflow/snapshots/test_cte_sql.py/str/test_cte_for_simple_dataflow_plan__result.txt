@@ -5,7 +5,7 @@ docstring:
 ---
 sql_without_cte:
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['__bookings']
+  -- Select: ['__bookings']
   SELECT
     1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
@@ -13,7 +13,7 @@ sql_without_cte:
 
 sql_with_cte:
   -- Read From CTE For node_id=rss_28001
-  -- Pass Only Elements: ['__bookings']
+  -- Select: ['__bookings']
   WITH rss_28001_cte AS (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT

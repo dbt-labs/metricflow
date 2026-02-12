@@ -17,11 +17,11 @@ FROM (
       subq_8.metric_time__month AS metric_time__month
       , subq_4.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
     FROM (
-      -- Pass Only Elements: ['metric_time__month']
+      -- Select: ['metric_time__month']
       SELECT
         subq_7.metric_time__month
       FROM (
-        -- Pass Only Elements: ['metric_time__month']
+        -- Select: ['metric_time__month']
         SELECT
           subq_6.metric_time__month
         FROM (
@@ -67,12 +67,12 @@ FROM (
         subq_3.metric_time__month
         , SUM(subq_3.__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
       FROM (
-        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__month']
+        -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__month']
         SELECT
           subq_2.metric_time__month
           , subq_2.__bookings_fill_nulls_with_0
         FROM (
-          -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__month']
+          -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__month']
           SELECT
             subq_1.metric_time__month
             , subq_1.__bookings_fill_nulls_with_0

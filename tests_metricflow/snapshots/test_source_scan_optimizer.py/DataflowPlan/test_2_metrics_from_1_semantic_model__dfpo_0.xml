@@ -18,10 +18,9 @@ docstring:
                 <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='am_2') -->
                 <!-- null_fill_value_mapping = {'bookings': None, 'booking_value': None} -->
-                <FilterElementsNode>
-                    <!-- description =                                                                          -->
-                    <!--   ("Pass Only Elements: ['__bookings', '__booking_value', 'listing__country_latest', " -->
-                    <!--    "'metric_time__day']")                                                              -->
+                <SelectorNode>
+                    <!-- description =                                                                                -->
+                    <!--   "Select: ['__bookings', '__booking_value', 'listing__country_latest', 'metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='pfe_8') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
@@ -36,10 +35,9 @@ docstring:
                     <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                     <!--   )                                                                             -->
                     <!-- distinct = False -->
-                    <FilterElementsNode>
-                        <!-- description =                                                                          -->
-                        <!--   ("Pass Only Elements: ['__bookings', '__booking_value', 'listing__country_latest', " -->
-                        <!--    "'metric_time__day']")                                                              -->
+                    <SelectorNode>
+                        <!-- description =                                                                                -->
+                        <!--   "Select: ['__bookings', '__booking_value', 'listing__country_latest', 'metric_time__day']" -->
                         <!-- node_id = NodeId(id_str='pfe_7') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
@@ -59,7 +57,7 @@ docstring:
                             <!-- node_id = NodeId(id_str='jso_2') -->
                             <!-- join0_for_node_id_pfe_6 =                                      -->
                             <!--   JoinDescription(                                             -->
-                            <!--     join_node=FilterElementsNode(node_id=pfe_6),               -->
+                            <!--     join_node=SelectorNode(node_id=pfe_6),                     -->
                             <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
                             <!--     join_type=LEFT_OUTER,                                      -->
                             <!--   )                                                            -->
@@ -73,8 +71,8 @@ docstring:
                                     <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
-                            <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['country_latest', 'listing']" -->
                                 <!-- node_id = NodeId(id_str='pfe_6') -->
                                 <!-- include_spec = DimensionSpec(element_name='country_latest') -->
                                 <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
@@ -89,10 +87,10 @@ docstring:
                                         <!-- data_set = SemanticModelDataSet('listings_latest') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
-                            </FilterElementsNode>
+                            </SelectorNode>
                         </JoinOnEntitiesNode>
-                    </FilterElementsNode>
-                </FilterElementsNode>
+                    </SelectorNode>
+                </SelectorNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataTableNode>

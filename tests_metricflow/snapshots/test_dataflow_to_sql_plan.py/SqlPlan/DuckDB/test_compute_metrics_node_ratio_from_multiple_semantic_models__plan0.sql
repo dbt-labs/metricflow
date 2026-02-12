@@ -35,13 +35,13 @@ FROM (
           , subq_7.listing__country_latest
           , SUM(subq_7.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']
+          -- Select: ['__bookings', 'listing__country_latest', 'ds__day']
           SELECT
             subq_6.ds__day
             , subq_6.listing__country_latest
             , subq_6.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'ds__day']
+            -- Select: ['__bookings', 'listing__country_latest', 'ds__day']
             SELECT
               subq_5.ds__day
               , subq_5.listing__country_latest
@@ -371,7 +371,7 @@ FROM (
                 ) subq_0
               ) subq_1
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['country_latest', 'listing']
+                -- Select: ['country_latest', 'listing']
                 SELECT
                   subq_3.listing
                   , subq_3.country_latest
@@ -535,13 +535,13 @@ FROM (
           , subq_16.listing__country_latest
           , SUM(subq_16.__views) AS __views
         FROM (
-          -- Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']
+          -- Select: ['__views', 'listing__country_latest', 'ds__day']
           SELECT
             subq_15.ds__day
             , subq_15.listing__country_latest
             , subq_15.__views
           FROM (
-            -- Pass Only Elements: ['__views', 'listing__country_latest', 'ds__day']
+            -- Select: ['__views', 'listing__country_latest', 'ds__day']
             SELECT
               subq_14.ds__day
               , subq_14.listing__country_latest
@@ -729,7 +729,7 @@ FROM (
                 ) subq_10
               ) subq_11
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['country_latest', 'listing']
+                -- Select: ['country_latest', 'listing']
                 SELECT
                   subq_12.listing
                   , subq_12.country_latest

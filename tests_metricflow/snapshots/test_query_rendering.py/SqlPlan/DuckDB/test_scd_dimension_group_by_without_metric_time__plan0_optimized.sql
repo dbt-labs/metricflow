@@ -3,7 +3,7 @@ test_filename: test_query_rendering.py
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__family_bookings', 'listing__capacity']
+-- Select: ['__family_bookings', 'listing__capacity']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -12,7 +12,7 @@ SELECT
   , SUM(family_bookings) AS family_bookings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__family_bookings', 'listing__capacity']
+  -- Select: ['__family_bookings', 'listing__capacity']
   SELECT
     listings_src_26000.capacity AS listing__capacity
     , subq_11.__family_bookings AS family_bookings

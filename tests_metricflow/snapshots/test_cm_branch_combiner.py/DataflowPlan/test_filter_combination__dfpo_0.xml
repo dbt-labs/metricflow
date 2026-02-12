@@ -7,8 +7,8 @@ docstring:
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
-        <FilterElementsNode>
-            <!-- description = "Pass Only Elements: ['__bookings', '__booking_value']" -->
+        <SelectorNode>
+            <!-- description = "Select: ['__bookings', '__booking_value']" -->
             <!-- node_id = NodeId(id_str='pfe_2') -->
             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
             <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
@@ -18,6 +18,6 @@ docstring:
                 <!-- node_id = NodeId(id_str='rss_0') -->
                 <!-- data_set = SemanticModelDataSet('bookings_source') -->
             </ReadSqlSourceNode>
-        </FilterElementsNode>
+        </SelectorNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

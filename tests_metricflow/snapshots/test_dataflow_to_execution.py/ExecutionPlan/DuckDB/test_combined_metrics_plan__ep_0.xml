@@ -28,8 +28,8 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  , MAX(subq_15.booking_value) AS booking_value\n'                                       -->
         <!--    'FROM (\n'                                                                                -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                              -->
-        <!--    "  -- Pass Only Elements: ['__bookings', 'is_instant', 'ds__day']\n"                      -->
-        <!--    "  -- Pass Only Elements: ['__bookings', 'is_instant', 'ds__day']\n"                      -->
+        <!--    "  -- Select: ['__bookings', 'is_instant', 'ds__day']\n"                                  -->
+        <!--    "  -- Select: ['__bookings', 'is_instant', 'ds__day']\n"                                  -->
         <!--    '  -- Aggregate Inputs for Simple Metrics\n'                                              -->
         <!--    '  -- Compute Metrics via Expressions\n'                                                  -->
         <!--    '  SELECT\n'                                                                              -->
@@ -43,8 +43,8 @@ test_filename: test_dataflow_to_execution.py
         <!--    ') subq_5\n'                                                                              -->
         <!--    'FULL OUTER JOIN (\n'                                                                     -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                              -->
-        <!--    "  -- Pass Only Elements: ['__instant_bookings', 'is_instant', 'ds__day']\n"              -->
-        <!--    "  -- Pass Only Elements: ['__instant_bookings', 'is_instant', 'ds__day']\n"              -->
+        <!--    "  -- Select: ['__instant_bookings', 'is_instant', 'ds__day']\n"                          -->
+        <!--    "  -- Select: ['__instant_bookings', 'is_instant', 'ds__day']\n"                          -->
         <!--    '  -- Aggregate Inputs for Simple Metrics\n'                                              -->
         <!--    '  -- Compute Metrics via Expressions\n'                                                  -->
         <!--    '  SELECT\n'                                                                              -->
@@ -64,8 +64,8 @@ test_filename: test_dataflow_to_execution.py
         <!--    '  )\n'                                                                                   -->
         <!--    'FULL OUTER JOIN (\n'                                                                     -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                              -->
-        <!--    "  -- Pass Only Elements: ['__booking_value', 'is_instant', 'ds__day']\n"                 -->
-        <!--    "  -- Pass Only Elements: ['__booking_value', 'is_instant', 'ds__day']\n"                 -->
+        <!--    "  -- Select: ['__booking_value', 'is_instant', 'ds__day']\n"                             -->
+        <!--    "  -- Select: ['__booking_value', 'is_instant', 'ds__day']\n"                             -->
         <!--    '  -- Aggregate Inputs for Simple Metrics\n'                                              -->
         <!--    '  -- Compute Metrics via Expressions\n'                                                  -->
         <!--    '  SELECT\n'                                                                              -->

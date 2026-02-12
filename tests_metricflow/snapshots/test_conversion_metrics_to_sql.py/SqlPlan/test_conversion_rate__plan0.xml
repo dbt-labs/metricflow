@@ -85,7 +85,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['__visits', 'visit__referrer_id']" -->
+                        <!-- description = "Select: ['__visits', 'visit__referrer_id']" -->
                         <!-- node_id = NodeId(id_str='ss_203') -->
                         <!-- col0 =                                                -->
                         <!--   SqlSelectColumn(                                    -->
@@ -98,7 +98,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['__visits', 'visit__referrer_id']" -->
+                            <!-- description = "Select: ['__visits', 'visit__referrer_id']" -->
                             <!-- node_id = NodeId(id_str='ss_202') -->
                             <!-- col0 =                                                -->
                             <!--   SqlSelectColumn(                                    -->
@@ -512,7 +512,7 @@ docstring:
                     <!-- where = None -->
                     <!-- distinct = False -->
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['__buys', 'visit__referrer_id']" -->
+                        <!-- description = "Select: ['__buys', 'visit__referrer_id']" -->
                         <!-- node_id = NodeId(id_str='ss_215') -->
                         <!-- col0 =                                                 -->
                         <!--   SqlSelectColumn(                                     -->
@@ -525,7 +525,7 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['__buys', 'visit__referrer_id']" -->
+                            <!-- description = "Select: ['__buys', 'visit__referrer_id']" -->
                             <!-- node_id = NodeId(id_str='ss_214') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
@@ -616,9 +616,8 @@ docstring:
                                     <!-- where = None -->
                                     <!-- distinct = True -->
                                     <SqlSelectStatementNode>
-                                        <!-- description =                                                -->
-                                        <!--   ("Pass Only Elements: ['__visits', 'visit__referrer_id', " -->
-                                        <!--    "'metric_time__day', 'user']")                            -->
+                                        <!-- description =                                                              -->
+                                        <!--   "Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']" -->
                                         <!-- node_id = NodeId(id_str='ss_208') -->
                                         <!-- col0 =                                                -->
                                         <!--   SqlSelectColumn(                                    -->
@@ -644,9 +643,9 @@ docstring:
                                         <!-- where = None -->
                                         <!-- distinct = False -->
                                         <SqlSelectStatementNode>
-                                            <!-- description =                                                -->
-                                            <!--   ("Pass Only Elements: ['__visits', 'visit__referrer_id', " -->
-                                            <!--    "'metric_time__day', 'user']")                            -->
+                                            <!-- description =                                                        -->
+                                            <!--   ("Select: ['__visits', 'visit__referrer_id', 'metric_time__day', " -->
+                                            <!--    "'user']")                                                        -->
                                             <!-- node_id = NodeId(id_str='ss_207') -->
                                             <!-- col0 =                                                -->
                                             <!--   SqlSelectColumn(                                    -->

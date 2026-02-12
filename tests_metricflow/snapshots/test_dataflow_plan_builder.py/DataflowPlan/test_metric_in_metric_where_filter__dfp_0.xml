@@ -15,8 +15,8 @@ docstring:
                 <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='am_1') -->
                 <!-- null_fill_value_mapping = {'active_listings': None} -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['__active_listings']" -->
+                <SelectorNode>
+                    <!-- description = "Select: ['__active_listings']" -->
                     <!-- node_id = NodeId(id_str='pfe_4') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='active_listings') -->
                     <!-- distinct = False -->
@@ -44,8 +44,8 @@ docstring:
                         <!--       ),                                                  -->
                         <!--     ),                                                    -->
                         <!--   )                                                       -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['__active_listings', 'listing__bookings']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__active_listings', 'listing__bookings']" -->
                             <!-- node_id = NodeId(id_str='pfe_3') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='active_listings') -->
                             <!-- include_spec =                                                               -->
@@ -60,7 +60,7 @@ docstring:
                                 <!-- node_id = NodeId(id_str='jso_0') -->
                                 <!-- join0_for_node_id_pfe_2 =                                      -->
                                 <!--   JoinDescription(                                             -->
-                                <!--     join_node=FilterElementsNode(node_id=pfe_2),               -->
+                                <!--     join_node=SelectorNode(node_id=pfe_2),                     -->
                                 <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
                                 <!--     join_type=LEFT_OUTER,                                      -->
                                 <!--   )                                                            -->
@@ -74,8 +74,8 @@ docstring:
                                         <!-- data_set = SemanticModelDataSet('listings_latest') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
-                                <FilterElementsNode>
-                                    <!-- description = "Pass Only Elements: ['listing', 'listing__bookings']" -->
+                                <SelectorNode>
+                                    <!-- description = "Select: ['listing', 'listing__bookings']" -->
                                     <!-- node_id = NodeId(id_str='pfe_2') -->
                                     <!-- include_spec = EntitySpec(element_name='listing') -->
                                     <!-- include_spec =                                                               -->
@@ -93,14 +93,14 @@ docstring:
                                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                                             <!-- node_id = NodeId(id_str='am_0') -->
                                             <!-- null_fill_value_mapping = {'bookings': None} -->
-                                            <FilterElementsNode>
-                                                <!-- description = "Pass Only Elements: ['__bookings', 'listing']" -->
+                                            <SelectorNode>
+                                                <!-- description = "Select: ['__bookings', 'listing']" -->
                                                 <!-- node_id = NodeId(id_str='pfe_1') -->
                                                 <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                                 <!-- include_spec = EntitySpec(element_name='listing') -->
                                                 <!-- distinct = False -->
-                                                <FilterElementsNode>
-                                                    <!-- description = "Pass Only Elements: ['__bookings', 'listing']" -->
+                                                <SelectorNode>
+                                                    <!-- description = "Select: ['__bookings', 'listing']" -->
                                                     <!-- node_id = NodeId(id_str='pfe_0') -->
                                                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                                     <!-- include_spec = EntitySpec(element_name='listing') -->
@@ -116,15 +116,15 @@ docstring:
                                                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                                         </ReadSqlSourceNode>
                                                     </MetricTimeDimensionTransformNode>
-                                                </FilterElementsNode>
-                                            </FilterElementsNode>
+                                                </SelectorNode>
+                                            </SelectorNode>
                                         </AggregateSimpleMetricInputsNode>
                                     </ComputeMetricsNode>
-                                </FilterElementsNode>
+                                </SelectorNode>
                             </JoinOnEntitiesNode>
-                        </FilterElementsNode>
+                        </SelectorNode>
                     </WhereConstraintNode>
-                </FilterElementsNode>
+                </SelectorNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataTableNode>

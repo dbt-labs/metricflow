@@ -14,8 +14,7 @@ test_filename: test_metric_time_without_metrics.py
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
-            <!-- description =                                                                                     -->
-            <!--   "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']" -->
+            <!-- description = "Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']" -->
             <!-- node_id = NodeId(id_str='ss_110') -->
             <!-- col0 =                                                                                                -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_163), column_alias='metric_time__day') -->
@@ -63,8 +62,8 @@ test_filename: test_metric_time_without_metrics.py
                 <!-- where = SqlBetweenExpression(node_id=betw_0) -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description =                                                                                     -->
-                    <!--   "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']" -->
+                    <!-- description =                                                                         -->
+                    <!--   "Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']" -->
                     <!-- node_id = NodeId(id_str='ss_108') -->
                     <!-- col0 =                                                 -->
                     <!--   SqlSelectColumn(                                     -->
@@ -682,7 +681,7 @@ test_filename: test_metric_time_without_metrics.py
                             </SqlTableNode>
                         </SqlSelectStatementNode>
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['metric_time__day']" -->
+                            <!-- description = "Select: ['metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_104') -->
                             <!-- col0 =                                                -->
                             <!--   SqlSelectColumn(                                    -->
@@ -893,7 +892,7 @@ test_filename: test_metric_time_without_metrics.py
                             </SqlSelectStatementNode>
                         </SqlSelectStatementNode>
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
+                            <!-- description = "Select: ['home_state_latest', 'user']" -->
                             <!-- node_id = NodeId(id_str='ss_106') -->
                             <!-- col0 =                                                                                   -->
                             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_91), column_alias='user') -->
