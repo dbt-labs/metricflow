@@ -289,10 +289,13 @@ class DataflowPlanBuilder:
         base_spec = SimpleMetricInputSpec(
             element_name=base_simple_metric_recipe.simple_metric_input.name,
         )
+
         base_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
-                spec_properties=SimpleMetricInputSpecProperties.create_from_simple_metric_inputs(
-                    (base_simple_metric_recipe.simple_metric_input,)
+                simple_metric_input_specs=(
+                    SimpleMetricInputSpec(
+                        element_name=base_simple_metric_recipe.simple_metric_input.name,
+                    ),
                 ),
                 predicate_pushdown_state=time_range_only_pushdown_state,
                 linkable_spec_set=base_required_linkable_specs,
@@ -306,8 +309,10 @@ class DataflowPlanBuilder:
         )
         conversion_source_node_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
-                spec_properties=SimpleMetricInputSpecProperties.create_from_simple_metric_inputs(
-                    (conversion_simple_metric_recipe.simple_metric_input,)
+                simple_metric_input_specs=(
+                    SimpleMetricInputSpec(
+                        element_name=conversion_simple_metric_recipe.simple_metric_input.name,
+                    ),
                 ),
                 predicate_pushdown_state=disabled_pushdown_state,
                 linkable_spec_set=LinkableSpecSet(),
@@ -895,9 +900,9 @@ class DataflowPlanBuilder:
         )
         dataflow_recipe = self._find_source_node_recipe(
             FindSourceNodeRecipeParameterSet(
+                simple_metric_input_specs=None,
                 linkable_spec_set=required_linkable_specs,
                 predicate_pushdown_state=predicate_pushdown_state,
-                spec_properties=None,
             )
         )
         if not dataflow_recipe:
@@ -1062,7 +1067,7 @@ class DataflowPlanBuilder:
     ) -> Optional[SourceNodeRecipe]:
         linkable_spec_set = parameter_set.linkable_spec_set
         predicate_pushdown_state = parameter_set.predicate_pushdown_state
-        spec_properties = parameter_set.spec_properties
+        simple_metric_input_specs = parameter_set.simple_metric_input_specs
 
         candidate_nodes_for_left_side_of_join: List[DataflowPlanNode] = []
         candidate_nodes_for_right_side_of_join: List[DataflowPlanNode] = []
@@ -1072,10 +1077,10 @@ class DataflowPlanBuilder:
         # base granularity from the source node in order to join to the appropriate time spine later.
         linkable_specs_to_satisfy = linkable_spec_set.replace_custom_granularity_with_base_granularity()
         linkable_specs_to_satisfy_tuple = linkable_specs_to_satisfy.as_tuple
-        if spec_properties:
+        if simple_metric_input_specs:
             candidate_nodes_for_right_side_of_join += self._source_node_set.source_nodes_for_metric_queries
             candidate_nodes_for_left_side_of_join += self._select_source_nodes_with_simple_metric_inputs(
-                input_specs=set(spec_properties.simple_metric_input_specs),
+                input_specs=set(simple_metric_input_specs),
                 source_nodes=self._source_node_set.source_nodes_for_metric_queries,
             )
             default_join_type = SqlJoinType.LEFT_OUTER
@@ -1186,8 +1191,7 @@ class DataflowPlanBuilder:
         for node in self._sort_by_suitability(candidate_nodes_for_left_side_of_join):
             data_set = self._node_data_set_resolver.get_output_data_set(node)
 
-            if spec_properties:
-                simple_metric_input_specs = spec_properties.simple_metric_input_specs
+            if simple_metric_input_specs:
                 missing_specs = [
                     spec
                     for spec in simple_metric_input_specs
@@ -1870,7 +1874,7 @@ class DataflowPlanBuilder:
             with ExecutionTimer() as execution_timer:
                 source_node_recipe = self._find_source_node_recipe(
                     FindSourceNodeRecipeParameterSet(
-                        spec_properties=spec_properties,
+                        simple_metric_input_specs=spec_properties.simple_metric_input_specs,
                         predicate_pushdown_state=simple_metric_input_ppd_state,
                         linkable_spec_set=required_linkable_specs,
                     )
