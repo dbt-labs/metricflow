@@ -159,7 +159,7 @@ class DataflowPlanBuilder:
         )
 
     def _build_query_output_node(
-        self, query_spec: MetricFlowQuerySpec, for_group_by_source_node: bool = False
+        self, query_spec: MetricFlowQuerySpec, output_group_by_metric_instances: bool = False
     ) -> DataflowPlanNode:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
         for metric_spec in query_spec.metric_specs:
@@ -205,7 +205,7 @@ class DataflowPlanBuilder:
             queried_linkable_specs=query_spec.linkable_specs,
             filter_spec_factory=filter_spec_factory,
             predicate_pushdown_state=predicate_pushdown_state,
-            for_group_by_source_node=for_group_by_source_node,
+            output_group_by_metric_instances=output_group_by_metric_instances,
         )
 
     @log_runtime()
@@ -421,7 +421,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        for_group_by_source_node: bool = False,
+        output_group_by_metric_instances: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a compute metric node for a conversion metric."""
         metric_reference = metric_spec.reference
@@ -480,7 +480,7 @@ class DataflowPlanBuilder:
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_node=aggregated_conversion_node,
-            for_group_by_source_node=for_group_by_source_node,
+            output_group_by_metric_instances=output_group_by_metric_instances,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
@@ -490,7 +490,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        for_group_by_source_node: bool = False,
+        output_group_by_metric_instances: bool = False,
     ) -> DataflowPlanNode:
         metric_reference = metric_spec.reference
         metric = self._metric_lookup.get_metric(metric_reference)
@@ -590,14 +590,14 @@ class DataflowPlanBuilder:
             aggregated_to_elements=aggregated_to_elements,
             # Due to the way that `DataflowNodeToSqlSubqueryVisitor` works, only the outermost
             # `ComputeMetricsNode` should be built with this set.
-            for_group_by_source_node=False,
+            output_group_by_metric_instances=False,
         )
 
         compute_metrics_node = self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_node=compute_simple_metric_node,
             aggregated_to_elements=aggregated_to_elements,
-            for_group_by_source_node=for_group_by_source_node,
+            output_group_by_metric_instances=output_group_by_metric_instances,
         )
 
         if requires_window_reaggregation:
@@ -616,7 +616,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        for_group_by_source_node: bool = False,
+        output_group_by_metric_instances: bool = False,
     ) -> ComputeMetricsNode:
         """Builds a node to compute a metric that is not defined from other metrics."""
         metric_reference = metric_spec.reference
@@ -643,7 +643,7 @@ class DataflowPlanBuilder:
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_node=aggregated_simple_metric_input_node,
-            for_group_by_source_node=for_group_by_source_node,
+            output_group_by_metric_instances=output_group_by_metric_instances,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
@@ -653,7 +653,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        for_group_by_source_node: bool,
+        output_group_by_metric_instances: bool,
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric defined from other metrics."""
         metric = self._metric_lookup.get_metric(metric_spec.reference)
@@ -715,7 +715,7 @@ class DataflowPlanBuilder:
                         ),
                         filter_spec_factory=filter_spec_factory,
                         predicate_pushdown_state=metric_pushdown_state,
-                        for_group_by_source_node=False,
+                        output_group_by_metric_instances=False,
                     )
                 )
             )
@@ -729,7 +729,7 @@ class DataflowPlanBuilder:
             parent_node=parent_node,
             computed_metric_specs=[metric_spec],
             passthrough_metric_specs=(),
-            for_group_by_source_node=for_group_by_source_node,
+            output_group_by_metric_instances=output_group_by_metric_instances,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
@@ -772,7 +772,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs = build_any_metric_output_node_input.queried_linkable_specs
         filter_spec_factory = build_any_metric_output_node_input.filter_spec_factory
         predicate_pushdown_state = build_any_metric_output_node_input.predicate_pushdown_state
-        for_group_by_source_node = build_any_metric_output_node_input.for_group_by_source_node
+        output_group_by_metric_instances = build_any_metric_output_node_input.output_group_by_metric_instances
 
         metric = self._metric_lookup.get_metric(metric_spec.reference)
 
@@ -782,7 +782,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
-                for_group_by_source_node=for_group_by_source_node,
+                output_group_by_metric_instances=output_group_by_metric_instances,
             )
 
         elif metric.type is MetricType.CUMULATIVE:
@@ -791,7 +791,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
-                for_group_by_source_node=for_group_by_source_node,
+                output_group_by_metric_instances=output_group_by_metric_instances,
             )
 
         elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
@@ -800,7 +800,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
-                for_group_by_source_node=for_group_by_source_node,
+                output_group_by_metric_instances=output_group_by_metric_instances,
             )
         elif metric.type is MetricType.CONVERSION:
             return self._build_conversion_metric_output_node(
@@ -808,7 +808,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 filter_spec_factory=filter_spec_factory,
                 predicate_pushdown_state=predicate_pushdown_state,
-                for_group_by_source_node=for_group_by_source_node,
+                output_group_by_metric_instances=output_group_by_metric_instances,
             )
 
         assert_values_exhausted(metric.type)
@@ -819,7 +819,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        for_group_by_source_node: bool = False,
+        output_group_by_metric_instances: bool = False,
     ) -> DataflowPlanNode:
         """Builds a node that computes all requested metrics.
 
@@ -846,7 +846,7 @@ class DataflowPlanBuilder:
                         queried_linkable_specs=queried_linkable_specs,
                         filter_spec_factory=filter_spec_factory,
                         predicate_pushdown_state=predicate_pushdown_state,
-                        for_group_by_source_node=for_group_by_source_node,
+                        output_group_by_metric_instances=output_group_by_metric_instances,
                     )
                 )
             )
@@ -1177,7 +1177,7 @@ class DataflowPlanBuilder:
         candidate_nodes_for_right_side_of_join += [
             self._build_query_output_node(
                 query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
-                for_group_by_source_node=True,
+                output_group_by_metric_instances=True,
             )
             for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs
         ]
@@ -1311,14 +1311,14 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         aggregated_node: Union[AggregateSimpleMetricInputsNode, DataflowPlanNode],
         aggregated_to_elements: Set[LinkableInstanceSpec],
-        for_group_by_source_node: bool,
+        output_group_by_metric_instances: bool,
     ) -> ComputeMetricsNode:
         """Builds a ComputeMetricsNode from aggregated inputs."""
         return ComputeMetricsNode.create(
             parent_node=aggregated_node,
             computed_metric_specs=[metric_spec],
             passthrough_metric_specs=(),
-            for_group_by_source_node=for_group_by_source_node,
+            output_group_by_metric_instances=output_group_by_metric_instances,
             aggregated_to_elements=aggregated_to_elements,
         )
 

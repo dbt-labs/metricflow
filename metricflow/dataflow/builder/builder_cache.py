@@ -39,7 +39,7 @@ class BuildAnyMetricOutputNodeInput:
     queried_linkable_specs: LinkableSpecSet
     filter_spec_factory: WhereSpecFactory
     predicate_pushdown_state: PredicatePushdownState
-    for_group_by_source_node: bool
+    output_group_by_metric_instances: bool
 
 
 class DataflowPlanBuilderCache:
