@@ -544,7 +544,7 @@ class PreJoinNodeProcessor:
 
                 # Remove simple-metric inputs from the joined node.
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
-                filtered_joinable_node = SelectorNode.create(
+                selector_node_for_joinable = SelectorNode.create(
                     parent_node=second_node_that_could_be_joined,
                     include_specs=group_specs_by_type(
                         specs.dimension_specs
@@ -569,7 +569,7 @@ class PreJoinNodeProcessor:
                             left_node=first_node_that_could_be_joined,
                             join_targets=[
                                 JoinDescription(
-                                    join_node=filtered_joinable_node,
+                                    join_node=selector_node_for_joinable,
                                     join_on_entity=LinklessEntitySpec.from_reference(
                                         desired_linkable_spec.entity_links[1]
                                     ),

@@ -93,7 +93,7 @@ def test_cte_for_simple_dataflow_plan(
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filter_node = SelectorNode.create(
+    selector_node = SelectorNode.create(
         parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,))
     )
 
@@ -101,7 +101,7 @@ def test_cte_for_simple_dataflow_plan(
         request=request,
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
-        node=filter_node,
+        node=selector_node,
         nodes_to_convert_to_cte=frozenset(
             [
                 source_node,

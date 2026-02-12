@@ -72,20 +72,20 @@ def test_filter_combination(
 ) -> None:
     """Tests combining a single node."""
     source0 = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["bookings_source"]
-    filter0 = SelectorNode.create(
+    selector0 = SelectorNode.create(
         parent_node=source0,
         include_specs=InstanceSpecSet(simple_metric_input_specs=(SimpleMetricInputSpec(element_name="bookings"),)),
     )
     source1 = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping["bookings_source"]
-    filter1 = SelectorNode.create(
+    selector1 = SelectorNode.create(
         parent_node=source1,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(SimpleMetricInputSpec(element_name="booking_value"),),
         ),
     )
-    combiner = ComputeMetricsBranchCombiner(filter0)
+    combiner = ComputeMetricsBranchCombiner(selector0)
 
-    result: ComputeMetricsBranchCombinerResult = filter1.accept(combiner)
+    result: ComputeMetricsBranchCombinerResult = selector1.accept(combiner)
     assert result.combined_branch
 
     dataflow_plan = make_dataflow_plan(result.combined_branch)

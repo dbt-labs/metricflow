@@ -66,8 +66,8 @@ def test_view_sql_generated_at_a_node(
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
-    # Show SQL and spec set at a filter node.
-    filter_elements_node = SelectorNode.create(
+    # Show SQL and spec set at a selector node.
+    selector_node = SelectorNode.create(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             time_dimension_specs=(
@@ -81,14 +81,10 @@ def test_view_sql_generated_at_a_node(
     )
     conversion_result = to_sql_plan_converter.convert_to_sql_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        dataflow_plan_node=filter_elements_node,
+        dataflow_plan_node=selector_node,
     )
-    sql_plan_at_filter_elements_node = conversion_result.sql_plan
-    sql_at_filter_elements_node = sql_renderer.render_sql_plan(sql_plan_at_filter_elements_node).sql
-    spec_set_at_filter_elements_node = node_output_resolver.get_output_data_set(
-        filter_elements_node
-    ).instance_set.spec_set
-    logger.debug(LazyFormat(lambda: f"SQL generated at {filter_elements_node} is:\n\n{sql_at_filter_elements_node}"))
-    logger.debug(
-        LazyFormat(lambda: f"Spec set at {filter_elements_node} is:\n\n{mf_pformat(spec_set_at_filter_elements_node)}")
-    )
+    sql_plan_at_selector_node = conversion_result.sql_plan
+    sql_at_selector_node = sql_renderer.render_sql_plan(sql_plan_at_selector_node).sql
+    spec_set_at_selector_node = node_output_resolver.get_output_data_set(selector_node).instance_set.spec_set
+    logger.debug(LazyFormat(lambda: f"SQL generated at {selector_node} is:\n\n{sql_at_selector_node}"))
+    logger.debug(LazyFormat(lambda: f"Spec set at {selector_node} is:\n\n{mf_pformat(spec_set_at_selector_node)}"))
