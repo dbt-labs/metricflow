@@ -8,7 +8,7 @@ sql_engine: Postgres
 SELECT
   subq_15.listing
 FROM (
-  -- Pass Only Elements: ['listing']
+  -- Select: ['listing']
   SELECT
     subq_14.listing
   FROM (
@@ -17,7 +17,7 @@ FROM (
       subq_13.listing
       , subq_13.listing__bookings
     FROM (
-      -- Pass Only Elements: ['listing', 'listing__bookings']
+      -- Select: ['listing', 'listing__bookings']
       SELECT
         subq_12.listing
         , subq_12.listing__bookings
@@ -37,7 +37,7 @@ FROM (
           FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
         ) subq_4
         FULL OUTER JOIN (
-          -- Pass Only Elements: ['listing', 'listing__bookings']
+          -- Select: ['listing', 'listing__bookings']
           SELECT
             subq_10.listing
             , subq_10.listing__bookings
@@ -52,12 +52,12 @@ FROM (
                 subq_8.listing
                 , SUM(subq_8.__bookings) AS __bookings
               FROM (
-                -- Pass Only Elements: ['__bookings', 'listing']
+                -- Select: ['__bookings', 'listing']
                 SELECT
                   subq_7.listing
                   , subq_7.__bookings
                 FROM (
-                  -- Pass Only Elements: ['__bookings', 'listing']
+                  -- Select: ['__bookings', 'listing']
                   SELECT
                     subq_6.listing
                     , subq_6.__bookings

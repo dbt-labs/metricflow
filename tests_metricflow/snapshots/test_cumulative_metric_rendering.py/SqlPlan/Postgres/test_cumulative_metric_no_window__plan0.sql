@@ -24,12 +24,12 @@ FROM (
         subq_3.ds__month
         , SUM(subq_3.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['__revenue', 'ds__month']
+        -- Select: ['__revenue', 'ds__month']
         SELECT
           subq_2.ds__month
           , subq_2.__revenue
         FROM (
-          -- Pass Only Elements: ['__revenue', 'ds__month']
+          -- Select: ['__revenue', 'ds__month']
           SELECT
             subq_1.ds__month
             , subq_1.__revenue

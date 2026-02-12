@@ -6,8 +6,8 @@ sql_engine: Postgres
 ---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements: ['__revenue', 'ds__month']
--- Pass Only Elements: ['__revenue', 'ds__month']
+-- Select: ['__revenue', 'ds__month']
+-- Select: ['__revenue', 'ds__month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

@@ -36,7 +36,7 @@ FROM (
     , MAX(subq_25.max_booking_value) AS max_booking_value
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__average_booking_value', 'metric_time__day']
+    -- Select: ['__average_booking_value', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -44,7 +44,7 @@ FROM (
       , AVG(average_booking_value) AS average_booking_value
     FROM (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__average_booking_value', 'booking__is_instant', 'metric_time__day']
+      -- Select: ['__average_booking_value', 'booking__is_instant', 'metric_time__day']
       SELECT
         metric_time__day
         , booking__is_instant
@@ -57,8 +57,8 @@ FROM (
   ) subq_20
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__max_booking_value', 'metric_time__day']
-    -- Pass Only Elements: ['__max_booking_value', 'metric_time__day']
+    -- Select: ['__max_booking_value', 'metric_time__day']
+    -- Select: ['__max_booking_value', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

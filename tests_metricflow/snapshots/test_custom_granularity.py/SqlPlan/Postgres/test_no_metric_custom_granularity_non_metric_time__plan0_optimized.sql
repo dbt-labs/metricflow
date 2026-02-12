@@ -4,8 +4,8 @@ sql_engine: Postgres
 ---
 -- Read Elements From Semantic Model 'bookings_source'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['booking__ds__alien_day']
--- Pass Only Elements: ['booking__ds__alien_day']
+-- Select: ['booking__ds__alien_day']
+-- Select: ['booking__ds__alien_day']
 -- Write to DataTable
 SELECT
   subq_4.alien_day AS booking__ds__alien_day

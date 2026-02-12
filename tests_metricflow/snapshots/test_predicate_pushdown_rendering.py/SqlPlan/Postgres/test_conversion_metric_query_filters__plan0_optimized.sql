@@ -38,7 +38,7 @@ FROM (
     , MAX(subq_49.__buys) AS __buys
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__visits', 'user__home_state_latest', 'metric_time__day']
+    -- Select: ['__visits', 'user__home_state_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
@@ -46,7 +46,7 @@ FROM (
       , SUM(visits) AS __visits
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__visits', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
+      -- Select: ['__visits', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
       SELECT
         sma_28019_cte.metric_time__day AS metric_time__day
         , sma_28019_cte.visit__referrer_id AS visit__referrer_id
@@ -65,8 +65,8 @@ FROM (
   ) subq_34
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
-    -- Pass Only Elements: ['__buys', 'user__home_state_latest', 'metric_time__day']
-    -- Pass Only Elements: ['__buys', 'user__home_state_latest', 'metric_time__day']
+    -- Select: ['__buys', 'user__home_state_latest', 'metric_time__day']
+    -- Select: ['__buys', 'user__home_state_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
@@ -119,7 +119,7 @@ FROM (
         , subq_44.__buys AS __buys
       FROM (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
+        -- Select: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
         SELECT
           metric_time__day
           , subq_39.user
@@ -128,7 +128,7 @@ FROM (
           , visits AS __visits
         FROM (
           -- Join Standard Outputs
-          -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
+          -- Select: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
           SELECT
             sma_28019_cte.metric_time__day AS metric_time__day
             , sma_28019_cte.user AS user

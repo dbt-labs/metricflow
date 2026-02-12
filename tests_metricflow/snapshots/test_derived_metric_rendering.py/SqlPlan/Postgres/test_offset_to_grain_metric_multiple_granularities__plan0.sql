@@ -32,13 +32,13 @@ FROM (
         , subq_8.metric_time__year AS metric_time__year
         , subq_4.__bookings AS __bookings
       FROM (
-        -- Pass Only Elements: ['metric_time__day', 'metric_time__month', 'metric_time__year']
+        -- Select: ['metric_time__day', 'metric_time__month', 'metric_time__year']
         SELECT
           subq_7.metric_time__day
           , subq_7.metric_time__month
           , subq_7.metric_time__year
         FROM (
-          -- Pass Only Elements: ['metric_time__day', 'metric_time__month', 'metric_time__year']
+          -- Select: ['metric_time__day', 'metric_time__month', 'metric_time__year']
           SELECT
             subq_6.metric_time__day
             , subq_6.metric_time__month
@@ -86,14 +86,14 @@ FROM (
           , subq_3.metric_time__year
           , SUM(subq_3.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+          -- Select: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
           SELECT
             subq_2.metric_time__day
             , subq_2.metric_time__month
             , subq_2.metric_time__year
             , subq_2.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+            -- Select: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
             SELECT
               subq_1.metric_time__day
               , subq_1.metric_time__month
