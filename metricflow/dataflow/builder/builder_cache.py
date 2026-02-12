@@ -16,7 +16,7 @@ from metricflow.plan_conversion.node_processor import PredicatePushdownState
 
 
 @dataclass(frozen=True)
-class FindSourceNodeRecipeParameterSet:
+class FindSourceNodeRecipeInput:
     """Parameters for `DataflowPlanBuilder._find_source_node_recipe()`."""
 
     simple_metric_input_specs: Optional[AnyLengthTuple[SimpleMetricInputSpec]]
@@ -32,7 +32,7 @@ class FindSourceNodeRecipeResult:
 
 
 @dataclass(frozen=True)
-class BuildAnyMetricOutputNodeParameterSet:
+class BuildAnyMetricOutputNodeInput:
     """Parameters for `DataflowPlanBuilder._build_any_metric_output_node()`."""
 
     metric_spec: MetricSpec
@@ -48,10 +48,10 @@ class DataflowPlanBuilderCache:
     def __init__(  # noqa: D107
         self, find_source_node_recipe_cache_size: int = 1000, build_any_metric_output_node_cache_size: int = 1000
     ) -> None:
-        self._find_source_node_recipe_cache = LruCache[FindSourceNodeRecipeParameterSet, FindSourceNodeRecipeResult](
+        self._find_source_node_recipe_cache = LruCache[FindSourceNodeRecipeInput, FindSourceNodeRecipeResult](
             find_source_node_recipe_cache_size
         )
-        self._build_any_metric_output_node_cache = LruCache[BuildAnyMetricOutputNodeParameterSet, DataflowPlanNode](
+        self._build_any_metric_output_node_cache = LruCache[BuildAnyMetricOutputNodeInput, DataflowPlanNode](
             build_any_metric_output_node_cache_size
         )
 
@@ -59,21 +59,21 @@ class DataflowPlanBuilderCache:
         assert build_any_metric_output_node_cache_size > 0
 
     def get_find_source_node_recipe_result(  # noqa: D102
-        self, parameter_set: FindSourceNodeRecipeParameterSet
+        self, parameter_set: FindSourceNodeRecipeInput
     ) -> Optional[FindSourceNodeRecipeResult]:
         return self._find_source_node_recipe_cache.get(parameter_set)
 
     def set_find_source_node_recipe_result(  # noqa: D102
-        self, parameter_set: FindSourceNodeRecipeParameterSet, source_node_recipe: FindSourceNodeRecipeResult
+        self, parameter_set: FindSourceNodeRecipeInput, source_node_recipe: FindSourceNodeRecipeResult
     ) -> None:
         self._find_source_node_recipe_cache.set(parameter_set, source_node_recipe)
 
     def get_build_any_metric_output_node_result(  # noqa: D102
-        self, parameter_set: BuildAnyMetricOutputNodeParameterSet
+        self, parameter_set: BuildAnyMetricOutputNodeInput
     ) -> Optional[DataflowPlanNode]:
         return self._build_any_metric_output_node_cache.get(parameter_set)
 
     def set_build_any_metric_output_node_result(  # noqa: D102
-        self, parameter_set: BuildAnyMetricOutputNodeParameterSet, dataflow_plan_node: DataflowPlanNode
+        self, parameter_set: BuildAnyMetricOutputNodeInput, dataflow_plan_node: DataflowPlanNode
     ) -> None:
         self._build_any_metric_output_node_cache.set(parameter_set, dataflow_plan_node)
