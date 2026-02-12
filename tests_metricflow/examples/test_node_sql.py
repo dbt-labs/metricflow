@@ -13,7 +13,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
@@ -67,7 +67,7 @@ def test_view_sql_generated_at_a_node(
     )
 
     # Show SQL and spec set at a filter node.
-    filter_elements_node = FilterElementsNode.create(
+    filter_elements_node = SelectorNode.create(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             time_dimension_specs=(

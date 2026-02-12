@@ -26,7 +26,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
@@ -544,7 +544,7 @@ class PreJoinNodeProcessor:
 
                 # Remove simple-metric inputs from the joined node.
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
-                filtered_joinable_node = FilterElementsNode.create(
+                filtered_joinable_node = SelectorNode.create(
                     parent_node=second_node_that_could_be_joined,
                     include_specs=group_specs_by_type(
                         specs.dimension_specs

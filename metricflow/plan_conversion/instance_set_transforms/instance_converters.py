@@ -214,8 +214,8 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
         return output
 
 
-class FilterElements(InstanceSetTransform[InstanceSet]):
-    """Return an instance set with the elements that don't match any of the pass specs removed."""
+class SelectElementsTransform(InstanceSetTransform[InstanceSet]):
+    """Return an instance set that only contains instances that match the given criteria."""
 
     def __init__(
         self,

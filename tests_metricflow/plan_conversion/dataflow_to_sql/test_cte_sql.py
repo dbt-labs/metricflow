@@ -20,7 +20,7 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataflow.dataflow_plan_analyzer import DataflowPlanAnalyzer
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.sql.optimizer.optimization_levels import SqlGenerationOptionSet, SqlOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
@@ -93,7 +93,7 @@ def test_cte_for_simple_dataflow_plan(
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filter_node = FilterElementsNode.create(
+    filter_node = SelectorNode.create(
         parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,))
     )
 

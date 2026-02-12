@@ -17,7 +17,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -69,7 +69,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     left_branch:
         <ComputeMetricsNode metrics=["bookings"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["bookings"]>
+                <SelectorNode include_specs=["bookings"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
@@ -77,7 +77,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     right_branch:
         <ComputeMetricsNode metrics=["booking_value"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["booking_value"]>
+                <SelectorNode include_specs=["booking_value"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
@@ -87,7 +87,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     <ComputeMetricsNode metrics=["bookings", "booking_value"]
         <AggregateSimpleMetricInputsNode>
-            <FilterElementsNode include_specs=["bookings", "booking_value"]>
+            <SelectorNode include_specs=["bookings", "booking_value"]>
                 <ReadSqlSourceNode semantic_model="bookings_source"/>
             </>
         </>
@@ -98,7 +98,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     left_branch:
         <ComputeMetricsNode metrics=["bookings"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["bookings", "is_instant"]>
+                <SelectorNode include_specs=["bookings", "is_instant"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
@@ -106,13 +106,13 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     right_branch:
         <ComputeMetricsNode metrics=["booking_value"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["booking_value"]>
+                <SelectorNode include_specs=["booking_value"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
         </>
 
-    can't be superpositioned / combined because the different set of linkable specs in the FilterElementsNode will cause
+    can't be superpositioned / combined because the different set of linkable specs in the SelectorNode will cause
     the AggregatedMeasuresNode to produce values for the simple-metric input that is different from the original branches. The logic
     to determine whether this is possible for each node type is encapsulated into the handler for each node type.
 
@@ -399,7 +399,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    def visit_selector_node(self, node: SelectorNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
         self._log_visit_node_type(node)
 
         current_right_node = node
@@ -419,7 +419,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_parent_node = results_of_visiting_parent_nodes[0]
         assert combined_parent_node is not None
 
-        # For the FilterElementsNode to be combined, the linkable specs have to be the same for the left and right.
+        # For the SelectorNode to be combined, the linkable specs have to be the same for the left and right.
         if not MatchingLinkableSpecsTransform(self._current_left_node.include_specs).transform(
             current_right_node.include_specs
         ):
@@ -432,7 +432,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         # De-dupe so that we don't see the same spec twice in include specs. For example, this can happen with dimension
         # specs since any branch that is merged together needs to output the same set of dimensions.
-        combined_node = FilterElementsNode.create(
+        combined_node = SelectorNode.create(
             parent_node=combined_parent_node,
             include_specs=self._current_left_node.include_specs.merge(current_right_node.include_specs).dedupe(),
         )

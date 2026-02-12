@@ -21,7 +21,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -228,9 +228,9 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         )
 
     @override
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> SqlDataSet:
+    def visit_selector_node(self, node: SelectorNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_filter_elements_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_selector_node, use_spec_output_order=False
         )
 
     @override

@@ -81,7 +81,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -112,10 +112,10 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     ConvertToMetadata,
     CreateSelectColumnForCombineOutputNode,
     CreateSqlColumnReferencesForInstances,
-    FilterElements,
     FilterLinkableInstancesWithLeadingLink,
     RemoveMetrics,
     RemoveSimpleMetricInputTransform,
+    SelectElementsTransform,
     UpdateSimpleMetricInputFillNullsWith,
 )
 from metricflow.plan_conversion.instance_set_transforms.select_columns import (
@@ -394,7 +394,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Build select columns, replacing agg_time_dimensions from the parent node with columns from the time spine.
         table_alias_to_instance_set[time_spine_data_set_alias] = time_spine_data_set.instance_set
         table_alias_to_instance_set[parent_data_set_alias] = parent_data_set.instance_set.transform(
-            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=node.queried_agg_time_dimension_specs))
+            SelectElementsTransform(
+                exclude_specs=InstanceSpecSet(time_dimension_specs=node.queried_agg_time_dimension_specs)
+            )
         )
         select_columns = create_simple_select_columns_for_instance_sets(
             column_resolver=self._column_association_resolver, table_alias_to_instance_set=table_alias_to_instance_set
@@ -421,7 +423,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # multiple rows, so we'll need to re-aggregate.
         from_data_set_output_instance_set = from_data_set.instance_set.transform(
             # TODO: is this filter doing anything? seems like no?
-            FilterElements(include_specs=from_data_set.instance_set.spec_set)
+            SelectElementsTransform(include_specs=from_data_set.instance_set.spec_set)
         ).transform(
             ChangeSimpleMetricInputAggregationState(
                 {
@@ -860,10 +862,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> SqlDataSet:
-        """Generates the query that realizes the behavior of FilterElementsNode."""
+    def visit_selector_node(self, node: SelectorNode) -> SqlDataSet:
+        """Generates the query that realizes the behavior of SelectorNode."""
         from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
-        output_instance_set = from_data_set.instance_set.transform(FilterElements(node.include_specs))
+        output_instance_set = from_data_set.instance_set.transform(SelectElementsTransform(node.include_specs))
         from_data_set_alias = self._next_unique_table_alias()
 
         # Also, the output columns should always follow the resolver format.
@@ -1415,7 +1417,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Build new instances and columns.
         time_spine_required_spec_set = InstanceSpecSet(time_dimension_specs=required_agg_time_dimension_specs)
         output_parent_instance_set = parent_data_set.instance_set.transform(
-            FilterElements(
+            SelectElementsTransform(
                 exclude_specs=InstanceSpecSet.create_from_specs(
                     tuple(
                         spec
@@ -1826,7 +1828,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         conversion_data_set_output_instance_set = conversion_data_set.instance_set.transform(
-            FilterElements(
+            SelectElementsTransform(
                 include_specs=InstanceSpecSet(simple_metric_input_specs=(node.conversion_input_metric_spec,))
             )
         )
@@ -1936,12 +1938,12 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Order by instance should not be included in the output dataset because it was not requested in the query.
         output_instance_set = parent_instance_set.transform(
-            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(order_by_instance.spec,)))
+            SelectElementsTransform(exclude_specs=InstanceSpecSet(time_dimension_specs=(order_by_instance.spec,)))
         )
 
         # Can't include window function in a group by, so we use a subquery and apply group by in the outer query.
         subquery_select_columns = output_instance_set.transform(
-            FilterElements(exclude_specs=InstanceSpecSet(metric_specs=(metric_instance.spec,)))
+            SelectElementsTransform(exclude_specs=InstanceSpecSet(metric_specs=(metric_instance.spec,)))
         ).transform(
             CreateSelectColumnsForInstances(parent_data_set_alias, self._column_association_resolver)
         ).get_columns() + (
