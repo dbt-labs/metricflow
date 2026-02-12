@@ -18,9 +18,9 @@ FROM (
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
@@ -28,9 +28,9 @@ FROM (
   ) subq_40
   INNER JOIN (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['__bookers', 'metric_time__day']
+    -- Select: ['__bookers', 'metric_time__day']
     -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
-    -- Pass Only Elements: ['__bookers', 'metric_time__day']
+    -- Select: ['__bookers', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_30.ds AS metric_time__day

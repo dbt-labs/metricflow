@@ -30,8 +30,8 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
-      -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Select: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Select: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , DATE_TRUNC('month', ds) AS metric_time__month

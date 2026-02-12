@@ -17,12 +17,12 @@ FROM (
       subq_8.listing__ds__alien_day
       , SUM(subq_8.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings', 'listing__ds__alien_day']
+      -- Select: ['__bookings', 'listing__ds__alien_day']
       SELECT
         subq_7.listing__ds__alien_day
         , subq_7.__bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'listing__ds__alien_day']
+        -- Select: ['__bookings', 'listing__ds__alien_day']
         SELECT
           subq_6.listing__ds__alien_day
           , subq_6.__bookings
@@ -353,7 +353,7 @@ FROM (
             ) subq_0
           ) subq_1
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['ds__day', 'listing']
+            -- Select: ['ds__day', 'listing']
             SELECT
               subq_3.ds__day
               , subq_3.listing

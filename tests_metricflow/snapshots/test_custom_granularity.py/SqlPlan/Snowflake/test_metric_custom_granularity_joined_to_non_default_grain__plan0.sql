@@ -20,13 +20,13 @@ FROM (
       , subq_4.listing__ds__month
       , SUM(subq_4.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
+      -- Select: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
       SELECT
         subq_3.metric_time__alien_day
         , subq_3.listing__ds__month
         , subq_3.__listings
       FROM (
-        -- Pass Only Elements: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
+        -- Select: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
         SELECT
           subq_2.metric_time__alien_day
           , subq_2.listing__ds__month

@@ -14,11 +14,11 @@ FROM (
     MIN(subq_3.metric_time__week) AS metric_time__week__min
     , MAX(subq_3.metric_time__week) AS metric_time__week__max
   FROM (
-    -- Pass Only Elements: ['metric_time__week']
+    -- Select: ['metric_time__week']
     SELECT
       subq_2.metric_time__week
     FROM (
-      -- Pass Only Elements: ['metric_time__week']
+      -- Select: ['metric_time__week']
       SELECT
         subq_1.metric_time__week
       FROM (

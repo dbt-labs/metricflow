@@ -12,9 +12,9 @@ SELECT
 FROM (
   -- Read From Time Spine 'mf_time_spine_hour'
   -- Change Column Aliases
-  -- Pass Only Elements: ['metric_time__hour']
+  -- Select: ['metric_time__hour']
   -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
-  -- Pass Only Elements: ['metric_time__hour']
+  -- Select: ['metric_time__hour']
   SELECT
     ts AS metric_time__hour
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
@@ -29,8 +29,8 @@ LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
     -- Constrain Time Range to [2020-01-01T02:00:00, 2020-01-01T05:00:00]
-    -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
-    -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
+    -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
+    -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
     SELECT
       DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
       , 1 AS __subdaily_join_to_time_spine_metric

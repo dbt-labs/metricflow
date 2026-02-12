@@ -32,7 +32,7 @@ FROM (
       , subq_3.metric_time__extract_doy
       , SUM(subq_3.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: [
+      -- Select: [
       --   '__bookings',
       --   'metric_time__extract_day',
       --   'metric_time__extract_dow',
@@ -50,7 +50,7 @@ FROM (
         , subq_2.metric_time__extract_doy
         , subq_2.__bookings
       FROM (
-        -- Pass Only Elements: [
+        -- Select: [
         --   '__bookings',
         --   'metric_time__extract_day',
         --   'metric_time__extract_dow',

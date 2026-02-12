@@ -18,9 +18,9 @@ FROM (
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
@@ -35,8 +35,8 @@ FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']
+      -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
+      -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS __bookings_fill_nulls_with_0

@@ -19,7 +19,7 @@ FROM (
       subq_8.listing__country_latest
       , SUM(subq_8.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings', 'listing__country_latest']
+      -- Select: ['__bookings', 'listing__country_latest']
       SELECT
         subq_7.listing__country_latest
         , subq_7.__bookings
@@ -30,7 +30,7 @@ FROM (
           , subq_6.booking__is_instant
           , subq_6.listing__country_latest
         FROM (
-          -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'booking__is_instant']
+          -- Select: ['__bookings', 'listing__country_latest', 'booking__is_instant']
           SELECT
             subq_5.booking__is_instant
             , subq_5.listing__country_latest
@@ -360,7 +360,7 @@ FROM (
               ) subq_0
             ) subq_1
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['country_latest', 'listing']
+              -- Select: ['country_latest', 'listing']
               SELECT
                 subq_3.listing
                 , subq_3.country_latest

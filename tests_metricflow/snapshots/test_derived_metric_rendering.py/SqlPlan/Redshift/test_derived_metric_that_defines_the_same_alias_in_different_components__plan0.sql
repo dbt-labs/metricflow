@@ -37,12 +37,12 @@ FROM (
             subq_3.booking__is_instant
             , SUM(subq_3.__bookings) AS __bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'booking__is_instant']
+            -- Select: ['__bookings', 'booking__is_instant']
             SELECT
               subq_2.booking__is_instant
               , subq_2.__bookings
             FROM (
-              -- Pass Only Elements: ['__bookings', 'booking__is_instant']
+              -- Select: ['__bookings', 'booking__is_instant']
               SELECT
                 subq_1.booking__is_instant
                 , subq_1.__bookings
@@ -282,12 +282,12 @@ FROM (
             subq_9.booking__is_instant
             , SUM(subq_9.__instant_bookings) AS __instant_bookings
           FROM (
-            -- Pass Only Elements: ['__instant_bookings', 'booking__is_instant']
+            -- Select: ['__instant_bookings', 'booking__is_instant']
             SELECT
               subq_8.booking__is_instant
               , subq_8.__instant_bookings
             FROM (
-              -- Pass Only Elements: ['__instant_bookings', 'booking__is_instant']
+              -- Select: ['__instant_bookings', 'booking__is_instant']
               SELECT
                 subq_7.booking__is_instant
                 , subq_7.__instant_bookings

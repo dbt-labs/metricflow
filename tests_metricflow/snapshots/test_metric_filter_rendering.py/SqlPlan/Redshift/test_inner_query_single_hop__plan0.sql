@@ -16,7 +16,7 @@ FROM (
     SELECT
       COUNT(DISTINCT subq_18.__third_hop_count) AS __third_hop_count
     FROM (
-      -- Pass Only Elements: ['__third_hop_count']
+      -- Select: ['__third_hop_count']
       SELECT
         subq_17.__third_hop_count
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_16.third_hop_count AS __third_hop_count
           , subq_16.customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers
         FROM (
-          -- Pass Only Elements: ['__third_hop_count', 'customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers']
+          -- Select: ['__third_hop_count', 'customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers']
           SELECT
             subq_15.customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers
             , subq_15.__third_hop_count AS third_hop_count
@@ -144,7 +144,7 @@ FROM (
               ) subq_5
             ) subq_6
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['customer_id__customer_third_hop_id', 'customer_id__customer_third_hop_id__paraguayan_customers']
+              -- Select: ['customer_id__customer_third_hop_id', 'customer_id__customer_third_hop_id__paraguayan_customers']
               SELECT
                 subq_13.customer_id__customer_third_hop_id
                 , subq_13.customer_id__customer_third_hop_id__paraguayan_customers
@@ -159,7 +159,7 @@ FROM (
                     subq_11.customer_id__customer_third_hop_id
                     , SUM(subq_11.__paraguayan_customers) AS __paraguayan_customers
                   FROM (
-                    -- Pass Only Elements: ['__paraguayan_customers', 'customer_id__customer_third_hop_id']
+                    -- Select: ['__paraguayan_customers', 'customer_id__customer_third_hop_id']
                     SELECT
                       subq_10.customer_id__customer_third_hop_id
                       , subq_10.__paraguayan_customers
@@ -170,7 +170,7 @@ FROM (
                         , subq_9.customer_id__country
                         , subq_9.customer_id__customer_third_hop_id
                       FROM (
-                        -- Pass Only Elements: ['__paraguayan_customers', 'customer_id__country', 'customer_id__customer_third_hop_id']
+                        -- Select: ['__paraguayan_customers', 'customer_id__country', 'customer_id__customer_third_hop_id']
                         SELECT
                           subq_8.customer_id__customer_third_hop_id
                           , subq_8.customer_id__country

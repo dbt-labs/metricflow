@@ -16,7 +16,7 @@ FROM (
     SELECT
       SUM(subq_6.__total_account_balance_first_day_of_month) AS __total_account_balance_first_day_of_month
     FROM (
-      -- Pass Only Elements: ['__total_account_balance_first_day_of_month']
+      -- Select: ['__total_account_balance_first_day_of_month']
       SELECT
         subq_5.__total_account_balance_first_day_of_month
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_2.ds_month__month AS ds_month__month
           , subq_2.__total_account_balance_first_day_of_month AS __total_account_balance_first_day_of_month
         FROM (
-          -- Pass Only Elements: ['__total_account_balance_first_day_of_month', 'ds_month__month']
+          -- Select: ['__total_account_balance_first_day_of_month', 'ds_month__month']
           SELECT
             subq_1.ds_month__month
             , subq_1.__total_account_balance_first_day_of_month
@@ -131,7 +131,7 @@ FROM (
           SELECT
             MIN(subq_3.ds_month__month) AS ds_month__month__complete
           FROM (
-            -- Pass Only Elements: ['__total_account_balance_first_day_of_month', 'ds_month__month']
+            -- Select: ['__total_account_balance_first_day_of_month', 'ds_month__month']
             SELECT
               subq_1.ds_month__month
               , subq_1.__total_account_balance_first_day_of_month

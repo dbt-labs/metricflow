@@ -19,12 +19,12 @@ FROM (
       subq_14.account_id__customer_id__customer_name
       , SUM(subq_14.__txn_count) AS __txn_count
     FROM (
-      -- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
+      -- Select: ['__txn_count', 'account_id__customer_id__customer_name']
       SELECT
         subq_13.account_id__customer_id__customer_name
         , subq_13.__txn_count
       FROM (
-        -- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
+        -- Select: ['__txn_count', 'account_id__customer_id__customer_name']
         SELECT
           subq_12.account_id__customer_id__customer_name
           , subq_12.__txn_count
@@ -209,7 +209,7 @@ FROM (
             ) subq_3
           ) subq_4
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
+            -- Select: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
             SELECT
               subq_10.ds_partitioned__day
               , subq_10.account_id
@@ -399,7 +399,7 @@ FROM (
                 ) subq_5
               ) subq_6
               LEFT OUTER JOIN (
-                -- Pass Only Elements: [
+                -- Select: [
                 --   'customer_name',
                 --   'customer_atomic_weight',
                 --   'customer_id__customer_name',

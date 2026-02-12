@@ -23,12 +23,12 @@ FROM (
         subq_4.metric_time__alien_day
         , SUM(subq_4.__visits) AS __visits
       FROM (
-        -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
+        -- Select: ['__visits', 'metric_time__alien_day']
         SELECT
           subq_3.metric_time__alien_day
           , subq_3.__visits
         FROM (
-          -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
+          -- Select: ['__visits', 'metric_time__alien_day']
           SELECT
             subq_2.metric_time__alien_day
             , subq_2.__visits
@@ -129,12 +129,12 @@ FROM (
         subq_16.metric_time__alien_day
         , SUM(subq_16.__buys) AS __buys
       FROM (
-        -- Pass Only Elements: ['__buys', 'metric_time__alien_day']
+        -- Select: ['__buys', 'metric_time__alien_day']
         SELECT
           subq_15.metric_time__alien_day
           , subq_15.__buys
         FROM (
-          -- Pass Only Elements: ['__buys', 'metric_time__alien_day']
+          -- Select: ['__buys', 'metric_time__alien_day']
           SELECT
             subq_14.metric_time__alien_day
             , subq_14.__buys
@@ -184,14 +184,14 @@ FROM (
                 , subq_12.mf_internal_uuid AS mf_internal_uuid
                 , subq_12.__buys AS __buys
               FROM (
-                -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+                -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
                 SELECT
                   subq_8.metric_time__alien_day
                   , subq_8.metric_time__day
                   , subq_8.user
                   , subq_8.__visits
                 FROM (
-                  -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+                  -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
                   SELECT
                     subq_7.metric_time__alien_day
                     , subq_7.metric_time__day

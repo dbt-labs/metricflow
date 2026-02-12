@@ -6,8 +6,8 @@ sql_engine: Trino
 ---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['__bookings', 'listing__user__ds__alien_day']
--- Pass Only Elements: ['__bookings', 'listing__user__ds__alien_day']
+-- Select: ['__bookings', 'listing__user__ds__alien_day']
+-- Select: ['__bookings', 'listing__user__ds__alien_day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -25,7 +25,7 @@ FROM (
 ) subq_40
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['user__ds_partitioned__day', 'user__ds__day', 'listing']
+  -- Select: ['user__ds_partitioned__day', 'user__ds__day', 'listing']
   SELECT
     DATE_TRUNC('day', users_ds_source_src_28000.ds) AS user__ds__day
     , DATE_TRUNC('day', users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__day

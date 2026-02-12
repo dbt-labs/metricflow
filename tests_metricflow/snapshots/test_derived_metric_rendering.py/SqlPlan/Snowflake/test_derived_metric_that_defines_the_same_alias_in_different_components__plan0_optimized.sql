@@ -28,8 +28,8 @@ FROM (
     , shared_alias - 10 AS derived_shared_alias_1a
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__bookings', 'booking__is_instant']
-    -- Pass Only Elements: ['__bookings', 'booking__is_instant']
+    -- Select: ['__bookings', 'booking__is_instant']
+    -- Select: ['__bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -47,8 +47,8 @@ FULL OUTER JOIN (
     , shared_alias + 10 AS derived_shared_alias_2
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__instant_bookings', 'booking__is_instant']
-    -- Pass Only Elements: ['__instant_bookings', 'booking__is_instant']
+    -- Select: ['__instant_bookings', 'booking__is_instant']
+    -- Select: ['__instant_bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

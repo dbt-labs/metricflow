@@ -15,8 +15,8 @@ FROM (
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
-    -- Pass Only Elements: ['metric_time__month']
-    -- Pass Only Elements: ['metric_time__month']
+    -- Select: ['metric_time__month']
+    -- Select: ['metric_time__month']
     SELECT
       DATE_TRUNC('month', ds) AS metric_time__month
     FROM ***************************.mf_time_spine time_spine_src_28006
@@ -31,8 +31,8 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__month']
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__month']
+      -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__month']
+      -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__month']
       SELECT
         DATE_TRUNC('month', ds) AS metric_time__month
         , 1 AS __bookings_fill_nulls_with_0

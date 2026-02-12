@@ -5,7 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__bookings', 'booking__is_instant']
+-- Select: ['__bookings', 'booking__is_instant']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,7 +14,7 @@ SELECT
   , SUM(bookings) AS bookings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'listing__country_latest']
+  -- Select: ['__bookings', 'booking__is_instant', 'listing__country_latest']
   SELECT
     subq_12.booking__is_instant AS booking__is_instant
     , listings_latest_src_28000.country AS listing__country_latest

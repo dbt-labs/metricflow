@@ -4,8 +4,8 @@ sql_engine: Postgres
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['__bookings', 'booking__ds__alien_day']
--- Pass Only Elements: ['__bookings', 'booking__ds__alien_day']
+-- Select: ['__bookings', 'booking__ds__alien_day']
+-- Select: ['__bookings', 'booking__ds__alien_day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable

@@ -20,12 +20,12 @@ FROM (
       , subq_10.metric_time__hour AS metric_time__hour
       , subq_5.__subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
     FROM (
-      -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
+      -- Select: ['metric_time__alien_day', 'metric_time__hour']
       SELECT
         subq_9.metric_time__alien_day
         , subq_9.metric_time__hour
       FROM (
-        -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
+        -- Select: ['metric_time__alien_day', 'metric_time__hour']
         SELECT
           subq_8.metric_time__alien_day
           , subq_8.metric_time__hour
@@ -77,13 +77,13 @@ FROM (
         , subq_4.metric_time__hour
         , SUM(subq_4.__subdaily_join_to_time_spine_metric) AS __subdaily_join_to_time_spine_metric
       FROM (
-        -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
+        -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
         SELECT
           subq_3.metric_time__alien_day
           , subq_3.metric_time__hour
           , subq_3.__subdaily_join_to_time_spine_metric
         FROM (
-          -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
+          -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
           SELECT
             subq_2.metric_time__alien_day
             , subq_2.metric_time__hour

@@ -30,11 +30,11 @@ FROM (
         , subq_5.booking__is_instant AS booking__is_instant
         , subq_5.__bookings_join_to_time_spine AS bookings_join_to_time_spine
       FROM (
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           subq_8.metric_time__day
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_7.metric_time__day
           FROM (
@@ -79,7 +79,7 @@ FROM (
           , subq_4.booking__is_instant
           , SUM(subq_4.__bookings_join_to_time_spine) AS __bookings_join_to_time_spine
         FROM (
-          -- Pass Only Elements: ['__bookings_join_to_time_spine', 'booking__is_instant', 'metric_time__day']
+          -- Select: ['__bookings_join_to_time_spine', 'booking__is_instant', 'metric_time__day']
           SELECT
             subq_3.metric_time__day
             , subq_3.booking__is_instant
@@ -91,7 +91,7 @@ FROM (
               , subq_2.booking__is_instant
               , subq_2.metric_time__day
             FROM (
-              -- Pass Only Elements: ['__bookings_join_to_time_spine', 'booking__is_instant', 'metric_time__day']
+              -- Select: ['__bookings_join_to_time_spine', 'booking__is_instant', 'metric_time__day']
               SELECT
                 subq_1.metric_time__day
                 , subq_1.booking__is_instant

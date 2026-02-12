@@ -4,8 +4,8 @@ sql_engine: Redshift
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['metric_time__alien_day']
--- Pass Only Elements: ['metric_time__alien_day']
+-- Select: ['metric_time__alien_day']
+-- Select: ['metric_time__alien_day']
 -- Write to DataTable
 SELECT
   subq_6.alien_day AS metric_time__alien_day

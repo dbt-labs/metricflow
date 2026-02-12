@@ -51,13 +51,13 @@ FROM (
             , subq_11.booking__ds__month AS booking__ds__month
             , subq_7.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
           FROM (
-            -- Pass Only Elements: ['metric_time__week', 'booking__ds__month', 'metric_time__day']
+            -- Select: ['metric_time__week', 'booking__ds__month', 'metric_time__day']
             SELECT
               subq_10.metric_time__day
               , subq_10.metric_time__week
               , subq_10.booking__ds__month
             FROM (
-              -- Pass Only Elements: ['metric_time__week', 'booking__ds__month', 'metric_time__day']
+              -- Select: ['metric_time__week', 'booking__ds__month', 'metric_time__day']
               SELECT
                 subq_9.metric_time__day
                 , subq_9.metric_time__week
@@ -105,14 +105,14 @@ FROM (
               , subq_6.metric_time__week
               , COUNT(DISTINCT subq_6.__bookers_fill_nulls_with_0_join_to_timespine) AS __bookers_fill_nulls_with_0_join_to_timespine
             FROM (
-              -- Pass Only Elements: ['__bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
+              -- Select: ['__bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
               SELECT
                 subq_5.booking__ds__month
                 , subq_5.metric_time__day
                 , subq_5.metric_time__week
                 , subq_5.__bookers_fill_nulls_with_0_join_to_timespine
               FROM (
-                -- Pass Only Elements: ['__bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
+                -- Select: ['__bookers_fill_nulls_with_0_join_to_timespine', 'metric_time__week', 'booking__ds__month', 'metric_time__day']
                 SELECT
                   subq_4.booking__ds__month
                   , subq_4.metric_time__day

@@ -16,7 +16,7 @@ FROM (
     SELECT
       SUM(subq_30.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Select: ['__listings']
       SELECT
         subq_29.__listings
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_28.listings AS __listings
           , subq_28.listing__bookings_per_booker
         FROM (
-          -- Pass Only Elements: ['__listings', 'listing__bookings_per_booker']
+          -- Select: ['__listings', 'listing__bookings_per_booker']
           SELECT
             subq_27.listing__bookings_per_booker
             , subq_27.__listings AS listings
@@ -239,7 +239,7 @@ FROM (
               ) subq_11
             ) subq_12
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['listing', 'listing__bookings_per_booker']
+              -- Select: ['listing', 'listing__bookings_per_booker']
               SELECT
                 subq_25.listing
                 , subq_25.listing__bookings_per_booker
@@ -265,12 +265,12 @@ FROM (
                         subq_16.listing
                         , SUM(subq_16.__bookings) AS __bookings
                       FROM (
-                        -- Pass Only Elements: ['__bookings', 'listing']
+                        -- Select: ['__bookings', 'listing']
                         SELECT
                           subq_15.listing
                           , subq_15.__bookings
                         FROM (
-                          -- Pass Only Elements: ['__bookings', 'listing']
+                          -- Select: ['__bookings', 'listing']
                           SELECT
                             subq_14.listing
                             , subq_14.__bookings
@@ -504,12 +504,12 @@ FROM (
                         subq_21.listing
                         , COUNT(DISTINCT subq_21.__bookers) AS __bookers
                       FROM (
-                        -- Pass Only Elements: ['__bookers', 'listing']
+                        -- Select: ['__bookers', 'listing']
                         SELECT
                           subq_20.listing
                           , subq_20.__bookers
                         FROM (
-                          -- Pass Only Elements: ['__bookers', 'listing']
+                          -- Select: ['__bookers', 'listing']
                           SELECT
                             subq_19.listing
                             , subq_19.__bookers

@@ -24,7 +24,7 @@ FROM (
         subq_10.metric_time__day
         , SUM(subq_10.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['__revenue', 'metric_time__day']
+        -- Select: ['__revenue', 'metric_time__day']
         SELECT
           subq_9.metric_time__day
           , subq_9.__revenue
@@ -35,7 +35,7 @@ FROM (
             , subq_8.user__home_state_latest
             , subq_8.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__revenue', 'user__home_state_latest', 'metric_time__day']
+            -- Select: ['__revenue', 'user__home_state_latest', 'metric_time__day']
             SELECT
               subq_7.metric_time__day
               , subq_7.user__home_state_latest
@@ -203,7 +203,7 @@ FROM (
                   )
               ) subq_4
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['home_state_latest', 'user']
+                -- Select: ['home_state_latest', 'user']
                 SELECT
                   subq_5.user
                   , subq_5.home_state_latest

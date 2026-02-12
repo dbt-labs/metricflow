@@ -17,7 +17,7 @@ FROM (
       subq_10.metric_time__day AS metric_time__day
       , subq_5.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
     FROM (
-      -- Pass Only Elements: ['metric_time__day']
+      -- Select: ['metric_time__day']
       SELECT
         subq_9.metric_time__day
       FROM (
@@ -26,7 +26,7 @@ FROM (
           subq_8.metric_time__day
           , subq_8.metric_time__month
         FROM (
-          -- Pass Only Elements: ['metric_time__day', 'metric_time__month']
+          -- Select: ['metric_time__day', 'metric_time__month']
           SELECT
             subq_7.metric_time__day
             , subq_7.metric_time__month
@@ -73,7 +73,7 @@ FROM (
         subq_4.metric_time__day
         , SUM(subq_4.__bookings_join_to_time_spine_with_tiered_filters) AS __bookings_join_to_time_spine_with_tiered_filters
       FROM (
-        -- Pass Only Elements: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day']
+        -- Select: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day']
         SELECT
           subq_3.metric_time__day
           , subq_3.__bookings_join_to_time_spine_with_tiered_filters
@@ -84,7 +84,7 @@ FROM (
             , subq_2.metric_time__day
             , subq_2.metric_time__month
           FROM (
-            -- Pass Only Elements: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day', 'metric_time__month']
+            -- Select: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day', 'metric_time__month']
             SELECT
               subq_1.metric_time__day
               , subq_1.metric_time__month

@@ -10,7 +10,7 @@ sql_engine: BigQuery
 -- Write to DataTable
 WITH cm_6_cte AS (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__bookings', 'listing__capacity_latest']
+  -- Select: ['__bookings', 'listing__capacity_latest']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
@@ -18,7 +18,7 @@ WITH cm_6_cte AS (
     , SUM(bookings) AS bookings
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+    -- Select: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
     SELECT
       subq_27.metric_time__day AS metric_time__day
       , listings_latest_src_28000.is_lux AS listing__is_lux_latest
@@ -45,7 +45,7 @@ WITH cm_6_cte AS (
 
 , cm_7_cte AS (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__views', 'listing__capacity_latest']
+  -- Select: ['__views', 'listing__capacity_latest']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
@@ -53,7 +53,7 @@ WITH cm_6_cte AS (
     , SUM(views) AS views
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+    -- Select: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
     SELECT
       subq_38.metric_time__day AS metric_time__day
       , listings_latest_src_28000.is_lux AS listing__is_lux_latest

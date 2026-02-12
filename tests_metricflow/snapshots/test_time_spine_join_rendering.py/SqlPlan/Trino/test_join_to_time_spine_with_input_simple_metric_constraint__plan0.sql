@@ -24,7 +24,7 @@ FROM (
       , subq_5.booking__is_instant AS booking__is_instant
       , subq_5.__instant_bookings_with_measure_filter AS __instant_bookings_with_measure_filter
     FROM (
-      -- Pass Only Elements: ['metric_time__day']
+      -- Select: ['metric_time__day']
       SELECT
         subq_9.metric_time__day
       FROM (
@@ -32,7 +32,7 @@ FROM (
         SELECT
           subq_8.metric_time__day
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_7.metric_time__day
           FROM (
@@ -79,7 +79,7 @@ FROM (
         , subq_4.booking__is_instant
         , SUM(subq_4.__instant_bookings_with_measure_filter) AS __instant_bookings_with_measure_filter
       FROM (
-        -- Pass Only Elements: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day']
+        -- Select: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day']
         SELECT
           subq_3.metric_time__day
           , subq_3.booking__is_instant
@@ -92,7 +92,7 @@ FROM (
             , subq_2.metric_time__day
             , subq_2.listing
           FROM (
-            -- Pass Only Elements: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day', 'listing']
+            -- Select: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day', 'listing']
             SELECT
               subq_1.metric_time__day
               , subq_1.listing

@@ -5,14 +5,14 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
+-- Select: ['user__home_state_latest', 'listing__is_lux_latest']
 -- Write to DataTable
 SELECT
   listing__is_lux_latest
   , user__home_state_latest
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']
+  -- Select: ['user__home_state_latest', 'listing__is_lux_latest']
   SELECT
     listings_latest_src_28000.is_lux AS listing__is_lux_latest
     , users_latest_src_28000.home_state_latest AS user__home_state_latest

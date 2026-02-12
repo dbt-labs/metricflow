@@ -3,7 +3,7 @@ test_filename: test_query_rendering.py
 sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__family_bookings', 'listing__capacity', 'metric_time__month']
+-- Select: ['__family_bookings', 'listing__capacity', 'metric_time__month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -13,7 +13,7 @@ SELECT
   , SUM(family_bookings) AS family_bookings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__family_bookings', 'listing__capacity', 'metric_time__month']
+  -- Select: ['__family_bookings', 'listing__capacity', 'metric_time__month']
   SELECT
     subq_11.metric_time__month AS metric_time__month
     , listings_src_26000.capacity AS listing__capacity

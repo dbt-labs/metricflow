@@ -3,7 +3,7 @@ test_filename: test_granularity_date_part_rendering.py
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__archived_users', 'metric_time__extract_year']
+-- Select: ['__archived_users', 'metric_time__extract_year']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -13,7 +13,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'users_ds_source'
   -- Metric Time Dimension 'archived_at'
-  -- Pass Only Elements: ['__archived_users', 'metric_time__extract_year', 'metric_time__extract_day']
+  -- Select: ['__archived_users', 'metric_time__extract_year', 'metric_time__extract_day']
   SELECT
     EXTRACT(year FROM archived_at) AS metric_time__extract_year
     , EXTRACT(day FROM archived_at) AS metric_time__extract_day

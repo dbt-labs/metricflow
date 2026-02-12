@@ -15,13 +15,13 @@ SELECT
   , subq_18.__instant_bookings_with_measure_filter AS instant_bookings_with_measure_filter
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day']
+  -- Select: ['metric_time__day']
   SELECT
     metric_time__day
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
@@ -30,7 +30,7 @@ FROM (
 ) subq_23
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day']
+  -- Select: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
@@ -39,7 +39,7 @@ LEFT OUTER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day', 'listing']
+    -- Select: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day', 'listing']
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , listing_id AS listing

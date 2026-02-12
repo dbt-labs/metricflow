@@ -16,7 +16,7 @@ FROM (
     SELECT
       COUNT(DISTINCT subq_30.__third_hop_count) AS __third_hop_count
     FROM (
-      -- Pass Only Elements: ['__third_hop_count']
+      -- Select: ['__third_hop_count']
       SELECT
         subq_29.__third_hop_count
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_28.third_hop_count AS __third_hop_count
           , subq_28.customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
         FROM (
-          -- Pass Only Elements: ['__third_hop_count', 'customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count']
+          -- Select: ['__third_hop_count', 'customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count']
           SELECT
             subq_27.customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
             , subq_27.__third_hop_count AS third_hop_count
@@ -144,7 +144,7 @@ FROM (
               ) subq_10
             ) subq_11
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['account_id__customer_id__customer_third_hop_id', 'account_id__customer_id__customer_third_hop_id__txn_count']
+              -- Select: ['account_id__customer_id__customer_third_hop_id', 'account_id__customer_id__customer_third_hop_id__txn_count']
               SELECT
                 subq_25.account_id__customer_id__customer_third_hop_id
                 , subq_25.account_id__customer_id__customer_third_hop_id__txn_count
@@ -159,12 +159,12 @@ FROM (
                     subq_23.account_id__customer_id__customer_third_hop_id
                     , SUM(subq_23.__txn_count) AS __txn_count
                   FROM (
-                    -- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_third_hop_id']
+                    -- Select: ['__txn_count', 'account_id__customer_id__customer_third_hop_id']
                     SELECT
                       subq_22.account_id__customer_id__customer_third_hop_id
                       , subq_22.__txn_count
                     FROM (
-                      -- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_third_hop_id']
+                      -- Select: ['__txn_count', 'account_id__customer_id__customer_third_hop_id']
                       SELECT
                         subq_21.account_id__customer_id__customer_third_hop_id
                         , subq_21.__txn_count
@@ -349,7 +349,7 @@ FROM (
                           ) subq_12
                         ) subq_13
                         LEFT OUTER JOIN (
-                          -- Pass Only Elements: ['ds_partitioned__day', 'account_id', 'customer_id__customer_third_hop_id']
+                          -- Select: ['ds_partitioned__day', 'account_id', 'customer_id__customer_third_hop_id']
                           SELECT
                             subq_19.ds_partitioned__day
                             , subq_19.account_id
@@ -552,7 +552,7 @@ FROM (
                               ) subq_14
                             ) subq_15
                             LEFT OUTER JOIN (
-                              -- Pass Only Elements: [
+                              -- Select: [
                               --   'country',
                               --   'customer_id__country',
                               --   'customer_third_hop_id__country',

@@ -17,12 +17,12 @@ FROM (
       subq_3.listing__country_latest
       , SUM(subq_3.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings', 'listing__country_latest']
+      -- Select: ['__listings', 'listing__country_latest']
       SELECT
         subq_2.listing__country_latest
         , subq_2.__listings
       FROM (
-        -- Pass Only Elements: ['__listings', 'listing__country_latest']
+        -- Select: ['__listings', 'listing__country_latest']
         SELECT
           subq_1.listing__country_latest
           , subq_1.__listings

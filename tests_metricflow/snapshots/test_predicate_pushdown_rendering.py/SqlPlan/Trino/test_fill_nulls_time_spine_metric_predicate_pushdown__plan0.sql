@@ -37,11 +37,11 @@ FROM (
           , subq_9.listing__country_latest AS listing__country_latest
           , subq_9.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_12.metric_time__day
           FROM (
-            -- Pass Only Elements: ['metric_time__day']
+            -- Select: ['metric_time__day']
             SELECT
               subq_11.metric_time__day
             FROM (
@@ -86,7 +86,7 @@ FROM (
             , subq_8.listing__country_latest
             , SUM(subq_8.__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
           FROM (
-            -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
+            -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
             SELECT
               subq_7.metric_time__day
               , subq_7.listing__country_latest
@@ -99,7 +99,7 @@ FROM (
                 , subq_6.listing__country_latest
                 , subq_6.metric_time__day
               FROM (
-                -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+                -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
                 SELECT
                   subq_5.metric_time__day
                   , subq_5.booking__is_instant
@@ -430,7 +430,7 @@ FROM (
                     ) subq_0
                   ) subq_1
                   LEFT OUTER JOIN (
-                    -- Pass Only Elements: ['country_latest', 'listing']
+                    -- Select: ['country_latest', 'listing']
                     SELECT
                       subq_3.listing
                       , subq_3.country_latest
@@ -599,11 +599,11 @@ FROM (
           , subq_23.listing__country_latest AS listing__country_latest
           , subq_23.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_26.metric_time__day
           FROM (
-            -- Pass Only Elements: ['metric_time__day']
+            -- Select: ['metric_time__day']
             SELECT
               subq_25.metric_time__day
             FROM (
@@ -648,7 +648,7 @@ FROM (
             , subq_22.listing__country_latest
             , SUM(subq_22.__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
           FROM (
-            -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
+            -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
             SELECT
               subq_21.metric_time__day
               , subq_21.listing__country_latest
@@ -661,7 +661,7 @@ FROM (
                 , subq_20.listing__country_latest
                 , subq_20.metric_time__day
               FROM (
-                -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+                -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
                 SELECT
                   subq_19.metric_time__day
                   , subq_19.booking__is_instant
@@ -992,7 +992,7 @@ FROM (
                     ) subq_0
                   ) subq_16
                   LEFT OUTER JOIN (
-                    -- Pass Only Elements: ['country_latest', 'listing']
+                    -- Select: ['country_latest', 'listing']
                     SELECT
                       subq_17.listing
                       , subq_17.country_latest

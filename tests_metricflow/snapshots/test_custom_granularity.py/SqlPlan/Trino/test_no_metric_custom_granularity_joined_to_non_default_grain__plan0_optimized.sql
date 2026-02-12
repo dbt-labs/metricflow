@@ -5,8 +5,8 @@ sql_engine: Trino
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
--- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
+-- Select: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
+-- Select: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
 -- Write to DataTable
 SELECT
   subq_14.alien_day AS user__bio_added_ts__alien_day

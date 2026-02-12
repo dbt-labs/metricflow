@@ -11,8 +11,8 @@ SELECT
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['__bookings', 'metric_time__alien_day']
-  -- Pass Only Elements: ['__bookings', 'metric_time__alien_day']
+  -- Select: ['__bookings', 'metric_time__alien_day']
+  -- Select: ['__bookings', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
@@ -35,8 +35,8 @@ FROM (
 FULL OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['__listings', 'metric_time__alien_day']
-  -- Pass Only Elements: ['__listings', 'metric_time__alien_day']
+  -- Select: ['__listings', 'metric_time__alien_day']
+  -- Select: ['__listings', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT

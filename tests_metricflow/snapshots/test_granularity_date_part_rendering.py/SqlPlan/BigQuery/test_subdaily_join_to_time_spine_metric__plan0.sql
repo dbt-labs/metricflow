@@ -17,11 +17,11 @@ FROM (
       subq_8.metric_time__hour AS metric_time__hour
       , subq_4.__subdaily_join_to_time_spine_metric AS __subdaily_join_to_time_spine_metric
     FROM (
-      -- Pass Only Elements: ['metric_time__hour']
+      -- Select: ['metric_time__hour']
       SELECT
         subq_7.metric_time__hour
       FROM (
-        -- Pass Only Elements: ['metric_time__hour']
+        -- Select: ['metric_time__hour']
         SELECT
           subq_6.metric_time__hour
         FROM (
@@ -65,12 +65,12 @@ FROM (
         subq_3.metric_time__hour
         , SUM(subq_3.__subdaily_join_to_time_spine_metric) AS __subdaily_join_to_time_spine_metric
       FROM (
-        -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
+        -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
         SELECT
           subq_2.metric_time__hour
           , subq_2.__subdaily_join_to_time_spine_metric
         FROM (
-          -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
+          -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
           SELECT
             subq_1.metric_time__hour
             , subq_1.__subdaily_join_to_time_spine_metric

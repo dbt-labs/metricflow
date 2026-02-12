@@ -61,7 +61,7 @@ FROM (
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
+        -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
@@ -69,7 +69,7 @@ FROM (
           , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           -- Join Standard Outputs
-          -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+          -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
           SELECT
             sma_28009_cte.metric_time__day AS metric_time__day
             , sma_28009_cte.booking__is_instant AS booking__is_instant
@@ -105,7 +105,7 @@ FROM (
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
+        -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
@@ -113,7 +113,7 @@ FROM (
           , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           -- Join Standard Outputs
-          -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+          -- Select: ['__bookings_fill_nulls_with_0', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
           SELECT
             sma_28009_cte.metric_time__day AS metric_time__day
             , sma_28009_cte.booking__is_instant AS booking__is_instant

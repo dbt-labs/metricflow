@@ -26,8 +26,8 @@ FROM (
   FROM (
     -- Read From CTE For node_id=sma_28019
     -- Join to Custom Granularity Dataset
-    -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
-    -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
+    -- Select: ['__visits', 'metric_time__alien_day']
+    -- Select: ['__visits', 'metric_time__alien_day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_21.alien_day AS metric_time__alien_day
@@ -42,8 +42,8 @@ FROM (
   ) subq_25
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
-    -- Pass Only Elements: ['__buys', 'metric_time__alien_day']
-    -- Pass Only Elements: ['__buys', 'metric_time__alien_day']
+    -- Select: ['__buys', 'metric_time__alien_day']
+    -- Select: ['__buys', 'metric_time__alien_day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__alien_day
@@ -88,8 +88,8 @@ FROM (
       FROM (
         -- Read From CTE For node_id=sma_28019
         -- Join to Custom Granularity Dataset
-        -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
-        -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+        -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+        -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
         SELECT
           subq_26.alien_day AS metric_time__alien_day
           , sma_28019_cte.metric_time__day AS metric_time__day

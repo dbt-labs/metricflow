@@ -6,11 +6,11 @@ sql_engine: Databricks
 SELECT
   subq_2.user__bio_added_ts__second
 FROM (
-  -- Pass Only Elements: ['user__bio_added_ts__second']
+  -- Select: ['user__bio_added_ts__second']
   SELECT
     subq_1.user__bio_added_ts__second
   FROM (
-    -- Pass Only Elements: ['user__bio_added_ts__second']
+    -- Select: ['user__bio_added_ts__second']
     SELECT
       subq_0.user__bio_added_ts__second
     FROM (

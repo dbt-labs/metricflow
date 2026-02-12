@@ -25,7 +25,7 @@ FROM (
         subq_6.visit__referrer_id
         , SUM(subq_6.__visits) AS __visits
       FROM (
-        -- Pass Only Elements: ['__visits', 'visit__referrer_id']
+        -- Select: ['__visits', 'visit__referrer_id']
         SELECT
           subq_5.visit__referrer_id
           , subq_5.__visits
@@ -35,7 +35,7 @@ FROM (
             subq_4.visits AS __visits
             , subq_4.visit__referrer_id
           FROM (
-            -- Pass Only Elements: ['__visits', 'visit__referrer_id']
+            -- Select: ['__visits', 'visit__referrer_id']
             SELECT
               subq_3.visit__referrer_id
               , subq_3.__visits AS visits
@@ -178,12 +178,12 @@ FROM (
         subq_18.visit__referrer_id
         , SUM(subq_18.__buys) AS __buys
       FROM (
-        -- Pass Only Elements: ['__buys', 'visit__referrer_id']
+        -- Select: ['__buys', 'visit__referrer_id']
         SELECT
           subq_17.visit__referrer_id
           , subq_17.__buys
         FROM (
-          -- Pass Only Elements: ['__buys', 'visit__referrer_id']
+          -- Select: ['__buys', 'visit__referrer_id']
           SELECT
             subq_16.visit__referrer_id
             , subq_16.__buys
@@ -233,7 +233,7 @@ FROM (
                 , subq_14.mf_internal_uuid AS mf_internal_uuid
                 , subq_14.__buys AS __buys
               FROM (
-                -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+                -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
                 SELECT
                   subq_10.metric_time__day
                   , subq_10.user
@@ -247,7 +247,7 @@ FROM (
                     , subq_9.metric_time__day
                     , subq_9.user
                   FROM (
-                    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+                    -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
                     SELECT
                       subq_8.metric_time__day
                       , subq_8.user

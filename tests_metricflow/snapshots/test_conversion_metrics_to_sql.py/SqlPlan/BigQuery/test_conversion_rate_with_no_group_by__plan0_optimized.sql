@@ -21,8 +21,8 @@ SELECT
   CAST(MAX(subq_33.__buys) AS FLOAT64) / CAST(NULLIF(MAX(subq_22.__visits), 0) AS FLOAT64) AS visit_buy_conversion_rate_7days
 FROM (
   -- Read From CTE For node_id=sma_28019
-  -- Pass Only Elements: ['__visits']
-  -- Pass Only Elements: ['__visits']
+  -- Select: ['__visits']
+  -- Select: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(__visits) AS __visits
@@ -30,8 +30,8 @@ FROM (
 ) subq_22
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['__buys']
-  -- Pass Only Elements: ['__buys']
+  -- Select: ['__buys']
+  -- Select: ['__buys']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(__buys) AS __buys

@@ -20,11 +20,11 @@ FROM (
       SELECT
         SUM(subq_3.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['__revenue']
+        -- Select: ['__revenue']
         SELECT
           subq_2.__revenue
         FROM (
-          -- Pass Only Elements: ['__revenue']
+          -- Select: ['__revenue']
           SELECT
             subq_1.__revenue
           FROM (

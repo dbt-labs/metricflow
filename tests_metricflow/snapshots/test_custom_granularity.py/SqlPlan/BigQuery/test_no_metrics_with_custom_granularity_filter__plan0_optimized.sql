@@ -5,14 +5,14 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing__ds__day']
+-- Select: ['listing__ds__day']
 -- Write to DataTable
 SELECT
   listing__ds__day
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['listing__ds__day', 'listing__ds__alien_day']
+  -- Select: ['listing__ds__day', 'listing__ds__alien_day']
   SELECT
     subq_5.alien_day AS listing__ds__alien_day
     , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS listing__ds__day

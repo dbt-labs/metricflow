@@ -17,12 +17,12 @@ FROM (
       subq_3.metric_time__extract_dow
       , SUM(subq_3.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
+      -- Select: ['__bookings', 'metric_time__extract_dow']
       SELECT
         subq_2.metric_time__extract_dow
         , subq_2.__bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
+        -- Select: ['__bookings', 'metric_time__extract_dow']
         SELECT
           subq_1.metric_time__extract_dow
           , subq_1.__bookings

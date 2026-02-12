@@ -22,7 +22,7 @@ FROM (
         subq_11.metric_time__day AS metric_time__day
         , subq_6.__bookings AS __bookings
       FROM (
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           subq_10.metric_time__day
         FROM (
@@ -31,7 +31,7 @@ FROM (
             subq_9.metric_time__day
             , subq_9.metric_time__alien_day
           FROM (
-            -- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day']
+            -- Select: ['metric_time__day', 'metric_time__alien_day']
             SELECT
               subq_8.metric_time__day
               , subq_8.metric_time__alien_day
@@ -78,7 +78,7 @@ FROM (
           subq_5.metric_time__day
           , SUM(subq_5.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__day']
+          -- Select: ['__bookings', 'metric_time__day']
           SELECT
             subq_4.metric_time__day
             , subq_4.__bookings
@@ -89,7 +89,7 @@ FROM (
               , subq_3.metric_time__alien_day
               , subq_3.metric_time__day
             FROM (
-              -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__alien_day']
+              -- Select: ['__bookings', 'metric_time__day', 'metric_time__alien_day']
               SELECT
                 subq_2.metric_time__alien_day
                 , subq_2.metric_time__day

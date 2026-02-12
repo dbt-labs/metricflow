@@ -9,7 +9,7 @@ SELECT
   , delayed_bookings * 2 AS double_counted_delayed_bookings
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__bookings', 'metric_time__day']
+  -- Select: ['__bookings', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
@@ -18,7 +18,7 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
+    -- Select: ['__bookings', 'booking__is_instant', 'metric_time__day']
     SELECT
       DATE_TRUNC('day', ds) AS metric_time__day
       , is_instant AS booking__is_instant

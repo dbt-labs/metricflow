@@ -8,7 +8,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__bookings', 'listing__country_latest']
+-- Select: ['__bookings', 'listing__country_latest']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -17,7 +17,7 @@ SELECT
   , SUM(bookings) AS bookings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
+  -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
   SELECT
     subq_12.metric_time__day AS metric_time__day
     , listings_latest_src_28000.country AS listing__country_latest

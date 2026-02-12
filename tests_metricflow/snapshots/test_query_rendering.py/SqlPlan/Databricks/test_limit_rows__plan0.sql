@@ -24,12 +24,12 @@ FROM (
         subq_3.ds__day
         , SUM(subq_3.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'ds__day']
+        -- Select: ['__bookings', 'ds__day']
         SELECT
           subq_2.ds__day
           , subq_2.__bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'ds__day']
+          -- Select: ['__bookings', 'ds__day']
           SELECT
             subq_1.ds__day
             , subq_1.__bookings

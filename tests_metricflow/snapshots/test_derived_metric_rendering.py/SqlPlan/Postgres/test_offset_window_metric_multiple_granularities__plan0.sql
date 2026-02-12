@@ -40,13 +40,13 @@ FROM (
           , subq_8.metric_time__year AS metric_time__year
           , subq_4.__booking_value AS __booking_value
         FROM (
-          -- Pass Only Elements: ['metric_time__day', 'metric_time__month', 'metric_time__year']
+          -- Select: ['metric_time__day', 'metric_time__month', 'metric_time__year']
           SELECT
             subq_7.metric_time__day
             , subq_7.metric_time__month
             , subq_7.metric_time__year
           FROM (
-            -- Pass Only Elements: ['metric_time__day', 'metric_time__month', 'metric_time__year']
+            -- Select: ['metric_time__day', 'metric_time__month', 'metric_time__year']
             SELECT
               subq_6.metric_time__day
               , subq_6.metric_time__month
@@ -94,14 +94,14 @@ FROM (
             , subq_3.metric_time__year
             , SUM(subq_3.__booking_value) AS __booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+            -- Select: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
             SELECT
               subq_2.metric_time__day
               , subq_2.metric_time__month
               , subq_2.metric_time__year
               , subq_2.__booking_value
             FROM (
-              -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+              -- Select: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
               SELECT
                 subq_1.metric_time__day
                 , subq_1.metric_time__month
@@ -346,14 +346,14 @@ FROM (
           , subq_13.metric_time__year
           , COUNT(DISTINCT subq_13.__bookers) AS __bookers
         FROM (
-          -- Pass Only Elements: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+          -- Select: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
           SELECT
             subq_12.metric_time__day
             , subq_12.metric_time__month
             , subq_12.metric_time__year
             , subq_12.__bookers
           FROM (
-            -- Pass Only Elements: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+            -- Select: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
             SELECT
               subq_11.metric_time__day
               , subq_11.metric_time__month

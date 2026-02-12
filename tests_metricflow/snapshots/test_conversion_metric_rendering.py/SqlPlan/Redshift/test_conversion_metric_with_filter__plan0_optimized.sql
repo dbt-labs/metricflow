@@ -21,13 +21,13 @@ SELECT
   CAST(MAX(subq_37.__buys) AS DOUBLE PRECISION) / CAST(NULLIF(MAX(subq_25.__visits), 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__visits']
+  -- Select: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(visits) AS __visits
   FROM (
     -- Read From CTE For node_id=sma_28019
-    -- Pass Only Elements: ['__visits', 'metric_time__day']
+    -- Select: ['__visits', 'metric_time__day']
     SELECT
       metric_time__day
       , __visits AS visits
@@ -37,8 +37,8 @@ FROM (
 ) subq_25
 CROSS JOIN (
   -- Find conversions for user within the range of INF
-  -- Pass Only Elements: ['__buys']
-  -- Pass Only Elements: ['__buys']
+  -- Select: ['__buys']
+  -- Select: ['__buys']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(__buys) AS __buys
@@ -73,14 +73,14 @@ CROSS JOIN (
       , subq_32.__buys AS __buys
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
+      -- Select: ['__visits', 'metric_time__day', 'user']
       SELECT
         metric_time__day
         , subq_27.user
         , visits AS __visits
       FROM (
         -- Read From CTE For node_id=sma_28019
-        -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
+        -- Select: ['__visits', 'metric_time__day', 'user']
         SELECT
           metric_time__day
           , sma_28019_cte.user

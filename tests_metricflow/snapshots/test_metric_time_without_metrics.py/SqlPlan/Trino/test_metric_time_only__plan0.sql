@@ -8,11 +8,11 @@ sql_engine: Trino
 SELECT
   subq_3.metric_time__day
 FROM (
-  -- Pass Only Elements: ['metric_time__day']
+  -- Select: ['metric_time__day']
   SELECT
     subq_2.metric_time__day
   FROM (
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       subq_1.metric_time__day
     FROM (

@@ -28,7 +28,7 @@ FROM (
           subq_4.metric_time__day
           , SUM(subq_4.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__day']
+          -- Select: ['__bookings', 'metric_time__day']
           SELECT
             subq_3.metric_time__day
             , subq_3.__bookings
@@ -38,7 +38,7 @@ FROM (
               subq_2.bookings AS __bookings
               , subq_2.metric_time__day
             FROM (
-              -- Pass Only Elements: ['__bookings', 'metric_time__day']
+              -- Select: ['__bookings', 'metric_time__day']
               SELECT
                 subq_1.metric_time__day
                 , subq_1.__bookings AS bookings
@@ -274,7 +274,7 @@ FROM (
           subq_16.metric_time__day AS metric_time__day
           , subq_11.__bookings AS __bookings
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_15.metric_time__day
           FROM (
@@ -282,7 +282,7 @@ FROM (
             SELECT
               subq_14.metric_time__day
             FROM (
-              -- Pass Only Elements: ['metric_time__day']
+              -- Select: ['metric_time__day']
               SELECT
                 subq_13.metric_time__day
               FROM (
@@ -328,7 +328,7 @@ FROM (
             subq_10.metric_time__day
             , SUM(subq_10.__bookings) AS __bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'metric_time__day']
+            -- Select: ['__bookings', 'metric_time__day']
             SELECT
               subq_9.metric_time__day
               , subq_9.__bookings
@@ -338,7 +338,7 @@ FROM (
                 subq_8.bookings AS __bookings
                 , subq_8.metric_time__day
               FROM (
-                -- Pass Only Elements: ['__bookings', 'metric_time__day']
+                -- Select: ['__bookings', 'metric_time__day']
                 SELECT
                   subq_7.metric_time__day
                   , subq_7.__bookings AS bookings

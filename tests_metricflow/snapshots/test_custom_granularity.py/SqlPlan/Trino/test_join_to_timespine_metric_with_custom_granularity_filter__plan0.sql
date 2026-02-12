@@ -17,7 +17,7 @@ FROM (
       subq_11.metric_time__alien_day AS metric_time__alien_day
       , subq_6.__bookings_join_to_time_spine AS __bookings_join_to_time_spine
     FROM (
-      -- Pass Only Elements: ['metric_time__alien_day']
+      -- Select: ['metric_time__alien_day']
       SELECT
         subq_10.metric_time__alien_day
       FROM (
@@ -25,7 +25,7 @@ FROM (
         SELECT
           subq_9.metric_time__alien_day
         FROM (
-          -- Pass Only Elements: ['metric_time__alien_day']
+          -- Select: ['metric_time__alien_day']
           SELECT
             subq_8.metric_time__alien_day
           FROM (
@@ -73,7 +73,7 @@ FROM (
         subq_5.metric_time__alien_day
         , SUM(subq_5.__bookings_join_to_time_spine) AS __bookings_join_to_time_spine
       FROM (
-        -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
+        -- Select: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
         SELECT
           subq_4.metric_time__alien_day
           , subq_4.__bookings_join_to_time_spine
@@ -83,7 +83,7 @@ FROM (
             subq_3.bookings_join_to_time_spine AS __bookings_join_to_time_spine
             , subq_3.metric_time__alien_day
           FROM (
-            -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
+            -- Select: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
             SELECT
               subq_2.metric_time__alien_day
               , subq_2.__bookings_join_to_time_spine AS bookings_join_to_time_spine

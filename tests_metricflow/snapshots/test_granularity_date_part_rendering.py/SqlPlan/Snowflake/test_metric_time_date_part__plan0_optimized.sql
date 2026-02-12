@@ -4,8 +4,8 @@ sql_engine: Snowflake
 ---
 -- Read From Time Spine 'mf_time_spine'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements: ['metric_time__extract_year']
--- Pass Only Elements: ['metric_time__extract_year']
+-- Select: ['metric_time__extract_year']
+-- Select: ['metric_time__extract_year']
 -- Write to DataTable
 SELECT
   EXTRACT(year FROM ds) AS metric_time__extract_year

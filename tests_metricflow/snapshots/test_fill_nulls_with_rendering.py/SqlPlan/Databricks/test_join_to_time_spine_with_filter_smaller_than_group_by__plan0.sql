@@ -17,7 +17,7 @@ FROM (
       subq_10.metric_time__day AS metric_time__day
       , subq_5.__archived_users_join_to_time_spine AS __archived_users_join_to_time_spine
     FROM (
-      -- Pass Only Elements: ['metric_time__day']
+      -- Select: ['metric_time__day']
       SELECT
         subq_9.metric_time__day
       FROM (
@@ -26,7 +26,7 @@ FROM (
           subq_8.metric_time__hour
           , subq_8.metric_time__day
         FROM (
-          -- Pass Only Elements: ['metric_time__day', 'metric_time__hour']
+          -- Select: ['metric_time__day', 'metric_time__hour']
           SELECT
             subq_7.metric_time__hour
             , subq_7.metric_time__day
@@ -75,7 +75,7 @@ FROM (
         subq_4.metric_time__day
         , SUM(subq_4.__archived_users_join_to_time_spine) AS __archived_users_join_to_time_spine
       FROM (
-        -- Pass Only Elements: ['__archived_users_join_to_time_spine', 'metric_time__day']
+        -- Select: ['__archived_users_join_to_time_spine', 'metric_time__day']
         SELECT
           subq_3.metric_time__day
           , subq_3.__archived_users_join_to_time_spine
@@ -86,7 +86,7 @@ FROM (
             , subq_2.metric_time__hour
             , subq_2.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__archived_users_join_to_time_spine', 'metric_time__day', 'metric_time__hour']
+            -- Select: ['__archived_users_join_to_time_spine', 'metric_time__day', 'metric_time__hour']
             SELECT
               subq_1.metric_time__hour
               , subq_1.metric_time__day

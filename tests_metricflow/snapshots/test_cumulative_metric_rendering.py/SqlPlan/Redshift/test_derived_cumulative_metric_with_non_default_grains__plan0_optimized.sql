@@ -23,8 +23,8 @@ FROM (
       , AVG(__revenue) OVER (PARTITION BY metric_time__week) AS t2mr
     FROM (
       -- Join Self Over Time Range
-      -- Pass Only Elements: ['__revenue', 'metric_time__week', 'metric_time__day']
-      -- Pass Only Elements: ['__revenue', 'metric_time__week', 'metric_time__day']
+      -- Select: ['__revenue', 'metric_time__week', 'metric_time__day']
+      -- Select: ['__revenue', 'metric_time__week', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_16.ds AS metric_time__day

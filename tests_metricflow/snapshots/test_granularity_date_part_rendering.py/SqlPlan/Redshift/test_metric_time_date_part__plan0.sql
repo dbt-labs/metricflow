@@ -6,11 +6,11 @@ sql_engine: Redshift
 SELECT
   subq_3.metric_time__extract_year
 FROM (
-  -- Pass Only Elements: ['metric_time__extract_year']
+  -- Select: ['metric_time__extract_year']
   SELECT
     subq_2.metric_time__extract_year
   FROM (
-    -- Pass Only Elements: ['metric_time__extract_year']
+    -- Select: ['metric_time__extract_year']
     SELECT
       subq_1.metric_time__extract_year
     FROM (

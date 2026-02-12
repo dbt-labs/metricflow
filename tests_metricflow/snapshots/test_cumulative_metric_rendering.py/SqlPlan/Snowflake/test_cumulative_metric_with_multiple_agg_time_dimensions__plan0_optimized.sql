@@ -5,8 +5,8 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Join Self Over Time Range
--- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day', 'revenue_instance__ds__month']
--- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day', 'revenue_instance__ds__month']
+-- Select: ['__revenue', 'revenue_instance__ds__day', 'revenue_instance__ds__month']
+-- Select: ['__revenue', 'revenue_instance__ds__day', 'revenue_instance__ds__month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

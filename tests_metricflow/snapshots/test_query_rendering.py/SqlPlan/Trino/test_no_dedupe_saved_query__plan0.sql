@@ -7,7 +7,7 @@ SELECT
   subq_9.metric_time__month
   , subq_9.listing__capacity_latest
 FROM (
-  -- Pass Only Elements: ['listing__capacity_latest', 'metric_time__month']
+  -- Select: ['listing__capacity_latest', 'metric_time__month']
   SELECT
     subq_8.metric_time__month
     , subq_8.listing__capacity_latest
@@ -18,7 +18,7 @@ FROM (
       , subq_7.user__home_state_latest
       , subq_7.metric_time__month
     FROM (
-      -- Pass Only Elements: ['listing__capacity_latest', 'user__home_state_latest', 'metric_time__month']
+      -- Select: ['listing__capacity_latest', 'user__home_state_latest', 'metric_time__month']
       SELECT
         subq_6.metric_time__month
         , subq_6.listing__capacity_latest
@@ -150,7 +150,7 @@ FROM (
           FROM ***************************.dim_listings_latest listings_latest_src_28000
         ) subq_0
         CROSS JOIN (
-          -- Pass Only Elements: ['metric_time__month']
+          -- Select: ['metric_time__month']
           SELECT
             subq_2.metric_time__month
           FROM (
@@ -200,7 +200,7 @@ FROM (
           ) subq_2
         ) subq_3
         FULL OUTER JOIN (
-          -- Pass Only Elements: ['home_state_latest', 'user']
+          -- Select: ['home_state_latest', 'user']
           SELECT
             subq_4.user
             , subq_4.home_state_latest

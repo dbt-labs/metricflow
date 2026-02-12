@@ -24,8 +24,8 @@ FROM (
     , MAX(subq_33.bookings_at_start_of_month) AS bookings_at_start_of_month
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__bookings', 'metric_time__day']
-    -- Pass Only Elements: ['__bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -44,8 +44,8 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day

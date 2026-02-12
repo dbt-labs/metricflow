@@ -16,7 +16,7 @@ FROM (
     SELECT
       SUM(subq_16.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Select: ['__listings']
       SELECT
         subq_15.__listings
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_14.listings AS __listings
           , subq_14.listing__bookings
         FROM (
-          -- Pass Only Elements: ['__listings', 'listing__bookings']
+          -- Select: ['__listings', 'listing__bookings']
           SELECT
             subq_13.listing__bookings
             , subq_13.__listings AS listings
@@ -239,7 +239,7 @@ FROM (
               ) subq_4
             ) subq_5
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['listing', 'listing__bookings']
+              -- Select: ['listing', 'listing__bookings']
               SELECT
                 subq_11.listing
                 , subq_11.listing__bookings
@@ -254,12 +254,12 @@ FROM (
                     subq_9.listing
                     , SUM(subq_9.__bookings) AS __bookings
                   FROM (
-                    -- Pass Only Elements: ['__bookings', 'listing']
+                    -- Select: ['__bookings', 'listing']
                     SELECT
                       subq_8.listing
                       , subq_8.__bookings
                     FROM (
-                      -- Pass Only Elements: ['__bookings', 'listing']
+                      -- Select: ['__bookings', 'listing']
                       SELECT
                         subq_7.listing
                         , subq_7.__bookings

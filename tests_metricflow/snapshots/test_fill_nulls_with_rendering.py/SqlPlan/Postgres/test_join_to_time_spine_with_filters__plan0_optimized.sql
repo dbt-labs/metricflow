@@ -16,13 +16,13 @@ FROM (
   FROM (
     -- Constrain Output with WHERE
     -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       metric_time__day
     FROM (
       -- Read From Time Spine 'mf_time_spine'
       -- Change Column Aliases
-      -- Pass Only Elements: ['metric_time__day', 'metric_time__week']
+      -- Select: ['metric_time__day', 'metric_time__week']
       SELECT
         ds AS metric_time__day
         , DATE_TRUNC('week', ds) AS metric_time__week
@@ -36,7 +36,7 @@ FROM (
   ) subq_31
   LEFT OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day']
+    -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
@@ -45,7 +45,7 @@ FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'metric_time__day', 'metric_time__week']
+      -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day', 'metric_time__week']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , DATE_TRUNC('week', ds) AS metric_time__week

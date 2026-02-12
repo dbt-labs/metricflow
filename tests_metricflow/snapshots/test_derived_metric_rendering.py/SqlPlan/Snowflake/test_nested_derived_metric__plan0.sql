@@ -40,12 +40,12 @@ FROM (
               subq_3.metric_time__day
               , SUM(subq_3.__referred_bookings) AS __referred_bookings
             FROM (
-              -- Pass Only Elements: ['__referred_bookings', 'metric_time__day']
+              -- Select: ['__referred_bookings', 'metric_time__day']
               SELECT
                 subq_2.metric_time__day
                 , subq_2.__referred_bookings
               FROM (
-                -- Pass Only Elements: ['__referred_bookings', 'metric_time__day']
+                -- Select: ['__referred_bookings', 'metric_time__day']
                 SELECT
                   subq_1.metric_time__day
                   , subq_1.__referred_bookings
@@ -279,12 +279,12 @@ FROM (
               subq_8.metric_time__day
               , SUM(subq_8.__bookings) AS __bookings
             FROM (
-              -- Pass Only Elements: ['__bookings', 'metric_time__day']
+              -- Select: ['__bookings', 'metric_time__day']
               SELECT
                 subq_7.metric_time__day
                 , subq_7.__bookings
               FROM (
-                -- Pass Only Elements: ['__bookings', 'metric_time__day']
+                -- Select: ['__bookings', 'metric_time__day']
                 SELECT
                   subq_6.metric_time__day
                   , subq_6.__bookings
@@ -524,12 +524,12 @@ FROM (
           subq_15.metric_time__day
           , SUM(subq_15.__instant_bookings) AS __instant_bookings
         FROM (
-          -- Pass Only Elements: ['__instant_bookings', 'metric_time__day']
+          -- Select: ['__instant_bookings', 'metric_time__day']
           SELECT
             subq_14.metric_time__day
             , subq_14.__instant_bookings
           FROM (
-            -- Pass Only Elements: ['__instant_bookings', 'metric_time__day']
+            -- Select: ['__instant_bookings', 'metric_time__day']
             SELECT
               subq_13.metric_time__day
               , subq_13.__instant_bookings
@@ -765,12 +765,12 @@ FROM (
           subq_8.metric_time__day
           , SUM(subq_8.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__day']
+          -- Select: ['__bookings', 'metric_time__day']
           SELECT
             subq_7.metric_time__day
             , subq_7.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'metric_time__day']
+            -- Select: ['__bookings', 'metric_time__day']
             SELECT
               subq_6.metric_time__day
               , subq_6.__bookings

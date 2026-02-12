@@ -9,8 +9,8 @@ SELECT
   , bookings AS bookings_offset_one_alien_day
 FROM (
   -- Join to Time Spine Dataset
-  -- Pass Only Elements: ['__bookings', 'metric_time__day']
-  -- Pass Only Elements: ['__bookings', 'metric_time__day']
+  -- Select: ['__bookings', 'metric_time__day']
+  -- Select: ['__bookings', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT

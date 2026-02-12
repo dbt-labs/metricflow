@@ -5,8 +5,8 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['__identity_verifications', 'user__home_state']
--- Pass Only Elements: ['__identity_verifications', 'user__home_state']
+-- Select: ['__identity_verifications', 'user__home_state']
+-- Select: ['__identity_verifications', 'user__home_state']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable

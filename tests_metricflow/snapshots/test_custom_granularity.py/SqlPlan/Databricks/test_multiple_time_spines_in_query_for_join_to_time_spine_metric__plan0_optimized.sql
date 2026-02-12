@@ -12,8 +12,8 @@ SELECT
 FROM (
   -- Change Column Aliases
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
-  -- Pass Only Elements: ['metric_time__alien_day', 'metric_time__hour']
+  -- Select: ['metric_time__alien_day', 'metric_time__hour']
+  -- Select: ['metric_time__alien_day', 'metric_time__hour']
   SELECT
     subq_20.alien_day AS metric_time__alien_day
     , time_spine_src_28005.ts AS metric_time__hour
@@ -26,8 +26,8 @@ FROM (
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'archived_at'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
-  -- Pass Only Elements: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
+  -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
+  -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__alien_day', 'metric_time__hour']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_14.alien_day AS metric_time__alien_day

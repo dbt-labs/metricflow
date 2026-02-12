@@ -17,12 +17,12 @@ FROM (
       subq_3.booking__paid_at__day
       , SUM(subq_3.__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
     FROM (
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__paid_at__day']
+      -- Select: ['__bookings_fill_nulls_with_0', 'booking__paid_at__day']
       SELECT
         subq_2.booking__paid_at__day
         , subq_2.__bookings_fill_nulls_with_0
       FROM (
-        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__paid_at__day']
+        -- Select: ['__bookings_fill_nulls_with_0', 'booking__paid_at__day']
         SELECT
           subq_1.booking__paid_at__day
           , subq_1.__bookings_fill_nulls_with_0

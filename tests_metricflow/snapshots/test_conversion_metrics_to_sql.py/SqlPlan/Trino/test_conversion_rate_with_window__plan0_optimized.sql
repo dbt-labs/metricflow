@@ -30,8 +30,8 @@ FROM (
     , MAX(subq_33.__buys) AS __buys
   FROM (
     -- Read From CTE For node_id=sma_28019
-    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
-    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
+    -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day']
+    -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
@@ -44,8 +44,8 @@ FROM (
   ) subq_22
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
-    -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
-    -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
+    -- Select: ['__buys', 'visit__referrer_id', 'metric_time__day']
+    -- Select: ['__buys', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day

@@ -5,8 +5,8 @@ docstring:
 sql_engine: Trino
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
--- Pass Only Elements: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
+-- Select: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
+-- Select: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -25,7 +25,7 @@ FROM (
 ) subq_19
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
+  -- Select: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
   SELECT
     listings_src_26000.active_from AS window_start__day
     , listings_src_26000.active_to AS window_end__day

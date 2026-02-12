@@ -32,8 +32,8 @@ FROM (
     , MAX(subq_43.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['__bookings', 'metric_time__year']
-    -- Pass Only Elements: ['__bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -50,8 +50,8 @@ FROM (
   ) subq_33
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['__bookings', 'metric_time__year']
-    -- Pass Only Elements: ['__bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

@@ -32,8 +32,8 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__booking_value', 'booking__ds__day']
-      -- Pass Only Elements: ['__booking_value', 'booking__ds__day']
+      -- Select: ['__booking_value', 'booking__ds__day']
+      -- Select: ['__booking_value', 'booking__ds__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         booking__ds__day
@@ -47,8 +47,8 @@ FROM (
   ) subq_28
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__bookers', 'booking__ds__day']
-    -- Pass Only Elements: ['__bookers', 'booking__ds__day']
+    -- Select: ['__bookers', 'booking__ds__day']
+    -- Select: ['__bookers', 'booking__ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

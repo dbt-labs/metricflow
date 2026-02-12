@@ -14,11 +14,11 @@ FROM (
     MIN(subq_2.booking__paid_at__quarter) AS booking__paid_at__quarter__min
     , MAX(subq_2.booking__paid_at__quarter) AS booking__paid_at__quarter__max
   FROM (
-    -- Pass Only Elements: ['booking__paid_at__quarter']
+    -- Select: ['booking__paid_at__quarter']
     SELECT
       subq_1.booking__paid_at__quarter
     FROM (
-      -- Pass Only Elements: ['booking__paid_at__quarter']
+      -- Select: ['booking__paid_at__quarter']
       SELECT
         subq_0.booking__paid_at__quarter
       FROM (

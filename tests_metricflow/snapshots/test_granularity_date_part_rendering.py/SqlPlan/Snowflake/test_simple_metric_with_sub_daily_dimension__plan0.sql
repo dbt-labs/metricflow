@@ -17,12 +17,12 @@ FROM (
       subq_3.user__archived_at__hour
       , SUM(subq_3.__new_users) AS __new_users
     FROM (
-      -- Pass Only Elements: ['__new_users', 'user__archived_at__hour']
+      -- Select: ['__new_users', 'user__archived_at__hour']
       SELECT
         subq_2.user__archived_at__hour
         , subq_2.__new_users
       FROM (
-        -- Pass Only Elements: ['__new_users', 'user__archived_at__hour']
+        -- Select: ['__new_users', 'user__archived_at__hour']
         SELECT
           subq_1.user__archived_at__hour
           , subq_1.__new_users

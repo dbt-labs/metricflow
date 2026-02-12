@@ -15,8 +15,8 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
-    -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
+    -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
+    -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
     SELECT
       is_instant AS booking__is_instant
       , 1 AS __bookings_fill_nulls_with_0

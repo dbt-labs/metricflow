@@ -10,8 +10,8 @@ SELECT
 FROM (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['__booking_value', '__bookers', 'booking__ds__alien_day']
-  -- Pass Only Elements: ['__booking_value', '__bookers', 'booking__ds__alien_day']
+  -- Select: ['__booking_value', '__bookers', 'booking__ds__alien_day']
+  -- Select: ['__booking_value', '__bookers', 'booking__ds__alien_day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT

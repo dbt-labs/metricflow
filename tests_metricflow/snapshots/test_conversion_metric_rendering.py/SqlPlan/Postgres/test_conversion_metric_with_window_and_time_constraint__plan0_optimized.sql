@@ -32,7 +32,7 @@ FROM (
     , MAX(subq_40.__buys) AS __buys
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
+    -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
@@ -40,7 +40,7 @@ FROM (
       , SUM(visits) AS __visits
     FROM (
       -- Read From CTE For node_id=ctr_0
-      -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
+      -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day']
       SELECT
         metric_time__day
         , visit__referrer_id
@@ -54,8 +54,8 @@ FROM (
   ) subq_28
   FULL OUTER JOIN (
     -- Find conversions for user within the range of 7 day
-    -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
-    -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
+    -- Select: ['__buys', 'visit__referrer_id', 'metric_time__day']
+    -- Select: ['__buys', 'visit__referrer_id', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
@@ -100,7 +100,7 @@ FROM (
         , subq_35.__buys AS __buys
       FROM (
         -- Constrain Output with WHERE
-        -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+        -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
         SELECT
           metric_time__day
           , subq_30.user
@@ -108,7 +108,7 @@ FROM (
           , visits AS __visits
         FROM (
           -- Read From CTE For node_id=ctr_0
-          -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+          -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
           SELECT
             metric_time__day
             , ctr_0_cte.user

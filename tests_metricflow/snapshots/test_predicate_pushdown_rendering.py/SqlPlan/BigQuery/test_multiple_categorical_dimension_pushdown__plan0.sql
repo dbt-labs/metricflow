@@ -19,7 +19,7 @@ FROM (
       subq_7.user__home_state_latest
       , SUM(subq_7.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings', 'user__home_state_latest']
+      -- Select: ['__listings', 'user__home_state_latest']
       SELECT
         subq_6.user__home_state_latest
         , subq_6.__listings
@@ -31,7 +31,7 @@ FROM (
           , subq_5.listing__capacity_latest
           , subq_5.user__home_state_latest
         FROM (
-          -- Pass Only Elements: ['__listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
+          -- Select: ['__listings', 'user__home_state_latest', 'listing__is_lux_latest', 'listing__capacity_latest']
           SELECT
             subq_4.listing__is_lux_latest
             , subq_4.listing__capacity_latest
@@ -247,7 +247,7 @@ FROM (
               ) subq_0
             ) subq_1
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['home_state_latest', 'user']
+              -- Select: ['home_state_latest', 'user']
               SELECT
                 subq_2.user
                 , subq_2.home_state_latest

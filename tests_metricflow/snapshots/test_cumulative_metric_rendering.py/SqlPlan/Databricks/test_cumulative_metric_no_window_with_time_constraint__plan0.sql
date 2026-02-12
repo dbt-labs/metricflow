@@ -24,7 +24,7 @@ FROM (
         subq_12.metric_time__day
         , SUM(subq_12.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['__revenue', 'metric_time__day']
+        -- Select: ['__revenue', 'metric_time__day']
         SELECT
           subq_11.metric_time__day
           , subq_11.__revenue
@@ -34,7 +34,7 @@ FROM (
             subq_10.metric_time__day
             , subq_10.__revenue
           FROM (
-            -- Pass Only Elements: ['__revenue', 'metric_time__day']
+            -- Select: ['__revenue', 'metric_time__day']
             SELECT
               subq_9.metric_time__day
               , subq_9.__revenue
