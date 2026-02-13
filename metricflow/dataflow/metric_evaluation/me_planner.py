@@ -175,23 +175,22 @@ class QueryDescriptor:
 
 @fast_frozen_dataclass()
 class RecursiveMetricQuery(MetricQuery, MetricFlowPrettyFormattable):
-    _input_query_and_passthrough_metric_descriptor_items: MappingItemsTuple[
+    _input_query_and_required_metric_descriptors_items: MappingItemsTuple[
         MetricQuery, FrozenOrderedSet[MetricDescriptor]
     ]
 
     @staticmethod
     def create(
         computed_metric_descriptors: Iterable[MetricDescriptor],
-        input_query_to_passthrough_descriptors: Mapping[MetricQuery, OrderedSet[MetricDescriptor]],
+        passthrough_metric_descriptors: Iterable[MetricDescriptor],
+        input_query_to_required_descriptors: Mapping[MetricQuery, OrderedSet[MetricDescriptor]],
     ) -> RecursiveMetricQuery:
         return RecursiveMetricQuery(
             computed_metric_descriptors=FrozenOrderedSet(computed_metric_descriptors),
-            passthrough_metric_descriptors=FrozenOrderedSet(
-                itertools.chain.from_iterable(input_query_to_passthrough_descriptors.values())
-            ),
-            _input_query_and_passthrough_metric_descriptor_items=tuple(
+            passthrough_metric_descriptors=FrozenOrderedSet(passthrough_metric_descriptors),
+            _input_query_and_required_metric_descriptors_items=tuple(
                 (input_query, FrozenOrderedSet(passthrough_descriptors))
-                for input_query, passthrough_descriptors in input_query_to_passthrough_descriptors.items()
+                for input_query, passthrough_descriptors in input_query_to_required_descriptors.items()
             ),
         )
 
@@ -199,7 +198,7 @@ class RecursiveMetricQuery(MetricQuery, MetricFlowPrettyFormattable):
     def input_query_to_passthrough_descriptors(self) -> Mapping[MetricQuery, FrozenOrderedSet[MetricDescriptor]]:
         return {
             input_query: passthrough_descriptor
-            for input_query, passthrough_descriptor in self._input_query_and_passthrough_metric_descriptor_items
+            for input_query, passthrough_descriptor in self._input_query_and_required_metric_descriptors_items
         }
 
     @override
@@ -384,7 +383,8 @@ class JoinCountOptimizedMetricEvaluationPlanner:
 
         top_level_query = RecursiveMetricQuery.create(
             computed_metric_descriptors=(),
-            input_query_to_passthrough_descriptors=input_query_to_top_level_descriptors,
+            passthrough_metric_descriptors=top_level_query_metric_descriptors,
+            input_query_to_required_descriptors=input_query_to_top_level_descriptors,
         )
 
         logger.debug(
@@ -394,6 +394,10 @@ class JoinCountOptimizedMetricEvaluationPlanner:
             )
         )
         return None
+
+    def _prune_query(self, metric_query: MetricQuery, required_metrics: OrderedSet[MetricDescriptor]) -> MetricQuery:
+
+        if metric_query
 
     def _generate_queries_for_base_metrics(
         self, metric_descriptors: OrderedSet[MetricDescriptor]
@@ -439,17 +443,26 @@ class JoinCountOptimizedMetricEvaluationPlanner:
                         candidate_queries=candidate_queries,
                     )
                 )
-            input_query_to_passthrough_metric_descriptors: defaultdict[
+            input_query_to_required_metric_descriptors: defaultdict[
                 MetricQuery, MutableOrderedSet[MetricDescriptor]
             ] = defaultdict(MutableOrderedSet)
 
+            for input_descriptor in input_descriptors:
+                input_query_for_input_descriptor = input_descriptor_to_query[input_descriptor]
+                input_query_to_required_metric_descriptors[input_query_for_input_descriptor].add(input_descriptor)
+
+            passthrough_metric_descriptors: list[MetricDescriptor] = []
             if metric_descriptor.allows_passed_metrics:
                 for input_descriptor, query in input_descriptor_to_query.items():
-                    input_query_to_passthrough_metric_descriptors[query].update(query.all_descriptors)
+                    input_query_to_required_metric_descriptors[query].update(query)
+
+                    passthrough_metric_descriptors.extend()
+
             queries_for_current_level.add(
                 RecursiveMetricQuery.create(
                     computed_metric_descriptors=(metric_descriptor,),
-                    input_query_to_passthrough_descriptors=input_query_to_passthrough_metric_descriptors,
+                    pass
+                    input_query_to_required_descriptors=input_query_to_required_metric_descriptors,
                 )
             )
 
@@ -524,63 +537,6 @@ class JoinCountOptimizedMetricEvaluationPlanner:
 
         return model_id_to_descriptors
 
-    def build_plan2(self, metric_specs: Sequence[MetricSpec]) -> None:
-        base_metric_queries: MutableOrderedSet[BaseMetricQuery] = MutableOrderedSet()
-
-        for metric_spec in metric_specs:
-            base_metric_queries.update(self._get_base_metric_queries(metric_spec.element_name))
-
-        model_id_to_computed_metric_descriptors: defaultdict[
-            SemanticModelId, MutableOrderedSet[MetricDescriptor]
-        ] = defaultdict(MutableOrderedSet)
-
-        for base_metric_query in base_metric_queries:
-            model_id_to_computed_metric_descriptors[base_metric_query.model_id].update(
-                base_metric_query.computed_metric_descriptors
-            )
-
-        grouped_base_metric_queries: MutableOrderedSet[BaseMetricQuery] = MutableOrderedSet()
-        for model_id, computed_metric_descriptors in model_id_to_computed_metric_descriptors.items():
-            grouped_base_metric_queries.add(
-                BaseMetricQuery.create(
-                    model_id=model_id,
-                    computed_metric_descriptors=computed_metric_descriptors,
-                )
-            )
-
-        raise NotImplementedError
-
-    def _get_base_metric_queries(self, metric_name: str) -> OrderedSet[BaseMetricQuery]:
-        metric = self._manifest_object_lookup.get_metric(metric_name)
-        metric_type = metric.type
-
-        if metric_type is MetricType.SIMPLE:
-            assert metric.type_params.metric_aggregation_params is not None, LazyFormat(
-                "A simple metric should have `metric_aggregation_params`", metric=metric
-            )
-            model_id = SemanticModelId.get_instance(metric.type_params.metric_aggregation_params.semantic_model)
-            return FrozenOrderedSet(
-                (
-                    BaseMetricQuery.create(
-                        model_id=model_id,
-                        computed_metric_descriptors=(MetricDescriptor.create(metric_name=metric_name),),
-                    ),
-                )
-            )
-        elif (
-            metric_type is MetricType.RATIO
-            or metric_type is MetricType.CUMULATIVE
-            or metric_type is MetricType.CONVERSION
-            or metric_type is MetricType.DERIVED
-            or metric_type is MetricType.RATIO
-        ):
-            metric_queries: MutableOrderedSet[BaseMetricQuery] = MutableOrderedSet()
-            for input_metric in metric.input_metrics:
-                metric_queries.update(self._get_base_metric_queries(input_metric.name))
-            return metric_queries
-        else:
-            assert_values_exhausted(metric_type)
-
     def _recursively_collect_descriptors(
         self,
         metric_descriptor: MetricDescriptor,
@@ -636,107 +592,3 @@ class JoinCountOptimizedMetricEvaluationPlanner:
             sorted_level_to_descriptors[level] = FrozenOrderedSet(sorted(level_to_descriptors[level]))
 
         return sorted_level_to_descriptors
-
-    # def _build_input_metric_specs_for_derived_metric(
-    #     self,
-    #     derived_metric_reference: MetricReference,
-    #     filter_spec_factory: WhereSpecFactory,
-    # ) -> Sequence[MetricSpec]:
-    #     """Return the metric specs referenced by the metric. Current use case is for derived metrics."""
-    #     metric = self._manifest_object_lookup.get_metric(derived_metric_reference.element_name)
-    #     input_metric_specs: list[MetricSpec] = []
-    #
-    #     for input_metric in metric.input_metrics:
-    #         filter_spec_set = WhereFilterSpecSet(
-    #             metric_level_filter_specs=tuple(
-    #                 filter_spec_factory.create_from_where_filter_intersection(
-    #                     filter_location=WhereFilterLocation.for_input_metric(
-    #                         input_metric_reference=input_metric.as_reference
-    #                     ),
-    #                     filter_intersection=input_metric.filter,
-    #                 )
-    #             ),
-    #         )
-    #
-    #         input_metric_offset_to_grain: Optional[TimeGranularity] = None
-    #         if input_metric.offset_to_grain is not None:
-    #             input_metric_offset_to_grain = error_if_not_standard_grain(
-    #                 context=f"Metric({metric.name}).InputMetric({input_metric.name}).offset_to_grain",
-    #                 input_granularity=input_metric.offset_to_grain,
-    #             )
-    #
-    #         spec = MetricSpec(
-    #             element_name=input_metric.name,
-    #             filter_spec_set=filter_spec_set,
-    #             alias=input_metric.alias,
-    #             offset_window=(
-    #                 PydanticMetricTimeWindow(
-    #                     count=input_metric.offset_window.count,
-    #                     granularity=input_metric.offset_window.granularity,
-    #                 )
-    #                 if input_metric.offset_window
-    #                 else None
-    #             ),
-    #             offset_to_grain=input_metric_offset_to_grain,
-    #         )
-    #         input_metric_specs.append(spec)
-    #     return tuple(input_metric_specs)
-
-    # def _build_metric_subquery_node(self, metric_spec: MetricSpec) -> MetricSubqueryNode:
-    #     cache_key = metric_spec
-    #     result = self._node_cache.get(cache_key)
-    #     if result:
-    #         return result.value
-    #
-    #     metric_name = metric_spec.element_name
-    #     metric = self._manifest_object_lookup.get_metric(metric_name)
-    #     metric_type = metric.type
-    #
-    #     if metric_type is MetricType.SIMPLE:
-    #         subquery_node = MetricSubqueryNode.create(
-    #             computed_metric_specs=(metric_spec,),
-    #             passed_metric_specs=(),
-    #             parent_metric_spec_to_parent_node={},
-    #         )
-    #     elif (
-    #             metric_type is MetricType.RATIO
-    #             or metric_type is MetricType.CUMULATIVE
-    #             or metric_type is MetricType.CONVERSION
-    #             or metric_type is MetricType.DERIVED
-    #             or metric_type is MetricType.RATIO
-    #     ):
-    #         parent_metric_spec_to_parent_node = {}
-    #         for input_metric in metric.input_metrics:
-    #
-    #             parent_metric_spec = MetricSpec(
-    #                 element_name=input_metric.name,
-    #                 filter_spec_set=WhereFilterSpecSet(
-    #                 metric_level_filter_specs=tuple(
-    #                     self._filter_spec_factory.create_from_where_filter_intersection(
-    #                         filter_location=WhereFilterLocation.for_input_metric(
-    #                             metric_spec.reference
-    #                         ),
-    #                         filter_intersection=metric_filter_intersection,
-    #                     )
-    #                 )
-    #         )
-    #             )
-    #         subquery_node = MetricSubqueryNode.create(
-    #             computed_metric_specs=(metric_spec,),
-    #             passed_metric_specs=(),
-    #             parent_metric_spec_to_parent_node={
-    #                 input_metric: None
-    #                 for input_metric in metric.input_metrics
-    #             }
-    #         )
-    #     else:
-    #         assert_values_exhausted(metric_type)
-    #
-    #     return self._node_cache.set_and_get(cache_key, subquery_node)
-    #
-    # def build_plan(self, metric_specs: Sequence[MetricSpec]) -> MetricEvaluationPlan:
-    #     return MetricEvaluationPlan(
-    #         sink_node=TopLevelQueryNode.create(
-    #             self._build_metric_subquery_node(metric_spec) for metric_spec in metric_specs
-    #         )
-    #     )
