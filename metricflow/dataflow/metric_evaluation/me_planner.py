@@ -131,13 +131,33 @@ class MetricDescriptor:
 
 
 @fast_frozen_dataclass()
-class MetricQuery:
+class MetricDescriptorSet:
+    computed_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
+    passthrough_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
+
+    @staticmethod
+    def create(
+        computed_metric_descriptors: Iterable[MetricDescriptor],
+        passthrough_metric_descriptors: Iterable[MetricDescriptor],
+    ) -> MetricDescriptorSet:
+        return MetricDescriptorSet(
+            computed_metric_descriptors=FrozenOrderedSet(computed_metric_descriptors),
+            passthrough_metric_descriptors=FrozenOrderedSet(passthrough_metric_descriptors),
+        )
+
+
+@fast_frozen_dataclass()
+class MetricQuery(ABC):
     computed_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
     passthrough_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
 
     @cached_property
     def all_descriptors(self) -> OrderedSet[MetricDescriptor]:
         return self.computed_metric_descriptors.union(self.passthrough_metric_descriptors)
+
+    @abstractmethod
+    def pruned_query(self, required_metric_descriptors: Set[MetricDescriptor]) -> Optional[MetricQuery]:
+        raise NotImplementedError
 
 
 @fast_frozen_dataclass()
@@ -155,21 +175,15 @@ class BaseMetricQuery(MetricQuery):
             model_id=model_id,
         )
 
-
-@fast_frozen_dataclass()
-class QueryDescriptor:
-    computed_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
-    passthrough_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
-
-    @staticmethod
-    def create(
-        computed_metric_descriptors: Iterable[MetricDescriptor],
-        passthrough_metric_descriptors: Iterable[MetricDescriptor],
-    ) -> QueryDescriptor:
-        return QueryDescriptor(
-            computed_metric_descriptors=FrozenOrderedSet(computed_metric_descriptors),
-            passthrough_metric_descriptors=FrozenOrderedSet(passthrough_metric_descriptors),
+    @override
+    def pruned_query(self, required_metric_descriptors: Set[MetricDescriptor]) -> Optional[MetricQuery]:
+        filtered_computed_metric_descriptors = tuple(
+            computed_metric_descriptor for computed_metric_descriptor in self.computed_metric_descriptors
+            if computed_metric_descriptor in required_metric_descriptors
         )
+
+
+
 
 
 @fast_frozen_dataclass()
