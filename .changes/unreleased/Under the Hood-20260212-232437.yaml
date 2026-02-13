@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Rename `FilterElementsNode` to `SelectorNode`
+time: 2026-02-12T23:24:37.408014-08:00
+custom:
+  Author: plypaul
+  Issue: "1973"
