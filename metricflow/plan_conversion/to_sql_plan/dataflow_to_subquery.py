@@ -573,11 +573,13 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Also, the output columns should always follow the resolver format.
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
-        output_instance_set = output_instance_set.transform(RemoveMetrics())
+        output_instance_set = output_instance_set.transform(
+            RemoveMetrics(retained_metric_specs=node.passthrough_metric_specs)
+        )
 
         if node.for_group_by_source_node:
             assert (
-                len(node.metric_specs) == 1 and len(output_instance_set.entity_instances) == 1
+                len(node.computed_metric_specs) == 1 and len(output_instance_set.entity_instances) == 1
             ), "Group by metrics currently only support exactly one metric grouped by exactly one entity."
 
         non_metric_select_column_set: SelectColumnSet = output_instance_set.transform(
@@ -595,7 +597,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             instance.spec.element_name: instance
             for instance in from_data_set.instance_set.simple_metric_input_instances
         }
-        for metric_spec in node.metric_specs:
+        for metric_spec in node.computed_metric_specs:
             metric = self._metric_lookup.get_metric(metric_spec.reference)
 
             metric_expr: Optional[SqlExpressionNode] = None

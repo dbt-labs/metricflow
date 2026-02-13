@@ -341,13 +341,16 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         # Dedupe (preserving order for output consistency) as it's possible for multiple derived metrics to use the same
         # metric.
         unique_metric_specs: List[MetricSpec] = []
-        for metric_spec in tuple(self._current_left_node.metric_specs) + tuple(current_right_node.metric_specs):
+        for metric_spec in tuple(self._current_left_node.computed_metric_specs) + tuple(
+            current_right_node.computed_metric_specs
+        ):
             if metric_spec not in unique_metric_specs:
                 unique_metric_specs.append(metric_spec)
 
         combined_node = ComputeMetricsNode.create(
             parent_node=combined_parent_node,
-            metric_specs=unique_metric_specs,
+            computed_metric_specs=unique_metric_specs,
+            passthrough_metric_specs=(),
             aggregated_to_elements=current_right_node.aggregated_to_elements,
             for_group_by_source_node=current_right_node.for_group_by_source_node,
         )
