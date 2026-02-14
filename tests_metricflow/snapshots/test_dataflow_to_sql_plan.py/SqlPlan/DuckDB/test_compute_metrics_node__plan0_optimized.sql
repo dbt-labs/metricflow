@@ -13,7 +13,7 @@ SELECT
   , SUM(subq_7.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['__bookings', 'listing']
+  -- Select: ['__bookings', 'listing']
   SELECT
     listing_id AS listing
     , 1 AS __bookings

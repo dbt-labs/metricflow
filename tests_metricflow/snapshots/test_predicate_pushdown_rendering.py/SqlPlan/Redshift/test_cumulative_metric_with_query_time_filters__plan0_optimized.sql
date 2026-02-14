@@ -7,7 +7,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__bookers', 'listing__country_latest', 'metric_time__day']
+-- Select: ['__bookers', 'listing__country_latest', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
@@ -18,7 +18,7 @@ SELECT
   , COUNT(DISTINCT bookers) AS every_two_days_bookers
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__bookers', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+  -- Select: ['__bookers', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
   SELECT
     subq_19.metric_time__day AS metric_time__day
     , subq_19.booking__is_instant AS booking__is_instant

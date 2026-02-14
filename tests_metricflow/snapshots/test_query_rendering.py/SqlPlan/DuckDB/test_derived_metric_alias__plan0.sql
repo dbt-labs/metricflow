@@ -34,7 +34,7 @@ FROM (
             subq_17.metric_time__day
             , SUM(subq_17.__booking_value) AS __booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+            -- Select: ['__booking_value', 'metric_time__day']
             SELECT
               subq_16.metric_time__day
               , subq_16.__booking_value
@@ -45,7 +45,7 @@ FROM (
                 , subq_15.metric_time__day
                 , subq_15.listing__booking_fees
               FROM (
-                -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'listing__booking_fees']
+                -- Select: ['__booking_value', 'metric_time__day', 'listing__booking_fees']
                 SELECT
                   subq_14.metric_time__day
                   , subq_14.listing__booking_fees
@@ -375,7 +375,7 @@ FROM (
                     ) subq_5
                   ) subq_6
                   LEFT OUTER JOIN (
-                    -- Pass Only Elements: ['listing', 'listing__booking_fees']
+                    -- Select: ['listing', 'listing__booking_fees']
                     SELECT
                       subq_12.listing
                       , subq_12.listing__booking_fees
@@ -395,12 +395,12 @@ FROM (
                             subq_9.listing
                             , SUM(subq_9.__booking_value) AS __booking_value
                           FROM (
-                            -- Pass Only Elements: ['__booking_value', 'listing']
+                            -- Select: ['__booking_value', 'listing']
                             SELECT
                               subq_8.listing
                               , subq_8.__booking_value
                             FROM (
-                              -- Pass Only Elements: ['__booking_value', 'listing']
+                              -- Select: ['__booking_value', 'listing']
                               SELECT
                                 subq_7.listing
                                 , subq_7.__booking_value

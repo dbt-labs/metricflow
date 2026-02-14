@@ -10,13 +10,13 @@ SELECT
   , subq_18.__bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day']
+  -- Select: ['metric_time__day']
   SELECT
     metric_time__day
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
-    -- Pass Only Elements: ['metric_time__day', 'booking__ds__month']
+    -- Select: ['metric_time__day', 'booking__ds__month']
     SELECT
       ds AS metric_time__day
       , DATE_TRUNC('month', ds) AS booking__ds__month
@@ -26,7 +26,7 @@ FROM (
 ) subq_23
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day']
+  -- Select: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
@@ -34,7 +34,7 @@ LEFT OUTER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day', 'booking__ds__month']
+    -- Select: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day', 'booking__ds__month']
     SELECT
       DATE_TRUNC('month', ds) AS booking__ds__month
       , DATE_TRUNC('day', ds) AS metric_time__day

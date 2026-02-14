@@ -19,14 +19,14 @@ SELECT
   CAST(MAX(subq_41.__buys) AS DOUBLE) / CAST(NULLIF(MAX(subq_28.__visits), 0) AS DOUBLE) AS visit_buy_conversion_rate_7days
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__visits']
+  -- Select: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(visits) AS __visits
   FROM (
     -- Read From CTE For node_id=sma_28019
     -- Join to Custom Granularity Dataset
-    -- Pass Only Elements: ['__visits', 'metric_time__alien_day']
+    -- Select: ['__visits', 'metric_time__alien_day']
     SELECT
       subq_23.alien_day AS metric_time__alien_day
       , sma_28019_cte.__visits AS visits
@@ -40,8 +40,8 @@ FROM (
 ) subq_28
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['__buys']
-  -- Pass Only Elements: ['__buys']
+  -- Select: ['__buys']
+  -- Select: ['__buys']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(__buys) AS __buys
@@ -84,7 +84,7 @@ CROSS JOIN (
       , subq_36.__buys AS __buys
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+      -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
       SELECT
         metric_time__alien_day
         , metric_time__day
@@ -93,7 +93,7 @@ CROSS JOIN (
       FROM (
         -- Read From CTE For node_id=sma_28019
         -- Join to Custom Granularity Dataset
-        -- Pass Only Elements: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
+        -- Select: ['__visits', 'metric_time__day', 'metric_time__alien_day', 'user']
         SELECT
           subq_29.alien_day AS metric_time__alien_day
           , sma_28019_cte.metric_time__day AS metric_time__day

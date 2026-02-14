@@ -8,7 +8,7 @@ sql_engine: BigQuery
 SELECT
   subq_4.listing__ds__day
 FROM (
-  -- Pass Only Elements: ['listing__ds__day']
+  -- Select: ['listing__ds__day']
   SELECT
     subq_3.listing__ds__day
   FROM (
@@ -17,7 +17,7 @@ FROM (
       subq_2.listing__ds__alien_day
       , subq_2.listing__ds__day
     FROM (
-      -- Pass Only Elements: ['listing__ds__day', 'listing__ds__alien_day']
+      -- Select: ['listing__ds__day', 'listing__ds__alien_day']
       SELECT
         subq_1.listing__ds__alien_day
         , subq_1.listing__ds__day

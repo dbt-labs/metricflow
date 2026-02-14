@@ -17,13 +17,13 @@ FROM (
     , subq_19.__bookings AS bookings_start_of_month
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['metric_time__month']
+    -- Select: ['metric_time__month']
     SELECT
       metric_time__month
     FROM (
       -- Read From Time Spine 'mf_time_spine'
       -- Change Column Aliases
-      -- Pass Only Elements: ['metric_time__month', 'metric_time__day']
+      -- Select: ['metric_time__month', 'metric_time__day']
       SELECT
         ds AS metric_time__day
         , DATETIME_TRUNC(ds, month) AS metric_time__month
@@ -35,7 +35,7 @@ FROM (
   ) subq_24
   INNER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings', 'metric_time__month']
+    -- Select: ['__bookings', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__month
@@ -43,7 +43,7 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['__bookings', 'metric_time__month', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__month', 'metric_time__day']
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , DATETIME_TRUNC(ds, month) AS metric_time__month

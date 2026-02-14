@@ -17,12 +17,12 @@ FROM (
       subq_23.listing__user__bio_added_ts__minute
       , SUM(subq_23.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings', 'listing__user__bio_added_ts__minute']
+      -- Select: ['__bookings', 'listing__user__bio_added_ts__minute']
       SELECT
         subq_22.listing__user__bio_added_ts__minute
         , subq_22.__bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'listing__user__bio_added_ts__minute']
+        -- Select: ['__bookings', 'listing__user__bio_added_ts__minute']
         SELECT
           subq_21.listing__user__bio_added_ts__minute
           , subq_21.__bookings
@@ -352,7 +352,7 @@ FROM (
             ) subq_12
           ) subq_13
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['user__ds_partitioned__day', 'user__bio_added_ts__minute', 'listing']
+            -- Select: ['user__ds_partitioned__day', 'user__bio_added_ts__minute', 'listing']
             SELECT
               subq_19.user__ds_partitioned__day
               , subq_19.user__bio_added_ts__minute
@@ -665,7 +665,7 @@ FROM (
                 ) subq_14
               ) subq_15
               LEFT OUTER JOIN (
-                -- Pass Only Elements: [
+                -- Select: [
                 --   'home_state',
                 --   'user__home_state',
                 --   'ds__day',

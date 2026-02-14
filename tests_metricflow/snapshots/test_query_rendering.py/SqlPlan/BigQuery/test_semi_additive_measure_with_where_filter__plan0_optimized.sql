@@ -5,7 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Join on MAX(ds) and ['user'] grouping by None
--- Pass Only Elements: ['__current_account_balance_by_user', 'user']
+-- Select: ['__current_account_balance_by_user', 'user']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -21,7 +21,7 @@ FROM (
   FROM (
     -- Read Elements From Semantic Model 'accounts_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
+    -- Select: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
     SELECT
       DATETIME_TRUNC(ds, day) AS ds__day
       , user_id AS user
@@ -40,7 +40,7 @@ INNER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'accounts_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
+    -- Select: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
     SELECT
       DATETIME_TRUNC(ds, day) AS ds__day
       , user_id AS user

@@ -8,7 +8,7 @@ SELECT
   , subq_14.listing__is_lux_latest
   , subq_14.user__home_state_latest
 FROM (
-  -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
+  -- Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
   SELECT
     subq_13.metric_time__day
     , subq_13.listing__is_lux_latest
@@ -20,7 +20,7 @@ FROM (
       , subq_12.listing__is_lux_latest
       , subq_12.user__home_state_latest
     FROM (
-      -- Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
+      -- Select: ['user__home_state_latest', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
         subq_11.metric_time__day
         , subq_11.listing__is_lux_latest
@@ -152,7 +152,7 @@ FROM (
           FROM ***************************.dim_listings_latest listings_latest_src_28000
         ) subq_5
         CROSS JOIN (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_7.metric_time__day
           FROM (
@@ -202,7 +202,7 @@ FROM (
           ) subq_7
         ) subq_8
         FULL OUTER JOIN (
-          -- Pass Only Elements: ['home_state_latest', 'user']
+          -- Select: ['home_state_latest', 'user']
           SELECT
             subq_9.user
             , subq_9.home_state_latest

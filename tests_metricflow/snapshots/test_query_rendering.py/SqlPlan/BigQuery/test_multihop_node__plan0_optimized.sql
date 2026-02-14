@@ -5,8 +5,8 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
--- Pass Only Elements: ['__txn_count', 'account_id__customer_id__customer_name']
+-- Select: ['__txn_count', 'account_id__customer_id__customer_name']
+-- Select: ['__txn_count', 'account_id__customer_id__customer_name']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -16,7 +16,7 @@ SELECT
 FROM ***************************.account_month_txns account_month_txns_src_22000
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
+  -- Select: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
   SELECT
     DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) AS ds_partitioned__day
     , bridge_table_src_22000.account_id AS account_id

@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing']
+-- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Order By ['bookings', 'metric_time__day', 'listing__capacity_latest', 'listing']
@@ -29,7 +29,7 @@ SELECT
   , SUM(bookings) AS bookings_alias
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing', 'listing__booking_fees']
+  -- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day', 'listing', 'listing__booking_fees']
   SELECT
     sma_28009_cte.metric_time__day AS metric_time__day
     , sma_28009_cte.listing AS listing
@@ -39,14 +39,14 @@ FROM (
   FROM sma_28009_cte
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__booking_fees']
+    -- Select: ['listing', 'listing__booking_fees']
     SELECT
       listing
       , booking_value * 0.05 AS listing__booking_fees
     FROM (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__booking_value', 'listing']
-      -- Pass Only Elements: ['__booking_value', 'listing']
+      -- Select: ['__booking_value', 'listing']
+      -- Select: ['__booking_value', 'listing']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT

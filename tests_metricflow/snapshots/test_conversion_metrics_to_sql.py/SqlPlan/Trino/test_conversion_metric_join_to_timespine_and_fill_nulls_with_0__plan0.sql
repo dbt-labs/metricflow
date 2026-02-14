@@ -25,11 +25,11 @@ FROM (
         subq_8.metric_time__day AS metric_time__day
         , subq_4.__visits_fill_nulls_with_0_join_to_timespine AS __visits_fill_nulls_with_0_join_to_timespine
       FROM (
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           subq_7.metric_time__day
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_6.metric_time__day
           FROM (
@@ -73,12 +73,12 @@ FROM (
           subq_3.metric_time__day
           , SUM(subq_3.__visits_fill_nulls_with_0_join_to_timespine) AS __visits_fill_nulls_with_0_join_to_timespine
         FROM (
-          -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+          -- Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
           SELECT
             subq_2.metric_time__day
             , subq_2.__visits_fill_nulls_with_0_join_to_timespine
           FROM (
-            -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+            -- Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
             SELECT
               subq_1.metric_time__day
               , subq_1.__visits_fill_nulls_with_0_join_to_timespine
@@ -176,11 +176,11 @@ FROM (
         subq_24.metric_time__day AS metric_time__day
         , subq_20.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
       FROM (
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           subq_23.metric_time__day
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_22.metric_time__day
           FROM (
@@ -224,12 +224,12 @@ FROM (
           subq_19.metric_time__day
           , SUM(subq_19.__buys_fill_nulls_with_0_join_to_timespine) AS __buys_fill_nulls_with_0_join_to_timespine
         FROM (
-          -- Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+          -- Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
           SELECT
             subq_18.metric_time__day
             , subq_18.__buys_fill_nulls_with_0_join_to_timespine
           FROM (
-            -- Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+            -- Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
             SELECT
               subq_17.metric_time__day
               , subq_17.__buys_fill_nulls_with_0_join_to_timespine
@@ -270,13 +270,13 @@ FROM (
                   , subq_15.mf_internal_uuid AS mf_internal_uuid
                   , subq_15.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
                 FROM (
-                  -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day', 'user']
+                  -- Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day', 'user']
                   SELECT
                     subq_11.metric_time__day
                     , subq_11.user
                     , subq_11.__visits_fill_nulls_with_0_join_to_timespine
                   FROM (
-                    -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day', 'user']
+                    -- Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day', 'user']
                     SELECT
                       subq_10.metric_time__day
                       , subq_10.user

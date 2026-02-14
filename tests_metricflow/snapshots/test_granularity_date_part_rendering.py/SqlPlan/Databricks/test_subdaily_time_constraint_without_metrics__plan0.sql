@@ -6,7 +6,7 @@ sql_engine: Databricks
 SELECT
   subq_4.metric_time__second
 FROM (
-  -- Pass Only Elements: ['metric_time__second']
+  -- Select: ['metric_time__second']
   SELECT
     subq_3.metric_time__second
   FROM (
@@ -14,7 +14,7 @@ FROM (
     SELECT
       subq_2.metric_time__second
     FROM (
-      -- Pass Only Elements: ['metric_time__second']
+      -- Select: ['metric_time__second']
       SELECT
         subq_1.metric_time__second
       FROM (

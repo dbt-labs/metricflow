@@ -13,7 +13,7 @@ SELECT
   , SUM(subq_1.__instant_bookings) AS __instant_bookings
   , COUNT(DISTINCT subq_1.__bookers) AS __bookers
 FROM (
-  -- Pass Only Elements: ['__bookings', '__instant_bookings', '__average_booking_value', '__bookers']
+  -- Select: ['__bookings', '__instant_bookings', '__average_booking_value', '__bookers']
   SELECT
     subq_0.__bookings
     , subq_0.__average_booking_value

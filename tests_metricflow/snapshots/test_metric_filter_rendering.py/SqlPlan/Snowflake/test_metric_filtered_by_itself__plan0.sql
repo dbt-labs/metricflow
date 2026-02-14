@@ -16,7 +16,7 @@ FROM (
     SELECT
       COUNT(DISTINCT subq_15.__bookers) AS __bookers
     FROM (
-      -- Pass Only Elements: ['__bookers']
+      -- Select: ['__bookers']
       SELECT
         subq_14.__bookers
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_13.bookers AS __bookers
           , subq_13.listing__bookers
         FROM (
-          -- Pass Only Elements: ['__bookers', 'listing__bookers']
+          -- Select: ['__bookers', 'listing__bookers']
           SELECT
             subq_12.listing__bookers
             , subq_12.__bookers AS bookers
@@ -354,7 +354,7 @@ FROM (
               ) subq_4
             ) subq_5
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['listing', 'listing__bookers']
+              -- Select: ['listing', 'listing__bookers']
               SELECT
                 subq_10.listing
                 , subq_10.listing__bookers
@@ -369,12 +369,12 @@ FROM (
                     subq_8.listing
                     , COUNT(DISTINCT subq_8.__bookers) AS __bookers
                   FROM (
-                    -- Pass Only Elements: ['__bookers', 'listing']
+                    -- Select: ['__bookers', 'listing']
                     SELECT
                       subq_7.listing
                       , subq_7.__bookers
                     FROM (
-                      -- Pass Only Elements: ['__bookers', 'listing']
+                      -- Select: ['__bookers', 'listing']
                       SELECT
                         subq_6.listing
                         , subq_6.__bookers

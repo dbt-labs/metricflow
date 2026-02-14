@@ -65,7 +65,7 @@ docstring:
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description = "Pass Only Elements: ['__bookings', '__bookers', 'listing']" -->
+                    <!-- description = "Select: ['__bookings', '__bookers', 'listing']" -->
                     <!-- node_id = NodeId(id_str='ss_1') -->
                     <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='listing') -->
                     <!-- col1 =                                                                                        -->
@@ -550,7 +550,7 @@ docstring:
                     </SqlSelectStatementNode>
                 </SqlSelectStatementNode>
                 <SqlSelectStatementNode>
-                    <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                    <!-- description = "Select: ['country_latest', 'listing']" -->
                     <!-- node_id = NodeId(id_str='ss_3') -->
                     <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_4), column_alias='listing') -->
                     <!-- col1 =                                                                                            -->

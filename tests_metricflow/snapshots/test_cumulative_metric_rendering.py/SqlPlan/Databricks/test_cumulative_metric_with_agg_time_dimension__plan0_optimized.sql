@@ -5,8 +5,8 @@ docstring:
 sql_engine: Databricks
 ---
 -- Join Self Over Time Range
--- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
--- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
+-- Select: ['__revenue', 'revenue_instance__ds__day']
+-- Select: ['__revenue', 'revenue_instance__ds__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

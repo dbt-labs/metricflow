@@ -7,7 +7,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'bookings_source'
--- Pass Only Elements: ['__bookings', '__instant_bookings', '__average_booking_value', '__bookers']
+-- Select: ['__bookings', '__instant_bookings', '__average_booking_value', '__bookers']
 -- Aggregate Inputs for Simple Metrics
 SELECT
   SUM(1) AS __bookings

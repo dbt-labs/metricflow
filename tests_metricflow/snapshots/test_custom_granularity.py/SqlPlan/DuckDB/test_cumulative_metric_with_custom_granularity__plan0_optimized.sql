@@ -17,8 +17,8 @@ FROM (
   FROM (
     -- Join Self Over Time Range
     -- Join to Custom Granularity Dataset
-    -- Pass Only Elements: ['__revenue', 'metric_time__alien_day', 'metric_time__day']
-    -- Pass Only Elements: ['__revenue', 'metric_time__alien_day', 'metric_time__day']
+    -- Select: ['__revenue', 'metric_time__alien_day', 'metric_time__day']
+    -- Select: ['__revenue', 'metric_time__alien_day', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_17.alien_day AS metric_time__alien_day

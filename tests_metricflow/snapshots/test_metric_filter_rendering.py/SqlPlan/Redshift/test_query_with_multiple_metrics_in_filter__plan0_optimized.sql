@@ -5,7 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -23,7 +23,7 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__listings', 'listing__bookings', 'listing__bookers']
+  -- Select: ['__listings', 'listing__bookings', 'listing__bookers']
   SELECT
     subq_37.listing__bookings AS listing__bookings
     , subq_43.listing__bookers AS listing__bookers
@@ -38,11 +38,11 @@ FROM (
   ) subq_30
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__bookings', 'listing']
-    -- Pass Only Elements: ['__bookings', 'listing']
+    -- Select: ['__bookings', 'listing']
+    -- Select: ['__bookings', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookings']
+    -- Select: ['listing', 'listing__bookings']
     SELECT
       listing
       , SUM(__bookings) AS listing__bookings
@@ -54,11 +54,11 @@ FROM (
     subq_30.listing = subq_37.listing
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__bookers', 'listing']
-    -- Pass Only Elements: ['__bookers', 'listing']
+    -- Select: ['__bookers', 'listing']
+    -- Select: ['__bookers', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookers']
+    -- Select: ['listing', 'listing__bookers']
     SELECT
       listing
       , COUNT(DISTINCT __bookers) AS listing__bookers

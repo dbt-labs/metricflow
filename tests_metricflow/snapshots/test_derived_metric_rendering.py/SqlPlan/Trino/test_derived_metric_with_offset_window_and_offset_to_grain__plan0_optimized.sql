@@ -38,8 +38,8 @@ FROM (
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
@@ -60,8 +60,8 @@ FROM (
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day

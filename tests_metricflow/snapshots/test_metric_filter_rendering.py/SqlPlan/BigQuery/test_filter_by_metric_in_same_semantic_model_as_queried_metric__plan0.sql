@@ -16,7 +16,7 @@ FROM (
     SELECT
       COUNT(DISTINCT subq_15.__bookers) AS __bookers
     FROM (
-      -- Pass Only Elements: ['__bookers']
+      -- Select: ['__bookers']
       SELECT
         subq_14.__bookers
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_13.bookers AS __bookers
           , subq_13.guest__booking_value
         FROM (
-          -- Pass Only Elements: ['__bookers', 'guest__booking_value']
+          -- Select: ['__bookers', 'guest__booking_value']
           SELECT
             subq_12.guest__booking_value
             , subq_12.__bookers AS bookers
@@ -354,7 +354,7 @@ FROM (
               ) subq_4
             ) subq_5
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['guest', 'guest__booking_value']
+              -- Select: ['guest', 'guest__booking_value']
               SELECT
                 subq_10.guest
                 , subq_10.guest__booking_value
@@ -369,12 +369,12 @@ FROM (
                     subq_8.guest
                     , SUM(subq_8.__booking_value) AS __booking_value
                   FROM (
-                    -- Pass Only Elements: ['__booking_value', 'guest']
+                    -- Select: ['__booking_value', 'guest']
                     SELECT
                       subq_7.guest
                       , subq_7.__booking_value
                     FROM (
-                      -- Pass Only Elements: ['__booking_value', 'guest']
+                      -- Select: ['__booking_value', 'guest']
                       SELECT
                         subq_6.guest
                         , subq_6.__booking_value

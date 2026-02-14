@@ -4,8 +4,8 @@ sql_engine: Postgres
 ---
 -- Join Self Over Time Range
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
--- Pass Only Elements: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
+-- Select: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
+-- Select: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions

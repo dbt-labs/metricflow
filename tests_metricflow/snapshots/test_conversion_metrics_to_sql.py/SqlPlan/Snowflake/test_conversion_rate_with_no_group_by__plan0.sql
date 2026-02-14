@@ -21,11 +21,11 @@ FROM (
       SELECT
         SUM(subq_3.__visits) AS __visits
       FROM (
-        -- Pass Only Elements: ['__visits']
+        -- Select: ['__visits']
         SELECT
           subq_2.__visits
         FROM (
-          -- Pass Only Elements: ['__visits']
+          -- Select: ['__visits']
           SELECT
             subq_1.__visits
           FROM (
@@ -116,11 +116,11 @@ FROM (
       SELECT
         SUM(subq_14.__buys) AS __buys
       FROM (
-        -- Pass Only Elements: ['__buys']
+        -- Select: ['__buys']
         SELECT
           subq_13.__buys
         FROM (
-          -- Pass Only Elements: ['__buys']
+          -- Select: ['__buys']
           SELECT
             subq_12.__buys
           FROM (
@@ -160,13 +160,13 @@ FROM (
                 , subq_10.mf_internal_uuid AS mf_internal_uuid
                 , subq_10.__buys AS __buys
               FROM (
-                -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
+                -- Select: ['__visits', 'metric_time__day', 'user']
                 SELECT
                   subq_6.metric_time__day
                   , subq_6.user
                   , subq_6.__visits
                 FROM (
-                  -- Pass Only Elements: ['__visits', 'metric_time__day', 'user']
+                  -- Select: ['__visits', 'metric_time__day', 'user']
                   SELECT
                     subq_5.metric_time__day
                     , subq_5.user

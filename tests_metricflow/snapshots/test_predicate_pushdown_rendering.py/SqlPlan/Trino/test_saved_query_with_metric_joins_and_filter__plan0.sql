@@ -30,7 +30,7 @@ FROM (
         subq_8.listing__capacity_latest
         , SUM(subq_8.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'listing__capacity_latest']
+        -- Select: ['__bookings', 'listing__capacity_latest']
         SELECT
           subq_7.listing__capacity_latest
           , subq_7.__bookings
@@ -42,7 +42,7 @@ FROM (
             , subq_6.listing__capacity_latest
             , subq_6.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+            -- Select: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
             SELECT
               subq_5.metric_time__day
               , subq_5.listing__is_lux_latest
@@ -374,7 +374,7 @@ FROM (
                 ) subq_0
               ) subq_1
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+                -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
                 SELECT
                   subq_3.listing
                   , subq_3.is_lux_latest
@@ -538,7 +538,7 @@ FROM (
         subq_18.listing__capacity_latest
         , SUM(subq_18.__views) AS __views
       FROM (
-        -- Pass Only Elements: ['__views', 'listing__capacity_latest']
+        -- Select: ['__views', 'listing__capacity_latest']
         SELECT
           subq_17.listing__capacity_latest
           , subq_17.__views
@@ -550,7 +550,7 @@ FROM (
             , subq_16.listing__capacity_latest
             , subq_16.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+            -- Select: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
             SELECT
               subq_15.metric_time__day
               , subq_15.listing__is_lux_latest
@@ -740,7 +740,7 @@ FROM (
                 ) subq_11
               ) subq_12
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+                -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
                 SELECT
                   subq_13.listing
                   , subq_13.is_lux_latest
@@ -917,7 +917,7 @@ FROM (
             subq_8.listing__capacity_latest
             , SUM(subq_8.__bookings) AS __bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'listing__capacity_latest']
+            -- Select: ['__bookings', 'listing__capacity_latest']
             SELECT
               subq_7.listing__capacity_latest
               , subq_7.__bookings
@@ -929,7 +929,7 @@ FROM (
                 , subq_6.listing__capacity_latest
                 , subq_6.metric_time__day
               FROM (
-                -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+                -- Select: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
                 SELECT
                   subq_5.metric_time__day
                   , subq_5.listing__is_lux_latest
@@ -1261,7 +1261,7 @@ FROM (
                     ) subq_0
                   ) subq_1
                   LEFT OUTER JOIN (
-                    -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+                    -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
                     SELECT
                       subq_3.listing
                       , subq_3.is_lux_latest
@@ -1425,7 +1425,7 @@ FROM (
             subq_18.listing__capacity_latest
             , SUM(subq_18.__views) AS __views
           FROM (
-            -- Pass Only Elements: ['__views', 'listing__capacity_latest']
+            -- Select: ['__views', 'listing__capacity_latest']
             SELECT
               subq_17.listing__capacity_latest
               , subq_17.__views
@@ -1437,7 +1437,7 @@ FROM (
                 , subq_16.listing__capacity_latest
                 , subq_16.metric_time__day
               FROM (
-                -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+                -- Select: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
                 SELECT
                   subq_15.metric_time__day
                   , subq_15.listing__is_lux_latest
@@ -1627,7 +1627,7 @@ FROM (
                     ) subq_11
                   ) subq_12
                   LEFT OUTER JOIN (
-                    -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+                    -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
                     SELECT
                       subq_13.listing
                       , subq_13.is_lux_latest

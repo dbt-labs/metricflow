@@ -14,7 +14,7 @@ FROM (
     SELECT
       SUM(subq_22.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Select: ['__listings']
       SELECT
         subq_21.__listings
       FROM (
@@ -23,7 +23,7 @@ FROM (
           subq_20.listings AS __listings
           , subq_20.user__listing__user__average_booking_value
         FROM (
-          -- Pass Only Elements: ['__listings', 'user__listing__user__average_booking_value']
+          -- Select: ['__listings', 'user__listing__user__average_booking_value']
           SELECT
             subq_19.user__listing__user__average_booking_value
             , subq_19.__listings AS listings
@@ -238,7 +238,7 @@ FROM (
               ) subq_7
             ) subq_8
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['listing__user', 'listing__user__average_booking_value']
+              -- Select: ['listing__user', 'listing__user__average_booking_value']
               SELECT
                 subq_17.listing__user
                 , subq_17.listing__user__average_booking_value
@@ -253,12 +253,12 @@ FROM (
                     subq_15.listing__user
                     , AVG(subq_15.__average_booking_value) AS __average_booking_value
                   FROM (
-                    -- Pass Only Elements: ['__average_booking_value', 'listing__user']
+                    -- Select: ['__average_booking_value', 'listing__user']
                     SELECT
                       subq_14.listing__user
                       , subq_14.__average_booking_value
                     FROM (
-                      -- Pass Only Elements: ['__average_booking_value', 'listing__user']
+                      -- Select: ['__average_booking_value', 'listing__user']
                       SELECT
                         subq_13.listing__user
                         , subq_13.__average_booking_value
@@ -587,7 +587,7 @@ FROM (
                           ) subq_9
                         ) subq_10
                         LEFT OUTER JOIN (
-                          -- Pass Only Elements: ['listing', 'user']
+                          -- Select: ['listing', 'user']
                           SELECT
                             subq_11.listing
                             , subq_11.user

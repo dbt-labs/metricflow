@@ -28,8 +28,8 @@ FROM (
     , MAX(subq_33.__buys) AS __buys
   FROM (
     -- Read From CTE For node_id=sma_28019
-    -- Pass Only Elements: ['__visits', 'visit__referrer_id']
-    -- Pass Only Elements: ['__visits', 'visit__referrer_id']
+    -- Select: ['__visits', 'visit__referrer_id']
+    -- Select: ['__visits', 'visit__referrer_id']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       visit__referrer_id
@@ -40,8 +40,8 @@ FROM (
   ) subq_22
   FULL OUTER JOIN (
     -- Find conversions for user within the range of INF
-    -- Pass Only Elements: ['__buys', 'visit__referrer_id']
-    -- Pass Only Elements: ['__buys', 'visit__referrer_id']
+    -- Select: ['__buys', 'visit__referrer_id']
+    -- Select: ['__buys', 'visit__referrer_id']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       visit__referrer_id

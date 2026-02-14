@@ -16,7 +16,7 @@ FROM (
     SELECT
       SUM(subq_5.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings']
+      -- Select: ['__bookings']
       SELECT
         subq_4.__bookings
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_3.bookings AS __bookings
           , subq_3.metric_time__alien_day
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__alien_day']
+          -- Select: ['__bookings', 'metric_time__alien_day']
           SELECT
             subq_2.metric_time__alien_day
             , subq_2.__bookings AS bookings

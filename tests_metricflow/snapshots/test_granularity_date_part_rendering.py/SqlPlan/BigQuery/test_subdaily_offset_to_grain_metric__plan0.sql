@@ -22,11 +22,11 @@ FROM (
         subq_8.metric_time__hour AS metric_time__hour
         , subq_4.__archived_users AS __archived_users
       FROM (
-        -- Pass Only Elements: ['metric_time__hour']
+        -- Select: ['metric_time__hour']
         SELECT
           subq_7.metric_time__hour
         FROM (
-          -- Pass Only Elements: ['metric_time__hour']
+          -- Select: ['metric_time__hour']
           SELECT
             subq_6.metric_time__hour
           FROM (
@@ -70,12 +70,12 @@ FROM (
           subq_3.metric_time__hour
           , SUM(subq_3.__archived_users) AS __archived_users
         FROM (
-          -- Pass Only Elements: ['__archived_users', 'metric_time__hour']
+          -- Select: ['__archived_users', 'metric_time__hour']
           SELECT
             subq_2.metric_time__hour
             , subq_2.__archived_users
           FROM (
-            -- Pass Only Elements: ['__archived_users', 'metric_time__hour']
+            -- Select: ['__archived_users', 'metric_time__hour']
             SELECT
               subq_1.metric_time__hour
               , subq_1.__archived_users

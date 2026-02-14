@@ -29,7 +29,7 @@ FROM (
           subq_8.metric_time__day
           , AVG(subq_8.__average_booking_value) AS __average_booking_value
         FROM (
-          -- Pass Only Elements: ['__average_booking_value', 'metric_time__day']
+          -- Select: ['__average_booking_value', 'metric_time__day']
           SELECT
             subq_7.metric_time__day
             , subq_7.__average_booking_value
@@ -40,7 +40,7 @@ FROM (
               , subq_6.listing__is_lux_latest
               , subq_6.metric_time__day
             FROM (
-              -- Pass Only Elements: ['__average_booking_value', 'listing__is_lux_latest', 'metric_time__day']
+              -- Select: ['__average_booking_value', 'listing__is_lux_latest', 'metric_time__day']
               SELECT
                 subq_5.metric_time__day
                 , subq_5.listing__is_lux_latest
@@ -370,7 +370,7 @@ FROM (
                   ) subq_0
                 ) subq_1
                 LEFT OUTER JOIN (
-                  -- Pass Only Elements: ['is_lux_latest', 'listing']
+                  -- Select: ['is_lux_latest', 'listing']
                   SELECT
                     subq_3.listing
                     , subq_3.is_lux_latest
@@ -533,7 +533,7 @@ FROM (
           subq_17.metric_time__day
           , SUM(subq_17.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__day']
+          -- Select: ['__bookings', 'metric_time__day']
           SELECT
             subq_16.metric_time__day
             , subq_16.__bookings
@@ -544,7 +544,7 @@ FROM (
               , subq_15.listing__is_lux_latest
               , subq_15.metric_time__day
             FROM (
-              -- Pass Only Elements: ['__bookings', 'listing__is_lux_latest', 'metric_time__day']
+              -- Select: ['__bookings', 'listing__is_lux_latest', 'metric_time__day']
               SELECT
                 subq_14.metric_time__day
                 , subq_14.listing__is_lux_latest
@@ -874,7 +874,7 @@ FROM (
                   ) subq_0
                 ) subq_11
                 LEFT OUTER JOIN (
-                  -- Pass Only Elements: ['is_lux_latest', 'listing']
+                  -- Select: ['is_lux_latest', 'listing']
                   SELECT
                     subq_12.listing
                     , subq_12.is_lux_latest
@@ -1039,12 +1039,12 @@ FROM (
           subq_22.metric_time__day
           , SUM(subq_22.__booking_value) AS __booking_value
         FROM (
-          -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+          -- Select: ['__booking_value', 'metric_time__day']
           SELECT
             subq_21.metric_time__day
             , subq_21.__booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+            -- Select: ['__booking_value', 'metric_time__day']
             SELECT
               subq_20.metric_time__day
               , subq_20.__booking_value

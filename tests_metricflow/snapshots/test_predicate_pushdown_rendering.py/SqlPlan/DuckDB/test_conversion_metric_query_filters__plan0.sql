@@ -29,7 +29,7 @@ FROM (
         , subq_7.user__home_state_latest
         , SUM(subq_7.__visits) AS __visits
       FROM (
-        -- Pass Only Elements: ['__visits', 'user__home_state_latest', 'metric_time__day']
+        -- Select: ['__visits', 'user__home_state_latest', 'metric_time__day']
         SELECT
           subq_6.metric_time__day
           , subq_6.user__home_state_latest
@@ -42,7 +42,7 @@ FROM (
             , subq_5.user__home_state_latest
             , subq_5.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__visits', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
+            -- Select: ['__visits', 'user__home_state_latest', 'visit__referrer_id', 'metric_time__day']
             SELECT
               subq_4.metric_time__day
               , subq_4.visit__referrer_id
@@ -174,7 +174,7 @@ FROM (
                 ) subq_0
               ) subq_1
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['home_state_latest', 'user']
+                -- Select: ['home_state_latest', 'user']
                 SELECT
                   subq_2.user
                   , subq_2.home_state_latest
@@ -227,13 +227,13 @@ FROM (
         , subq_22.user__home_state_latest
         , SUM(subq_22.__buys) AS __buys
       FROM (
-        -- Pass Only Elements: ['__buys', 'user__home_state_latest', 'metric_time__day']
+        -- Select: ['__buys', 'user__home_state_latest', 'metric_time__day']
         SELECT
           subq_21.metric_time__day
           , subq_21.user__home_state_latest
           , subq_21.__buys
         FROM (
-          -- Pass Only Elements: ['__buys', 'user__home_state_latest', 'metric_time__day']
+          -- Select: ['__buys', 'user__home_state_latest', 'metric_time__day']
           SELECT
             subq_20.metric_time__day
             , subq_20.user__home_state_latest
@@ -293,7 +293,7 @@ FROM (
                 , subq_18.mf_internal_uuid AS mf_internal_uuid
                 , subq_18.__buys AS __buys
               FROM (
-                -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
+                -- Select: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
                 SELECT
                   subq_14.metric_time__day
                   , subq_14.user
@@ -309,7 +309,7 @@ FROM (
                     , subq_13.metric_time__day
                     , subq_13.user
                   FROM (
-                    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
+                    -- Select: ['__visits', 'visit__referrer_id', 'user__home_state_latest', 'metric_time__day', 'user']
                     SELECT
                       subq_12.metric_time__day
                       , subq_12.user
@@ -442,7 +442,7 @@ FROM (
                         ) subq_0
                       ) subq_9
                       LEFT OUTER JOIN (
-                        -- Pass Only Elements: ['home_state_latest', 'user']
+                        -- Select: ['home_state_latest', 'user']
                         SELECT
                           subq_10.user
                           , subq_10.home_state_latest

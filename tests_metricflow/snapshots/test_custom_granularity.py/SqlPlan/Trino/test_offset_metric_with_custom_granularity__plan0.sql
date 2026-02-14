@@ -22,12 +22,12 @@ FROM (
         subq_9.booking__ds__alien_day
         , SUM(subq_9.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'booking__ds__alien_day']
+        -- Select: ['__bookings', 'booking__ds__alien_day']
         SELECT
           subq_8.booking__ds__alien_day
           , subq_8.__bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'booking__ds__alien_day']
+          -- Select: ['__bookings', 'booking__ds__alien_day']
           SELECT
             subq_7.booking__ds__alien_day
             , subq_7.__bookings
@@ -144,11 +144,11 @@ FROM (
               , subq_1.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
               , subq_6.alien_day AS booking__ds__alien_day
             FROM (
-              -- Pass Only Elements: ['booking__ds__day']
+              -- Select: ['booking__ds__day']
               SELECT
                 subq_4.booking__ds__day
               FROM (
-                -- Pass Only Elements: ['booking__ds__day']
+                -- Select: ['booking__ds__day']
                 SELECT
                   subq_3.booking__ds__day
                 FROM (

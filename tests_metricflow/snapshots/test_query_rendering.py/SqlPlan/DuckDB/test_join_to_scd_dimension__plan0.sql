@@ -19,7 +19,7 @@ FROM (
       subq_7.metric_time__day
       , SUM(subq_7.__family_bookings) AS __family_bookings
     FROM (
-      -- Pass Only Elements: ['__family_bookings', 'metric_time__day']
+      -- Select: ['__family_bookings', 'metric_time__day']
       SELECT
         subq_6.metric_time__day
         , subq_6.__family_bookings
@@ -30,7 +30,7 @@ FROM (
           , subq_5.listing__capacity
           , subq_5.metric_time__day
         FROM (
-          -- Pass Only Elements: ['__family_bookings', 'listing__capacity', 'metric_time__day']
+          -- Select: ['__family_bookings', 'listing__capacity', 'metric_time__day']
           SELECT
             subq_4.metric_time__day
             , subq_4.listing__capacity
@@ -310,7 +310,7 @@ FROM (
               ) subq_0
             ) subq_1
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['capacity', 'window_start__day', 'window_end__day', 'listing']
+              -- Select: ['capacity', 'window_start__day', 'window_end__day', 'listing']
               SELECT
                 subq_2.window_start__day
                 , subq_2.window_end__day

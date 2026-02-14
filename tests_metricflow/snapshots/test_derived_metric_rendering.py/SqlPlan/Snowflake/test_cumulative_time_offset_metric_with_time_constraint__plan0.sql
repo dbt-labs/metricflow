@@ -32,7 +32,7 @@ FROM (
             subq_17.metric_time__day AS metric_time__day
             , subq_12.__bookers AS __bookers
           FROM (
-            -- Pass Only Elements: ['metric_time__day']
+            -- Select: ['metric_time__day']
             SELECT
               subq_16.metric_time__day
             FROM (
@@ -40,7 +40,7 @@ FROM (
               SELECT
                 subq_15.metric_time__day
               FROM (
-                -- Pass Only Elements: ['metric_time__day']
+                -- Select: ['metric_time__day']
                 SELECT
                   subq_14.metric_time__day
                 FROM (
@@ -86,7 +86,7 @@ FROM (
               subq_11.metric_time__day
               , COUNT(DISTINCT subq_11.__bookers) AS __bookers
             FROM (
-              -- Pass Only Elements: ['__bookers', 'metric_time__day']
+              -- Select: ['__bookers', 'metric_time__day']
               SELECT
                 subq_10.metric_time__day
                 , subq_10.__bookers
@@ -96,7 +96,7 @@ FROM (
                   subq_9.metric_time__day
                   , subq_9.__bookers
                 FROM (
-                  -- Pass Only Elements: ['__bookers', 'metric_time__day']
+                  -- Select: ['__bookers', 'metric_time__day']
                   SELECT
                     subq_8.metric_time__day
                     , subq_8.__bookers

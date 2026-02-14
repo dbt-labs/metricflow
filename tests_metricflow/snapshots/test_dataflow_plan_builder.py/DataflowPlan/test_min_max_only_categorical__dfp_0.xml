@@ -10,8 +10,8 @@ docstring:
         <MinMaxNode>
             <!-- description = 'Calculate min and max' -->
             <!-- node_id = NodeId(id_str='mm_0') -->
-            <FilterElementsNode>
-                <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
+            <SelectorNode>
+                <!-- description = "Select: ['listing__country_latest']" -->
                 <!-- node_id = NodeId(id_str='pfe_1') -->
                 <!-- include_spec =                                               -->
                 <!--   DimensionSpec(                                             -->
@@ -19,8 +19,8 @@ docstring:
                 <!--     entity_links=(EntityReference(element_name='listing'),), -->
                 <!--   )                                                          -->
                 <!-- distinct = True -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
+                <SelectorNode>
+                    <!-- description = "Select: ['listing__country_latest']" -->
                     <!-- node_id = NodeId(id_str='pfe_0') -->
                     <!-- include_spec =                                               -->
                     <!--   DimensionSpec(                                             -->
@@ -33,8 +33,8 @@ docstring:
                         <!-- node_id = NodeId(id_str='rss_28024') -->
                         <!-- data_set = SemanticModelDataSet('listings_latest') -->
                     </ReadSqlSourceNode>
-                </FilterElementsNode>
-            </FilterElementsNode>
+                </SelectorNode>
+            </SelectorNode>
         </MinMaxNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

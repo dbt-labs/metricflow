@@ -3,14 +3,14 @@ test_filename: test_query_rendering.py
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing__capacity', 'metric_time__month']
+-- Select: ['listing__capacity', 'metric_time__month']
 -- Write to DataTable
 SELECT
   metric_time__month
   , listing__capacity
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['listing__capacity', 'user__home_state_latest', 'metric_time__month']
+  -- Select: ['listing__capacity', 'user__home_state_latest', 'metric_time__month']
   SELECT
     DATETIME_TRUNC(time_spine_src_26006.ds, month) AS metric_time__month
     , listings_src_26000.capacity AS listing__capacity

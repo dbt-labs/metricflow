@@ -9,7 +9,7 @@ SELECT
   subq_1.listing AS listing
   , subq_1.__bookings AS __bookings
 FROM (
-  -- Pass Only Elements: ['__bookings', 'listing']
+  -- Select: ['__bookings', 'listing']
   SELECT
     subq_0.listing
     , subq_0.__bookings
@@ -117,7 +117,7 @@ FROM (
   ) subq_0
 ) subq_1
 LEFT OUTER JOIN (
-  -- Pass Only Elements: ['listing__country_latest', 'listing']
+  -- Select: ['listing__country_latest', 'listing']
   SELECT
     subq_2.listing
     , subq_2.listing__country_latest

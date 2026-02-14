@@ -4,8 +4,8 @@ sql_engine: BigQuery
 ---
 -- Metric Time Dimension 'ds'
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
--- Pass Only Elements: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
+-- Select: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
+-- Select: ['__listings', 'metric_time__alien_day', 'listing__ds__month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable

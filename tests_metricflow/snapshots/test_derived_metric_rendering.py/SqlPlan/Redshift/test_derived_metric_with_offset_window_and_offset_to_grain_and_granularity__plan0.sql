@@ -28,12 +28,12 @@ FROM (
           subq_8.metric_time__year
           , SUM(subq_8.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__year']
+          -- Select: ['__bookings', 'metric_time__year']
           SELECT
             subq_7.metric_time__year
             , subq_7.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'metric_time__year']
+            -- Select: ['__bookings', 'metric_time__year']
             SELECT
               subq_6.metric_time__year
               , subq_6.__bookings
@@ -148,12 +148,12 @@ FROM (
                 , subq_1.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
                 , subq_1.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
               FROM (
-                -- Pass Only Elements: ['metric_time__day', 'metric_time__year']
+                -- Select: ['metric_time__day', 'metric_time__year']
                 SELECT
                   subq_4.metric_time__day
                   , subq_4.metric_time__year
                 FROM (
-                  -- Pass Only Elements: ['metric_time__day', 'metric_time__year']
+                  -- Select: ['metric_time__day', 'metric_time__year']
                   SELECT
                     subq_3.metric_time__day
                     , subq_3.metric_time__year
@@ -426,12 +426,12 @@ FROM (
           subq_18.metric_time__year
           , SUM(subq_18.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__year']
+          -- Select: ['__bookings', 'metric_time__year']
           SELECT
             subq_17.metric_time__year
             , subq_17.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'metric_time__year']
+            -- Select: ['__bookings', 'metric_time__year']
             SELECT
               subq_16.metric_time__year
               , subq_16.__bookings
@@ -546,12 +546,12 @@ FROM (
                 , subq_11.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
                 , subq_11.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
               FROM (
-                -- Pass Only Elements: ['metric_time__day', 'metric_time__year']
+                -- Select: ['metric_time__day', 'metric_time__year']
                 SELECT
                   subq_14.metric_time__day
                   , subq_14.metric_time__year
                 FROM (
-                  -- Pass Only Elements: ['metric_time__day', 'metric_time__year']
+                  -- Select: ['metric_time__day', 'metric_time__year']
                   SELECT
                     subq_13.metric_time__day
                     , subq_13.metric_time__year

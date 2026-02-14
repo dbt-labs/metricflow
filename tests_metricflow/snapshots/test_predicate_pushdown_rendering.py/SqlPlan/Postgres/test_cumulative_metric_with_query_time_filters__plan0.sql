@@ -30,7 +30,7 @@ FROM (
         , subq_11.listing__country_latest
         , COUNT(DISTINCT subq_11.__bookers) AS __bookers
       FROM (
-        -- Pass Only Elements: ['__bookers', 'listing__country_latest', 'metric_time__day']
+        -- Select: ['__bookers', 'listing__country_latest', 'metric_time__day']
         SELECT
           subq_10.metric_time__day
           , subq_10.listing__country_latest
@@ -43,7 +43,7 @@ FROM (
             , subq_9.listing__country_latest
             , subq_9.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__bookers', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
+            -- Select: ['__bookers', 'listing__country_latest', 'booking__is_instant', 'metric_time__day']
             SELECT
               subq_8.metric_time__day
               , subq_8.booking__is_instant
@@ -497,7 +497,7 @@ FROM (
                   )
               ) subq_4
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['country_latest', 'listing']
+                -- Select: ['country_latest', 'listing']
                 SELECT
                   subq_6.listing
                   , subq_6.country_latest

@@ -19,12 +19,12 @@ FROM (
       subq_3.booking__homonymous_metric_and_dimension
       , SUM(subq_3.__homonymous_metric_and_dimension) AS __homonymous_metric_and_dimension
     FROM (
-      -- Pass Only Elements: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
+      -- Select: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
       SELECT
         subq_2.booking__homonymous_metric_and_dimension
         , subq_2.__homonymous_metric_and_dimension
       FROM (
-        -- Pass Only Elements: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
+        -- Select: ['__homonymous_metric_and_dimension', 'booking__homonymous_metric_and_dimension']
         SELECT
           subq_1.booking__homonymous_metric_and_dimension
           , subq_1.__homonymous_metric_and_dimension

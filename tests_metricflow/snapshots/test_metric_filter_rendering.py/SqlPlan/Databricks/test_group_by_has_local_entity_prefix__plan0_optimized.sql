@@ -3,7 +3,7 @@ test_filename: test_metric_filter_rendering.py
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -21,18 +21,18 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__listings', 'user__listing__user__average_booking_value']
+  -- Select: ['__listings', 'user__listing__user__average_booking_value']
   SELECT
     subq_36.listing__user__average_booking_value AS user__listing__user__average_booking_value
     , sma_28014_cte.__listings AS listings
   FROM sma_28014_cte
   LEFT OUTER JOIN (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__average_booking_value', 'listing__user']
-    -- Pass Only Elements: ['__average_booking_value', 'listing__user']
+    -- Select: ['__average_booking_value', 'listing__user']
+    -- Select: ['__average_booking_value', 'listing__user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing__user', 'listing__user__average_booking_value']
+    -- Select: ['listing__user', 'listing__user__average_booking_value']
     SELECT
       sma_28014_cte.user AS listing__user
       , AVG(bookings_source_src_28000.booking_value) AS listing__user__average_booking_value

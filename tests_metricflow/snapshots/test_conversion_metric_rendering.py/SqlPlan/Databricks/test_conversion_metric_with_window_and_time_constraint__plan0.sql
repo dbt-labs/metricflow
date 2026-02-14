@@ -29,7 +29,7 @@ FROM (
         , subq_6.visit__referrer_id
         , SUM(subq_6.__visits) AS __visits
       FROM (
-        -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
+        -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day']
         SELECT
           subq_5.metric_time__day
           , subq_5.visit__referrer_id
@@ -41,7 +41,7 @@ FROM (
             , subq_4.visit__referrer_id
             , subq_4.metric_time__day
           FROM (
-            -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day']
+            -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day']
             SELECT
               subq_3.metric_time__day
               , subq_3.visit__referrer_id
@@ -187,13 +187,13 @@ FROM (
         , subq_18.visit__referrer_id
         , SUM(subq_18.__buys) AS __buys
       FROM (
-        -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
+        -- Select: ['__buys', 'visit__referrer_id', 'metric_time__day']
         SELECT
           subq_17.metric_time__day
           , subq_17.visit__referrer_id
           , subq_17.__buys
         FROM (
-          -- Pass Only Elements: ['__buys', 'visit__referrer_id', 'metric_time__day']
+          -- Select: ['__buys', 'visit__referrer_id', 'metric_time__day']
           SELECT
             subq_16.metric_time__day
             , subq_16.visit__referrer_id
@@ -244,7 +244,7 @@ FROM (
                 , subq_14.mf_internal_uuid AS mf_internal_uuid
                 , subq_14.__buys AS __buys
               FROM (
-                -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+                -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
                 SELECT
                   subq_10.metric_time__day
                   , subq_10.user
@@ -258,7 +258,7 @@ FROM (
                     , subq_9.metric_time__day
                     , subq_9.user
                   FROM (
-                    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+                    -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
                     SELECT
                       subq_8.metric_time__day
                       , subq_8.user

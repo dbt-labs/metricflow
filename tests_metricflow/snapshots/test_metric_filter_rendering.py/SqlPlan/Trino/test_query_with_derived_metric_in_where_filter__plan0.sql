@@ -16,7 +16,7 @@ FROM (
     SELECT
       SUM(subq_31.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Select: ['__listings']
       SELECT
         subq_30.__listings
       FROM (
@@ -25,7 +25,7 @@ FROM (
           subq_29.listings AS __listings
           , subq_29.listing__views_times_booking_value
         FROM (
-          -- Pass Only Elements: ['__listings', 'listing__views_times_booking_value']
+          -- Select: ['__listings', 'listing__views_times_booking_value']
           SELECT
             subq_28.listing__views_times_booking_value
             , subq_28.__listings AS listings
@@ -239,7 +239,7 @@ FROM (
               ) subq_11
             ) subq_12
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
+              -- Select: ['listing', 'listing__views_times_booking_value']
               SELECT
                 subq_26.listing
                 , subq_26.listing__views_times_booking_value
@@ -265,12 +265,12 @@ FROM (
                         subq_16.listing
                         , SUM(subq_16.__booking_value) AS __booking_value
                       FROM (
-                        -- Pass Only Elements: ['__booking_value', 'listing']
+                        -- Select: ['__booking_value', 'listing']
                         SELECT
                           subq_15.listing
                           , subq_15.__booking_value
                         FROM (
-                          -- Pass Only Elements: ['__booking_value', 'listing']
+                          -- Select: ['__booking_value', 'listing']
                           SELECT
                             subq_14.listing
                             , subq_14.__booking_value
@@ -504,12 +504,12 @@ FROM (
                         subq_22.listing
                         , SUM(subq_22.__views) AS __views
                       FROM (
-                        -- Pass Only Elements: ['__views', 'listing']
+                        -- Select: ['__views', 'listing']
                         SELECT
                           subq_21.listing
                           , subq_21.__views
                         FROM (
-                          -- Pass Only Elements: ['__views', 'listing']
+                          -- Select: ['__views', 'listing']
                           SELECT
                             subq_20.listing
                             , subq_20.__views

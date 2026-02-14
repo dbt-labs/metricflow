@@ -17,12 +17,12 @@ FROM (
       subq_3.booking__is_instant
       , SUM(subq_3.__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
     FROM (
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
+      -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
       SELECT
         subq_2.booking__is_instant
         , subq_2.__bookings_fill_nulls_with_0
       FROM (
-        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
+        -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant']
         SELECT
           subq_1.booking__is_instant
           , subq_1.__bookings_fill_nulls_with_0

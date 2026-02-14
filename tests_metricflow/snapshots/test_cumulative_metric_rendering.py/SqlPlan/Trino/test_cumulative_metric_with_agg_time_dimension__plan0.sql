@@ -24,12 +24,12 @@ FROM (
         subq_6.revenue_instance__ds__day
         , SUM(subq_6.__revenue) AS __revenue
       FROM (
-        -- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
+        -- Select: ['__revenue', 'revenue_instance__ds__day']
         SELECT
           subq_5.revenue_instance__ds__day
           , subq_5.__revenue
         FROM (
-          -- Pass Only Elements: ['__revenue', 'revenue_instance__ds__day']
+          -- Select: ['__revenue', 'revenue_instance__ds__day']
           SELECT
             subq_4.revenue_instance__ds__day
             , subq_4.__revenue

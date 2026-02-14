@@ -40,8 +40,8 @@ FROM (
     FROM rss_28018_cte
     LEFT OUTER JOIN (
       -- Read From CTE For node_id=sma_28019
-      -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
-      -- Pass Only Elements: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+      -- Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+      -- Select: ['__visits_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
@@ -61,8 +61,8 @@ FROM (
     FROM rss_28018_cte
     LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
-      -- Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
-      -- Pass Only Elements: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+      -- Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+      -- Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day

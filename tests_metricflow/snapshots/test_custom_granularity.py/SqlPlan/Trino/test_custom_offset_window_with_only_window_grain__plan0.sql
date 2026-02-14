@@ -26,13 +26,13 @@ FROM (
         , subq_9.booking__ds__alien_day
         , SUM(subq_9.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
+        -- Select: ['__bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
         SELECT
           subq_8.metric_time__alien_day
           , subq_8.booking__ds__alien_day
           , subq_8.__bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
+          -- Select: ['__bookings', 'metric_time__alien_day', 'booking__ds__alien_day']
           SELECT
             subq_7.metric_time__alien_day
             , subq_7.booking__ds__alien_day
@@ -150,14 +150,14 @@ FROM (
               , subq_2.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
               , subq_2.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
             FROM (
-              -- Pass Only Elements: ['ds__day', 'metric_time__day', 'metric_time__alien_day', 'booking__ds__alien_day']
+              -- Select: ['ds__day', 'metric_time__day', 'metric_time__alien_day', 'booking__ds__alien_day']
               SELECT
                 subq_5.ds__day
                 , subq_5.metric_time__day
                 , subq_5.metric_time__alien_day
                 , subq_5.booking__ds__alien_day
               FROM (
-                -- Pass Only Elements: ['ds__day', 'metric_time__day', 'metric_time__alien_day', 'booking__ds__alien_day']
+                -- Select: ['ds__day', 'metric_time__day', 'metric_time__alien_day', 'booking__ds__alien_day']
                 SELECT
                   subq_4.ds__day
                   , subq_4.metric_time__day

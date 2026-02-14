@@ -28,12 +28,12 @@ FROM (
           subq_3.metric_time__week
           , SUM(subq_3.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__week']
+          -- Select: ['__bookings', 'metric_time__week']
           SELECT
             subq_2.metric_time__week
             , subq_2.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'metric_time__week']
+            -- Select: ['__bookings', 'metric_time__week']
             SELECT
               subq_1.metric_time__week
               , subq_1.__bookings
@@ -267,12 +267,12 @@ FROM (
           subq_13.metric_time__week
           , SUM(subq_13.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__week']
+          -- Select: ['__bookings', 'metric_time__week']
           SELECT
             subq_12.metric_time__week
             , subq_12.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'metric_time__week']
+            -- Select: ['__bookings', 'metric_time__week']
             SELECT
               subq_11.metric_time__week
               , subq_11.__bookings
@@ -387,12 +387,12 @@ FROM (
                 , subq_6.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
                 , subq_6.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
               FROM (
-                -- Pass Only Elements: ['metric_time__day', 'metric_time__week']
+                -- Select: ['metric_time__day', 'metric_time__week']
                 SELECT
                   subq_9.metric_time__day
                   , subq_9.metric_time__week
                 FROM (
-                  -- Pass Only Elements: ['metric_time__day', 'metric_time__week']
+                  -- Select: ['metric_time__day', 'metric_time__week']
                   SELECT
                     subq_8.metric_time__day
                     , subq_8.metric_time__week

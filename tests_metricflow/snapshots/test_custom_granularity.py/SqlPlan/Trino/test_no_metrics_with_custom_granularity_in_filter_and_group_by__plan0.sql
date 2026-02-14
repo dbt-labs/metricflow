@@ -8,7 +8,7 @@ sql_engine: Trino
 SELECT
   subq_4.listing__ds__alien_day
 FROM (
-  -- Pass Only Elements: ['listing__ds__alien_day']
+  -- Select: ['listing__ds__alien_day']
   SELECT
     subq_3.listing__ds__alien_day
   FROM (
@@ -16,7 +16,7 @@ FROM (
     SELECT
       subq_2.listing__ds__alien_day
     FROM (
-      -- Pass Only Elements: ['listing__ds__alien_day']
+      -- Select: ['listing__ds__alien_day']
       SELECT
         subq_1.listing__ds__alien_day
       FROM (

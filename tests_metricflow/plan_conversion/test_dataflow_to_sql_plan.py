@@ -44,7 +44,7 @@ from metricflow.dataflow.nodes.aggregate_simple_metric_inputs import AggregateSi
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
@@ -155,7 +155,7 @@ def test_filter_node(
     source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "bookings_source"
     ]
-    filter_node = FilterElementsNode.create(
+    selector_node = SelectorNode.create(
         parent_node=source_node, include_specs=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,))
     )
 
@@ -164,7 +164,7 @@ def test_filter_node(
         mf_test_configuration=mf_test_configuration,
         dataflow_to_sql_converter=dataflow_to_sql_converter,
         sql_client=sql_client,
-        node=filter_node,
+        node=selector_node,
     )
 
 
@@ -191,7 +191,7 @@ def test_filter_with_where_constraint_node(
         entity_links=(),
         time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
-    filter_node = FilterElementsNode.create(
+    selector_node = SelectorNode.create(
         parent_node=source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(simple_metric_input_spec,), time_dimension_specs=(ds_spec,)
@@ -199,7 +199,7 @@ def test_filter_with_where_constraint_node(
     )  # need to include ds_spec because where constraint operates on ds
     time_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY)
     where_constraint_node = WhereConstraintNode.create(
-        parent_node=filter_node,
+        parent_node=selector_node,
         where_specs=(
             WhereFilterSpec(
                 where_sql="booking__ds__day = '2020-01-01'",
@@ -261,13 +261,13 @@ def test_simple_metric_aggregation_node(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(simple_metric_input_specs=tuple(simple_metric_input_specs)),
     )
 
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
-        parent_node=filtered_measure_node,
+        parent_node=selector_node_for_measure,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
@@ -297,7 +297,7 @@ def test_single_join_node(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(simple_metric_input_spec,),
@@ -312,7 +312,7 @@ def test_single_join_node(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode.create(
+    selector_node_for_dimension = SelectorNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -321,10 +321,10 @@ def test_single_join_node(
     )
 
     join_node = JoinOnEntitiesNode.create(
-        left_node=filtered_measure_node,
+        left_node=selector_node_for_measure,
         join_targets=[
             JoinDescription(
-                join_node=filtered_dimension_node,
+                join_node=selector_node_for_dimension,
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
@@ -359,7 +359,7 @@ def test_multi_join_node(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(simple_metric_input_spec,), entity_specs=(entity_spec,)
@@ -373,7 +373,7 @@ def test_multi_join_node(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode.create(
+    selector_node_for_dimension = SelectorNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -382,17 +382,17 @@ def test_multi_join_node(
     )
 
     join_node = JoinOnEntitiesNode.create(
-        left_node=filtered_measure_node,
+        left_node=selector_node_for_measure,
         join_targets=[
             JoinDescription(
-                join_node=filtered_dimension_node,
+                join_node=selector_node_for_dimension,
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
             ),
             JoinDescription(
-                join_node=filtered_dimension_node,
+                join_node=selector_node_for_dimension,
                 join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
@@ -427,7 +427,7 @@ def test_compute_metrics_node(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(simple_metric_input_spec,),
@@ -442,7 +442,7 @@ def test_compute_metrics_node(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode.create(
+    selector_node_for_dimension = SelectorNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -451,10 +451,10 @@ def test_compute_metrics_node(
     )
 
     join_node = JoinOnEntitiesNode.create(
-        left_node=filtered_measure_node,
+        left_node=selector_node_for_measure,
         join_targets=[
             JoinDescription(
-                join_node=filtered_dimension_node,
+                join_node=selector_node_for_dimension,
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
@@ -502,7 +502,7 @@ def test_compute_metrics_node_simple_expr(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(simple_metric_input_spec,), entity_specs=(entity_spec,)
@@ -516,7 +516,7 @@ def test_compute_metrics_node_simple_expr(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode.create(
+    selector_node_for_dimension = SelectorNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -525,10 +525,10 @@ def test_compute_metrics_node_simple_expr(
     )
 
     join_node = JoinOnEntitiesNode.create(
-        left_node=filtered_measure_node,
+        left_node=selector_node_for_measure,
         join_targets=[
             JoinDescription(
-                join_node=filtered_dimension_node,
+                join_node=selector_node_for_dimension,
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
@@ -594,7 +594,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_measures_node = FilterElementsNode.create(
+    selector_node_for_measures = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(numerator_spec, denominator_spec), entity_specs=(entity_spec,)
@@ -608,7 +608,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     dimension_source_node = mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
         "listings_latest"
     ]
-    filtered_dimension_node = FilterElementsNode.create(
+    selector_node_for_dimension = SelectorNode.create(
         parent_node=dimension_source_node,
         include_specs=InstanceSpecSet(
             entity_specs=(entity_spec,),
@@ -617,10 +617,10 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     )
 
     join_node = JoinOnEntitiesNode.create(
-        left_node=filtered_measures_node,
+        left_node=selector_node_for_measures,
         join_targets=[
             JoinDescription(
-                join_node=filtered_dimension_node,
+                join_node=selector_node_for_dimension,
                 join_on_entity=entity_spec,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
@@ -678,7 +678,7 @@ def test_order_by_node(
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
 
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(simple_metric_input_spec,),
@@ -688,7 +688,7 @@ def test_order_by_node(
     )
 
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
-        parent_node=filtered_measure_node,
+        parent_node=selector_node_for_measure,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
@@ -909,7 +909,7 @@ def test_constrain_time_range_node(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(
@@ -927,7 +927,7 @@ def test_constrain_time_range_node(
         ),
     )
     metric_time_node = MetricTimeDimensionTransformNode.create(
-        parent_node=filtered_measure_node,
+        parent_node=selector_node_for_measure,
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
@@ -1015,27 +1015,27 @@ def test_combine_output_node(
 
     # Build compute simple-metric inputs node
     simple_metric_input_specs: List[SimpleMetricInputSpec] = [sum_spec]
-    filtered_measure_node = FilterElementsNode.create(
+    selector_node_for_measure = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=tuple(simple_metric_input_specs), dimension_specs=(dimension_spec,)
         ),
     )
     aggregated_measure_node = AggregateSimpleMetricInputsNode.create(
-        parent_node=filtered_measure_node,
+        parent_node=selector_node_for_measure,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
     # Build agg simple-metric inputs node
     simple_metric_input_specs_2 = [sum_boolean_spec, count_distinct_spec]
-    filtered_measure_node_2 = FilterElementsNode.create(
+    selector_node_for_measure_2 = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=tuple(simple_metric_input_specs_2), dimension_specs=(dimension_spec,)
         ),
     )
     aggregated_measure_node_2 = AggregateSimpleMetricInputsNode.create(
-        parent_node=filtered_measure_node_2,
+        parent_node=selector_node_for_measure_2,
         null_fill_value_mapping=NullFillValueMapping.create(
             {spec.element_name: 1 for spec in simple_metric_input_specs_2}
         ),
@@ -1121,7 +1121,7 @@ def test_compute_metrics_node_with_passthrough(
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
-    filtered_node = FilterElementsNode.create(
+    selector_node = SelectorNode.create(
         parent_node=simple_metric_input_source_node,
         include_specs=InstanceSpecSet(
             simple_metric_input_specs=(simple_metric_input_spec,),
@@ -1129,7 +1129,7 @@ def test_compute_metrics_node_with_passthrough(
     )
 
     aggregation_node = AggregateSimpleMetricInputsNode.create(
-        parent_node=filtered_node,
+        parent_node=selector_node,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 

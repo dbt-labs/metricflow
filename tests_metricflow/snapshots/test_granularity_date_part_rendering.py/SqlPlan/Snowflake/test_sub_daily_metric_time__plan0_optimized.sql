@@ -4,8 +4,8 @@ sql_engine: Snowflake
 ---
 -- Read From Time Spine 'mf_time_spine_millisecond'
 -- Metric Time Dimension 'ts'
--- Pass Only Elements: ['metric_time__millisecond']
--- Pass Only Elements: ['metric_time__millisecond']
+-- Select: ['metric_time__millisecond']
+-- Select: ['metric_time__millisecond']
 -- Write to DataTable
 SELECT
   ts AS metric_time__millisecond

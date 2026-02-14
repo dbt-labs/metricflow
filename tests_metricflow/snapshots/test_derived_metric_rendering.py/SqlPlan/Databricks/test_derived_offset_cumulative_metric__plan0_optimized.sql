@@ -17,8 +17,8 @@ FROM (
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['__bookers', 'metric_time__day']
-    -- Pass Only Elements: ['__bookers', 'metric_time__day']
+    -- Select: ['__bookers', 'metric_time__day']
+    -- Select: ['__bookers', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_19.ds AS metric_time__day

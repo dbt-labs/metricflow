@@ -24,7 +24,7 @@ FROM (
     , MAX(subq_39.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -32,7 +32,7 @@ FROM (
       , SUM(bookings) AS bookings
     FROM (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       SELECT
         metric_time__day
         , __bookings AS bookings
@@ -50,13 +50,13 @@ FROM (
       , subq_32.__bookings AS bookings_2_weeks_ago
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['metric_time__day']
+      -- Select: ['metric_time__day']
       SELECT
         metric_time__day
       FROM (
         -- Read From Time Spine 'mf_time_spine'
         -- Change Column Aliases
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           ds AS metric_time__day
         FROM ***************************.mf_time_spine time_spine_src_28006
@@ -65,14 +65,14 @@ FROM (
     ) subq_37
     INNER JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
         , SUM(bookings) AS __bookings
       FROM (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['__bookings', 'metric_time__day']
+        -- Select: ['__bookings', 'metric_time__day']
         SELECT
           metric_time__day
           , __bookings AS bookings

@@ -6,11 +6,11 @@ sql_engine: DuckDB
 SELECT
   subq_3.metric_time__millisecond
 FROM (
-  -- Pass Only Elements: ['metric_time__millisecond']
+  -- Select: ['metric_time__millisecond']
   SELECT
     subq_2.metric_time__millisecond
   FROM (
-    -- Pass Only Elements: ['metric_time__millisecond']
+    -- Select: ['metric_time__millisecond']
     SELECT
       subq_1.metric_time__millisecond
     FROM (

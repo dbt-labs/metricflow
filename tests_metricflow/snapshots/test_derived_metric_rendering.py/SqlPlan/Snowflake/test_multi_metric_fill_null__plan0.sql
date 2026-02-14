@@ -29,12 +29,12 @@ FROM (
           subq_3.metric_time__day
           , SUM(subq_3.__bookings_fill_nulls_with_0_without_time_spine) AS __bookings_fill_nulls_with_0_without_time_spine
         FROM (
-          -- Pass Only Elements: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
+          -- Select: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
           SELECT
             subq_2.metric_time__day
             , subq_2.__bookings_fill_nulls_with_0_without_time_spine
           FROM (
-            -- Pass Only Elements: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
+            -- Select: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
             SELECT
               subq_1.metric_time__day
               , subq_1.__bookings_fill_nulls_with_0_without_time_spine
@@ -269,12 +269,12 @@ FROM (
         subq_10.metric_time__day
         , SUM(subq_10.__listings) AS __listings
       FROM (
-        -- Pass Only Elements: ['__listings', 'metric_time__day']
+        -- Select: ['__listings', 'metric_time__day']
         SELECT
           subq_9.metric_time__day
           , subq_9.__listings
         FROM (
-          -- Pass Only Elements: ['__listings', 'metric_time__day']
+          -- Select: ['__listings', 'metric_time__day']
           SELECT
             subq_8.metric_time__day
             , subq_8.__listings

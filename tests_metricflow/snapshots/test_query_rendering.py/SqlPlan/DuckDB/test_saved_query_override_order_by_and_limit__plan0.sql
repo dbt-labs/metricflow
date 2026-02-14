@@ -35,13 +35,13 @@ FROM (
           , subq_7.listing__capacity_latest
           , SUM(subq_7.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
+          -- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
           SELECT
             subq_6.metric_time__day
             , subq_6.listing__capacity_latest
             , subq_6.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
+            -- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
             SELECT
               subq_5.metric_time__day
               , subq_5.listing__capacity_latest
@@ -371,7 +371,7 @@ FROM (
                 ) subq_0
               ) subq_1
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['capacity_latest', 'listing']
+                -- Select: ['capacity_latest', 'listing']
                 SELECT
                   subq_3.listing
                   , subq_3.capacity_latest
@@ -535,13 +535,13 @@ FROM (
           , subq_16.listing__capacity_latest
           , SUM(subq_16.__views) AS __views
         FROM (
-          -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'metric_time__day']
+          -- Select: ['__views', 'listing__capacity_latest', 'metric_time__day']
           SELECT
             subq_15.metric_time__day
             , subq_15.listing__capacity_latest
             , subq_15.__views
           FROM (
-            -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'metric_time__day']
+            -- Select: ['__views', 'listing__capacity_latest', 'metric_time__day']
             SELECT
               subq_14.metric_time__day
               , subq_14.listing__capacity_latest
@@ -729,7 +729,7 @@ FROM (
                 ) subq_10
               ) subq_11
               LEFT OUTER JOIN (
-                -- Pass Only Elements: ['capacity_latest', 'listing']
+                -- Select: ['capacity_latest', 'listing']
                 SELECT
                   subq_12.listing
                   , subq_12.capacity_latest

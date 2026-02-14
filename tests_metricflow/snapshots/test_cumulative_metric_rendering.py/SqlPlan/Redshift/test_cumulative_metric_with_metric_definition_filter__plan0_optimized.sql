@@ -5,7 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__revenue', 'metric_time__day']
+-- Select: ['__revenue', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
@@ -15,7 +15,7 @@ SELECT
   , SUM(revenue) AS trailing_2_months_revenue_with_filter
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__revenue', 'user__home_state_latest', 'metric_time__day']
+  -- Select: ['__revenue', 'user__home_state_latest', 'metric_time__day']
   SELECT
     subq_18.metric_time__day AS metric_time__day
     , users_latest_src_28000.home_state_latest AS user__home_state_latest

@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing__capacity_latest', 'listing']
+-- Select: ['listing__capacity_latest', 'listing']
 -- Order By ['listing__capacity_latest', 'listing']
 -- Change Column Aliases
 -- Write to DataTable
@@ -14,7 +14,7 @@ SELECT
   , listing__capacity_latest AS listing_capacity
 FROM (
   -- Read Elements From Semantic Model 'listings_latest'
-  -- Pass Only Elements: ['listing__capacity_latest', 'listing']
+  -- Select: ['listing__capacity_latest', 'listing']
   SELECT
     listing_id AS listing
     , capacity AS listing__capacity_latest

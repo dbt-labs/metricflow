@@ -25,7 +25,7 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
+      -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
@@ -34,7 +34,7 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
+        -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
         SELECT
           DATE_TRUNC('day', ds) AS metric_time__day
           , is_instant AS booking__is_instant

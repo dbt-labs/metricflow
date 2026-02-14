@@ -26,12 +26,12 @@ FROM (
         subq_3.metric_time__day
         , SUM(subq_3.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'metric_time__day']
+        -- Select: ['__bookings', 'metric_time__day']
         SELECT
           subq_2.metric_time__day
           , subq_2.__bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__day']
+          -- Select: ['__bookings', 'metric_time__day']
           SELECT
             subq_1.metric_time__day
             , subq_1.__bookings
@@ -265,12 +265,12 @@ FROM (
         subq_9.metric_time__day
         , SUM(subq_9.__booking_payments) AS __booking_payments
       FROM (
-        -- Pass Only Elements: ['__booking_payments', 'metric_time__day']
+        -- Select: ['__booking_payments', 'metric_time__day']
         SELECT
           subq_8.metric_time__day
           , subq_8.__booking_payments
         FROM (
-          -- Pass Only Elements: ['__booking_payments', 'metric_time__day']
+          -- Select: ['__booking_payments', 'metric_time__day']
           SELECT
             subq_7.metric_time__day
             , subq_7.__booking_payments

@@ -28,7 +28,7 @@ FROM (
     , MAX(subq_37.bookers) AS bookers
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__booking_value', 'metric_time__month']
+    -- Select: ['__booking_value', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -36,7 +36,7 @@ FROM (
       , SUM(booking_value) AS booking_value
     FROM (
       -- Join to Time Spine Dataset
-      -- Pass Only Elements: ['__booking_value', 'metric_time__month', 'metric_time__day']
+      -- Select: ['__booking_value', 'metric_time__month', 'metric_time__day']
       SELECT
         time_spine_src_28006.ds AS metric_time__day
         , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
@@ -53,7 +53,7 @@ FROM (
   ) subq_31
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookers', 'metric_time__month']
+    -- Select: ['__bookers', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -61,7 +61,7 @@ FROM (
       , COUNT(DISTINCT bookers) AS bookers
     FROM (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__bookers', 'metric_time__month', 'metric_time__day']
+      -- Select: ['__bookers', 'metric_time__month', 'metric_time__day']
       SELECT
         metric_time__day
         , metric_time__month

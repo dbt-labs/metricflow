@@ -42,8 +42,8 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
-      -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Select: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Select: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
@@ -61,8 +61,8 @@ FROM (
   ) subq_28
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
-    -- Pass Only Elements: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+    -- Select: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+    -- Select: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

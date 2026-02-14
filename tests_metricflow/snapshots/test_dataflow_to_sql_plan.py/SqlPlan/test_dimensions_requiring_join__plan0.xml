@@ -15,7 +15,7 @@ docstring:
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
-            <!-- description = "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']" -->
+            <!-- description = "Select: ['user__home_state_latest', 'listing__is_lux_latest']" -->
             <!-- node_id = NodeId(id_str='ss_71') -->
             <!-- col0 =                                                -->
             <!--   SqlSelectColumn(                                    -->
@@ -41,7 +41,7 @@ docstring:
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
-                <!-- description = "Pass Only Elements: ['user__home_state_latest', 'listing__is_lux_latest']" -->
+                <!-- description = "Select: ['user__home_state_latest', 'listing__is_lux_latest']" -->
                 <!-- node_id = NodeId(id_str='ss_70') -->
                 <!-- col0 =                                                -->
                 <!--   SqlSelectColumn(                                    -->
@@ -615,7 +615,7 @@ docstring:
                         </SqlTableNode>
                     </SqlSelectStatementNode>
                     <SqlSelectStatementNode>
-                        <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
+                        <!-- description = "Select: ['home_state_latest', 'user']" -->
                         <!-- node_id = NodeId(id_str='ss_68') -->
                         <!-- col0 =                                                                                  -->
                         <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='user') -->

@@ -22,13 +22,13 @@ SELECT
   COALESCE(MAX(subq_37.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__visits']
+  -- Select: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(visits) AS __visits
   FROM (
     -- Read From CTE For node_id=sma_28019
-    -- Pass Only Elements: ['__visits', 'visit__referrer_id']
+    -- Select: ['__visits', 'visit__referrer_id']
     SELECT
       visit__referrer_id
       , __visits AS visits
@@ -38,8 +38,8 @@ FROM (
 ) subq_25
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['__buys_fill_nulls_with_0']
-  -- Pass Only Elements: ['__buys_fill_nulls_with_0']
+  -- Select: ['__buys_fill_nulls_with_0']
+  -- Select: ['__buys_fill_nulls_with_0']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     SUM(__buys_fill_nulls_with_0) AS __buys_fill_nulls_with_0
@@ -82,7 +82,7 @@ CROSS JOIN (
       , subq_32.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+      -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
       SELECT
         metric_time__day
         , subq_27.user
@@ -90,7 +90,7 @@ CROSS JOIN (
         , visits AS __visits
       FROM (
         -- Read From CTE For node_id=sma_28019
-        -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+        -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
         SELECT
           metric_time__day
           , sma_28019_cte.user

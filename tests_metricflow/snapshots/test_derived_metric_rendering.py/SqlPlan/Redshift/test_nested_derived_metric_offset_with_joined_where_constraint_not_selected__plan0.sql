@@ -12,7 +12,7 @@ FROM (
     subq_18.metric_time__day
     , 2 * bookings_offset_once AS bookings_offset_twice
   FROM (
-    -- Pass Only Elements: ['metric_time__day', 'bookings_offset_once']
+    -- Select: ['metric_time__day', 'bookings_offset_once']
     SELECT
       subq_17.metric_time__day
       , subq_17.bookings_offset_once
@@ -29,11 +29,11 @@ FROM (
           , subq_11.booking__is_instant AS booking__is_instant
           , subq_11.bookings_offset_once AS bookings_offset_once
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_14.metric_time__day
           FROM (
-            -- Pass Only Elements: ['metric_time__day']
+            -- Select: ['metric_time__day']
             SELECT
               subq_13.metric_time__day
             FROM (
@@ -90,11 +90,11 @@ FROM (
                 , subq_4.booking__is_instant AS booking__is_instant
                 , subq_4.__bookings AS __bookings
               FROM (
-                -- Pass Only Elements: ['metric_time__day']
+                -- Select: ['metric_time__day']
                 SELECT
                   subq_7.metric_time__day
                 FROM (
-                  -- Pass Only Elements: ['metric_time__day']
+                  -- Select: ['metric_time__day']
                   SELECT
                     subq_6.metric_time__day
                   FROM (
@@ -139,13 +139,13 @@ FROM (
                   , subq_3.booking__is_instant
                   , SUM(subq_3.__bookings) AS __bookings
                 FROM (
-                  -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
+                  -- Select: ['__bookings', 'booking__is_instant', 'metric_time__day']
                   SELECT
                     subq_2.metric_time__day
                     , subq_2.booking__is_instant
                     , subq_2.__bookings
                   FROM (
-                    -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
+                    -- Select: ['__bookings', 'booking__is_instant', 'metric_time__day']
                     SELECT
                       subq_1.metric_time__day
                       , subq_1.booking__is_instant

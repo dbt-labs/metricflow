@@ -21,7 +21,7 @@ FROM (
       SELECT
         SUM(subq_4.__visits) AS __visits
       FROM (
-        -- Pass Only Elements: ['__visits']
+        -- Select: ['__visits']
         SELECT
           subq_3.__visits
         FROM (
@@ -30,7 +30,7 @@ FROM (
             subq_2.visits AS __visits
             , subq_2.visit__referrer_id
           FROM (
-            -- Pass Only Elements: ['__visits', 'visit__referrer_id']
+            -- Select: ['__visits', 'visit__referrer_id']
             SELECT
               subq_1.visit__referrer_id
               , subq_1.__visits AS visits
@@ -124,11 +124,11 @@ FROM (
       SELECT
         SUM(subq_16.__buys_fill_nulls_with_0) AS __buys_fill_nulls_with_0
       FROM (
-        -- Pass Only Elements: ['__buys_fill_nulls_with_0']
+        -- Select: ['__buys_fill_nulls_with_0']
         SELECT
           subq_15.__buys_fill_nulls_with_0
         FROM (
-          -- Pass Only Elements: ['__buys_fill_nulls_with_0']
+          -- Select: ['__buys_fill_nulls_with_0']
           SELECT
             subq_14.__buys_fill_nulls_with_0
           FROM (
@@ -177,7 +177,7 @@ FROM (
                 , subq_12.mf_internal_uuid AS mf_internal_uuid
                 , subq_12.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
               FROM (
-                -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+                -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
                 SELECT
                   subq_8.metric_time__day
                   , subq_8.user
@@ -191,7 +191,7 @@ FROM (
                     , subq_7.metric_time__day
                     , subq_7.user
                   FROM (
-                    -- Pass Only Elements: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
+                    -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
                     SELECT
                       subq_6.metric_time__day
                       , subq_6.user

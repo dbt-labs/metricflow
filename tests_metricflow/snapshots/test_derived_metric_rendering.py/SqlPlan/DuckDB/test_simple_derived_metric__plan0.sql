@@ -25,11 +25,11 @@ FROM (
         SELECT
           SUM(subq_3.__bookings) AS __bookings
         FROM (
-          -- Pass Only Elements: ['__bookings']
+          -- Select: ['__bookings']
           SELECT
             subq_2.__bookings
           FROM (
-            -- Pass Only Elements: ['__bookings']
+            -- Select: ['__bookings']
             SELECT
               subq_1.__bookings
             FROM (
@@ -258,11 +258,11 @@ FROM (
         SELECT
           SUM(subq_8.__referred_bookings) AS __referred_bookings
         FROM (
-          -- Pass Only Elements: ['__referred_bookings']
+          -- Select: ['__referred_bookings']
           SELECT
             subq_7.__referred_bookings
           FROM (
-            -- Pass Only Elements: ['__referred_bookings']
+            -- Select: ['__referred_bookings']
             SELECT
               subq_6.__referred_bookings
             FROM (
@@ -491,11 +491,11 @@ FROM (
         SELECT
           SUM(subq_13.__instant_bookings) AS __instant_bookings
         FROM (
-          -- Pass Only Elements: ['__instant_bookings']
+          -- Select: ['__instant_bookings']
           SELECT
             subq_12.__instant_bookings
           FROM (
-            -- Pass Only Elements: ['__instant_bookings']
+            -- Select: ['__instant_bookings']
             SELECT
               subq_11.__instant_bookings
             FROM (
@@ -724,11 +724,11 @@ FROM (
         SELECT
           SUM(subq_18.__booking_value) AS __booking_value
         FROM (
-          -- Pass Only Elements: ['__booking_value']
+          -- Select: ['__booking_value']
           SELECT
             subq_17.__booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value']
+            -- Select: ['__booking_value']
             SELECT
               subq_16.__booking_value
             FROM (

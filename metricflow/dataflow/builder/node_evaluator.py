@@ -37,7 +37,7 @@ from metricflow.dataflow.builder.partitions import (
     PartitionTimeDimensionJoinDescription,
 )
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, ValidityWindowJoinDescription
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataset.dataset_classes import DataSet
@@ -78,7 +78,7 @@ class JoinLinkableInstancesRecipe:
             raise RuntimeError("`join_on_entity` is required unless using CROSS JOIN.")
 
     # TODO: JoinDescription is very similar to JoinLinkableInstancesRecipe. Can we consolidate by just adding a
-    # `filtered_node_to_join` property on JoinLinkableInstancesRecipe?
+    # `selector_node_to_join` property on JoinLinkableInstancesRecipe?
     @property
     def join_description(self) -> JoinDescription:
         """The recipe as a join description to use in the dataflow plan node.
@@ -120,12 +120,12 @@ class JoinLinkableInstancesRecipe:
             ]
         )
 
-        filtered_node_to_join = FilterElementsNode.create(
+        selector_node_to_join = SelectorNode.create(
             parent_node=self.node_to_join, include_specs=group_specs_by_type(include_specs).dedupe()
         )
 
         return JoinDescription(
-            join_node=filtered_node_to_join,
+            join_node=selector_node_to_join,
             join_on_entity=self.join_on_entity,
             join_on_partition_dimensions=self.join_on_partition_dimensions,
             join_on_partition_time_dimensions=self.join_on_partition_time_dimensions,

@@ -30,7 +30,7 @@ FROM (
           SELECT
             AVG(subq_8.__average_booking_value) AS __average_booking_value
           FROM (
-            -- Pass Only Elements: ['__average_booking_value']
+            -- Select: ['__average_booking_value']
             SELECT
               subq_7.__average_booking_value
             FROM (
@@ -40,7 +40,7 @@ FROM (
                 , subq_6.booking__is_instant
                 , subq_6.listing__is_lux_latest
               FROM (
-                -- Pass Only Elements: ['__average_booking_value', 'listing__is_lux_latest', 'booking__is_instant']
+                -- Select: ['__average_booking_value', 'listing__is_lux_latest', 'booking__is_instant']
                 SELECT
                   subq_5.booking__is_instant
                   , subq_5.listing__is_lux_latest
@@ -370,7 +370,7 @@ FROM (
                     ) subq_0
                   ) subq_1
                   LEFT OUTER JOIN (
-                    -- Pass Only Elements: ['is_lux_latest', 'listing']
+                    -- Select: ['is_lux_latest', 'listing']
                     SELECT
                       subq_3.listing
                       , subq_3.is_lux_latest
@@ -529,7 +529,7 @@ FROM (
           SELECT
             SUM(subq_17.__bookings) AS __bookings
           FROM (
-            -- Pass Only Elements: ['__bookings']
+            -- Select: ['__bookings']
             SELECT
               subq_16.__bookings
             FROM (
@@ -539,7 +539,7 @@ FROM (
                 , subq_15.booking__is_instant
                 , subq_15.listing__is_lux_latest
               FROM (
-                -- Pass Only Elements: ['__bookings', 'listing__is_lux_latest', 'booking__is_instant']
+                -- Select: ['__bookings', 'listing__is_lux_latest', 'booking__is_instant']
                 SELECT
                   subq_14.booking__is_instant
                   , subq_14.listing__is_lux_latest
@@ -869,7 +869,7 @@ FROM (
                     ) subq_0
                   ) subq_11
                   LEFT OUTER JOIN (
-                    -- Pass Only Elements: ['is_lux_latest', 'listing']
+                    -- Select: ['is_lux_latest', 'listing']
                     SELECT
                       subq_12.listing
                       , subq_12.is_lux_latest
@@ -1028,7 +1028,7 @@ FROM (
           SELECT
             SUM(subq_23.__booking_value) AS __booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value']
+            -- Select: ['__booking_value']
             SELECT
               subq_22.__booking_value
             FROM (
@@ -1037,7 +1037,7 @@ FROM (
                 subq_21.booking_value AS __booking_value
                 , subq_21.booking__is_instant
               FROM (
-                -- Pass Only Elements: ['__booking_value', 'booking__is_instant']
+                -- Select: ['__booking_value', 'booking__is_instant']
                 SELECT
                   subq_20.booking__is_instant
                   , subq_20.__booking_value AS booking_value

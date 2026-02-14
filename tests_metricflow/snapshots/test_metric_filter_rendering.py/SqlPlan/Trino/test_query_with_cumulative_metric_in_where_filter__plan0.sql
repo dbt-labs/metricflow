@@ -18,7 +18,7 @@ FROM (
     SELECT
       SUM(subq_18.__listings) AS __listings
     FROM (
-      -- Pass Only Elements: ['__listings']
+      -- Select: ['__listings']
       SELECT
         subq_17.__listings
       FROM (
@@ -27,7 +27,7 @@ FROM (
           subq_16.listings AS __listings
           , subq_16.user__revenue_all_time
         FROM (
-          -- Pass Only Elements: ['__listings', 'user__revenue_all_time']
+          -- Select: ['__listings', 'user__revenue_all_time']
           SELECT
             subq_15.user__revenue_all_time
             , subq_15.__listings AS listings
@@ -241,7 +241,7 @@ FROM (
               ) subq_5
             ) subq_6
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['user', 'user__revenue_all_time']
+              -- Select: ['user', 'user__revenue_all_time']
               SELECT
                 subq_13.user
                 , subq_13.user__revenue_all_time
@@ -261,12 +261,12 @@ FROM (
                       subq_10.user
                       , SUM(subq_10.__revenue) AS __revenue
                     FROM (
-                      -- Pass Only Elements: ['__revenue', 'user']
+                      -- Select: ['__revenue', 'user']
                       SELECT
                         subq_9.user
                         , subq_9.__revenue
                       FROM (
-                        -- Pass Only Elements: ['__revenue', 'user']
+                        -- Select: ['__revenue', 'user']
                         SELECT
                           subq_8.user
                           , subq_8.__revenue

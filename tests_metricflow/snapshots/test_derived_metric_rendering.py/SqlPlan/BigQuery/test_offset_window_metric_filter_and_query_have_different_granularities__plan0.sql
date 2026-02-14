@@ -30,7 +30,7 @@ FROM (
           subq_9.metric_time__month
           , SUM(subq_9.__booking_value) AS __booking_value
         FROM (
-          -- Pass Only Elements: ['__booking_value', 'metric_time__month']
+          -- Select: ['__booking_value', 'metric_time__month']
           SELECT
             subq_8.metric_time__month
             , subq_8.__booking_value
@@ -41,7 +41,7 @@ FROM (
               , subq_7.metric_time__day
               , subq_7.metric_time__month
             FROM (
-              -- Pass Only Elements: ['__booking_value', 'metric_time__month', 'metric_time__day']
+              -- Select: ['__booking_value', 'metric_time__month', 'metric_time__day']
               SELECT
                 subq_6.metric_time__day
                 , subq_6.metric_time__month
@@ -157,12 +157,12 @@ FROM (
                   , subq_1.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
                   , subq_1.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
                 FROM (
-                  -- Pass Only Elements: ['metric_time__day', 'metric_time__month']
+                  -- Select: ['metric_time__day', 'metric_time__month']
                   SELECT
                     subq_4.metric_time__day
                     , subq_4.metric_time__month
                   FROM (
-                    -- Pass Only Elements: ['metric_time__day', 'metric_time__month']
+                    -- Select: ['metric_time__day', 'metric_time__month']
                     SELECT
                       subq_3.metric_time__day
                       , subq_3.metric_time__month
@@ -436,7 +436,7 @@ FROM (
           subq_15.metric_time__month
           , COUNT(DISTINCT subq_15.__bookers) AS __bookers
         FROM (
-          -- Pass Only Elements: ['__bookers', 'metric_time__month']
+          -- Select: ['__bookers', 'metric_time__month']
           SELECT
             subq_14.metric_time__month
             , subq_14.__bookers
@@ -447,7 +447,7 @@ FROM (
               , subq_13.metric_time__day
               , subq_13.metric_time__month
             FROM (
-              -- Pass Only Elements: ['__bookers', 'metric_time__month', 'metric_time__day']
+              -- Select: ['__bookers', 'metric_time__month', 'metric_time__day']
               SELECT
                 subq_12.metric_time__day
                 , subq_12.metric_time__month

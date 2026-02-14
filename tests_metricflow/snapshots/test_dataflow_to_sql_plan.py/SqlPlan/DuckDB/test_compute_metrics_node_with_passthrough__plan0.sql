@@ -17,7 +17,7 @@ FROM (
     SELECT
       SUM(subq_1.__booking_value) AS __booking_value
     FROM (
-      -- Pass Only Elements: ['__booking_value']
+      -- Select: ['__booking_value']
       SELECT
         subq_0.__booking_value
       FROM (

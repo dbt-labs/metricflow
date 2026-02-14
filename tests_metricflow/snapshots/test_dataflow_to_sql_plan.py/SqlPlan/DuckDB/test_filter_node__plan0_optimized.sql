@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'bookings_source'
--- Pass Only Elements: ['__bookings']
+-- Select: ['__bookings']
 SELECT
   1 AS __bookings
 FROM ***************************.fct_bookings bookings_source_src_28000

@@ -22,8 +22,8 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'users_ds_source'
       -- Metric Time Dimension 'archived_at'
-      -- Pass Only Elements: ['__archived_users', 'metric_time__hour']
-      -- Pass Only Elements: ['__archived_users', 'metric_time__hour']
+      -- Select: ['__archived_users', 'metric_time__hour']
+      -- Select: ['__archived_users', 'metric_time__hour']
       SELECT
         DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
         , 1 AS __archived_users

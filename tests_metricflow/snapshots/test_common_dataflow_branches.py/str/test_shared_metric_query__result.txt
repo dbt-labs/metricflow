@@ -22,8 +22,8 @@ dataflow_plan:
                       <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                       <!-- node_id = NodeId(id_str='am_0') -->
                       <!-- null_fill_value_mapping = {'bookings': None} -->
-                      <FilterElementsNode>
-                          <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                      <SelectorNode>
+                          <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                           <!-- node_id = NodeId(id_str='pfe_1') -->
                           <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                           <!-- include_spec =                                                                  -->
@@ -32,8 +32,8 @@ dataflow_plan:
                           <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                           <!--   )                                                                             -->
                           <!-- distinct = False -->
-                          <FilterElementsNode>
-                              <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                          <SelectorNode>
+                              <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                               <!-- node_id = NodeId(id_str='pfe_0') -->
                               <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                               <!-- include_spec =                                                                  -->
@@ -52,8 +52,8 @@ dataflow_plan:
                                       <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                   </ReadSqlSourceNode>
                               </MetricTimeDimensionTransformNode>
-                          </FilterElementsNode>
-                      </FilterElementsNode>
+                          </SelectorNode>
+                      </SelectorNode>
                   </AggregateSimpleMetricInputsNode>
               </ComputeMetricsNode>
               <ComputeMetricsNode>
@@ -71,8 +71,8 @@ dataflow_plan:
                               <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                               <!-- node_id = NodeId(id_str='am_0') -->
                               <!-- null_fill_value_mapping = {'bookings': None} -->
-                              <FilterElementsNode>
-                                  <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                              <SelectorNode>
+                                  <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                                   <!-- node_id = NodeId(id_str='pfe_1') -->
                                   <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                   <!-- include_spec =                                                                  -->
@@ -81,8 +81,8 @@ dataflow_plan:
                                   <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                   <!--   )                                                                             -->
                                   <!-- distinct = False -->
-                                  <FilterElementsNode>
-                                      <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+                                  <SelectorNode>
+                                      <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                                       <!-- node_id = NodeId(id_str='pfe_0') -->
                                       <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                                       <!-- include_spec =                                                                  -->
@@ -101,8 +101,8 @@ dataflow_plan:
                                               <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                           </ReadSqlSourceNode>
                                       </MetricTimeDimensionTransformNode>
-                                  </FilterElementsNode>
-                              </FilterElementsNode>
+                                  </SelectorNode>
+                              </SelectorNode>
                           </AggregateSimpleMetricInputsNode>
                       </ComputeMetricsNode>
                       <ComputeMetricsNode>
@@ -113,8 +113,8 @@ dataflow_plan:
                               <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                               <!-- node_id = NodeId(id_str='am_1') -->
                               <!-- null_fill_value_mapping = {'bookers': None} -->
-                              <FilterElementsNode>
-                                  <!-- description = "Pass Only Elements: ['__bookers', 'metric_time__day']" -->
+                              <SelectorNode>
+                                  <!-- description = "Select: ['__bookers', 'metric_time__day']" -->
                                   <!-- node_id = NodeId(id_str='pfe_3') -->
                                   <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
                                   <!-- include_spec =                                                                  -->
@@ -123,8 +123,8 @@ dataflow_plan:
                                   <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                   <!--   )                                                                             -->
                                   <!-- distinct = False -->
-                                  <FilterElementsNode>
-                                      <!-- description = "Pass Only Elements: ['__bookers', 'metric_time__day']" -->
+                                  <SelectorNode>
+                                      <!-- description = "Select: ['__bookers', 'metric_time__day']" -->
                                       <!-- node_id = NodeId(id_str='pfe_2') -->
                                       <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
                                       <!-- include_spec =                                                                  -->
@@ -143,8 +143,8 @@ dataflow_plan:
                                               <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                           </ReadSqlSourceNode>
                                       </MetricTimeDimensionTransformNode>
-                                  </FilterElementsNode>
-                              </FilterElementsNode>
+                                  </SelectorNode>
+                              </SelectorNode>
                           </AggregateSimpleMetricInputsNode>
                       </ComputeMetricsNode>
                   </CombineAggregatedOutputsNode>
@@ -162,8 +162,8 @@ common_branch_0:
           <!-- description = 'Aggregate Inputs for Simple Metrics' -->
           <!-- node_id = NodeId(id_str='am_0') -->
           <!-- null_fill_value_mapping = {'bookings': None} -->
-          <FilterElementsNode>
-              <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+          <SelectorNode>
+              <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
               <!-- node_id = NodeId(id_str='pfe_1') -->
               <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
               <!-- include_spec =                                                                  -->
@@ -172,8 +172,8 @@ common_branch_0:
               <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
               <!--   )                                                                             -->
               <!-- distinct = False -->
-              <FilterElementsNode>
-                  <!-- description = "Pass Only Elements: ['__bookings', 'metric_time__day']" -->
+              <SelectorNode>
+                  <!-- description = "Select: ['__bookings', 'metric_time__day']" -->
                   <!-- node_id = NodeId(id_str='pfe_0') -->
                   <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                   <!-- include_spec =                                                                  -->
@@ -192,8 +192,8 @@ common_branch_0:
                           <!-- data_set = SemanticModelDataSet('bookings_source') -->
                       </ReadSqlSourceNode>
                   </MetricTimeDimensionTransformNode>
-              </FilterElementsNode>
-          </FilterElementsNode>
+              </SelectorNode>
+          </SelectorNode>
       </AggregateSimpleMetricInputsNode>
   </ComputeMetricsNode>
 

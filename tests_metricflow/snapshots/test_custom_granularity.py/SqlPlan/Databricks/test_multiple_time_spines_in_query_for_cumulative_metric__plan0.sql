@@ -26,13 +26,13 @@ FROM (
         , subq_7.metric_time__hour
         , SUM(subq_7.__simple_subdaily_metric_default_day) AS __simple_subdaily_metric_default_day
       FROM (
-        -- Pass Only Elements: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
+        -- Select: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
         SELECT
           subq_6.metric_time__alien_day
           , subq_6.metric_time__hour
           , subq_6.__simple_subdaily_metric_default_day
         FROM (
-          -- Pass Only Elements: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
+          -- Select: ['__simple_subdaily_metric_default_day', 'metric_time__alien_day', 'metric_time__hour']
           SELECT
             subq_5.metric_time__alien_day
             , subq_5.metric_time__hour

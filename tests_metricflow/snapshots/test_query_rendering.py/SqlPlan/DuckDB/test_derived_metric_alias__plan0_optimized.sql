@@ -23,7 +23,7 @@ SELECT
   , booking_value * 0.05 AS bookings_alias
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+  -- Select: ['__booking_value', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT
@@ -31,7 +31,7 @@ FROM (
     , SUM(booking_value) AS booking_value
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__booking_value', 'metric_time__day', 'listing__booking_fees']
+    -- Select: ['__booking_value', 'metric_time__day', 'listing__booking_fees']
     SELECT
       sma_28009_cte.metric_time__day AS metric_time__day
       , subq_31.listing__booking_fees AS listing__booking_fees
@@ -39,14 +39,14 @@ FROM (
     FROM sma_28009_cte
     LEFT OUTER JOIN (
       -- Compute Metrics via Expressions
-      -- Pass Only Elements: ['listing', 'listing__booking_fees']
+      -- Select: ['listing', 'listing__booking_fees']
       SELECT
         listing
         , booking_value * 0.05 AS listing__booking_fees
       FROM (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['__booking_value', 'listing']
-        -- Pass Only Elements: ['__booking_value', 'listing']
+        -- Select: ['__booking_value', 'listing']
+        -- Select: ['__booking_value', 'listing']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT

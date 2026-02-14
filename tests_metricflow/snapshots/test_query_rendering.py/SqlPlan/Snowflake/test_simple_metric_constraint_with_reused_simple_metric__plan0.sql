@@ -28,7 +28,7 @@ FROM (
           subq_4.metric_time__day
           , SUM(subq_4.__booking_value) AS __booking_value
         FROM (
-          -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+          -- Select: ['__booking_value', 'metric_time__day']
           SELECT
             subq_3.metric_time__day
             , subq_3.__booking_value
@@ -39,7 +39,7 @@ FROM (
               , subq_2.booking__is_instant
               , subq_2.metric_time__day
             FROM (
-              -- Pass Only Elements: ['__booking_value', 'booking__is_instant', 'metric_time__day']
+              -- Select: ['__booking_value', 'booking__is_instant', 'metric_time__day']
               SELECT
                 subq_1.metric_time__day
                 , subq_1.booking__is_instant
@@ -276,12 +276,12 @@ FROM (
           subq_9.metric_time__day
           , SUM(subq_9.__booking_value) AS __booking_value
         FROM (
-          -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+          -- Select: ['__booking_value', 'metric_time__day']
           SELECT
             subq_8.metric_time__day
             , subq_8.__booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+            -- Select: ['__booking_value', 'metric_time__day']
             SELECT
               subq_7.metric_time__day
               , subq_7.__booking_value

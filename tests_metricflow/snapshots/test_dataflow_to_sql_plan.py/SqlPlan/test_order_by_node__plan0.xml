@@ -42,7 +42,7 @@ docstring:
                 <!-- where = None -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description = "Pass Only Elements: ['__bookings', 'is_instant', 'ds__day']" -->
+                    <!-- description = "Select: ['__bookings', 'is_instant', 'ds__day']" -->
                     <!-- node_id = NodeId(id_str='ss_1') -->
                     <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_2), column_alias='ds__day') -->
                     <!-- col1 =                                                                                        -->

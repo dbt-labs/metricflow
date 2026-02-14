@@ -23,11 +23,11 @@ FROM (
         subq_10.metric_time__day AS metric_time__day
         , subq_6.booking_fees_start_of_month AS booking_fees_start_of_month
       FROM (
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           subq_9.metric_time__day
         FROM (
-          -- Pass Only Elements: ['metric_time__day']
+          -- Select: ['metric_time__day']
           SELECT
             subq_8.metric_time__day
           FROM (
@@ -81,12 +81,12 @@ FROM (
               subq_3.metric_time__day
               , SUM(subq_3.__booking_value) AS __booking_value
             FROM (
-              -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+              -- Select: ['__booking_value', 'metric_time__day']
               SELECT
                 subq_2.metric_time__day
                 , subq_2.__booking_value
               FROM (
-                -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+                -- Select: ['__booking_value', 'metric_time__day']
                 SELECT
                   subq_1.metric_time__day
                   , subq_1.__booking_value
@@ -329,12 +329,12 @@ FROM (
             subq_14.metric_time__day
             , SUM(subq_14.__booking_value) AS __booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+            -- Select: ['__booking_value', 'metric_time__day']
             SELECT
               subq_13.metric_time__day
               , subq_13.__booking_value
             FROM (
-              -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+              -- Select: ['__booking_value', 'metric_time__day']
               SELECT
                 subq_12.metric_time__day
                 , subq_12.__booking_value

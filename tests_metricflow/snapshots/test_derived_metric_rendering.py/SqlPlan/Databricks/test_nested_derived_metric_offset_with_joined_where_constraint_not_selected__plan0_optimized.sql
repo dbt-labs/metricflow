@@ -16,7 +16,7 @@ SELECT
   , 2 * bookings_offset_once AS bookings_offset_twice
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day', 'bookings_offset_once']
+  -- Select: ['metric_time__day', 'bookings_offset_once']
   SELECT
     metric_time__day
     , bookings_offset_once
@@ -50,8 +50,8 @@ FROM (
           FROM (
             -- Read Elements From Semantic Model 'bookings_source'
             -- Metric Time Dimension 'ds'
-            -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
-            -- Pass Only Elements: ['__bookings', 'booking__is_instant', 'metric_time__day']
+            -- Select: ['__bookings', 'booking__is_instant', 'metric_time__day']
+            -- Select: ['__bookings', 'booking__is_instant', 'metric_time__day']
             SELECT
               DATE_TRUNC('day', ds) AS metric_time__day
               , is_instant AS booking__is_instant

@@ -5,7 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__active_listings', 'metric_time__day']
+-- Select: ['__active_listings', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,7 +14,7 @@ SELECT
   , SUM(active_listings) AS active_listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__active_listings', 'metric_time__day', 'listing__bookings']
+  -- Select: ['__active_listings', 'metric_time__day', 'listing__bookings']
   SELECT
     subq_20.metric_time__day AS metric_time__day
     , subq_27.listing__bookings AS listing__bookings
@@ -31,15 +31,15 @@ FROM (
   LEFT OUTER JOIN (
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookings']
+    -- Select: ['listing', 'listing__bookings']
     SELECT
       listing
       , SUM(__bookings) AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['__bookings', 'listing']
-      -- Pass Only Elements: ['__bookings', 'listing']
+      -- Select: ['__bookings', 'listing']
+      -- Select: ['__bookings', 'listing']
       SELECT
         listing_id AS listing
         , 1 AS __bookings

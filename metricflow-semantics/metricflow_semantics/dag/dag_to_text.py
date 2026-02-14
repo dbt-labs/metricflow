@@ -47,7 +47,7 @@ class MetricFlowDagTextFormatter:
 
     The text representation should be similar to the XML format where the parents are printed in an indented section.:
 
-    <FilterElementsNode>
+    <SelectorNode>
       ...
     </>
     """

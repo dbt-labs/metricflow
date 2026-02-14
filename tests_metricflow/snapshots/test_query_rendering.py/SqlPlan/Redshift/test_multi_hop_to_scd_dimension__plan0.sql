@@ -22,13 +22,13 @@ FROM (
       , subq_12.listing__lux_listing__is_confirmed_lux
       , SUM(subq_12.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
       SELECT
         subq_11.metric_time__day
         , subq_11.listing__lux_listing__is_confirmed_lux
         , subq_11.__bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+        -- Select: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
         SELECT
           subq_10.metric_time__day
           , subq_10.listing__lux_listing__is_confirmed_lux
@@ -308,7 +308,7 @@ FROM (
             ) subq_3
           ) subq_4
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
+            -- Select: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
             SELECT
               subq_8.lux_listing__window_start__day
               , subq_8.lux_listing__window_end__day
@@ -352,7 +352,7 @@ FROM (
                 FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_26000
               ) subq_5
               LEFT OUTER JOIN (
-                -- Pass Only Elements: [
+                -- Select: [
                 --   'is_confirmed_lux',
                 --   'lux_listing__is_confirmed_lux',
                 --   'window_start__day',

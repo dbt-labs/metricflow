@@ -18,8 +18,8 @@ FROM (
     , AVG(__revenue) OVER (PARTITION BY metric_time__year) AS trailing_2_months_revenue
   FROM (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['__revenue', 'metric_time__year', 'metric_time__day']
-    -- Pass Only Elements: ['__revenue', 'metric_time__year', 'metric_time__day']
+    -- Select: ['__revenue', 'metric_time__year', 'metric_time__day']
+    -- Select: ['__revenue', 'metric_time__year', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_15.ds AS metric_time__day

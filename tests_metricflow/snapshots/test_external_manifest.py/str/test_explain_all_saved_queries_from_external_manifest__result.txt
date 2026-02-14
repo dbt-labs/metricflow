@@ -7,7 +7,7 @@ query_0b295dd4:
   status: PASS
   explain_sql:
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings', '__instant_bookings', 'listing__capacity_latest', 'metric_time__day']
+    -- Select: ['__bookings', '__instant_bookings', 'listing__capacity_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Write to DataTable
@@ -18,7 +18,7 @@ query_0b295dd4:
       , SUM(instant_bookings) AS instant_bookings
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__bookings', '__instant_bookings', 'listing__capacity_latest', 'metric_time__day']
+      -- Select: ['__bookings', '__instant_bookings', 'listing__capacity_latest', 'metric_time__day']
       SELECT
         subq_1.metric_time__day AS metric_time__day
         , subq_4.capacity_latest AS listing__capacity_latest
@@ -37,7 +37,7 @@ query_0b295dd4:
       LEFT OUTER JOIN (
         -- Read Elements From Semantic Model 'listings_latest'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['capacity_latest', 'listing']
+        -- Select: ['capacity_latest', 'listing']
         SELECT
           1 AS listing
           , '1' AS capacity_latest
@@ -58,7 +58,7 @@ query_1ee34d0e:
     -- Write to DataTable
     WITH cm_3_cte AS (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__bookings', 'listing__capacity_latest']
+      -- Select: ['__bookings', 'listing__capacity_latest']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -66,7 +66,7 @@ query_1ee34d0e:
         , SUM(bookings) AS bookings
       FROM (
         -- Join Standard Outputs
-        -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+        -- Select: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
         SELECT
           subq_1.metric_time__day AS metric_time__day
           , subq_4.is_lux_latest AS listing__is_lux_latest
@@ -84,7 +84,7 @@ query_1ee34d0e:
         LEFT OUTER JOIN (
           -- Read Elements From Semantic Model 'listings_latest'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+          -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
           SELECT
             1 AS listing
             , '1' AS is_lux_latest
@@ -101,7 +101,7 @@ query_1ee34d0e:
 
     , cm_4_cte AS (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__views', 'listing__capacity_latest']
+      -- Select: ['__views', 'listing__capacity_latest']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -109,7 +109,7 @@ query_1ee34d0e:
         , SUM(views) AS views
       FROM (
         -- Join Standard Outputs
-        -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
+        -- Select: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
         SELECT
           subq_12.metric_time__day AS metric_time__day
           , subq_14.is_lux_latest AS listing__is_lux_latest
@@ -127,7 +127,7 @@ query_1ee34d0e:
         LEFT OUTER JOIN (
           -- Read Elements From Semantic Model 'listings_latest'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['capacity_latest', 'is_lux_latest', 'listing']
+          -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
           SELECT
             1 AS listing
             , '1' AS is_lux_latest
@@ -193,8 +193,8 @@ query_25c402a1:
       , MAX(subq_18.views) AS views
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
-      -- Pass Only Elements: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__capacity_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -220,8 +220,8 @@ query_25c402a1:
     ) subq_9
     FULL OUTER JOIN (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'metric_time__day']
-      -- Pass Only Elements: ['__views', 'listing__capacity_latest', 'metric_time__day']
+      -- Select: ['__views', 'listing__capacity_latest', 'metric_time__day']
+      -- Select: ['__views', 'listing__capacity_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -261,8 +261,8 @@ query_788497ac:
   status: PASS
   explain_sql:
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['__revenue', 'metric_time__day']
-    -- Pass Only Elements: ['__revenue', 'metric_time__day']
+    -- Select: ['__revenue', 'metric_time__day']
+    -- Select: ['__revenue', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
@@ -292,8 +292,8 @@ query_d4073379:
   status: PASS
   explain_sql:
     -- Join Standard Outputs
-    -- Pass Only Elements: ['listing__capacity_latest', 'metric_time__month']
-    -- Pass Only Elements: ['listing__capacity_latest', 'metric_time__month']
+    -- Select: ['listing__capacity_latest', 'metric_time__month']
+    -- Select: ['listing__capacity_latest', 'metric_time__month']
     -- Write to DataTable
     SELECT
       DATE_TRUNC('month', time_spine_src_10006.ds) AS metric_time__month

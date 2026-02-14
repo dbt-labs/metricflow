@@ -5,7 +5,7 @@ docstring:
 sql_engine: Trino
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -13,7 +13,7 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__listings', 'listing__bookings_per_booker']
+  -- Select: ['__listings', 'listing__bookings_per_booker']
   SELECT
     CAST(subq_40.bookings AS DOUBLE) / CAST(NULLIF(subq_40.bookers, 0) AS DOUBLE) AS listing__bookings_per_booker
     , subq_34.__listings AS listings
@@ -35,8 +35,8 @@ FROM (
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['__bookings', '__bookers', 'listing']
-      -- Pass Only Elements: ['__bookings', '__bookers', 'listing']
+      -- Select: ['__bookings', '__bookers', 'listing']
+      -- Select: ['__bookings', '__bookers', 'listing']
       SELECT
         listing_id AS listing
         , 1 AS __bookings

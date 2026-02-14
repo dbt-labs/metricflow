@@ -5,8 +5,8 @@ docstring:
 sql_engine: Trino
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
--- Pass Only Elements: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+-- Select: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+-- Select: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -25,7 +25,7 @@ FROM (
 ) subq_16
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
+  -- Select: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
   SELECT
     lux_listings_src_26000.valid_from AS lux_listing__window_start__day
     , lux_listings_src_26000.valid_to AS lux_listing__window_end__day

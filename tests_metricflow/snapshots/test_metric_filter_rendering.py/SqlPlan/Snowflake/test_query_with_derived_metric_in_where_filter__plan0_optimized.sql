@@ -5,7 +5,7 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -13,7 +13,7 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__listings', 'listing__views_times_booking_value']
+  -- Select: ['__listings', 'listing__views_times_booking_value']
   SELECT
     subq_50.listing__views_times_booking_value AS listing__views_times_booking_value
     , subq_35.__listings AS listings
@@ -27,7 +27,7 @@ FROM (
   ) subq_35
   LEFT OUTER JOIN (
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__views_times_booking_value']
+    -- Select: ['listing', 'listing__views_times_booking_value']
     SELECT
       listing
       , booking_value * views AS listing__views_times_booking_value
@@ -40,8 +40,8 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['__booking_value', 'listing']
-        -- Pass Only Elements: ['__booking_value', 'listing']
+        -- Select: ['__booking_value', 'listing']
+        -- Select: ['__booking_value', 'listing']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
@@ -60,8 +60,8 @@ FROM (
         FROM (
           -- Read Elements From Semantic Model 'views_source'
           -- Metric Time Dimension 'ds'
-          -- Pass Only Elements: ['__views', 'listing']
-          -- Pass Only Elements: ['__views', 'listing']
+          -- Select: ['__views', 'listing']
+          -- Select: ['__views', 'listing']
           SELECT
             listing_id AS listing
             , 1 AS __views

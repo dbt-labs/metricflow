@@ -9,14 +9,14 @@ SELECT
   , subq_8.user__bio_added_ts__month
   , subq_8.metric_time__day
 FROM (
-  -- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
+  -- Select: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
   SELECT
     subq_7.user__bio_added_ts__alien_day
     , subq_7.metric_time__alien_day
     , subq_7.user__bio_added_ts__month
     , subq_7.metric_time__day
   FROM (
-    -- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
+    -- Select: ['metric_time__day', 'metric_time__alien_day', 'user__bio_added_ts__alien_day', 'user__bio_added_ts__month']
     SELECT
       subq_6.user__bio_added_ts__alien_day
       , subq_6.metric_time__alien_day
@@ -402,7 +402,7 @@ FROM (
         FROM ***************************.dim_users users_ds_source_src_28000
       ) subq_0
       CROSS JOIN (
-        -- Pass Only Elements: ['metric_time__day']
+        -- Select: ['metric_time__day']
         SELECT
           subq_2.metric_time__day
         FROM (

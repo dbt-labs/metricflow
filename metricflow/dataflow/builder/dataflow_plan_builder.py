@@ -85,7 +85,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode, SpecToAlias
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
@@ -950,7 +950,7 @@ class DataflowPlanBuilder:
             )
 
         if output_selection_specs:
-            pre_result_node = FilterElementsNode.create(
+            pre_result_node = SelectorNode.create(
                 parent_node=pre_result_node or parent_node, include_specs=output_selection_specs
             )
 
@@ -1701,7 +1701,7 @@ class DataflowPlanBuilder:
                 output_node = ConstrainTimeRangeNode.create(
                     parent_node=output_node, time_range_constraint=time_range_constraint
                 )
-            # FilterElementsNode will be needed if there are where filter specs that were not selected in the group by.
+            # SelectorNode will be needed if there are where filter specs that were not selected in the group by.
             specs_to_keep_for_aggregation = None
             specs_in_filters = set(
                 linkable_spec for filter_spec in where_filter_specs for linkable_spec in filter_spec.linkable_specs
@@ -1711,9 +1711,7 @@ class DataflowPlanBuilder:
                     InstanceSpecSet.create_from_specs(queried_linkable_specs)
                 )
             if specs_to_keep_for_aggregation:
-                output_node = FilterElementsNode.create(
-                    parent_node=output_node, include_specs=specs_to_keep_for_aggregation
-                )
+                output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_for_aggregation)
         return output_node
 
     def _build_time_spine_join_node_for_before_aggregation(
@@ -2024,7 +2022,7 @@ class DataflowPlanBuilder:
             spec_properties=spec_properties,
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
-        output_node = FilterElementsNode.create(parent_node=output_node, include_specs=specs_to_keep_before_constraints)
+        output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_before_constraints)
 
         if len(where_filter_specs) > 0:
             output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
@@ -2046,7 +2044,7 @@ class DataflowPlanBuilder:
                 parent_node=output_node,
             )
 
-        output_node = FilterElementsNode.create(
+        output_node = SelectorNode.create(
             parent_node=output_node, include_specs=specs_to_keep_for_aggregation, distinct=distinct
         )
 

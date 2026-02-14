@@ -5,7 +5,7 @@ docstring:
 sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__bookers']
+-- Select: ['__bookers']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -23,7 +23,7 @@ SELECT
   COUNT(DISTINCT bookers) AS bookers
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__bookers', 'guest__booking_value']
+  -- Select: ['__bookers', 'guest__booking_value']
   SELECT
     subq_25.guest__booking_value AS guest__booking_value
     , subq_19.__bookers AS bookers
@@ -36,11 +36,11 @@ FROM (
   ) subq_19
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__booking_value', 'guest']
-    -- Pass Only Elements: ['__booking_value', 'guest']
+    -- Select: ['__booking_value', 'guest']
+    -- Select: ['__booking_value', 'guest']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['guest', 'guest__booking_value']
+    -- Select: ['guest', 'guest__booking_value']
     SELECT
       guest
       , SUM(__booking_value) AS guest__booking_value

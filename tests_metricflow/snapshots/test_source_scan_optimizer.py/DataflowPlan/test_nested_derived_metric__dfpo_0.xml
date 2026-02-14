@@ -30,9 +30,8 @@ docstring:
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_3') -->
                             <!-- null_fill_value_mapping = {'referred_bookings': None, 'bookings': None} -->
-                            <FilterElementsNode>
-                                <!-- description =                                                                     -->
-                                <!--   "Pass Only Elements: ['__referred_bookings', '__bookings', 'metric_time__day']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['__referred_bookings', '__bookings', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_7') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='referred_bookings') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
@@ -42,9 +41,9 @@ docstring:
                                 <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                 <!--   )                                                                             -->
                                 <!-- distinct = False -->
-                                <FilterElementsNode>
-                                    <!-- description =                                                                     -->
-                                    <!--   "Pass Only Elements: ['__referred_bookings', '__bookings', 'metric_time__day']" -->
+                                <SelectorNode>
+                                    <!-- description =                                                         -->
+                                    <!--   "Select: ['__referred_bookings', '__bookings', 'metric_time__day']" -->
                                     <!-- node_id = NodeId(id_str='pfe_6') -->
                                     <!-- include_spec = SimpleMetricInputSpec(element_name='referred_bookings') -->
                                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
@@ -64,8 +63,8 @@ docstring:
                                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
-                                </FilterElementsNode>
-                            </FilterElementsNode>
+                                </SelectorNode>
+                            </SelectorNode>
                         </AggregateSimpleMetricInputsNode>
                     </ComputeMetricsNode>
                 </ComputeMetricsNode>
@@ -78,9 +77,8 @@ docstring:
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_4') -->
                         <!-- null_fill_value_mapping = {'instant_bookings': None, 'bookings': None} -->
-                        <FilterElementsNode>
-                            <!-- description =                                                                    -->
-                            <!--   "Pass Only Elements: ['__instant_bookings', '__bookings', 'metric_time__day']" -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__instant_bookings', '__bookings', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='pfe_9') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='instant_bookings') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
@@ -90,9 +88,8 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- distinct = False -->
-                            <FilterElementsNode>
-                                <!-- description =                                                                    -->
-                                <!--   "Pass Only Elements: ['__instant_bookings', '__bookings', 'metric_time__day']" -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['__instant_bookings', '__bookings', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_8') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='instant_bookings') -->
                                 <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
@@ -112,8 +109,8 @@ docstring:
                                         <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
-                            </FilterElementsNode>
-                        </FilterElementsNode>
+                            </SelectorNode>
+                        </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>
             </CombineAggregatedOutputsNode>

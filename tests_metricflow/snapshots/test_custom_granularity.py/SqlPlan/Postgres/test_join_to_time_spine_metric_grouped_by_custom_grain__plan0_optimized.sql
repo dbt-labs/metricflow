@@ -11,8 +11,8 @@ SELECT
 FROM (
   -- Read From Time Spine 'mf_time_spine'
   -- Change Column Aliases
-  -- Pass Only Elements: ['metric_time__alien_day']
-  -- Pass Only Elements: ['metric_time__alien_day']
+  -- Select: ['metric_time__alien_day']
+  -- Select: ['metric_time__alien_day']
   SELECT
     alien_day AS metric_time__alien_day
   FROM ***************************.mf_time_spine time_spine_src_28006
@@ -22,8 +22,8 @@ FROM (
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'ds'
   -- Join to Custom Granularity Dataset
-  -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
-  -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
+  -- Select: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
+  -- Select: ['__bookings_join_to_time_spine', 'metric_time__alien_day']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     subq_13.alien_day AS metric_time__alien_day

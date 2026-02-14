@@ -15,7 +15,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
     from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
     from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-    from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+    from metricflow.dataflow.nodes.filter_elements import SelectorNode
     from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
     from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
     from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -81,7 +81,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D102
+    def visit_selector_node(self, node: SelectorNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
@@ -190,7 +190,7 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
         return self._default_handler(node)
 
     @override
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> VisitorOutputT:  # noqa: D102
+    def visit_selector_node(self, node: SelectorNode) -> VisitorOutputT:  # noqa: D102
         return self._default_handler(node)
 
     @override

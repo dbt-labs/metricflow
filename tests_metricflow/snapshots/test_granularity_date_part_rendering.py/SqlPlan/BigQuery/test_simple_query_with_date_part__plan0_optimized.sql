@@ -11,8 +11,8 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
-  -- Pass Only Elements: ['__bookings', 'metric_time__extract_dow']
+  -- Select: ['__bookings', 'metric_time__extract_dow']
+  -- Select: ['__bookings', 'metric_time__extract_dow']
   SELECT
     IF(EXTRACT(dayofweek FROM ds) = 1, 7, EXTRACT(dayofweek FROM ds) - 1) AS metric_time__extract_dow
     , 1 AS __bookings

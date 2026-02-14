@@ -4,8 +4,8 @@ sql_engine: Redshift
 ---
 -- Join Standard Outputs
 -- Join to Custom Granularity Dataset
--- Pass Only Elements: ['__bookings', 'listing__ds__alien_day']
--- Pass Only Elements: ['__bookings', 'listing__ds__alien_day']
+-- Select: ['__bookings', 'listing__ds__alien_day']
+-- Select: ['__bookings', 'listing__ds__alien_day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable

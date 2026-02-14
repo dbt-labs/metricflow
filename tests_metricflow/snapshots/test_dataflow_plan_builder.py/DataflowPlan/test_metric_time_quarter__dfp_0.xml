@@ -5,8 +5,8 @@ test_filename: test_dataflow_plan_builder.py
     <WriteToResultDataTableNode>
         <!-- description = 'Write to DataTable' -->
         <!-- node_id = NodeId(id_str='wrd_0') -->
-        <FilterElementsNode>
-            <!-- description = "Pass Only Elements: ['metric_time__quarter']" -->
+        <SelectorNode>
+            <!-- description = "Select: ['metric_time__quarter']" -->
             <!-- node_id = NodeId(id_str='pfe_1') -->
             <!-- include_spec =                                                                          -->
             <!--   TimeDimensionSpec(                                                                    -->
@@ -14,8 +14,8 @@ test_filename: test_dataflow_plan_builder.py
             <!--     time_granularity=ExpandedTimeGranularity(name='quarter', base_granularity=QUARTER), -->
             <!--   )                                                                                     -->
             <!-- distinct = True -->
-            <FilterElementsNode>
-                <!-- description = "Pass Only Elements: ['metric_time__quarter']" -->
+            <SelectorNode>
+                <!-- description = "Select: ['metric_time__quarter']" -->
                 <!-- node_id = NodeId(id_str='pfe_0') -->
                 <!-- include_spec =                                                                          -->
                 <!--   TimeDimensionSpec(                                                                    -->
@@ -33,7 +33,7 @@ test_filename: test_dataflow_plan_builder.py
                         <!-- data_set = SqlDataSet() -->
                     </ReadSqlSourceNode>
                 </MetricTimeDimensionTransformNode>
-            </FilterElementsNode>
-        </FilterElementsNode>
+            </SelectorNode>
+        </SelectorNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

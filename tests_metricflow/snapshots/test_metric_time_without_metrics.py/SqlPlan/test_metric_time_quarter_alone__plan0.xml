@@ -11,7 +11,7 @@ test_filename: test_metric_time_without_metrics.py
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
-            <!-- description = "Pass Only Elements: ['metric_time__quarter']" -->
+            <!-- description = "Select: ['metric_time__quarter']" -->
             <!-- node_id = NodeId(id_str='ss_39') -->
             <!-- col0 =                                                                                                   -->
             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_25), column_alias='metric_time__quarter') -->
@@ -21,7 +21,7 @@ test_filename: test_metric_time_without_metrics.py
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
-                <!-- description = "Pass Only Elements: ['metric_time__quarter']" -->
+                <!-- description = "Select: ['metric_time__quarter']" -->
                 <!-- node_id = NodeId(id_str='ss_38') -->
                 <!-- col0 =                                                -->
                 <!--   SqlSelectColumn(                                    -->

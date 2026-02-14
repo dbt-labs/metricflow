@@ -5,7 +5,7 @@ docstring:
 sql_engine: Redshift
 ---
 -- Join on MIN(ds_month) and [] grouping by None
--- Pass Only Elements: ['__total_account_balance_first_day_of_month']
+-- Select: ['__total_account_balance_first_day_of_month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,7 +14,7 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
-  -- Pass Only Elements: ['__total_account_balance_first_day_of_month', 'ds_month__month']
+  -- Select: ['__total_account_balance_first_day_of_month', 'ds_month__month']
   SELECT
     DATE_TRUNC('month', ds_month) AS ds_month__month
     , account_balance AS __total_account_balance_first_day_of_month
@@ -23,7 +23,7 @@ FROM (
 INNER JOIN (
   -- Read Elements From Semantic Model 'accounts_source'
   -- Metric Time Dimension 'ds_month'
-  -- Pass Only Elements: ['__total_account_balance_first_day_of_month', 'ds_month__month']
+  -- Select: ['__total_account_balance_first_day_of_month', 'ds_month__month']
   -- Filter row on MIN(ds_month__month)
   SELECT
     MIN(DATE_TRUNC('month', ds_month)) AS ds_month__month__complete

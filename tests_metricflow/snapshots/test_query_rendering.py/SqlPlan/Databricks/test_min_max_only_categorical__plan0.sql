@@ -14,11 +14,11 @@ FROM (
     MIN(subq_2.listing__country_latest) AS listing__country_latest__min
     , MAX(subq_2.listing__country_latest) AS listing__country_latest__max
   FROM (
-    -- Pass Only Elements: ['listing__country_latest']
+    -- Select: ['listing__country_latest']
     SELECT
       subq_1.listing__country_latest
     FROM (
-      -- Pass Only Elements: ['listing__country_latest']
+      -- Select: ['listing__country_latest']
       SELECT
         subq_0.listing__country_latest
       FROM (

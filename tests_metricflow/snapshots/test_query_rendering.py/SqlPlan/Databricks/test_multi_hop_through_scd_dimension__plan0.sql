@@ -22,13 +22,13 @@ FROM (
       , subq_15.listing__user__home_state_latest
       , SUM(subq_15.__bookings) AS __bookings
     FROM (
-      -- Pass Only Elements: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
       SELECT
         subq_14.metric_time__day
         , subq_14.listing__user__home_state_latest
         , subq_14.__bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
+        -- Select: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
         SELECT
           subq_13.metric_time__day
           , subq_13.listing__user__home_state_latest
@@ -308,7 +308,7 @@ FROM (
             ) subq_6
           ) subq_7
           LEFT OUTER JOIN (
-            -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
+            -- Select: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
             SELECT
               subq_11.window_start__day
               , subq_11.window_end__day
@@ -441,7 +441,7 @@ FROM (
                 FROM ***************************.dim_listings listings_src_26000
               ) subq_8
               LEFT OUTER JOIN (
-                -- Pass Only Elements: [
+                -- Select: [
                 --   'home_state_latest',
                 --   'user__home_state_latest',
                 --   'ds__day',

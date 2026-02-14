@@ -20,12 +20,12 @@ docstring:
                     <!-- node_id = NodeId(id_str='jso_0') -->
                     <!-- join0_for_node_id_pfe_1 =                                      -->
                     <!--   JoinDescription(                                             -->
-                    <!--     join_node=FilterElementsNode(node_id=pfe_1),               -->
+                    <!--     join_node=SelectorNode(node_id=pfe_1),                     -->
                     <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
                     <!--     join_type=LEFT_OUTER,                                      -->
                     <!--   )                                                            -->
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['__booking_value', 'listing']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['__booking_value', 'listing']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
@@ -35,9 +35,9 @@ docstring:
                             <!-- node_id = NodeId(id_str='rss_28001') -->
                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                         </ReadSqlSourceNode>
-                    </FilterElementsNode>
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['country_latest', 'listing']" -->
+                    </SelectorNode>
+                    <SelectorNode>
+                        <!-- description = "Select: ['country_latest', 'listing']" -->
                         <!-- node_id = NodeId(id_str='pfe_1') -->
                         <!-- include_spec = DimensionSpec(element_name='country_latest') -->
                         <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
@@ -47,7 +47,7 @@ docstring:
                             <!-- node_id = NodeId(id_str='rss_28005') -->
                             <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
-                    </FilterElementsNode>
+                    </SelectorNode>
                 </JoinOnEntitiesNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>

@@ -12,7 +12,7 @@ FROM (
   SELECT
     subq_3.listing__country_latest
   FROM (
-    -- Pass Only Elements: ['listing__country_latest']
+    -- Select: ['listing__country_latest']
     SELECT
       subq_2.listing__country_latest
     FROM (
@@ -20,7 +20,7 @@ FROM (
       SELECT
         subq_1.listing__country_latest
       FROM (
-        -- Pass Only Elements: ['listing__country_latest']
+        -- Select: ['listing__country_latest']
         SELECT
           subq_0.listing__country_latest
         FROM (

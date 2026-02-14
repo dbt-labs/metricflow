@@ -7,7 +7,7 @@ query_56a97413:
   status: SQL_EXCEPTION
   explain_sql:
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Write to DataTable
@@ -17,7 +17,7 @@ query_56a97413:
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings
@@ -33,7 +33,7 @@ query_56a97413:
     LINE 18: WHERE invalid_column > 1
                    ^
     [SQL: EXPLAIN -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Write to DataTable
@@ -43,7 +43,7 @@ query_56a97413:
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , 1 AS bookings

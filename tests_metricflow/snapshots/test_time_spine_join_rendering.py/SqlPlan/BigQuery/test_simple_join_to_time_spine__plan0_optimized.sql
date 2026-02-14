@@ -17,8 +17,8 @@ LEFT OUTER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__day']
-    -- Pass Only Elements: ['__bookings_join_to_time_spine', 'metric_time__day']
+    -- Select: ['__bookings_join_to_time_spine', 'metric_time__day']
+    -- Select: ['__bookings_join_to_time_spine', 'metric_time__day']
     SELECT
       DATETIME_TRUNC(ds, day) AS metric_time__day
       , 1 AS __bookings_join_to_time_spine

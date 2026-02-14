@@ -35,8 +35,8 @@ FROM (
         , booking_value * 0.05 AS booking_fees_start_of_month
       FROM (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['__booking_value', 'metric_time__day']
-        -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+        -- Select: ['__booking_value', 'metric_time__day']
+        -- Select: ['__booking_value', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         -- Compute Metrics via Expressions
         SELECT
@@ -57,8 +57,8 @@ FROM (
       , booking_value * 0.05 AS booking_fees
     FROM (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['__booking_value', 'metric_time__day']
-      -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+      -- Select: ['__booking_value', 'metric_time__day']
+      -- Select: ['__booking_value', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT

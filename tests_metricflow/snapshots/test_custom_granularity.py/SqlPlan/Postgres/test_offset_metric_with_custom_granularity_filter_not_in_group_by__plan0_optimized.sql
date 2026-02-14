@@ -15,13 +15,13 @@ FROM (
     , subq_21.__bookings AS bookings_5_days_ago
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       metric_time__day
     FROM (
       -- Read From Time Spine 'mf_time_spine'
       -- Change Column Aliases
-      -- Pass Only Elements: ['metric_time__day', 'metric_time__alien_day']
+      -- Select: ['metric_time__day', 'metric_time__alien_day']
       SELECT
         ds AS metric_time__day
         , alien_day AS metric_time__alien_day
@@ -31,7 +31,7 @@ FROM (
   ) subq_26
   INNER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
@@ -39,7 +39,7 @@ FROM (
     FROM (
       -- Metric Time Dimension 'ds'
       -- Join to Custom Granularity Dataset
-      -- Pass Only Elements: ['__bookings', 'metric_time__day', 'metric_time__alien_day']
+      -- Select: ['__bookings', 'metric_time__day', 'metric_time__alien_day']
       SELECT
         subq_16.alien_day AS metric_time__alien_day
         , subq_15.ds__day AS metric_time__day

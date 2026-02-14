@@ -28,11 +28,11 @@ FROM (
           subq_8.booking__ds__day AS booking__ds__day
           , subq_4.__booking_value AS __booking_value
         FROM (
-          -- Pass Only Elements: ['booking__ds__day']
+          -- Select: ['booking__ds__day']
           SELECT
             subq_7.booking__ds__day
           FROM (
-            -- Pass Only Elements: ['booking__ds__day']
+            -- Select: ['booking__ds__day']
             SELECT
               subq_6.booking__ds__day
             FROM (
@@ -76,12 +76,12 @@ FROM (
             subq_3.booking__ds__day
             , SUM(subq_3.__booking_value) AS __booking_value
           FROM (
-            -- Pass Only Elements: ['__booking_value', 'booking__ds__day']
+            -- Select: ['__booking_value', 'booking__ds__day']
             SELECT
               subq_2.booking__ds__day
               , subq_2.__booking_value
             FROM (
-              -- Pass Only Elements: ['__booking_value', 'booking__ds__day']
+              -- Select: ['__booking_value', 'booking__ds__day']
               SELECT
                 subq_1.booking__ds__day
                 , subq_1.__booking_value
@@ -318,12 +318,12 @@ FROM (
           subq_13.booking__ds__day
           , COUNT(DISTINCT subq_13.__bookers) AS __bookers
         FROM (
-          -- Pass Only Elements: ['__bookers', 'booking__ds__day']
+          -- Select: ['__bookers', 'booking__ds__day']
           SELECT
             subq_12.booking__ds__day
             , subq_12.__bookers
           FROM (
-            -- Pass Only Elements: ['__bookers', 'booking__ds__day']
+            -- Select: ['__bookers', 'booking__ds__day']
             SELECT
               subq_11.booking__ds__day
               , subq_11.__bookers

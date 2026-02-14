@@ -6,11 +6,11 @@ sql_engine: Databricks
 SELECT
   subq_3.metric_time__quarter
 FROM (
-  -- Pass Only Elements: ['metric_time__quarter']
+  -- Select: ['metric_time__quarter']
   SELECT
     subq_2.metric_time__quarter
   FROM (
-    -- Pass Only Elements: ['metric_time__quarter']
+    -- Select: ['metric_time__quarter']
     SELECT
       subq_1.metric_time__quarter
     FROM (

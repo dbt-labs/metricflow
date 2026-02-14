@@ -6,11 +6,11 @@ sql_engine: Postgres
 SELECT
   subq_4.metric_time__alien_day
 FROM (
-  -- Pass Only Elements: ['metric_time__alien_day']
+  -- Select: ['metric_time__alien_day']
   SELECT
     subq_3.metric_time__alien_day
   FROM (
-    -- Pass Only Elements: ['metric_time__alien_day']
+    -- Select: ['metric_time__alien_day']
     SELECT
       subq_2.metric_time__alien_day
     FROM (

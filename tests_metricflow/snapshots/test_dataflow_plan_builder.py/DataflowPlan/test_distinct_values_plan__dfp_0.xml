@@ -19,8 +19,8 @@ docstring:
             <!--     descending=True,                                           -->
             <!--   )                                                            -->
             <!-- limit = '100' -->
-            <FilterElementsNode>
-                <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
+            <SelectorNode>
+                <!-- description = "Select: ['listing__country_latest']" -->
                 <!-- node_id = NodeId(id_str='pfe_1') -->
                 <!-- include_spec =                                               -->
                 <!--   DimensionSpec(                                             -->
@@ -48,8 +48,8 @@ docstring:
                     <!--       ),                                                          -->
                     <!--     ),                                                            -->
                     <!--   )                                                               -->
-                    <FilterElementsNode>
-                        <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
+                    <SelectorNode>
+                        <!-- description = "Select: ['listing__country_latest']" -->
                         <!-- node_id = NodeId(id_str='pfe_0') -->
                         <!-- include_spec =                                               -->
                         <!--   DimensionSpec(                                             -->
@@ -62,9 +62,9 @@ docstring:
                             <!-- node_id = NodeId(id_str='rss_28024') -->
                             <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
-                    </FilterElementsNode>
+                    </SelectorNode>
                 </WhereConstraintNode>
-            </FilterElementsNode>
+            </SelectorNode>
         </OrderByLimitNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

@@ -13,7 +13,7 @@ docstring:
         <!-- where = None -->
         <!-- distinct = False -->
         <SqlSelectStatementNode>
-            <!-- description = "Pass Only Elements: ['user__home_state_latest']" -->
+            <!-- description = "Select: ['user__home_state_latest']" -->
             <!-- node_id = NodeId(id_str='ss_75') -->
             <!-- col0 =                                                -->
             <!--   SqlSelectColumn(                                    -->
@@ -45,7 +45,7 @@ docstring:
                 <!-- where = SqlStringExpression(node_id=str_0 sql_expr=listing__country_latest = 'us') -->
                 <!-- distinct = False -->
                 <SqlSelectStatementNode>
-                    <!-- description = "Pass Only Elements: ['user__home_state_latest', 'listing__country_latest']" -->
+                    <!-- description = "Select: ['user__home_state_latest', 'listing__country_latest']" -->
                     <!-- node_id = NodeId(id_str='ss_71') -->
                     <!-- col0 =                                                -->
                     <!--   SqlSelectColumn(                                    -->
@@ -641,7 +641,7 @@ docstring:
                             </SqlTableNode>
                         </SqlSelectStatementNode>
                         <SqlSelectStatementNode>
-                            <!-- description = "Pass Only Elements: ['home_state_latest', 'user']" -->
+                            <!-- description = "Select: ['home_state_latest', 'user']" -->
                             <!-- node_id = NodeId(id_str='ss_68') -->
                             <!-- col0 =                                                                                  -->
                             <!--   SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='user') -->

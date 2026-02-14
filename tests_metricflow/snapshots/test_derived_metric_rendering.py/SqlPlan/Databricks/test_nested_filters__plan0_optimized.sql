@@ -20,7 +20,7 @@ FROM (
       , MAX(subq_46.booking_value) AS booking_value
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__average_booking_value', '__bookings']
+      -- Select: ['__average_booking_value', '__bookings']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -28,7 +28,7 @@ FROM (
         , SUM(bookings) AS bookings
       FROM (
         -- Join Standard Outputs
-        -- Pass Only Elements: ['__average_booking_value', '__bookings', 'listing__is_lux_latest', 'booking__is_instant']
+        -- Select: ['__average_booking_value', '__bookings', 'listing__is_lux_latest', 'booking__is_instant']
         SELECT
           subq_30.booking__is_instant AS booking__is_instant
           , listings_latest_src_28000.is_lux AS listing__is_lux_latest
@@ -53,7 +53,7 @@ FROM (
     ) subq_39
     CROSS JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['__booking_value']
+      -- Select: ['__booking_value']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -61,7 +61,7 @@ FROM (
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
-        -- Pass Only Elements: ['__booking_value', 'booking__is_instant']
+        -- Select: ['__booking_value', 'booking__is_instant']
         SELECT
           is_instant AS booking__is_instant
           , booking_value

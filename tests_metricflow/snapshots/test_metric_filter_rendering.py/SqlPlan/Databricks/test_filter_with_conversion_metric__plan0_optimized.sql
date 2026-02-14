@@ -3,7 +3,7 @@ test_filename: test_metric_filter_rendering.py
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -21,7 +21,7 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__listings', 'user__visit_buy_conversion_rate']
+  -- Select: ['__listings', 'user__visit_buy_conversion_rate']
   SELECT
     CAST(subq_60.__buys AS DOUBLE) / CAST(NULLIF(subq_60.__visits, 0) AS DOUBLE) AS user__visit_buy_conversion_rate
     , subq_43.__listings AS listings
@@ -41,8 +41,8 @@ FROM (
       , MAX(subq_59.__buys) AS __buys
     FROM (
       -- Read From CTE For node_id=sma_28019
-      -- Pass Only Elements: ['__visits', 'user']
-      -- Pass Only Elements: ['__visits', 'user']
+      -- Select: ['__visits', 'user']
+      -- Select: ['__visits', 'user']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         sma_28019_cte.user
@@ -53,8 +53,8 @@ FROM (
     ) subq_48
     FULL OUTER JOIN (
       -- Find conversions for user within the range of INF
-      -- Pass Only Elements: ['__buys', 'user']
-      -- Pass Only Elements: ['__buys', 'user']
+      -- Select: ['__buys', 'user']
+      -- Select: ['__buys', 'user']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         subq_55.user

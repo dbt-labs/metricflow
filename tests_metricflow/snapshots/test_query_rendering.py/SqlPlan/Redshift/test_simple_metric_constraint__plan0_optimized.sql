@@ -16,7 +16,7 @@ FROM (
     , MAX(subq_43.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['__average_booking_value', '__bookings', 'metric_time__day']
+    -- Select: ['__average_booking_value', '__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -25,7 +25,7 @@ FROM (
       , SUM(bookings) AS bookings
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__average_booking_value', '__bookings', 'listing__is_lux_latest', 'metric_time__day']
+      -- Select: ['__average_booking_value', '__bookings', 'listing__is_lux_latest', 'metric_time__day']
       SELECT
         subq_28.metric_time__day AS metric_time__day
         , listings_latest_src_28000.is_lux AS listing__is_lux_latest
@@ -53,8 +53,8 @@ FROM (
   FULL OUTER JOIN (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__booking_value', 'metric_time__day']
-    -- Pass Only Elements: ['__booking_value', 'metric_time__day']
+    -- Select: ['__booking_value', 'metric_time__day']
+    -- Select: ['__booking_value', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

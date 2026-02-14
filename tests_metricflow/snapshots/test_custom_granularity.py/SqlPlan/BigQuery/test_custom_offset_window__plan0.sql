@@ -22,12 +22,12 @@ FROM (
         subq_15.metric_time__day
         , SUM(subq_15.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'metric_time__day']
+        -- Select: ['__bookings', 'metric_time__day']
         SELECT
           subq_14.metric_time__day
           , subq_14.__bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'metric_time__day']
+          -- Select: ['__bookings', 'metric_time__day']
           SELECT
             subq_13.metric_time__day
             , subq_13.__bookings
@@ -142,12 +142,12 @@ FROM (
               , subq_5.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
               , subq_5.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
             FROM (
-              -- Pass Only Elements: ['ds__day', 'metric_time__day']
+              -- Select: ['ds__day', 'metric_time__day']
               SELECT
                 subq_11.ds__day
                 , subq_11.metric_time__day
               FROM (
-                -- Pass Only Elements: ['ds__day', 'metric_time__day']
+                -- Select: ['ds__day', 'metric_time__day']
                 SELECT
                   subq_10.ds__day
                   , subq_10.metric_time__day

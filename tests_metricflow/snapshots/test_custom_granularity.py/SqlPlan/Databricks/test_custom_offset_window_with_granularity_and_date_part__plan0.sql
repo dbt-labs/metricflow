@@ -30,14 +30,14 @@ FROM (
         , subq_16.metric_time__extract_year
         , SUM(subq_16.__bookings) AS __bookings
       FROM (
-        -- Pass Only Elements: ['__bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
+        -- Select: ['__bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
         SELECT
           subq_15.metric_time__alien_day
           , subq_15.booking__ds__month
           , subq_15.metric_time__extract_year
           , subq_15.__bookings
         FROM (
-          -- Pass Only Elements: ['__bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
+          -- Select: ['__bookings', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__alien_day']
           SELECT
             subq_14.metric_time__alien_day
             , subq_14.booking__ds__month
@@ -156,14 +156,14 @@ FROM (
               , subq_5.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
               , subq_13.alien_day AS metric_time__alien_day
             FROM (
-              -- Pass Only Elements: ['ds__day', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__day']
+              -- Select: ['ds__day', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__day']
               SELECT
                 subq_11.ds__day
                 , subq_11.booking__ds__month
                 , subq_11.metric_time__extract_year
                 , subq_11.metric_time__day
               FROM (
-                -- Pass Only Elements: ['ds__day', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__day']
+                -- Select: ['ds__day', 'booking__ds__month', 'metric_time__extract_year', 'metric_time__day']
                 SELECT
                   subq_10.ds__day
                   , subq_10.booking__ds__month

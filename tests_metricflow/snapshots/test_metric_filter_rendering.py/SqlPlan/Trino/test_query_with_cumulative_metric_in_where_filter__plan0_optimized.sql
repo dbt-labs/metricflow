@@ -7,7 +7,7 @@ docstring:
 sql_engine: Trino
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['__listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -15,7 +15,7 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['__listings', 'user__revenue_all_time']
+  -- Select: ['__listings', 'user__revenue_all_time']
   SELECT
     subq_30.user__revenue_all_time AS user__revenue_all_time
     , subq_22.__listings AS listings
@@ -30,12 +30,12 @@ FROM (
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['__revenue', 'user']
-    -- Pass Only Elements: ['__revenue', 'user']
+    -- Select: ['__revenue', 'user']
+    -- Select: ['__revenue', 'user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['user', 'user__revenue_all_time']
+    -- Select: ['user', 'user__revenue_all_time']
     SELECT
       user_id AS user
       , SUM(revenue) AS user__revenue_all_time

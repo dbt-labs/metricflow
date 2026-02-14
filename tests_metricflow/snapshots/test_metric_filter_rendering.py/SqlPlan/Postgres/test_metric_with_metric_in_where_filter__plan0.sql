@@ -19,7 +19,7 @@ FROM (
       subq_16.metric_time__day
       , SUM(subq_16.__active_listings) AS __active_listings
     FROM (
-      -- Pass Only Elements: ['__active_listings', 'metric_time__day']
+      -- Select: ['__active_listings', 'metric_time__day']
       SELECT
         subq_15.metric_time__day
         , subq_15.__active_listings
@@ -30,7 +30,7 @@ FROM (
           , subq_14.metric_time__day
           , subq_14.listing__bookings
         FROM (
-          -- Pass Only Elements: ['__active_listings', 'metric_time__day', 'listing__bookings']
+          -- Select: ['__active_listings', 'metric_time__day', 'listing__bookings']
           SELECT
             subq_13.metric_time__day
             , subq_13.listing__bookings
@@ -245,7 +245,7 @@ FROM (
               ) subq_4
             ) subq_5
             LEFT OUTER JOIN (
-              -- Pass Only Elements: ['listing', 'listing__bookings']
+              -- Select: ['listing', 'listing__bookings']
               SELECT
                 subq_11.listing
                 , subq_11.listing__bookings
@@ -260,12 +260,12 @@ FROM (
                     subq_9.listing
                     , SUM(subq_9.__bookings) AS __bookings
                   FROM (
-                    -- Pass Only Elements: ['__bookings', 'listing']
+                    -- Select: ['__bookings', 'listing']
                     SELECT
                       subq_8.listing
                       , subq_8.__bookings
                     FROM (
-                      -- Pass Only Elements: ['__bookings', 'listing']
+                      -- Select: ['__bookings', 'listing']
                       SELECT
                         subq_7.listing
                         , subq_7.__bookings

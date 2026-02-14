@@ -25,8 +25,8 @@ FROM (
     , MAX(subq_33.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['__bookings', 'metric_time__quarter']
-    -- Pass Only Elements: ['__bookings', 'metric_time__quarter']
+    -- Select: ['__bookings', 'metric_time__quarter']
+    -- Select: ['__bookings', 'metric_time__quarter']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -38,8 +38,8 @@ FROM (
   ) subq_23
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['__bookings', 'metric_time__quarter']
-    -- Pass Only Elements: ['__bookings', 'metric_time__quarter']
+    -- Select: ['__bookings', 'metric_time__quarter']
+    -- Select: ['__bookings', 'metric_time__quarter']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT

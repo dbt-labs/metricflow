@@ -56,7 +56,7 @@ docstring:
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
-                <!-- description = "Pass Only Elements: ['__bookings', 'is_instant']" -->
+                <!-- description = "Select: ['__bookings', 'is_instant']" -->
                 <!-- node_id = NodeId(id_str='ss_1') -->
                 <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_1), column_alias='is_instant') -->
                 <!-- col1 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_0), column_alias='__bookings') -->
@@ -515,7 +515,7 @@ docstring:
             <!-- where = None -->
             <!-- distinct = False -->
             <SqlSelectStatementNode>
-                <!-- description = "Pass Only Elements: ['__instant_bookings', '__bookers', 'is_instant']" -->
+                <!-- description = "Select: ['__instant_bookings', '__bookers', 'is_instant']" -->
                 <!-- node_id = NodeId(id_str='ss_4') -->
                 <!-- col0 = SqlSelectColumn(expr=SqlColumnReferenceExpression(node_id=cr_7), column_alias='is_instant') -->
                 <!-- col1 =                                                                                                -->

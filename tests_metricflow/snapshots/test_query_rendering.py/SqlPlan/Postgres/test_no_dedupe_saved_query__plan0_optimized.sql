@@ -3,14 +3,14 @@ test_filename: test_query_rendering.py
 sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing__capacity_latest', 'metric_time__month']
+-- Select: ['listing__capacity_latest', 'metric_time__month']
 -- Write to DataTable
 SELECT
   metric_time__month
   , listing__capacity_latest
 FROM (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['listing__capacity_latest', 'user__home_state_latest', 'metric_time__month']
+  -- Select: ['listing__capacity_latest', 'user__home_state_latest', 'metric_time__month']
   SELECT
     DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
     , listings_latest_src_28000.capacity AS listing__capacity_latest

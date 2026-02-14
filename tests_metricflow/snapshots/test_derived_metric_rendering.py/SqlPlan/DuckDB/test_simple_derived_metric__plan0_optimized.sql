@@ -9,8 +9,8 @@ SELECT
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: ['__bookings', '__referred_bookings', '__instant_bookings', '__booking_value']
-  -- Pass Only Elements: ['__bookings', '__referred_bookings', '__instant_bookings', '__booking_value']
+  -- Select: ['__bookings', '__referred_bookings', '__instant_bookings', '__booking_value']
+  -- Select: ['__bookings', '__referred_bookings', '__instant_bookings', '__booking_value']
   -- Aggregate Inputs for Simple Metrics
   -- Compute Metrics via Expressions
   SELECT

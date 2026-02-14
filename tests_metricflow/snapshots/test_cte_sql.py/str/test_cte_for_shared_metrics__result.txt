@@ -14,8 +14,8 @@ sql_without_cte:
     , MAX(CAST(subq_21.bookings AS DOUBLE) / CAST(NULLIF(subq_21.views, 0) AS DOUBLE)) AS bookings_per_view
   FROM (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
-    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -41,8 +41,8 @@ sql_without_cte:
   ) subq_9
   FULL OUTER JOIN (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
-    -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__views', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__views', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -81,8 +81,8 @@ sql_without_cte:
       , MAX(subq_20.views) AS views
     FROM (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
-      -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
+      -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -108,8 +108,8 @@ sql_without_cte:
     ) subq_19
     FULL OUTER JOIN (
       -- Join Standard Outputs
-      -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
-      -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
+      -- Select: ['__views', 'listing__country_latest', 'metric_time__day']
+      -- Select: ['__views', 'listing__country_latest', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       -- Compute Metrics via Expressions
       SELECT
@@ -159,8 +159,8 @@ sql_with_cte:
   -- Write to DataTable
   WITH cm_0_cte AS (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
-    -- Pass Only Elements: ['__bookings', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -187,8 +187,8 @@ sql_with_cte:
 
   , cm_1_cte AS (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
-    -- Pass Only Elements: ['__views', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__views', 'listing__country_latest', 'metric_time__day']
+    -- Select: ['__views', 'listing__country_latest', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
