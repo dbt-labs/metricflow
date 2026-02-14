@@ -14,6 +14,7 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow.sql.render.athena import AthenaSqlPlanRenderer
 from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlPlanRenderer
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
@@ -35,6 +36,7 @@ DATABRICKS_CLUSTER_EXPLAIN_PLAN_ERROR_KEY = "org.apache.spark.sql.AnalysisExcept
 class SupportedAdapterTypes(enum.Enum):
     """Enumeration of supported dbt adapter types."""
 
+    ATHENA = "athena"
     DATABRICKS = "databricks"
     POSTGRES = "postgres"
     SNOWFLAKE = "snowflake"
@@ -46,7 +48,9 @@ class SupportedAdapterTypes(enum.Enum):
     @property
     def sql_engine_type(self) -> SqlEngine:
         """Return the SqlEngine corresponding to the supported adapter type."""
-        if self is SupportedAdapterTypes.BIGQUERY:
+        if self is SupportedAdapterTypes.ATHENA:
+            return SqlEngine.ATHENA
+        elif self is SupportedAdapterTypes.BIGQUERY:
             return SqlEngine.BIGQUERY
         elif self is SupportedAdapterTypes.DATABRICKS:
             return SqlEngine.DATABRICKS
@@ -66,7 +70,9 @@ class SupportedAdapterTypes(enum.Enum):
     @property
     def sql_plan_renderer(self) -> SqlPlanRenderer:
         """Return the SqlPlanRenderer corresponding to the supported adapter type."""
-        if self is SupportedAdapterTypes.BIGQUERY:
+        if self is SupportedAdapterTypes.ATHENA:
+            return AthenaSqlPlanRenderer()
+        elif self is SupportedAdapterTypes.BIGQUERY:
             return BigQuerySqlPlanRenderer()
         elif self is SupportedAdapterTypes.DATABRICKS:
             return DatabricksSqlPlanRenderer()

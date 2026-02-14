@@ -170,6 +170,15 @@ description = "Dev environment for working with Trino"
 template = "dev-env"
 features = ["trino-env-requirements"]
 
+[tool.hatch.envs.athena-env.env-vars]
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
+MF_TEST_ADAPTER_TYPE="athena"
+
+[tool.hatch.envs.athena-env]
+description = "Dev environment for working with the Athena adapter"
+template = "dev-env"
+extra-dependencies = ["dbt-athena>=1.8.0, <1.10.0"]
+
 
 [tool.black]
 line-length = 120
