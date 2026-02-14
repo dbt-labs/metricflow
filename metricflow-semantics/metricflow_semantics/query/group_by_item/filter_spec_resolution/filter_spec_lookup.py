@@ -216,3 +216,4 @@ class PatternAssociationForWhereFilterGroupByItem:
     call_parameter_set: CallParameterSet
     object_builder_str: str
     spec_pattern: SpecPattern
+    is_optional: bool = False

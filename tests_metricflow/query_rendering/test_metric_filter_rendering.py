@@ -67,6 +67,91 @@ def test_metric_with_metric_in_where_filter(
 
 
 @pytest.mark.sql_engine_snapshot
+def test_query_with_metric_in_where_filter_with_metric_time(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a query with a metric in the query-level where filter using metric_time."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('bookings', ['listing', 'metric_time']) }} > 2",
+            )
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_query_with_metric_in_where_filter_with_metric_time_grain(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests that metric_time grains in filters align to the query's granularity."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        group_by_names=("metric_time__month",),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Metric('bookings', ['listing', 'metric_time__day']) }} > 2",
+            )
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_metric_with_metric_time_in_where_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Tests a metric definition filter that includes metric_time in group by."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("active_listings_with_metric_time",),
+        group_by_names=("metric_time__day",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
 def test_query_with_derived_metric_in_where_filter(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,

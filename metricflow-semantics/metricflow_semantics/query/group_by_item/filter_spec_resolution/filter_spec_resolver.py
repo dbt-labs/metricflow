@@ -5,10 +5,11 @@ import logging
 from collections import defaultdict
 from typing import Dict, List, Optional, Sequence, Set, Union
 
-from dbt_semantic_interfaces.call_parameter_sets import JinjaCallParameterSets, MetricCallParameterSet
+from dbt_semantic_interfaces.call_parameter_sets import JinjaCallParameterSets, TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.protocols import WhereFilter
-from dbt_semantic_interfaces.references import EntityReference
+from dbt_semantic_interfaces.references import TimeDimensionReference
 from typing_extensions import override
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -197,18 +198,11 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     ),
                 )
             )
+        time_dimension_call_parameter_sets = set(filter_call_parameter_sets.time_dimension_call_parameter_sets)
         for metric_call_parameter_set in filter_call_parameter_sets.metric_call_parameter_sets:
-            # Convert LinkableElementReferences to EntityReferences. Will need to support dimensions later.
-            updated_metric_call_parameter_set = MetricCallParameterSet(
-                metric_reference=metric_call_parameter_set.metric_reference,
-                group_by=tuple(
-                    EntityReference(element_name=group_by_ref.element_name)
-                    for group_by_ref in metric_call_parameter_set.group_by
-                ),
-            )
             patterns_in_filter.append(
                 PatternAssociationForWhereFilterGroupByItem(
-                    call_parameter_set=updated_metric_call_parameter_set,
+                    call_parameter_set=metric_call_parameter_set,
                     object_builder_str=ObjectBuilderNameConverter.input_str_from_metric_call_parameter_set(
                         metric_call_parameter_set
                     ),
@@ -217,6 +211,29 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     ),
                 )
             )
+            if any(
+                group_by_ref.element_name == METRIC_TIME_ELEMENT_NAME
+                for group_by_ref in metric_call_parameter_set.group_by
+            ):
+                metric_time_call_parameter_set = TimeDimensionCallParameterSet(
+                    entity_path=(),
+                    time_dimension_reference=TimeDimensionReference(METRIC_TIME_ELEMENT_NAME),
+                    time_granularity_name=None,
+                    date_part=None,
+                )
+                if metric_time_call_parameter_set not in time_dimension_call_parameter_sets:
+                    patterns_in_filter.append(
+                        PatternAssociationForWhereFilterGroupByItem(
+                            call_parameter_set=metric_time_call_parameter_set,
+                            object_builder_str=ObjectBuilderNameConverter.input_str_from_time_dimension_call_parameter_set(
+                                metric_time_call_parameter_set
+                            ),
+                            spec_pattern=self._spec_pattern_factory.create_for_time_dimension_call_parameter_set(
+                                metric_time_call_parameter_set
+                            ),
+                            is_optional=True,
+                        )
+                    )
 
         return patterns_in_filter
 
@@ -398,6 +415,10 @@ class _ResolveWhereFilterSpecVisitor(GroupByItemResolutionNodeVisitor[FilterSpec
                     resolution_node=current_node,
                     filter_location=filter_location,
                 )
+                if group_by_item_in_where_filter.is_optional and (
+                    group_by_item_resolution.spec is None or group_by_item_resolution.issue_set.has_errors
+                ):
+                    continue
                 # The paths in the issue set are generated relative to the current node. For error messaging, it seems more
                 # helpful for those paths to be relative to the query. To do, we have to add nodes from the resolution path.
                 # e.g. if the current node is B, and the resolution path is [A, B], an issue might have the relative path

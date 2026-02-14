@@ -18,6 +18,7 @@ from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import (
     DimensionReference,
     EntityReference,
+    GroupByItemReference,
     MetricReference,
     SemanticModelReference,
     TimeDimensionReference,
@@ -501,7 +502,7 @@ def test_metric_in_filter(  # noqa: D103
         column_association_resolver=column_association_resolver,
         spec_resolution_lookup=create_spec_lookup(
             call_parameter_set=MetricCallParameterSet(
-                group_by=(EntityReference("listing"),),
+                group_by=(GroupByItemReference("listing"),),
                 metric_reference=MetricReference("bookings"),
             ),
             resolved_spec=group_by_metric_spec,

@@ -10,6 +10,7 @@ from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
@@ -120,7 +121,7 @@ class SourceNodeBuilder:
         )
 
     def build_source_node_inputs_for_group_by_metric(
-        self, group_by_metric_spec: GroupByMetricSpec
+        self, group_by_metric_spec: GroupByMetricSpec, time_dimension_specs: Sequence[TimeDimensionSpec] = ()
     ) -> MetricFlowQuerySpec:
         """Build source node inputs used to satisfy requested group by metrics.
 
@@ -130,4 +131,6 @@ class SourceNodeBuilder:
         This is just a wrapper around the query parser method, stored here to limit the scope of the DataFlowPlanBuilder's
         dependency on the query parser to only source nodes.
         """
-        return self._query_parser.build_query_spec_for_group_by_metric_source_node(group_by_metric_spec)
+        return self._query_parser.build_query_spec_for_group_by_metric_source_node(
+            group_by_metric_spec, time_dimension_specs=time_dimension_specs
+        )
