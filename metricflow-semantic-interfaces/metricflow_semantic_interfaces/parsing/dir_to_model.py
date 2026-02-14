@@ -392,7 +392,7 @@ def parse_config_yaml(
                         extra_detail="".join(traceback.format_tb(e.__traceback__)),
                     )
                 )
-    # If a runtime error occured, we still want this to break things
+    # If a runtime error occurred, we still want this to break things
     except RuntimeError:
         raise
     # Any other error should be handled as an issue  # type: ignore[misc]
