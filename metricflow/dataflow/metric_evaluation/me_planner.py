@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from collections.abc import Iterable, Mapping, Sequence, Set
+from collections.abc import Iterable, Mapping, Sequence, Set, Sized
 from functools import cached_property
 from typing import Optional
 
@@ -131,7 +131,7 @@ class MetricDescriptor:
 
 
 @fast_frozen_dataclass()
-class MetricDescriptorSet:
+class MetricDescriptorSet(Sized):
     computed_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
     passthrough_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
 
@@ -145,18 +145,31 @@ class MetricDescriptorSet:
             passthrough_metric_descriptors=FrozenOrderedSet(passthrough_metric_descriptors),
         )
 
-
-@fast_frozen_dataclass()
-class MetricQuery(ABC):
-    computed_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
-    passthrough_metric_descriptors: FrozenOrderedSet[MetricDescriptor]
-
     @cached_property
     def all_descriptors(self) -> OrderedSet[MetricDescriptor]:
         return self.computed_metric_descriptors.union(self.passthrough_metric_descriptors)
 
+    def prune(self, allowed_descriptors: Set[MetricDescriptor]) -> MetricDescriptorSet:
+        return MetricDescriptorSet.create(
+            computed_metric_descriptors=(
+                descriptor for descriptor in self.computed_metric_descriptors if descriptor in allowed_descriptors
+            ),
+            passthrough_metric_descriptors=(
+                descriptor for descriptor in self.passthrough_metric_descriptors if descriptor in allowed_descriptors
+            ),
+        )
+
+    @override
+    def __len__(self) -> int:
+        return len(self.computed_metric_descriptors) + len(self.passthrough_metric_descriptors)
+
+
+@fast_frozen_dataclass()
+class MetricQuery(ABC):
+    descriptor_set: MetricDescriptorSet
+
     @abstractmethod
-    def pruned_query(self, required_metric_descriptors: Set[MetricDescriptor]) -> Optional[MetricQuery]:
+    def pruned_query(self, allowed_metric_descriptors: Set[MetricDescriptor]) -> Optional[MetricQuery]:
         raise NotImplementedError
 
 
@@ -167,29 +180,34 @@ class BaseMetricQuery(MetricQuery):
     @staticmethod
     def create(
         model_id: SemanticModelId,
-        computed_metric_descriptors: Optional[Iterable[MetricDescriptor]] = None,
+        computed_metric_descriptors: Iterable[MetricDescriptor],
     ) -> BaseMetricQuery:
         return BaseMetricQuery(
-            computed_metric_descriptors=FrozenOrderedSet(computed_metric_descriptors),
-            passthrough_metric_descriptors=FrozenOrderedSet(),
+            descriptor_set=MetricDescriptorSet.create(
+                computed_metric_descriptors=computed_metric_descriptors,
+                passthrough_metric_descriptors=(),
+            ),
             model_id=model_id,
         )
 
     @override
-    def pruned_query(self, required_metric_descriptors: Set[MetricDescriptor]) -> Optional[MetricQuery]:
-        filtered_computed_metric_descriptors = tuple(
-            computed_metric_descriptor for computed_metric_descriptor in self.computed_metric_descriptors
-            if computed_metric_descriptor in required_metric_descriptors
+    def pruned_query(self, allowed_metric_descriptors: Set[MetricDescriptor]) -> Optional[MetricQuery]:
+        pruned_descriptor_set = self.descriptor_set.prune(allowed_metric_descriptors)
+        if len(pruned_descriptor_set.all_descriptors) == 0:
+            return None
+        return BaseMetricQuery(
+            descriptor_set=pruned_descriptor_set,
+            model_id=self.model_id,
         )
-
-
-
 
 
 @fast_frozen_dataclass()
 class RecursiveMetricQuery(MetricQuery, MetricFlowPrettyFormattable):
-    _input_query_and_required_metric_descriptors_items: MappingItemsTuple[
+    _input_query_and_referenced_metric_descriptors_items: MappingItemsTuple[
         MetricQuery, FrozenOrderedSet[MetricDescriptor]
+    ]
+    _output_descriptor_to_input_descriptors_items: MappingItemsTuple[
+        MetricDescriptor, FrozenOrderedSet[MetricDescriptor]
     ]
 
     @staticmethod
@@ -199,19 +217,21 @@ class RecursiveMetricQuery(MetricQuery, MetricFlowPrettyFormattable):
         input_query_to_required_descriptors: Mapping[MetricQuery, OrderedSet[MetricDescriptor]],
     ) -> RecursiveMetricQuery:
         return RecursiveMetricQuery(
-            computed_metric_descriptors=FrozenOrderedSet(computed_metric_descriptors),
-            passthrough_metric_descriptors=FrozenOrderedSet(passthrough_metric_descriptors),
-            _input_query_and_required_metric_descriptors_items=tuple(
-                (input_query, FrozenOrderedSet(passthrough_descriptors))
-                for input_query, passthrough_descriptors in input_query_to_required_descriptors.items()
+            descriptor_set=MetricDescriptorSet.create(
+                computed_metric_descriptors=computed_metric_descriptors,
+                passthrough_metric_descriptors=passthrough_metric_descriptors,
+            ),
+            _input_query_and_referenced_metric_descriptors_items=tuple(
+                (input_query, FrozenOrderedSet(referenced_descriptors))
+                for input_query, referenced_descriptors in input_query_to_required_descriptors.items()
             ),
         )
 
     @cached_property
-    def input_query_to_required_descriptors(self) -> Mapping[MetricQuery, FrozenOrderedSet[MetricDescriptor]]:
+    def input_query_to_referenced_descriptors(self) -> Mapping[MetricQuery, FrozenOrderedSet[MetricDescriptor]]:
         return {
             input_query: passthrough_descriptor
-            for input_query, passthrough_descriptor in self._input_query_and_required_metric_descriptors_items
+            for input_query, passthrough_descriptor in self._input_query_and_referenced_metric_descriptors_items
         }
 
     @override
@@ -219,10 +239,49 @@ class RecursiveMetricQuery(MetricQuery, MetricFlowPrettyFormattable):
         return format_context.formatter.pretty_format_object_by_parts(
             class_name=self.__class__.__name__,
             field_mapping={
-                "computed_metric_descriptors": self.computed_metric_descriptors,
-                "passthrough_metric_descriptors": self.passthrough_metric_descriptors,
-                "input_query_to_required_descriptors": self.input_query_to_required_descriptors,
+                "computed_metric_descriptors": self.descriptor_set.computed_metric_descriptors,
+                "passthrough_metric_descriptors": self.descriptor_set.passthrough_metric_descriptors,
+                "input_query_to_referenced_descriptors": self.input_query_to_referenced_descriptors,
             },
+        )
+
+    @override
+    def pruned_query(self, allowed_metric_descriptors: Set[MetricDescriptor]) -> Optional[MetricQuery]:
+        new_input_query_to_referenced_descriptors: dict[MetricQuery, FrozenOrderedSet[MetricDescriptor]] = {}
+        for input_query, referenced_metric_descriptors in self._input_query_and_referenced_metric_descriptors_items:
+            pruned_metric_descriptors = FrozenOrderedSet(
+                metric_descriptor
+                for metric_descriptor in referenced_metric_descriptors
+                if metric_descriptor in allowed_metric_descriptors
+            )
+            if len(pruned_metric_descriptors) == 0:
+                continue
+
+            pruned_query = input_query.pruned_query(pruned_metric_descriptors)
+            if pruned_query is None:
+                continue
+            new_input_query_to_referenced_descriptors[pruned_query] = pruned_metric_descriptors
+
+        if len(new_input_query_to_referenced_descriptors) == 0:
+            return None
+
+        pruned_descriptor_set = self.descriptor_set.prune(allowed_metric_descriptors)
+
+        if len(pruned_descriptor_set) == 0:
+            return None
+
+        return RecursiveMetricQuery.create(
+            computed_metric_descriptors=(
+                descriptor
+                for descriptor in self.descriptor_set.computed_metric_descriptors
+                if descriptor in allowed_metric_descriptors
+            ),
+            passthrough_metric_descriptors=(
+                descriptor
+                for descriptor in self.descriptor_set.passthrough_metric_descriptors
+                if descriptor in allowed_metric_descriptors
+            ),
+            input_query_to_required_descriptors=new_input_query_to_referenced_descriptors,
         )
 
     # _descriptor_to_query_mapping_items: MappingItemsTuple[MetricDescriptor, MetricQuery]
@@ -238,22 +297,22 @@ class RecursiveMetricQuery(MetricQuery, MetricFlowPrettyFormattable):
     #     }
 
 
-class MetricQueryGroup:
-    def __init__(self, metric_queries: Iterable[MetricQuery]) -> None:
-        self._metric_queries: MutableOrderedSet[MetricQuery] = MutableOrderedSet()
-        self._metric_name_to_metric_queries: defaultdict[str, MutableOrderedSet[MetricQuery]] = defaultdict(
-            MutableOrderedSet
-        )
-
-        for metric_query in metric_queries:
-            self.add_metric_query(metric_query)
-
-    def add_metric_query(self, metric_query: MetricQuery) -> None:
-        self._metric_queries.add(metric_query)
-        for computed_metric_descriptor in metric_query.computed_metric_descriptors:
-            self._metric_name_to_metric_queries[computed_metric_descriptor.metric_name].add(metric_query)
-        for passed_metric_descriptor in metric_query.passthrough_metric_descriptors:
-            self._metric_name_to_metric_queries[passed_metric_descriptor.metric_name].add(metric_query)
+# class MetricQueryGroup:
+#     def __init__(self, metric_queries: Iterable[MetricQuery]) -> None:
+#         self._metric_queries: MutableOrderedSet[MetricQuery] = MutableOrderedSet()
+#         self._metric_name_to_metric_queries: defaultdict[str, MutableOrderedSet[MetricQuery]] = defaultdict(
+#             MutableOrderedSet
+#         )
+#
+#         for metric_query in metric_queries:
+#             self.add_metric_query(metric_query)
+#
+#     def add_metric_query(self, metric_query: MetricQuery) -> None:
+#         self._metric_queries.add(metric_query)
+#         for computed_metric_descriptor in metric_query.computed_metric_descriptors:
+#             self._metric_name_to_metric_queries[computed_metric_descriptor.metric_name].add(metric_query)
+#         for passed_metric_descriptor in metric_query.passthrough_metric_descriptors:
+#             self._metric_name_to_metric_queries[passed_metric_descriptor.metric_name].add(metric_query)
 
 
 class MetricDescriptorCollector:
@@ -305,7 +364,7 @@ class JoinCountOptimizedMetricEvaluationPlanner:
     def build_plan(self, metric_specs: Iterable[MetricSpec]) -> None:
         # Figure out all forms of metrics that are required.
         descriptor_collector = MetricDescriptorCollector()
-        top_level_query_metric_descriptors = tuple(
+        top_level_query_metric_descriptors = FrozenOrderedSet(
             MetricDescriptor.create_from_spec(metric_spec) for metric_spec in metric_specs
         )
         logger.debug(
@@ -406,6 +465,13 @@ class JoinCountOptimizedMetricEvaluationPlanner:
                 top_level_query=top_level_query,
             )
         )
+
+        logger.debug(
+            LazyFormat(
+                "Generated pruned top-level query",
+                top_level_query=top_level_query.pruned_query(top_level_query_metric_descriptors),
+            )
+        )
         return None
 
     def _prune_query(self, metric_query: MetricQuery, required_metrics: OrderedSet[MetricDescriptor]) -> MetricQuery:
@@ -470,7 +536,7 @@ class JoinCountOptimizedMetricEvaluationPlanner:
                 for input_descriptor, query in input_descriptor_to_query.items():
                     passthrough_descriptors_for_query = tuple(
                         descriptor
-                        for descriptor in query.all_descriptors
+                        for descriptor in query.descriptor_set.all_descriptors
                         if descriptor not in computed_metric_descriptors
                     )
                     input_query_to_required_metric_descriptors[query].update(passthrough_descriptors_for_query)
@@ -504,7 +570,7 @@ class JoinCountOptimizedMetricEvaluationPlanner:
         while remaining_input_descriptors:
             input_descriptor = mf_first_item(remaining_input_descriptors)
             queries_with_input_descriptor = tuple(
-                query for query in candidate_queries if input_descriptor in query.computed_metric_descriptors
+                query for query in candidate_queries if input_descriptor in query.descriptor_set.all_descriptors
             )
             match_count = len(queries_with_input_descriptor)
             if match_count == 0:
@@ -526,7 +592,9 @@ class JoinCountOptimizedMetricEvaluationPlanner:
                 )
             input_query = queries_with_input_descriptor[0]
 
-            resolved_input_descriptors = remaining_input_descriptors.intersection(input_query.all_descriptors)
+            resolved_input_descriptors = remaining_input_descriptors.intersection(
+                input_query.descriptor_set.all_descriptors
+            )
 
             for metric_descriptor in resolved_input_descriptors:
                 input_descriptor_to_candidate_query[metric_descriptor] = input_query
