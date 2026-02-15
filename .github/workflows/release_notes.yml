@@ -1,0 +1,36 @@
+# **what?**
+# Open an issue in https://github.com/dbt-labs/docs-internal when a PR is merged in the target team's repo
+
+# **why?**
+# To ensure timely documentation updates coincide with new releases
+
+# **when?**
+# When a PR in the target team's repo is merged and has the 'release_note' label
+
+name: Open issues in docs-internal repo when a PR is merged
+run-name: "Create an issue in docs-internal for PR #${{ github.event.pull_request.number }}"
+
+on:
+  pull_request_target:
+    types: [closed, labeled]
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+    issues: write
+
+jobs:
+  create_issue:
+    # Only run this job when a PR is merged and has the 'release_note' label
+   if: >
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'release_note')
+    uses: dbt-labs/actions/.github/workflows/open-issue-in-repo.yml@main
+    with:
+        issue_repository: "dbt-labs/docs-internal"
+        issue_title: "Release Note: Changes from ${{ github.event.repository.name }} PR #${{ github.event.pull_request.number }}"
+        issue_body: "Please review the merged PR and create appropriate release notes in the documentation. Link to the merged PR: ${{ github.event.pull_request.html_url }}"
+    secrets:
+      FISHTOWN_BOT_PAT: ${{ secrets.FA_ASSISTANT_PAT_TOKEN }}
