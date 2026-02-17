@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
-from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 
@@ -17,7 +17,7 @@ from metricflow_semantics.toolkit.visitor import VisitorOutputT
 class MetricSpec(InstanceSpec):  # noqa: D101
     # Time-over-time could go here
     element_name: str
-    filter_spec_set: WhereFilterSpecSet = WhereFilterSpecSet()
+    where_filter_specs: Tuple[WhereFilterSpec, ...] = ()
     alias: Optional[str] = None
     offset_window: Optional[PydanticMetricTimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
@@ -49,13 +49,13 @@ class MetricSpec(InstanceSpec):  # noqa: D101
 
     def without_offset(self) -> MetricSpec:
         """Represents the metric spec with any time offsets removed."""
-        return MetricSpec(element_name=self.element_name, filter_spec_set=self.filter_spec_set, alias=self.alias)
+        return MetricSpec(element_name=self.element_name, where_filter_specs=self.where_filter_specs, alias=self.alias)
 
     def with_alias(self, alias: Optional[str]) -> MetricSpec:
         """Add the alias to the metric spec."""
         return MetricSpec(
             element_name=self.element_name,
-            filter_spec_set=self.filter_spec_set,
+            where_filter_specs=self.where_filter_specs,
             alias=alias,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,

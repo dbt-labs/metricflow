@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Optional
+from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
-from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
+from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
@@ -43,9 +44,9 @@ class SimpleMetricRecipe:
     simple_metric_input: SimpleMetricInput
 
     # For the filter defined in `simple_metric_input`
-    metric_filter_spec_set: WhereFilterSpecSet
+    metric_filter_specs: Tuple[WhereFilterSpec, ...]
     # For additional filters that might be needed (e.g. a filter defined in a derived metric or query).
-    additional_filter_spec_set: WhereFilterSpecSet
+    additional_filter_specs: Tuple[WhereFilterSpec, ...]
 
     offset_window: Optional[MetricTimeWindow]
     offset_to_grain: Optional[TimeGranularity]
@@ -54,8 +55,8 @@ class SimpleMetricRecipe:
     after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
 
     @cached_property
-    def combined_filter_spec_set(self) -> WhereFilterSpecSet:  # noqa: D102
-        return self.metric_filter_spec_set.merge(self.additional_filter_spec_set)
+    def combined_filter_specs(self) -> Sequence[WhereFilterSpec]:  # noqa: D102
+        return self.metric_filter_specs + self.additional_filter_specs
 
 
 @dataclass(frozen=True)
