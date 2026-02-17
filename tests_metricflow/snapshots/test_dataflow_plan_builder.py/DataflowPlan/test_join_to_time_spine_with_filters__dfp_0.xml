@@ -10,39 +10,35 @@ docstring:
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec =                                          -->
-            <!--   MetricSpec(                                          -->
-            <!--     element_name='bookings_fill_nulls_with_0',         -->
-            <!--     filter_spec_set=WhereFilterSpecSet(                -->
-            <!--       query_level_filter_specs=(                       -->
-            <!--         WhereFilterSpec(                               -->
-            <!--           where_sql="metric_time__day = '2020-01-01'", -->
-            <!--           bind_parameters=SqlBindParameterSet(),       -->
-            <!--           element_set=GroupByItemSet(                  -->
-            <!--             annotated_specs=(                          -->
-            <!--               AnnotatedSpec(                           -->
-            <!--                 element_type=TIME_DIMENSION,           -->
-            <!--                 element_name='metric_time',            -->
-            <!--                 time_grain=ExpandedTimeGranularity(    -->
-            <!--                   name='day',                          -->
-            <!--                   base_granularity=DAY,                -->
-            <!--                 ),                                     -->
-            <!--                 element_properties=(                   -->
-            <!--                   METRIC_TIME,                         -->
-            <!--                 ),                                     -->
-            <!--                 origin_semantic_model_names=(          -->
-            <!--                   'bookings_source',                   -->
-            <!--                 ),                                     -->
-            <!--                 derived_from_semantic_model_names=(    -->
-            <!--                   'bookings_source',                   -->
-            <!--                 ),                                     -->
-            <!--               ),                                       -->
-            <!--             ),                                         -->
-            <!--           ),                                           -->
-            <!--         ),                                             -->
-            <!--       ),                                               -->
-            <!--     ),                                                 -->
-            <!--   )                                                    -->
+            <!-- metric_spec =                                        -->
+            <!--   MetricSpec(                                        -->
+            <!--     element_name='bookings_fill_nulls_with_0',       -->
+            <!--     where_filter_specs=(                             -->
+            <!--       WhereFilterSpec(                               -->
+            <!--         where_sql="metric_time__day = '2020-01-01'", -->
+            <!--         bind_parameters=SqlBindParameterSet(),       -->
+            <!--         element_set=GroupByItemSet(                  -->
+            <!--           annotated_specs=(                          -->
+            <!--             AnnotatedSpec(                           -->
+            <!--               element_type=TIME_DIMENSION,           -->
+            <!--               element_name='metric_time',            -->
+            <!--               time_grain=ExpandedTimeGranularity(    -->
+            <!--                 name='day',                          -->
+            <!--                 base_granularity=DAY,                -->
+            <!--               ),                                     -->
+            <!--               element_properties=(METRIC_TIME,),     -->
+            <!--               origin_semantic_model_names=(          -->
+            <!--                 'bookings_source',                   -->
+            <!--               ),                                     -->
+            <!--               derived_from_semantic_model_names=(    -->
+            <!--                 'bookings_source',                   -->
+            <!--               ),                                     -->
+            <!--             ),                                       -->
+            <!--           ),                                         -->
+            <!--         ),                                           -->
+            <!--       ),                                             -->
+            <!--     ),                                               -->
+            <!--   )                                                  -->
             <ConstrainTimeRangeNode>
                 <!-- description = 'Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]' -->
                 <!-- node_id = NodeId(id_str='ctr_2') -->
