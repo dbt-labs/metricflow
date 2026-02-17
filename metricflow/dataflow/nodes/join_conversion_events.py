@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
@@ -11,6 +10,7 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
@@ -41,7 +41,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
     conversion_time_dimension_spec: TimeDimensionSpec
     unique_identifier_keys: Tuple[InstanceSpec, ...]
     entity_spec: EntitySpec
-    window: Optional[MetricTimeWindow]
+    window: Optional[TimeWindow]
     constant_properties: Optional[Tuple[ConstantPropertySpec, ...]]
 
     @staticmethod
@@ -53,7 +53,7 @@ class JoinConversionEventsNode(DataflowPlanNode):
         conversion_time_dimension_spec: TimeDimensionSpec,
         unique_identifier_keys: Sequence[InstanceSpec],
         entity_spec: EntitySpec,
-        window: Optional[MetricTimeWindow] = None,
+        window: Optional[TimeWindow] = None,
         constant_properties: Optional[Sequence[ConstantPropertySpec]] = None,
     ) -> JoinConversionEventsNode:
         return JoinConversionEventsNode(

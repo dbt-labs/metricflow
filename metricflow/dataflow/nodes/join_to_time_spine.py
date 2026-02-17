@@ -4,11 +4,11 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
@@ -34,7 +34,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
     requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec]
     join_on_time_dimension_spec: TimeDimensionSpec
     join_type: SqlJoinType
-    standard_offset_window: Optional[MetricTimeWindow]
+    standard_offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
 
     def __post_init__(self) -> None:  # noqa: D105
@@ -58,7 +58,7 @@ class JoinToTimeSpineNode(DataflowPlanNode, ABC):
         requested_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
         join_on_time_dimension_spec: TimeDimensionSpec,
         join_type: SqlJoinType,
-        standard_offset_window: Optional[MetricTimeWindow] = None,
+        standard_offset_window: Optional[TimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
     ) -> JoinToTimeSpineNode:
         return JoinToTimeSpineNode(

@@ -3,12 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
@@ -19,7 +18,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
     element_name: str
     where_filter_specs: Tuple[WhereFilterSpec, ...] = ()
     alias: Optional[str] = None
-    offset_window: Optional[PydanticMetricTimeWindow] = None
+    offset_window: Optional[TimeWindow] = None
     offset_to_grain: Optional[TimeGranularity] = None
 
     @staticmethod
@@ -70,14 +69,14 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         )
 
     @property
-    def standard_offset_window(self) -> Optional[MetricTimeWindow]:
+    def standard_offset_window(self) -> Optional[TimeWindow]:
         """Return the offset window if it exists and uses a standard granularity."""
         if self.offset_window and self.offset_window.is_standard_granularity:
             return self.offset_window
         return None
 
     @property
-    def custom_offset_window(self) -> Optional[MetricTimeWindow]:
+    def custom_offset_window(self) -> Optional[TimeWindow]:
         """Return the offset window if it exists and uses a custom granularity."""
         if self.offset_window and not self.offset_window.is_standard_granularity:
             return self.offset_window
