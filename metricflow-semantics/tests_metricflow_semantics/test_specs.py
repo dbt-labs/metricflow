@@ -5,9 +5,6 @@ from typing import Sequence
 import pytest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
-    GroupByItemSet,
-)
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -16,9 +13,6 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
-from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 
@@ -218,60 +212,3 @@ def test_linkless_entity() -> None:
 
     set_with_entity_spec.add(linkless_entity_spec)
     assert len(set_with_entity_spec) == 1
-
-
-@pytest.fixture
-def where_filter_spec_set() -> WhereFilterSpecSet:  # noqa: D103
-    return WhereFilterSpecSet(
-        metric_level_filter_specs=(
-            WhereFilterSpec(
-                where_sql="metric is true",
-                bind_parameters=SqlBindParameterSet(),
-                element_set=GroupByItemSet(),
-            ),
-        ),
-        query_level_filter_specs=(
-            WhereFilterSpec(
-                where_sql="query is true",
-                bind_parameters=SqlBindParameterSet(),
-                element_set=GroupByItemSet(),
-            ),
-        ),
-    )
-
-
-def test_where_filter_spec_set_all_specs(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
-    assert set(where_filter_spec_set.all_filter_specs) == {
-        WhereFilterSpec(
-            where_sql="metric is true",
-            bind_parameters=SqlBindParameterSet(),
-            element_set=GroupByItemSet(),
-        ),
-        WhereFilterSpec(
-            where_sql="query is true",
-            bind_parameters=SqlBindParameterSet(),
-            element_set=GroupByItemSet(),
-        ),
-    }
-
-
-def test_where_filter_spec_set_merge(where_filter_spec_set: WhereFilterSpecSet) -> None:  # noqa: D103
-    metric_level_filter = WhereFilterSpec(
-        where_sql="metric is true",
-        bind_parameters=SqlBindParameterSet(),
-        element_set=GroupByItemSet(),
-    )
-    query_level_filter = WhereFilterSpec(
-        where_sql="query is true",
-        bind_parameters=SqlBindParameterSet(),
-        element_set=GroupByItemSet(),
-    )
-
-    spec_set1 = WhereFilterSpecSet(
-        metric_level_filter_specs=(metric_level_filter,),
-    )
-    spec_set2 = WhereFilterSpecSet(query_level_filter_specs=(query_level_filter,))
-
-    assert spec_set1.merge(spec_set2) == WhereFilterSpecSet(
-        metric_level_filter_specs=(metric_level_filter,), query_level_filter_specs=(query_level_filter,)
-    )
