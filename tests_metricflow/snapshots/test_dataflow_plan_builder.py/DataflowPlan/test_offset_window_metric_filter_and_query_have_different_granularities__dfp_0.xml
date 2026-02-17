@@ -45,36 +45,36 @@ docstring:
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                                            -->
-                    <!--   MetricSpec(                                                            -->
-                    <!--     element_name='booking_value',                                        -->
-                    <!--     where_filter_specs=(                                                 -->
-                    <!--       WhereFilterSpec(                                                   -->
-                    <!--         where_sql="metric_time__day = '2020-01-01'",                     -->
-                    <!--         bind_parameters=SqlBindParameterSet(),                           -->
-                    <!--         element_set=GroupByItemSet(                                      -->
-                    <!--           annotated_specs=(                                              -->
-                    <!--             AnnotatedSpec(                                               -->
-                    <!--               element_type=TIME_DIMENSION,                               -->
-                    <!--               element_name='metric_time',                                -->
-                    <!--               time_grain=ExpandedTimeGranularity(                        -->
-                    <!--                 name='day',                                              -->
-                    <!--                 base_granularity=DAY,                                    -->
-                    <!--               ),                                                         -->
-                    <!--               element_properties=(METRIC_TIME,),                         -->
-                    <!--               origin_semantic_model_names=(                              -->
-                    <!--                 'bookings_source',                                       -->
-                    <!--               ),                                                         -->
-                    <!--               derived_from_semantic_model_names=(                        -->
-                    <!--                 'bookings_source',                                       -->
-                    <!--               ),                                                         -->
-                    <!--             ),                                                           -->
-                    <!--           ),                                                             -->
-                    <!--         ),                                                               -->
-                    <!--       ),                                                                 -->
-                    <!--     ),                                                                   -->
-                    <!--     offset_window=PydanticMetricTimeWindow(count=1, granularity='week'), -->
-                    <!--   )                                                                      -->
+                    <!-- metric_spec =                                              -->
+                    <!--   MetricSpec(                                              -->
+                    <!--     element_name='booking_value',                          -->
+                    <!--     where_filter_specs=(                                   -->
+                    <!--       WhereFilterSpec(                                     -->
+                    <!--         where_sql="metric_time__day = '2020-01-01'",       -->
+                    <!--         bind_parameters=SqlBindParameterSet(),             -->
+                    <!--         element_set=GroupByItemSet(                        -->
+                    <!--           annotated_specs=(                                -->
+                    <!--             AnnotatedSpec(                                 -->
+                    <!--               element_type=TIME_DIMENSION,                 -->
+                    <!--               element_name='metric_time',                  -->
+                    <!--               time_grain=ExpandedTimeGranularity(          -->
+                    <!--                 name='day',                                -->
+                    <!--                 base_granularity=DAY,                      -->
+                    <!--               ),                                           -->
+                    <!--               element_properties=(METRIC_TIME,),           -->
+                    <!--               origin_semantic_model_names=(                -->
+                    <!--                 'bookings_source',                         -->
+                    <!--               ),                                           -->
+                    <!--               derived_from_semantic_model_names=(          -->
+                    <!--                 'bookings_source',                         -->
+                    <!--               ),                                           -->
+                    <!--             ),                                             -->
+                    <!--           ),                                               -->
+                    <!--         ),                                                 -->
+                    <!--       ),                                                   -->
+                    <!--     ),                                                     -->
+                    <!--     offset_window=TimeWindow(count=1, granularity='week'), -->
+                    <!--   )                                                        -->
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -157,8 +157,7 @@ docstring:
                                         <!--     ),                                        -->
                                         <!--   )                                           -->
                                         <!-- join_type = INNER -->
-                                        <!-- standard_offset_window =                                -->
-                                        <!--   PydanticMetricTimeWindow(count=1, granularity='week') -->
+                                        <!-- standard_offset_window = TimeWindow(count=1, granularity='week') -->
                                         <MetricTimeDimensionTransformNode>
                                             <!-- description = "Metric Time Dimension 'ds'" -->
                                             <!-- node_id = NodeId(id_str='sma_28009') -->
