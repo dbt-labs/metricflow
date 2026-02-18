@@ -27,7 +27,7 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 logger = logging.getLogger(__name__)
 
 
-class WhereSpecFactory:
+class WhereFilterSpecFactory:
     """Renders the SQL template in the WhereFilter and converts it to a WhereFilterSpec."""
 
     def __init__(  # noqa: D107

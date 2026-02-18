@@ -6,7 +6,7 @@ from typing import Optional
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
-from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
+from metricflow_semantics.specs.where_filter.where_filter_spec_factory import WhereFilterSpecFactory
 from metricflow_semantics.toolkit.cache.lru_cache import LruCache
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
@@ -37,7 +37,7 @@ class BuildAnyMetricOutputNodeInput:
 
     metric_spec: MetricSpec
     queried_linkable_specs: LinkableSpecSet
-    filter_spec_factory: WhereSpecFactory
+    filter_spec_factory: WhereFilterSpecFactory
     predicate_pushdown_state: PredicatePushdownState
     output_group_by_metric_instances: bool
 
