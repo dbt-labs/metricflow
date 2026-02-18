@@ -175,7 +175,7 @@ class DataflowPlanBuilder:
         filter_spec_factory = WhereSpecFactory(
             column_association_resolver=self._column_association_resolver,
             spec_resolution_lookup=query_spec.filter_spec_resolution_lookup,
-            semantic_model_lookup=self._semantic_model_lookup,
+            custom_grain_names=self._semantic_model_lookup.custom_granularity_names,
         )
 
         query_level_filter_specs = tuple(
@@ -877,7 +877,7 @@ class DataflowPlanBuilder:
                 column_association_resolver=self._column_association_resolver,
                 spec_resolution_lookup=base_query_spec.filter_spec_resolution_lookup
                 or FilterSpecResolutionLookUp.empty_instance(),
-                semantic_model_lookup=self._semantic_model_lookup,
+                custom_grain_names=self._semantic_model_lookup.custom_granularity_names,
             )
 
             query_level_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
