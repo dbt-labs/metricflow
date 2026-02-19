@@ -156,7 +156,7 @@ def log_dataflow_plan() -> None:  # noqa: D103
 
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",

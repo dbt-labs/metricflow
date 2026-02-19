@@ -45,7 +45,7 @@ def test_cumulative_metric(
 ) -> None:
     """Tests rendering a basic cumulative metric query."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -81,7 +81,7 @@ def test_cumulative_metric_with_time_constraint(
     automatically adjust it should render a query similar to this one.
     """
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         dimension_specs=(),
         time_dimension_specs=(
             TimeDimensionSpec(
@@ -156,7 +156,7 @@ def test_cumulative_metric_no_ds(
 ) -> None:
     """Tests rendering a cumulative metric with no time dimension specified."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(),
     )
 
@@ -181,7 +181,7 @@ def test_cumulative_metric_no_window(
 ) -> None:
     """Tests rendering a query where there is a windowless cumulative metric to compute."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+        metric_specs=(MetricSpec.create(element_name="revenue_all_time"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -212,7 +212,7 @@ def test_cumulative_metric_no_window_with_time_constraint(
 ) -> None:
     """Tests rendering a query for a windowless cumulative metric query with an adjustable time constraint."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+        metric_specs=(MetricSpec.create(element_name="revenue_all_time"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
@@ -240,7 +240,7 @@ def test_cumulative_metric_grain_to_date(
 ) -> None:
     """Tests rendering a query against a grain_to_date cumulative metric."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="revenue_mtd"),),
+        metric_specs=(MetricSpec.create(element_name="revenue_mtd"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -272,7 +272,7 @@ def test_cumulative_metric_month(
 ) -> None:
     """Tests rendering a query for a cumulative metric based on a monthly time dimension."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_3_months_bookings"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_3_months_bookings"),),
         time_dimension_specs=(MTD_SPEC_MONTH,),
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-03-05"), end_time=as_datetime("2021-01-04")
@@ -300,7 +300,7 @@ def test_cumulative_metric_with_agg_time_dimension(
 ) -> None:
     """Tests rendering a query for a cumulative metric queried with agg time dimension."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -331,7 +331,7 @@ def test_cumulative_metric_with_multiple_agg_time_dimensions(
 ) -> None:
     """Tests rendering a query for a cumulative metric queried with multiple agg time dimensions."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -367,7 +367,7 @@ def test_cumulative_metric_with_multiple_metric_time_dimensions(
 ) -> None:
     """Tests rendering a query for a cumulative metric queried with multiple metric time dimensions."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(MTD_SPEC_DAY, MTD_SPEC_MONTH),
     )
 
@@ -392,7 +392,7 @@ def test_cumulative_metric_with_agg_time_and_metric_time(
 ) -> None:
     """Tests rendering a query for a cumulative metric queried with one agg time dimension and one metric time dimension."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(
             MTD_SPEC_DAY,
             TimeDimensionSpec(
@@ -424,7 +424,7 @@ def test_cumulative_metric_with_non_default_grain(
 ) -> None:
     """Tests rendering a query for a cumulative all-time metric queried with non-default grain."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+        metric_specs=(MetricSpec.create(element_name="revenue_all_time"),),
         time_dimension_specs=(MTD_SPEC_WEEK,),
     )
 
@@ -449,7 +449,7 @@ def test_window_metric_with_non_default_grain(
 ) -> None:
     """Tests rendering a query for a cumulative window metric queried with non-default grain."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
         time_dimension_specs=(MTD_SPEC_YEAR,),
     )
 
@@ -474,7 +474,7 @@ def test_grain_to_date_metric_with_non_default_grain(
 ) -> None:
     """Tests rendering a query for a cumulative grain to date metric queried with non-default grain."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="revenue_mtd"),),
+        metric_specs=(MetricSpec.create(element_name="revenue_mtd"),),
         time_dimension_specs=(MTD_SPEC_MONTH,),
     )
 
@@ -502,7 +502,7 @@ def test_window_metric_with_non_default_grains(
     Uses both metric_time and agg_time_dimension. Excludes default grain.
     """
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="every_two_days_bookers_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="every_two_days_bookers_fill_nulls_with_0"),),
         time_dimension_specs=(
             MTD_SPEC_WEEK,
             TimeDimensionSpec(
@@ -537,7 +537,7 @@ def test_grain_to_date_metric_with_non_default_grains(
     Uses agg time dimension instead of metric_time. Excludes default grain.
     """
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="revenue_mtd"),),
+        metric_specs=(MetricSpec.create(element_name="revenue_mtd"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -576,7 +576,7 @@ def test_all_time_metric_with_non_default_grains(
     Uses only metric_time. Excludes default grain.
     """
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+        metric_specs=(MetricSpec.create(element_name="revenue_all_time"),),
         time_dimension_specs=(MTD_SPEC_WEEK, MTD_SPEC_QUARTER),
     )
 
@@ -601,7 +601,7 @@ def test_derived_cumulative_metric_with_non_default_grains(
 ) -> None:
     """Test querying a derived metric with a cumulative input metric using non-default grains."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="trailing_2_months_revenue_sub_10"),),
+        metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue_sub_10"),),
         time_dimension_specs=(MTD_SPEC_WEEK,),
     )
 

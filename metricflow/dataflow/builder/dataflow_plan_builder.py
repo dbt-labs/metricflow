@@ -194,7 +194,7 @@ class DataflowPlanBuilder:
         )
         return self._build_metrics_output_node(
             metric_specs=tuple(
-                MetricSpec(
+                MetricSpec.create(
                     element_name=metric_spec.element_name,
                     where_filter_specs=query_level_filter_specs,
                 )
@@ -581,7 +581,7 @@ class DataflowPlanBuilder:
 
         # The simple metric is computed to handle `fill_nulls_with`.
         compute_simple_metric_node = self.build_computed_metrics_node(
-            metric_spec=MetricSpec(element_name=cumulative_metric_input.name),
+            metric_spec=MetricSpec.create(element_name=cumulative_metric_input.name),
             aggregated_node=aggregated_node,
             aggregated_to_elements=aggregated_to_elements,
             # Due to the way that `DataflowNodeToSqlSubqueryVisitor` works, only the outermost
@@ -695,7 +695,7 @@ class DataflowPlanBuilder:
             parent_nodes.append(
                 self._build_any_metric_output_node(
                     BuildAnyMetricOutputNodeInput(
-                        metric_spec=MetricSpec(
+                        metric_spec=MetricSpec.create(
                             element_name=metric_input_spec.element_name,
                             where_filter_specs=tuple(where_filter_specs),
                             alias=metric_input_spec.alias,
@@ -955,7 +955,7 @@ class DataflowPlanBuilder:
 
         # Recreate metric_specs to remove auxiliary fields that will interfere with AliasSpecsNode
         output_metric_specs = tuple(
-            MetricSpec(metric_spec.element_name, alias=metric_spec.alias) for metric_spec in metric_specs
+            MetricSpec.create(metric_spec.element_name, alias=metric_spec.alias) for metric_spec in metric_specs
         )
         alias_specs: Tuple[SpecToAlias, ...] = ()
         for spec in output_metric_specs + dimension_specs + entity_specs + time_dimension_specs:
@@ -1498,7 +1498,7 @@ class DataflowPlanBuilder:
                     input_granularity=input_metric.offset_to_grain,
                 )
 
-            spec = MetricSpec(
+            spec = MetricSpec.create(
                 element_name=input_metric.name,
                 where_filter_specs=where_filter_specs,
                 alias=input_metric.alias,

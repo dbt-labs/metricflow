@@ -35,7 +35,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -58,7 +58,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         time_dimension_specs=(MTD_SPEC_MONTH,),
     )
 
@@ -81,7 +81,7 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="paid_at",
@@ -110,7 +110,7 @@ def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
     )
 
@@ -133,7 +133,7 @@ def test_simple_fill_nulls_without_time_spine(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0_without_time_spine"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0_without_time_spine"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -156,7 +156,7 @@ def test_cumulative_fill_nulls(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="every_two_days_bookers_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="every_two_days_bookers_fill_nulls_with_0"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -179,7 +179,7 @@ def test_derived_fill_nulls_for_one_input_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 

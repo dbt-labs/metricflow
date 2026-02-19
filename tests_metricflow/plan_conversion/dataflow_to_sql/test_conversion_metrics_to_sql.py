@@ -30,7 +30,7 @@ def test_conversion_rate(
         element_name="referrer_id",
         entity_links=(EntityReference(element_name="visit"),),
     )
-    metric_spec = MetricSpec(element_name="visit_buy_conversion_rate")
+    metric_spec = MetricSpec.create(element_name="visit_buy_conversion_rate")
 
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -66,7 +66,7 @@ def test_conversion_rate_with_window(
         entity_links=(),
         time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
-    metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days")
+    metric_spec = MetricSpec.create(element_name="visit_buy_conversion_rate_7days")
 
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -94,7 +94,7 @@ def test_conversion_rate_with_no_group_by(
     sql_client: SqlClient,
 ) -> None:
     """Test conversion metric with no group by data flow plan rendering."""
-    metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days")
+    metric_spec = MetricSpec.create(element_name="visit_buy_conversion_rate_7days")
 
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -120,7 +120,7 @@ def test_conversion_count_with_no_group_by(
     sql_client: SqlClient,
 ) -> None:
     """Test conversion metric with no group by data flow plan rendering."""
-    metric_spec = MetricSpec(element_name="visit_buy_conversions")
+    metric_spec = MetricSpec.create(element_name="visit_buy_conversions")
 
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -146,7 +146,7 @@ def test_conversion_rate_with_constant_properties(
     sql_client: SqlClient,
 ) -> None:
     """Test conversion metric with constant properties by data flow plan rendering."""
-    metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_by_session")
+    metric_spec = MetricSpec.create(element_name="visit_buy_conversion_rate_by_session")
     dimension_spec = DimensionSpec(
         element_name="referrer_id",
         entity_links=(EntityReference(element_name="visit"),),
@@ -182,7 +182,7 @@ def test_conversion_metric_join_to_timespine_and_fill_nulls_with_0(
     sql_client: SqlClient,
 ) -> None:
     """Test conversion metric that joins to time spine and fills nulls with 0."""
-    metric_spec = MetricSpec(element_name="visit_buy_conversion_rate_7days_fill_nulls_with_0")
+    metric_spec = MetricSpec.create(element_name="visit_buy_conversion_rate_7days_fill_nulls_with_0")
     metric_time_spec = TimeDimensionSpec(
         element_name="metric_time",
         entity_links=(),

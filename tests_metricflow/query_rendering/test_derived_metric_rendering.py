@@ -38,7 +38,7 @@ def test_derived_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="non_referred_bookings_pct"),),
+        metric_specs=(MetricSpec.create(element_name="non_referred_bookings_pct"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -61,7 +61,7 @@ def test_nested_derived_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="instant_plus_non_referred_bookings_pct"),),
+        metric_specs=(MetricSpec.create(element_name="instant_plus_non_referred_bookings_pct"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -85,7 +85,7 @@ def test_simple_derived_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="test_simple_derived_metric"),),
+        metric_specs=(MetricSpec.create(element_name="test_simple_derived_metric"),),
     )
 
     render_and_check(
@@ -107,7 +107,7 @@ def test_derived_metric_with_offset_window(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_growth_2_weeks"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -163,7 +163,7 @@ def test_derived_metric_with_offset_to_grain(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_growth_since_start_of_month"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -186,7 +186,7 @@ def test_derived_metric_with_offset_window_and_offset_to_grain(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_month_start_compared_to_1_month_prior"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_month_start_compared_to_1_month_prior"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -209,7 +209,7 @@ def test_derived_offset_metric_with_one_input_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_5_day_lag"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -232,7 +232,7 @@ def test_derived_metric_with_offset_window_and_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_growth_2_weeks"),),
         time_dimension_specs=(MTD_SPEC_QUARTER,),
     )
 
@@ -255,7 +255,7 @@ def test_derived_metric_with_month_dimension_and_offset_window(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_last_month"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_last_month"),),
         time_dimension_specs=(MTD_SPEC_MONTH,),
     )
 
@@ -278,7 +278,7 @@ def test_derived_metric_with_offset_to_grain_and_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_growth_since_start_of_month"),),
         time_dimension_specs=(MTD_SPEC_WEEK,),
     )
 
@@ -301,7 +301,7 @@ def test_derived_metric_with_offset_window_and_offset_to_grain_and_granularity( 
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_month_start_compared_to_1_month_prior"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_month_start_compared_to_1_month_prior"),),
         time_dimension_specs=(MTD_SPEC_YEAR,),
     )
 
@@ -324,7 +324,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
+        metric_specs=(MetricSpec.create(element_name="every_2_days_bookers_2_days_ago"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -348,7 +348,7 @@ def test_nested_offsets(  # noqa: D103
     create_source_tables: bool,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_offset_twice"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -372,7 +372,7 @@ def test_nested_derived_metric_with_offset_multiple_input_metrics(  # noqa: D103
     create_source_tables: bool,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="booking_fees_since_start_of_month"),),
+        metric_specs=(MetricSpec.create(element_name="booking_fees_since_start_of_month"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -430,7 +430,7 @@ def test_nested_offsets_with_time_constraint(  # noqa: D103
     create_source_tables: bool,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_offset_twice"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
         time_range_constraint=TimeRangeConstraint(
             start_time=datetime.datetime(2020, 1, 12), end_time=datetime.datetime(2020, 1, 13)
@@ -457,7 +457,7 @@ def test_time_offset_metric_with_time_constraint(  # noqa: D103
     create_source_tables: bool,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_5_day_lag"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
         time_range_constraint=TimeRangeConstraint(
             start_time=datetime.datetime(2019, 12, 19), end_time=datetime.datetime(2020, 1, 2)
@@ -507,7 +507,7 @@ def test_cumulative_time_offset_metric_with_time_constraint(  # noqa: D103
     create_source_tables: bool,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
+        metric_specs=(MetricSpec.create(element_name="every_2_days_bookers_2_days_ago"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
         time_range_constraint=TimeRangeConstraint(
             start_time=datetime.datetime(2019, 12, 19), end_time=datetime.datetime(2020, 1, 2)
@@ -643,8 +643,8 @@ def test_multi_metric_fill_null(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(
-            MetricSpec(element_name="twice_bookings_fill_nulls_with_0_without_time_spine"),
-            MetricSpec(element_name="listings"),
+            MetricSpec.create(element_name="twice_bookings_fill_nulls_with_0_without_time_spine"),
+            MetricSpec.create(element_name="listings"),
         ),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
@@ -669,7 +669,7 @@ def test_nested_fill_nulls_without_time_spine(  # noqa: D103
     create_source_tables: bool,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="nested_fill_nulls_without_time_spine"),),
+        metric_specs=(MetricSpec.create(element_name="nested_fill_nulls_without_time_spine"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -694,8 +694,8 @@ def test_nested_fill_nulls_without_time_spine_multi_metric(  # noqa: D103
 ) -> None:
     query_spec = MetricFlowQuerySpec(
         metric_specs=(
-            MetricSpec(element_name="nested_fill_nulls_without_time_spine"),
-            MetricSpec(element_name="listings"),
+            MetricSpec.create(element_name="nested_fill_nulls_without_time_spine"),
+            MetricSpec.create(element_name="listings"),
         ),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )

@@ -471,7 +471,7 @@ def test_compute_metrics_node(
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
-    metric_spec = MetricSpec(element_name="bookings")
+    metric_spec = MetricSpec.create(element_name="bookings")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         computed_metric_specs=[metric_spec],
@@ -545,7 +545,7 @@ def test_compute_metrics_node_simple_expr(
         parent_node=join_node,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
-    metric_spec = MetricSpec(element_name="booking_fees")
+    metric_spec = MetricSpec.create(element_name="booking_fees")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         computed_metric_specs=[metric_spec],
@@ -638,7 +638,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         parent_node=join_node,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
-    metric_spec = MetricSpec(element_name="bookings_per_booker")
+    metric_spec = MetricSpec.create(element_name="bookings_per_booker")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         computed_metric_specs=[metric_spec],
@@ -697,7 +697,7 @@ def test_order_by_node(
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
-    metric_spec = MetricSpec(element_name="bookings")
+    metric_spec = MetricSpec.create(element_name="bookings")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         computed_metric_specs=[metric_spec],
@@ -972,7 +972,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
         entity_links=(),
         time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
-    metric_spec = MetricSpec(element_name="bookings_per_view")
+    metric_spec = MetricSpec.create(element_name="bookings_per_view")
 
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -1140,15 +1140,15 @@ def test_compute_metrics_node_with_passthrough(
 
     compute_metrics_node_0 = ComputeMetricsNode.create(
         parent_node=aggregation_node,
-        computed_metric_specs=(MetricSpec(element_name="booking_value"),),
+        computed_metric_specs=(MetricSpec.create(element_name="booking_value"),),
         passthrough_metric_specs=(),
         aggregated_to_elements=set(),
     )
 
     compute_metrics_node_1 = ComputeMetricsNode.create(
         parent_node=compute_metrics_node_0,
-        computed_metric_specs=(MetricSpec(element_name="booking_fees"),),
-        passthrough_metric_specs=(MetricSpec(element_name="booking_value"),),
+        computed_metric_specs=(MetricSpec.create(element_name="booking_fees"),),
+        passthrough_metric_specs=(MetricSpec.create(element_name="booking_value"),),
         aggregated_to_elements=set(),
     )
 

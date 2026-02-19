@@ -35,7 +35,7 @@ def test_cyclic_join(
     """Tests that sources with the same joinable keys don't cause cycle issues."""
     dataflow_plan = cyclic_join_manifest_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="listings"),),
+            metric_specs=(MetricSpec.create(element_name="listings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="capacity_latest",

@@ -80,8 +80,8 @@ def test_simple_query_with_metric_time_dimension(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_payments"),
+                MetricSpec.create(element_name="bookings"),
+                MetricSpec.create(element_name="booking_payments"),
             ),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),

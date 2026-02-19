@@ -138,7 +138,9 @@ class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsRe
                 # The metric spec used in the dataflow plan contains additional attributes that are different from
                 # the metric spec provided in the query spec (e.g. includes filters), so the mapping should use the
                 # simplified form.
-                simplified_metric_spec = MetricSpec(element_name=metric_spec.element_name, alias=metric_spec.alias)
+                simplified_metric_spec = MetricSpec.create(
+                    element_name=metric_spec.element_name, alias=metric_spec.alias
+                )
                 spec_to_associated_columns[simplified_metric_spec] = columns
 
         simple_metric_input_cols = []
