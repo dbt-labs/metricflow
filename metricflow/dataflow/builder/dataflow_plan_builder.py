@@ -96,7 +96,7 @@ from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGran
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -1653,7 +1653,7 @@ class DataflowPlanBuilder:
             if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs))
         ]
         if len(queried_non_agg_time_filter_specs) > 0:
-            output_node = WhereConstraintNode.create(
+            output_node = WhereFilterNode.create(
                 parent_node=output_node, where_specs=queried_non_agg_time_filter_specs, always_apply=True
             )
 
@@ -1694,7 +1694,7 @@ class DataflowPlanBuilder:
         if len(metric_spec.where_filter_specs) > 0 or time_range_constraint:
             where_filter_specs = metric_spec.where_filter_specs
             if len(where_filter_specs) > 0:
-                output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
+                output_node = WhereFilterNode.create(parent_node=output_node, where_specs=where_filter_specs)
             if time_range_constraint:
                 output_node = ConstrainTimeRangeNode.create(
                     parent_node=output_node, time_range_constraint=time_range_constraint
@@ -2023,7 +2023,7 @@ class DataflowPlanBuilder:
         output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_before_constraints)
 
         if len(where_filter_specs) > 0:
-            output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
+            output_node = WhereFilterNode.create(parent_node=output_node, where_specs=where_filter_specs)
 
         if time_range_constraint:
             output_node = ConstrainTimeRangeNode.create(

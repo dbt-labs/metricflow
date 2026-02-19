@@ -49,7 +49,7 @@ from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntiti
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
@@ -198,7 +198,7 @@ def test_filter_with_where_constraint_node(
         ),
     )  # need to include ds_spec because where constraint operates on ds
     time_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY)
-    where_constraint_node = WhereConstraintNode.create(
+    where_constraint_node = WhereFilterNode.create(
         parent_node=selector_node,
         where_specs=(
             WhereFilterSpec(

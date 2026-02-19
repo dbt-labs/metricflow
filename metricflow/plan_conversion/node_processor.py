@@ -29,7 +29,7 @@ from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
 from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
 
@@ -97,7 +97,7 @@ class PredicatePushdownState:
     added to the query filters.
     The second may be updated based on query configuration, like if a cumulative metric is added to the plan
     there may be changes to what sort of predicate pushdown operations are supported.
-    The last will be updated as filters are applied via pushdown or by the original WhereConstraintNode.
+    The last will be updated as filters are applied via pushdown or by the original WhereFilterNode.
 
     Finally, the time_range_constraint property holds the time window for setting up a time range filter expression.
     """
@@ -434,7 +434,7 @@ class PreJoinNodeProcessor:
                     filtered_nodes.append(source_node)
                 else:
                     filtered_nodes.append(
-                        WhereConstraintNode.create(parent_node=source_node, where_specs=matching_filter_specs)
+                        WhereFilterNode.create(parent_node=source_node, where_specs=matching_filter_specs)
                     )
             else:
                 filtered_nodes.append(source_node)

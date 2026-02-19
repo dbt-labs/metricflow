@@ -13,15 +13,15 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)
-class WhereConstraintNode(DataflowPlanNode):
+class WhereFilterNode(DataflowPlanNode):
     """Remove rows using a WHERE clause.
 
     Attributes:
-        where_specs: Specifications for the WHERE clause to filter rows.
+        filter_specs: Specifications for the WHERE clause to filter rows.
         always_apply: Indicator if the WHERE clause should always be applied.
     """
 
-    where_specs: Sequence[WhereFilterSpec]
+    filter_specs: Sequence[WhereFilterSpec]
     always_apply: bool
 
     def __post_init__(self) -> None:  # noqa: D105
@@ -33,10 +33,10 @@ class WhereConstraintNode(DataflowPlanNode):
         parent_node: DataflowPlanNode,
         where_specs: Sequence[WhereFilterSpec],
         always_apply: bool = False,
-    ) -> WhereConstraintNode:
-        return WhereConstraintNode(
+    ) -> WhereFilterNode:
+        return WhereFilterNode(
             parent_nodes=(parent_node,),
-            where_specs=where_specs,
+            filter_specs=where_specs,
             always_apply=always_apply,
         )
 
@@ -47,7 +47,7 @@ class WhereConstraintNode(DataflowPlanNode):
     @property
     def where(self) -> WhereFilterSpec:
         """Returns the specs for the elements that it should pass."""
-        return WhereFilterSpec.merge_iterable(self.where_specs)
+        return WhereFilterSpec.merge_iterable(self.filter_specs)
 
     @property
     def input_where_specs(self) -> Sequence[WhereFilterSpec]:
@@ -57,16 +57,16 @@ class WhereConstraintNode(DataflowPlanNode):
         for pushdown operations on the filter spec level. We merge them for things like rendering and node comparisons,
         but in some cases we may be able to push down a subset of the input specs for efficiency reasons.
         """
-        return self.where_specs
+        return self.filter_specs
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
         return visitor.visit_where_constraint_node(self)
 
     @property
     def description(self) -> str:  # noqa: D102
-        # Can't put the where condition here as it can cause rendering issues when there are SQL execution parameters.
-        # e.g. "Constrain Output with WHERE listing__country = :1"
-        return "Constrain Output with WHERE"
+        # Can't put the where condition here as it can cause rendering issues when there are SQL bind parameters.
+        # e.g. "Filter Output with WHERE: listing__country = :1"
+        return "Filter Output with WHERE"
 
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
@@ -86,9 +86,9 @@ class WhereConstraintNode(DataflowPlanNode):
             and other_node.always_apply == self.always_apply
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WhereConstraintNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> WhereFilterNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
-        return WhereConstraintNode.create(
+        return WhereFilterNode.create(
             parent_node=new_parent_nodes[0],
             where_specs=self.input_where_specs,
             always_apply=self.always_apply,
