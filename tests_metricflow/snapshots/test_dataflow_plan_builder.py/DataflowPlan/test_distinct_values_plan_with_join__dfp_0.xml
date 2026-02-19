@@ -36,7 +36,7 @@ docstring:
                 <WhereFilterNode>
                     <!-- description = 'Filter Output with WHERE' -->
                     <!-- node_id = NodeId(id_str='wcc_0') -->
-                    <!-- where_condition =                                                 -->
+                    <!-- filter_spec =                                                     -->
                     <!--   WhereFilterSpec(                                                -->
                     <!--     where_sql="listing__country_latest = 'us'",                   -->
                     <!--     bind_parameters=SqlBindParameterSet(),                        -->

@@ -77,7 +77,7 @@ docstring:
                             <WhereFilterNode>
                                 <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                                -->
+                                <!-- filter_spec =                                    -->
                                 <!--   WhereFilterSpec(                               -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'", -->
                                 <!--     bind_parameters=SqlBindParameterSet(),       -->
@@ -149,7 +149,7 @@ docstring:
                             <WhereFilterNode>
                                 <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_1') -->
-                                <!-- where_condition =                                -->
+                                <!-- filter_spec =                                    -->
                                 <!--   WhereFilterSpec(                               -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'", -->
                                 <!--     bind_parameters=SqlBindParameterSet(),       -->

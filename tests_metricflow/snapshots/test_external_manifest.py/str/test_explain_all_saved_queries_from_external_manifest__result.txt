@@ -94,7 +94,11 @@ query_1ee34d0e:
         ON
           subq_1.listing = subq_4.listing
       ) subq_6
-      WHERE ((listing__is_lux_latest IS NOT NULL)) AND ((metric_time__day IS NOT NULL))
+      WHERE (
+        (listing__is_lux_latest IS NOT NULL)
+      ) AND (
+        (metric_time__day IS NOT NULL)
+      )
       GROUP BY
         listing__capacity_latest
     )
@@ -137,7 +141,11 @@ query_1ee34d0e:
         ON
           subq_12.listing = subq_14.listing
       ) subq_16
-      WHERE ((listing__is_lux_latest IS NOT NULL)) AND ((metric_time__day IS NOT NULL))
+      WHERE (
+        (listing__is_lux_latest IS NOT NULL)
+      ) AND (
+        (metric_time__day IS NOT NULL)
+      )
       GROUP BY
         listing__capacity_latest
     )

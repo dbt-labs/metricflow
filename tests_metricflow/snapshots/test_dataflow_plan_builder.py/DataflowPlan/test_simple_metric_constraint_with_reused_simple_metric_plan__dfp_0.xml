@@ -61,7 +61,7 @@ docstring:
                             <WhereFilterNode>
                                 <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                             -->
+                                <!-- filter_spec =                                 -->
                                 <!--   WhereFilterSpec(                            -->
                                 <!--     where_sql='booking__is_instant',          -->
                                 <!--     bind_parameters=SqlBindParameterSet(),    -->
