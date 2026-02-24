@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.dataflow_plan import (
@@ -338,19 +339,18 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_parent_node = combined_parent_nodes[0]
         assert combined_parent_node is not None
 
-        # Dedupe (preserving order for output consistency) as it's possible for multiple derived metrics to use the same
-        # metric.
-        unique_metric_specs: List[MetricSpec] = []
-        for metric_spec in tuple(self._current_left_node.computed_metric_specs) + tuple(
-            current_right_node.computed_metric_specs
-        ):
-            if metric_spec not in unique_metric_specs:
-                unique_metric_specs.append(metric_spec)
-
         combined_node = ComputeMetricsNode.create(
             parent_node=combined_parent_node,
-            computed_metric_specs=unique_metric_specs,
-            passthrough_metric_specs=(),
+            # Dedupe (preserving order for output consistency) as it's possible for multiple derived metrics to use the same
+            # metric.
+            computed_metric_specs=FrozenOrderedSet(
+                itertools.chain(self._current_left_node.computed_metric_specs, current_right_node.computed_metric_specs)
+            ),
+            passthrough_metric_specs=FrozenOrderedSet(
+                itertools.chain(
+                    self._current_left_node.passthrough_metric_specs, current_right_node.passthrough_metric_specs
+                )
+            ),
             aggregated_to_elements=current_right_node.aggregated_to_elements,
             output_group_by_metric_instances=current_right_node.output_group_by_metric_instances,
         )
