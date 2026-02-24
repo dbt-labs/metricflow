@@ -9,7 +9,7 @@ from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
-from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
@@ -230,7 +230,7 @@ def test_node_evaluator_with_joined_spec(
                 node_to_join=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
                     "listings_latest"
                 ],
-                join_on_entity=LinklessEntitySpec.from_element_name("listing"),
+                join_on_entity=EntityReference("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="country_latest",
@@ -282,7 +282,7 @@ def test_node_evaluator_with_joined_spec_on_unique_id(
                 node_to_join=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
                     "companies"
                 ],
-                join_on_entity=LinklessEntitySpec.from_element_name("user"),
+                join_on_entity=EntityReference("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="company_name",
@@ -338,7 +338,7 @@ def test_node_evaluator_with_multiple_joined_specs(
                 node_to_join=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
                     "listings_latest"
                 ],
-                join_on_entity=LinklessEntitySpec.from_element_name("listing"),
+                join_on_entity=EntityReference("listing"),
                 satisfiable_linkable_specs=[
                     EntitySpec(
                         element_name="user",
@@ -353,7 +353,7 @@ def test_node_evaluator_with_multiple_joined_specs(
                 node_to_join=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
                     "users_latest"
                 ],
-                join_on_entity=LinklessEntitySpec.from_element_name("user"),
+                join_on_entity=EntityReference("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state_latest",
@@ -414,7 +414,7 @@ def test_node_evaluator_with_multihop_joined_spec(
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
-                join_on_entity=LinklessEntitySpec.from_element_name("account_id"),
+                join_on_entity=EntityReference("account_id"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="customer_name",
@@ -477,7 +477,7 @@ def test_node_evaluator_with_partition_joined_spec(
                 node_to_join=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST].read_node_mapping[
                     "users_ds_source"
                 ],
-                join_on_entity=LinklessEntitySpec.from_element_name("user"),
+                join_on_entity=EntityReference("user"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state",
@@ -552,7 +552,7 @@ def test_node_evaluator_with_scd_target(
                 node_to_join=mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].read_node_mapping[
                     "listings"
                 ],
-                join_on_entity=LinklessEntitySpec.from_element_name("listing"),
+                join_on_entity=EntityReference("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="is_lux",
@@ -622,7 +622,7 @@ def test_node_evaluator_with_multi_hop_scd_target(
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
-                join_on_entity=LinklessEntitySpec.from_element_name("listing"),
+                join_on_entity=EntityReference("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="is_confirmed_lux",
@@ -695,7 +695,7 @@ def test_node_evaluator_with_multi_hop_through_scd(
         join_recipes=(
             JoinLinkableInstancesRecipe(
                 node_to_join=evaluation.join_recipes[0].node_to_join,
-                join_on_entity=LinklessEntitySpec.from_element_name("listing"),
+                join_on_entity=EntityReference("listing"),
                 satisfiable_linkable_specs=[
                     DimensionSpec(
                         element_name="home_state_latest",

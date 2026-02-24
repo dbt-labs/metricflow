@@ -1273,7 +1273,9 @@ class DataflowPlanBuilder:
 
             # Nodes containing the linkable instances will be joined to the source node, so these
             # entities will need to be present in the source node.
-            required_local_entity_specs = tuple(x.join_on_entity for x in evaluation.join_recipes if x.join_on_entity)
+            required_local_entity_specs = tuple(
+                EntitySpec.create_from_reference(x.join_on_entity) for x in evaluation.join_recipes if x.join_on_entity
+            )
             # Same thing with partitions.
             required_local_dimension_specs = tuple(
                 y.start_node_dimension_spec for x in evaluation.join_recipes for y in x.join_on_partition_dimensions
@@ -2073,7 +2075,10 @@ class DataflowPlanBuilder:
             )
         # Include specs needed for the semi-additive join.
         if spec_properties and non_additive_dimension_spec:
-            semi_additive_join_specs: Tuple[InstanceSpec, ...] = non_additive_dimension_spec.window_groupings_as_specs
+            semi_additive_join_specs: Tuple[InstanceSpec, ...] = tuple(
+                EntitySpec.create_from_reference(entity_reference)
+                for entity_reference in non_additive_dimension_spec.window_grouping_references
+            )
             semi_additive_join_specs += (non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties),)
             specs_to_keep_before_constraints = specs_to_keep_before_constraints.merge(
                 InstanceSpecSet.create_from_specs(semi_additive_join_specs)
@@ -2098,10 +2103,10 @@ class DataflowPlanBuilder:
             non_additive_dimension_spec=non_additive_dimension_spec,
         )
         time_dimension_spec = non_additive_dimension_spec.name_as_time_dimension_spec(spec_properties)
-        window_groupings = non_additive_dimension_spec.window_groupings_as_specs
+        window_groupings = non_additive_dimension_spec.window_grouping_references
         return SemiAdditiveJoinNode.create(
             parent_node=parent_node,
-            entity_specs=window_groupings,
+            entity_references=window_groupings,
             time_dimension_spec=time_dimension_spec,
             agg_by_function=non_additive_dimension_spec.window_choice,
             queried_time_dimension_spec=queried_time_dimension_spec,

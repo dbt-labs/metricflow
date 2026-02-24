@@ -12,7 +12,6 @@ from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.spec_set_transforms import ToElementNameSet
@@ -53,7 +52,7 @@ class MultiHopJoinCandidateLineage:
 
     first_node_to_join: DataflowPlanNode
     second_node_to_join: DataflowPlanNode
-    join_second_node_by_entity: LinklessEntitySpec
+    join_second_node_by_entity: EntityReference
 
 
 @dataclasses.dataclass(frozen=True)
@@ -570,9 +569,7 @@ class PreJoinNodeProcessor:
                             join_targets=[
                                 JoinDescription(
                                     join_node=selector_node_for_joinable,
-                                    join_on_entity=LinklessEntitySpec.from_reference(
-                                        desired_linkable_spec.entity_links[1]
-                                    ),
+                                    join_on_entity=desired_linkable_spec.entity_links[1],
                                     join_on_partition_dimensions=join_on_partition_dimensions,
                                     join_on_partition_time_dimensions=join_on_partition_time_dimensions,
                                     join_type=join_type,
@@ -582,11 +579,7 @@ class PreJoinNodeProcessor:
                         lineage=MultiHopJoinCandidateLineage(
                             first_node_to_join=first_node_that_could_be_joined,
                             second_node_to_join=second_node_that_could_be_joined,
-                            # entity_spec_in_first_node should already not have entity links since we checked
-                            # for that, but using this method for type checking.
-                            join_second_node_by_entity=LinklessEntitySpec.from_reference(
-                                desired_linkable_spec.entity_links[1]
-                            ),
+                            join_second_node_by_entity=desired_linkable_spec.entity_links[1],
                         ),
                     )
                 )

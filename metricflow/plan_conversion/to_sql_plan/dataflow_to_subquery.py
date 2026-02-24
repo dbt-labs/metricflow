@@ -31,6 +31,7 @@ from metricflow_semantics.instances import (
 )
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
@@ -449,9 +450,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             if join_on_entity:
                 # Remove any instances that already have the join_on_entity as the leading link. This will prevent a duplicate
                 # entity link when we add it in the next step.
-                right_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                    join_on_entity.reference
-                ).transform(right_data_set.instance_set)
+                right_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(join_on_entity).transform(
+                    right_data_set.instance_set
+                )
 
                 # After the right data set is joined, update the entity links to indicate that joining on the entity was
                 # required to reach the spec. If the "country" dimension was joined and "user_id" is the join_on_entity,
@@ -459,7 +460,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 new_instances: Tuple[MdoInstance, ...] = ()
                 for original_instance in right_instance_set_filtered.linkable_instances:
                     new_instance = original_instance.with_entity_prefix(
-                        join_on_entity.reference, column_association_resolver=self._column_association_resolver
+                        join_on_entity, column_association_resolver=self._column_association_resolver
                     )
                     # Build new select column using the old column name as the expr and the new column name as the alias.
                     select_column = SqlSelectColumn(
@@ -1312,7 +1313,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Build optional window grouping SqlSelectColumn
         entity_select_columns: List[SqlSelectColumn] = []
-        for entity_spec in node.entity_specs:
+        for entity_reference in node.entity_references:
+            entity_spec = EntitySpec.create_from_reference(entity_reference)
             entity_column_name = self._column_association_resolver.resolve_spec(entity_spec).column_name
             entity_select_columns.append(
                 SqlSelectColumn(

@@ -5,11 +5,12 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
@@ -76,11 +77,13 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
                 entity_links=(),
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(non_additive_dimension_grain),
             ),
-        ) + tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)
+        ) + tuple(
+            EntitySpec.create_from_reference(entity_reference) for entity_reference in self.window_grouping_references
+        )
 
     @property
-    def window_groupings_as_specs(self) -> Tuple[LinklessEntitySpec, ...]:  # noqa: D102
-        return tuple(LinklessEntitySpec.from_element_name(entity_name) for entity_name in self.window_groupings)
+    def window_grouping_references(self) -> Tuple[EntityReference, ...]:  # noqa: D102
+        return tuple(EntityReference(element_name=entity_name) for entity_name in self.window_groupings)
 
     def name_as_time_dimension_spec(  # noqa: D102
         self, spec_properties: SimpleMetricInputSpecProperties
