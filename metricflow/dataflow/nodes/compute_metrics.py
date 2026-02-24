@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Sequence, Set, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
@@ -67,11 +68,16 @@ class ComputeMetricsNode(DataflowPlanNode):
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
-        displayed_properties = tuple(super().displayed_properties) + tuple(
+        displayed_properties = list(super().displayed_properties)
+        # TODO: Use different key names for computed / passthrough metric specs.
+        displayed_properties.extend(
             DisplayedProperty("metric_spec", metric_spec) for metric_spec in self.computed_metric_specs
         )
+        displayed_properties.extend(
+            DisplayedProperty("metric_spec", metric_spec) for metric_spec in self.passthrough_metric_specs
+        )
         if self.output_group_by_metric_instances:
-            displayed_properties += (
+            displayed_properties.append(
                 DisplayedProperty("output_group_by_metric_instances", self.output_group_by_metric_instances),
             )
         return displayed_properties
@@ -84,7 +90,10 @@ class ComputeMetricsNode(DataflowPlanNode):
         if not isinstance(other_node, self.__class__):
             return False
 
-        if other_node.computed_metric_specs != self.computed_metric_specs:
+        if (
+            other_node.computed_metric_specs != self.computed_metric_specs
+            or other_node.passthrough_metric_specs != self.passthrough_metric_specs
+        ):
             return False
 
         return (
@@ -105,8 +114,8 @@ class ComputeMetricsNode(DataflowPlanNode):
 
         if other_node.output_group_by_metric_instances != self.output_group_by_metric_instances:
             return False, "one node is a group by metric source node"
-
-        alias_to_metric_spec = {spec.alias: spec for spec in self.computed_metric_specs if spec.alias is not None}
+        metric_specs = self.computed_metric_specs + self.passthrough_metric_specs
+        alias_to_metric_spec = {spec.alias: spec for spec in metric_specs if spec.alias is not None}
 
         for spec in other_node.computed_metric_specs:
             if (
@@ -135,3 +144,7 @@ class ComputeMetricsNode(DataflowPlanNode):
     @override
     def aggregated_to_elements(self) -> Set[LinkableInstanceSpec]:
         return set(self._aggregated_to_elements)
+
+    @cached_property
+    def metric_specs(self) -> Sequence[MetricSpec]:  # noqa: D102
+        return self.computed_metric_specs + self.passthrough_metric_specs
