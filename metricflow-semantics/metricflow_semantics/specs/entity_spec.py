@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional, Tuple
+from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference
@@ -37,14 +37,6 @@ class EntitySpec(LinkableInstanceSpec, SerializableDataclass):  # noqa: D101
         e.g. as a prefix to a DimensionSpec's entity links to when a join is occurring via this entity
         """
         return (EntityReference(element_name=self.element_name),) + self.entity_links
-
-    def __eq__(self, other: Any) -> bool:  # type: ignore[misc]  # noqa: D105
-        if not isinstance(other, EntitySpec):
-            return False
-        return self.element_name == other.element_name and self.entity_links == other.entity_links
-
-    def __hash__(self) -> int:  # noqa: D105
-        return hash((self.element_name, self.entity_links))
 
     @property
     def reference(self) -> EntityReference:  # noqa: D102
