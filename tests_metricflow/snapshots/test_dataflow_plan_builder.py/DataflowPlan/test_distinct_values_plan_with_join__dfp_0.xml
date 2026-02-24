@@ -76,12 +76,12 @@ docstring:
                         <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
                             <!-- node_id = NodeId(id_str='jso_0') -->
-                            <!-- join0_for_node_id_pfe_0 =                                   -->
-                            <!--   JoinDescription(                                          -->
-                            <!--     join_node=SelectorNode(node_id=pfe_0),                  -->
-                            <!--     join_on_entity=LinklessEntitySpec(element_name='user'), -->
-                            <!--     join_type=FULL_OUTER,                                   -->
-                            <!--   )                                                         -->
+                            <!-- join0_for_node_id_pfe_0 =                                -->
+                            <!--   JoinDescription(                                       -->
+                            <!--     join_node=SelectorNode(node_id=pfe_0),               -->
+                            <!--     join_on_entity=EntityReference(element_name='user'), -->
+                            <!--     join_type=FULL_OUTER,                                -->
+                            <!--   )                                                      -->
                             <ReadSqlSourceNode>
                                 <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
                                 <!-- node_id = NodeId(id_str='rss_28024') -->
@@ -91,7 +91,7 @@ docstring:
                                 <!-- description = "Select: ['home_state_latest', 'user']" -->
                                 <!-- node_id = NodeId(id_str='pfe_0') -->
                                 <!-- include_spec = DimensionSpec(element_name='home_state_latest') -->
-                                <!-- include_spec = LinklessEntitySpec(element_name='user') -->
+                                <!-- include_spec = EntitySpec(element_name='user') -->
                                 <!-- distinct = False -->
                                 <ReadSqlSourceNode>
                                     <!-- description = "Read From SemanticModelDataSet('users_latest')" -->

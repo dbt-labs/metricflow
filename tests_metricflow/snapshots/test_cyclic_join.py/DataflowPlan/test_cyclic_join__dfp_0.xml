@@ -38,12 +38,12 @@ docstring:
                         <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
                             <!-- node_id = NodeId(id_str='jso_0') -->
-                            <!-- join0_for_node_id_pfe_0 =                                            -->
-                            <!--   JoinDescription(                                                   -->
-                            <!--     join_node=SelectorNode(node_id=pfe_0),                           -->
-                            <!--     join_on_entity=LinklessEntitySpec(element_name='cyclic_entity'), -->
-                            <!--     join_type=LEFT_OUTER,                                            -->
-                            <!--   )                                                                  -->
+                            <!-- join0_for_node_id_pfe_0 =                                         -->
+                            <!--   JoinDescription(                                                -->
+                            <!--     join_node=SelectorNode(node_id=pfe_0),                        -->
+                            <!--     join_on_entity=EntityReference(element_name='cyclic_entity'), -->
+                            <!--     join_type=LEFT_OUTER,                                         -->
+                            <!--   )                                                               -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = "Metric Time Dimension 'ds'" -->
                                 <!-- node_id = NodeId(id_str='sma_12007') -->
@@ -58,7 +58,7 @@ docstring:
                                 <!-- description = "Select: ['capacity_latest', 'cyclic_entity']" -->
                                 <!-- node_id = NodeId(id_str='pfe_0') -->
                                 <!-- include_spec = DimensionSpec(element_name='capacity_latest') -->
-                                <!-- include_spec = LinklessEntitySpec(element_name='cyclic_entity') -->
+                                <!-- include_spec = EntitySpec(element_name='cyclic_entity') -->
                                 <!-- distinct = False -->
                                 <ReadSqlSourceNode>
                                     <!-- description = "Read From SemanticModelDataSet('listings_latest_cyclic')" -->

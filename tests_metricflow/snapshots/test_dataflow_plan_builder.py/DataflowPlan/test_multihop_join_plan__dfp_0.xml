@@ -44,30 +44,30 @@ docstring:
                         <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
                             <!-- node_id = NodeId(id_str='jso_1') -->
-                            <!-- join0_for_node_id_pfe_1 =                                         -->
-                            <!--   JoinDescription(                                                -->
-                            <!--     join_node=SelectorNode(node_id=pfe_1),                        -->
-                            <!--     join_on_entity=LinklessEntitySpec(element_name='account_id'), -->
-                            <!--     join_type=LEFT_OUTER,                                         -->
-                            <!--     join_on_partition_time_dimensions=(                           -->
-                            <!--       PartitionTimeDimensionJoinDescription(                      -->
-                            <!--         start_node_time_dimension_spec=TimeDimensionSpec(         -->
-                            <!--           element_name='ds_partitioned',                          -->
-                            <!--           time_granularity=ExpandedTimeGranularity(               -->
-                            <!--             name='day',                                           -->
-                            <!--             base_granularity=DAY,                                 -->
-                            <!--           ),                                                      -->
-                            <!--         ),                                                        -->
-                            <!--         node_to_join_time_dimension_spec=TimeDimensionSpec(       -->
-                            <!--           element_name='ds_partitioned',                          -->
-                            <!--           time_granularity=ExpandedTimeGranularity(               -->
-                            <!--             name='day',                                           -->
-                            <!--             base_granularity=DAY,                                 -->
-                            <!--           ),                                                      -->
-                            <!--         ),                                                        -->
-                            <!--       ),                                                          -->
-                            <!--     ),                                                            -->
-                            <!--   )                                                               -->
+                            <!-- join0_for_node_id_pfe_1 =                                      -->
+                            <!--   JoinDescription(                                             -->
+                            <!--     join_node=SelectorNode(node_id=pfe_1),                     -->
+                            <!--     join_on_entity=EntityReference(element_name='account_id'), -->
+                            <!--     join_type=LEFT_OUTER,                                      -->
+                            <!--     join_on_partition_time_dimensions=(                        -->
+                            <!--       PartitionTimeDimensionJoinDescription(                   -->
+                            <!--         start_node_time_dimension_spec=TimeDimensionSpec(      -->
+                            <!--           element_name='ds_partitioned',                       -->
+                            <!--           time_granularity=ExpandedTimeGranularity(            -->
+                            <!--             name='day',                                        -->
+                            <!--             base_granularity=DAY,                              -->
+                            <!--           ),                                                   -->
+                            <!--         ),                                                     -->
+                            <!--         node_to_join_time_dimension_spec=TimeDimensionSpec(    -->
+                            <!--           element_name='ds_partitioned',                       -->
+                            <!--           time_granularity=ExpandedTimeGranularity(            -->
+                            <!--             name='day',                                        -->
+                            <!--             base_granularity=DAY,                              -->
+                            <!--           ),                                                   -->
+                            <!--         ),                                                     -->
+                            <!--       ),                                                       -->
+                            <!--     ),                                                         -->
+                            <!--   )                                                            -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = "Metric Time Dimension 'ds'" -->
                                 <!-- node_id = NodeId(id_str='sma_22007') -->
@@ -92,35 +92,35 @@ docstring:
                                 <!--     element_name='ds_partitioned',                                              -->
                                 <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                 <!--   )                                                                             -->
-                                <!-- include_spec = LinklessEntitySpec(element_name='account_id') -->
+                                <!-- include_spec = EntitySpec(element_name='account_id') -->
                                 <!-- distinct = False -->
                                 <JoinOnEntitiesNode>
                                     <!-- description = 'Join Standard Outputs' -->
                                     <!-- node_id = NodeId(id_str='jso_0') -->
-                                    <!-- join0_for_node_id_pfe_0 =                                          -->
-                                    <!--   JoinDescription(                                                 -->
-                                    <!--     join_node=SelectorNode(node_id=pfe_0),                         -->
-                                    <!--     join_on_entity=LinklessEntitySpec(element_name='customer_id'), -->
-                                    <!--     join_type=LEFT_OUTER,                                          -->
-                                    <!--     join_on_partition_time_dimensions=(                            -->
-                                    <!--       PartitionTimeDimensionJoinDescription(                       -->
-                                    <!--         start_node_time_dimension_spec=TimeDimensionSpec(          -->
-                                    <!--           element_name='ds_partitioned',                           -->
-                                    <!--           time_granularity=ExpandedTimeGranularity(                -->
-                                    <!--             name='day',                                            -->
-                                    <!--             base_granularity=DAY,                                  -->
-                                    <!--           ),                                                       -->
-                                    <!--         ),                                                         -->
-                                    <!--         node_to_join_time_dimension_spec=TimeDimensionSpec(        -->
-                                    <!--           element_name='ds_partitioned',                           -->
-                                    <!--           time_granularity=ExpandedTimeGranularity(                -->
-                                    <!--             name='day',                                            -->
-                                    <!--             base_granularity=DAY,                                  -->
-                                    <!--           ),                                                       -->
-                                    <!--         ),                                                         -->
-                                    <!--       ),                                                           -->
-                                    <!--     ),                                                             -->
-                                    <!--   )                                                                -->
+                                    <!-- join0_for_node_id_pfe_0 =                                       -->
+                                    <!--   JoinDescription(                                              -->
+                                    <!--     join_node=SelectorNode(node_id=pfe_0),                      -->
+                                    <!--     join_on_entity=EntityReference(element_name='customer_id'), -->
+                                    <!--     join_type=LEFT_OUTER,                                       -->
+                                    <!--     join_on_partition_time_dimensions=(                         -->
+                                    <!--       PartitionTimeDimensionJoinDescription(                    -->
+                                    <!--         start_node_time_dimension_spec=TimeDimensionSpec(       -->
+                                    <!--           element_name='ds_partitioned',                        -->
+                                    <!--           time_granularity=ExpandedTimeGranularity(             -->
+                                    <!--             name='day',                                         -->
+                                    <!--             base_granularity=DAY,                               -->
+                                    <!--           ),                                                    -->
+                                    <!--         ),                                                      -->
+                                    <!--         node_to_join_time_dimension_spec=TimeDimensionSpec(     -->
+                                    <!--           element_name='ds_partitioned',                        -->
+                                    <!--           time_granularity=ExpandedTimeGranularity(             -->
+                                    <!--             name='day',                                         -->
+                                    <!--             base_granularity=DAY,                               -->
+                                    <!--           ),                                                    -->
+                                    <!--         ),                                                      -->
+                                    <!--       ),                                                        -->
+                                    <!--     ),                                                          -->
+                                    <!--   )                                                             -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds_partitioned'" -->
                                         <!-- node_id = NodeId(id_str='sma_22008') -->

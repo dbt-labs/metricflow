@@ -55,12 +55,12 @@ docstring:
                         <JoinOnEntitiesNode>
                             <!-- description = 'Join Standard Outputs' -->
                             <!-- node_id = NodeId(id_str='jso_2') -->
-                            <!-- join0_for_node_id_pfe_6 =                                      -->
-                            <!--   JoinDescription(                                             -->
-                            <!--     join_node=SelectorNode(node_id=pfe_6),                     -->
-                            <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
-                            <!--     join_type=LEFT_OUTER,                                      -->
-                            <!--   )                                                            -->
+                            <!-- join0_for_node_id_pfe_6 =                                   -->
+                            <!--   JoinDescription(                                          -->
+                            <!--     join_node=SelectorNode(node_id=pfe_6),                  -->
+                            <!--     join_on_entity=EntityReference(element_name='listing'), -->
+                            <!--     join_type=LEFT_OUTER,                                   -->
+                            <!--   )                                                         -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = "Metric Time Dimension 'ds'" -->
                                 <!-- node_id = NodeId(id_str='sma_0') -->
@@ -75,7 +75,7 @@ docstring:
                                 <!-- description = "Select: ['country_latest', 'listing']" -->
                                 <!-- node_id = NodeId(id_str='pfe_6') -->
                                 <!-- include_spec = DimensionSpec(element_name='country_latest') -->
-                                <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                <!-- include_spec = EntitySpec(element_name='listing') -->
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
