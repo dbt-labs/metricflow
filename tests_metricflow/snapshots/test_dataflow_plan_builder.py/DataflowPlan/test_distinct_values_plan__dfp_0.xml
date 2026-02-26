@@ -28,8 +28,8 @@ docstring:
                 <!--     entity_links=(EntityReference(element_name='listing'),), -->
                 <!--   )                                                          -->
                 <!-- distinct = True -->
-                <WhereConstraintNode>
-                    <!-- description = 'Constrain Output with WHERE' -->
+                <WhereFilterNode>
+                    <!-- description = 'Filter Output with WHERE' -->
                     <!-- node_id = NodeId(id_str='wcc_0') -->
                     <!-- where_condition =                                                 -->
                     <!--   WhereFilterSpec(                                                -->
@@ -63,7 +63,7 @@ docstring:
                             <!-- data_set = SemanticModelDataSet('listings_latest') -->
                         </ReadSqlSourceNode>
                     </SelectorNode>
-                </WhereConstraintNode>
+                </WhereFilterNode>
             </SelectorNode>
         </OrderByLimitNode>
     </WriteToResultDataTableNode>

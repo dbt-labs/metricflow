@@ -104,8 +104,8 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                             <!--   )                                                                                 -->
                             <!-- distinct = False -->
-                            <WhereConstraintNode>
-                                <!-- description = 'Constrain Output with WHERE' -->
+                            <WhereFilterNode>
+                                <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
                                 <!-- where_condition =                                -->
                                 <!--   WhereFilterSpec(                               -->
@@ -161,7 +161,7 @@ docstring:
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
                                 </SelectorNode>
-                            </WhereConstraintNode>
+                            </WhereFilterNode>
                         </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                     <SelectorNode>
@@ -173,8 +173,8 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                         <!--   )                                                                                 -->
                         <!-- distinct = True -->
-                        <WhereConstraintNode>
-                            <!-- description = 'Constrain Output with WHERE' -->
+                        <WhereFilterNode>
+                            <!-- description = 'Filter Output with WHERE' -->
                             <!-- node_id = NodeId(id_str='wcc_1') -->
                             <!-- where_condition =                                           -->
                             <!--   WhereFilterSpec(                                          -->
@@ -257,7 +257,7 @@ docstring:
                                     </ReadSqlSourceNode>
                                 </AliasSpecsNode>
                             </SelectorNode>
-                        </WhereConstraintNode>
+                        </WhereFilterNode>
                     </SelectorNode>
                 </JoinToTimeSpineNode>
             </ComputeMetricsNode>

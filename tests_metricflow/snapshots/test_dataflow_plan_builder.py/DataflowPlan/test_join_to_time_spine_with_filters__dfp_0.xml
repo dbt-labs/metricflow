@@ -74,8 +74,8 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- distinct = False -->
-                            <WhereConstraintNode>
-                                <!-- description = 'Constrain Output with WHERE' -->
+                            <WhereFilterNode>
+                                <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
                                 <!-- where_condition =                                -->
                                 <!--   WhereFilterSpec(                               -->
@@ -129,7 +129,7 @@ docstring:
                                         </MetricTimeDimensionTransformNode>
                                     </ConstrainTimeRangeNode>
                                 </SelectorNode>
-                            </WhereConstraintNode>
+                            </WhereFilterNode>
                         </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                     <SelectorNode>
@@ -146,8 +146,8 @@ docstring:
                             <!-- node_id = NodeId(id_str='ctr_1') -->
                             <!-- time_range_start = '2020-01-03T00:00:00' -->
                             <!-- time_range_end = '2020-01-05T00:00:00' -->
-                            <WhereConstraintNode>
-                                <!-- description = 'Constrain Output with WHERE' -->
+                            <WhereFilterNode>
+                                <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_1') -->
                                 <!-- where_condition =                                -->
                                 <!--   WhereFilterSpec(                               -->
@@ -211,7 +211,7 @@ docstring:
                                         </ReadSqlSourceNode>
                                     </AliasSpecsNode>
                                 </SelectorNode>
-                            </WhereConstraintNode>
+                            </WhereFilterNode>
                         </ConstrainTimeRangeNode>
                     </SelectorNode>
                 </JoinToTimeSpineNode>
