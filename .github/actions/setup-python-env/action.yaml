@@ -27,7 +27,7 @@ runs:
     run: echo "LINUX_RELEASE=$(lsb_release -rs)" >> $GITHUB_ENV
 
   - name: Set up Python ${{ inputs.python_version }}
-    uses: actions/setup-python@v4
+    uses: actions/setup-python@v6
     with:
       python-version: "${{ inputs.python-version }}"
 
@@ -36,7 +36,7 @@ runs:
     run: "echo '${{ inputs.hatch-environment-cache-config-json }}' > hatch-environment-cache-config.json"
 
   # Cache the dependencies installed by Hatch so that we don't need to reinstall them on every run.
-  - uses: actions/cache@v3
+  - uses: actions/cache@v5
     with:
       # Save pip cache.
       # Save Hatch environments.
@@ -67,9 +67,9 @@ runs:
 
   - name: Install Hatch
     shell: bash
-    # Pin click to avoid bug in 8.3.0 - can remove when a fix is released
+    # Pin `virtualenv` to avoid `module 'virtualenv.discovery.builtin' has no attribute 'propose_interpreters'` error.
     run: |
-      pip3 install "click<8.3.0"
+      pip3 install "virtualenv<20.40"
       pip3 install hatch
 
   # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
