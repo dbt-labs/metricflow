@@ -47,7 +47,6 @@ from metricflow_semantics.specs.simple_metric_input_spec import (
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
-from metricflow_semantics.specs.where_filter.where_filter_spec_set import WhereFilterSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
@@ -164,7 +163,7 @@ class DataflowPlanBuilder:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
         for metric_spec in query_spec.metric_specs:
             if (
-                len(metric_spec.filter_spec_set.all_filter_specs) > 0
+                len(metric_spec.where_filter_specs) > 0
                 or metric_spec.offset_to_grain is not None
                 or metric_spec.offset_window is not None
             ):
@@ -198,7 +197,7 @@ class DataflowPlanBuilder:
             metric_specs=tuple(
                 MetricSpec(
                     element_name=metric_spec.element_name,
-                    filter_spec_set=WhereFilterSpecSet(query_level_filter_specs=query_level_filter_specs),
+                    where_filter_specs=query_level_filter_specs,
                 )
                 for metric_spec in query_spec.metric_specs
             ),
@@ -284,7 +283,7 @@ class DataflowPlanBuilder:
         # Build simple-metric recipes
         base_required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
-            filter_specs=base_simple_metric_recipe.combined_filter_spec_set.all_filter_specs,
+            filter_specs=base_simple_metric_recipe.combined_filter_specs,
         )
         base_spec = SimpleMetricInputSpec(
             element_name=base_simple_metric_recipe.simple_metric_input.name,
@@ -373,7 +372,7 @@ class DataflowPlanBuilder:
             .merge(base_required_linkable_specs.as_instance_spec_set)
             .dedupe(),
             custom_granularity_specs=base_required_linkable_specs.time_dimension_specs_with_custom_grain,
-            where_filter_specs=base_simple_metric_recipe.combined_filter_spec_set.all_filter_specs,
+            where_filter_specs=base_simple_metric_recipe.combined_filter_specs,
         )
 
         # Gets the successful conversions using JoinConversionEventsNode
@@ -434,15 +433,13 @@ class DataflowPlanBuilder:
             filter_location=WhereFilterLocation.for_metric(metric_spec.reference),
             filter_intersection=metric.filter,
         )
-        conversion_metric_filter_spec_set = WhereFilterSpecSet(
-            metric_level_filter_specs=tuple(metric_definition_filter_specs),
-        ).merge(metric_spec.filter_spec_set)
+        conversion_metric_filter_specs = tuple(metric_definition_filter_specs) + metric_spec.where_filter_specs
 
         base_metric_recipe, conversion_metric_recipe = self._build_input_recipes_for_conversion_metric(
             metric_reference=metric_spec.reference,
             conversion_type_params=conversion_type_params,
             filter_spec_factory=filter_spec_factory,
-            descendant_filter_spec_set=conversion_metric_filter_spec_set,
+            descendant_filter_specs=conversion_metric_filter_specs,
             queried_linkable_specs=queried_linkable_specs,
         )
         # TODO: [custom granularity] change this to an assertion once we're sure there aren't exceptions
@@ -556,9 +553,7 @@ class DataflowPlanBuilder:
             filter_location=WhereFilterLocation.for_metric(metric_spec.reference),
             filter_intersection=metric.filter,
         )
-        cumulative_metric_filter_spec_set = WhereFilterSpecSet(
-            metric_level_filter_specs=tuple(metric_definition_filter_specs),
-        ).merge(metric_spec.filter_spec_set)
+        cumulative_metric_filter_spec_set = tuple(metric_definition_filter_specs) + metric_spec.where_filter_specs
 
         simple_metric_recipe = self._build_simple_metric_recipe(
             simple_metric_input=self._manifest_object_lookup.simple_metric_name_to_input[cumulative_metric_input.name],
@@ -573,7 +568,7 @@ class DataflowPlanBuilder:
                 ),
                 cumulative_grain_to_date=cumulative_grain_to_date,
             ),
-            additional_filter_spec_set=cumulative_metric_filter_spec_set,
+            additional_filter_specs=cumulative_metric_filter_spec_set,
             filter_spec_factory=filter_spec_factory,
         )
         aggregated_node = self.build_aggregated_simple_metric_input(
@@ -631,7 +626,7 @@ class DataflowPlanBuilder:
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
             cumulative_description=None,
             filter_spec_factory=filter_spec_factory,
-            additional_filter_spec_set=metric_spec.filter_spec_set,
+            additional_filter_specs=metric_spec.where_filter_specs,
         )
 
         aggregated_simple_metric_input_node = self.build_aggregated_simple_metric_input(
@@ -668,7 +663,7 @@ class DataflowPlanBuilder:
         )
 
         required_linkable_specs = self.__get_required_linkable_specs(
-            queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.filter_spec_set.all_filter_specs
+            queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.where_filter_specs
         )
 
         parent_nodes: List[DataflowPlanNode] = []
@@ -680,12 +675,8 @@ class DataflowPlanBuilder:
         )
 
         for metric_input_spec in metric_input_specs:
-            where_filter_spec_set = WhereFilterSpecSet(
-                metric_level_filter_specs=tuple(metric_definition_filter_specs),
-            )
-
-            # These are the filters that's defined as part of the input metric.
-            where_filter_spec_set = where_filter_spec_set.merge(metric_input_spec.filter_spec_set)
+            where_filter_specs = list(metric_definition_filter_specs)
+            where_filter_specs.extend(metric_input_spec.where_filter_specs)
 
             # If metric is offset, we'll apply where constraint after offset to avoid removing values
             # unexpectedly. Time constraint will be applied by INNER JOINing to time spine.
@@ -693,7 +684,7 @@ class DataflowPlanBuilder:
             # is about post-join to pre-join for dimension access, and relies on the builder to collect
             # predicates from query and metric specs and make them available at simple-metric-input level.
             if not metric_spec.has_time_offset:
-                where_filter_spec_set = where_filter_spec_set.merge(metric_spec.filter_spec_set)
+                where_filter_specs.extend(metric_spec.where_filter_specs)
             metric_pushdown_state = (
                 predicate_pushdown_state
                 if not metric_spec.has_time_offset
@@ -705,7 +696,7 @@ class DataflowPlanBuilder:
                     BuildAnyMetricOutputNodeInput(
                         metric_spec=MetricSpec(
                             element_name=metric_input_spec.element_name,
-                            filter_spec_set=where_filter_spec_set,
+                            where_filter_specs=tuple(where_filter_specs),
                             alias=metric_input_spec.alias,
                             offset_window=metric_input_spec.offset_window,
                             offset_to_grain=metric_input_spec.offset_to_grain,
@@ -1327,7 +1318,7 @@ class DataflowPlanBuilder:
         metric_reference: MetricReference,
         conversion_type_params: ConversionTypeParams,
         filter_spec_factory: WhereSpecFactory,
-        descendant_filter_spec_set: WhereFilterSpecSet,
+        descendant_filter_specs: Sequence[WhereFilterSpec],
         queried_linkable_specs: LinkableSpecSet,
     ) -> Tuple[SimpleMetricRecipe, SimpleMetricRecipe]:
         """Return base / conversion recipes for computing a conversion metric."""
@@ -1348,12 +1339,12 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 child_metric_offset_window=None,
                 child_metric_offset_to_grain=None,
-                additional_filter_spec_set=descendant_filter_spec_set,
+                additional_filter_specs=descendant_filter_specs,
             )
             # Filters should only be applied to base metrics.
-            for input_metric, descendant_filter_spec_set in [
-                (conversion_type_params.base_metric, descendant_filter_spec_set),
-                (conversion_type_params.conversion_metric, WhereFilterSpecSet()),
+            for input_metric, descendant_filter_specs in [
+                (conversion_type_params.base_metric, descendant_filter_specs),
+                (conversion_type_params.conversion_metric, ()),
             ]
         ]
 
@@ -1367,7 +1358,7 @@ class DataflowPlanBuilder:
         child_metric_offset_to_grain: Optional[TimeGranularity],
         cumulative_description: Optional[CumulativeDescription],
         filter_spec_factory: WhereSpecFactory,
-        additional_filter_spec_set: WhereFilterSpecSet,
+        additional_filter_specs: Sequence[WhereFilterSpec],
     ) -> SimpleMetricRecipe:
         """Return the recipe required to compute the simple metric with modifications as specified by args.
 
@@ -1458,24 +1449,22 @@ class DataflowPlanBuilder:
 
         metric_filter_intersection = simple_metric_input.filter
         if metric_filter_intersection is not None:
-            metric_filter_spec_set = WhereFilterSpecSet(
-                metric_level_filter_specs=tuple(
-                    filter_spec_factory.create_from_where_filter_intersection(
-                        filter_location=WhereFilterLocation.for_metric(simple_metric_input.metric_reference),
-                        filter_intersection=metric_filter_intersection,
-                    )
+            metric_filter_specs = tuple(
+                filter_spec_factory.create_from_where_filter_intersection(
+                    filter_location=WhereFilterLocation.for_metric(simple_metric_input.metric_reference),
+                    filter_intersection=metric_filter_intersection,
                 )
             )
         else:
-            metric_filter_spec_set = WhereFilterSpecSet()
+            metric_filter_specs = ()
 
         return SimpleMetricRecipe(
             simple_metric_input=simple_metric_input,
             offset_window=child_metric_offset_window,
             offset_to_grain=child_metric_offset_to_grain,
             cumulative_description=cumulative_description,
-            metric_filter_spec_set=metric_filter_spec_set,
-            additional_filter_spec_set=additional_filter_spec_set,
+            metric_filter_specs=metric_filter_specs,
+            additional_filter_specs=tuple(additional_filter_specs),
             before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
             after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
         )
@@ -1490,15 +1479,13 @@ class DataflowPlanBuilder:
         input_metric_specs: List[MetricSpec] = []
 
         for input_metric in metric.input_metrics:
-            filter_spec_set = WhereFilterSpecSet(
-                metric_level_filter_specs=tuple(
-                    filter_spec_factory.create_from_where_filter_intersection(
-                        filter_location=WhereFilterLocation.for_input_metric(
-                            input_metric_reference=input_metric.as_reference
-                        ),
-                        filter_intersection=input_metric.filter,
-                    )
-                ),
+            where_filter_specs = tuple(
+                filter_spec_factory.create_from_where_filter_intersection(
+                    filter_location=WhereFilterLocation.for_input_metric(
+                        input_metric_reference=input_metric.as_reference
+                    ),
+                    filter_intersection=input_metric.filter,
+                )
             )
 
             input_metric_offset_to_grain: Optional[TimeGranularity] = None
@@ -1510,7 +1497,7 @@ class DataflowPlanBuilder:
 
             spec = MetricSpec(
                 element_name=input_metric.name,
-                filter_spec_set=filter_spec_set,
+                where_filter_specs=where_filter_specs,
                 alias=input_metric.alias,
                 offset_window=(
                     PydanticMetricTimeWindow(
@@ -1703,8 +1690,8 @@ class DataflowPlanBuilder:
         )
 
         # TODO: fix bug here where filter specs are being included in when aggregating.
-        if len(metric_spec.filter_spec_set.all_filter_specs) > 0 or time_range_constraint:
-            where_filter_specs = metric_spec.filter_spec_set.all_filter_specs
+        if len(metric_spec.where_filter_specs) > 0 or time_range_constraint:
+            where_filter_specs = metric_spec.where_filter_specs
             if len(where_filter_specs) > 0:
                 output_node = WhereConstraintNode.create(parent_node=output_node, where_specs=where_filter_specs)
             if time_range_constraint:
@@ -1785,7 +1772,7 @@ class DataflowPlanBuilder:
             LazyFormat(
                 "Building aggregate node",
                 simple_metric_recipe=simple_metric_recipe,
-                combined_filter_spec_set=simple_metric_recipe.combined_filter_spec_set,
+                combined_filter_specs=simple_metric_recipe.combined_filter_specs,
             )
         )
 
@@ -1836,7 +1823,7 @@ class DataflowPlanBuilder:
 
         required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=queried_linkable_specs,
-            filter_specs=simple_metric_recipe.combined_filter_spec_set.all_filter_specs,
+            filter_specs=simple_metric_recipe.combined_filter_specs,
             spec_properties=spec_properties,
         )
 
@@ -1970,7 +1957,7 @@ class DataflowPlanBuilder:
             source_node=unaggregated_simple_metric_input_node,
             join_targets=source_node_recipe.join_targets,
             custom_granularity_specs=custom_granularity_specs_to_join,
-            where_filter_specs=simple_metric_recipe.combined_filter_spec_set.all_filter_specs,
+            where_filter_specs=simple_metric_recipe.combined_filter_specs,
             time_range_constraint=time_range_constraint_to_apply,
             specs_to_keep_for_aggregation=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,)).merge(
                 InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
@@ -1991,8 +1978,8 @@ class DataflowPlanBuilder:
                 source_node=aggregate_node,
                 queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 queried_linkable_specs=queried_linkable_specs.as_tuple,
-                metric_where_filter_specs=simple_metric_recipe.metric_filter_spec_set.all_filter_specs,
-                after_aggregation_where_filter_specs=simple_metric_recipe.additional_filter_spec_set.all_filter_specs,
+                metric_where_filter_specs=simple_metric_recipe.metric_filter_specs,
+                after_aggregation_where_filter_specs=simple_metric_recipe.additional_filter_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
             )
 
