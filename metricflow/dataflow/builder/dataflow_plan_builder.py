@@ -5,11 +5,9 @@ import time
 from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple, Union
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
 from dbt_semantic_interfaces.protocols.metric import (
     ConstantPropertyInput,
     ConversionTypeParams,
-    MetricTimeWindow,
     MetricType,
 )
 from dbt_semantic_interfaces.references import MetricReference, TimeDimensionReference
@@ -46,6 +44,7 @@ from metricflow_semantics.specs.simple_metric_input_spec import (
 )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_transform import WhereSpecFactory
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
@@ -263,7 +262,7 @@ class DataflowPlanBuilder:
         base_simple_metric_recipe: SimpleMetricRecipe,
         conversion_simple_metric_recipe: SimpleMetricRecipe,
         entity_spec: EntitySpec,
-        window: Optional[MetricTimeWindow],
+        window: Optional[TimeWindow],
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
         constant_properties: Optional[Sequence[ConstantPropertyInput]] = None,
@@ -470,7 +469,9 @@ class DataflowPlanBuilder:
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
             entity_spec=entity_spec,
-            window=conversion_type_params.window,
+            window=TimeWindow.create_from_dsi_time_window(conversion_type_params.window)
+            if conversion_type_params.window is not None
+            else None,
             constant_properties=conversion_type_params.constant_properties,
         )
 
@@ -562,8 +563,8 @@ class DataflowPlanBuilder:
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
             cumulative_description=CumulativeDescription(
                 cumulative_window=(
-                    metric.type_params.cumulative_type_params.window
-                    if metric.type_params.cumulative_type_params
+                    TimeWindow.create_from_dsi_time_window(metric.type_params.cumulative_type_params.window)
+                    if metric.type_params.cumulative_type_params and metric.type_params.cumulative_type_params.window
                     else None
                 ),
                 cumulative_grain_to_date=cumulative_grain_to_date,
@@ -1354,7 +1355,7 @@ class DataflowPlanBuilder:
         self,
         simple_metric_input: SimpleMetricInput,
         queried_linkable_specs: LinkableSpecSet,
-        child_metric_offset_window: Optional[MetricTimeWindow],
+        child_metric_offset_window: Optional[TimeWindow],
         child_metric_offset_to_grain: Optional[TimeGranularity],
         cumulative_description: Optional[CumulativeDescription],
         filter_spec_factory: WhereSpecFactory,
@@ -1500,7 +1501,7 @@ class DataflowPlanBuilder:
                 where_filter_specs=where_filter_specs,
                 alias=input_metric.alias,
                 offset_window=(
-                    PydanticMetricTimeWindow(
+                    TimeWindow(
                         count=input_metric.offset_window.count,
                         granularity=input_metric.offset_window.granularity,
                     )
@@ -2135,7 +2136,7 @@ class DataflowPlanBuilder:
         join_on_time_dimension_spec: TimeDimensionSpec,
         where_filter_specs: Sequence[WhereFilterSpec] = (),
         time_range_constraint: Optional[TimeRangeConstraint] = None,
-        custom_offset_window: Optional[MetricTimeWindow] = None,
+        custom_offset_window: Optional[TimeWindow] = None,
         use_offset_custom_granularity_node: bool = False,
     ) -> DataflowPlanNode:
         """Return the time spine node needed to satisfy the specs."""
@@ -2216,7 +2217,7 @@ class DataflowPlanBuilder:
 
     def build_custom_offset_time_spine_node(
         self,
-        offset_window: MetricTimeWindow,
+        offset_window: TimeWindow,
         required_time_spine_specs: Tuple[TimeDimensionSpec, ...],
         use_offset_custom_granularity_node: bool,
     ) -> DataflowPlanNode:

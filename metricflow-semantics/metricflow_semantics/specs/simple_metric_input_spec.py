@@ -5,11 +5,11 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
@@ -33,7 +33,7 @@ class SimpleMetricInputSpec(InstanceSpec):  # noqa: D101
 class CumulativeDescription:
     """If a simple metric is a part of a cumulative metric, this represents the associated parameters."""
 
-    cumulative_window: Optional[MetricTimeWindow]
+    cumulative_window: Optional[TimeWindow]
     cumulative_grain_to_date: Optional[TimeGranularity]
 
 
@@ -48,7 +48,7 @@ class SimpleMetricRecipe:
     # For additional filters that might be needed (e.g. a filter defined in a derived metric or query).
     additional_filter_specs: Tuple[WhereFilterSpec, ...]
 
-    offset_window: Optional[MetricTimeWindow]
+    offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
     cumulative_description: Optional[CumulativeDescription]
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
@@ -64,18 +64,18 @@ class JoinToTimeSpineDescription:
     """Describes how a time spine join should be performed."""
 
     join_type: SqlJoinType
-    offset_window: Optional[MetricTimeWindow]
+    offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
 
     @property
-    def standard_offset_window(self) -> Optional[MetricTimeWindow]:
+    def standard_offset_window(self) -> Optional[TimeWindow]:
         """Return the offset window if it uses a standard granularity."""
         if self.offset_window and self.offset_window.is_standard_granularity:
             return self.offset_window
         return None
 
     @property
-    def custom_offset_window(self) -> Optional[MetricTimeWindow]:
+    def custom_offset_window(self) -> Optional[TimeWindow]:
         """Return the offset window if it uses a custom granularity."""
         if self.offset_window and not self.offset_window.is_standard_granularity:
             return self.offset_window

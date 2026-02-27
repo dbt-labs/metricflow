@@ -3,12 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
@@ -27,7 +27,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
     """
 
     queried_agg_time_dimension_specs: Tuple[TimeDimensionSpec, ...]
-    window: Optional[MetricTimeWindow]
+    window: Optional[TimeWindow]
     grain_to_date: Optional[TimeGranularity]
     time_range_constraint: Optional[TimeRangeConstraint]
 
@@ -39,7 +39,7 @@ class JoinOverTimeRangeNode(DataflowPlanNode):
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
         queried_agg_time_dimension_specs: Tuple[TimeDimensionSpec, ...],
-        window: Optional[MetricTimeWindow] = None,
+        window: Optional[TimeWindow] = None,
         grain_to_date: Optional[TimeGranularity] = None,
         time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> JoinOverTimeRangeNode:

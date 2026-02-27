@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.sql.sql_exprs import (
     SqlColumnReference,
     SqlColumnReferenceExpression,
@@ -410,7 +410,7 @@ class SqlPlanJoinBuilder:
     def _make_time_range_window_join_condition(
         base_data_set: AnnotatedSqlDataSet,
         time_comparison_dataset: AnnotatedSqlDataSet,
-        window: Optional[MetricTimeWindow] = None,
+        window: Optional[TimeWindow] = None,
         grain_to_date: Optional[TimeGranularity] = None,
     ) -> SqlLogicalExpression:
         """Helper to generate a renderable SqlExpression for expressing a time range window join condition.
