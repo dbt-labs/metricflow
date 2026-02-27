@@ -47,7 +47,13 @@ LEFT OUTER JOIN (
       , 1 AS instant_bookings_with_measure_filter
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_15
-  WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
+  WHERE (
+    booking__is_instant
+  ) AND (
+    listing IS NOT NULL
+  ) AND (
+    metric_time__day > '2020-01-01'
+  )
   GROUP BY
     metric_time__day
     , booking__is_instant

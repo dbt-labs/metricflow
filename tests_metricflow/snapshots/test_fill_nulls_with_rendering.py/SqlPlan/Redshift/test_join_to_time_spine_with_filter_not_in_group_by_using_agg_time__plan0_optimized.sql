@@ -23,7 +23,13 @@ FROM (
       , DATE_TRUNC('month', ds) AS booking__ds__month
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_21
-  WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
+  WHERE (
+    metric_time__day >= '2020-01-02'
+  ) AND (
+    metric_time__day <= '2020-01-02'
+  ) AND (
+    booking__ds__month > '2020-01-01'
+  )
 ) subq_23
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
@@ -43,7 +49,13 @@ LEFT OUTER JOIN (
       , 1 AS bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_15
-  WHERE ((metric_time__day >= '2020-01-02') AND (metric_time__day <= '2020-01-02')) AND (booking__ds__month > '2020-01-01')
+  WHERE (
+    metric_time__day >= '2020-01-02'
+  ) AND (
+    metric_time__day <= '2020-01-02'
+  ) AND (
+    booking__ds__month > '2020-01-01'
+  )
   GROUP BY
     booking__ds__day
 ) subq_18

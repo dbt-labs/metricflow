@@ -64,7 +64,11 @@ FROM (
             ) subq_6
           ) subq_7
         ) subq_8
-        WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
+        WHERE (
+          metric_time__hour > '2020-01-01 00:09:00'
+        ) AND (
+          metric_time__day = '2020-01-01'
+        )
       ) subq_9
       GROUP BY
         metric_time__day
@@ -478,7 +482,11 @@ FROM (
               ) subq_0
             ) subq_1
           ) subq_2
-          WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
+          WHERE (
+            metric_time__hour > '2020-01-01 00:09:00'
+          ) AND (
+            metric_time__day = '2020-01-01'
+          )
         ) subq_3
       ) subq_4
       GROUP BY
