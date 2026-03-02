@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from abc import ABC
 from dataclasses import dataclass
@@ -56,15 +57,14 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricFlowGraph[NodeT, EdgeT], ABC):
         self.add_edges((edge,))
 
     def add_edges(self, edges: Iterable[EdgeT]) -> None:  # noqa: D102
-        tail_nodes = [edge.tail_node for edge in edges]
-        head_nodes = [edge.head_node for edge in edges]
+        edges_tuple = tuple(edges)
 
         nodes_to_add: MutableOrderedSet[NodeT] = MutableOrderedSet()
-        nodes_to_add.update(tail_nodes, head_nodes)
+        nodes_to_add.update(itertools.chain.from_iterable(((edge.tail_node, edge.head_node) for edge in edges_tuple)))
         nodes_to_add.difference_update(self.nodes)
         self.add_nodes(nodes_to_add)
 
-        for edge in edges:
+        for edge in edges_tuple:
             tail_node = edge.tail_node
             head_node = edge.head_node
 
@@ -73,7 +73,7 @@ class MutableGraph(Generic[NodeT, EdgeT], MetricFlowGraph[NodeT, EdgeT], ABC):
             self._node_to_successor_nodes[tail_node].add(head_node)
             self._node_to_predecessor_nodes[head_node].add(tail_node)
 
-        self._edges.update(edges)
+        self._edges.update(edges_tuple)
         self._graph_id = SequentialGraphId.create()
 
     def update(self, other: MetricFlowGraph[NodeT, EdgeT]) -> None:
