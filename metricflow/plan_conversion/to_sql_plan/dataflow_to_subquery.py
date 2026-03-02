@@ -1073,13 +1073,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Sanity check that all parents have the same linkable specs before building the join descriptions.
         linkable_specs = from_data_set.data_set.instance_set.spec_set.linkable_specs
-        assert all(
+        if not all(
             [set(x.data_set.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in join_data_sets]
-        ), (
-            "All join data sets should have the same set of linkable instances as the from dataset since all values are coalesced.\n"
-            f"From dataset instance set: {from_data_set.data_set.instance_set}\n"
-            f"Join dataset instance sets: {[join_data_set.data_set.instance_set for join_data_set in join_data_sets]}"
-        )
+        ):
+            raise MetricFlowInternalError(
+                LazyFormat(
+                    "All join data sets should have the same set of linkable instances as the `from` dataset since all values"
+                    " are coalesced.",
+                    from_data_set_instance_set=from_data_set.data_set.instance_set,
+                    join_data_set_instance_sets=[
+                        join_data_set.data_set.instance_set for join_data_set in join_data_sets
+                    ],
+                )
+            )
 
         linkable_spec_set = from_data_set.data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
         join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else SqlJoinType.FULL_OUTER
