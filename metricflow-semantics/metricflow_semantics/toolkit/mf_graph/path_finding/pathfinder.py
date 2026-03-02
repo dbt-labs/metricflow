@@ -46,7 +46,6 @@ class MetricFlowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
 
     def __init__(self) -> None:  # noqa: D107
         self._local_state = _MetricFlowPathfinderLocalState()
-        self._lo = MutableGraphTraversalProfile()
         self._verbose_debug_logs = False
 
     def find_paths_dfs(
