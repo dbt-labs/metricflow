@@ -22,7 +22,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_fill_nulls_with_0"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
@@ -49,7 +49,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_fill_nulls_with_0"],
             group_by_names=["metric_time__month"],
             order_by_names=["metric_time__month"],
@@ -76,7 +76,7 @@ def test_simple_join_to_time_spine(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_join_to_time_spine"],
             group_by_names=["metric_time"],
             time_constraint_start=datetime.datetime(2019, 11, 27),
@@ -103,7 +103,7 @@ def test_fill_nulls_with_0_multi_metric_query(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_fill_nulls_with_0", "views"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
@@ -130,7 +130,7 @@ def test_fill_nulls_with_0_multi_metric_query_with_categorical_dimension(  # noq
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_fill_nulls_with_0_without_time_spine", "views"],
             group_by_names=["metric_time", "listing__is_lux_latest"],
             order_by_names=["metric_time", "listing__is_lux_latest"],
@@ -160,7 +160,7 @@ def test_join_to_time_spine_with_filter_not_in_group_by(  # noqa: D103
         )
 
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_join_to_time_spine_with_tiered_filters"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
@@ -191,7 +191,7 @@ def test_join_to_time_spine_with_filter_smaller_than_group_by(  # noqa: D103
         )
 
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["archived_users_join_to_time_spine"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
@@ -225,7 +225,7 @@ def test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time(  # noqa:
         )
 
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_join_to_time_spine_with_tiered_filters"],
             group_by_names=["booking__ds__day"],
             order_by_names=["booking__ds__day"],
@@ -256,7 +256,7 @@ def test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time_and_metri
         )
 
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_join_to_time_spine_with_tiered_filters"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
@@ -282,7 +282,7 @@ def test_join_to_time_spine_with_custom_grain_in_group_by(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_join_to_time_spine"],
             group_by_names=["booking__ds__alien_day"],
             order_by_names=["booking__ds__alien_day"],
@@ -312,7 +312,7 @@ def test_join_to_timespine_metric_with_custom_granularity_filter(  # noqa: D103
         )
 
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("bookings_join_to_time_spine",),
             group_by_names=("metric_time__alien_day",),
             order_by_names=("metric_time__alien_day",),
@@ -343,7 +343,7 @@ def test_join_to_timespine_metric_with_custom_granularity_filter_not_in_group_by
         )
 
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("bookings_join_to_time_spine",),
             group_by_names=("metric_time__day",),
             order_by_names=("metric_time__day",),
@@ -374,7 +374,7 @@ def test_join_to_timespine_metric_with_date_part(
 ) -> None:
     """Test join_to_timespine metric with date part."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("bookings_join_to_time_spine",),
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
             order_by=(OrderByParameter(order_by=TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH)),),

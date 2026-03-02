@@ -63,9 +63,7 @@ class ExhaustiveQueryGenerator(MetricFlowRequestGenerator):
                 ):
                     group_by.append(TimeDimensionParameter(name=METRIC_TIME_ELEMENT_NAME))
 
-                mf_requests.append(
-                    MetricFlowQueryRequest.create_with_random_request_id(metrics=metrics, group_by=group_by)
-                )
+                mf_requests.append(MetricFlowQueryRequest.create(metrics=metrics, group_by=group_by))
         return mf_requests
 
     def _resolve_possible_group_by_items(

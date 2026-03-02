@@ -21,7 +21,7 @@ def test_conversion_metric(
 ) -> None:
     """Test query against a conversion metric."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversion_rate",),
             group_by_names=("metric_time",),
             order_by_names=("metric_time",),
@@ -47,7 +47,7 @@ def test_conversion_metric_with_window(
 ) -> None:
     """Test query against a conversion metric with a window."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversion_rate_7days",),
             group_by_names=("metric_time",),
             order_by_names=("metric_time",),
@@ -73,7 +73,7 @@ def test_conversion_metric_with_categorical_filter(
 ) -> None:
     """Test query against a conversion metric with a categorical filter."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversion_rate",),
             group_by_names=("metric_time", "visit__referrer_id"),
             order_by_names=("metric_time", "visit__referrer_id"),
@@ -100,7 +100,7 @@ def test_conversion_metric_with_time_constraint(
 ) -> None:
     """Test query against a conversion metric with a time constraint and categorical filter."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversion_rate",),
             group_by_names=("visit__referrer_id",),
             order_by_names=("visit__referrer_id",),
@@ -129,7 +129,7 @@ def test_conversion_metric_with_window_and_time_constraint(
 ) -> None:
     """Test query against a conversion metric with a window, time constraint, and categorical filter."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversion_rate_7days",),
             group_by_names=(
                 "metric_time",
@@ -161,7 +161,7 @@ def test_conversion_metric_with_filter_not_in_group_by(
 ) -> None:
     """Test query against a conversion metric with a filter that doesn't exist in group by."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversions",),
             time_constraint_start=datetime.datetime(2020, 1, 1),
             time_constraint_end=datetime.datetime(2020, 1, 1),
@@ -187,7 +187,7 @@ def test_conversion_metric_with_different_time_dimension_grains(
 ) -> None:
     """Test query against a conversion metric with a filter that doesn't exist in group by."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversion_rate_with_monthly_conversion",),
         )
     )
@@ -212,7 +212,7 @@ def test_conversion_metric_with_metric_definition_filter(
 ) -> None:
     """Test query against a conversion metric that has a filter defined in the YAML metric definition."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=("visit_buy_conversion_rate_with_filter",),
             group_by_names=("metric_time",),
             order_by_names=("metric_time",),

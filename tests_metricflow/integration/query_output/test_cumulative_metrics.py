@@ -22,7 +22,7 @@ def test_simple_cumulative_metric(
 ) -> None:
     """Tests a query of a cumulative metric with a monthly window and a time constraint adjustment."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["trailing_2_months_revenue"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
@@ -50,7 +50,7 @@ def test_multiple_cumulative_metrics(
 ) -> None:
     """Tests a query with multiple cumulative metrics to ensure date selections align."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["revenue_all_time", "trailing_2_months_revenue"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
@@ -78,7 +78,7 @@ def test_non_additive_cumulative_metric(
 ) -> None:
     """Tests a query with a non-additive cumulative metric to ensure the non-additive constraint is applied."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["every_two_days_bookers"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
@@ -106,7 +106,7 @@ def test_grain_to_date_cumulative_metric(
 ) -> None:
     """Tests a month to date cumulative metric with a constraint to ensure all necessary input data is included."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["revenue_mtd"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
@@ -140,7 +140,7 @@ def test_cumulative_metric_with_non_adjustable_filter(
     where_constraint += f" {{{{ TimeDimension('metric_time', 'day') }}}} = {second_ds_expr}"
 
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["trailing_2_months_revenue"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],
@@ -169,7 +169,7 @@ def test_cumulative_metric_with_metric_definition_filter(
 ) -> None:
     """Tests a cumulative metric that has a filter defined in the YAML metric definition."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["trailing_2_months_revenue_with_filter"],
             group_by_names=["metric_time"],
             order_by_names=["metric_time"],

@@ -15,6 +15,6 @@ class SavedQueryRequestGenerator(MetricFlowRequestGenerator):
     @override
     def generate_requests(self, semantic_manifest: SemanticManifest) -> Sequence[MetricFlowQueryRequest]:
         return tuple(
-            MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query.name)
+            MetricFlowQueryRequest.create(saved_query_name=saved_query.name)
             for saved_query in semantic_manifest.saved_queries
         )

@@ -84,9 +84,7 @@ def mf_explain_saved_query(
                 )
             )
             try:
-                explain_result = mf_engine.explain(
-                    MetricFlowQueryRequest.create_with_random_request_id(saved_query_name=saved_query.name)
-                )
+                explain_result = mf_engine.explain(MetricFlowQueryRequest.create(saved_query_name=saved_query.name))
             except Exception:
                 logger.exception("Ignoring exception for the test")
 
@@ -129,9 +127,7 @@ def mf_simulate_validation(
             )
             try:
                 mf_engine.explain(
-                    MetricFlowQueryRequest.create_with_random_request_id(
-                        metric_names=[metric_name], group_by_names=[METRIC_TIME_ELEMENT_NAME]
-                    )
+                    MetricFlowQueryRequest.create(metric_names=[metric_name], group_by_names=[METRIC_TIME_ELEMENT_NAME])
                 )
             except Exception:
                 logger.exception("Ignoring exception for the test")

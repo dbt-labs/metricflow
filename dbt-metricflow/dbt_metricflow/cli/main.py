@@ -206,7 +206,7 @@ def query(
         spinner = Halo(text="Initiating query…", spinner="dots")
         spinner.start()
 
-    mf_request = MetricFlowQueryRequest.create_with_random_request_id(
+    mf_request = MetricFlowQueryRequest.create(
         saved_query_name=saved_query,
         metric_names=metrics,
         group_by_names=group_by,

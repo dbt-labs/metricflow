@@ -484,7 +484,7 @@ class DataWarehouseTaskBuilder:
                     query_and_params_callable=partial(
                         cls._gen_explain_query_task_query_and_params,
                         mf_engine=mf_engine,
-                        mf_request=MetricFlowQueryRequest.create_with_random_request_id(
+                        mf_request=MetricFlowQueryRequest.create(
                             metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
                         ),
                     ),
@@ -519,9 +519,7 @@ class DataWarehouseTaskBuilder:
                     query_and_params_callable=partial(
                         cls._gen_explain_query_task_query_and_params,
                         mf_engine=mf_engine,
-                        mf_request=MetricFlowQueryRequest.create_with_random_request_id(
-                            saved_query_name=saved_query.name
-                        ),
+                        mf_request=MetricFlowQueryRequest.create(saved_query_name=saved_query.name),
                     ),
                     context=SavedQueryContext(
                         file_context=FileContext.from_metadata(metadata=saved_query.metadata),
