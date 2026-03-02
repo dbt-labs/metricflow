@@ -71,7 +71,9 @@ class BestMetricQuerySetSelector:
                     remaining_desired_query_elements=remaining_desired_query_elements.as_frozen(),
                     input_query_node_to_fulfilled_query_elements=input_query_node_to_fulfilled_query_elements,
                 )
-            fulfilled_query_elements = remaining_desired_query_elements.intersection(selected_query_node.output_query_elements).as_frozen()
+            fulfilled_query_elements = remaining_desired_query_elements.intersection(
+                selected_query_node.output_query_elements
+            ).as_frozen()
             input_query_node_to_fulfilled_query_elements[selected_query_node] = fulfilled_query_elements
             remaining_desired_query_elements.difference_update(fulfilled_query_elements)
 

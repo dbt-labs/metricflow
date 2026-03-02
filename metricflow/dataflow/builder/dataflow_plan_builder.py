@@ -114,6 +114,8 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import (
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.metric_evaluation.dfs_me_planner import DepthFirstSearchMetricEvaluationPlanner
 from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
+from metricflow.metric_evaluation.metric_query_planner import MetricEvaluationPlanner
+from metricflow.metric_evaluation.passthrough.passthrough_me_planner import PassThroughMetricEvaluationPlanner
 from metricflow.metric_evaluation.plan.me_edges import MetricQueryDependencyEdge
 from metricflow.metric_evaluation.plan.me_labels import TopLevelQueryLabel
 from metricflow.metric_evaluation.plan.me_nodes import (
@@ -164,6 +166,9 @@ class DataflowPlanBuilder:
         self._cache = dataflow_plan_builder_cache or DataflowPlanBuilderCache()
         self._metric_evaluation_plan_formatter = MetricEvaluationPlanTableFormatter()
 
+        # This should be moved to a build context object.
+        self._optimizations: frozenset[DataflowPlanOptimization] = frozenset()
+
     def build_plan(
         self,
         query_spec: MetricFlowQuerySpec,
@@ -172,6 +177,7 @@ class DataflowPlanBuilder:
         optimizations: FrozenSet[DataflowPlanOptimization] = frozenset(),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
+        self._optimizations = optimizations
         metrics_output_node = self._build_query_output_node(query_spec=query_spec)
 
         sink_node = DataflowPlanBuilder.build_sink_node(
@@ -188,8 +194,7 @@ class DataflowPlanBuilder:
 
         plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
         plan = DataflowPlan(sink_nodes=[sink_node], plan_id=plan_id)
-
-        optimized_plan = self._optimize_plan(plan, optimizations)
+        optimized_plan = self._optimize_plan(plan)
         logger.debug(LazyFormat("Generated final plan", optimized_plan=lambda: optimized_plan.structure_text()))
         return optimized_plan
 
@@ -240,10 +245,18 @@ class DataflowPlanBuilder:
 
         queried_linkable_specs = query_spec.linkable_specs
 
-        me_planner = DepthFirstSearchMetricEvaluationPlanner(
-            manifest_object_lookup=self._manifest_object_lookup,
-            column_association_resolver=self._column_association_resolver,
-        )
+        me_planner: MetricEvaluationPlanner
+        if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in self._optimizations:
+            me_planner = PassThroughMetricEvaluationPlanner(
+                manifest_object_lookup=self._manifest_object_lookup,
+                column_association_resolver=self._column_association_resolver,
+            )
+        else:
+            me_planner = DepthFirstSearchMetricEvaluationPlanner(
+                manifest_object_lookup=self._manifest_object_lookup,
+                column_association_resolver=self._column_association_resolver,
+            )
+
         me_plan = me_planner.build_plan(
             metric_specs=metric_specs,
             group_by_item_specs=queried_linkable_specs.as_tuple,
@@ -402,9 +415,9 @@ class DataflowPlanBuilder:
         else:
             return CombineAggregatedOutputsNode.create(output_nodes)
 
-    def _optimize_plan(self, plan: DataflowPlan, optimizations: FrozenSet[DataflowPlanOptimization]) -> DataflowPlan:
+    def _optimize_plan(self, plan: DataflowPlan) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
-        for optimizer in optimizer_factory.get_optimizers(optimizations):
+        for optimizer in optimizer_factory.get_optimizers(self._optimizations):
             logger.debug(LazyFormat(lambda: f"Applying optimizer: {optimizer.__class__.__name__}"))
             try:
                 plan = optimizer.optimize(plan)
@@ -865,12 +878,11 @@ class DataflowPlanBuilder:
         """
         # Workaround for a Pycharm type inspection issue with decorators.
         # noinspection PyArgumentList
-        return self._build_plan_for_no_metrics_query(query_spec, optimizations=optimizations)
+        self._optimizations = optimizations
+        return self._build_plan_for_no_metrics_query(query_spec)
 
     @log_runtime()
-    def _build_plan_for_no_metrics_query(
-        self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization]
-    ) -> DataflowPlan:
+    def _build_plan_for_no_metrics_query(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
 
         # Remove aliases for easier spec-matching. Will be added back in sink node.
@@ -932,7 +944,7 @@ class DataflowPlanBuilder:
         )
 
         plan = DataflowPlan(sink_nodes=[sink_node])
-        return self._optimize_plan(plan, optimizations)
+        return self._optimize_plan(plan)
 
     @staticmethod
     def build_sink_node(
