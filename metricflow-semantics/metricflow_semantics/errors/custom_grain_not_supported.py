@@ -8,7 +8,7 @@ from metricflow_semantics.errors.error_classes import FeatureNotSupportedError
 
 
 def error_if_not_standard_grain(input_granularity: str, context: Optional[str] = None) -> TimeGranularity:
-    """Cast input grainularity string to TimeGranularity, otherwise error.
+    """Cast input granularity string to TimeGranularity, otherwise error.
 
     TODO: Not needed once, custom grain is supported for most things.
     """
