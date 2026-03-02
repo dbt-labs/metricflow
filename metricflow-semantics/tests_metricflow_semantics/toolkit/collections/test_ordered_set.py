@@ -67,6 +67,18 @@ def test_eq() -> None:  # noqa: D103
     assert MutableOrderedSet((1,)) == FrozenOrderedSet((1,))
 
 
+def test_frozen_hash_ignores_insertion_order() -> None:  # noqa: D103
+    left = FrozenOrderedSet((1, 2, 3))
+    right = FrozenOrderedSet((3, 2, 1))
+    assert left == right
+    assert hash(left) == hash(right)
+
+
+def test_from_iterable_reuses_frozen_instance() -> None:  # noqa: D103
+    frozen_set = FrozenOrderedSet((1, 2, 3))
+    assert FrozenOrderedSet.from_iterable(frozen_set) is frozen_set
+
+
 def test_intersection_update() -> None:  # noqa: D103
     example_set = MutableOrderedSet((1, 2, 3))
     example_set.intersection_update({1, 2}, {2})
