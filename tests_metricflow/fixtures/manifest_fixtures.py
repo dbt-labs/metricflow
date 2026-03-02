@@ -13,6 +13,7 @@ from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -157,6 +158,7 @@ class MetricFlowEngineTestFixture:
     """Contains objects for testing the MF engine for a specific semantic manifest."""
 
     semantic_manifest: PydanticSemanticManifest
+    manifest_object_lookup: ManifestObjectLookup
     semantic_manifest_lookup: SemanticManifestLookup
     column_association_resolver: ColumnAssociationResolver
     data_set_mapping: OrderedDict[str, SemanticModelDataSet]
@@ -175,6 +177,7 @@ class MetricFlowEngineTestFixture:
         semantic_manifest: PydanticSemanticManifest,
     ) -> MetricFlowEngineTestFixture:
         semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
+        manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
         data_set_mapping = MetricFlowEngineTestFixture._create_data_sets(semantic_manifest_lookup)
         read_node_mapping = MetricFlowEngineTestFixture._data_set_to_read_nodes(data_set_mapping)
         column_association_resolver = DunderColumnAssociationResolver()
@@ -188,6 +191,7 @@ class MetricFlowEngineTestFixture:
         query_parser = MetricFlowQueryParser(semantic_manifest_lookup=semantic_manifest_lookup)
         return MetricFlowEngineTestFixture(
             semantic_manifest=semantic_manifest,
+            manifest_object_lookup=manifest_object_lookup,
             semantic_manifest_lookup=semantic_manifest_lookup,
             column_association_resolver=column_association_resolver,
             data_set_mapping=data_set_mapping,
