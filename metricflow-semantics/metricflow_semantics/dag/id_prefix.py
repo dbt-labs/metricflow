@@ -34,6 +34,12 @@ class EnumMetaClassHelper(ABCMeta, EnumMeta):
 class StaticIdPrefix(IdPrefix, Enum, metaclass=EnumMetaClassHelper):
     """Enumerates the prefixes used for generating IDs."""
 
+    METRIC_EVALUATION_NODE__SIMPLE_METRICS_QUERY = "smp"
+    METRIC_EVALUATION_NODE__CUMULATIVE_METRIC_QUERY = "cml"
+    METRIC_EVALUATION_NODE__CONVERSION_METRIC_QUERY = "cnv"
+    METRIC_EVALUATION_NODE__DERIVED_METRIC_QUERY = "drv"
+    METRIC_EVALUATION_NODE__TOP_LEVEL_QUERY = "tpl"
+
     DATAFLOW_NODE_AGGREGATE_ID_PREFIX = "am"
     DATAFLOW_NODE_COMPUTE_METRICS_ID_PREFIX = "cm"
     DATAFLOW_NODE_JOIN_TO_STANDARD_OUTPUT_ID_PREFIX = "jso"
