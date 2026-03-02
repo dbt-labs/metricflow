@@ -202,6 +202,50 @@ class MetricFlowQueryRequest:
             order_output_columns_by_input_order=order_output_columns_by_input_order,
         )
 
+    @staticmethod
+    def create(  # noqa: D102
+        request_id: Optional[MetricFlowRequestId] = None,
+        saved_query_name: Optional[str] = None,
+        metric_names: Optional[Sequence[str]] = None,
+        metrics: Optional[Sequence[MetricQueryParameter]] = None,
+        group_by_names: Optional[Sequence[str]] = None,
+        group_by: Optional[Sequence[GroupByQueryParameter]] = None,
+        limit: Optional[int] = None,
+        time_constraint_start: Optional[datetime.datetime] = None,
+        time_constraint_end: Optional[datetime.datetime] = None,
+        where_constraints: Optional[Sequence[str]] = None,
+        order_by_names: Optional[Sequence[str]] = None,
+        order_by: Optional[Sequence[OrderByQueryParameter]] = None,
+        sql_optimization_level: SqlOptimizationLevel = SqlOptimizationLevel.default_level(),
+        dataflow_plan_optimizations: FrozenSet[
+            DataflowPlanOptimization
+        ] = DataflowPlanOptimization.enabled_optimizations(),
+        query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
+        min_max_only: bool = False,
+        apply_group_by: bool = True,
+        order_output_columns_by_input_order: bool = False,
+    ) -> MetricFlowQueryRequest:
+        return MetricFlowQueryRequest(
+            request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}") if request_id is None else request_id,
+            saved_query_name=saved_query_name,
+            metric_names=metric_names,
+            metrics=metrics,
+            group_by_names=group_by_names,
+            group_by=tuple(group_by) if group_by is not None else None,
+            limit=limit,
+            time_constraint_start=time_constraint_start,
+            time_constraint_end=time_constraint_end,
+            where_constraints=where_constraints,
+            order_by_names=order_by_names,
+            order_by=order_by,
+            sql_optimization_level=sql_optimization_level,
+            dataflow_plan_optimizations=dataflow_plan_optimizations,
+            query_type=query_type,
+            min_max_only=min_max_only,
+            apply_group_by=apply_group_by,
+            order_output_columns_by_input_order=order_output_columns_by_input_order,
+        )
+
     def with_request_id(self, request_id: MetricFlowRequestId) -> MetricFlowQueryRequest:  # noqa: D102
         return MetricFlowQueryRequest(
             request_id=request_id,
