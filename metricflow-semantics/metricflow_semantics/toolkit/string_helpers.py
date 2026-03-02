@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import textwrap
+from typing import Optional
 
 MF_INDENT_2_SPACE = "  "
 
@@ -36,3 +37,8 @@ def mf_dedent(text: str) -> str:
        )
     """
     return textwrap.dedent(text.lstrip("\n")).rstrip("\n")
+
+
+def mf_wrap(text: str, width: Optional[int] = None) -> str:
+    """Wraps text to the specified width. Useful for user-facing messages."""
+    return "\n".join(textwrap.wrap(text=text, width=width if width is not None else 80))
