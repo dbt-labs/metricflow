@@ -187,7 +187,7 @@ class DataflowPlanBuilder:
             )
         )
 
-        predicate_pushdown_state = PredicatePushdownState(
+        predicate_pushdown_state = PredicatePushdownState.create(
             time_range_constraint=query_spec.time_range_constraint,
             where_filter_specs=(),
             pushdown_enabled_types=frozenset({PredicateInputType.TIME_RANGE_CONSTRAINT}),
@@ -273,7 +273,7 @@ class DataflowPlanBuilder:
         # pushdown for any filter parameter set that is not part of the original time range constraint
         # implementation.
         disabled_pushdown_state = PredicatePushdownState.with_pushdown_disabled()
-        time_range_only_pushdown_state = PredicatePushdownState(
+        time_range_only_pushdown_state = PredicatePushdownState.create(
             time_range_constraint=predicate_pushdown_state.time_range_constraint,
             where_filter_specs=tuple(),
             pushdown_enabled_types=frozenset([PredicateInputType.TIME_RANGE_CONSTRAINT]),
@@ -888,7 +888,7 @@ class DataflowPlanBuilder:
         required_linkable_specs = self.__get_required_linkable_specs(
             queried_linkable_specs=base_query_spec.linkable_specs, filter_specs=query_level_filter_specs
         )
-        predicate_pushdown_state = PredicatePushdownState(
+        predicate_pushdown_state = PredicatePushdownState.create(
             time_range_constraint=base_query_spec.time_range_constraint,
             where_filter_specs=tuple(query_level_filter_specs),
         )
