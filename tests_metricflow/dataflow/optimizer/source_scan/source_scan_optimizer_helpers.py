@@ -31,7 +31,7 @@ from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGran
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -109,7 +109,7 @@ class _ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> int:  # noqa: D102
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> int:  # noqa: D102

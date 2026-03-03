@@ -16,7 +16,7 @@ class DataflowPlanOptimization(Enum):
     Values indicate order of application. We apply the source scan optimizer first because it reduces input branches,
     making for maximally parsimonious queries prior to application of predicate pushdown. Note this is safe only
     because the SourceScanOptimizer combines from the CombineAggregatedOutputNode, and will only combine branches
-    from there to source if they are functionally identical (i.e., they have all of the same WhereConstraintNode
+    from there to source if they are functionally identical (i.e., they have all of the same WhereFilterNode
     configurations).
     """
 

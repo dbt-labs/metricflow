@@ -73,8 +73,8 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <WhereConstraintNode>
-                            <!-- description = 'Constrain Output with WHERE' -->
+                        <WhereFilterNode>
+                            <!-- description = 'Filter Output with WHERE' -->
                             <!-- node_id = NodeId(id_str='wcc_0') -->
                             <!-- where_condition =                                           -->
                             <!--   WhereFilterSpec(                                          -->
@@ -122,7 +122,7 @@ docstring:
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </SelectorNode>
-                        </WhereConstraintNode>
+                        </WhereFilterNode>
                     </SelectorNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>

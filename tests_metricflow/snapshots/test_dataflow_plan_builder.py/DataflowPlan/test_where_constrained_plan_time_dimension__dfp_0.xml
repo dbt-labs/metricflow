@@ -53,8 +53,8 @@ docstring:
                     <!--     entity_links=(EntityReference(element_name='booking'),), -->
                     <!--   )                                                          -->
                     <!-- distinct = False -->
-                    <WhereConstraintNode>
-                        <!-- description = 'Constrain Output with WHERE' -->
+                    <WhereFilterNode>
+                        <!-- description = 'Filter Output with WHERE' -->
                         <!-- node_id = NodeId(id_str='wcc_0') -->
                         <!-- where_condition =                                                 -->
                         <!--   WhereFilterSpec(                                                -->
@@ -102,7 +102,7 @@ docstring:
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
                         </SelectorNode>
-                    </WhereConstraintNode>
+                    </WhereFilterNode>
                 </SelectorNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
