@@ -45,11 +45,10 @@ runs:
       python-version: "${{ inputs.python-version }}"
       hatch-environment-cache-config-json: "${{ inputs.hatch-environment-cache-config-json }}"
 
-  - name: Cache APT Packages
-    uses: awalsh128/cache-apt-pkgs-action@v1.4.3
-    with:
-      packages: graphviz
-      version: "@latest"
+  - name: Install graphviz
+    shell: bash
+    run: >
+      sudo apt-get update && sudo apt-get install -y graphviz
 
   - name: Register `graphviz` plug-ins
     shell: bash

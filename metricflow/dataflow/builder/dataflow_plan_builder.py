@@ -1654,7 +1654,7 @@ class DataflowPlanBuilder:
         ]
         if len(queried_non_agg_time_filter_specs) > 0:
             output_node = WhereFilterNode.create(
-                parent_node=output_node, where_specs=queried_non_agg_time_filter_specs, always_apply=True
+                parent_node=output_node, filter_specs=queried_non_agg_time_filter_specs, always_apply=True
             )
 
         # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
@@ -1694,7 +1694,7 @@ class DataflowPlanBuilder:
         if len(metric_spec.where_filter_specs) > 0 or time_range_constraint:
             where_filter_specs = metric_spec.where_filter_specs
             if len(where_filter_specs) > 0:
-                output_node = WhereFilterNode.create(parent_node=output_node, where_specs=where_filter_specs)
+                output_node = WhereFilterNode.create(parent_node=output_node, filter_specs=where_filter_specs)
             if time_range_constraint:
                 output_node = ConstrainTimeRangeNode.create(
                     parent_node=output_node, time_range_constraint=time_range_constraint
@@ -2023,7 +2023,7 @@ class DataflowPlanBuilder:
         output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_before_constraints)
 
         if len(where_filter_specs) > 0:
-            output_node = WhereFilterNode.create(parent_node=output_node, where_specs=where_filter_specs)
+            output_node = WhereFilterNode.create(parent_node=output_node, filter_specs=where_filter_specs)
 
         if time_range_constraint:
             output_node = ConstrainTimeRangeNode.create(

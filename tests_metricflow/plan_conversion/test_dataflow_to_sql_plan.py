@@ -200,7 +200,7 @@ def test_filter_with_where_constraint_node(
     time_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY)
     where_constraint_node = WhereFilterNode.create(
         parent_node=selector_node,
-        where_specs=(
+        filter_specs=(
             WhereFilterSpec(
                 where_sql="booking__ds__day = '2020-01-01'",
                 bind_parameters=SqlBindParameterSet(),

@@ -312,7 +312,13 @@ FROM (
               ) subq_0
             ) subq_1
           ) subq_2
-          WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
+          WHERE (
+            booking__is_instant
+          ) AND (
+            listing IS NOT NULL
+          ) AND (
+            metric_time__day > '2020-01-01'
+          )
         ) subq_3
       ) subq_4
       GROUP BY

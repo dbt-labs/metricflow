@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Improve rendering of multiple `WHERE` filters
+time: 2026-03-02T21:16:34.819061-08:00
+custom:
+  Author: plypaul
+  Issue: "1980"

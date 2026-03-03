@@ -434,7 +434,7 @@ class PreJoinNodeProcessor:
                     filtered_nodes.append(source_node)
                 else:
                     filtered_nodes.append(
-                        WhereFilterNode.create(parent_node=source_node, where_specs=matching_filter_specs)
+                        WhereFilterNode.create(parent_node=source_node, filter_specs=matching_filter_specs)
                     )
             else:
                 filtered_nodes.append(source_node)
