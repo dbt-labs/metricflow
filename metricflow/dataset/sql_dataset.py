@@ -3,12 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import SemanticModelReference
+from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 from dbt_semantic_interfaces.type_enums import DatePart
 from metricflow_semantics.instances import EntityInstance, InstanceSet, MdoInstance, TimeDimensionInstance
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.toolkit.assert_one_arg import assert_exactly_one_arg_set
@@ -78,14 +77,14 @@ class SqlDataSet(DataSet):
 
     def column_associations_for_entity(
         self,
-        entity_spec: EntitySpec,
+        entity_reference: EntityReference,
     ) -> Sequence[ColumnAssociation]:
         """Given the name of the entity, return the set of columns associated with it in the data set."""
         matching_instances_with_same_entity_links: List[EntityInstance] = []
         matching_instances_with_different_entity_links: List[EntityInstance] = []
         for linkable_instance in self.instance_set.entity_instances:
-            if entity_spec.element_name == linkable_instance.spec.element_name:
-                if entity_spec.entity_links == linkable_instance.spec.entity_links:
+            if entity_reference.element_name == linkable_instance.spec.element_name:
+                if not linkable_instance.spec.entity_links:
                     matching_instances_with_same_entity_links.append(linkable_instance)
                 else:
                     matching_instances_with_different_entity_links.append(linkable_instance)
@@ -97,7 +96,7 @@ class SqlDataSet(DataSet):
 
         if len(matching_instances) != 1:
             raise RuntimeError(
-                f"Expected exactly one matching instance for {entity_spec} in instance set, but found: {matching_instances}. "
+                f"Expected exactly one matching instance for {entity_reference} in instance set, but found: {matching_instances}. "
                 f"All entity instances: {self.instance_set.entity_instances}"
             )
         matching_instance = matching_instances[0]

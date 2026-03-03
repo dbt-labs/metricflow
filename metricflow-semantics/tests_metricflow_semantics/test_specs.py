@@ -6,7 +6,7 @@ import pytest
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import EntitySpec, LinklessEntitySpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -191,24 +191,10 @@ def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D103
     }
 
 
-def test_linkless_entity() -> None:
-    """Check that equals and hash works as expected for the LinklessEntitySpec / EntitySpec."""
+def test_entity_from_reference() -> None:
+    """Check that from_reference() and direct EntitySpec construction are equivalent."""
+    entity_reference = EntityReference("user_id")
     entity_spec = EntitySpec(element_name="user_id", entity_links=())
-    linkless_entity_spec = LinklessEntitySpec.from_element_name("user_id")
 
-    # Check equality between the two.
-    assert entity_spec == entity_spec
-    assert linkless_entity_spec == linkless_entity_spec
-    assert entity_spec == linkless_entity_spec
-
-    # Check that they are treated equivalently in sets.
-    set_with_entity_spec = {entity_spec}
-    assert entity_spec in set_with_entity_spec
-    assert linkless_entity_spec in set_with_entity_spec
-
-    set_with_linkless_entity_spec = {linkless_entity_spec}
-    assert entity_spec in set_with_linkless_entity_spec
-    assert linkless_entity_spec in set_with_linkless_entity_spec
-
-    set_with_entity_spec.add(linkless_entity_spec)
-    assert len(set_with_entity_spec) == 1
+    assert EntitySpec.create_from_reference(entity_reference) == entity_spec
+    assert EntitySpec.create_from_element_name("user_id") == entity_spec

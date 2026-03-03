@@ -3,10 +3,11 @@ from __future__ import annotations
 import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, List, Optional, Sequence, Tuple, TypeVar
+from typing import Generic, List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, LinkableElementReference
+from typing_extensions import Self
 
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 
@@ -107,13 +108,13 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
 
     @property
     @abstractmethod
-    def without_first_entity_link(self: SelfTypeT) -> SelfTypeT:
+    def without_first_entity_link(self) -> Self:
         """e.g. user_id__device_id__platform -> device_id__platform."""
         raise NotImplementedError()
 
     @property
     @abstractmethod
-    def without_entity_links(self: SelfTypeT) -> SelfTypeT:
+    def without_entity_links(self) -> Self:
         """e.g. user_id__device_id__platform -> platform."""
         raise NotImplementedError()
 
@@ -147,6 +148,3 @@ class LinkableInstanceSpec(InstanceSpec, ABC):
     def with_alias(self, alias: Optional[str]) -> LinkableInstanceSpec:
         """Return the same instance spec with the alias field replaced."""
         raise NotImplementedError()
-
-
-SelfTypeT = TypeVar("SelfTypeT", bound="LinkableInstanceSpec")

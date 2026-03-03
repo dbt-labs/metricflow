@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
+from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import AggregationType
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
@@ -64,13 +64,13 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
     | 2020-01-15 |            4000 |    u1|
 
     Attributes:
-        entity_specs: The entities to group the join by.
+        entity_references: The entities to group the join by.
         time_dimension_spec: The time dimension used for row filtering via an aggregation.
         agg_by_function: The aggregation function used on the time dimension.
         queried_time_dimension_spec: The group by provided in the query used to build the windows we want to filter on.
     """
 
-    entity_specs: Sequence[LinklessEntitySpec]
+    entity_references: Sequence[EntityReference]
     time_dimension_spec: TimeDimensionSpec
     agg_by_function: AggregationType
     queried_time_dimension_spec: Optional[TimeDimensionSpec]
@@ -82,14 +82,14 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
     @staticmethod
     def create(  # noqa: D102
         parent_node: DataflowPlanNode,
-        entity_specs: Sequence[LinklessEntitySpec],
+        entity_references: Sequence[EntityReference],
         time_dimension_spec: TimeDimensionSpec,
         agg_by_function: AggregationType,
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = None,
     ) -> SemiAdditiveJoinNode:
         return SemiAdditiveJoinNode(
             parent_nodes=(parent_node,),
-            entity_specs=tuple(entity_specs),
+            entity_references=tuple(entity_references),
             time_dimension_spec=time_dimension_spec,
             agg_by_function=agg_by_function,
             queried_time_dimension_spec=queried_time_dimension_spec,
@@ -104,7 +104,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
 
     @property
     def description(self) -> str:  # noqa: D102
-        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.entity_specs]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
+        return f"""Join on {self.agg_by_function.name}({self.time_dimension_spec.element_name}) and {[i.element_name for i in self.entity_references]} grouping by {self.queried_time_dimension_spec.element_name if self.queried_time_dimension_spec else None}"""
 
     @property
     def parent_node(self) -> DataflowPlanNode:  # noqa: D102
@@ -119,7 +119,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
             return False
 
         return (
-            other_node.entity_specs == self.entity_specs
+            other_node.entity_references == self.entity_references
             and other_node.time_dimension_spec == self.time_dimension_spec
             and other_node.agg_by_function == self.agg_by_function
             and other_node.queried_time_dimension_spec == self.queried_time_dimension_spec
@@ -130,7 +130,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
 
         return SemiAdditiveJoinNode.create(
             parent_node=new_parent_nodes[0],
-            entity_specs=self.entity_specs,
+            entity_references=self.entity_references,
             time_dimension_spec=self.time_dimension_spec,
             agg_by_function=self.agg_by_function,
             queried_time_dimension_spec=self.queried_time_dimension_spec,

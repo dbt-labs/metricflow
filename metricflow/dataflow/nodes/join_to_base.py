@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
+from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
@@ -31,7 +31,7 @@ class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: DataflowPlanNode
-    join_on_entity: Optional[LinklessEntitySpec]
+    join_on_entity: Optional[EntityReference]
     join_type: SqlJoinType
 
     join_on_partition_dimensions: Tuple[PartitionDimensionJoinDescription, ...]

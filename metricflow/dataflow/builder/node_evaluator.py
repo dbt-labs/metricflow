@@ -21,10 +21,11 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
@@ -59,7 +60,7 @@ class JoinLinkableInstancesRecipe:
 
     node_to_join: DataflowPlanNode
     # The entity to join "node_to_join" on. Only nullable if using CROSS JOIN.
-    join_on_entity: Optional[LinklessEntitySpec]
+    join_on_entity: Optional[EntityReference]
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
     # "satisfiable_linkable_specs", but "country" is the linkable spec in the node.
@@ -102,7 +103,7 @@ class JoinLinkableInstancesRecipe:
         else:
             for spec in self.satisfiable_linkable_specs:
                 if len(spec.entity_links) > 0:
-                    include_specs.append(LinklessEntitySpec.from_reference(spec.entity_links[0]))
+                    include_specs.append(EntitySpec.create_from_reference(spec.entity_links[0]))
 
         include_specs.extend([join.node_to_join_dimension_spec for join in self.join_on_partition_dimensions])
         include_specs.extend([join.node_to_join_time_dimension_spec for join in self.join_on_partition_time_dimensions])
@@ -282,9 +283,7 @@ class NodeEvaluatorForLinkableInstances:
                 ):
                     continue
 
-                linkless_entity_spec_in_node = LinklessEntitySpec.from_element_name(
-                    entity_spec_in_right_node.element_name
-                )
+                entity_reference_in_node = entity_spec_in_right_node.reference
 
                 satisfiable_linkable_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
@@ -310,8 +309,7 @@ class NodeEvaluatorForLinkableInstances:
                     # but since we're doing all left joins now, it's been left out.
 
                     required_entity_matches_data_set_entity = (
-                        LinklessEntitySpec.from_reference(needed_linkable_spec.entity_links[0])
-                        == linkless_entity_spec_in_node
+                        needed_linkable_spec.entity_links[0] == entity_reference_in_node
                     )
                     needed_linkable_spec_in_node = (
                         needed_linkable_spec.without_first_entity_link in linkable_specs_in_right_node
@@ -337,7 +335,7 @@ class NodeEvaluatorForLinkableInstances:
                     candidates_for_join.append(
                         JoinLinkableInstancesRecipe(
                             node_to_join=right_node,
-                            join_on_entity=linkless_entity_spec_in_node,
+                            join_on_entity=entity_reference_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
@@ -429,7 +427,7 @@ class NodeEvaluatorForLinkableInstances:
                     # metric_time is the only element that can be joined without entity links.
                     len(required_linkable_spec.entity_links) == 0
                     # In order be joinable, the first entity link must be in the left node's dataset.
-                    or LinklessEntitySpec.from_reference(required_linkable_spec.entity_links[0])
+                    or EntitySpec.create_from_reference(required_linkable_spec.entity_links[0])
                     not in data_set_linkable_specs
                 )
             )
