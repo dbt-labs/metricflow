@@ -38,7 +38,7 @@ class ExternalManifestSetupSource(ManifestSetupSource):
     Please see the associated transform rules for details.
     """
 
-    def __init__(self, manifest_directory: Path) -> None:
+    def __init__(self, manifest_directory: Path, normalize_sql: bool) -> None:
         """Initializer.
 
         Args:
@@ -47,6 +47,7 @@ class ExternalManifestSetupSource(ManifestSetupSource):
         self._manifest_directory = manifest_directory
         self._dummy_table_name = "dummy_table"
         self._time_spine_table_name = "time_spine"
+        self._normalize_sql = normalize_sql
 
     @override
     def get_manifest_setups(self) -> Sequence[ManifestSetup]:
@@ -96,6 +97,9 @@ class ExternalManifestSetupSource(ManifestSetupSource):
         return sorted(column_names)
 
     def _load_manifest(self, manifest_name: str, manifest_path: Path) -> PydanticSemanticManifest:
+        if not self._normalize_sql:
+            return mf_load_manifest_from_json_file(manifest_path, apply_transforms=True)
+
         semantic_manifest = mf_load_manifest_from_json_file(manifest_path)
         rule_set = PydanticSemanticManifestTransformRuleSet().all_rules
 
