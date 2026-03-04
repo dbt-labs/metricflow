@@ -45,12 +45,14 @@ class DuckDbExplainTester:
         manifest_setup_source: ManifestSetupSource,
         result_file_directory: Path,
         request_generator: MetricFlowRequestGenerator,
+        explain_in_sql_engine: bool = True,
         max_worker_count: int = DEFAULT_MAX_WORKER_COUNT,
     ) -> None:
         self._manifest_setup_source = manifest_setup_source
         self._result_file_directory = result_file_directory
         self._request_generator = request_generator
         self._max_worker_count = max_worker_count
+        self._explain_in_sql_engine = explain_in_sql_engine
 
     def run(self) -> Sequence[ExplainTaskResult]:  # noqa: D102
         executor = ProcessPoolExecutor(
@@ -154,6 +156,7 @@ class DuckDbExplainTester:
                 request_name=request_name,
                 mf_request=request,
                 result_file_prefix=self._result_file_directory.joinpath(manifest_setup.manifest_name, request_name),
+                explain_in_sql_engine=self._explain_in_sql_engine,
             )
             future = executor.submit(DuckDbExplainTaskRunner.run_task, task)
             future_to_task[future] = task
