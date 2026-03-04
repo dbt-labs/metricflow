@@ -105,6 +105,8 @@ class MetricFlowExplainTask(MetricFlowPrettyFormattable):
     # The prefix of the path to use to generate the result files. See `ResultFilePathSet`.
     result_file_prefix: Path
 
+    explain_in_sql_engine: bool
+
     @cached_property
     def manifest_name(self) -> str:  # noqa: D102
         return self.manifest_setup.manifest_name
@@ -118,6 +120,7 @@ class MetricFlowExplainTask(MetricFlowPrettyFormattable):
                 "request_name": self.request_name,
                 "mf_request": self.mf_request,
                 "result_file_prefix": self.result_file_prefix,
+                "explain_in_sql_engine": self.explain_in_sql_engine,
                 # Avoid including the entire manifest.
             },
         )
@@ -223,9 +226,10 @@ class DuckDbExplainTaskRunner:
             try:
                 mf_engine = cls._get_engine(explain_task)
                 result = mf_engine.explain(explain_task.mf_request)
-                sql = result.sql_statement.sql
+                sql = result.sql_statement.without_descriptions.sql
                 with open(result_file_path_set.explain_sql_file_path, "w") as fp:
                     fp.write(sql)
+                    fp.write("\n")
             except UnsupportedEngineFeatureError as e:
                 logger.exception(
                     LazyFormat(
@@ -236,6 +240,7 @@ class DuckDbExplainTaskRunner:
                 )
                 with open(result_file_path_set.mf_unsupported_file_path, "w") as fp:
                     fp.write(str(e))
+                    fp.write("\n")
                 return ExplainQueryStatus.MF_UNSUPPORTED
             except Exception as e:
                 logger.exception(
@@ -247,7 +252,11 @@ class DuckDbExplainTaskRunner:
                 )
                 with open(result_file_path_set.mf_exception_file_path, "w") as fp:
                     fp.write(str(e))
+                    fp.write("\n")
                 return ExplainQueryStatus.MF_EXCEPTION
+
+            if not explain_task.explain_in_sql_engine:
+                return ExplainQueryStatus.PASS
 
             try:
                 sql_client = cls._get_sql_client()
@@ -262,6 +271,7 @@ class DuckDbExplainTaskRunner:
                 )
                 with open(result_file_path_set.sql_exception_file_path, "w") as fp:
                     fp.write(str(e))
+                    fp.write("\n")
                 return ExplainQueryStatus.SQL_EXCEPTION
 
             return ExplainQueryStatus.PASS
