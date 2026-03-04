@@ -151,14 +151,14 @@ def test_profile_explain(
     mf_explain_saved_query(manifest_with_50_models_25_metrics, sql_client, saved_query_names=saved_query_names)
 
 
-@pytest.mark.skip("Example only.")
+# @pytest.mark.skip("Example only.")
 def test_profile_performance_using_json_manifest(
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,
 ) -> None:
     """Example of profiling MF engine performance using a JSON-serialized manifest."""
     # Example file path - replace with actual path.
-    manifest_path = Path("git_ignored/semantic_manifest.json")
+    manifest_path = Path("git_ignored/external_manifests/us_foods/us_foods_manifest_pretty.json")
 
     with ExecutionTimer(LazyFormat("Load Manifest", manifest_path=manifest_path)):
         semantic_manifest = mf_load_manifest_from_json_file(manifest_path)
@@ -172,7 +172,7 @@ def test_profile_performance_using_json_manifest(
             saved_query_count=len(semantic_manifest.saved_queries),
         )
     )
-    saved_query_names = tuple(saved_query.name for saved_query in semantic_manifest.saved_queries)[:100]
-
+    # saved_query_names = tuple(saved_query.name for saved_query in semantic_manifest.saved_queries)[:100]
+    saved_query_names = ["sq_act_trigger_dashboard_export_ytd_all_company_metrics_wo_sales"]
     mf_explain_saved_query(semantic_manifest, sql_client, saved_query_names=saved_query_names, profile=True)
-    mf_simulate_validation(semantic_manifest, sql_client, profile=True)
+    # mf_simulate_validation(semantic_manifest, sql_client, profile=True)
