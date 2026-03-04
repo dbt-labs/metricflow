@@ -40,7 +40,7 @@ def mf_load_manifest_from_yaml_directory(
 def mf_load_manifest_from_json_file(
     json_file_path: Path,
     override_project_configuration: Optional[PydanticProjectConfiguration] = None,
-    apply_transforms: bool = False,
+    apply_transforms: bool = True,
 ) -> PydanticSemanticManifest:
     """Load a manifest from a file containing the JSON-serialized form of a `PydanticSemanticManifest`.
 

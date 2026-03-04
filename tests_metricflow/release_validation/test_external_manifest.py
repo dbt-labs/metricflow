@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
 
@@ -9,7 +8,7 @@ from _pytest.fixtures import FixtureRequest
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.toolkit.time_helpers import PrettyDuration
 
 from metricflow.protocols.sql_client import SqlClient
@@ -57,7 +56,7 @@ def test_explain_all_saved_queries_from_external_manifest(
     assert_explain_tester_results_equal(request=request, mf_test_configuration=mf_test_configuration, results=results)
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 def test_manifests_in_local_directory(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -68,14 +67,14 @@ def test_manifests_in_local_directory(
 ) -> None:
     """Test generated SQL for all saved queries in a JSON-serialized manifest."""
     working_directory = Path().joinpath("git_ignored")
-    manifest_directory = working_directory.joinpath("external_manifests/us_foods")
-    results_directory = working_directory.joinpath("tester_results_after")
+    manifest_directory = working_directory.joinpath("external_manifests/mecca_1")
+    results_directory = working_directory.joinpath("tester_results_before")
     explain_tester = DuckDbExplainTester(
         manifest_setup_source=ExternalManifestSetupSource(manifest_directory, normalize_sql=False),
         result_file_directory=results_directory,
         request_generator=SavedQueryRequestGenerator(
             # saved_query_names=["sq_steering_dashboard_export_weekly_market_1"]
-            saved_query_names=["sq_act_trigger_dashboard_export_ytd_all_company_metrics_wo_sales"]
+            # saved_query_names=["sq_act_trigger_dashboard_export_ytd_all_company_metrics_wo_sales"]
         ),
         explain_in_sql_engine=False,
     )
@@ -90,11 +89,13 @@ def test_manifests_in_local_directory(
         else:
             unsuccessful_results.append(result)
 
+    result_summary_file_path = results_directory.joinpath("results.json")
     unsuccessful_count = len(unsuccessful_results)
     total_duration = PrettyDuration.sum(result.execution_duration for result in results)
     slowest_result = max(results, key=lambda _result: _result.execution_duration.seconds)
 
     result_dict = {
+        "result_summary_file_path": str(result_summary_file_path),
         "total_count": total_count,
         "total_duration": str(total_duration),
         "slowest_result": mf_pformat(slowest_result),
@@ -103,12 +104,11 @@ def test_manifests_in_local_directory(
         "unsuccessful_results": mf_pformat(unsuccessful_results),
     }
     logger.info(LazyFormat("Finished test", **result_dict))
-    result_summary_file_path = results_directory.joinpath("results.json")
     with open(result_summary_file_path, "w") as fp:
-        json.dump(result_dict, fp, indent=4)
+        fp.write(mf_pformat_dict(obj_dict=result_dict) + "\n")
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 def test_diff_explain_sql() -> None:  # noqa: D103
     working_directory = Path().joinpath("git_ignored")
     left_result_path = working_directory.joinpath("tester_results_before")
