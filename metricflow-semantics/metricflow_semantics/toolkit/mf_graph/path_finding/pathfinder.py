@@ -52,7 +52,7 @@ class MetricFlowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
         self,
         graph: MetricFlowGraph[NodeT, EdgeT],
         initial_path: MutablePathT,
-        target_nodes: Set[NodeT],
+        target_nodes: Optional[Set[NodeT]],
         weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
         max_path_weight: int,
         node_allow_set: Optional[Set[NodeT]] = None,
@@ -64,7 +64,7 @@ class MetricFlowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
         Args:
             graph: The graph to traverse.
             initial_path: The mutable path that should be extended during traversal.
-            target_nodes: The nodes where the traversal should stop.
+            target_nodes: The nodes where the traversal should stop. If None, paths to all reachable nodes are returned.
             weight_function: The weight function that should be used to compute the integer weight of a path. Edges can
             be blocked if the function returns `None`.
             max_path_weight: The maximum allowed weight of a path as computed by the provided weight function.
@@ -106,9 +106,9 @@ class MetricFlowPathfinder(Generic[NodeT, EdgeT, MutablePathT], ABC):
             source_nodes: Search for descendants of these nodes.
             target_nodes: When traversing the graph to find descendants, stop if any one of these nodes are reached.
             node_allow_set: If specified, only allow these nodes for traversal. Otherwise, all nodes in the graph are
-            allowed.
+                allowed.
             downward_closed: Whether to return descendants that are downward-closed with respect to the set of reachable
-            nodes (source nodes + descendants).
+                nodes (source nodes + descendants).
             deny_labels: If specified, prevent traversal to edges or nodes with these labels.
             max_iteration_count: In each iteration, the descendants of a current set of nodes are added for visiting.
             This is the maximum number of iterations that should be done.
@@ -333,7 +333,7 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
         self,
         graph: MetricFlowGraph[NodeT, EdgeT],
         initial_path: MutablePathT,
-        target_nodes: Set[NodeT],
+        target_nodes: Optional[Set[NodeT]],
         weight_function: WeightFunction[NodeT, EdgeT, MutablePathT],
         max_path_weight: int,
         node_allow_set: Optional[Set[NodeT]],
@@ -407,7 +407,7 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
         self._traversal_profile.increment_node_visit_count()
         current_path = self._current_path
 
-        if current_node in self._target_nodes:
+        if self._target_nodes is not None and current_node in self._target_nodes:
             self._traversal_profile.increment_generated_paths_count()
             yield current_path
             return
@@ -417,6 +417,12 @@ class _DfsTraversal(Generic[NodeT, EdgeT, MutablePathT]):
             for path in self._traverse_dfs(next_edge.head_node):
                 yield path
             current_path.pop_end()
+
+        # When finding all possible paths, DFS traversal requires to visiting the current node after all successor nodes
+        # have been visited.
+        if self._target_nodes is None:
+            self._traversal_profile.increment_generated_paths_count()
+            yield current_path
 
 
 class _MetricFlowPathfinderLocalState(threading.local):
