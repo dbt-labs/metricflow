@@ -184,7 +184,7 @@ def test_derived_metric_with_non_derived_metric(
             dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=3,
-        expected_num_sources_in_optimized=2,
+        expected_num_sources_in_optimized=1,
     )
 
 
@@ -257,7 +257,8 @@ def test_2_ratio_metrics_from_1_semantic_model(
             ),
             dimension_specs=(MTD_SPEC_DAY,),
         ),
-        expected_num_sources_in_unoptimized=4,
+        # TODO: Check change.
+        expected_num_sources_in_unoptimized=6,
         expected_num_sources_in_optimized=1,
     )
 

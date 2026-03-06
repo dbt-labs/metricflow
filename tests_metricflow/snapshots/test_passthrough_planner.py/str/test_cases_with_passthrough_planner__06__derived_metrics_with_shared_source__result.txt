@@ -1,0 +1,50 @@
+test_name: test_cases_with_passthrough_planner[06__derived_metrics_with_shared_source]
+test_filename: test_passthrough_planner.py
+docstring:
+  Test enumerated cases using the `PassThroughMetricEvaluationPlanner`.
+---
+Query for 2 derived metrics that can use the same source query.
+
+  Metric Names: ['derived_bookings_0', 'derived_bookings_1']
+  Group-By Names: ['metric_time']
+  Metric Evaluation Overview:
+    ┌───────┬───────────┬────────────────────┬───────────────────────┬────────────────────┬──────────────────┐
+    │ id    │ src_ids   │ computed_outputs   │ passthrough_outputs   │ source_metrics     │ semantic_model   │
+    ├───────┼───────────┼────────────────────┼───────────────────────┼────────────────────┼──────────────────┤
+    │ smp_0 │           │ bookings           │                       │                    │ bookings_source  │
+    ├───────┼───────────┼────────────────────┼───────────────────────┼────────────────────┼──────────────────┤
+    │ drv_3 │ smp_0     │ derived_bookings_0 │                       │ bookings           │                  │
+    │       │           │ derived_bookings_1 │                       │                    │                  │
+    ├───────┼───────────┼────────────────────┼───────────────────────┼────────────────────┼──────────────────┤
+    │ tpl_0 │ drv_3     │                    │ derived_bookings_0    │ derived_bookings_0 │                  │
+    │       │           │                    │ derived_bookings_1    │ derived_bookings_1 │                  │
+    └───────┴───────────┴────────────────────┴───────────────────────┴────────────────────┴──────────────────┘
+  Metric Query Output:
+    ┌───────┬───────────────────────────────────────────────┬─────────────────────────────────────────────┐
+    │ id    │ output_specs                                  │ output_properties                           │
+    ├───────┼───────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ smp_0 │ MetricSpec(element_name='bookings')           │ SimpleMetricQueryPropertySet(               │
+    │       │                                               │   model='bookings_source',                  │
+    │       │                                               │   group_by_item_specs=['metric_time__day'], │
+    │       │                                               │   pushdown_enabled_types={                  │
+    │       │                                               │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                               │     CATEGORICAL_DIMENSION,                  │
+    │       │                                               │   },                                        │
+    │       │                                               │ )                                           │
+    ├───────┼───────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ drv_3 │ MetricSpec(element_name='derived_bookings_0') │ MetricQueryPropertySet(                     │
+    │       │ MetricSpec(element_name='derived_bookings_1') │   group_by_item_specs=['metric_time__day'], │
+    │       │                                               │   pushdown_enabled_types={                  │
+    │       │                                               │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                               │     CATEGORICAL_DIMENSION,                  │
+    │       │                                               │   },                                        │
+    │       │                                               │ )                                           │
+    ├───────┼───────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ tpl_0 │ MetricSpec(element_name='derived_bookings_0') │ MetricQueryPropertySet(                     │
+    │       │ MetricSpec(element_name='derived_bookings_1') │   group_by_item_specs=['metric_time__day'], │
+    │       │                                               │   pushdown_enabled_types={                  │
+    │       │                                               │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                               │     CATEGORICAL_DIMENSION,                  │
+    │       │                                               │   },                                        │
+    │       │                                               │ )                                           │
+    └───────┴───────────────────────────────────────────────┴─────────────────────────────────────────────┘

@@ -1,0 +1,46 @@
+test_name: test_cases_with_passthrough_planner[03__filtered_simple_metric_in_derived_metric]
+test_filename: test_passthrough_planner.py
+docstring:
+  Test enumerated cases using the `PassThroughMetricEvaluationPlanner`.
+---
+Query for a simple metric and a derived metric that is defined using the same metric with a filter.
+
+  Metric Names: ['booking_value', 'instant_booking_value']
+  Group-By Names: ['metric_time']
+  Metric Evaluation Overview:
+    ┌───────┬───────────┬───────────────────────┬───────────────────────┬───────────────────────┬──────────────────┐
+    │ id    │ src_ids   │ computed_metrics      │ passthrough_metrics   │ source_metrics        │ semantic_model   │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ smp_0 │           │ booking_value         │                       │                       │ bookings_source  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ smp_1 │           │ instant_booking_value │                       │                       │ bookings_source  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ tpl_0 │ smp_0     │                       │ booking_value         │ booking_value         │                  │
+    │       │ smp_1     │                       │ instant_booking_value │ instant_booking_value │                  │
+    └───────┴───────────┴───────────────────────┴───────────────────────┴───────────────────────┴──────────────────┘
+  Metric Query Output:
+    ┌───────┬──────────────────────────────────────────────────┬───────────────────────────────────────────────────┐
+    │ id    │ output_specs                                     │ output_properties                                 │
+    ├───────┼──────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ smp_0 │ MetricSpec(element_name='booking_value')         │ SimpleMetricQueryPropertySet(                     │
+    │       │                                                  │   model='bookings_source',                        │
+    │       │                                                  │   group_by_item_specs=['metric_time__day'],       │
+    │       │                                                  │   pushdown_enabled_types={TIME_RANGE_CONSTRAINT}, │
+    │       │                                                  │ )                                                 │
+    ├───────┼──────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ smp_1 │ MetricSpec(element_name='instant_booking_value') │ SimpleMetricQueryPropertySet(                     │
+    │       │                                                  │   model='bookings_source',                        │
+    │       │                                                  │   filters_from_metric_definition=(                │
+    │       │                                                  │     ('{{ '                                        │
+    │       │                                                  │      "Dimension('booking__is_instant') "          │
+    │       │                                                  │      '}}'),                                       │
+    │       │                                                  │   ),                                              │
+    │       │                                                  │   group_by_item_specs=['metric_time__day'],       │
+    │       │                                                  │   pushdown_enabled_types={TIME_RANGE_CONSTRAINT}, │
+    │       │                                                  │ )                                                 │
+    ├───────┼──────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ tpl_0 │ MetricSpec(element_name='booking_value')         │ MetricQueryPropertySet(                           │
+    │       │ MetricSpec(element_name='instant_booking_value') │   group_by_item_specs=['metric_time__day'],       │
+    │       │                                                  │   pushdown_enabled_types={TIME_RANGE_CONSTRAINT}, │
+    │       │                                                  │ )                                                 │
+    └───────┴──────────────────────────────────────────────────┴───────────────────────────────────────────────────┘

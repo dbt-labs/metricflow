@@ -112,8 +112,8 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import (
     DataflowPlanOptimizerFactory,
 )
 from metricflow.dataset.dataset_classes import DataSet
-from metricflow.metric_evaluation.dfs_me_planner import DepthFirstSearchMetricEvaluationPlanner
 from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
+from metricflow.metric_evaluation.passthrough.passthrough_me_planner import PassThroughMetricEvaluationPlanner
 from metricflow.metric_evaluation.plan.me_edges import MetricQueryDependencyEdge
 from metricflow.metric_evaluation.plan.me_labels import TopLevelQueryLabel
 from metricflow.metric_evaluation.plan.me_nodes import (
@@ -242,7 +242,7 @@ class DataflowPlanBuilder:
 
         queried_linkable_specs = query_spec.linkable_specs
 
-        me_planner = DepthFirstSearchMetricEvaluationPlanner(
+        me_planner = PassThroughMetricEvaluationPlanner(
             manifest_object_lookup=self._manifest_object_lookup,
             column_association_resolver=self._column_association_resolver,
         )
@@ -2309,7 +2309,6 @@ class DataflowPlanBuilder:
                     predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
                     output_group_by_metric_instances=self._output_group_by_metric_instances,
                 )
-
                 simple_metric_nodes.append(simple_metric_node)
 
             if len(simple_metric_nodes) == 1:

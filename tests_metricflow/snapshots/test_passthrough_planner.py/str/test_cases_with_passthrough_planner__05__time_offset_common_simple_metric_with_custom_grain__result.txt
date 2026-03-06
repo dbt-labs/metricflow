@@ -1,0 +1,57 @@
+test_name: test_cases_with_passthrough_planner[05__time_offset_common_simple_metric_with_custom_grain]
+test_filename: test_passthrough_planner.py
+docstring:
+  Test enumerated cases using the `PassThroughMetricEvaluationPlanner`.
+---
+Query for a simple metric and a derived metric that time-offsets the same simple metric. Uses a custom grain in the group-by to help check query properties.
+
+  Metric Names: ['bookings', 'bookings_offset_twice']
+  Group-By Names: ['metric_time__alien_day']
+  Metric Evaluation Overview:
+    ┌───────┬───────────┬───────────────────────┬───────────────────────┬───────────────────────┬──────────────────┐
+    │ id    │ src_ids   │ computed_metrics      │ passthrough_metrics   │ source_metrics        │ semantic_model   │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ smp_1 │           │ bookings              │                       │                       │ bookings_source  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ drv_0 │ smp_1     │ bookings_offset_once  │                       │ bookings              │                  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ drv_2 │ drv_0     │ bookings_offset_twice │                       │ bookings_offset_once  │                  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ smp_0 │           │ bookings              │                       │                       │ bookings_source  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ tpl_0 │ drv_2     │                       │ bookings              │ bookings_offset_twice │                  │
+    │       │ smp_0     │                       │ bookings_offset_twice │ bookings              │                  │
+    └───────┴───────────┴───────────────────────┴───────────────────────┴───────────────────────┴──────────────────┘
+  Metric Query Output:
+    ┌───────┬─────────────────────────────────────────────────────────┬───────────────────────────────────────────────────┐
+    │ id    │ output_specs                                            │ output_properties                                 │
+    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ smp_1 │ MetricSpec(                                             │ SimpleMetricQueryPropertySet(                     │
+    │       │   element_name='bookings',                              │   model='bookings_source',                        │
+    │       │   offset_window=TimeWindow(count=5, granularity='day'), │   group_by_item_specs=[                           │
+    │       │ )                                                       │     'metric_time__alien_day',                     │
+    │       │                                                         │     'metric_time__day',                           │
+    │       │                                                         │   ],                                              │
+    │       │                                                         │ )                                                 │
+    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ drv_0 │ MetricSpec(                                             │ MetricQueryPropertySet(                           │
+    │       │   element_name='bookings_offset_once',                  │   group_by_item_specs=['metric_time__alien_day'], │
+    │       │   offset_window=TimeWindow(count=2, granularity='day'), │   pushdown_enabled_types={TIME_RANGE_CONSTRAINT}, │
+    │       │ )                                                       │ )                                                 │
+    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ drv_2 │ MetricSpec(element_name='bookings_offset_twice')        │ MetricQueryPropertySet(                           │
+    │       │                                                         │   group_by_item_specs=['metric_time__alien_day'], │
+    │       │                                                         │   pushdown_enabled_types={TIME_RANGE_CONSTRAINT}, │
+    │       │                                                         │ )                                                 │
+    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ smp_0 │ MetricSpec(element_name='bookings')                     │ SimpleMetricQueryPropertySet(                     │
+    │       │                                                         │   model='bookings_source',                        │
+    │       │                                                         │   group_by_item_specs=['metric_time__alien_day'], │
+    │       │                                                         │   pushdown_enabled_types={TIME_RANGE_CONSTRAINT}, │
+    │       │                                                         │ )                                                 │
+    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
+    │ tpl_0 │ MetricSpec(element_name='bookings')                     │ MetricQueryPropertySet(                           │
+    │       │ MetricSpec(element_name='bookings_offset_twice')        │   group_by_item_specs=['metric_time__alien_day'], │
+    │       │                                                         │   pushdown_enabled_types={TIME_RANGE_CONSTRAINT}, │
+    │       │                                                         │ )                                                 │
+    └───────┴─────────────────────────────────────────────────────────┴───────────────────────────────────────────────────┘
