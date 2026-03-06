@@ -63,11 +63,11 @@ docstring:
                             <!--   )                                                         -->
                             <MetricTimeDimensionTransformNode>
                                 <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_0') -->
+                                <!-- node_id = NodeId(id_str='sma_28009') -->
                                 <!-- aggregation_time_dimension = 'ds' -->
                                 <ReadSqlSourceNode>
                                     <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                    <!-- node_id = NodeId(id_str='rss_0') -->
+                                    <!-- node_id = NodeId(id_str='rss_28020') -->
                                     <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                 </ReadSqlSourceNode>
                             </MetricTimeDimensionTransformNode>
@@ -79,11 +79,11 @@ docstring:
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_1') -->
+                                    <!-- node_id = NodeId(id_str='sma_28014') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
                                         <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                                        <!-- node_id = NodeId(id_str='rss_1') -->
+                                        <!-- node_id = NodeId(id_str='rss_28024') -->
                                         <!-- data_set = SemanticModelDataSet('listings_latest') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
