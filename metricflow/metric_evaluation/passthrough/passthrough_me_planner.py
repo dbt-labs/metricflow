@@ -149,7 +149,7 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
                 query_element_to_level=query_element_to_level,
             )
             node_consolidator = DerivedMetricsNodeConsolidator(
-                derived_metrics_nodes=output_query_nodes,
+                nodes_to_consolidate=output_query_nodes,
                 corresponding_source_edges=edges_from_nodes,
             )
             output_query_nodes, edges_from_nodes = node_consolidator.consolidate_nodes()
