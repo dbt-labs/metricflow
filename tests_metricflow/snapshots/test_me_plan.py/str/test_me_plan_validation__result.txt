@@ -1,0 +1,86 @@
+test_name: test_me_plan_validation
+test_filename: test_me_plan.py
+docstring:
+  Test creating and validating an example metric evaluation plan.
+---
+┌───────┬───────────┬────────────────────┬───────────────────────┬──────────────────┬──────────────────┐
+│ id    │ src_ids   │ computed_outputs   │ passthrough_outputs   │ source_metrics   │ semantic_model   │
+├───────┼───────────┼────────────────────┼───────────────────────┼──────────────────┼──────────────────┤
+│ smp_0 │           │ bookings           │                       │                  │ bookings_source  │
+├───────┼───────────┼────────────────────┼───────────────────────┼──────────────────┼──────────────────┤
+│ smp_1 │           │ listings           │                       │                  │ listings_source  │
+├───────┼───────────┼────────────────────┼───────────────────────┼──────────────────┼──────────────────┤
+│ tpl_0 │ smp_0     │                    │ bookings              │ bookings         │                  │
+│       │ smp_1     │                    │ listings              │ listings         │                  │
+└───────┴───────────┴────────────────────┴───────────────────────┴──────────────────┴──────────────────┘
+
+┌───────┬─────────────────────────────────────┬─────────────────────────────────────────────┐
+│ id    │ output_specs                        │ output_properties                           │
+├───────┼─────────────────────────────────────┼─────────────────────────────────────────────┤
+│ smp_0 │ MetricSpec(element_name='bookings') │ MetricQueryPropertySet(                     │
+│       │                                     │   group_by_item_specs=['metric_time__day'], │
+│       │                                     │   pushdown_enabled_types={                  │
+│       │                                     │     TIME_RANGE_CONSTRAINT,                  │
+│       │                                     │     CATEGORICAL_DIMENSION,                  │
+│       │                                     │   },                                        │
+│       │                                     │ )                                           │
+├───────┼─────────────────────────────────────┼─────────────────────────────────────────────┤
+│ smp_1 │ MetricSpec(element_name='listings') │ MetricQueryPropertySet(                     │
+│       │                                     │   group_by_item_specs=['metric_time__day'], │
+│       │                                     │   pushdown_enabled_types={                  │
+│       │                                     │     TIME_RANGE_CONSTRAINT,                  │
+│       │                                     │     CATEGORICAL_DIMENSION,                  │
+│       │                                     │   },                                        │
+│       │                                     │ )                                           │
+├───────┼─────────────────────────────────────┼─────────────────────────────────────────────┤
+│ tpl_0 │ MetricSpec(element_name='bookings') │ MetricQueryPropertySet(                     │
+│       │ MetricSpec(element_name='listings') │   group_by_item_specs=['metric_time__day'], │
+│       │                                     │   pushdown_enabled_types={                  │
+│       │                                     │     TIME_RANGE_CONSTRAINT,                  │
+│       │                                     │     CATEGORICAL_DIMENSION,                  │
+│       │                                     │   },                                        │
+│       │                                     │ )                                           │
+└───────┴─────────────────────────────────────┴─────────────────────────────────────────────┘
+
+MutableMetricEvaluationPlan(
+  nodes_dfs={
+    SimpleMetricsQueryNode(
+      node_name='smp_0',
+      model_id=bookings_source,
+      metric_specs={MetricSpec(element_name='bookings')},
+      query_properties=MetricQueryPropertySet(
+        group_by_item_specs=['metric_time__day'],
+        pushdown_enabled_types={TIME_RANGE_CONSTRAINT, CATEGORICAL_DIMENSION},
+      ),
+    ),
+    SimpleMetricsQueryNode(
+      node_name='smp_1',
+      model_id=listings_source,
+      metric_specs={MetricSpec(element_name='listings')},
+      query_properties=MetricQueryPropertySet(
+        group_by_item_specs=['metric_time__day'],
+        pushdown_enabled_types={TIME_RANGE_CONSTRAINT, CATEGORICAL_DIMENSION},
+      ),
+    ),
+    TopLevelQueryNode(
+      node_name='tpl_0',
+      passthrough_metric_specs={MetricSpec(element_name='bookings'), MetricSpec(element_name='listings')},
+      query_properties=MetricQueryPropertySet(
+        group_by_item_specs=['metric_time__day'],
+        pushdown_enabled_types={TIME_RANGE_CONSTRAINT, CATEGORICAL_DIMENSION},
+      ),
+    ),
+  },
+  edges_dfs={
+    MetricQueryDependencyEdge(
+      edge='tpl_0 -> smp_0',
+      target_node_output_spec=MetricSpec(element_name='bookings'),
+      source_node_output_spec=MetricSpec(element_name='bookings'),
+    ),
+    MetricQueryDependencyEdge(
+      edge='tpl_0 -> smp_1',
+      target_node_output_spec=MetricSpec(element_name='listings'),
+      source_node_output_spec=MetricSpec(element_name='listings'),
+    ),
+  },
+)
