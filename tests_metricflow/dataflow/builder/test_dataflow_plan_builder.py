@@ -49,7 +49,7 @@ def test_simple_plan(
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
@@ -82,7 +82,7 @@ def test_primary_entity_dimension(
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
@@ -115,7 +115,7 @@ def test_joined_plan(
     """Tests a plan getting a simple-metric input and a joined dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
@@ -152,7 +152,7 @@ def test_order_by_plan(
     """Tests a plan with an order by."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
             order_by_specs=(
                 OrderBySpec(
@@ -160,7 +160,7 @@ def test_order_by_plan(
                     descending=False,
                 ),
                 OrderBySpec(
-                    instance_spec=MetricSpec(element_name="bookings"),
+                    instance_spec=MetricSpec.create(element_name="bookings"),
                     descending=True,
                 ),
             ),
@@ -190,7 +190,7 @@ def test_limit_rows_plan(
     """Tests a plan with a limit to the number of rows returned."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
             limit=1,
         )
@@ -219,7 +219,7 @@ def test_multiple_metrics_plan(
     """Tests a plan to retrieve multiple metrics."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            metric_specs=(MetricSpec.create(element_name="bookings"), MetricSpec.create(element_name="booking_value")),
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
@@ -253,7 +253,7 @@ def test_single_semantic_model_ratio_metrics_plan(
     """Tests a plan to retrieve a ratio where both simple-metric inputs come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_per_booker"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_per_booker"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
@@ -287,7 +287,7 @@ def test_multi_semantic_model_ratio_metrics_plan(
     """Tests a plan to retrieve a ratio where both simple-metric inputs come from one semantic model."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_per_view"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_per_view"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="country_latest",
@@ -321,7 +321,7 @@ def test_multihop_join_plan(
     """Tests a plan with an order by."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="txn_count"),),
+            metric_specs=(MetricSpec.create(element_name="txn_count"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",
@@ -446,7 +446,7 @@ def test_multihop_join_plan_ambiguous_dim(
     with pytest.raises(UnableToSatisfyQueryError):
         dataflow_plan_builder.build_plan(
             MetricFlowQuerySpec(
-                metric_specs=(MetricSpec(element_name="views"),),
+                metric_specs=(MetricSpec.create(element_name="views"),),
                 dimension_specs=(
                     DimensionSpec(
                         element_name="home_country",
@@ -469,7 +469,7 @@ def test_cumulative_metric_with_window(
     """Tests a plan to compute a cumulative metric."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="trailing_2_months_revenue"),),
+            metric_specs=(MetricSpec.create(element_name="trailing_2_months_revenue"),),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
@@ -497,7 +497,7 @@ def test_cumulative_metric_no_window_or_grain_with_metric_time(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+            metric_specs=(MetricSpec.create(element_name="revenue_all_time"),),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
@@ -525,7 +525,7 @@ def test_cumulative_metric_no_window_or_grain_without_metric_time(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="revenue_all_time"),),
+            metric_specs=(MetricSpec.create(element_name="revenue_all_time"),),
             dimension_specs=(),
             time_dimension_specs=(),
         )
@@ -671,7 +671,7 @@ def test_common_semantic_model(
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            metric_specs=(MetricSpec.create(element_name="bookings"), MetricSpec.create(element_name="booking_value")),
             dimension_specs=(
                 MTD_SPEC_DAY,
                 DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
@@ -702,7 +702,7 @@ def test_derived_metric_offset_window(
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_5_day_lag"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
@@ -730,7 +730,7 @@ def test_derived_metric_offset_to_grain(
     """Tests a simple plan getting a metric and a local dimension."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_growth_since_start_of_month"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_growth_since_start_of_month"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
@@ -757,7 +757,7 @@ def test_derived_metric_offset_with_granularity(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_5_day_lag"),), time_dimension_specs=(MTD_SPEC_MONTH,)
+            metric_specs=(MetricSpec.create(element_name="bookings_5_day_lag"),), time_dimension_specs=(MTD_SPEC_MONTH,)
         )
     )
 
@@ -783,7 +783,7 @@ def test_derived_offset_cumulative_metric(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="every_2_days_bookers_2_days_ago"),),
+            metric_specs=(MetricSpec.create(element_name="every_2_days_bookers_2_days_ago"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
@@ -809,7 +809,7 @@ def test_join_to_time_spine_with_metric_time(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
@@ -835,7 +835,7 @@ def test_join_to_time_spine_derived_metric(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_nulls_with_0"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_growth_2_weeks_fill_nulls_with_0"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )
@@ -861,7 +861,7 @@ def test_join_to_time_spine_with_non_metric_time(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
             time_dimension_specs=(
                 TimeDimensionSpec(
                     element_name="paid_at",
@@ -892,7 +892,7 @@ def test_dont_join_to_time_spine_if_no_time_dimension_requested(  # noqa: D103
     dataflow_plan_builder: DataflowPlanBuilder,
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
-        MetricFlowQuerySpec(metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),))
+        MetricFlowQuerySpec(metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),))
     )
 
     assert_plan_snapshot_text_equal(
@@ -916,7 +916,7 @@ def test_nested_derived_metric_with_outer_offset(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings_offset_twice"),),
+            metric_specs=(MetricSpec.create(element_name="bookings_offset_twice"),),
             time_dimension_specs=(MTD_SPEC_DAY,),
         )
     )

@@ -48,7 +48,7 @@ def test_joined_plan(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
@@ -89,8 +89,8 @@ def test_small_combined_metrics_plan(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_value"),
+                MetricSpec.create(element_name="bookings"),
+                MetricSpec.create(element_name="booking_value"),
             ),
             dimension_specs=(
                 DimensionSpec(
@@ -127,9 +127,9 @@ def test_combined_metrics_plan(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="instant_bookings"),
-                MetricSpec(element_name="booking_value"),
+                MetricSpec.create(element_name="bookings"),
+                MetricSpec.create(element_name="instant_bookings"),
+                MetricSpec.create(element_name="booking_value"),
             ),
             dimension_specs=(
                 DimensionSpec(
@@ -173,7 +173,7 @@ def test_multihop_joined_plan(
     """Tests a plan getting a measure and a joined dimension."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="txn_count"),),
+            metric_specs=(MetricSpec.create(element_name="txn_count"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",

@@ -21,7 +21,7 @@ def test_simple_query(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="identity_verifications"),),
+        metric_specs=(MetricSpec.create(element_name="identity_verifications"),),
         dimension_specs=(
             DimensionSpec(
                 element_name="home_state",
@@ -47,7 +47,7 @@ def test_simple_query_2(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="identity_verifications"),),
+        metric_specs=(MetricSpec.create(element_name="identity_verifications"),),
         dimension_specs=(
             DimensionSpec(
                 element_name="home_state",

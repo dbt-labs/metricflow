@@ -34,7 +34,7 @@ def test_simple_join_to_time_spine(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_join_to_time_spine"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_join_to_time_spine"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 

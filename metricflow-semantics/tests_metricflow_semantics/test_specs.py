@@ -103,13 +103,13 @@ def test_dunder_name() -> None:  # noqa: D103
 
 
 def test_merge_spec_set() -> None:  # noqa: D103
-    spec_set1 = InstanceSpecSet(metric_specs=(MetricSpec(element_name="bookings"),))
+    spec_set1 = InstanceSpecSet(metric_specs=(MetricSpec.create(element_name="bookings"),))
     spec_set2 = InstanceSpecSet(
         dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),)
     )
 
     assert spec_set1.merge(spec_set2) == InstanceSpecSet(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec.create(element_name="bookings"),),
         dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
     )
 
@@ -117,7 +117,7 @@ def test_merge_spec_set() -> None:  # noqa: D103
 @pytest.fixture
 def spec_set() -> InstanceSpecSet:  # noqa: D103
     return InstanceSpecSet(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec.create(element_name="bookings"),),
         simple_metric_input_specs=(
             SimpleMetricInputSpec(
                 element_name="bookings",
@@ -169,7 +169,7 @@ def test_spec_set_linkable_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D1
 
 def test_spec_set_all_specs(spec_set: InstanceSpecSet) -> None:  # noqa: D103
     assert set(spec_set.all_specs) == {
-        MetricSpec(element_name="bookings"),
+        MetricSpec.create(element_name="bookings"),
         SimpleMetricInputSpec(
             element_name="bookings",
         ),

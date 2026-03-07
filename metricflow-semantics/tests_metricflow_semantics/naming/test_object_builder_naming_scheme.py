@@ -63,7 +63,7 @@ def test_input_str(object_builder_naming_scheme: ObjectBuilderNamingScheme) -> N
         == "Metric('bookings', group_by=['listing'])"
     )
 
-    assert object_builder_naming_scheme.input_str(MetricSpec("bookings")) is None
+    assert object_builder_naming_scheme.input_str(MetricSpec.create("bookings")) is None
 
 
 def test_input_follows_scheme(  # noqa: D103

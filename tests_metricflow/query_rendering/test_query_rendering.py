@@ -49,7 +49,7 @@ def test_multihop_node(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 simple-metric input and 2 dimensions."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="txn_count"),),
+        metric_specs=(MetricSpec.create(element_name="txn_count"),),
         dimension_specs=(
             DimensionSpec(
                 element_name="customer_name",
@@ -111,7 +111,7 @@ def test_partitioned_join(
 ) -> None:
     """Tests converting a dataflow plan where there's a join on a partitioned dimension."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="identity_verifications"),),
+        metric_specs=(MetricSpec.create(element_name="identity_verifications"),),
         dimension_specs=(
             DimensionSpec(
                 element_name="home_state",
@@ -140,7 +140,7 @@ def test_limit_rows(
 ) -> None:
     """Tests a plan with a limit to the number of rows returned."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec.create(element_name="bookings"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -202,7 +202,7 @@ def test_local_dimension_using_local_entity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="listings"),),
+        metric_specs=(MetricSpec.create(element_name="listings"),),
         dimension_specs=(
             DimensionSpec(
                 element_name="country_latest",
@@ -334,7 +334,7 @@ def test_multi_hop_through_scd_dimension(
 ) -> None:
     """Tests conversion of a plan using a dimension that is reached through an SCD table."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec.create(element_name="bookings"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
         dimension_specs=(
             DimensionSpec(
@@ -363,7 +363,7 @@ def test_multi_hop_to_scd_dimension(
 ) -> None:
     """Tests conversion of a plan using an SCD dimension that is reached through another table."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec.create(element_name="bookings"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
         dimension_specs=(
             DimensionSpec(
@@ -392,7 +392,7 @@ def test_multiple_metrics_no_dimensions(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
+        metric_specs=(MetricSpec.create(element_name="bookings"), MetricSpec.create(element_name="listings")),
         time_range_constraint=TimeRangeConstraint(
             start_time=as_datetime("2020-01-01"), end_time=as_datetime("2020-01-01")
         ),
@@ -417,7 +417,7 @@ def test_metric_with_simple_metrics_from_multiple_sources_no_dimensions(  # noqa
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_per_listing"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_per_listing"),),
     )
 
     render_and_check(
@@ -439,7 +439,7 @@ def test_common_semantic_model(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+        metric_specs=(MetricSpec.create(element_name="bookings"), MetricSpec.create(element_name="booking_value")),
         dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -600,7 +600,7 @@ def test_non_additive_dimension_with_non_default_grain(
 ) -> None:
     """Tests querying a metric with a non-additive agg_time_dimension that has non-default granularity."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="total_account_balance_first_day_of_month"),)
+        metric_specs=(MetricSpec.create(element_name="total_account_balance_first_day_of_month"),)
     )
 
     render_and_check(

@@ -21,7 +21,7 @@ def test_offset_to_grain_with_single_granularity(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_at_start_of_month"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
@@ -46,7 +46,7 @@ def test_offset_to_grain_with_multiple_granularities(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_at_start_of_month"],
             group_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
             order_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
@@ -72,7 +72,7 @@ def test_custom_offset_window_with_base_grain(
 ) -> None:
     """Gives a side by side comparison of bookings and bookings_offset_one_alien_day."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_offset_one_alien_day"],
             group_by_names=["metric_time__day", "metric_time__alien_day"],
             order_by_names=["metric_time__day", "metric_time__alien_day"],
@@ -97,7 +97,7 @@ def test_custom_offset_window_with_grains_and_date_part(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_offset_one_alien_day"],
             group_by=(
                 TimeDimensionParameter(name="booking__ds", grain=TimeGranularity.MONTH.name),
@@ -131,7 +131,7 @@ def test_custom_offset_window_with_matching_custom_grain(
 ) -> None:
     """Gives a side by side comparison of bookings and bookings_offset_one_alien_day."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_offset_one_alien_day"],
             group_by_names=["booking__ds__alien_day", "metric_time__alien_day"],
             order_by_names=["booking__ds__alien_day", "metric_time__alien_day"],
@@ -159,7 +159,7 @@ def test_offset_window_with_grain_smaller_than_offset(  # noqa: D103
 ) -> None:
     """Test offset window metric queried with grain smaller than offset grain."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
@@ -186,7 +186,7 @@ def test_offset_window_with_grain_smaller_than_offset_non_default(  # noqa: D103
 ) -> None:
     """Test offset window metric queried with grain that is not the default and is smaller than offset grain."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_1_year_ago", "bookings_yoy"],
             group_by_names=["metric_time__month"],
             order_by_names=["metric_time__month"],
@@ -213,7 +213,7 @@ def test_offset_window_with_grain_matching_offset(  # noqa: D103
 ) -> None:
     """Test offset window metric queried with grain matching offset grain."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
             group_by_names=["metric_time__month"],
             order_by_names=["metric_time__month"],
@@ -244,7 +244,7 @@ def test_offset_window_with_grain_larger_than_offset(  # noqa: D103
     Not a very useful query, but still demonstrates that we can handle these params.
     """
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
             group_by_names=["metric_time__year"],
             order_by_names=["metric_time__year"],
@@ -274,7 +274,7 @@ def test_offset_window_with_custom_grain(  # noqa: D103
     Not a very useful query, but still demonstrates that we can handle this query.
     """
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
             group_by_names=["metric_time__alien_day"],
             order_by_names=["metric_time__alien_day"],
@@ -301,7 +301,7 @@ def test_offset_window_with_multiple_grains(  # noqa: D103
 ) -> None:
     """Test offset window metric queried with multiple grains."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
             group_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
             order_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
@@ -332,7 +332,7 @@ def test_offset_window_with_date_part_only(  # noqa: D103
     Note: date part is allowed for offset_window but not for offset_to_grain.
     """
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "bookings_1_month_ago", "bookings_mom"],
             group_by=(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH),),
             order_by=(OrderByParameter(TimeDimensionParameter(name="metric_time", date_part=DatePart.MONTH)),),
@@ -360,7 +360,7 @@ def test_offset_to_grain_with_grain_smaller_than_offset(  # noqa: D103
 ) -> None:
     """Test offset to grain metric queried with grain smaller than offset grain."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
@@ -388,7 +388,7 @@ def test_offset_to_grain_with_grain_smaller_than_offset_non_default(  # noqa: D1
 ) -> None:
     """Test offset to grain metric queried with grain that is not the default and is smaller than offset grain."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_year", "bookings_since_start_of_year"],
             group_by_names=["metric_time__month"],
             order_by_names=["metric_time__month"],
@@ -419,7 +419,7 @@ def test_offset_to_grain_with_grain_matching_offset(  # noqa: D103
     Not likely a useful query, but still demonstrates that we do this correctly.
     """
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
             group_by_names=["metric_time__month"],
             order_by_names=["metric_time__month"],
@@ -450,7 +450,7 @@ def test_offset_to_grain_with_grain_larger_than_offset(  # noqa: D103
     Not likely a useful query, but still demonstrates that we do this correctly.
     """
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
             group_by_names=["metric_time__year"],
             order_by_names=["metric_time__year"],
@@ -480,7 +480,7 @@ def test_offset_to_grain_with_custom_grain(  # noqa: D103
     Not a very useful query, but still demonstrates that we can handle this query.
     """
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
             group_by_names=["metric_time__alien_day"],
             order_by_names=["metric_time__alien_day"],
@@ -507,7 +507,7 @@ def test_offset_to_grain_with_multiple_grains(  # noqa: D103
 ) -> None:
     """Test offset to grain metric queried with multiple grains."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
             group_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
             order_by_names=["metric_time__day", "metric_time__month", "metric_time__year"],
@@ -534,7 +534,7 @@ def test_offset_window_with_cumulative_input_metric(  # noqa: D103
 ) -> None:
     """Test offset window metric that uses a cumulative metric with window as input."""
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["trailing_7_days_bookings", "trailing_7_days_bookings_offset_1_week"],
             group_by_names=["metric_time__day"],
             order_by_names=["metric_time__day"],
@@ -566,7 +566,7 @@ def test_non_default_grain_where_constraint_with_cumulative_offset_to_grain(  # 
     Tests that where constraints work properly with JoinOverTimeRangeNode and JoinToTimeSpineNode.
     """
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings_all_time", "bookings_all_time_at_start_of_month", "bookings_since_start_of_month"],
             group_by_names=["metric_time__month"],
             order_by_names=["metric_time__month"],

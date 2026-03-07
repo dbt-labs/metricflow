@@ -304,7 +304,7 @@ def _test_case(
         else:
             group_by.append(DimensionOrEntityParameter(**kwargs))
     query_result = engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=case.metrics,
             group_by_names=case.group_bys if len(case.group_bys) > 0 else None,
             group_by=tuple(group_by) if len(group_by) > 0 else None,

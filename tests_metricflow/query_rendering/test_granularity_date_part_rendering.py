@@ -38,7 +38,7 @@ def test_simple_query_with_date_part(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec.create(element_name="bookings"),),
         time_dimension_specs=(DataSet.metric_time_dimension_spec(date_part=DatePart.DOW),),
     )
 
@@ -61,7 +61,7 @@ def test_simple_query_with_multiple_date_parts(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings"),),
+        metric_specs=(MetricSpec.create(element_name="bookings"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(date_part=DatePart.DAY),
             DataSet.metric_time_dimension_spec(date_part=DatePart.DOW),
@@ -91,7 +91,7 @@ def test_offset_window_with_date_part(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_growth_2_weeks"),),
         time_dimension_specs=(DataSet.metric_time_dimension_spec(date_part=DatePart.DOW),),
     )
 
@@ -168,7 +168,7 @@ def test_simple_metric_with_sub_daily_dimension(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("new_users"),),
+        metric_specs=(MetricSpec.create("new_users"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="archived_at",
@@ -197,7 +197,7 @@ def test_simple_metric_with_joined_sub_daily_dimension(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings"),),
+        metric_specs=(MetricSpec.create("bookings"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="bio_added_ts",
@@ -229,7 +229,7 @@ def test_subdaily_cumulative_window_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("subdaily_cumulative_window_metric"),),
+        metric_specs=(MetricSpec.create("subdaily_cumulative_window_metric"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
@@ -256,7 +256,7 @@ def test_subdaily_cumulative_grain_to_date_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("subdaily_cumulative_grain_to_date_metric"),),
+        metric_specs=(MetricSpec.create("subdaily_cumulative_grain_to_date_metric"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
@@ -283,7 +283,7 @@ def test_subdaily_offset_window_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("subdaily_offset_window_metric"),),
+        metric_specs=(MetricSpec.create("subdaily_offset_window_metric"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
@@ -310,7 +310,7 @@ def test_subdaily_offset_to_grain_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("subdaily_offset_grain_to_date_metric"),),
+        metric_specs=(MetricSpec.create("subdaily_offset_grain_to_date_metric"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
@@ -337,7 +337,7 @@ def test_subdaily_join_to_time_spine_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
+        metric_specs=(MetricSpec.create("subdaily_join_to_time_spine_metric"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
@@ -393,7 +393,7 @@ def test_subdaily_time_constraint_with_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
+        metric_specs=(MetricSpec.create("subdaily_join_to_time_spine_metric"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)
@@ -423,7 +423,7 @@ def test_subdaily_granularity_overrides_metric_default_granularity(  # noqa: D10
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("subdaily_join_to_time_spine_metric"),),
+        metric_specs=(MetricSpec.create("subdaily_join_to_time_spine_metric"),),
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
                 time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.HOUR)

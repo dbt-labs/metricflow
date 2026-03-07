@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import itertools
 import typing
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
 
@@ -136,7 +137,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
         )
 
     @staticmethod
-    def create_from_specs(specs: Sequence[LinkableInstanceSpec]) -> LinkableSpecSet:  # noqa: D102
+    def create_from_specs(specs: Iterable[LinkableInstanceSpec]) -> LinkableSpecSet:  # noqa: D102
         return _group_specs_by_type(specs)
 
     @property
@@ -187,8 +188,8 @@ class _GroupSpecByTypeVisitor(InstanceSpecVisitor[None]):
         pass
 
 
-def _group_specs_by_type(specs: Sequence[LinkableInstanceSpec]) -> LinkableSpecSet:
-    """Groups a sequence of specs by type."""
+def _group_specs_by_type(specs: Iterable[LinkableInstanceSpec]) -> LinkableSpecSet:
+    """Groups specs by type."""
     grouper = _GroupSpecByTypeVisitor()
     for spec in specs:
         spec.accept(grouper)

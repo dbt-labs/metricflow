@@ -33,7 +33,7 @@ def test_2_metrics_from_1_semantic_model(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="booking_value")),
+            metric_specs=(MetricSpec.create(element_name="bookings"), MetricSpec.create(element_name="booking_value")),
             dimension_specs=(
                 MTD_SPEC_DAY,
                 DimensionSpec(element_name="country_latest", entity_links=(EntityReference("listing"),)),
@@ -55,7 +55,7 @@ def test_2_metrics_from_2_semantic_models(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"), MetricSpec(element_name="listings")),
+            metric_specs=(MetricSpec.create(element_name="bookings"), MetricSpec.create(element_name="listings")),
             dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=2,
@@ -75,9 +75,9 @@ def test_3_metrics_from_2_semantic_models(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_value"),
-                MetricSpec(element_name="listings"),
+                MetricSpec.create(element_name="bookings"),
+                MetricSpec.create(element_name="booking_value"),
+                MetricSpec.create(element_name="listings"),
             ),
             dimension_specs=(MTD_SPEC_DAY,),
         ),
@@ -126,7 +126,7 @@ def test_derived_metric(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="non_referred_bookings_pct"),),
+            metric_specs=(MetricSpec.create(element_name="non_referred_bookings_pct"),),
             dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=2,
@@ -149,7 +149,7 @@ def test_nested_derived_metric(
         mf_test_configuration=mf_test_configuration,
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="instant_plus_non_referred_bookings_pct"),),
+            metric_specs=(MetricSpec.create(element_name="instant_plus_non_referred_bookings_pct"),),
             dimension_specs=(MTD_SPEC_DAY,),
         ),
         expected_num_sources_in_unoptimized=4,
@@ -178,8 +178,8 @@ def test_derived_metric_with_non_derived_metric(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="booking_value"),
-                MetricSpec(element_name="non_referred_bookings_pct"),
+                MetricSpec.create(element_name="booking_value"),
+                MetricSpec.create(element_name="non_referred_bookings_pct"),
             ),
             dimension_specs=(MTD_SPEC_DAY,),
         ),
@@ -204,8 +204,8 @@ def test_derived_metric_same_alias_components_combined(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="derived_shared_alias_1a"),
-                MetricSpec(element_name="derived_shared_alias_1b"),
+                MetricSpec.create(element_name="derived_shared_alias_1a"),
+                MetricSpec.create(element_name="derived_shared_alias_1b"),
             ),
             dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
         ),
@@ -230,8 +230,8 @@ def test_derived_metric_same_alias_components_not_combined(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="derived_shared_alias_1a"),
-                MetricSpec(element_name="derived_shared_alias_2"),
+                MetricSpec.create(element_name="derived_shared_alias_1a"),
+                MetricSpec.create(element_name="derived_shared_alias_2"),
             ),
             dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
         ),
@@ -252,8 +252,8 @@ def test_2_ratio_metrics_from_1_semantic_model(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings_per_booker"),
-                MetricSpec(element_name="bookings_per_dollar"),
+                MetricSpec.create(element_name="bookings_per_booker"),
+                MetricSpec.create(element_name="bookings_per_dollar"),
             ),
             dimension_specs=(MTD_SPEC_DAY,),
         ),
@@ -274,8 +274,8 @@ def test_duplicate_simple_metrics(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="derived_bookings_0"),
-                MetricSpec(element_name="derived_bookings_1"),
+                MetricSpec.create(element_name="derived_bookings_0"),
+                MetricSpec.create(element_name="derived_bookings_1"),
             ),
             dimension_specs=(MTD_SPEC_DAY,),
         ),

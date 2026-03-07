@@ -16,7 +16,7 @@ def metric_naming_scheme() -> MetricNamingScheme:  # noqa: D103
 
 
 def test_input_str(metric_naming_scheme: MetricNamingScheme) -> None:  # noqa: D103
-    assert metric_naming_scheme.input_str(MetricSpec(element_name="bookings")) == "bookings"
+    assert metric_naming_scheme.input_str(MetricSpec.create(element_name="bookings")) == "bookings"
 
 
 def test_input_follows_scheme(  # noqa: D103
@@ -35,10 +35,10 @@ def test_spec_pattern(  # noqa: D103
     )
 
     specs: Sequence[InstanceSpec] = (
-        MetricSpec(element_name="bookings"),
-        MetricSpec(element_name="listings"),
+        MetricSpec.create(element_name="bookings"),
+        MetricSpec.create(element_name="listings"),
         # Shouldn't happen in practice, but checks to see that only metric specs are matched.
         DimensionSpec(element_name="bookings", entity_links=()),
     )
 
-    assert (MetricSpec(element_name="bookings"),) == tuple(spec_pattern.match(specs))
+    assert (MetricSpec.create(element_name="bookings"),) == tuple(spec_pattern.match(specs))

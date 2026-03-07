@@ -53,7 +53,7 @@ def test_simple_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings"),),
+        metric_specs=(MetricSpec.create("bookings"),),
         time_dimension_specs=(normal_time_dim_with_custom_grain1,),
     )
 
@@ -76,7 +76,7 @@ def test_cumulative_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create("trailing_2_months_revenue"),),
         time_dimension_specs=(metric_time_with_custom_grain,),
     )
 
@@ -99,7 +99,7 @@ def test_derived_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("booking_fees_per_booker"),),
+        metric_specs=(MetricSpec.create("booking_fees_per_booker"),),
         time_dimension_specs=(normal_time_dim_with_custom_grain1,),
     )
 
@@ -123,7 +123,7 @@ def test_multiple_metrics_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings"), MetricSpec("listings")),
+        metric_specs=(MetricSpec.create("bookings"), MetricSpec.create("listings")),
         time_dimension_specs=(metric_time_with_custom_grain,),
     )
 
@@ -147,7 +147,7 @@ def test_metric_custom_granularity_joined_to_non_default_grain(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("listings"),),
+        metric_specs=(MetricSpec.create("listings"),),
         time_dimension_specs=(
             metric_time_with_custom_grain,
             TimeDimensionSpec(
@@ -253,7 +253,7 @@ def test_simple_metric_with_custom_granularity_and_join(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings"),),
+        metric_specs=(MetricSpec.create("bookings"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -418,7 +418,7 @@ def test_offset_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings_5_day_lag"),),
+        metric_specs=(MetricSpec.create("bookings_5_day_lag"),),
         time_dimension_specs=(normal_time_dim_with_custom_grain1,),
     )
 

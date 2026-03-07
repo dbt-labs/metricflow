@@ -160,7 +160,8 @@ class MetricFlowQueryRequest:
     order_output_columns_by_input_order: bool
 
     @staticmethod
-    def create_with_random_request_id(  # noqa: D102
+    def create(  # noqa: D102
+        request_id: Optional[MetricFlowRequestId] = None,
         saved_query_name: Optional[str] = None,
         metric_names: Optional[Sequence[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
@@ -182,7 +183,7 @@ class MetricFlowQueryRequest:
         order_output_columns_by_input_order: bool = False,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
-            request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}"),
+            request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}") if request_id is None else request_id,
             saved_query_name=saved_query_name,
             metric_names=metric_names,
             metrics=metrics,
@@ -871,7 +872,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     ) -> List[str]:
         # Run query
         query_result: MetricFlowQueryResult = self.query(
-            MetricFlowQueryRequest.create_with_random_request_id(
+            MetricFlowQueryRequest.create(
                 metric_names=metric_names,
                 group_by_names=[get_group_by_values],
                 time_constraint_start=time_constraint_start,
@@ -899,7 +900,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             get_group_by_values and group_by
         ), "Both get_group_by_values and group_by were set, but if a group by is specified you should only use one of these!"
         return self._create_execution_plan(
-            MetricFlowQueryRequest.create_with_random_request_id(
+            MetricFlowQueryRequest.create(
                 metric_names=metric_names,
                 metrics=metrics,
                 group_by_names=(get_group_by_values,) if get_group_by_values else None,

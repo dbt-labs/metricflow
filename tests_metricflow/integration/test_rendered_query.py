@@ -21,7 +21,7 @@ def test_render_query(  # noqa: D103
     request: FixtureRequest, mf_test_configuration: MetricFlowTestConfiguration, it_helpers: IntegrationTestHelpers
 ) -> None:
     result = it_helpers.mf_engine.explain(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings"],
             group_by_names=["metric_time"],
         )
@@ -52,7 +52,7 @@ def test_id_enumeration(  # noqa: D103
     )
 
     result = mf_engine.explain(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "listings"],
             group_by_names=["metric_time"],
         )
@@ -68,7 +68,7 @@ def test_id_enumeration(  # noqa: D103
 
     # The resulting snapshot should be the same since mf_engine was created with consistent_id_enumeration=True
     result = mf_engine.explain(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["bookings", "listings"],
             group_by_names=["metric_time"],
         )
