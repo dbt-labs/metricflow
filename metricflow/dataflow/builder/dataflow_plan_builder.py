@@ -1801,7 +1801,10 @@ class DataflowPlanBuilder:
         if cumulative and predicate_pushdown_state.time_range_constraint is not None:
             logger.debug(
                 LazyFormat(
-                    lambda: f"Time range constraint before adjustment is {predicate_pushdown_state.time_range_constraint}"
+                    lambda: (
+                        f"Adjusting time range constraint for cumulative metric '{simple_metric_input.name}'. "
+                        f"Original constraint: {predicate_pushdown_state.time_range_constraint}"
+                    )
                 )
             )
             granularity: Optional[TimeGranularity] = None
@@ -1821,7 +1824,13 @@ class DataflowPlanBuilder:
                 )
             )
             logger.debug(
-                LazyFormat(lambda: f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
+                LazyFormat(
+                    lambda: (
+                        f"Time range constraint adjusted for cumulative metric '{simple_metric_input.name}' "
+                        f"with window (granularity={granularity}, count={count}). "
+                        f"New constraint: {cumulative_metric_adjusted_time_constraint}"
+                    )
+                )
             )
 
         required_linkable_specs = self.__get_required_linkable_specs(
@@ -1846,10 +1855,12 @@ class DataflowPlanBuilder:
         if source_node_recipe is None:
             logger.debug(
                 LazyFormat(
-                    "Looking for a simple metric recipe",
-                    simple_metric=simple_metric_recipe.simple_metric_input.name,
-                    spec_properties=spec_properties,
-                    required_linkable_specs=required_linkable_specs,
+                    lambda: (
+                        f"Building source node recipe for simple metric '{simple_metric_recipe.simple_metric_input.name}'. "
+                        f"Required dimensions: {[spec.element_name for spec in required_linkable_specs.dimension_specs] if required_linkable_specs.dimension_specs else []}, "
+                        f"Required time dimensions: {[spec.element_name for spec in required_linkable_specs.time_dimension_specs] if required_linkable_specs.time_dimension_specs else []}, "
+                        f"Has filters: {len(simple_metric_recipe.combined_filter_spec_set.all_filter_specs) > 0}"
+                    )
                 )
             )
 
@@ -1858,6 +1869,17 @@ class DataflowPlanBuilder:
                 if not uses_offset  # Time constraints will be applied after offset
                 else None
             )
+
+            if uses_offset and predicate_pushdown_state.time_range_constraint:
+                logger.debug(
+                    LazyFormat(
+                        lambda: (
+                            f"Time constraint will be applied after offset for metric '{simple_metric_recipe.simple_metric_input.name}'. "
+                            f"Constraint: {predicate_pushdown_state.time_range_constraint}"
+                        )
+                    )
+                )
+
             if time_constraint is None:
                 simple_metric_input_ppd_state = PredicatePushdownState.without_time_range_constraint(
                     predicate_pushdown_state
