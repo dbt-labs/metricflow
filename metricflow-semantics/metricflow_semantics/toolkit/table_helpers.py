@@ -7,12 +7,8 @@ from types import ModuleType
 from typing import Mapping, Optional, Sequence, Union
 
 import tabulate
-from packaging.version import Version
 
 logger = logging.getLogger(__name__)
-
-
-_TABULATE_VERSION = Version(tabulate.__version__)
 
 
 class IsolatedTabulateRunner:
@@ -68,8 +64,8 @@ class IsolatedTabulateRunner:
             "colalign": column_alignment,
             "tablefmt": tablefmt,
         }
-
-        if (_TABULATE_VERSION.major, _TABULATE_VERSION.minor) > (0, 9):
+        tabulate_major_version, tabulate_minor_version = map(int, tabulate.__version__.split(".")[:2])
+        if (tabulate_major_version, tabulate_minor_version) > (0, 9):
             tabulate_kwargs["preserve_whitespace"] = True
 
         if IsolatedTabulateRunner._TABULATE_MODULE_COPY is None:
