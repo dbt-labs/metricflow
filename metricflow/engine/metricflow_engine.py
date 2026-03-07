@@ -180,7 +180,7 @@ class MetricFlowQueryRequest:
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
         apply_group_by: bool = True,
-        order_output_columns_by_input_order: bool = False,
+        order_output_columns_by_input_order: bool = True,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}") if request_id is None else request_id,
