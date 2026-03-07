@@ -57,23 +57,22 @@ class IsolatedTabulateRunner:
         # result in unexpected values when coupled with the `--decimals` option, so disabling that feature.
         disable_numparse = True
 
+        tabulate_kwargs = {
+            "tabular_data": tabular_data,
+            "headers": headers,
+            "disable_numparse": disable_numparse,
+            "colalign": column_alignment,
+            "tablefmt": tablefmt,
+        }
+        major_version, minor_version = map(int, tabulate.__version__.split(".")[:2])
+        if (major_version, minor_version) > (0, 9):
+            tabulate_kwargs["preserve_whitespace"] = True
+
         if IsolatedTabulateRunner._TABULATE_MODULE_COPY is None:
             logger.warning(
                 "Generating text table without required options set as there was an error loading the "
                 "`tabulate` module."
             )
-            return tabulate.tabulate(
-                tabular_data=tabular_data,
-                headers=headers,
-                disable_numparse=disable_numparse,
-                colalign=column_alignment,
-                tablefmt=tablefmt,
-            )
+            return tabulate.tabulate(**tabulate_kwargs)  # type: ignore[arg-type]
 
-        return IsolatedTabulateRunner._TABULATE_MODULE_COPY.tabulate(
-            tabular_data=tabular_data,
-            headers=headers,
-            disable_numparse=disable_numparse,
-            colalign=column_alignment,
-            tablefmt=tablefmt,
-        )
+        return IsolatedTabulateRunner._TABULATE_MODULE_COPY.tabulate(**tabulate_kwargs)  # type: ignore[arg-type]
