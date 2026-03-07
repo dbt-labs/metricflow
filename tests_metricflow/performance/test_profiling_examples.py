@@ -151,7 +151,7 @@ def test_profile_explain(
     mf_explain_saved_query(manifest_with_50_models_25_metrics, sql_client, saved_query_names=saved_query_names)
 
 
-# @pytest.mark.skip("Example only.")
+@pytest.mark.skip("Example only.")
 def test_profile_performance_using_json_manifest(
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_client: SqlClient,

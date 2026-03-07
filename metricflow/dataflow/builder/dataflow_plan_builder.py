@@ -112,8 +112,8 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import (
     DataflowPlanOptimizerFactory,
 )
 from metricflow.dataset.dataset_classes import DataSet
-from metricflow.metric_evaluation.dfs_me_planner import DepthFirstSearchMetricEvaluationPlanner
 from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
+from metricflow.metric_evaluation.passthrough.passthrough_me_planner import PassThroughMetricEvaluationPlanner
 from metricflow.metric_evaluation.plan.me_edges import MetricQueryDependencyEdge
 from metricflow.metric_evaluation.plan.me_labels import TopLevelQueryLabel
 from metricflow.metric_evaluation.plan.me_nodes import (
@@ -192,7 +192,7 @@ class DataflowPlanBuilder:
         # return plan
 
         optimized_plan = self._optimize_plan(plan, optimizations)
-        logger.info(LazyFormat("Generated optimized plan", optimized_plan=lambda: optimized_plan.structure_text()))
+        logger.debug(LazyFormat("Generated optimized plan", optimized_plan=lambda: optimized_plan.structure_text()))
         return optimized_plan
 
     def _build_query_output_node(
@@ -242,7 +242,7 @@ class DataflowPlanBuilder:
 
         queried_linkable_specs = query_spec.linkable_specs
 
-        me_planner = DepthFirstSearchMetricEvaluationPlanner(
+        me_planner = PassThroughMetricEvaluationPlanner(
             manifest_object_lookup=self._manifest_object_lookup,
             column_association_resolver=self._column_association_resolver,
         )
@@ -252,13 +252,17 @@ class DataflowPlanBuilder:
             predicate_pushdown_state=predicate_pushdown_state,
             filter_spec_factory=filter_spec_factory,
         )
-        logger.debug(
-            LazyFormat(
-                "Generated metric evaluation plan",
-                planner_class=me_planner.__class__.__name__,
-                me_plan=lambda: self._metric_evaluation_plan_formatter.format_plan(me_plan),
+
+        if logger.isEnabledFor(logging.INFO):
+            table_result = self._metric_evaluation_plan_formatter.format_plan(me_plan)
+            logger.info(
+                LazyFormat(
+                    "Generated metric evaluation plan",
+                    planner_class=me_planner.__class__.__name__,
+                    overview_table=table_result.overview_table,
+                    node_output_table=table_result.node_output_table,
+                )
             )
-        )
 
         # To convert the metric evaluation plan to a dataflow plan, visit the nodes in the metric evaluation plan in
         # DFS order i.e. for a given evaluation plan node A, convert the sources of A to the corresponding dataflow,
@@ -2311,7 +2315,6 @@ class DataflowPlanBuilder:
                     predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
                     output_group_by_metric_instances=self._output_group_by_metric_instances,
                 )
-
                 simple_metric_nodes.append(simple_metric_node)
 
             if len(simple_metric_nodes) == 1:

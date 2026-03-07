@@ -57,7 +57,7 @@ def test_explain_all_saved_queries_from_external_manifest(
     assert_explain_tester_results_equal(request=request, mf_test_configuration=mf_test_configuration, results=results)
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 def test_manifests_in_local_directory(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -108,7 +108,7 @@ def test_manifests_in_local_directory(
         json.dump(result_dict, fp, indent=4)
 
 
-# @pytest.mark.skip
+@pytest.mark.skip
 def test_diff_explain_sql() -> None:  # noqa: D103
     working_directory = Path().joinpath("git_ignored")
     left_result_path = working_directory.joinpath("tester_results_before")
