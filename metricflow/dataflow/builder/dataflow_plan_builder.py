@@ -16,7 +16,11 @@ from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowRese
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
-from metricflow_semantics.errors.error_classes import InvalidManifestException, UnableToSatisfyQueryError
+from metricflow_semantics.errors.error_classes import (
+    InvalidManifestException,
+    MetricFlowInternalError,
+    UnableToSatisfyQueryError,
+)
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
@@ -53,18 +57,21 @@ from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjust
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, OrderedSet
+from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
+from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import EdgeCountWeightFunction
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
 from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from typing_extensions import override
 
 from metricflow.dataflow.builder.aggregation_helper import NullFillValueMapping
 from metricflow.dataflow.builder.builder_cache import (
-    BuildAnyMetricOutputNodeInput,
     DataflowPlanBuilderCache,
     FindSourceNodeRecipeInput,
     FindSourceNodeRecipeResult,
+    MetricQueryDescriptor,
 )
 from metricflow.dataflow.builder.node_evaluator import (
     LinkableInstanceSatisfiabilityEvaluation,
@@ -105,6 +112,23 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import (
     DataflowPlanOptimizerFactory,
 )
 from metricflow.dataset.dataset_classes import DataSet
+from metricflow.metric_evaluation.dfs_me_planner import DepthFirstSearchMetricEvaluationPlanner
+from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
+from metricflow.metric_evaluation.plan.me_edges import MetricQueryDependencyEdge
+from metricflow.metric_evaluation.plan.me_labels import TopLevelQueryLabel
+from metricflow.metric_evaluation.plan.me_nodes import (
+    ConversionMetricQueryNode,
+    CumulativeMetricQueryNode,
+    DerivedMetricsQueryNode,
+    MetricQueryNode,
+    MetricQueryNodeVisitor,
+    SimpleMetricsQueryNode,
+    TopLevelQueryNode,
+)
+from metricflow.metric_evaluation.plan.me_path import MutableMetricEvaluationPath
+from metricflow.metric_evaluation.plan.me_plan import (
+    MetricEvaluationPlan,
+)
 from metricflow.plan_conversion.node_processor import (
     PredicateInputType,
     PredicatePushdownState,
@@ -138,6 +162,7 @@ class DataflowPlanBuilder:
         self._source_node_builder = source_node_builder
         self._time_period_adjuster = DateutilTimePeriodAdjuster()
         self._cache = dataflow_plan_builder_cache or DataflowPlanBuilderCache()
+        self._metric_evaluation_plan_formatter = MetricEvaluationPlanTableFormatter()
 
     def build_plan(
         self,
@@ -147,14 +172,28 @@ class DataflowPlanBuilder:
         optimizations: FrozenSet[DataflowPlanOptimization] = frozenset(),
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
-        # Workaround for a Pycharm type inspection issue with decorators.
-        # noinspection PyArgumentList
-        return self._build_plan(
-            query_spec=query_spec,
+        metrics_output_node = self._build_query_output_node(query_spec=query_spec)
+
+        sink_node = DataflowPlanBuilder.build_sink_node(
+            parent_node=metrics_output_node,
+            metric_specs=query_spec.metric_specs,
+            order_by_specs=query_spec.order_by_specs,
             output_sql_table=output_sql_table,
+            limit=query_spec.limit,
             output_selection_specs=output_selection_specs,
-            optimizations=optimizations,
+            dimension_specs=query_spec.dimension_specs,
+            time_dimension_specs=query_spec.time_dimension_specs,
+            entity_specs=query_spec.entity_specs,
         )
+
+        plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
+        plan = DataflowPlan(sink_nodes=[sink_node], plan_id=plan_id)
+        # logger.info(LazyFormat("Generated plan", plan=lambda: plan.structure_text()))
+        # return plan
+
+        optimized_plan = self._optimize_plan(plan, optimizations)
+        logger.info(LazyFormat("Generated optimized plan", optimized_plan=lambda: optimized_plan.structure_text()))
+        return optimized_plan
 
     def _build_query_output_node(
         self, query_spec: MetricFlowQuerySpec, output_group_by_metric_instances: bool = False
@@ -192,45 +231,176 @@ class DataflowPlanBuilder:
             where_filter_specs=(),
             pushdown_enabled_types=frozenset({PredicateInputType.TIME_RANGE_CONSTRAINT}),
         )
-        return self._build_metrics_output_node(
-            metric_specs=tuple(
-                MetricSpec.create(
-                    element_name=metric_spec.element_name,
-                    where_filter_specs=query_level_filter_specs,
-                )
-                for metric_spec in query_spec.metric_specs
-            ),
-            queried_linkable_specs=query_spec.linkable_specs,
-            filter_spec_factory=filter_spec_factory,
+
+        metric_specs = tuple(
+            MetricSpec.create(
+                element_name=metric_spec.element_name,
+                where_filter_specs=query_level_filter_specs,
+            )
+            for metric_spec in query_spec.metric_specs
+        )
+
+        queried_linkable_specs = query_spec.linkable_specs
+
+        me_planner = DepthFirstSearchMetricEvaluationPlanner(
+            manifest_object_lookup=self._manifest_object_lookup,
+            column_association_resolver=self._column_association_resolver,
+        )
+        me_plan = me_planner.build_plan(
+            metric_specs=metric_specs,
+            group_by_item_specs=queried_linkable_specs.as_tuple,
             predicate_pushdown_state=predicate_pushdown_state,
-            output_group_by_metric_instances=output_group_by_metric_instances,
+            filter_spec_factory=filter_spec_factory,
+        )
+        logger.debug(
+            LazyFormat(
+                "Generated metric evaluation plan",
+                planner_class=me_planner.__class__.__name__,
+                me_plan=lambda: self._metric_evaluation_plan_formatter.format_plan(me_plan),
+            )
         )
 
-    @log_runtime()
-    def _build_plan(
+        # Visit the nodes in the metric evaluation plan in DFS order and create the corresponding dataflow branch.
+        top_level_query_node = me_plan.node_with_label(TopLevelQueryLabel.get_instance())
+        # On visit, the metric evaluation plan node is mapped to a dataflow branch and stored here.
+        query_node_to_dataflow_node: dict[MetricQueryNode, DataflowPlanNode] = {}
+
+        # Handling of `output_group_by_metric_instances` is currently odd because the flag only applies to the direct
+        # source nodes of the query node. This needs to be simplified by changing how
+        # `output_group_by_metric_instances` is implemented to use a dedicated dataflow node.
+        nodes_to_output_group_by_metric_instances: set[MetricQueryNode] = set()
+        if output_group_by_metric_instances:
+            nodes_to_output_group_by_metric_instances.update(me_plan.successors(top_level_query_node))
+
+        # Instead of the pathfinder, this could also be handled using a recursive function, but having the path can
+        # aid debugging.
+        pathfinder: MetricFlowPathfinder[
+            MetricQueryNode, MetricQueryDependencyEdge, MutableMetricEvaluationPath
+        ] = MetricFlowPathfinder()
+        weight_function: EdgeCountWeightFunction[
+            MetricQueryNode, MetricQueryDependencyEdge, MutableMetricEvaluationPath
+        ] = EdgeCountWeightFunction()
+
+        mutable_path = MutableMetricEvaluationPath.create(top_level_query_node)
+        for path in pathfinder.find_paths_dfs(
+            graph=me_plan,
+            initial_path=mutable_path,
+            target_nodes=None,
+            weight_function=weight_function,
+            max_path_weight=MetricEvaluationPlan.MAX_METRIC_DEFINITION_RECURSION_DEPTH,
+        ):
+            if len(path.nodes) == 0:
+                raise MetricFlowInternalError(
+                    LazyFormat("DFS traversal should have yielded non-empty paths", path=path)
+                )
+            current_query_node = path.nodes[-1]
+
+            if current_query_node in query_node_to_dataflow_node:
+                continue
+
+            input_dataflow_plan_nodes: list[DataflowPlanNode] = []
+            for source_query_node in me_plan.source_nodes(current_query_node):
+                input_dataflow_plan_node = query_node_to_dataflow_node.get(source_query_node)
+                if input_dataflow_plan_node is None:
+                    raise MetricFlowInternalError(
+                        LazyFormat(
+                            "A dataflow node has not been generated for given metric evaluation node. This indicates an"
+                            " error in traversal.",
+                            source_query_node=source_query_node,
+                            valid_nodes=query_node_to_dataflow_node.keys(),
+                        )
+                    )
+                input_dataflow_plan_nodes.append(input_dataflow_plan_node)
+
+            dataflow_plan_node = current_query_node.accept(
+                DataflowPlanBuilder._EvaluationNodeToDataflowNodeConverter(
+                    dataflow_plan_builder=self,
+                    filter_spec_factory=filter_spec_factory,
+                    input_dataflow_plan_nodes=input_dataflow_plan_nodes,
+                    output_group_by_metric_instances=current_query_node in nodes_to_output_group_by_metric_instances,
+                )
+            )
+            query_node_to_dataflow_node[current_query_node] = dataflow_plan_node
+
+        output_node = query_node_to_dataflow_node.get(top_level_query_node)
+
+        if output_node is None:
+            raise RuntimeError(
+                LazyFormat(
+                    "A dataflow plan node was not created for the top level query node."
+                    " This indicates an error in graph traversal.",
+                    top_level_query_node=top_level_query_node,
+                    mapped_query_nodes=list(query_node_to_dataflow_node),
+                )
+            )
+
+        return output_node
+
+    def _build_node_for_base_metrics(
         self,
-        query_spec: MetricFlowQuerySpec,
-        output_sql_table: Optional[SqlTable],
-        output_selection_specs: Optional[InstanceSpecSet],
-        optimizations: FrozenSet[DataflowPlanOptimization],
-    ) -> DataflowPlan:
-        metrics_output_node = self._build_query_output_node(query_spec=query_spec)
+        metric_query_descriptor: MetricQueryDescriptor,
+        filter_spec_factory: WhereFilterSpecFactory,
+        output_group_by_metric_instances: bool,
+    ) -> DataflowPlanNode:
+        if len(metric_query_descriptor.passthrough_metric_specs) > 0:
+            raise MetricFlowInternalError(
+                LazyFormat(
+                    "Can't build base metric output node using the query descriptor as it specifies passthrough metrics",
+                    metric_query_descriptor=metric_query_descriptor,
+                )
+            )
+        metric_specs = metric_query_descriptor.computed_metric_specs
 
-        sink_node = DataflowPlanBuilder.build_sink_node(
-            parent_node=metrics_output_node,
-            metric_specs=query_spec.metric_specs,
-            order_by_specs=query_spec.order_by_specs,
-            output_sql_table=output_sql_table,
-            limit=query_spec.limit,
-            output_selection_specs=output_selection_specs,
-            dimension_specs=query_spec.dimension_specs,
-            time_dimension_specs=query_spec.time_dimension_specs,
-            entity_specs=query_spec.entity_specs,
-        )
+        output_nodes: list[DataflowPlanNode] = []
+        for metric_spec in metric_specs:
+            metric_name = metric_spec.element_name
+            metric = self._manifest_object_lookup.get_metric(metric_name)
+            metric_type = metric.type
 
-        plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
-        plan = DataflowPlan(sink_nodes=[sink_node], plan_id=plan_id)
-        return self._optimize_plan(plan, optimizations)
+            if metric_type is MetricType.SIMPLE:
+                output_node = self._build_simple_metric_output_node(
+                    metric_spec=metric_spec,
+                    queried_linkable_specs=LinkableSpecSet.create_from_specs(
+                        metric_query_descriptor.group_by_item_specs
+                    ),
+                    filter_spec_factory=filter_spec_factory,
+                    predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
+                    output_group_by_metric_instances=output_group_by_metric_instances,
+                )
+            elif metric_type is MetricType.CUMULATIVE:
+                output_node = self._build_cumulative_metric_output_node(
+                    metric_spec=metric_spec,
+                    queried_linkable_specs=LinkableSpecSet.create_from_specs(
+                        metric_query_descriptor.group_by_item_specs
+                    ),
+                    filter_spec_factory=filter_spec_factory,
+                    predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
+                    output_group_by_metric_instances=output_group_by_metric_instances,
+                )
+            elif metric_type is MetricType.CONVERSION:
+                output_node = self._build_conversion_metric_output_node(
+                    metric_spec=metric_spec,
+                    queried_linkable_specs=LinkableSpecSet.create_from_specs(
+                        metric_query_descriptor.group_by_item_specs
+                    ),
+                    filter_spec_factory=filter_spec_factory,
+                    predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
+                    output_group_by_metric_instances=output_group_by_metric_instances,
+                )
+            elif metric_type is MetricType.RATIO or metric_type is MetricType.DERIVED:
+                raise MetricFlowInternalError("This should have only been called with base metrics")
+            else:
+                assert_values_exhausted(metric_type)
+
+            output_nodes.append(output_node)
+
+        output_node_count = len(output_nodes)
+        if output_node_count == 0:
+            raise MetricFlowInternalError("No base metrics provided")
+        elif output_node_count == 1:
+            return output_nodes[0]
+        else:
+            return CombineAggregatedOutputsNode.create(output_nodes)
 
     def _optimize_plan(self, plan: DataflowPlan, optimizations: FrozenSet[DataflowPlanOptimization]) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
@@ -613,7 +783,7 @@ class DataflowPlanBuilder:
         filter_spec_factory: WhereFilterSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
         output_group_by_metric_instances: bool = False,
-    ) -> ComputeMetricsNode:
+    ) -> DataflowPlanNode:
         """Builds a node to compute a metric that is not defined from other metrics."""
         metric_reference = metric_spec.reference
         metric = self._metric_lookup.get_metric(metric_reference)
@@ -646,81 +816,23 @@ class DataflowPlanBuilder:
     def _build_derived_metric_output_node(
         self,
         metric_spec: MetricSpec,
+        passthrough_metric_specs: OrderedSet[MetricSpec],
         queried_linkable_specs: LinkableSpecSet,
-        filter_spec_factory: WhereFilterSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
         output_group_by_metric_instances: bool,
+        input_dataflow_plan_nodes: Sequence[DataflowPlanNode],
     ) -> DataflowPlanNode:
-        """Builds a node to compute a metric defined from other metrics."""
-        metric = self._metric_lookup.get_metric(metric_spec.reference)
-        metric_input_specs = self._build_input_metric_specs_for_derived_metric(
-            metric_reference=metric_spec.reference,
-            filter_spec_factory=filter_spec_factory,
-        )
-        logger.debug(
-            LazyFormat(
-                "Building derived metric output node", metric_spec=metric_spec, metric_input_specs=metric_input_specs
-            )
-        )
+        logger.debug(LazyFormat("Building derived metric output node", metric_spec=metric_spec))
 
-        required_linkable_specs = self.__get_required_linkable_specs(
-            queried_linkable_specs=queried_linkable_specs, filter_specs=metric_spec.where_filter_specs
-        )
-
-        parent_nodes: List[DataflowPlanNode] = []
-
-        # This is the filter that's defined for the metric in the configs.
-        metric_definition_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
-            filter_location=WhereFilterLocation.for_metric(metric_spec.reference),
-            filter_intersection=metric.filter,
-        )
-
-        for metric_input_spec in metric_input_specs:
-            where_filter_specs = list(metric_definition_filter_specs)
-            where_filter_specs.extend(metric_input_spec.where_filter_specs)
-
-            # If metric is offset, we'll apply where constraint after offset to avoid removing values
-            # unexpectedly. Time constraint will be applied by INNER JOINing to time spine.
-            # We may consider encapsulating this in pushdown state later, but as of this moment pushdown
-            # is about post-join to pre-join for dimension access, and relies on the builder to collect
-            # predicates from query and metric specs and make them available at simple-metric-input level.
-            if not metric_spec.has_time_offset:
-                where_filter_specs.extend(metric_spec.where_filter_specs)
-            metric_pushdown_state = (
-                predicate_pushdown_state
-                if not metric_spec.has_time_offset
-                else PredicatePushdownState.with_pushdown_disabled()
-            )
-
-            parent_nodes.append(
-                self._build_any_metric_output_node(
-                    BuildAnyMetricOutputNodeInput(
-                        metric_spec=MetricSpec.create(
-                            element_name=metric_input_spec.element_name,
-                            where_filter_specs=tuple(where_filter_specs),
-                            alias=metric_input_spec.alias,
-                            offset_window=metric_input_spec.offset_window,
-                            offset_to_grain=metric_input_spec.offset_to_grain,
-                        ),
-                        queried_linkable_specs=(
-                            queried_linkable_specs if not metric_spec.has_time_offset else required_linkable_specs
-                        ),
-                        filter_spec_factory=filter_spec_factory,
-                        predicate_pushdown_state=metric_pushdown_state,
-                        output_group_by_metric_instances=False,
-                    )
-                )
-            )
-
-        parent_node = (
-            parent_nodes[0]
-            if len(parent_nodes) == 1
-            else CombineAggregatedOutputsNode.create(parent_nodes=parent_nodes)
+        input_node = (
+            input_dataflow_plan_nodes[0]
+            if len(input_dataflow_plan_nodes) == 1
+            else CombineAggregatedOutputsNode.create(input_dataflow_plan_nodes)
         )
         output_node: DataflowPlanNode = ComputeMetricsNode.create(
-            parent_node=parent_node,
+            parent_node=input_node,
             computed_metric_specs=[metric_spec],
-            passthrough_metric_specs=(),
+            passthrough_metric_specs=tuple(passthrough_metric_specs),
             output_group_by_metric_instances=output_group_by_metric_instances,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
@@ -743,112 +855,6 @@ class DataflowPlanBuilder:
             )
 
         return output_node
-
-    def _build_any_metric_output_node(
-        self, build_any_metric_output_node_input: BuildAnyMetricOutputNodeInput
-    ) -> DataflowPlanNode:
-        """Builds a node to compute a metric of any type."""
-        result = self._cache.get_build_any_metric_output_node_result(build_any_metric_output_node_input)
-        if result is not None:
-            return result
-
-        result = self._build_any_metric_output_node_non_cached(build_any_metric_output_node_input)
-        self._cache.set_build_any_metric_output_node_result(build_any_metric_output_node_input, result)
-        return result
-
-    def _build_any_metric_output_node_non_cached(
-        self, build_any_metric_output_node_input: BuildAnyMetricOutputNodeInput
-    ) -> DataflowPlanNode:
-        """Builds a node to compute a metric of any type."""
-        metric_spec = build_any_metric_output_node_input.metric_spec
-        queried_linkable_specs = build_any_metric_output_node_input.queried_linkable_specs
-        filter_spec_factory = build_any_metric_output_node_input.filter_spec_factory
-        predicate_pushdown_state = build_any_metric_output_node_input.predicate_pushdown_state
-        output_group_by_metric_instances = build_any_metric_output_node_input.output_group_by_metric_instances
-
-        metric = self._metric_lookup.get_metric(metric_spec.reference)
-
-        if metric.type is MetricType.SIMPLE:
-            return self._build_simple_metric_output_node(
-                metric_spec=metric_spec,
-                queried_linkable_specs=queried_linkable_specs,
-                filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_state=predicate_pushdown_state,
-                output_group_by_metric_instances=output_group_by_metric_instances,
-            )
-
-        elif metric.type is MetricType.CUMULATIVE:
-            return self._build_cumulative_metric_output_node(
-                metric_spec=metric_spec,
-                queried_linkable_specs=queried_linkable_specs,
-                filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_state=predicate_pushdown_state,
-                output_group_by_metric_instances=output_group_by_metric_instances,
-            )
-
-        elif metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
-            return self._build_derived_metric_output_node(
-                metric_spec=metric_spec,
-                queried_linkable_specs=queried_linkable_specs,
-                filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_state=predicate_pushdown_state,
-                output_group_by_metric_instances=output_group_by_metric_instances,
-            )
-        elif metric.type is MetricType.CONVERSION:
-            return self._build_conversion_metric_output_node(
-                metric_spec=metric_spec,
-                queried_linkable_specs=queried_linkable_specs,
-                filter_spec_factory=filter_spec_factory,
-                predicate_pushdown_state=predicate_pushdown_state,
-                output_group_by_metric_instances=output_group_by_metric_instances,
-            )
-
-        assert_values_exhausted(metric.type)
-
-    def _build_metrics_output_node(
-        self,
-        metric_specs: Sequence[MetricSpec],
-        queried_linkable_specs: LinkableSpecSet,
-        filter_spec_factory: WhereFilterSpecFactory,
-        predicate_pushdown_state: PredicatePushdownState,
-        output_group_by_metric_instances: bool = False,
-    ) -> DataflowPlanNode:
-        """Builds a node that computes all requested metrics.
-
-        Args:
-            metric_specs: Specs for metrics to compute. Contains modifications to the metric defined in the model to
-            include offsets and filters.
-            queried_linkable_specs: Dimensions/entities that were queried.
-            filter_spec_factory: Constructs WhereFilterSpecs with the resolved ambiguous group-by-items in the filter.
-            predicate_pushdown_state: Parameters for evaluating and applying filter predicate pushdown, e.g., for
-            applying time constraints prior to other dimension joins.
-        """
-        output_nodes: List[DataflowPlanNode] = []
-
-        for metric_spec in metric_specs:
-            logger.debug(
-                LazyFormat(lambda: f"Generating compute metrics node for:\n{mf_indent(mf_pformat(metric_spec))}")
-            )
-            self._metric_lookup.get_metric(metric_spec.reference)
-
-            output_nodes.append(
-                self._build_any_metric_output_node(
-                    BuildAnyMetricOutputNodeInput(
-                        metric_spec=metric_spec,
-                        queried_linkable_specs=queried_linkable_specs,
-                        filter_spec_factory=filter_spec_factory,
-                        predicate_pushdown_state=predicate_pushdown_state,
-                        output_group_by_metric_instances=output_group_by_metric_instances,
-                    )
-                )
-            )
-
-        assert len(output_nodes) > 0, "ComputeMetricsNode was not properly constructed"
-
-        if len(output_nodes) == 1:
-            return output_nodes[0]
-
-        return CombineAggregatedOutputsNode.create(parent_nodes=output_nodes)
 
     def build_plan_for_distinct_values(
         self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization] = frozenset()
@@ -1166,13 +1172,20 @@ class DataflowPlanBuilder:
                 lambda: f"Building source nodes for group by metrics: {linkable_specs_to_satisfy.group_by_metric_specs}"
             )
         )
-        candidate_nodes_for_right_side_of_join += [
-            self._build_query_output_node(
+        for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs:
+            query_output_node = self._build_query_output_node(
                 query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
                 output_group_by_metric_instances=True,
             )
-            for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs
-        ]
+            logger.debug(
+                LazyFormat(
+                    "Generated output node for group-by metric",
+                    group_by_metric_spec=group_by_metric_spec,
+                    query_output_node=lambda: query_output_node.structure_text(),
+                )
+            )
+
+            candidate_nodes_for_right_side_of_join.append(query_output_node)
 
         logger.debug(LazyFormat(lambda: f"Processing nodes took: {time.perf_counter()-start_time:.2f}s"))
 
@@ -2268,3 +2281,102 @@ class DataflowPlanBuilder:
             sample_agg_time_dimension_spec = required_time_spine_specs[0]
             join_on_time_dimension_spec = sample_agg_time_dimension_spec.with_grain(time_granularity=expanded_grain)
         return join_on_time_dimension_spec
+
+    class _EvaluationNodeToDataflowNodeConverter(MetricQueryNodeVisitor[DataflowPlanNode]):
+        """Visitor that returns the appropriate dataflow branch for each metric evaluation node."""
+
+        def __init__(
+            self,
+            dataflow_plan_builder: DataflowPlanBuilder,
+            filter_spec_factory: WhereFilterSpecFactory,
+            input_dataflow_plan_nodes: Iterable[DataflowPlanNode],
+            output_group_by_metric_instances: bool,
+        ) -> None:
+            self._dataflow_plan_builder = dataflow_plan_builder
+            self._filter_spec_factory = filter_spec_factory
+            self._output_group_by_metric_instances = output_group_by_metric_instances
+            self._input_dataflow_plan_nodes = tuple(input_dataflow_plan_nodes)
+
+        @override
+        def visit_simple_metrics_query_node(self, node: SimpleMetricsQueryNode) -> DataflowPlanNode:
+            simple_metric_nodes: list[DataflowPlanNode] = []
+
+            for simple_metric_spec in node.output_metric_specs:
+                simple_metric_node = self._dataflow_plan_builder._build_simple_metric_output_node(
+                    metric_spec=simple_metric_spec,
+                    queried_linkable_specs=node.query_properties.group_by_item_spec_set,
+                    filter_spec_factory=self._filter_spec_factory,
+                    predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
+                    output_group_by_metric_instances=self._output_group_by_metric_instances,
+                )
+
+                simple_metric_nodes.append(simple_metric_node)
+
+            if len(simple_metric_nodes) == 1:
+                return simple_metric_nodes[0]
+            else:
+                return CombineAggregatedOutputsNode.create(simple_metric_nodes)
+
+        @override
+        def visit_cumulative_metric_query_node(self, node: CumulativeMetricQueryNode) -> DataflowPlanNode:
+            return self._dataflow_plan_builder._build_cumulative_metric_output_node(
+                metric_spec=node.metric_spec,
+                queried_linkable_specs=node.query_properties.group_by_item_spec_set,
+                filter_spec_factory=self._filter_spec_factory,
+                predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
+                output_group_by_metric_instances=self._output_group_by_metric_instances,
+            )
+
+        @override
+        def visit_conversion_metric_query_node(self, node: ConversionMetricQueryNode) -> DataflowPlanNode:
+            return self._dataflow_plan_builder._build_conversion_metric_output_node(
+                metric_spec=node.metric_spec,
+                queried_linkable_specs=node.query_properties.group_by_item_spec_set,
+                filter_spec_factory=self._filter_spec_factory,
+                predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
+                output_group_by_metric_instances=self._output_group_by_metric_instances,
+            )
+
+        @override
+        def visit_derived_metrics_query_node(self, node: DerivedMetricsQueryNode) -> DataflowPlanNode:
+            derived_metric_nodes = []
+            for computed_metric_spec in node.computed_metric_specs:
+                result_for_one_computed_spec = self._dataflow_plan_builder._build_derived_metric_output_node(
+                    metric_spec=computed_metric_spec,
+                    passthrough_metric_specs=node.passthrough_metric_specs,
+                    queried_linkable_specs=node.query_properties.group_by_item_spec_set,
+                    predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
+                    output_group_by_metric_instances=self._output_group_by_metric_instances,
+                    input_dataflow_plan_nodes=self._input_dataflow_plan_nodes,
+                )
+                derived_metric_nodes.append(result_for_one_computed_spec)
+
+            derived_metric_node_count = len(derived_metric_nodes)
+            if derived_metric_node_count == 0:
+                raise MetricFlowInternalError(
+                    LazyFormat(
+                        "No derived metric nodes generated",
+                        node=node,
+                    )
+                )
+            elif derived_metric_node_count == 1:
+                return derived_metric_nodes[0]
+            else:
+                return CombineAggregatedOutputsNode.create(derived_metric_nodes)
+
+        @override
+        def visit_top_level_query_node(self, node: TopLevelQueryNode) -> DataflowPlanNode:
+            input_dataflow_plan_node_count = len(self._input_dataflow_plan_nodes)
+            if input_dataflow_plan_node_count == 0:
+                raise MetricFlowInternalError(
+                    LazyFormat(
+                        "A top level query node requires input dataflow plan nodes",
+                        node=node,
+                    )
+                )
+            elif input_dataflow_plan_node_count == 1:
+                return self._input_dataflow_plan_nodes[0]
+            else:
+                return CombineAggregatedOutputsNode.create(
+                    self._input_dataflow_plan_nodes,
+                )
