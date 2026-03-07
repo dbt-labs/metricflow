@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import Hashable, MutableSet, Set
+from collections.abc import Hashable, MutableSet, Reversible, Set
 from functools import cached_property
 from typing import Generic, Iterable, Iterator, Optional, TypeVar
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 OrderedSetT = TypeVar("OrderedSetT", bound="OrderedSet", covariant=True)
 
 
-class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
+class OrderedSet(Set[HashableT_co], Reversible[HashableT_co], Generic[HashableT_co], ABC):
     """Set where the iteration order is the insertion order.
 
     * Having a consistent iteration order is helpful for ensuring consistency in tests and snapshot generation without
@@ -74,6 +74,10 @@ class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
         return iter(self._set_as_dict)
 
     @override
+    def __reversed__(self) -> Iterator[HashableT_co]:
+        return reversed(self._set_as_dict)
+
+    @override
     def __str__(self) -> str:
         return "{" + ", ".join(str(item) for item in self) + "}"
 
@@ -91,7 +95,7 @@ class OrderedSet(Generic[HashableT_co], Set[HashableT_co], ABC):
         raise NotImplementedError
 
 
-class FrozenOrderedSet(Generic[HashableT_co], OrderedSet[HashableT_co], Hashable):
+class FrozenOrderedSet(OrderedSet[HashableT_co], Hashable, Generic[HashableT_co]):
     """A frozen version of `OrderedSet` that can be hashed."""
 
     def __init__(  # noqa: D107
@@ -101,9 +105,18 @@ class FrozenOrderedSet(Generic[HashableT_co], OrderedSet[HashableT_co], Hashable
     ) -> None:
         super().__init__(iterable, _set_as_dict)
 
+    @staticmethod
+    def from_iterable(iterable: Optional[Iterable[HashableT_co]] = None) -> FrozenOrderedSet[HashableT_co]:
+        """Factory method to avoid new set creation if the input is also a `FrozenOrderedSet`."""
+        if iterable.__class__ is FrozenOrderedSet:
+            # If the provided iterable is a FrozenOrderedSet, it can be returned as it is immutable.
+            return iterable  # type: ignore[return-value]
+        return FrozenOrderedSet(iterable)
+
     @cached_property
     def _cached_hash_value(self) -> int:
-        return hash(tuple(self._set_as_dict))
+        # Use `frozenset` for order-independence comparison.
+        return hash(frozenset(self._set_as_dict))
 
     @override
     def __hash__(self) -> int:
@@ -122,7 +135,7 @@ class FrozenOrderedSet(Generic[HashableT_co], OrderedSet[HashableT_co], Hashable
         return FrozenOrderedSet(_set_as_dict=self._set_as_dict)
 
 
-class MutableOrderedSet(Generic[HashableT], OrderedSet[HashableT], MutableSet[HashableT]):
+class MutableOrderedSet(OrderedSet[HashableT], MutableSet[HashableT], Generic[HashableT]):
     """An ordered set that can be modified."""
 
     def update(self, *iterables: Iterable[HashableT]) -> None:  # noqa: D102

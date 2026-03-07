@@ -163,7 +163,10 @@ class MetricFlowGraph(MetricFlowPrettyFormattable, Generic[NodeT_co, EdgeT_co], 
 
     @abstractmethod
     def nodes_with_labels(self, *graph_labels: MetricFlowGraphLabel) -> OrderedSet[NodeT_co]:
-        """Return nodes in the graph with any one of the given labels."""
+        """Return nodes in the graph with any one of the given labels.
+
+        # TODO: Maybe rename to `nodes_with_any_label`.
+        """
         raise NotImplementedError()
 
     def node_with_label(self, label: MetricFlowGraphLabel) -> NodeT_co:

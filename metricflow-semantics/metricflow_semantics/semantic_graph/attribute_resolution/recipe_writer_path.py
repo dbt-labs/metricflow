@@ -15,7 +15,6 @@ from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_s
 from metricflow_semantics.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.toolkit.mf_graph.path_finding.graph_path import MutableGraphPath
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
-from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,7 @@ _EMPTY_RECIPE = AttributeRecipe()
 
 
 @dataclass
-class AttributeRecipeWriterPath(MutableGraphPath[SemanticGraphNode, SemanticGraphEdge], MetricFlowPrettyFormattable):
+class AttributeRecipeWriterPath(MutableGraphPath[SemanticGraphNode, SemanticGraphEdge]):
     """An implementation of a path in the semantic graph that writes recipes.
 
     The nodes and edges in the semantic graph are annotated with recipe steps that describe the computation of

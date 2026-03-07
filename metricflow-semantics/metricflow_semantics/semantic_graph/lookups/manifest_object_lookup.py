@@ -114,11 +114,16 @@ class ManifestObjectLookup(AttributePrettyFormattable):
 
     @cached_property
     def simple_metric_name_to_input(self) -> Mapping[str, SimpleMetricInput]:  # noqa: D102
-        return {
+        simple_metric_name_to_simple_metric_input = {
             simple_metric_input.name: simple_metric_input
             for lookup in self.simple_metric_model_lookups
             for simple_metric_inputs in lookup.aggregation_configuration_to_simple_metric_inputs.values()
             for simple_metric_input in simple_metric_inputs
+        }
+
+        return {
+            metric_name: simple_metric_name_to_simple_metric_input[metric_name]
+            for metric_name in sorted(simple_metric_name_to_simple_metric_input)
         }
 
     @cached_property
