@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import logging
 from collections import defaultdict
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Sequence
 from typing import Optional
 
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
@@ -22,15 +22,15 @@ logger = logging.getLogger(__name__)
 
 
 class DerivedMetricsNodeConsolidator:
-    """Consolidate multiple `DerivedMetricsQueryNode`s with common sources.
+    """Consolidate multiple `DerivedMetricsQueryNode`s with common sources to a single node.
 
-    Given `DerivedMetricsQueryNode`s A (computing `bookings`) and B (computing `listings`) that have the same source
-    nodes {C}, consolidate A and B to a new node D that computes both `bookings` and `listings`.
+    Given `DerivedMetricsQueryNode`s A (computing `metric_0`) and B (computing `metric_1`) that have the same source
+    nodes {C}, consolidate A and B to a new node D that computes both `metric_0` and `metric_1`.
 
-    This consolidation helps to reduce the number of queries in the evaluation plan.
+    This consolidation helps to reduce the number of queries / joins in the evaluation plan.
 
     There are some cases where the consolidation is currently skipped even if the sources are the same.
-    e.g. when a computed derived metric uses aliases.
+    e.g. when a derived metric uses aliases.
     """
 
     def __init__(  # noqa: D107
@@ -39,6 +39,8 @@ class DerivedMetricsNodeConsolidator:
         corresponding_source_edges: OrderedSet[MetricQueryDependencyEdge],
     ) -> None:
         # Check that the correct inputs have been passed in.
+
+        # The target for all edges should be in `nodes_to_consolidate`.
         edges_with_invalid_targets: MutableOrderedSet[MetricQueryDependencyEdge] = MutableOrderedSet(
             edge for edge in corresponding_source_edges if edge.target_node not in nodes_to_consolidate
         )
@@ -50,6 +52,8 @@ class DerivedMetricsNodeConsolidator:
                     nodes_to_consolidate=nodes_to_consolidate,
                 )
             )
+
+        # The source for all edges should not be in `nodes_to_consolidate`.
         edges_with_invalid_sources: MutableOrderedSet[MetricQueryDependencyEdge] = MutableOrderedSet(
             edge for edge in corresponding_source_edges if edge.source_node in nodes_to_consolidate
         )
@@ -64,6 +68,7 @@ class DerivedMetricsNodeConsolidator:
                     )
                 )
 
+        # Each node should compute 1 metric spec to reflect the pre-consolidated state.
         for node_to_consolidate in nodes_to_consolidate:
             if len(node_to_consolidate.computed_metric_specs) != 1:
                 raise MetricFlowInternalError(
@@ -87,7 +92,7 @@ class DerivedMetricsNodeConsolidator:
         consolidation_key_to_nodes: defaultdict[NodeConsolidationKey, list[DerivedMetricsQueryNode]] = defaultdict(list)
 
         for node in self._nodes_to_consolidate:
-            # The nodes to consolidate only computes a single metric as per check in the initializer.
+            # As per check in the initializer, each node to consolidate should only compute a single metric.
             metric_spec = mf_first_item(node.computed_metric_specs)
 
             consolidation_key_to_nodes[
@@ -99,7 +104,7 @@ class DerivedMetricsNodeConsolidator:
             ].append(node)
 
         for consolidation_key, nodes in consolidation_key_to_nodes.items():
-            # If a metric is aliased, skip consolidation and copy them to the result.
+            # Keep aliased metrics as a separate query.
             if consolidation_key.aliased_metric is not None:
                 new_nodes.update(nodes)
                 new_edges.update(*(self._subplan.source_edges(node) for node in nodes))
@@ -116,35 +121,12 @@ class DerivedMetricsNodeConsolidator:
 
         return (new_nodes, new_edges)
 
-    def _group_nodes_by_source_node_set(
-        self, nodes: Iterable[DerivedMetricsQueryNode]
-    ) -> Mapping[FrozenOrderedSet[MetricQueryNode], OrderedSet[DerivedMetricsQueryNode]]:
-        source_node_set_to_target_nodes: defaultdict[
-            FrozenOrderedSet[MetricQueryNode], MutableOrderedSet[DerivedMetricsQueryNode]
-        ] = defaultdict(MutableOrderedSet)
-
-        for node in nodes:
-            source_node_set_to_target_nodes[self._subplan.source_nodes(node).as_frozen()].add(node)
-
-        return source_node_set_to_target_nodes
-
-    def _group_nodes_by_query_properties(
-        self, nodes: Iterable[DerivedMetricsQueryNode]
-    ) -> Mapping[MetricQueryPropertySet, OrderedSet[DerivedMetricsQueryNode]]:
-        query_property_set_to_nodes: defaultdict[
-            MetricQueryPropertySet, MutableOrderedSet[DerivedMetricsQueryNode]
-        ] = defaultdict(MutableOrderedSet)
-
-        for node in nodes:
-            query_property_set_to_nodes[node.query_properties].add(node)
-        return query_property_set_to_nodes
-
     def _consolidate_nodes_for_non_aliased_metrics(
         self, nodes: Sequence[DerivedMetricsQueryNode], query_properties: MetricQueryPropertySet
     ) -> tuple[DerivedMetricsQueryNode, Iterable[MetricQueryDependencyEdge]]:
         """Consolidate the given nodes to a single node that computes all metrics.
 
-        The nodes must have the same source nodes.
+        The nodes must have the same source nodes and can't represent aliased metrics.
         """
         node_count = len(nodes)
         if node_count == 0:
@@ -216,6 +198,8 @@ class DerivedMetricsNodeConsolidator:
 class NodeConsolidationKey:
     """A key to use for grouping nodes for consolidation."""
 
+    # `aliased_metric` is only set for metrics with an alias. It ensures that each aliased metric maps to
+    # a separate node.
     aliased_metric: Optional[MetricSpec]
     source_node_set: FrozenOrderedSet[MetricQueryNode]
     query_properties: MetricQueryPropertySet

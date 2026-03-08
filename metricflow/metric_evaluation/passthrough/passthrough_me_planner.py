@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import logging
 from collections import defaultdict
-from collections.abc import Iterable, Mapping, Sequence, Set
+from collections.abc import Mapping, Sequence, Set
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import MetricType
@@ -20,20 +20,19 @@ from typing_extensions import override
 
 from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
 from metricflow.metric_evaluation.metric_query_planner import MetricEvaluationPlanner
+from metricflow.metric_evaluation.passthrough.base_metric_query_node_builder import (
+    BaseMetricQueryNodeBuilder,
+)
 from metricflow.metric_evaluation.passthrough.me_level_resolver import MetricEvaluationLevelResolver
 from metricflow.metric_evaluation.passthrough.node_consolidator import DerivedMetricsNodeConsolidator
-from metricflow.metric_evaluation.passthrough.query_element_grouper import QueryElementGrouper
 from metricflow.metric_evaluation.passthrough.query_set_selector import (
     BestMetricQuerySetSelector,
     FindBestQuerySetResult,
 )
 from metricflow.metric_evaluation.plan.me_edges import MetricQueryDependencyEdge
 from metricflow.metric_evaluation.plan.me_nodes import (
-    ConversionMetricQueryNode,
-    CumulativeMetricQueryNode,
     DerivedMetricsQueryNode,
     MetricQueryNode,
-    SimpleMetricsQueryNode,
     TopLevelQueryNode,
 )
 from metricflow.metric_evaluation.plan.me_plan import (
@@ -52,10 +51,10 @@ logger = logging.getLogger(__name__)
 
 
 class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
-    """Plans metric evaluation with passthrough metrics for derived metrics.
+    """Create metric evaluation plans that allows for passthrough metrics in queries to compute derived metrics.
 
     By allowing input metrics to pass through to queries that depend on a derived metric, it may be possible to reduce
-    the number of full-outer joins in the top-level query.
+    the number of full-outer joins in the final query.
     """
 
     def __init__(  # noqa: D107
@@ -66,7 +65,6 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
         )
 
         self._level_resolver: MetricEvaluationLevelResolver = MetricEvaluationLevelResolver(manifest_object_lookup)
-        self._query_element_grouper = QueryElementGrouper(manifest_object_lookup)
 
     @override
     def build_plan(
@@ -77,13 +75,14 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
         filter_spec_factory: WhereFilterSpecFactory,
     ) -> MetricEvaluationPlan:
         # Figure out all forms of metrics that are required.
-        query_element_collector = MetricQueryElementCollector()
         logger.debug(
             LazyFormat(
                 "Building metric evaluation plan",
                 metric_specs=metric_specs,
             )
         )
+
+        query_element_collector = MetricQueryElementCollector()
         top_level_query_elements = FrozenOrderedSet(
             (
                 MetricQueryElement.create(
@@ -124,15 +123,14 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
 
         logger.debug(LazyFormat("Grouped query elements by level", level_to_query_elements=level_to_query_elements))
 
-        base_metric_query_elements = level_to_query_elements[0]
-
         evaluation_plan = MutableMetricEvaluationPlan.create()
 
-        base_metric_query_nodes = self._get_nodes_for_base_metrics(base_metric_query_elements)
-
+        base_metric_query_elements = level_to_query_elements[0]
+        base_metric_query_node_builder = BaseMetricQueryNodeBuilder(self._manifest_object_lookup)
+        base_metric_query_nodes = base_metric_query_node_builder.build_nodes(base_metric_query_elements)
         logger.debug(
             LazyFormat(
-                "Resolved base metric query nodes",
+                "Constructed base metric query nodes",
                 base_metric_query_nodes=base_metric_query_nodes,
             )
         )
@@ -140,14 +138,19 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
 
         candidate_query_nodes = list(base_metric_query_nodes)
 
+        # For each definition level, construct the derived metrics query nodes using the results from previous levels.
         for level in range(1, max_level + 1):
             query_elements_for_current_level = level_to_query_elements[level]
+
+            # This generates separate query node for each query element.
             output_query_nodes, edges_from_nodes = self._generate_subplan_for_recursive_metrics_at_single_level(
                 output_query_elements=query_elements_for_current_level,
                 candidate_input_query_nodes=candidate_query_nodes,
                 query_element_lookup=query_element_lookup,
                 query_element_to_level=query_element_to_level,
             )
+
+            # Since query nodes may have the same sources, consolidate them to reduce the node count.
             node_consolidator = DerivedMetricsNodeConsolidator(
                 nodes_to_consolidate=output_query_nodes,
                 corresponding_source_edges=edges_from_nodes,
@@ -165,6 +168,7 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
             candidate_query_nodes.extend(output_query_nodes)
             evaluation_plan.add_edges(edges_from_nodes)
 
+        # Generate the node for the top-level query.
         query_set_selector_for_top_level = BestMetricQuerySetSelector(query_element_to_level)
         find_best_query_set_result = query_set_selector_for_top_level.find_best_queries(
             desired_query_elements=top_level_query_elements,
@@ -210,7 +214,7 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
             format_result = MetricEvaluationPlanTableFormatter().format_plan(evaluation_plan)
             raise MetricFlowInternalError(
                 LazyFormat(
-                    "Validation error in inital passthrough plan",
+                    "Validation error in the initial passthrough plan",
                     overview_table=format_result.overview_table,
                     node_output_table=format_result.node_output_table,
                 )
@@ -222,7 +226,7 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
                 query_graph=lambda: evaluation_plan.format(PrettyFormatGraphFormatter()),
             )
         )
-
+        # Not all passthrough metrics output by the nodes are required, so remove the ones that are not used.
         node_to_metric_specs_to_retain = self._map_retained_metric_specs_by_node(
             query_graph=evaluation_plan,
             root_query_node=top_level_query_node,
@@ -332,63 +336,6 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
                     nodes_to_process.add(edge.head_node)
 
         return node_to_metric_specs_to_retain
-
-    def _get_nodes_for_base_metrics(self, query_elements: Iterable[MetricQueryElement]) -> Sequence[MetricQueryNode]:
-        nodes: list[MetricQueryNode] = []
-
-        grouping_result = self._query_element_grouper.group_query_elements(query_elements)
-
-        for property_set, query_elements in grouping_result.property_set_to_simple_metric_query_elements.items():
-            logger.debug(
-                LazyFormat(
-                    "Found simple metric group",
-                    property_set=property_set,
-                    query_elements=query_elements,
-                )
-            )
-            nodes.append(
-                SimpleMetricsQueryNode.create(
-                    model_id=property_set.model_id,
-                    metric_specs=(query_element.metric_spec for query_element in query_elements),
-                    query_properties=property_set,
-                )
-            )
-
-        for non_grouped_query_element in grouping_result.non_grouped_query_elements:
-            metric_name = non_grouped_query_element.metric_spec.element_name
-            metric_type = self._manifest_object_lookup.get_metric(metric_name).type
-
-            if metric_type is MetricType.SIMPLE:
-                nodes.append(
-                    SimpleMetricsQueryNode.create(
-                        model_id=self._manifest_object_lookup.simple_metric_name_to_input[metric_name].model_id,
-                        metric_specs=(non_grouped_query_element.metric_spec,),
-                        query_properties=non_grouped_query_element.query_properties,
-                    )
-                )
-            elif metric_type is MetricType.CUMULATIVE:
-                nodes.append(
-                    CumulativeMetricQueryNode.create(
-                        metric_spec=non_grouped_query_element.metric_spec,
-                        query_properties=non_grouped_query_element.query_properties,
-                    )
-                )
-            elif metric_type is MetricType.CONVERSION:
-                nodes.append(
-                    ConversionMetricQueryNode.create(
-                        metric_spec=non_grouped_query_element.metric_spec,
-                        query_properties=non_grouped_query_element.query_properties,
-                    )
-                )
-            elif metric_type is MetricType.RATIO or metric_type is MetricType.DERIVED:
-                raise MetricFlowInternalError(
-                    LazyFormat(
-                        "Only base metrics should have been provided to this method",
-                        non_grouped_query_element=non_grouped_query_element,
-                    )
-                )
-
-        return nodes
 
     def _metric_spec_allows_passthrough(self, metric_spec: MetricSpec) -> bool:
         return metric_spec.offset_window is None and metric_spec.offset_to_grain is None and metric_spec.alias is None
