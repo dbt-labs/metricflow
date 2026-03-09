@@ -19,14 +19,15 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_31.metric_time__day, subq_37.metric_time__day) AS metric_time__day
-    , MAX(subq_31.booking_fees_start_of_month) AS booking_fees_start_of_month
-    , MAX(subq_37.booking_fees) AS booking_fees
+    COALESCE(subq_33.metric_time__day, subq_39.metric_time__day) AS metric_time__day
+    , MAX(subq_33.booking_fees_start_of_month) AS booking_fees_start_of_month
+    , MAX(subq_39.booking_fees) AS booking_fees
   FROM (
     -- Join to Time Spine Dataset
+    -- Select: ['metric_time__day', 'booking_fees_start_of_month']
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , subq_26.booking_fees_start_of_month AS booking_fees_start_of_month
+      , subq_27.booking_fees_start_of_month AS booking_fees_start_of_month
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Compute Metrics via Expressions
@@ -45,11 +46,11 @@ FROM (
         FROM sma_28009_cte
         GROUP BY
           metric_time__day
-      ) subq_25
-    ) subq_26
+      ) subq_26
+    ) subq_27
     ON
-      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_26.metric_time__day
-  ) subq_31
+      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_27.metric_time__day
+  ) subq_33
   FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
@@ -67,10 +68,10 @@ FROM (
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
-    ) subq_36
-  ) subq_37
+    ) subq_38
+  ) subq_39
   ON
-    subq_31.metric_time__day = subq_37.metric_time__day
+    subq_33.metric_time__day = subq_39.metric_time__day
   GROUP BY
-    COALESCE(subq_31.metric_time__day, subq_37.metric_time__day)
-) subq_38
+    COALESCE(subq_33.metric_time__day, subq_39.metric_time__day)
+) subq_40
