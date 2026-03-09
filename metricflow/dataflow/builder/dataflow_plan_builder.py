@@ -1692,26 +1692,21 @@ class DataflowPlanBuilder:
             join_type=SqlJoinType.INNER,
         )
 
-        # TODO: fix bug here where filter specs are being included in when aggregating.
-        if len(metric_spec.where_filter_specs) > 0 or time_range_constraint:
-            where_filter_specs = metric_spec.where_filter_specs
-            if len(where_filter_specs) > 0:
-                output_node = WhereFilterNode.create(parent_node=output_node, filter_specs=where_filter_specs)
-            if time_range_constraint:
-                output_node = ConstrainTimeRangeNode.create(
-                    parent_node=output_node, time_range_constraint=time_range_constraint
-                )
-            # SelectorNode will be needed if there are where filter specs that were not selected in the group by.
-            specs_to_keep_for_aggregation = None
-            specs_in_filters = set(
-                linkable_spec for filter_spec in where_filter_specs for linkable_spec in filter_spec.linkable_specs
+        where_filter_specs = metric_spec.where_filter_specs
+        if len(where_filter_specs) > 0:
+            output_node = WhereFilterNode.create(parent_node=output_node, filter_specs=where_filter_specs)
+
+        if time_range_constraint:
+            output_node = ConstrainTimeRangeNode.create(
+                parent_node=output_node, time_range_constraint=time_range_constraint
             )
-            if not specs_in_filters.issubset(queried_linkable_specs):
-                specs_to_keep_for_aggregation = InstanceSpecSet(metric_specs=(metric_spec,)).merge(
-                    InstanceSpecSet.create_from_specs(queried_linkable_specs)
-                )
-            if specs_to_keep_for_aggregation:
-                output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_for_aggregation)
+
+        # Keep only queried linkables plus the metric after the offset join so internal base-grain
+        # columns added for planning (e.g. custom grain base time dims) don't leak into output.
+        specs_to_keep_after_offset_join = InstanceSpecSet(metric_specs=(metric_spec,)).merge(
+            InstanceSpecSet.create_from_specs(queried_linkable_specs)
+        )
+        output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_after_offset_join)
         return output_node
 
     def _build_time_spine_join_node_for_before_aggregation(
