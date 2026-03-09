@@ -18,7 +18,7 @@ from metricflow_semantics.specs.query_param_implementations import TimeDimension
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_ALIEN_DAY, MTD_SPEC_DAY
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
@@ -757,6 +757,64 @@ def test_offset_to_grain_metric(  # noqa: D103
         metric_names=("booking_fees_since_start_of_month",),
         group_by_names=("metric_time__alien_day",),
     ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_nested_offsets_with_custom_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Check a nested offset query does not select `metric_time` at different grains if not requested.
+
+    It should not have `metric_time__day` in the output query.
+    """
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec.create(element_name="bookings_offset_twice"),),
+        time_dimension_specs=(MTD_SPEC_ALIEN_DAY,),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_nested_offset_metric_and_simple_metric_with_custom_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Check that metric with a nested offset metric can be queried with the associated simple metric."""
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(
+            MetricSpec.create(element_name="bookings_offset_twice"),
+            MetricSpec.create(element_name="bookings"),
+        ),
+        time_dimension_specs=(MTD_SPEC_ALIEN_DAY,),
+    )
 
     render_and_check(
         request=request,
