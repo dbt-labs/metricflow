@@ -72,7 +72,7 @@ class MetricEvaluationPlan(MetricFlowGraph[MetricQueryNode, MetricQueryDependenc
             output_metric_specs = node.output_metric_specs
             for target_edge in self.target_edges(node):
                 if target_edge.source_node_output_spec not in output_metric_specs:
-                    raise ValueError(
+                    raise MetricFlowInternalError(
                         LazyFormat(
                             "An edge from the target node to a source node states that the source node"
                             " outputs a spec that is not described by the output specs of the source node. This"
@@ -86,7 +86,7 @@ class MetricEvaluationPlan(MetricFlowGraph[MetricQueryNode, MetricQueryDependenc
             # specs output by this node.
             for source_edge in self.source_edges(node):
                 if source_edge.target_node_output_spec not in output_metric_specs:
-                    raise ValueError(
+                    raise MetricFlowInternalError(
                         LazyFormat(
                             "An edge from the target node to a source node states that the target node"
                             " outputs a spec that is not described by the output specs of the target node."
@@ -206,7 +206,7 @@ class MetricEvaluationPlan(MetricFlowGraph[MetricQueryNode, MetricQueryDependenc
 
             for passthrough_metric_spec in passthrough_metric_specs:
                 if passthrough_metric_spec not in source_output_specs:
-                    raise ValueError(
+                    raise MetricFlowInternalError(
                         LazyFormat(
                             "A passthrough metric is not present in an edge to a source node."
                             " This indicates incorrect plan construction.",
