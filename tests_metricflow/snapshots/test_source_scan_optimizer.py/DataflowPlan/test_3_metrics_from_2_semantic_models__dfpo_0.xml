@@ -9,10 +9,10 @@ docstring:
         <!-- node_id = NodeId(id_str='wrd_1') -->
         <CombineAggregatedOutputsNode>
             <!-- description = 'Combine Aggregated Outputs' -->
-            <!-- node_id = NodeId(id_str='cao_1') -->
+            <!-- node_id = NodeId(id_str='cao_2') -->
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
-                <!-- node_id = NodeId(id_str='cm_6') -->
+                <!-- node_id = NodeId(id_str='cm_5') -->
                 <!-- metric_spec = MetricSpec(element_name='bookings') -->
                 <!-- metric_spec = MetricSpec(element_name='booking_value') -->
                 <AggregateSimpleMetricInputsNode>
@@ -57,7 +57,7 @@ docstring:
             </ComputeMetricsNode>
             <ComputeMetricsNode>
                 <!-- description = 'Compute Metrics via Expressions' -->
-                <!-- node_id = NodeId(id_str='cm_5') -->
+                <!-- node_id = NodeId(id_str='cm_6') -->
                 <!-- metric_spec = MetricSpec(element_name='listings') -->
                 <AggregateSimpleMetricInputsNode>
                     <!-- description = 'Aggregate Inputs for Simple Metrics' -->

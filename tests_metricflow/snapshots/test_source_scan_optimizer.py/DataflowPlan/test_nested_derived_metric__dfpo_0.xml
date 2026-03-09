@@ -19,11 +19,56 @@ docstring:
                 <!-- node_id = NodeId(id_str='cao_2') -->
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
-                    <!-- node_id = NodeId(id_str='cm_8') -->
+                    <!-- node_id = NodeId(id_str='cm_10') -->
+                    <!-- metric_spec = MetricSpec(element_name='bookings') -->
+                    <!-- metric_spec = MetricSpec(element_name='instant_bookings', alias='instant') -->
+                    <AggregateSimpleMetricInputsNode>
+                        <!-- description = 'Aggregate Inputs for Simple Metrics' -->
+                        <!-- node_id = NodeId(id_str='am_4') -->
+                        <!-- null_fill_value_mapping = {'bookings': None, 'instant_bookings': None} -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__bookings', '__instant_bookings', 'metric_time__day']" -->
+                            <!-- node_id = NodeId(id_str='pfe_9') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='instant_bookings') -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
+                            <!-- distinct = False -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['__bookings', '__instant_bookings', 'metric_time__day']" -->
+                                <!-- node_id = NodeId(id_str='pfe_8') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='instant_bookings') -->
+                                <!-- include_spec =                                                                  -->
+                                <!--   TimeDimensionSpec(                                                            -->
+                                <!--     element_name='metric_time',                                                 -->
+                                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                <!--   )                                                                             -->
+                                <!-- distinct = False -->
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
+                            </SelectorNode>
+                        </SelectorNode>
+                    </AggregateSimpleMetricInputsNode>
+                </ComputeMetricsNode>
+                <ComputeMetricsNode>
+                    <!-- description = 'Compute Metrics via Expressions' -->
+                    <!-- node_id = NodeId(id_str='cm_9') -->
                     <!-- metric_spec = MetricSpec(element_name='non_referred_bookings_pct', alias='non_referred') -->
                     <ComputeMetricsNode>
                         <!-- description = 'Compute Metrics via Expressions' -->
-                        <!-- node_id = NodeId(id_str='cm_7') -->
+                        <!-- node_id = NodeId(id_str='cm_8') -->
                         <!-- metric_spec = MetricSpec(element_name='referred_bookings', alias='ref_bookings') -->
                         <!-- metric_spec = MetricSpec(element_name='bookings') -->
                         <AggregateSimpleMetricInputsNode>
@@ -67,51 +112,6 @@ docstring:
                             </SelectorNode>
                         </AggregateSimpleMetricInputsNode>
                     </ComputeMetricsNode>
-                </ComputeMetricsNode>
-                <ComputeMetricsNode>
-                    <!-- description = 'Compute Metrics via Expressions' -->
-                    <!-- node_id = NodeId(id_str='cm_10') -->
-                    <!-- metric_spec = MetricSpec(element_name='instant_bookings', alias='instant') -->
-                    <!-- metric_spec = MetricSpec(element_name='bookings') -->
-                    <AggregateSimpleMetricInputsNode>
-                        <!-- description = 'Aggregate Inputs for Simple Metrics' -->
-                        <!-- node_id = NodeId(id_str='am_4') -->
-                        <!-- null_fill_value_mapping = {'instant_bookings': None, 'bookings': None} -->
-                        <SelectorNode>
-                            <!-- description = "Select: ['__instant_bookings', '__bookings', 'metric_time__day']" -->
-                            <!-- node_id = NodeId(id_str='pfe_9') -->
-                            <!-- include_spec = SimpleMetricInputSpec(element_name='instant_bookings') -->
-                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
-                            <!-- include_spec =                                                                  -->
-                            <!--   TimeDimensionSpec(                                                            -->
-                            <!--     element_name='metric_time',                                                 -->
-                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                            <!--   )                                                                             -->
-                            <!-- distinct = False -->
-                            <SelectorNode>
-                                <!-- description = "Select: ['__instant_bookings', '__bookings', 'metric_time__day']" -->
-                                <!-- node_id = NodeId(id_str='pfe_8') -->
-                                <!-- include_spec = SimpleMetricInputSpec(element_name='instant_bookings') -->
-                                <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
-                                <!-- include_spec =                                                                  -->
-                                <!--   TimeDimensionSpec(                                                            -->
-                                <!--     element_name='metric_time',                                                 -->
-                                <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
-                                <!--   )                                                                             -->
-                                <!-- distinct = False -->
-                                <MetricTimeDimensionTransformNode>
-                                    <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_28009') -->
-                                    <!-- aggregation_time_dimension = 'ds' -->
-                                    <ReadSqlSourceNode>
-                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_28020') -->
-                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                    </ReadSqlSourceNode>
-                                </MetricTimeDimensionTransformNode>
-                            </SelectorNode>
-                        </SelectorNode>
-                    </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>
             </CombineAggregatedOutputsNode>
         </ComputeMetricsNode>

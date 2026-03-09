@@ -19,14 +19,33 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_31.metric_time__day, subq_37.metric_time__day) AS metric_time__day
-    , MAX(subq_31.booking_fees_start_of_month) AS booking_fees_start_of_month
-    , MAX(subq_37.booking_fees) AS booking_fees
+    COALESCE(subq_26.metric_time__day, subq_37.metric_time__day) AS metric_time__day
+    , MAX(subq_26.booking_fees) AS booking_fees
+    , MAX(subq_37.booking_fees_start_of_month) AS booking_fees_start_of_month
   FROM (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , booking_value * 0.05 AS booking_fees
+    FROM (
+      -- Read From CTE For node_id=sma_28009
+      -- Select: ['__booking_value', 'metric_time__day']
+      -- Select: ['__booking_value', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , SUM(__booking_value) AS booking_value
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_25
+  ) subq_26
+  FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , subq_26.booking_fees_start_of_month AS booking_fees_start_of_month
+      , subq_32.booking_fees_start_of_month AS booking_fees_start_of_month
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Compute Metrics via Expressions
@@ -45,32 +64,13 @@ FROM (
         FROM sma_28009_cte
         GROUP BY
           metric_time__day
-      ) subq_25
-    ) subq_26
+      ) subq_31
+    ) subq_32
     ON
-      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_26.metric_time__day
-  ) subq_31
-  FULL OUTER JOIN (
-    -- Compute Metrics via Expressions
-    SELECT
-      metric_time__day
-      , booking_value * 0.05 AS booking_fees
-    FROM (
-      -- Read From CTE For node_id=sma_28009
-      -- Select: ['__booking_value', 'metric_time__day']
-      -- Select: ['__booking_value', 'metric_time__day']
-      -- Aggregate Inputs for Simple Metrics
-      -- Compute Metrics via Expressions
-      SELECT
-        metric_time__day
-        , SUM(__booking_value) AS booking_value
-      FROM sma_28009_cte
-      GROUP BY
-        metric_time__day
-    ) subq_36
+      DATE_TRUNC('month', time_spine_src_28006.ds) = subq_32.metric_time__day
   ) subq_37
   ON
-    subq_31.metric_time__day = subq_37.metric_time__day
+    subq_26.metric_time__day = subq_37.metric_time__day
   GROUP BY
-    COALESCE(subq_31.metric_time__day, subq_37.metric_time__day)
+    COALESCE(subq_26.metric_time__day, subq_37.metric_time__day)
 ) subq_38

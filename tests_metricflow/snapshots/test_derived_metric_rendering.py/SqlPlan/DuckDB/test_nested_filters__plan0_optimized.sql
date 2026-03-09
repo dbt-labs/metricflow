@@ -27,9 +27,9 @@ FROM (
   FROM (
     -- Combine Aggregated Outputs
     SELECT
-      MAX(subq_39.average_booking_value) AS average_booking_value
-      , MAX(subq_39.bookings) AS bookings
-      , MAX(subq_45.booking_value) AS booking_value
+      MAX(subq_40.average_booking_value) AS average_booking_value
+      , MAX(subq_40.bookings) AS bookings
+      , MAX(subq_46.booking_value) AS booking_value
     FROM (
       -- Constrain Output with WHERE
       -- Select: ['__average_booking_value', '__bookings']
@@ -51,9 +51,9 @@ FROM (
           ***************************.dim_listings_latest listings_latest_src_28000
         ON
           sma_28009_cte.listing = listings_latest_src_28000.listing_id
-      ) subq_35
+      ) subq_36
       WHERE (listing__is_lux_latest) AND (booking__is_instant)
-    ) subq_39
+    ) subq_40
     CROSS JOIN (
       -- Constrain Output with WHERE
       -- Select: ['__booking_value']
@@ -68,8 +68,8 @@ FROM (
           booking__is_instant
           , __booking_value AS booking_value
         FROM sma_28009_cte
-      ) subq_41
+      ) subq_42
       WHERE booking__is_instant
-    ) subq_45
-  ) subq_46
-) subq_47
+    ) subq_46
+  ) subq_47
+) subq_48

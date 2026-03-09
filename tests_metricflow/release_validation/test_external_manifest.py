@@ -68,7 +68,7 @@ def test_manifests_in_local_directory(
     """Test generated SQL for all saved queries in a JSON-serialized manifest."""
     working_directory = Path().joinpath("git_ignored")
     manifest_directory = working_directory.joinpath("external_manifests/mecca_1")
-    results_directory = working_directory.joinpath("tester_results_before")
+    results_directory = working_directory.joinpath("tester_results_after")
     explain_tester = DuckDbExplainTester(
         manifest_setup_source=ExternalManifestSetupSource(manifest_directory, normalize_sql=False),
         result_file_directory=results_directory,
