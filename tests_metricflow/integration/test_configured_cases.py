@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+from collections.abc import Set
 from copy import copy
 from typing import List, Mapping, Optional, Sequence, Tuple
 
@@ -33,6 +34,7 @@ from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
+from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
@@ -258,12 +260,41 @@ def test_case(
     )
 
 
+@pytest.mark.parametrize(
+    "name",
+    CONFIGURED_INTEGRATION_TESTS_REPOSITORY.all_test_case_names,
+    ids=lambda name: f"name={name}",
+)
+def test_case_with_all_dataflow_optimizers(
+    name: str,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Temporary test to run tests with all dataflow optimizers instead of just the enabled ones.
+
+    Once `DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION` is added to the default set of enabled optimizations,
+    this can be removed.
+    """
+    _test_case(
+        name=name,
+        mf_test_configuration=mf_test_configuration,
+        engine_test_fixture_mapping=mf_engine_test_fixture_mapping,
+        time_spine_sources=time_spine_sources,
+        sql_client=sql_client,
+        dataflow_optimizers=DataflowPlanOptimization.all_optimizations(),
+    )
+
+
 def _test_case(
     name: str,
     mf_test_configuration: MetricFlowTestConfiguration,
     engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
     time_spine_sources: Mapping[TimeGranularity, TimeSpineSource],
     sql_client: SqlClient,
+    dataflow_optimizers: Optional[Set[DataflowPlanOptimization]] = None,
 ) -> None:
     case = CONFIGURED_INTEGRATION_TESTS_REPOSITORY.get_test_case(name)
     logger.debug(LazyFormat(lambda: f"Running integration test case: '{case.name}' from file '{case.file_path}'"))
@@ -344,6 +375,7 @@ def _test_case(
             min_max_only=case.min_max_only,
             apply_group_by=case.apply_group_by,
             order_output_columns_by_input_order=True,
+            dataflow_plan_optimizations=dataflow_optimizers,
         )
     )
 
