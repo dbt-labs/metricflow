@@ -173,6 +173,6 @@ def test_profile_performance_using_json_manifest(
         )
     )
     # saved_query_names = tuple(saved_query.name for saved_query in semantic_manifest.saved_queries)[:100]
-    saved_query_names = ["sq_act_trigger_dashboard_export_ytd_all_company_metrics_wo_sales"]
+    saved_query_names = ["sq_act_trigger_dashboard_export_ytd_subregion_metrics_wo_sales_batch_2"]
     mf_explain_saved_query(semantic_manifest, sql_client, saved_query_names=saved_query_names, profile=True)
     # mf_simulate_validation(semantic_manifest, sql_client, profile=True)

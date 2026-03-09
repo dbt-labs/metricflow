@@ -261,7 +261,8 @@ class DataflowPlanBuilder:
 
         if me_plan_override is None:
             me_planner: MetricEvaluationPlanner
-            if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in option_set.optimizations:
+            #if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in option_set.optimizations:
+            if True:
                 me_planner = PassThroughMetricEvaluationPlanner(
                     manifest_object_lookup=self._manifest_object_lookup,
                     column_association_resolver=self._column_association_resolver,
@@ -2386,6 +2387,7 @@ class DataflowPlanBuilder:
                             option_set=self._option_set,
                         ),
                     )
+
                 simple_metric_nodes.append(simple_metric_node)
 
             if len(simple_metric_nodes) == 1:
