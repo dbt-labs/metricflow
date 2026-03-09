@@ -16,9 +16,10 @@ SELECT
   , 2 * bookings_offset_once AS bookings_offset_twice
 FROM (
   -- Join to Time Spine Dataset
+  -- Select: ['metric_time__day', 'bookings_offset_once']
   SELECT
     rss_28018_cte.ds__day AS metric_time__day
-    , subq_29.bookings_offset_once AS bookings_offset_once
+    , subq_30.bookings_offset_once AS bookings_offset_once
   FROM rss_28018_cte
   INNER JOIN (
     -- Compute Metrics via Expressions
@@ -30,7 +31,7 @@ FROM (
       -- Compute Metrics via Expressions
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_22.__bookings AS bookings
+        , subq_23.__bookings AS bookings
       FROM rss_28018_cte
       INNER JOIN (
         -- Aggregate Inputs for Simple Metrics
@@ -46,14 +47,14 @@ FROM (
             DATE_TRUNC('day', ds) AS metric_time__day
             , 1 AS __bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_21
+        ) subq_22
         GROUP BY
           metric_time__day
-      ) subq_22
+      ) subq_23
       ON
-        rss_28018_cte.ds__day - INTERVAL 5 day = subq_22.metric_time__day
-    ) subq_28
-  ) subq_29
+        rss_28018_cte.ds__day - INTERVAL 5 day = subq_23.metric_time__day
+    ) subq_29
+  ) subq_30
   ON
-    rss_28018_cte.ds__day - INTERVAL 2 day = subq_29.metric_time__day
-) subq_34
+    rss_28018_cte.ds__day - INTERVAL 2 day = subq_30.metric_time__day
+) subq_36
