@@ -21,11 +21,25 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.metric_time__day, subq_32.metric_time__day) AS metric_time__day
-    , MAX(subq_27.non_referred) AS non_referred
-    , MAX(subq_32.instant) AS instant
-    , MAX(subq_32.bookings) AS bookings
+    COALESCE(subq_26.metric_time__day, subq_32.metric_time__day) AS metric_time__day
+    , MAX(subq_26.bookings) AS bookings
+    , MAX(subq_26.instant) AS instant
+    , MAX(subq_32.non_referred) AS non_referred
   FROM (
+    -- Read From CTE For node_id=sma_28009
+    -- Select: ['__bookings', '__instant_bookings', 'metric_time__day']
+    -- Select: ['__bookings', '__instant_bookings', 'metric_time__day']
+    -- Aggregate Inputs for Simple Metrics
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , SUM(__bookings) AS bookings
+      , SUM(__instant_bookings) AS instant
+    FROM sma_28009_cte
+    GROUP BY
+      metric_time__day
+  ) subq_26
+  FULL OUTER JOIN (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
@@ -43,24 +57,10 @@ FROM (
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
-    ) subq_26
-  ) subq_27
-  FULL OUTER JOIN (
-    -- Read From CTE For node_id=sma_28009
-    -- Select: ['__instant_bookings', '__bookings', 'metric_time__day']
-    -- Select: ['__instant_bookings', '__bookings', 'metric_time__day']
-    -- Aggregate Inputs for Simple Metrics
-    -- Compute Metrics via Expressions
-    SELECT
-      metric_time__day
-      , SUM(__instant_bookings) AS instant
-      , SUM(__bookings) AS bookings
-    FROM sma_28009_cte
-    GROUP BY
-      metric_time__day
+    ) subq_31
   ) subq_32
   ON
-    subq_27.metric_time__day = subq_32.metric_time__day
+    subq_26.metric_time__day = subq_32.metric_time__day
   GROUP BY
-    COALESCE(subq_27.metric_time__day, subq_32.metric_time__day)
+    COALESCE(subq_26.metric_time__day, subq_32.metric_time__day)
 ) subq_33

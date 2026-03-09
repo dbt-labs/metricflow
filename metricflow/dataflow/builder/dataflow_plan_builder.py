@@ -2335,7 +2335,6 @@ class DataflowPlanBuilder:
                     predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
                     output_group_by_metric_instances=self._output_group_by_metric_instances,
                 )
-
                 simple_metric_nodes.append(simple_metric_node)
 
             if len(simple_metric_nodes) == 1:

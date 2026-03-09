@@ -22,10 +22,10 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_37.metric_time__day, subq_42.metric_time__day) AS metric_time__day
-    , MAX(subq_37.average_booking_value) AS average_booking_value
-    , MAX(subq_37.bookings) AS bookings
-    , MAX(subq_42.booking_value) AS booking_value
+    COALESCE(subq_38.metric_time__day, subq_43.metric_time__day) AS metric_time__day
+    , MAX(subq_38.average_booking_value) AS average_booking_value
+    , MAX(subq_38.bookings) AS bookings
+    , MAX(subq_43.booking_value) AS booking_value
   FROM (
     -- Constrain Output with WHERE
     -- Select: ['__average_booking_value', '__bookings', 'metric_time__day']
@@ -48,11 +48,11 @@ FROM (
         ***************************.dim_listings_latest listings_latest_src_28000
       ON
         sma_28009_cte.listing = listings_latest_src_28000.listing_id
-    ) subq_33
+    ) subq_34
     WHERE listing__is_lux_latest
     GROUP BY
       metric_time__day
-  ) subq_37
+  ) subq_38
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Select: ['__booking_value', 'metric_time__day']
@@ -65,9 +65,9 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       metric_time__day
-  ) subq_42
+  ) subq_43
   ON
-    subq_37.metric_time__day = subq_42.metric_time__day
+    subq_38.metric_time__day = subq_43.metric_time__day
   GROUP BY
-    COALESCE(subq_37.metric_time__day, subq_42.metric_time__day)
-) subq_43
+    COALESCE(subq_38.metric_time__day, subq_43.metric_time__day)
+) subq_44
