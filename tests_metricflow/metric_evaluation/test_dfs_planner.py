@@ -7,6 +7,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.metric_evaluation.dfs_me_planner import DepthFirstSearchMetricEvaluationPlanner
 from metricflow.plan_conversion.node_processor import PredicatePushdownState
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
@@ -25,6 +26,8 @@ logger = logging.getLogger(__name__)
     METRIC_EVALUATION_TEST_CASES,
     ids=[case.case_id for case in METRIC_EVALUATION_TEST_CASES],
 )
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_cases_with_dfs_planner(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -57,9 +60,18 @@ def test_cases_with_dfs_planner(
             column_association_resolver=engine_test_fixture.column_association_resolver,
         ),
     )
+    execution_plan = engine_test_fixture.dataflow_to_execution_converter.convert_to_execution_plan(
+        dataflow_plan=engine_test_fixture.dataflow_plan_builder.build_plan(
+            query_spec=query_spec,
+            optimizations=DataflowPlanOptimization.enabled_optimizations(),
+            me_plan=me_plan,
+        )
+    )
+
     assert_me_plan_snapshot_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         me_test_case=me_test_case,
         me_plan=me_plan,
+        sql=execution_plan.render_sql_result.sql,
     )

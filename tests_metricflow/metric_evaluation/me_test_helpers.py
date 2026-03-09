@@ -158,6 +158,7 @@ def assert_me_plan_snapshot_equal(
     mf_test_configuration: MetricFlowTestConfiguration,
     me_plan: MetricEvaluationPlan,
     me_test_case: MetricEvaluationTestCase,
+    sql: Optional[str],
 ) -> None:
     """Helper to compare snapshots for a metric evaluation plan."""
     format_result = MetricEvaluationPlanTableFormatter().format_plan(me_plan)
@@ -172,6 +173,7 @@ def assert_me_plan_snapshot_equal(
                 "Group-By Names": me_test_case.request.group_by_names,
                 "Metric Evaluation Overview": format_result.overview_table,
                 "Metric Query Output": format_result.node_output_table,
+                "SQL": sql,
             },
         ),
         expectation_description=me_test_case.expectation_description,

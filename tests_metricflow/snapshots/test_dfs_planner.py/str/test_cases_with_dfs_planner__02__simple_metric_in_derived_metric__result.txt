@@ -50,3 +50,43 @@ Query for a derived metric and one of its input metrics.
     │       │                                          │   },                                        │
     │       │                                          │ )                                           │
     └───────┴──────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    -- Combine Aggregated Outputs
+    -- Write to DataTable
+    WITH cm_2_cte AS (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Select: ['__booking_value', 'metric_time__day']
+      -- Select: ['__booking_value', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , SUM(booking_value) AS booking_value
+      FROM ***************************.fct_bookings bookings_source_src_28000
+      GROUP BY
+        DATE_TRUNC('day', ds)
+    )
+
+    SELECT
+      COALESCE(cm_2_cte.metric_time__day, subq_7.metric_time__day) AS metric_time__day
+      , MAX(cm_2_cte.booking_value) AS booking_value
+      , MAX(subq_7.booking_fees) AS booking_fees
+    FROM cm_2_cte
+    FULL OUTER JOIN (
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , booking_value * 0.05 AS booking_fees
+      FROM (
+        -- Read From CTE For node_id=cm_2
+        SELECT
+          metric_time__day
+          , booking_value
+        FROM cm_2_cte
+      ) subq_6
+    ) subq_7
+    ON
+      cm_2_cte.metric_time__day = subq_7.metric_time__day
+    GROUP BY
+      COALESCE(cm_2_cte.metric_time__day, subq_7.metric_time__day)

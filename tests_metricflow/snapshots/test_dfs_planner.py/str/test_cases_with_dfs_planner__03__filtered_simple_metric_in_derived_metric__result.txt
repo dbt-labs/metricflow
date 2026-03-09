@@ -50,3 +50,59 @@ Query for a simple metric and a derived metric that is defined using the same me
     │       │                                                  │   },                                        │
     │       │                                                  │ )                                           │
     └───────┴──────────────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    -- Combine Aggregated Outputs
+    -- Write to DataTable
+    WITH sma_28009_cte AS (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , is_instant AS booking__is_instant
+        , booking_value AS __booking_value
+        , booking_value AS __instant_booking_value
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    )
+
+    SELECT
+      COALESCE(subq_5.metric_time__day, subq_11.metric_time__day) AS metric_time__day
+      , MAX(subq_5.booking_value) AS booking_value
+      , MAX(subq_11.instant_booking_value) AS instant_booking_value
+    FROM (
+      -- Read From CTE For node_id=sma_28009
+      -- Select: ['__booking_value', 'metric_time__day']
+      -- Select: ['__booking_value', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , SUM(__booking_value) AS booking_value
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_5
+    FULL OUTER JOIN (
+      -- Constrain Output with WHERE
+      -- Select: ['__instant_booking_value', 'metric_time__day']
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , SUM(instant_booking_value) AS instant_booking_value
+      FROM (
+        -- Read From CTE For node_id=sma_28009
+        -- Select: ['__instant_booking_value', 'booking__is_instant', 'metric_time__day']
+        SELECT
+          metric_time__day
+          , booking__is_instant
+          , __instant_booking_value AS instant_booking_value
+        FROM sma_28009_cte
+      ) subq_7
+      WHERE booking__is_instant
+      GROUP BY
+        metric_time__day
+    ) subq_11
+    ON
+      subq_5.metric_time__day = subq_11.metric_time__day
+    GROUP BY
+      COALESCE(subq_5.metric_time__day, subq_11.metric_time__day)

@@ -175,6 +175,7 @@ class DataflowPlanBuilder:
         output_sql_table: Optional[SqlTable] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
         optimizations: FrozenSet[DataflowPlanOptimization] = frozenset(),
+        me_plan: Optional[MetricEvaluationPlan] = None,
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
         self._optimizations = optimizations
@@ -199,7 +200,10 @@ class DataflowPlanBuilder:
         return optimized_plan
 
     def _build_query_output_node(
-        self, query_spec: MetricFlowQuerySpec, output_group_by_metric_instances: bool = False
+        self,
+        query_spec: MetricFlowQuerySpec,
+        output_group_by_metric_instances: bool = False,
+        me_plan: Optional[MetricEvaluationPlan] = None,
     ) -> DataflowPlanNode:
         """Build SQL output node from query inputs. May be used to build query DFP or source node."""
         for metric_spec in query_spec.metric_specs:
@@ -245,33 +249,38 @@ class DataflowPlanBuilder:
 
         queried_linkable_specs = query_spec.linkable_specs
 
-        me_planner: MetricEvaluationPlanner
-        if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in self._optimizations:
-            me_planner = PassThroughMetricEvaluationPlanner(
-                manifest_object_lookup=self._manifest_object_lookup,
-                column_association_resolver=self._column_association_resolver,
+        if me_plan is not None:
+            logger.debug(
+                LazyFormat(
+                    "Using provided metric evaluation plan",
+                    me_plan=lambda: self._metric_evaluation_plan_formatter.format_plan(me_plan),
+                )
             )
         else:
-            me_planner = DepthFirstSearchMetricEvaluationPlanner(
-                manifest_object_lookup=self._manifest_object_lookup,
-                column_association_resolver=self._column_association_resolver,
+            me_planner: MetricEvaluationPlanner
+            if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in self._optimizations:
+                me_planner = PassThroughMetricEvaluationPlanner(
+                    manifest_object_lookup=self._manifest_object_lookup,
+                    column_association_resolver=self._column_association_resolver,
+                )
+            else:
+                me_planner = DepthFirstSearchMetricEvaluationPlanner(
+                    manifest_object_lookup=self._manifest_object_lookup,
+                    column_association_resolver=self._column_association_resolver,
+                )
+
+            me_plan = me_planner.build_plan(
+                metric_specs=metric_specs,
+                group_by_item_specs=queried_linkable_specs.as_tuple,
+                predicate_pushdown_state=predicate_pushdown_state,
+                filter_spec_factory=filter_spec_factory,
             )
 
-        me_plan = me_planner.build_plan(
-            metric_specs=metric_specs,
-            group_by_item_specs=queried_linkable_specs.as_tuple,
-            predicate_pushdown_state=predicate_pushdown_state,
-            filter_spec_factory=filter_spec_factory,
-        )
-
-        if logger.isEnabledFor(logging.INFO):
-            table_result = self._metric_evaluation_plan_formatter.format_plan(me_plan)
-            logger.info(
+            logger.debug(
                 LazyFormat(
                     "Generated metric evaluation plan",
                     planner_class=me_planner.__class__.__name__,
-                    overview_table=table_result.overview_table,
-                    node_output_table=table_result.node_output_table,
+                    me_plan=lambda: self._metric_evaluation_plan_formatter.format_plan(me_plan),
                 )
             )
 
