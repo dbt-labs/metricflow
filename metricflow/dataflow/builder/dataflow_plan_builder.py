@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import logging
 import time
 from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple, Union
@@ -740,6 +741,12 @@ class DataflowPlanBuilder:
                 metric_spec=metric_spec,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
                 metric_source_node=output_node,
+            )
+            output_node = SelectorNode.create(
+                parent_node=output_node,
+                include_specs=InstanceSpecSet.create_from_specs(
+                    itertools.chain([metric_spec], queried_linkable_specs.as_tuple)
+                ),
             )
 
         return output_node
