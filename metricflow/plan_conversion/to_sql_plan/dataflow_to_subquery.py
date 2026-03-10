@@ -573,7 +573,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         if node.output_group_by_metric_instances:
             assert (
-                len(node.computed_metric_specs) == 1 and len(output_instance_set.entity_instances) == 1
+                len(node.metric_specs) == 1 and len(output_instance_set.entity_instances) == 1
             ), "Group by metrics currently only support exactly one metric grouped by exactly one entity."
 
         non_metric_select_column_set: SelectColumnSet = output_instance_set.transform(
