@@ -121,7 +121,7 @@ METRIC_EVALUATION_TEST_CASES = (
                 "bookings",
                 "bookings_offset_twice",
             ],
-            group_by_names=["metric_time__alien_day"],
+            group_by_names=["metric_time__day"],
         ),
         expectation_description=mf_wrap(
             "The input to `bookings_offset_twice` is defined with a time offset, which changes the query properties"
