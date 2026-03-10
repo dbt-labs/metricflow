@@ -1706,7 +1706,9 @@ class DataflowPlanBuilder:
         specs_to_keep_after_offset_join = InstanceSpecSet(metric_specs=(metric_spec,)).merge(
             InstanceSpecSet.create_from_specs(queried_linkable_specs)
         )
-        output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_after_offset_join)
+        output_spec_set = self._node_data_set_resolver.get_output_data_set(output_node).instance_set.spec_set
+        if set(output_spec_set.all_specs) != set(specs_to_keep_after_offset_join.all_specs):
+            output_node = SelectorNode.create(parent_node=output_node, include_specs=specs_to_keep_after_offset_join)
         return output_node
 
     def _build_time_spine_join_node_for_before_aggregation(
