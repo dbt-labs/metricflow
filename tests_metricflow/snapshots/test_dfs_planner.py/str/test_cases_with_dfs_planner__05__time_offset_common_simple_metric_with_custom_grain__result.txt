@@ -11,7 +11,7 @@ expectation_description:
 Query for a simple metric and a derived metric that time-offsets the same simple metric. Uses a custom grain in the group-by to help check query properties.
 
   Metric Names: ['bookings', 'bookings_offset_twice']
-  Group-By Names: ['metric_time__alien_day']
+  Group-By Names: ['metric_time__day']
   Metric Evaluation Overview:
     ┌───────┬───────────┬───────────────────────┬───────────────────────┬───────────────────────┬──────────────────┐
     │ id    │ src_ids   │ computed_outputs      │ passthrough_outputs   │ source_metrics        │ semantic_model   │
@@ -28,45 +28,43 @@ Query for a simple metric and a derived metric that time-offsets the same simple
     │       │ drv_1     │                       │ bookings_offset_twice │ bookings_offset_twice │                  │
     └───────┴───────────┴───────────────────────┴───────────────────────┴───────────────────────┴──────────────────┘
   Metric Query Output:
-    ┌───────┬─────────────────────────────────────────────────────────┬───────────────────────────────────────────────────┐
-    │ id    │ output_specs                                            │ output_properties                                 │
-    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
-    │ smp_0 │ MetricSpec(element_name='bookings')                     │ MetricQueryPropertySet(                           │
-    │       │                                                         │   group_by_item_specs=['metric_time__alien_day'], │
-    │       │                                                         │   pushdown_enabled_types={                        │
-    │       │                                                         │     TIME_RANGE_CONSTRAINT,                        │
-    │       │                                                         │     CATEGORICAL_DIMENSION,                        │
-    │       │                                                         │   },                                              │
-    │       │                                                         │ )                                                 │
-    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
-    │ smp_1 │ MetricSpec(                                             │ MetricQueryPropertySet(                           │
-    │       │   element_name='bookings',                              │   group_by_item_specs=[                           │
-    │       │   offset_window=TimeWindow(count=5, granularity='day'), │     'metric_time__alien_day',                     │
-    │       │ )                                                       │     'metric_time__day',                           │
-    │       │                                                         │   ],                                              │
-    │       │                                                         │ )                                                 │
-    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
-    │ drv_0 │ MetricSpec(                                             │ MetricQueryPropertySet(                           │
-    │       │   element_name='bookings_offset_once',                  │   group_by_item_specs=['metric_time__alien_day'], │
-    │       │   offset_window=TimeWindow(count=2, granularity='day'), │   pushdown_enabled_types={                        │
-    │       │ )                                                       │     TIME_RANGE_CONSTRAINT,                        │
-    │       │                                                         │     CATEGORICAL_DIMENSION,                        │
-    │       │                                                         │   },                                              │
-    │       │                                                         │ )                                                 │
-    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
-    │ drv_1 │ MetricSpec(element_name='bookings_offset_twice')        │ MetricQueryPropertySet(                           │
-    │       │                                                         │   group_by_item_specs=['metric_time__alien_day'], │
-    │       │                                                         │   pushdown_enabled_types={                        │
-    │       │                                                         │     TIME_RANGE_CONSTRAINT,                        │
-    │       │                                                         │     CATEGORICAL_DIMENSION,                        │
-    │       │                                                         │   },                                              │
-    │       │                                                         │ )                                                 │
-    ├───────┼─────────────────────────────────────────────────────────┼───────────────────────────────────────────────────┤
-    │ tpl_0 │ MetricSpec(element_name='bookings')                     │ MetricQueryPropertySet(                           │
-    │       │ MetricSpec(element_name='bookings_offset_twice')        │   group_by_item_specs=['metric_time__alien_day'], │
-    │       │                                                         │   pushdown_enabled_types={                        │
-    │       │                                                         │     TIME_RANGE_CONSTRAINT,                        │
-    │       │                                                         │     CATEGORICAL_DIMENSION,                        │
-    │       │                                                         │   },                                              │
-    │       │                                                         │ )                                                 │
-    └───────┴─────────────────────────────────────────────────────────┴───────────────────────────────────────────────────┘
+    ┌───────┬─────────────────────────────────────────────────────────┬─────────────────────────────────────────────┐
+    │ id    │ output_specs                                            │ output_properties                           │
+    ├───────┼─────────────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ smp_0 │ MetricSpec(element_name='bookings')                     │ MetricQueryPropertySet(                     │
+    │       │                                                         │   group_by_item_specs=['metric_time__day'], │
+    │       │                                                         │   pushdown_enabled_types={                  │
+    │       │                                                         │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                         │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                         │   },                                        │
+    │       │                                                         │ )                                           │
+    ├───────┼─────────────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ smp_1 │ MetricSpec(                                             │ MetricQueryPropertySet(                     │
+    │       │   element_name='bookings',                              │   group_by_item_specs=['metric_time__day'], │
+    │       │   offset_window=TimeWindow(count=5, granularity='day'), │ )                                           │
+    │       │ )                                                       │                                             │
+    ├───────┼─────────────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ drv_0 │ MetricSpec(                                             │ MetricQueryPropertySet(                     │
+    │       │   element_name='bookings_offset_once',                  │   group_by_item_specs=['metric_time__day'], │
+    │       │   offset_window=TimeWindow(count=2, granularity='day'), │   pushdown_enabled_types={                  │
+    │       │ )                                                       │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                         │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                         │   },                                        │
+    │       │                                                         │ )                                           │
+    ├───────┼─────────────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ drv_1 │ MetricSpec(element_name='bookings_offset_twice')        │ MetricQueryPropertySet(                     │
+    │       │                                                         │   group_by_item_specs=['metric_time__day'], │
+    │       │                                                         │   pushdown_enabled_types={                  │
+    │       │                                                         │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                         │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                         │   },                                        │
+    │       │                                                         │ )                                           │
+    ├───────┼─────────────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ tpl_0 │ MetricSpec(element_name='bookings')                     │ MetricQueryPropertySet(                     │
+    │       │ MetricSpec(element_name='bookings_offset_twice')        │   group_by_item_specs=['metric_time__day'], │
+    │       │                                                         │   pushdown_enabled_types={                  │
+    │       │                                                         │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                         │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                         │   },                                        │
+    │       │                                                         │ )                                           │
+    └───────┴─────────────────────────────────────────────────────────┴─────────────────────────────────────────────┘
