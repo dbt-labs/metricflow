@@ -17,9 +17,13 @@ from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat_dict
 from metricflow_semantics.toolkit.string_helpers import mf_wrap
 
+from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowRequestId
 from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
+from metricflow.metric_evaluation.metric_query_planner import MetricEvaluationPlanner
 from metricflow.metric_evaluation.plan.me_plan import MetricEvaluationPlan
+from metricflow.plan_conversion.node_processor import PredicatePushdownState
+from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture
 from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
@@ -158,6 +162,7 @@ def assert_me_plan_snapshot_equal(
     mf_test_configuration: MetricFlowTestConfiguration,
     me_plan: MetricEvaluationPlan,
     me_test_case: MetricEvaluationTestCase,
+    sql: Optional[str],
 ) -> None:
     """Helper to compare snapshots for a metric evaluation plan."""
     format_result = MetricEvaluationPlanTableFormatter().format_plan(me_plan)
@@ -172,6 +177,7 @@ def assert_me_plan_snapshot_equal(
                 "Group-By Names": me_test_case.request.group_by_names,
                 "Metric Evaluation Overview": format_result.overview_table,
                 "Metric Query Output": format_result.node_output_table,
+                "SQL": sql,
             },
         ),
         expectation_description=me_test_case.expectation_description,
@@ -188,4 +194,51 @@ def _create_top_level_query_filter_specs(
             ),
             filter_intersection=query_spec.filter_intersection,
         )
+    )
+
+
+def check_metric_evaluation_plan_test_case(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    engine_test_fixture: MetricFlowEngineTestFixture,
+    me_planner: MetricEvaluationPlanner,
+    me_test_case: MetricEvaluationTestCase,
+) -> None:
+    """Check the test case for the given `MetricEvaluationPlanner`."""
+    query_parser = engine_test_fixture.query_parser
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=me_test_case.request.metric_names,
+        group_by_names=me_test_case.request.group_by_names,
+    ).query_spec
+
+    predicate_pushdown_state = PredicatePushdownState.create(
+        time_range_constraint=query_spec.time_range_constraint,
+        where_filter_specs=(),
+    )
+    me_plan = me_planner.build_plan(
+        metric_specs=query_spec.metric_specs,
+        group_by_item_specs=query_spec.linkable_specs.as_tuple,
+        predicate_pushdown_state=predicate_pushdown_state,
+        filter_spec_factory=_create_filter_spec_factory(
+            query_spec=query_spec,
+            manifest_object_lookup=engine_test_fixture.manifest_object_lookup,
+            column_association_resolver=engine_test_fixture.column_association_resolver,
+        ),
+    )
+    execution_plan = engine_test_fixture.dataflow_to_execution_converter.convert_to_execution_plan(
+        dataflow_plan=engine_test_fixture.dataflow_plan_builder.build_plan(
+            query_spec=query_spec,
+            optimizations=DataflowPlanOptimization.enabled_optimizations(),
+            me_plan_override=me_plan,
+        )
+    )
+    sql_statements = [
+        task.sql_statement for task in execution_plan.execution_plan.tasks if task.sql_statement is not None
+    ]
+    assert_me_plan_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        me_test_case=me_test_case,
+        me_plan=me_plan,
+        sql="\n".join(sql_statement.without_descriptions.sql for sql_statement in sql_statements),
     )
