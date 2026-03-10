@@ -8,6 +8,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_plan_snapshot_text_equal,
 )
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan, DataflowPlanNode
@@ -65,7 +66,16 @@ def check_source_scan_optimization(  # noqa: D103
     )
 
     source_counter = _ReadSqlSourceNodeCounter()
-    assert source_counter.count_source_nodes(dataflow_plan) == expected_num_sources_in_unoptimized
+    source_node_count_in_unoptimized_plan = source_counter.count_source_nodes(dataflow_plan)
+
+    if source_node_count_in_unoptimized_plan != expected_num_sources_in_unoptimized:
+        raise AssertionError(
+            LazyFormat(
+                "Unexpected source node count in unoptimized dataflow plan",
+                source_node_count_in_unoptimized_plan=source_node_count_in_unoptimized_plan,
+                expected_num_sources_in_unoptimized=expected_num_sources_in_unoptimized,
+            )
+        )
 
     optimizer = SourceScanOptimizer()
     optimized_dataflow_plan = optimizer.optimize(dataflow_plan)
@@ -82,7 +92,15 @@ def check_source_scan_optimization(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dag_graph=optimized_dataflow_plan,
     )
-    assert source_counter.count_source_nodes(optimized_dataflow_plan) == expected_num_sources_in_optimized
+    source_node_count_in_optimized_dataflow_plan = source_counter.count_source_nodes(optimized_dataflow_plan)
+    if source_node_count_in_optimized_dataflow_plan != expected_num_sources_in_optimized:
+        raise AssertionError(
+            LazyFormat(
+                "Unexpected source node count in optimized dataflow plan",
+                source_node_count_in_optimized_dataflow_plan=source_node_count_in_optimized_dataflow_plan,
+                expected_num_sources_in_optimized=expected_num_sources_in_optimized,
+            )
+        )
 
 
 class _ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):

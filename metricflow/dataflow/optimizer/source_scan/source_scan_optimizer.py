@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Sequence
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.dataflow_plan import (
@@ -115,6 +116,9 @@ class SourceScanOptimizer(
 
     def __init__(self) -> None:  # noqa: D107
         self._node_to_result: Dict[DataflowPlanNode, OptimizeBranchResult] = {}
+        self._branch_combiner_cache: ResultCache[
+            tuple[DataflowPlanNode, DataflowPlanNode], ComputeMetricsBranchCombinerResult
+        ] = ResultCache()
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
         logger.debug(LazyFormat(lambda: f"Visiting {node.node_id}"))
@@ -205,9 +209,8 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    @staticmethod
     def _combine_branches(
-        left_branches: Sequence[DataflowPlanNode], right_branch: DataflowPlanNode
+        self, left_branches: Sequence[DataflowPlanNode], right_branch: DataflowPlanNode
     ) -> Sequence[BranchCombinationResult]:
         """Combine the right branch with one of the left branches.
 
@@ -220,7 +223,9 @@ class SourceScanOptimizer(
         for left_branch in left_branches:
             # Try combining only if we haven't combined before.
             if not combined:
-                combiner = ComputeMetricsBranchCombiner(left_branch_node=left_branch)
+                combiner = ComputeMetricsBranchCombiner(
+                    left_branch_node=left_branch, branch_combiner_cache=self._branch_combiner_cache
+                )
                 combiner_result: ComputeMetricsBranchCombinerResult = right_branch.accept(combiner)
                 if combiner_result.combined_branch is not None:
                     combined = True
@@ -267,7 +272,7 @@ class SourceScanOptimizer(
         # the seemingly transitive properties of the combination operation, this seems reasonable.
         combined_parent_branches: List[DataflowPlanNode] = []
         for optimized_parent_branch in optimized_parent_branches:
-            combination_results = SourceScanOptimizer._combine_branches(
+            combination_results = self._combine_branches(
                 left_branches=combined_parent_branches, right_branch=optimized_parent_branch
             )
 
