@@ -21,7 +21,8 @@ This project uses **hatch** for dependency management and testing:
 
 - **Always add type annotations** to all Python functions (parameters and 
   return types).
-- Use `from __future__ import annotations` at the top of Python files.
+- Include `from __future__ import annotations` at the top of Python files.
+- Include `logger = logging.getLogger(__name__)` in Python files.
 - Avoid the use of `isinstance()`.
 - Prefer to use immutable data types.
 - Prioritize code clarity and readability.

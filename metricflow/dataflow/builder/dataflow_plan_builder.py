@@ -170,9 +170,10 @@ class DataflowPlanBuilder:
         output_sql_table: Optional[SqlTable] = None,
         output_selection_specs: Optional[InstanceSpecSet] = None,
         optimizations: FrozenSet[DataflowPlanOptimization] = frozenset(),
+        me_plan_override: Optional[MetricEvaluationPlan] = None,
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
-        metrics_output_node = self._build_query_output_node(query_spec=query_spec)
+        metrics_output_node = self._build_query_output_node(query_spec=query_spec, me_plan_override=me_plan_override)
 
         sink_node = DataflowPlanBuilder.build_sink_node(
             parent_node=metrics_output_node,
@@ -194,9 +195,15 @@ class DataflowPlanBuilder:
         return optimized_plan
 
     def _build_query_output_node(
-        self, query_spec: MetricFlowQuerySpec, output_group_by_metric_instances: bool = False
+        self,
+        query_spec: MetricFlowQuerySpec,
+        me_plan_override: Optional[MetricEvaluationPlan] = None,
+        output_group_by_metric_instances: bool = False,
     ) -> DataflowPlanNode:
-        """Build SQL output node from query inputs. May be used to build query DFP or source node."""
+        """Build SQL output node from query inputs. May be used to build query DFP or source node.
+
+        If `me_plan_override` is provided, it's used instead of generating one (for testing).
+        """
         for metric_spec in query_spec.metric_specs:
             if (
                 len(metric_spec.where_filter_specs) > 0
@@ -240,28 +247,37 @@ class DataflowPlanBuilder:
 
         queried_linkable_specs = query_spec.linkable_specs
 
-        me_planner = DepthFirstSearchMetricEvaluationPlanner(
-            manifest_object_lookup=self._manifest_object_lookup,
-            column_association_resolver=self._column_association_resolver,
-        )
-        me_plan = me_planner.build_plan(
-            metric_specs=metric_specs,
-            group_by_item_specs=queried_linkable_specs.as_tuple,
-            predicate_pushdown_state=predicate_pushdown_state,
-            filter_spec_factory=filter_spec_factory,
-        )
-        logger.debug(
-            LazyFormat(
-                "Generated metric evaluation plan",
-                planner_class=me_planner.__class__.__name__,
-                me_plan=lambda: self._metric_evaluation_plan_formatter.format_plan(me_plan),
+        if me_plan_override is None:
+            me_planner = DepthFirstSearchMetricEvaluationPlanner(
+                manifest_object_lookup=self._manifest_object_lookup,
+                column_association_resolver=self._column_association_resolver,
             )
-        )
 
+            me_plan_override = me_planner.build_plan(
+                metric_specs=metric_specs,
+                group_by_item_specs=queried_linkable_specs.as_tuple,
+                predicate_pushdown_state=predicate_pushdown_state,
+                filter_spec_factory=filter_spec_factory,
+            )
+
+            logger.debug(
+                LazyFormat(
+                    "Generated metric evaluation plan",
+                    planner_class=me_planner.__class__.__name__,
+                    me_plan=lambda: self._metric_evaluation_plan_formatter.format_plan(me_plan_override),
+                )
+            )
+        else:
+            logger.debug(
+                LazyFormat(
+                    "Using provided metric evaluation plan",
+                    me_plan=lambda: self._metric_evaluation_plan_formatter.format_plan(me_plan_override),
+                )
+            )
         # To convert the metric evaluation plan to a dataflow plan, visit the nodes in the metric evaluation plan in
         # DFS order i.e. for a given evaluation plan node A, convert the sources of A to the corresponding dataflow,
         # then use those converted nodes as inputs to build the dataflow that corresponds to A.
-        top_level_query_node = me_plan.node_with_label(TopLevelQueryLabel.get_instance())
+        top_level_query_node = me_plan_override.node_with_label(TopLevelQueryLabel.get_instance())
         # On visit, the metric evaluation plan node is mapped to a dataflow branch and stored here.
         query_node_to_dataflow_node: dict[MetricQueryNode, DataflowPlanNode] = {}
 
@@ -270,7 +286,7 @@ class DataflowPlanBuilder:
         # `output_group_by_metric_instances` is implemented to use a dedicated dataflow node.
         nodes_to_output_group_by_metric_instances: set[MetricQueryNode] = set()
         if output_group_by_metric_instances:
-            nodes_to_output_group_by_metric_instances.update(me_plan.successors(top_level_query_node))
+            nodes_to_output_group_by_metric_instances.update(me_plan_override.successors(top_level_query_node))
 
         # Instead of the pathfinder, this could also be handled using a recursive function, but having the path can
         # aid debugging.
@@ -283,7 +299,7 @@ class DataflowPlanBuilder:
 
         mutable_path = MutableMetricEvaluationPath.create(top_level_query_node)
         for path in pathfinder.find_paths_dfs(
-            graph=me_plan,
+            graph=me_plan_override,
             initial_path=mutable_path,
             target_nodes=None,
             weight_function=weight_function,
@@ -299,7 +315,7 @@ class DataflowPlanBuilder:
                 continue
 
             input_dataflow_plan_nodes: list[DataflowPlanNode] = []
-            for source_query_node in me_plan.source_nodes(current_query_node):
+            for source_query_node in me_plan_override.source_nodes(current_query_node):
                 input_dataflow_plan_node = query_node_to_dataflow_node.get(source_query_node)
                 if input_dataflow_plan_node is None:
                     raise MetricFlowInternalError(

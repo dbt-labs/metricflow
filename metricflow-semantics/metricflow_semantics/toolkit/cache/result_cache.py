@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 @fast_frozen_dataclass()
-class ResultContainer(Generic[ValueT]):
+class ResultCacheEntry(Generic[ValueT]):
     """Container for a cache result.
 
-    Enables `if result` instead of `if result is not None` to handle falsey result values (e.g. empty set).
+    This is useful in the case where the value of the cache entry is `None`.
     """
 
     value: ValueT
@@ -48,16 +48,16 @@ class ResultCache(Generic[ResultCacheKeyT, ValueT]):
     """
 
     def __init__(self) -> None:  # noqa: D107
-        self._cache_dict: dict[ResultCacheKeyT, ResultContainer[ValueT]] = {}
+        self._cache_dict: dict[ResultCacheKeyT, ResultCacheEntry[ValueT]] = {}
 
-    def get(self, key: ResultCacheKeyT) -> Optional[ResultContainer[ValueT]]:
-        """Returns the cache item for a given key. Also see `ResultContainer`."""
+    def get(self, key: ResultCacheKeyT) -> Optional[ResultCacheEntry[ValueT]]:
+        """Returns the cache entry for a given key."""
         return self._cache_dict.get(key)
 
     def set_and_get(self, key: ResultCacheKeyT, value: ValueT) -> ValueT:
         """Set the result for the given key and return the same result.
 
-        This allows the return call to be done in one line.
+        This allows for a single-line return (e.g. `return self._cache.set_and_get(cache_key, ...)`).
         """
-        self._cache_dict[key] = ResultContainer(value=value)
+        self._cache_dict[key] = ResultCacheEntry(value=value)
         return value
