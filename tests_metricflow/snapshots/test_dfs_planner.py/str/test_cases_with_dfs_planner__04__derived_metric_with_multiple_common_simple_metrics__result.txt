@@ -62,3 +62,59 @@ Query for a derived metric and input metrics that are from different models
     │       │                                                 │   },                                        │
     │       │                                                 │ )                                           │
     └───────┴─────────────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    WITH cm_3_cte AS (
+      SELECT
+        metric_time__day
+        , SUM(__bookings) AS bookings
+      FROM (
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS __bookings
+        FROM ***************************.fct_bookings bookings_source_src_28000
+      ) subq_3
+      GROUP BY
+        metric_time__day
+    )
+
+    , cm_4_cte AS (
+      SELECT
+        metric_time__day
+        , SUM(__listings) AS listings
+      FROM (
+        SELECT
+          DATE_TRUNC('day', created_at) AS metric_time__day
+          , 1 AS __listings
+        FROM ***************************.dim_listings_latest listings_latest_src_28000
+      ) subq_9
+      GROUP BY
+        metric_time__day
+    )
+
+    SELECT
+      COALESCE(cm_3_cte.metric_time__day, cm_4_cte.metric_time__day, subq_14.metric_time__day) AS metric_time__day
+      , MAX(cm_3_cte.bookings) AS bookings
+      , MAX(cm_4_cte.listings) AS listings
+      , MAX(CAST(subq_14.bookings AS DOUBLE) / CAST(NULLIF(subq_14.listings, 0) AS DOUBLE)) AS bookings_per_listing
+    FROM cm_3_cte
+    FULL OUTER JOIN
+      cm_4_cte
+    ON
+      cm_3_cte.metric_time__day = cm_4_cte.metric_time__day
+    FULL OUTER JOIN (
+      SELECT
+        COALESCE(cm_3_cte.metric_time__day, cm_4_cte.metric_time__day) AS metric_time__day
+        , MAX(cm_3_cte.bookings) AS bookings
+        , MAX(cm_4_cte.listings) AS listings
+      FROM cm_3_cte
+      FULL OUTER JOIN
+        cm_4_cte
+      ON
+        cm_3_cte.metric_time__day = cm_4_cte.metric_time__day
+      GROUP BY
+        COALESCE(cm_3_cte.metric_time__day, cm_4_cte.metric_time__day)
+    ) subq_14
+    ON
+      COALESCE(cm_3_cte.metric_time__day, cm_4_cte.metric_time__day) = subq_14.metric_time__day
+    GROUP BY
+      COALESCE(cm_3_cte.metric_time__day, cm_4_cte.metric_time__day, subq_14.metric_time__day)

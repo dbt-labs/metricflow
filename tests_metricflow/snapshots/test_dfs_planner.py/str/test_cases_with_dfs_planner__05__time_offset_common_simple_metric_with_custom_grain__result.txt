@@ -68,3 +68,67 @@ Query for a simple metric and a derived metric that time-offsets the same simple
     │       │                                                         │   },                                        │
     │       │                                                         │ )                                           │
     └───────┴─────────────────────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    WITH sma_28009_cte AS (
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS __bookings
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    )
+
+    , rss_28018_cte AS (
+      SELECT
+        ds AS ds__day
+      FROM ***************************.mf_time_spine time_spine_src_28006
+    )
+
+    SELECT
+      COALESCE(subq_5.metric_time__day, subq_22.metric_time__day) AS metric_time__day
+      , MAX(subq_5.bookings) AS bookings
+      , MAX(subq_22.bookings_offset_twice) AS bookings_offset_twice
+    FROM (
+      SELECT
+        metric_time__day
+        , SUM(__bookings) AS bookings
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_5
+    FULL OUTER JOIN (
+      SELECT
+        metric_time__day
+        , 2 * bookings_offset_once AS bookings_offset_twice
+      FROM (
+        SELECT
+          rss_28018_cte.ds__day AS metric_time__day
+          , subq_16.bookings_offset_once AS bookings_offset_once
+        FROM rss_28018_cte
+        INNER JOIN (
+          SELECT
+            metric_time__day
+            , 2 * bookings AS bookings_offset_once
+          FROM (
+            SELECT
+              rss_28018_cte.ds__day AS metric_time__day
+              , subq_9.__bookings AS bookings
+            FROM rss_28018_cte
+            INNER JOIN (
+              SELECT
+                metric_time__day
+                , SUM(__bookings) AS __bookings
+              FROM sma_28009_cte
+              GROUP BY
+                metric_time__day
+            ) subq_9
+            ON
+              rss_28018_cte.ds__day - INTERVAL 5 day = subq_9.metric_time__day
+          ) subq_15
+        ) subq_16
+        ON
+          rss_28018_cte.ds__day - INTERVAL 2 day = subq_16.metric_time__day
+      ) subq_21
+    ) subq_22
+    ON
+      subq_5.metric_time__day = subq_22.metric_time__day
+    GROUP BY
+      COALESCE(subq_5.metric_time__day, subq_22.metric_time__day)
