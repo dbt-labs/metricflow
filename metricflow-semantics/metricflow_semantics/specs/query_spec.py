@@ -19,7 +19,15 @@ from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+
+
+@fast_frozen_dataclass()
+class InputSpecOrder:
+    """Represents the order of specs in the query input."""
+
+    group_by_item_specs: tuple[InstanceSpec, ...]
+    metric_specs: tuple[MetricSpec, ...]
 
 
 @dataclass(frozen=True)
@@ -41,11 +49,10 @@ class MetricFlowQuerySpec(SerializableDataclass):
     min_max_only: bool = False
     apply_group_by: bool = True
 
-    # Use the following to order the sequence of columns in the output. If a spec is not present in the list,
-    # it will appear after the columns for specs that are in this field. Note that in the current implementation,
-    # the ordering only applies within a group of specs of the same type. i.e. all group-by-item columns will still be
-    # listed before metric columns.
-    spec_output_order: AnyLengthTuple[InstanceSpec] = ()
+    # Use the following to track the order in which specs were provided in the query input.
+    input_spec_order: InputSpecOrder = field(
+        default_factory=lambda: InputSpecOrder(group_by_item_specs=(), metric_specs=())
+    )
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D102
@@ -69,6 +76,9 @@ class MetricFlowQuerySpec(SerializableDataclass):
             limit=self.limit,
             filter_intersection=self.filter_intersection,
             filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
+            min_max_only=self.min_max_only,
+            apply_group_by=self.apply_group_by,
+            input_spec_order=self.input_spec_order,
         )
 
     def without_aliases(self) -> MetricFlowQuerySpec:
@@ -90,4 +100,8 @@ class MetricFlowQuerySpec(SerializableDataclass):
             filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
             min_max_only=self.min_max_only,
             apply_group_by=self.apply_group_by,
+            input_spec_order=InputSpecOrder(
+                group_by_item_specs=tuple(spec.with_alias(None) for spec in self.input_spec_order.group_by_item_specs),
+                metric_specs=tuple(metric_spec.with_alias(None) for metric_spec in self.input_spec_order.metric_specs),
+            ),
         )

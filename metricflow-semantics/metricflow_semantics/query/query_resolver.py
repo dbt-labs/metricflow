@@ -68,7 +68,7 @@ from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInsta
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
-from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
+from metricflow_semantics.specs.query_spec import InputSpecOrder, MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
@@ -683,7 +683,10 @@ class MetricFlowQueryResolver:
                 filter_spec_resolution_lookup=filter_spec_lookup,
                 min_max_only=min_max_only_input.min_max_only,
                 apply_group_by=apply_group_by_input.apply_group_by,
-                spec_output_order=group_by_item_specs + metric_specs,
+                input_spec_order=InputSpecOrder(
+                    group_by_item_specs=group_by_item_specs,
+                    metric_specs=metric_specs,
+                ),
             ),
             resolution_dag=resolution_dag,
             filter_spec_lookup=filter_spec_lookup,
