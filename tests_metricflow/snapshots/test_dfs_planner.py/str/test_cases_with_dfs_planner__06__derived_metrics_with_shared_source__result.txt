@@ -56,3 +56,21 @@ Query for 2 derived metrics that can use the same source query.
     │       │                                               │   },                                        │
     │       │                                               │ )                                           │
     └───────┴───────────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    SELECT
+      metric_time__day
+      , bookings AS derived_bookings_0
+      , bookings AS derived_bookings_1
+    FROM (
+      SELECT
+        metric_time__day
+        , SUM(__bookings) AS bookings
+      FROM (
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS __bookings
+        FROM ***************************.fct_bookings bookings_source_src_28000
+      ) subq_3
+      GROUP BY
+        metric_time__day
+    ) subq_5
