@@ -1,0 +1,106 @@
+test_name: test_cases_with_passthrough_planner[04__derived_metric_with_multiple_common_simple_metrics]
+test_filename: test_passthrough_planner.py
+docstring:
+  Test enumerated cases using the `PassThroughMetricEvaluationPlanner`.
+expectation_description:
+  For the passthrough planner: separate queries and a FOJ are needed to combine
+  `bookings` and `listings` since they are defined in different models, but those
+  metrics can be passed through to avoid a FOJ.
+---
+Query for a derived metric and input metrics that are from different models
+
+  Metric Names: ['bookings', 'listings', 'bookings_per_listing']
+  Group-By Names: ['metric_time']
+  Metric Evaluation Overview:
+    ┌───────┬───────────┬──────────────────────┬───────────────────────┬──────────────────────┬──────────────────┐
+    │ id    │ src_ids   │ computed_outputs     │ passthrough_outputs   │ source_metrics       │ semantic_model   │
+    ├───────┼───────────┼──────────────────────┼───────────────────────┼──────────────────────┼──────────────────┤
+    │ smp_0 │           │ bookings             │                       │                      │ bookings_source  │
+    ├───────┼───────────┼──────────────────────┼───────────────────────┼──────────────────────┼──────────────────┤
+    │ smp_1 │           │ listings             │                       │                      │ listings_latest  │
+    ├───────┼───────────┼──────────────────────┼───────────────────────┼──────────────────────┼──────────────────┤
+    │ drv_0 │ smp_0     │ bookings_per_listing │ bookings              │ bookings             │                  │
+    │       │ smp_1     │                      │ listings              │ listings             │                  │
+    ├───────┼───────────┼──────────────────────┼───────────────────────┼──────────────────────┼──────────────────┤
+    │ tpl_0 │ drv_0     │                      │ bookings              │ bookings_per_listing │                  │
+    │       │           │                      │ listings              │ bookings             │                  │
+    │       │           │                      │ bookings_per_listing  │ listings             │                  │
+    └───────┴───────────┴──────────────────────┴───────────────────────┴──────────────────────┴──────────────────┘
+  Metric Query Output:
+    ┌───────┬─────────────────────────────────────────────────┬─────────────────────────────────────────────┐
+    │ id    │ output_specs                                    │ output_properties                           │
+    ├───────┼─────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ smp_0 │ MetricSpec(element_name='bookings')             │ MetricQueryPropertySet(                     │
+    │       │                                                 │   group_by_item_specs=['metric_time__day'], │
+    │       │                                                 │   pushdown_enabled_types={                  │
+    │       │                                                 │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                 │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                 │   },                                        │
+    │       │                                                 │ )                                           │
+    ├───────┼─────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ smp_1 │ MetricSpec(element_name='listings')             │ MetricQueryPropertySet(                     │
+    │       │                                                 │   group_by_item_specs=['metric_time__day'], │
+    │       │                                                 │   pushdown_enabled_types={                  │
+    │       │                                                 │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                 │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                 │   },                                        │
+    │       │                                                 │ )                                           │
+    ├───────┼─────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ drv_0 │ MetricSpec(element_name='bookings_per_listing') │ MetricQueryPropertySet(                     │
+    │       │ MetricSpec(element_name='bookings')             │   group_by_item_specs=['metric_time__day'], │
+    │       │ MetricSpec(element_name='listings')             │   pushdown_enabled_types={                  │
+    │       │                                                 │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                 │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                 │   },                                        │
+    │       │                                                 │ )                                           │
+    ├───────┼─────────────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ tpl_0 │ MetricSpec(element_name='bookings')             │ MetricQueryPropertySet(                     │
+    │       │ MetricSpec(element_name='listings')             │   group_by_item_specs=['metric_time__day'], │
+    │       │ MetricSpec(element_name='bookings_per_listing') │   pushdown_enabled_types={                  │
+    │       │                                                 │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                                 │     CATEGORICAL_DIMENSION,                  │
+    │       │                                                 │   },                                        │
+    │       │                                                 │ )                                           │
+    └───────┴─────────────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    SELECT
+      metric_time__day
+      , bookings
+      , listings
+      , CAST(bookings AS DOUBLE) / CAST(NULLIF(listings, 0) AS DOUBLE) AS bookings_per_listing
+    FROM (
+      SELECT
+        COALESCE(subq_5.metric_time__day, subq_11.metric_time__day) AS metric_time__day
+        , MAX(subq_5.bookings) AS bookings
+        , MAX(subq_11.listings) AS listings
+      FROM (
+        SELECT
+          metric_time__day
+          , SUM(__bookings) AS bookings
+        FROM (
+          SELECT
+            DATE_TRUNC('day', ds) AS metric_time__day
+            , 1 AS __bookings
+          FROM ***************************.fct_bookings bookings_source_src_28000
+        ) subq_3
+        GROUP BY
+          metric_time__day
+      ) subq_5
+      FULL OUTER JOIN (
+        SELECT
+          metric_time__day
+          , SUM(__listings) AS listings
+        FROM (
+          SELECT
+            DATE_TRUNC('day', created_at) AS metric_time__day
+            , 1 AS __listings
+          FROM ***************************.dim_listings_latest listings_latest_src_28000
+        ) subq_9
+        GROUP BY
+          metric_time__day
+      ) subq_11
+      ON
+        subq_5.metric_time__day = subq_11.metric_time__day
+      GROUP BY
+        COALESCE(subq_5.metric_time__day, subq_11.metric_time__day)
+    ) subq_12
