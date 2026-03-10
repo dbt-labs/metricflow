@@ -14,12 +14,14 @@ MetricFlowQuerySpec(
   filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
   min_max_only=False,
   apply_group_by=True,
-  spec_output_order=(
-    TimeDimensionSpec(
-      element_name='ds',
-      entity_links=(EntityReference(element_name='listing'),),
-      time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+  input_spec_order=InputSpecOrder(
+    group_by_item_specs=(
+      TimeDimensionSpec(
+        element_name='ds',
+        entity_links=(EntityReference(element_name='listing'),),
+        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
+      ),
     ),
-    MetricSpec(element_name='largest_listing'),
+    metric_specs=(MetricSpec(element_name='largest_listing'),),
   ),
 )

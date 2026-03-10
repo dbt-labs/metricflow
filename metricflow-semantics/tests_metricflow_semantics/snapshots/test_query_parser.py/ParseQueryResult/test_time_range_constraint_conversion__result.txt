@@ -20,6 +20,18 @@ ParseQueryResult(
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,
     apply_group_by=True,
+    input_spec_order=InputSpecOrder(
+      group_by_item_specs=(
+        TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='month',
+            base_granularity=MONTH,
+          ),
+        ),
+      ),
+      metric_specs=(MetricSpec(element_name='bookings'), MetricSpec(element_name='revenue')),
+    ),
   ),
   queried_semantic_models=(
     SemanticModelReference(semantic_model_name='bookings_source'),

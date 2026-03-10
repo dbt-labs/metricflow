@@ -24,20 +24,25 @@ ParseQueryResult(
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,
     apply_group_by=True,
-    spec_output_order=(
-      DimensionSpec(
-        element_name='referrer_id',
-        entity_links=(EntityReference(element_name='visit'),),
+    input_spec_order=InputSpecOrder(
+      group_by_item_specs=(
+        DimensionSpec(
+          element_name='referrer_id',
+          entity_links=(EntityReference(element_name='visit'),),
+        ),
+        DimensionSpec(
+          element_name='home_state_latest',
+          entity_links=(EntityReference(element_name='user'),),
+        ),
+        TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='day',
+            base_granularity=DAY,
+          ),
+        ),
       ),
-      DimensionSpec(
-        element_name='home_state_latest',
-        entity_links=(EntityReference(element_name='user'),),
-      ),
-      TimeDimensionSpec(
-        element_name='metric_time',
-        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
-      ),
-      MetricSpec(element_name='visit_buy_conversion_rate_by_session'),
+      metric_specs=(MetricSpec(element_name='visit_buy_conversion_rate_by_session'),),
     ),
   ),
   queried_semantic_models=(
