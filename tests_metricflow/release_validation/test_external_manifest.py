@@ -56,7 +56,7 @@ def test_explain_all_saved_queries_from_external_manifest(
     assert_explain_tester_results_equal(request=request, mf_test_configuration=mf_test_configuration, results=results)
 
 
-@pytest.mark.skip
+# @pytest.mark.skip
 def test_manifests_in_local_directory(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -67,7 +67,7 @@ def test_manifests_in_local_directory(
 ) -> None:
     """Test generated SQL for all saved queries in a JSON-serialized manifest."""
     working_directory = Path().joinpath("git_ignored")
-    manifest_directory = working_directory.joinpath("external_manifests/mecca_1")
+    manifest_directory = working_directory.joinpath("external_manifests/us_foods")
     results_directory = working_directory.joinpath("tester_results_before")
     explain_tester = DuckDbExplainTester(
         manifest_setup_source=ExternalManifestSetupSource(manifest_directory, normalize_sql=False),
@@ -75,6 +75,7 @@ def test_manifests_in_local_directory(
         request_generator=SavedQueryRequestGenerator(
             # saved_query_names=["sq_steering_dashboard_export_weekly_market_1"]
             # saved_query_names=["sq_act_trigger_dashboard_export_ytd_all_company_metrics_wo_sales"]
+            # saved_query_names=["sq_act_trigger_dashboard_export_ytd_subregion_metrics_wo_sales_batch_2"],
         ),
         explain_in_sql_engine=False,
     )
