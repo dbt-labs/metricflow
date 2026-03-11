@@ -157,29 +157,37 @@ sql_without_cte:
 sql_with_cte:
   -- Combine Aggregated Outputs
   -- Write to DataTable
-  WITH cm_1_cte AS (
+  WITH cm_0_cte AS (
+    -- Aggregate Inputs for Simple Metrics
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , SUM(__bookings) AS bookings
+    FROM (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
+      -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
+      SELECT
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS __bookings
+      FROM ***************************.bookings_source bookings_source_src_34000
+    ) subq_19
+    GROUP BY
+      metric_time__day
+  )
+
+  , cm_1_cte AS (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
       , bookings AS metric_level_0_index_0
     FROM (
-      -- Aggregate Inputs for Simple Metrics
-      -- Compute Metrics via Expressions
+      -- Read From CTE For node_id=cm_0
       SELECT
         metric_time__day
-        , SUM(__bookings) AS bookings
-      FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
-        -- Select: ['__bookings', 'metric_time__day']
-        -- Select: ['__bookings', 'metric_time__day']
-        SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
-          , 1 AS __bookings
-        FROM ***************************.bookings_source bookings_source_src_34000
-      ) subq_19
-      GROUP BY
-        metric_time__day
+        , bookings
+      FROM cm_0_cte
     ) subq_21
   )
 
@@ -189,23 +197,11 @@ sql_with_cte:
       metric_time__day
       , bookings AS metric_level_0_index_1
     FROM (
-      -- Aggregate Inputs for Simple Metrics
-      -- Compute Metrics via Expressions
+      -- Read From CTE For node_id=cm_0
       SELECT
         metric_time__day
-        , SUM(__bookings) AS bookings
-      FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
-        -- Select: ['__bookings', 'metric_time__day']
-        -- Select: ['__bookings', 'metric_time__day']
-        SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
-          , 1 AS __bookings
-        FROM ***************************.bookings_source bookings_source_src_34000
-      ) subq_19
-      GROUP BY
-        metric_time__day
+        , bookings
+      FROM cm_0_cte
     ) subq_23
   )
 
