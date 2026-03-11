@@ -1,0 +1,259 @@
+test_name: test_nested_cte
+test_filename: test_cte_sql.py
+docstring:
+  Check generation of nested CTEs.
+
+      `metric_level_1_index_0` and `metric_level_1_index_1` share input metrics `metric_level_0_index_0` and
+      `metric_level_0_index_1`. This checks that CTEs are generated for `metric_level_0_index_0` and
+      `metric_level_0_index_1`. In addition, a CTE can be generated for `bookings` since it's an input metric to both.
+---
+sql_without_cte:
+  -- Combine Aggregated Outputs
+  -- Write to DataTable
+  SELECT
+    COALESCE(subq_10.metric_time__day, subq_14.metric_time__day) AS metric_time__day
+    , MAX(subq_10.metric_level_1_index_0) AS metric_level_1_index_0
+    , MAX(subq_14.metric_level_1_index_1) AS metric_level_1_index_1
+  FROM (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , metric_level_0_index_0 + metric_level_0_index_1 AS metric_level_1_index_0
+    FROM (
+      -- Combine Aggregated Outputs
+      SELECT
+        COALESCE(subq_6.metric_time__day, subq_8.metric_time__day) AS metric_time__day
+        , MAX(subq_6.metric_level_0_index_0) AS metric_level_0_index_0
+        , MAX(subq_8.metric_level_0_index_1) AS metric_level_0_index_1
+      FROM (
+        -- Compute Metrics via Expressions
+        SELECT
+          metric_time__day
+          , bookings AS metric_level_0_index_0
+        FROM (
+          -- Aggregate Inputs for Simple Metrics
+          -- Compute Metrics via Expressions
+          SELECT
+            metric_time__day
+            , SUM(__bookings) AS bookings
+          FROM (
+            -- Read Elements From Semantic Model 'bookings_source'
+            -- Metric Time Dimension 'ds'
+            -- Select: ['__bookings', 'metric_time__day']
+            -- Select: ['__bookings', 'metric_time__day']
+            SELECT
+              DATE_TRUNC('day', ds) AS metric_time__day
+              , 1 AS __bookings
+            FROM ***************************.bookings_source bookings_source_src_34000
+          ) subq_3
+          GROUP BY
+            metric_time__day
+        ) subq_5
+      ) subq_6
+      FULL OUTER JOIN (
+        -- Compute Metrics via Expressions
+        SELECT
+          metric_time__day
+          , bookings AS metric_level_0_index_1
+        FROM (
+          -- Aggregate Inputs for Simple Metrics
+          -- Compute Metrics via Expressions
+          SELECT
+            metric_time__day
+            , SUM(__bookings) AS bookings
+          FROM (
+            -- Read Elements From Semantic Model 'bookings_source'
+            -- Metric Time Dimension 'ds'
+            -- Select: ['__bookings', 'metric_time__day']
+            -- Select: ['__bookings', 'metric_time__day']
+            SELECT
+              DATE_TRUNC('day', ds) AS metric_time__day
+              , 1 AS __bookings
+            FROM ***************************.bookings_source bookings_source_src_34000
+          ) subq_3
+          GROUP BY
+            metric_time__day
+        ) subq_7
+      ) subq_8
+      ON
+        subq_6.metric_time__day = subq_8.metric_time__day
+      GROUP BY
+        COALESCE(subq_6.metric_time__day, subq_8.metric_time__day)
+    ) subq_9
+  ) subq_10
+  FULL OUTER JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , metric_level_0_index_0 + metric_level_0_index_1 AS metric_level_1_index_1
+    FROM (
+      -- Combine Aggregated Outputs
+      SELECT
+        COALESCE(subq_11.metric_time__day, subq_12.metric_time__day) AS metric_time__day
+        , MAX(subq_11.metric_level_0_index_0) AS metric_level_0_index_0
+        , MAX(subq_12.metric_level_0_index_1) AS metric_level_0_index_1
+      FROM (
+        -- Compute Metrics via Expressions
+        SELECT
+          metric_time__day
+          , bookings AS metric_level_0_index_0
+        FROM (
+          -- Aggregate Inputs for Simple Metrics
+          -- Compute Metrics via Expressions
+          SELECT
+            metric_time__day
+            , SUM(__bookings) AS bookings
+          FROM (
+            -- Read Elements From Semantic Model 'bookings_source'
+            -- Metric Time Dimension 'ds'
+            -- Select: ['__bookings', 'metric_time__day']
+            -- Select: ['__bookings', 'metric_time__day']
+            SELECT
+              DATE_TRUNC('day', ds) AS metric_time__day
+              , 1 AS __bookings
+            FROM ***************************.bookings_source bookings_source_src_34000
+          ) subq_3
+          GROUP BY
+            metric_time__day
+        ) subq_5
+      ) subq_11
+      FULL OUTER JOIN (
+        -- Compute Metrics via Expressions
+        SELECT
+          metric_time__day
+          , bookings AS metric_level_0_index_1
+        FROM (
+          -- Aggregate Inputs for Simple Metrics
+          -- Compute Metrics via Expressions
+          SELECT
+            metric_time__day
+            , SUM(__bookings) AS bookings
+          FROM (
+            -- Read Elements From Semantic Model 'bookings_source'
+            -- Metric Time Dimension 'ds'
+            -- Select: ['__bookings', 'metric_time__day']
+            -- Select: ['__bookings', 'metric_time__day']
+            SELECT
+              DATE_TRUNC('day', ds) AS metric_time__day
+              , 1 AS __bookings
+            FROM ***************************.bookings_source bookings_source_src_34000
+          ) subq_3
+          GROUP BY
+            metric_time__day
+        ) subq_7
+      ) subq_12
+      ON
+        subq_11.metric_time__day = subq_12.metric_time__day
+      GROUP BY
+        COALESCE(subq_11.metric_time__day, subq_12.metric_time__day)
+    ) subq_13
+  ) subq_14
+  ON
+    subq_10.metric_time__day = subq_14.metric_time__day
+  GROUP BY
+    COALESCE(subq_10.metric_time__day, subq_14.metric_time__day)
+
+
+sql_with_cte:
+  -- Combine Aggregated Outputs
+  -- Write to DataTable
+  WITH cm_1_cte AS (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , bookings AS metric_level_0_index_0
+    FROM (
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , SUM(__bookings) AS bookings
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        -- Select: ['__bookings', 'metric_time__day']
+        -- Select: ['__bookings', 'metric_time__day']
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS __bookings
+        FROM ***************************.bookings_source bookings_source_src_34000
+      ) subq_19
+      GROUP BY
+        metric_time__day
+    ) subq_21
+  )
+
+  , cm_2_cte AS (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , bookings AS metric_level_0_index_1
+    FROM (
+      -- Aggregate Inputs for Simple Metrics
+      -- Compute Metrics via Expressions
+      SELECT
+        metric_time__day
+        , SUM(__bookings) AS bookings
+      FROM (
+        -- Read Elements From Semantic Model 'bookings_source'
+        -- Metric Time Dimension 'ds'
+        -- Select: ['__bookings', 'metric_time__day']
+        -- Select: ['__bookings', 'metric_time__day']
+        SELECT
+          DATE_TRUNC('day', ds) AS metric_time__day
+          , 1 AS __bookings
+        FROM ***************************.bookings_source bookings_source_src_34000
+      ) subq_19
+      GROUP BY
+        metric_time__day
+    ) subq_23
+  )
+
+  SELECT
+    COALESCE(subq_26.metric_time__day, subq_30.metric_time__day) AS metric_time__day
+    , MAX(subq_26.metric_level_1_index_0) AS metric_level_1_index_0
+    , MAX(subq_30.metric_level_1_index_1) AS metric_level_1_index_1
+  FROM (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , metric_level_0_index_0 + metric_level_0_index_1 AS metric_level_1_index_0
+    FROM (
+      -- Combine Aggregated Outputs
+      SELECT
+        COALESCE(cm_1_cte.metric_time__day, cm_2_cte.metric_time__day) AS metric_time__day
+        , MAX(cm_1_cte.metric_level_0_index_0) AS metric_level_0_index_0
+        , MAX(cm_2_cte.metric_level_0_index_1) AS metric_level_0_index_1
+      FROM cm_1_cte
+      FULL OUTER JOIN
+        cm_2_cte
+      ON
+        cm_1_cte.metric_time__day = cm_2_cte.metric_time__day
+      GROUP BY
+        COALESCE(cm_1_cte.metric_time__day, cm_2_cte.metric_time__day)
+    ) subq_25
+  ) subq_26
+  FULL OUTER JOIN (
+    -- Compute Metrics via Expressions
+    SELECT
+      metric_time__day
+      , metric_level_0_index_0 + metric_level_0_index_1 AS metric_level_1_index_1
+    FROM (
+      -- Combine Aggregated Outputs
+      SELECT
+        COALESCE(cm_1_cte.metric_time__day, cm_2_cte.metric_time__day) AS metric_time__day
+        , MAX(cm_1_cte.metric_level_0_index_0) AS metric_level_0_index_0
+        , MAX(cm_2_cte.metric_level_0_index_1) AS metric_level_0_index_1
+      FROM cm_1_cte
+      FULL OUTER JOIN
+        cm_2_cte
+      ON
+        cm_1_cte.metric_time__day = cm_2_cte.metric_time__day
+      GROUP BY
+        COALESCE(cm_1_cte.metric_time__day, cm_2_cte.metric_time__day)
+    ) subq_29
+  ) subq_30
+  ON
+    subq_26.metric_time__day = subq_30.metric_time__day
+  GROUP BY
+    COALESCE(subq_26.metric_time__day, subq_30.metric_time__day)
