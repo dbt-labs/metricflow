@@ -56,6 +56,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import EdgeCountWeightFunction
@@ -68,6 +69,7 @@ from typing_extensions import override
 
 from metricflow.dataflow.builder.aggregation_helper import NullFillValueMapping
 from metricflow.dataflow.builder.builder_cache import (
+    BuildAnyMetricOutputNodeInput,
     DataflowPlanBuilderCache,
     FindSourceNodeRecipeInput,
     FindSourceNodeRecipeResult,
@@ -272,6 +274,7 @@ class DataflowPlanBuilder:
         if output_group_by_metric_instances:
             nodes_to_output_group_by_metric_instances.update(me_plan.successors(top_level_query_node))
 
+        simple_metric_node_cache: ResultCache[BuildAnyMetricOutputNodeInput, DataflowPlanNode] = ResultCache()
         # Instead of the pathfinder, this could also be handled using a recursive function, but having the path can
         # aid debugging.
         pathfinder: MetricFlowPathfinder[
@@ -318,6 +321,7 @@ class DataflowPlanBuilder:
                     filter_spec_factory=filter_spec_factory,
                     input_dataflow_plan_nodes=input_dataflow_plan_nodes,
                     output_group_by_metric_instances=current_query_node in nodes_to_output_group_by_metric_instances,
+                    simple_metric_node_cache=simple_metric_node_cache,
                 )
             )
             query_node_to_dataflow_node[current_query_node] = dataflow_plan_node
@@ -2291,31 +2295,49 @@ class DataflowPlanBuilder:
             filter_spec_factory: WhereFilterSpecFactory,
             input_dataflow_plan_nodes: Iterable[DataflowPlanNode],
             output_group_by_metric_instances: bool,
+            simple_metric_node_cache: ResultCache[BuildAnyMetricOutputNodeInput, DataflowPlanNode],
         ) -> None:
             self._dataflow_plan_builder = dataflow_plan_builder
             self._filter_spec_factory = filter_spec_factory
             self._output_group_by_metric_instances = output_group_by_metric_instances
             self._input_dataflow_plan_nodes = tuple(input_dataflow_plan_nodes)
+            self._simple_metric_node_cache = simple_metric_node_cache
 
         @override
         def visit_simple_metrics_query_node(self, node: SimpleMetricsQueryNode) -> DataflowPlanNode:
             simple_metric_nodes: list[DataflowPlanNode] = []
 
             for simple_metric_spec in node.output_metric_specs:
-                simple_metric_node = self._dataflow_plan_builder._build_simple_metric_output_node(
-                    metric_spec=simple_metric_spec,
-                    queried_linkable_specs=node.query_properties.group_by_item_spec_set,
-                    filter_spec_factory=self._filter_spec_factory,
-                    predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
+                build_node_input = BuildAnyMetricOutputNodeInput(
+                    metric_query_descriptor=MetricQueryDescriptor.create(
+                        computed_metric_specs=(simple_metric_spec,),
+                        passthrough_metric_specs=(),
+                        group_by_item_specs=node.query_properties.group_by_item_specs,
+                        predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
+                    ),
                     output_group_by_metric_instances=self._output_group_by_metric_instances,
                 )
 
+                cache_entry = self._simple_metric_node_cache.get(build_node_input)
+                if cache_entry is not None:
+                    simple_metric_node = cache_entry.value
+                else:
+                    simple_metric_node = self._simple_metric_node_cache.set_and_get(
+                        key=build_node_input,
+                        value=self._dataflow_plan_builder._build_simple_metric_output_node(
+                            metric_spec=simple_metric_spec,
+                            queried_linkable_specs=node.query_properties.group_by_item_spec_set,
+                            filter_spec_factory=self._filter_spec_factory,
+                            predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
+                            output_group_by_metric_instances=self._output_group_by_metric_instances,
+                        ),
+                    )
                 simple_metric_nodes.append(simple_metric_node)
 
             if len(simple_metric_nodes) == 1:
                 return simple_metric_nodes[0]
-            else:
-                return CombineAggregatedOutputsNode.create(simple_metric_nodes)
+
+            return CombineAggregatedOutputsNode.create(simple_metric_nodes)
 
         @override
         def visit_cumulative_metric_query_node(self, node: CumulativeMetricQueryNode) -> DataflowPlanNode:
