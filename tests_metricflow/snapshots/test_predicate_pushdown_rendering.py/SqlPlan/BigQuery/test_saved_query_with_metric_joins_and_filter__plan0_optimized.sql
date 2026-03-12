@@ -8,7 +8,17 @@ sql_engine: BigQuery
 ---
 -- Combine Aggregated Outputs
 -- Write to DataTable
-WITH cm_6_cte AS (
+WITH sma_28014_cte AS (
+  -- Read Elements From Semantic Model 'listings_latest'
+  -- Metric Time Dimension 'ds'
+  SELECT
+    listing_id AS listing
+    , is_lux AS is_lux_latest
+    , capacity AS capacity_latest
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
+)
+
+, cm_6_cte AS (
   -- Constrain Output with WHERE
   -- Select: ['__bookings', 'listing__capacity_latest']
   -- Aggregate Inputs for Simple Metrics
@@ -21,8 +31,8 @@ WITH cm_6_cte AS (
     -- Select: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
     SELECT
       subq_27.metric_time__day AS metric_time__day
-      , listings_latest_src_28000.is_lux AS listing__is_lux_latest
-      , listings_latest_src_28000.capacity AS listing__capacity_latest
+      , sma_28014_cte.is_lux_latest AS listing__is_lux_latest
+      , sma_28014_cte.capacity_latest AS listing__capacity_latest
       , subq_27.__bookings AS bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
@@ -34,9 +44,9 @@ WITH cm_6_cte AS (
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_27
     LEFT OUTER JOIN
-      ***************************.dim_listings_latest listings_latest_src_28000
+      sma_28014_cte
     ON
-      subq_27.listing = listings_latest_src_28000.listing_id
+      subq_27.listing = sma_28014_cte.listing
   ) subq_32
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
@@ -56,8 +66,8 @@ WITH cm_6_cte AS (
     -- Select: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
     SELECT
       subq_38.metric_time__day AS metric_time__day
-      , listings_latest_src_28000.is_lux AS listing__is_lux_latest
-      , listings_latest_src_28000.capacity AS listing__capacity_latest
+      , sma_28014_cte.is_lux_latest AS listing__is_lux_latest
+      , sma_28014_cte.capacity_latest AS listing__capacity_latest
       , subq_38.__views AS views
     FROM (
       -- Read Elements From Semantic Model 'views_source'
@@ -69,9 +79,9 @@ WITH cm_6_cte AS (
       FROM ***************************.fct_views views_source_src_28000
     ) subq_38
     LEFT OUTER JOIN
-      ***************************.dim_listings_latest listings_latest_src_28000
+      sma_28014_cte
     ON
-      subq_38.listing = listings_latest_src_28000.listing_id
+      subq_38.listing = sma_28014_cte.listing
   ) subq_42
   WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
   GROUP BY
