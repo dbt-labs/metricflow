@@ -56,7 +56,17 @@ query_1ee34d0e:
   explain_sql:
     -- Combine Aggregated Outputs
     -- Write to DataTable
-    WITH cm_3_cte AS (
+    WITH sma_10014_cte AS (
+      -- Read Elements From Semantic Model 'listings_latest'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        1 AS listing
+        , '1' AS is_lux_latest
+        , '1' AS capacity_latest
+      FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
+    )
+
+    , cm_3_cte AS (
       -- Constrain Output with WHERE
       -- Select: ['__bookings', 'listing__capacity_latest']
       -- Aggregate Inputs for Simple Metrics
@@ -69,8 +79,8 @@ query_1ee34d0e:
         -- Select: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
         SELECT
           subq_1.metric_time__day AS metric_time__day
-          , subq_4.is_lux_latest AS listing__is_lux_latest
-          , subq_4.capacity_latest AS listing__capacity_latest
+          , sma_10014_cte.is_lux_latest AS listing__is_lux_latest
+          , sma_10014_cte.capacity_latest AS listing__capacity_latest
           , subq_1.__bookings AS bookings
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
@@ -81,18 +91,10 @@ query_1ee34d0e:
             , 1 AS __bookings
           FROM simple_semantic_manifest.dummy_table bookings_source_src_10000
         ) subq_1
-        LEFT OUTER JOIN (
-          -- Read Elements From Semantic Model 'listings_latest'
-          -- Metric Time Dimension 'ds'
-          -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
-          SELECT
-            1 AS listing
-            , '1' AS is_lux_latest
-            , '1' AS capacity_latest
-          FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
-        ) subq_4
+        LEFT OUTER JOIN
+          sma_10014_cte
         ON
-          subq_1.listing = subq_4.listing
+          subq_1.listing = sma_10014_cte.listing
       ) subq_6
       WHERE (
         (listing__is_lux_latest IS NOT NULL)
@@ -116,8 +118,8 @@ query_1ee34d0e:
         -- Select: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
         SELECT
           subq_12.metric_time__day AS metric_time__day
-          , subq_14.is_lux_latest AS listing__is_lux_latest
-          , subq_14.capacity_latest AS listing__capacity_latest
+          , sma_10014_cte.is_lux_latest AS listing__is_lux_latest
+          , sma_10014_cte.capacity_latest AS listing__capacity_latest
           , subq_12.__views AS views
         FROM (
           -- Read Elements From Semantic Model 'views_source'
@@ -128,18 +130,10 @@ query_1ee34d0e:
             , 1 AS __views
           FROM simple_semantic_manifest.dummy_table views_source_src_10000
         ) subq_12
-        LEFT OUTER JOIN (
-          -- Read Elements From Semantic Model 'listings_latest'
-          -- Metric Time Dimension 'ds'
-          -- Select: ['capacity_latest', 'is_lux_latest', 'listing']
-          SELECT
-            1 AS listing
-            , '1' AS is_lux_latest
-            , '1' AS capacity_latest
-          FROM simple_semantic_manifest.dummy_table listings_latest_src_10000
-        ) subq_14
+        LEFT OUTER JOIN
+          sma_10014_cte
         ON
-          subq_12.listing = subq_14.listing
+          subq_12.listing = sma_10014_cte.listing
       ) subq_16
       WHERE (
         (listing__is_lux_latest IS NOT NULL)

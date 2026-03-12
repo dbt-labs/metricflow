@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import FrozenSet, Optional, Sequence, Set
+from collections.abc import Sequence, Set
+from typing import FrozenSet, Optional
 
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -226,7 +227,7 @@ class DataflowToSqlPlanConverter:
     ) -> FrozenSet[DataflowPlanNode]:
         """Handles logic for selecting which nodes to convert to CTEs based on the request."""
         dataflow_plan = dataflow_plan_node.as_plan()
-        nodes_to_convert_to_cte: Set[DataflowPlanNode] = set(DataflowPlanAnalyzer.find_common_branches(dataflow_plan))
+        nodes_to_convert_to_cte: Set[DataflowPlanNode] = DataflowPlanAnalyzer.find_common_branches(dataflow_plan)
         # Additional nodes will be added later.
 
         return frozenset(nodes_to_convert_to_cte)

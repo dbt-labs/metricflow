@@ -1,0 +1,84 @@
+# Manifest containing the minimal number of elements.
+---
+semantic_model:
+  name: bookings_source
+
+  node_relation:
+    schema_name: $source_schema
+    alias: bookings_source
+
+  defaults:
+    agg_time_dimension: ds
+
+  entities:
+    - name: booking
+      type: primary
+
+  measures:
+    - name: booking_count
+      expr: "1"
+      agg: sum
+
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+---
+metric:
+  name: bookings
+  type: simple
+  type_params:
+    measure: booking_count
+
+---
+metric:
+  name: "metric_level_0_index_0"
+  description: Derived metric for testing optimizations for duplicate measures in a query.
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+---
+metric:
+  name: "metric_level_0_index_1"
+  description: Derived metric for testing optimizations for duplicate measures in a query.
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+
+---
+metric:
+  name: "metric_level_0_index_2"
+  description: Derived metric for testing optimizations for duplicate measures in a query.
+  type: derived
+  type_params:
+    expr: bookings
+    metrics:
+      - name: bookings
+
+
+---
+metric:
+  name: "metric_level_1_index_0"
+  description: Derived metric for testing optimizations for duplicate measures in a query.
+  type: derived
+  type_params:
+    expr: metric_level_0_index_0 + metric_level_0_index_1
+    metrics:
+      - name: metric_level_0_index_0
+      - name: metric_level_0_index_1
+
+---
+metric:
+  name: "metric_level_1_index_1"
+  description: Derived metric for testing optimizations for duplicate measures in a query.
+  type: derived
+  type_params:
+    expr: metric_level_0_index_0 + metric_level_0_index_1
+    metrics:
+      - name: metric_level_0_index_0
+      - name: metric_level_0_index_1
