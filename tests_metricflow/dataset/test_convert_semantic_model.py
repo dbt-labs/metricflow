@@ -12,6 +12,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_spec_set_snapshot_equal
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.sql_plan import SqlPlanNode
 from metricflow.sql.sql_select_text_node import SqlSelectTextNode
 from metricflow.sql.sql_table_node import SqlTableNode
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
@@ -142,6 +143,7 @@ def test_from_source_branching_logic() -> None:
     # Table-based model (no compiled_sql)
     table_relation = PydanticNodeRelation(schema_name="my_schema", alias="my_table")
     table_compiled_sql = getattr(table_relation, "compiled_sql", None)
+    table_from_source: SqlPlanNode
     if table_compiled_sql is not None:
         table_from_source = SqlSelectTextNode.create(select_query=table_compiled_sql)
     else:
@@ -156,6 +158,7 @@ def test_from_source_branching_logic() -> None:
         compiled_sql=compiled_sql,
     )
     ephemeral_compiled_sql = getattr(ephemeral_relation, "compiled_sql", None)
+    ephemeral_from_source: SqlPlanNode
     if ephemeral_compiled_sql is not None:
         ephemeral_from_source = SqlSelectTextNode.create(select_query=ephemeral_compiled_sql)
     else:
