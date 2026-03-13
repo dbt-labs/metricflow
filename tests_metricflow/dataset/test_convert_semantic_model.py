@@ -106,16 +106,21 @@ def test_convert_query_semantic_model(  # noqa: D103
     )
 
 
+_DSI_HAS_COMPILED_SQL = hasattr(PydanticNodeRelation, "compiled_sql")
+
+
+@pytest.mark.skipif(not _DSI_HAS_COMPILED_SQL, reason="installed dbt-semantic-interfaces lacks compiled_sql")
 def test_from_source_uses_sql_table_node_for_table_models() -> None:
     """When compiled_sql is not set, the from_source should be a SqlTableNode."""
     node_relation = PydanticNodeRelation(schema_name="my_schema", alias="my_table")
 
-    assert node_relation.compiled_sql is None
+    assert getattr(node_relation, "compiled_sql", None) is None
     from_source = SqlTableNode.create(sql_table=SqlTable.from_string(node_relation.relation_name))
     assert isinstance(from_source, SqlTableNode)
     assert from_source.sql_table == SqlTable.from_string("my_schema.my_table")
 
 
+@pytest.mark.skipif(not _DSI_HAS_COMPILED_SQL, reason="installed dbt-semantic-interfaces lacks compiled_sql")
 def test_from_source_uses_sql_select_text_node_for_ephemeral_models() -> None:
     """When compiled_sql is set (ephemeral model), the from_source should be a SqlSelectTextNode."""
     compiled_sql = "SELECT id, name FROM raw.source_table WHERE active = true"
@@ -125,12 +130,13 @@ def test_from_source_uses_sql_select_text_node_for_ephemeral_models() -> None:
         compiled_sql=compiled_sql,
     )
 
-    assert node_relation.compiled_sql is not None
+    assert getattr(node_relation, "compiled_sql", None) is not None
     from_source = SqlSelectTextNode.create(select_query=node_relation.compiled_sql)
     assert isinstance(from_source, SqlSelectTextNode)
     assert from_source.select_query == compiled_sql
 
 
+@pytest.mark.skipif(not _DSI_HAS_COMPILED_SQL, reason="installed dbt-semantic-interfaces lacks compiled_sql")
 def test_from_source_branching_logic() -> None:
     """Test the branching logic used in the converter to select the right from_source node type."""
     # Table-based model (no compiled_sql)
@@ -139,9 +145,7 @@ def test_from_source_branching_logic() -> None:
     if table_compiled_sql is not None:
         table_from_source = SqlSelectTextNode.create(select_query=table_compiled_sql)
     else:
-        table_from_source = SqlTableNode.create(
-            sql_table=SqlTable.from_string(table_relation.relation_name)
-        )
+        table_from_source = SqlTableNode.create(sql_table=SqlTable.from_string(table_relation.relation_name))
     assert isinstance(table_from_source, SqlTableNode)
 
     # Ephemeral model (with compiled_sql)
@@ -155,8 +159,6 @@ def test_from_source_branching_logic() -> None:
     if ephemeral_compiled_sql is not None:
         ephemeral_from_source = SqlSelectTextNode.create(select_query=ephemeral_compiled_sql)
     else:
-        ephemeral_from_source = SqlTableNode.create(
-            sql_table=SqlTable.from_string(ephemeral_relation.relation_name)
-        )
+        ephemeral_from_source = SqlTableNode.create(sql_table=SqlTable.from_string(ephemeral_relation.relation_name))
     assert isinstance(ephemeral_from_source, SqlSelectTextNode)
     assert ephemeral_from_source.select_query == compiled_sql
