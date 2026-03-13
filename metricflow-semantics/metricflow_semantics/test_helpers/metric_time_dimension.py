@@ -15,6 +15,11 @@ MTD_SPEC_DAY = TimeDimensionSpec(
     entity_links=(),
     time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
 )
+MTD_SPEC_ALIEN_DAY = TimeDimensionSpec(
+    element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
+    entity_links=(),
+    time_granularity=ExpandedTimeGranularity(name="alien_day", base_granularity=TimeGranularity.DAY),
+)
 MTD_SPEC_WEEK = TimeDimensionSpec(
     element_name=MetricFlowReservedKeywords.METRIC_TIME.value,
     entity_links=(),
