@@ -513,6 +513,8 @@ class SemanticModelToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
+        # TODO: Use `semantic_model.node_relation.compiled_sql` directly once the published
+        # dbt-semantic-interfaces package includes the `compiled_sql` field on `NodeRelation`.
         compiled_sql: Optional[str] = getattr(semantic_model.node_relation, "compiled_sql", None)
         from_source: SqlPlanNode
         if compiled_sql is not None:
