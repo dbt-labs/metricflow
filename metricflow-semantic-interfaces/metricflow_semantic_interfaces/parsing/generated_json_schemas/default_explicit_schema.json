@@ -587,6 +587,9 @@
                 "alias": {
                     "type": "string"
                 },
+                "compiled_sql": {
+                    "type": "string"
+                },
                 "database": {
                     "type": "string"
                 },
