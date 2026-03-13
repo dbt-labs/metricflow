@@ -135,11 +135,14 @@ def test_from_source_branching_logic() -> None:
     """Test the branching logic used in the converter to select the right from_source node type."""
     # Table-based model (no compiled_sql)
     table_relation = PydanticNodeRelation(schema_name="my_schema", alias="my_table")
-    if table_relation.compiled_sql is not None:
-        from_source = SqlSelectTextNode.create(select_query=table_relation.compiled_sql)
+    table_compiled_sql = getattr(table_relation, "compiled_sql", None)
+    if table_compiled_sql is not None:
+        table_from_source = SqlSelectTextNode.create(select_query=table_compiled_sql)
     else:
-        from_source = SqlTableNode.create(sql_table=SqlTable.from_string(table_relation.relation_name))
-    assert isinstance(from_source, SqlTableNode)
+        table_from_source = SqlTableNode.create(
+            sql_table=SqlTable.from_string(table_relation.relation_name)
+        )
+    assert isinstance(table_from_source, SqlTableNode)
 
     # Ephemeral model (with compiled_sql)
     compiled_sql = "SELECT 1 AS id"
@@ -148,9 +151,12 @@ def test_from_source_branching_logic() -> None:
         alias="my_table",
         compiled_sql=compiled_sql,
     )
-    if ephemeral_relation.compiled_sql is not None:
-        from_source = SqlSelectTextNode.create(select_query=ephemeral_relation.compiled_sql)
+    ephemeral_compiled_sql = getattr(ephemeral_relation, "compiled_sql", None)
+    if ephemeral_compiled_sql is not None:
+        ephemeral_from_source = SqlSelectTextNode.create(select_query=ephemeral_compiled_sql)
     else:
-        from_source = SqlTableNode.create(sql_table=SqlTable.from_string(ephemeral_relation.relation_name))
-    assert isinstance(from_source, SqlSelectTextNode)
-    assert from_source.select_query == compiled_sql
+        ephemeral_from_source = SqlTableNode.create(
+            sql_table=SqlTable.from_string(ephemeral_relation.relation_name)
+        )
+    assert isinstance(ephemeral_from_source, SqlSelectTextNode)
+    assert ephemeral_from_source.select_query == compiled_sql

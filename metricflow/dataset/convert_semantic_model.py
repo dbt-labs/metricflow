@@ -49,6 +49,7 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.sql.sql_plan import (
+    SqlPlanNode,
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
@@ -512,10 +513,14 @@ class SemanticModelToDataSetConverter:
             all_select_columns.extend(select_columns)
 
         # Generate the "from" clause depending on whether it's an SQL query or an SQL table.
-        if semantic_model.node_relation.compiled_sql is not None:
-            from_source = SqlSelectTextNode.create(select_query=semantic_model.node_relation.compiled_sql)
+        compiled_sql: Optional[str] = getattr(semantic_model.node_relation, "compiled_sql", None)
+        from_source: SqlPlanNode
+        if compiled_sql is not None:
+            from_source = SqlSelectTextNode.create(select_query=compiled_sql)
         else:
-            from_source = SqlTableNode.create(sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name))
+            from_source = SqlTableNode.create(
+                sql_table=SqlTable.from_string(semantic_model.node_relation.relation_name)
+            )
 
         select_statement_node = SqlSelectStatementNode.create(
             description=f"Read Elements From Semantic Model '{semantic_model.name}'",
