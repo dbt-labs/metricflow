@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from collections import OrderedDict
 from dataclasses import dataclass
 from functools import cached_property
@@ -13,14 +12,12 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow_semantics.toolkit.collections.mapping_helpers import mf_items_to_dict
 from metricflow_semantics.toolkit.merger import Mergeable
-from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple, MappingItemsTuple
 from typing_extensions import override
 
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
+from metricflow.plan_conversion.to_sql_plan.output_column_orderer import OutputColumnOrderer
 from metricflow.sql.sql_plan import SqlSelectColumn
-
-logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -62,44 +59,14 @@ class CreateSelectColumnsResult(Mergeable):
             select_column_set=SelectColumnSet.empty_instance(), spec_to_associated_columns_mapping_items=()
         )
 
-    def get_columns(self, spec_output_order: Sequence[InstanceSpec] = ()) -> AnyLengthTuple[SqlSelectColumn]:
-        """Returns the generated columns.
+    def get_columns(
+        self, output_column_orderer: Optional[OutputColumnOrderer] = None
+    ) -> AnyLengthTuple[SqlSelectColumn]:
+        """Returns the generated columns."""
+        if output_column_orderer is not None:
+            return tuple(output_column_orderer.order_columns(self.spec_to_columns_mapping))
 
-        If `spec_output_order` is specified, use the relative ordering described to determine the column order.
-        """
-        if len(spec_output_order) > 0:
-            accounted_specs: set[InstanceSpec] = set()
-            unknown_specs: set[InstanceSpec] = set()
-            output_columns: list[SqlSelectColumn] = []
-            for spec in spec_output_order:
-                columns = self.spec_to_columns_mapping.get(spec)
-                if columns is None:
-                    unknown_specs.add(spec)
-                    continue
-                output_columns.extend(columns)
-                accounted_specs.add(spec)
-
-            if len(accounted_specs) != len(spec_output_order):
-                unaccounted_specs = set()
-                for spec, columns in self.spec_to_columns_mapping.items():
-                    if spec not in accounted_specs:
-                        unaccounted_specs.add(spec)
-                logger.error(
-                    LazyFormat(
-                        "Mismatch between `spec_output_order` and created specs. This is a bug and should be"
-                        " investigated, but returning the default ordering to reduce user-facing errors.",
-                        accounted_specs=accounted_specs,
-                        unaccounted_specs=unaccounted_specs,
-                        unknown_specs=unknown_specs,
-                        spec_output_order=spec_output_order,
-                        spec_to_columns_mapping=self.spec_to_columns_mapping,
-                    )
-                )
-                return self.select_column_set.columns_in_default_order
-
-            return tuple(output_columns)
-        else:
-            return self.select_column_set.columns_in_default_order
+        return self.select_column_set.columns_in_default_order
 
 
 class CreateSelectColumnsForInstances(InstanceSetTransform[CreateSelectColumnsResult]):

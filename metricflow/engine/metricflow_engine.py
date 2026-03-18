@@ -75,6 +75,11 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlStatement
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow.plan_conversion.to_sql_plan.output_column_orderer import (
+    InputOrderPreservingOrderer,
+    OutputColumnOrderer,
+    TypeGroupedOrderer,
+)
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
@@ -626,14 +631,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             sql_optimization_level=mf_query_request.sql_optimization_level,
         )
 
+        output_column_orderer: OutputColumnOrderer
+        if mf_query_request.order_output_columns_by_input_order:
+            output_column_orderer = InputOrderPreservingOrderer(query_spec.input_spec_order)
+        else:
+            output_column_orderer = TypeGroupedOrderer()
+
         convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(
             dataflow_plan=dataflow_plan,
-            spec_output_order=(
-                query_spec.spec_output_order
-                # Need to check on how the min/max case should be handled.
-                if mf_query_request.order_output_columns_by_input_order and not query_spec.min_max_only
-                else ()
-            ),
+            output_column_orderer=(output_column_orderer if not query_spec.min_max_only else None),
         )
         return MetricFlowExplainResult(
             query_spec=query_spec,

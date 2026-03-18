@@ -133,7 +133,7 @@ class InstanceSpecSet(Mergeable, SerializableDataclass):
         )
 
     @staticmethod
-    def create_from_specs(specs: Sequence[InstanceSpec]) -> InstanceSpecSet:  # noqa: D102
+    def create_from_specs(specs: Iterable[InstanceSpec]) -> InstanceSpecSet:  # noqa: D102
         return group_specs_by_type(specs)
 
 
