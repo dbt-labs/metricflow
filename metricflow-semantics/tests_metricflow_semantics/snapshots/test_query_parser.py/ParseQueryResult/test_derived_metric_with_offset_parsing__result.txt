@@ -16,12 +16,17 @@ ParseQueryResult(
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,
     apply_group_by=True,
-    spec_output_order=(
-      TimeDimensionSpec(
-        element_name='metric_time',
-        time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
+    input_spec_order=InputSpecOrder(
+      group_by_item_specs=(
+        TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='month',
+            base_granularity=MONTH,
+          ),
+        ),
       ),
-      MetricSpec(element_name='revenue_growth_2_weeks'),
+      metric_specs=(MetricSpec(element_name='revenue_growth_2_weeks'),),
     ),
   ),
   queried_semantic_models=(SemanticModelReference(semantic_model_name='revenue_source'),),

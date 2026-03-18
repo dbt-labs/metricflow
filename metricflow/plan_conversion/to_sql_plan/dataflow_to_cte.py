@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Callable, Dict, FrozenSet, Sequence, Tuple, TypeVar
+from typing import Callable, Dict, FrozenSet, Optional, Sequence, Tuple, TypeVar
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import NodeId
 from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
@@ -41,6 +40,7 @@ from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
 from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.instance_set_transforms.select_columns import CreateSelectColumnsForInstances
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow.plan_conversion.to_sql_plan.output_column_orderer import OutputColumnOrderer
 from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import SqlSelectColumn
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
@@ -92,12 +92,12 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
         nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode],
-        spec_output_order: Sequence[InstanceSpec],
+        output_column_orderer: Optional[OutputColumnOrderer] = None,
     ) -> None:
         super().__init__(
             column_association_resolver=column_association_resolver,
             semantic_manifest_lookup=semantic_manifest_lookup,
-            spec_output_order=spec_output_order,
+            output_column_orderer=output_column_orderer,
         )
         self._nodes_to_convert_to_cte = nodes_to_convert_to_cte
 
@@ -112,7 +112,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         self,
         node: DataflowNodeT,
         node_to_select_subquery_function: Callable[[DataflowNodeT], SqlDataSet],
-        use_spec_output_order: bool,
+        use_column_orderer: bool,
     ) -> SqlDataSet:
         """Default handler that is called for each node as the dataflow plan is traversed.
 
@@ -159,7 +159,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
                 column_resolver=self._column_association_resolver,
             )
             .transform(select_from_subquery_dataset.instance_set)
-            .get_columns(self._spec_output_order if use_spec_output_order else ()),
+            .get_columns(self._output_column_orderer if use_column_orderer else None),
             instance_set=select_from_subquery_dataset.instance_set,
         )
         self._node_to_cte_generation_result[node] = cte_generation_result
@@ -168,13 +168,13 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
     @override
     def visit_source_node(self, node: ReadSqlSourceNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_source_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_source_node, use_column_orderer=False
         )
 
     @override
     def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_join_on_entities_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_join_on_entities_node, use_column_orderer=False
         )
 
     @override
@@ -182,13 +182,13 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_aggregate_simple_metric_inputs_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
     def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_compute_metrics_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_compute_metrics_node, use_column_orderer=False
         )
 
     @override
@@ -196,19 +196,19 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_window_reaggregation_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_order_by_limit_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_order_by_limit_node, use_column_orderer=False
         )
 
     @override
     def visit_where_constraint_node(self, node: WhereFilterNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_where_constraint_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_where_constraint_node, use_column_orderer=False
         )
 
     @override
@@ -216,7 +216,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_write_to_result_data_table_node,
-            use_spec_output_order=True,
+            use_column_orderer=True,
         )
 
     @override
@@ -224,13 +224,13 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_write_to_result_table_node,
-            use_spec_output_order=True,
+            use_column_orderer=True,
         )
 
     @override
     def visit_selector_node(self, node: SelectorNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_selector_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_selector_node, use_column_orderer=False
         )
 
     @override
@@ -238,7 +238,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_combine_aggregated_outputs_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -246,7 +246,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_constrain_time_range_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -254,7 +254,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_join_over_time_range_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -262,7 +262,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_semi_additive_join_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -270,7 +270,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_metric_time_dimension_transform_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -278,13 +278,13 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_join_to_time_spine_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
     def visit_min_max_node(self, node: MinMaxNode) -> SqlDataSet:
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_min_max_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_min_max_node, use_column_orderer=False
         )
 
     @override
@@ -292,7 +292,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_add_generated_uuid_column_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -300,7 +300,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_join_conversion_events_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -308,13 +308,13 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_join_to_custom_granularity_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
     def visit_alias_specs_node(self, node: AliasSpecsNode) -> SqlDataSet:  # noqa: D102
         return self._default_handler(
-            node=node, node_to_select_subquery_function=super().visit_alias_specs_node, use_spec_output_order=False
+            node=node, node_to_select_subquery_function=super().visit_alias_specs_node, use_column_orderer=False
         )
 
     @override
@@ -324,7 +324,7 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_offset_base_grain_by_custom_grain_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )
 
     @override
@@ -332,5 +332,5 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_offset_custom_granularity_node,
-            use_spec_output_order=False,
+            use_column_orderer=False,
         )

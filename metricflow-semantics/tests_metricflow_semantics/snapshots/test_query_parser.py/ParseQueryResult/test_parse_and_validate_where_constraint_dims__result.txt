@@ -104,6 +104,18 @@ ParseQueryResult(
     ),
     min_max_only=False,
     apply_group_by=True,
+    input_spec_order=InputSpecOrder(
+      group_by_item_specs=(
+        TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='day',
+            base_granularity=DAY,
+          ),
+        ),
+      ),
+      metric_specs=(MetricSpec(element_name='bookings'),),
+    ),
   ),
   queried_semantic_models=(SemanticModelReference(semantic_model_name='bookings_source'),),
 )

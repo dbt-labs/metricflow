@@ -25,19 +25,24 @@ ParseQueryResult(
     filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
     min_max_only=False,
     apply_group_by=True,
-    spec_output_order=(
-      TimeDimensionSpec(
-        element_name='metric_time',
-        time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY),
-      ),
-      DimensionSpec(
-        element_name='home_state_latest',
-        entity_links=(
-          EntityReference(element_name='listing'),
-          EntityReference(element_name='user'),
+    input_spec_order=InputSpecOrder(
+      group_by_item_specs=(
+        TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='day',
+            base_granularity=DAY,
+          ),
+        ),
+        DimensionSpec(
+          element_name='home_state_latest',
+          entity_links=(
+            EntityReference(element_name='listing'),
+            EntityReference(element_name='user'),
+          ),
         ),
       ),
-      MetricSpec(element_name='bookings'),
+      metric_specs=(MetricSpec(element_name='bookings'),),
     ),
   ),
   queried_semantic_models=(

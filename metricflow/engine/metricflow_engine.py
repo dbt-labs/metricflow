@@ -3,9 +3,10 @@ from __future__ import annotations
 import datetime
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Iterable, Sequence, Set
 from dataclasses import dataclass
 from enum import Enum
-from typing import FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import Optional
 
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
@@ -74,6 +75,11 @@ from metricflow.execution.execution_plan import ExecutionPlan, SqlStatement
 from metricflow.execution.executor import SequentialPlanExecutor
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow.plan_conversion.to_sql_plan.output_column_orderer import (
+    InputOrderPreservingOrderer,
+    OutputColumnOrderer,
+    TypeGroupedOrderer,
+)
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
@@ -145,7 +151,7 @@ class MetricFlowQueryRequest:
     metric_names: Optional[Sequence[str]]
     metrics: Optional[Sequence[MetricQueryParameter]]
     group_by_names: Optional[Sequence[str]]
-    group_by: Optional[Tuple[GroupByQueryParameter, ...]]
+    group_by: Optional[tuple[GroupByQueryParameter, ...]]
     limit: Optional[int]
     time_constraint_start: Optional[datetime.datetime]
     time_constraint_end: Optional[datetime.datetime]
@@ -155,7 +161,7 @@ class MetricFlowQueryRequest:
     min_max_only: bool
     apply_group_by: bool
     sql_optimization_level: SqlOptimizationLevel
-    dataflow_plan_optimizations: FrozenSet[DataflowPlanOptimization]
+    dataflow_plan_optimizations: frozenset[DataflowPlanOptimization]
     query_type: MetricFlowQueryType
     order_output_columns_by_input_order: bool
 
@@ -173,10 +179,8 @@ class MetricFlowQueryRequest:
         where_constraints: Optional[Sequence[str]] = None,
         order_by_names: Optional[Sequence[str]] = None,
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
-        sql_optimization_level: SqlOptimizationLevel = SqlOptimizationLevel.default_level(),
-        dataflow_plan_optimizations: FrozenSet[
-            DataflowPlanOptimization
-        ] = DataflowPlanOptimization.enabled_optimizations(),
+        sql_optimization_level: Optional[SqlOptimizationLevel] = None,
+        dataflow_plan_optimizations: Optional[Set[DataflowPlanOptimization]] = None,
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
         apply_group_by: bool = True,
@@ -195,8 +199,12 @@ class MetricFlowQueryRequest:
             where_constraints=where_constraints,
             order_by_names=order_by_names,
             order_by=order_by,
-            sql_optimization_level=sql_optimization_level,
-            dataflow_plan_optimizations=dataflow_plan_optimizations,
+            sql_optimization_level=sql_optimization_level
+            if sql_optimization_level is not None
+            else SqlOptimizationLevel.default_level(),
+            dataflow_plan_optimizations=frozenset(dataflow_plan_optimizations)
+            if dataflow_plan_optimizations is not None
+            else DataflowPlanOptimization.enabled_optimizations(),
             query_type=query_type,
             min_max_only=min_max_only,
             apply_group_by=apply_group_by,
@@ -296,9 +304,9 @@ class AbstractMetricFlowEngine(ABC):
     @abstractmethod
     def simple_dimensions_for_metrics(
         self,
-        metric_names: List[str],
+        metric_names: list[str],
         without_any_property: Sequence[GroupByItemProperty],
-    ) -> List[Dimension]:
+    ) -> list[Dimension]:
         """Retrieves a list of all common dimensions for metric_names.
 
         "simple" dimensions are the ones that people expect from a UI perspective. For example, if "ds" is a time
@@ -314,7 +322,7 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:
+    def entities_for_metrics(self, metric_names: list[str]) -> list[Entity]:
         """Retrieves a list of all entities for metric_names.
 
         Args:
@@ -326,7 +334,7 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def list_metrics(self, include_dimensions: bool = True) -> List[Metric]:
+    def list_metrics(self, include_dimensions: bool = True) -> list[Metric]:
         """Retrieves a list of metric names.
 
         Returns:
@@ -337,11 +345,11 @@ class AbstractMetricFlowEngine(ABC):
     @abstractmethod
     def get_dimension_values(
         self,
-        metric_names: List[str],
+        metric_names: list[str],
         get_group_by_values: str,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-    ) -> List[str]:
+    ) -> list[str]:
         """Retrieves a list of dimension values given a [metric_name, get_group_by_values].
 
         Args:
@@ -358,7 +366,7 @@ class AbstractMetricFlowEngine(ABC):
     @abstractmethod
     def explain_get_dimension_values(
         self,
-        metric_names: Optional[List[str]] = None,
+        metric_names: Optional[list[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         get_group_by_values: Optional[str] = None,
         group_by: Optional[GroupByQueryParameter] = None,
@@ -381,22 +389,22 @@ class AbstractMetricFlowEngine(ABC):
         pass
 
     @abstractmethod
-    def list_dimensions(self, metric_names: Optional[List[str]] = None) -> List[Dimension]:
+    def list_dimensions(self, metric_names: Optional[list[str]] = None) -> list[Dimension]:
         """List all dimensions in the semantic manifest, with optional filters."""
         pass
 
     @abstractmethod
     def list_group_bys(
         self,
-        metric_names: Optional[List[str]] = None,
+        metric_names: Optional[list[str]] = None,
         include_derived_time_granularities: bool = False,
         order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.DUNDER_NAME,
-    ) -> List[Entity | Dimension]:
+    ) -> list[Entity | Dimension]:
         """List all group bys in the semantic manifest, with optional filters."""
         pass
 
     @abstractmethod
-    def list_saved_queries(self) -> List[SavedQuery]:
+    def list_saved_queries(self) -> list[SavedQuery]:
         """List all saved queries in the semantic manifest, with optional filters."""
         pass
 
@@ -452,7 +460,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         self._time_spine_sources = TimeSpineSource.build_standard_time_spine_sources(
             semantic_manifest_lookup.semantic_manifest
         )
-        self._source_data_sets: List[SemanticModelDataSet] = []
+        self._source_data_sets: list[SemanticModelDataSet] = []
         converter = SemanticModelToDataSetConverter(
             column_association_resolver=self._column_association_resolver,
             manifest_lookup=self._semantic_manifest_lookup,
@@ -623,14 +631,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             sql_optimization_level=mf_query_request.sql_optimization_level,
         )
 
+        output_column_orderer: OutputColumnOrderer
+        if mf_query_request.order_output_columns_by_input_order:
+            output_column_orderer = InputOrderPreservingOrderer(query_spec.input_spec_order)
+        else:
+            output_column_orderer = TypeGroupedOrderer()
+
         convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(
             dataflow_plan=dataflow_plan,
-            spec_output_order=(
-                query_spec.spec_output_order
-                # Need to check on how the min/max case should be handled.
-                if mf_query_request.order_output_columns_by_input_order and not query_spec.min_max_only
-                else ()
-            ),
+            output_column_orderer=(output_column_orderer if not query_spec.min_max_only else None),
         )
         return MetricFlowExplainResult(
             query_spec=query_spec,
@@ -681,9 +690,9 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     def simple_dimensions_for_metrics(  # noqa: D102
         self,
-        metric_names: List[str],
+        metric_names: list[str],
         without_any_property: Sequence[GroupByItemProperty] = tuple(SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES),
-    ) -> List[Dimension]:
+    ) -> list[Dimension]:
         self._check_metric_names(metric_names)
 
         group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
@@ -694,8 +703,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         return self._filter_simple_linkable_dimensions(group_by_item_set=group_by_item_set)
 
-    def _filter_simple_linkable_dimensions(self, group_by_item_set: BaseGroupByItemSet) -> List[Dimension]:
-        dimensions: List[Dimension] = []
+    def _filter_simple_linkable_dimensions(self, group_by_item_set: BaseGroupByItemSet) -> list[Dimension]:
+        dimensions: list[Dimension] = []
 
         for annotated_spec in group_by_item_set.annotated_specs:
             properties = annotated_spec.property_set
@@ -750,11 +759,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_dimensions(
         self,
-        metric_names: Optional[List[str]] = None,
+        metric_names: Optional[list[str]] = None,
         order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.DUNDER_NAME,
-    ) -> List[Dimension]:
+    ) -> list[Dimension]:
         """Get full dimension object for all dimensions in the semantic manifest."""
-        dimensions: List[Dimension] = []
+        dimensions: list[Dimension] = []
         if metric_names:
             dimensions = self.simple_dimensions_for_metrics(metric_names=metric_names)
         else:
@@ -770,7 +779,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
                     )
                     dimensions.append(dimension)
 
-        def sort_dimensions(dimension: Dimension) -> Tuple[str, ...]:
+        def sort_dimensions(dimension: Dimension) -> tuple[str, ...]:
             if order_by == GroupByOrderByAttribute.DUNDER_NAME:
                 return (dimension.dunder_name,)
             elif order_by == GroupByOrderByAttribute.SEMANTIC_MODEL_NAME:
@@ -787,7 +796,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
         return sorted(set(dimensions), key=sort_dimensions)
 
-    def entities_for_metrics(self, metric_names: List[str]) -> List[Entity]:  # noqa: D102
+    def entities_for_metrics(self, metric_names: list[str]) -> list[Entity]:  # noqa: D102
         group_by_item_set = self._semantic_manifest_lookup.metric_lookup.get_common_group_by_items(
             metric_references=tuple(MetricReference(element_name=mname) for mname in metric_names),
             set_filter=GroupByItemSetFilter.create(
@@ -798,8 +807,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         entities = self._filter_linkable_entities(group_by_item_set=group_by_item_set)
         return sorted(set(entities), key=lambda x: x.default_search_and_sort_attribute)
 
-    def _filter_linkable_entities(self, group_by_item_set: BaseGroupByItemSet) -> List[Entity]:
-        entities: List[Entity] = []
+    def _filter_linkable_entities(self, group_by_item_set: BaseGroupByItemSet) -> list[Entity]:
+        entities: list[Entity] = []
 
         for annotated_spec in group_by_item_set.annotated_specs:
             element_type = annotated_spec.element_type
@@ -835,10 +844,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return entities
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_metrics(self, include_dimensions: bool = True) -> List[Metric]:
+    def list_metrics(self, include_dimensions: bool = True) -> list[Metric]:
         """List all metrics in semantic manifest matching params. Sorted automatically."""
         metric_lookup = self._semantic_manifest_lookup.metric_lookup
-        metrics: List[Metric] = []
+        metrics: list[Metric] = []
         for pydantic_metric in metric_lookup.get_metrics(metric_lookup.metric_references):
             if pydantic_metric.type_params.is_private:
                 continue
@@ -855,8 +864,8 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         return sorted(metrics, key=lambda m: m.default_search_and_sort_attribute)
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
-    def list_saved_queries(self) -> List[SavedQuery]:  # noqa: D102
-        saved_queries: List[SavedQuery] = []
+    def list_saved_queries(self) -> list[SavedQuery]:  # noqa: D102
+        saved_queries: list[SavedQuery] = []
         for pydantic_saved_query in self._semantic_manifest_lookup.semantic_manifest.saved_queries:
             saved_query = SavedQuery.from_pydantic(pydantic_saved_query)
             saved_queries.append(saved_query)
@@ -865,11 +874,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def get_dimension_values(  # noqa: D102
         self,
-        metric_names: List[str],
+        metric_names: list[str],
         get_group_by_values: str,
         time_constraint_start: Optional[datetime.datetime] = None,
         time_constraint_end: Optional[datetime.datetime] = None,
-    ) -> List[str]:
+    ) -> list[str]:
         # Run query
         query_result: MetricFlowQueryResult = self.query(
             MetricFlowQueryRequest.create(
@@ -888,7 +897,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain_get_dimension_values(  # noqa: D102
         self,
-        metric_names: Optional[List[str]] = None,
+        metric_names: Optional[list[str]] = None,
         metrics: Optional[Sequence[MetricQueryParameter]] = None,
         get_group_by_values: Optional[str] = None,
         group_by: Optional[GroupByQueryParameter] = None,
@@ -915,10 +924,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def list_group_bys(
         self,
-        metric_names: Optional[List[str]] = None,
+        metric_names: Optional[list[str]] = None,
         include_derived_time_granularities: bool = False,
         order_by: GroupByOrderByAttribute = GroupByOrderByAttribute.DUNDER_NAME,
-    ) -> List[Entity | Dimension]:
+    ) -> list[Entity | Dimension]:
         """List all possible group bys, or all group bys allowed for the selected metrics."""
         if metric_names:
             without_any_of = SIMPLE_DIMENSIONS_WITHOUT_ANY_PROPERTIES - ENTITY_WITH_ANY_PROPERTIES
@@ -937,7 +946,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             # TODO: better support for querying entities without metrics; include entities here at that time
             group_bys = self.list_dimensions()
 
-        def sort_group_bys(group_by: Entity | Dimension) -> Tuple[str, ...]:
+        def sort_group_bys(group_by: Entity | Dimension) -> tuple[str, ...]:
             name_attr = group_by.dunder_name if isinstance(group_by, Dimension) else group_by.name
             if order_by == GroupByOrderByAttribute.DUNDER_NAME:
                 return (name_attr,)

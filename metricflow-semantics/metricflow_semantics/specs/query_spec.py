@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Optional, Tuple
 
@@ -7,6 +8,7 @@ from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclas
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
     FilterSpecResolutionLookUp,
@@ -19,7 +21,33 @@ from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
-from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+
+
+@fast_frozen_dataclass()
+class InputSpecOrder:
+    """Represents the order of specs in the query input."""
+
+    group_by_item_specs: tuple[InstanceSpec, ...]
+    metric_specs: tuple[MetricSpec, ...]
+
+    def __post_init__(self) -> None:  # noqa: D105
+        spec_to_count: defaultdict[InstanceSpec, int] = defaultdict(int)
+
+        for spec in self.group_by_item_specs + self.metric_specs:
+            spec_to_count[spec] += 1
+
+        duplicate_specs = {spec: count for spec, count in spec_to_count.items() if count > 1}
+
+        if duplicate_specs:
+            raise MetricFlowInternalError(
+                LazyFormat(
+                    "Duplicate specs found in the order",
+                    duplicate_specs=duplicate_specs,
+                    input_spec_order=self,
+                )
+            )
 
 
 @dataclass(frozen=True)
@@ -41,11 +69,10 @@ class MetricFlowQuerySpec(SerializableDataclass):
     min_max_only: bool = False
     apply_group_by: bool = True
 
-    # Use the following to order the sequence of columns in the output. If a spec is not present in the list,
-    # it will appear after the columns for specs that are in this field. Note that in the current implementation,
-    # the ordering only applies within a group of specs of the same type. i.e. all group-by-item columns will still be
-    # listed before metric columns.
-    spec_output_order: AnyLengthTuple[InstanceSpec] = ()
+    # Use the following to track the order in which specs were provided in the query input.
+    input_spec_order: InputSpecOrder = field(
+        default_factory=lambda: InputSpecOrder(group_by_item_specs=(), metric_specs=())
+    )
 
     @property
     def linkable_specs(self) -> LinkableSpecSet:  # noqa: D102
@@ -69,6 +96,9 @@ class MetricFlowQuerySpec(SerializableDataclass):
             limit=self.limit,
             filter_intersection=self.filter_intersection,
             filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
+            min_max_only=self.min_max_only,
+            apply_group_by=self.apply_group_by,
+            input_spec_order=self.input_spec_order,
         )
 
     def without_aliases(self) -> MetricFlowQuerySpec:
@@ -90,4 +120,8 @@ class MetricFlowQuerySpec(SerializableDataclass):
             filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
             min_max_only=self.min_max_only,
             apply_group_by=self.apply_group_by,
+            input_spec_order=InputSpecOrder(
+                group_by_item_specs=tuple(spec.with_alias(None) for spec in self.input_spec_order.group_by_item_specs),
+                metric_specs=tuple(metric_spec.with_alias(None) for metric_spec in self.input_spec_order.metric_specs),
+            ),
         )
