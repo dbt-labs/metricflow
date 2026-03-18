@@ -35,3 +35,10 @@ Query for a simple metric.
     │       │                                          │   },                                        │
     │       │                                          │ )                                           │
     └───────┴──────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , SUM(booking_value) AS booking_value
+    FROM ***************************.fct_bookings bookings_source_src_28000
+    GROUP BY
+      DATE_TRUNC('day', ds)
