@@ -71,6 +71,7 @@ from metricflow.dataflow.builder.aggregation_helper import NullFillValueMapping
 from metricflow.dataflow.builder.builder_cache import (
     BuildAnyMetricOutputNodeInput,
     DataflowPlanBuilderCache,
+    DataflowPlanOptionSet,
     FindSourceNodeRecipeInput,
     FindSourceNodeRecipeResult,
     MetricQueryDescriptor,
@@ -168,9 +169,6 @@ class DataflowPlanBuilder:
         self._cache = dataflow_plan_builder_cache or DataflowPlanBuilderCache()
         self._metric_evaluation_plan_formatter = MetricEvaluationPlanTableFormatter()
 
-        # This should be moved to a build context object.
-        self._optimizations: frozenset[DataflowPlanOptimization] = frozenset()
-
     def build_plan(
         self,
         query_spec: MetricFlowQuerySpec,
@@ -180,8 +178,15 @@ class DataflowPlanBuilder:
         me_plan_override: Optional[MetricEvaluationPlan] = None,
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
-        self._optimizations = optimizations
-        metrics_output_node = self._build_query_output_node(query_spec=query_spec, me_plan_override=me_plan_override)
+        option_set = DataflowPlanOptionSet(
+            optimizations=frozenset(optimizations),
+            output_group_by_metric_instances=False,
+        )
+        metrics_output_node = self._build_query_output_node(
+            query_spec=query_spec,
+            option_set=option_set,
+            me_plan_override=me_plan_override,
+        )
 
         sink_node = DataflowPlanBuilder.build_sink_node(
             parent_node=metrics_output_node,
@@ -197,15 +202,15 @@ class DataflowPlanBuilder:
 
         plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
         plan = DataflowPlan(sink_nodes=[sink_node], plan_id=plan_id)
-        optimized_plan = self._optimize_plan(plan)
+        optimized_plan = self._optimize_plan(plan=plan, option_set=option_set)
         logger.debug(LazyFormat("Generated final plan", optimized_plan=lambda: optimized_plan.structure_text()))
         return optimized_plan
 
     def _build_query_output_node(
         self,
         query_spec: MetricFlowQuerySpec,
+        option_set: DataflowPlanOptionSet,
         me_plan_override: Optional[MetricEvaluationPlan] = None,
-        output_group_by_metric_instances: bool = False,
     ) -> DataflowPlanNode:
         """Build SQL output node from query inputs. May be used to build query DFP or source node.
 
@@ -256,7 +261,7 @@ class DataflowPlanBuilder:
 
         if me_plan_override is None:
             me_planner: MetricEvaluationPlanner
-            if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in self._optimizations:
+            if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in option_set.optimizations:
                 me_planner = PassThroughMetricEvaluationPlanner(
                     manifest_object_lookup=self._manifest_object_lookup,
                     column_association_resolver=self._column_association_resolver,
@@ -298,7 +303,7 @@ class DataflowPlanBuilder:
         # source nodes of the query node. This needs to be simplified by changing how
         # `output_group_by_metric_instances` is implemented to use a dedicated dataflow node.
         nodes_to_output_group_by_metric_instances: set[MetricQueryNode] = set()
-        if output_group_by_metric_instances:
+        if option_set.output_group_by_metric_instances:
             nodes_to_output_group_by_metric_instances.update(me_plan_override.successors(top_level_query_node))
 
         simple_metric_node_cache: ResultCache[BuildAnyMetricOutputNodeInput, DataflowPlanNode] = ResultCache()
@@ -347,7 +352,9 @@ class DataflowPlanBuilder:
                     dataflow_plan_builder=self,
                     filter_spec_factory=filter_spec_factory,
                     input_dataflow_plan_nodes=input_dataflow_plan_nodes,
-                    output_group_by_metric_instances=current_query_node in nodes_to_output_group_by_metric_instances,
+                    option_set=option_set.with_output_group_by_metric_instances(
+                        current_query_node in nodes_to_output_group_by_metric_instances
+                    ),
                     simple_metric_node_cache=simple_metric_node_cache,
                 )
             )
@@ -371,7 +378,7 @@ class DataflowPlanBuilder:
         self,
         metric_query_descriptor: MetricQueryDescriptor,
         filter_spec_factory: WhereFilterSpecFactory,
-        output_group_by_metric_instances: bool,
+        option_set: DataflowPlanOptionSet,
     ) -> DataflowPlanNode:
         if len(metric_query_descriptor.passthrough_metric_specs) > 0:
             raise MetricFlowInternalError(
@@ -396,7 +403,7 @@ class DataflowPlanBuilder:
                     ),
                     filter_spec_factory=filter_spec_factory,
                     predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
-                    output_group_by_metric_instances=output_group_by_metric_instances,
+                    option_set=option_set,
                 )
             elif metric_type is MetricType.CUMULATIVE:
                 output_node = self._build_cumulative_metric_output_node(
@@ -406,7 +413,7 @@ class DataflowPlanBuilder:
                     ),
                     filter_spec_factory=filter_spec_factory,
                     predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
-                    output_group_by_metric_instances=output_group_by_metric_instances,
+                    option_set=option_set,
                 )
             elif metric_type is MetricType.CONVERSION:
                 output_node = self._build_conversion_metric_output_node(
@@ -416,7 +423,7 @@ class DataflowPlanBuilder:
                     ),
                     filter_spec_factory=filter_spec_factory,
                     predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
-                    output_group_by_metric_instances=output_group_by_metric_instances,
+                    option_set=option_set,
                 )
             elif metric_type is MetricType.RATIO or metric_type is MetricType.DERIVED:
                 raise MetricFlowInternalError("This should have only been called with base metrics")
@@ -433,9 +440,9 @@ class DataflowPlanBuilder:
         else:
             return CombineAggregatedOutputsNode.create(output_nodes)
 
-    def _optimize_plan(self, plan: DataflowPlan) -> DataflowPlan:
+    def _optimize_plan(self, plan: DataflowPlan, option_set: DataflowPlanOptionSet) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
-        for optimizer in optimizer_factory.get_optimizers(self._optimizations):
+        for optimizer in optimizer_factory.get_optimizers(option_set.optimizations):
             logger.debug(LazyFormat(lambda: f"Applying optimizer: {optimizer.__class__.__name__}"))
             try:
                 plan = optimizer.optimize(plan)
@@ -462,6 +469,7 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         base_simple_metric_recipe: SimpleMetricRecipe,
         conversion_simple_metric_recipe: SimpleMetricRecipe,
+        option_set: DataflowPlanOptionSet,
         entity_spec: EntitySpec,
         window: Optional[TimeWindow],
         queried_linkable_specs: LinkableSpecSet,
@@ -498,6 +506,7 @@ class DataflowPlanBuilder:
                 ),
                 predicate_pushdown_state=time_range_only_pushdown_state,
                 linkable_spec_set=base_required_linkable_specs,
+                optimizations=option_set.optimizations,
             )
         )
         logger.debug(
@@ -515,6 +524,7 @@ class DataflowPlanBuilder:
                 ),
                 predicate_pushdown_state=disabled_pushdown_state,
                 linkable_spec_set=LinkableSpecSet(),
+                optimizations=option_set.optimizations,
             )
         )
         logger.debug(
@@ -536,6 +546,7 @@ class DataflowPlanBuilder:
             simple_metric_recipe=base_simple_metric_recipe,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=time_range_only_pushdown_state,
+            option_set=option_set,
         )
 
         # Build unaggregated conversions source node
@@ -606,6 +617,7 @@ class DataflowPlanBuilder:
             simple_metric_recipe=conversion_simple_metric_recipe,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=disabled_pushdown_state,
+            option_set=option_set,
             source_node_recipe=recipe_with_join_conversion_source_node,
         )
 
@@ -620,7 +632,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereFilterSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        output_group_by_metric_instances: bool = False,
+        option_set: DataflowPlanOptionSet,
     ) -> ComputeMetricsNode:
         """Builds a compute metric node for a conversion metric."""
         metric_reference = metric_spec.reference
@@ -667,6 +679,7 @@ class DataflowPlanBuilder:
             metric_spec=metric_spec,
             base_simple_metric_recipe=base_metric_recipe,
             conversion_simple_metric_recipe=conversion_metric_recipe,
+            option_set=option_set,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
             entity_spec=entity_spec,
@@ -679,7 +692,7 @@ class DataflowPlanBuilder:
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_node=aggregated_conversion_node,
-            output_group_by_metric_instances=output_group_by_metric_instances,
+            option_set=option_set,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
@@ -689,7 +702,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereFilterSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        output_group_by_metric_instances: bool = False,
+        option_set: DataflowPlanOptionSet,
     ) -> DataflowPlanNode:
         metric_reference = metric_spec.reference
         metric = self._metric_lookup.get_metric(metric_reference)
@@ -777,6 +790,7 @@ class DataflowPlanBuilder:
             simple_metric_recipe=simple_metric_recipe,
             queried_linkable_specs=required_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
+            option_set=option_set,
         )
         aggregated_to_elements = set(required_linkable_specs.as_tuple)
 
@@ -787,14 +801,14 @@ class DataflowPlanBuilder:
             aggregated_to_elements=aggregated_to_elements,
             # Due to the way that `DataflowNodeToSqlSubqueryVisitor` works, only the outermost
             # `ComputeMetricsNode` should be built with this set.
-            output_group_by_metric_instances=False,
+            option_set=option_set.with_output_group_by_metric_instances(False),
         )
 
         compute_metrics_node = self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_node=compute_simple_metric_node,
             aggregated_to_elements=aggregated_to_elements,
-            output_group_by_metric_instances=output_group_by_metric_instances,
+            option_set=option_set,
         )
 
         if requires_window_reaggregation:
@@ -813,7 +827,7 @@ class DataflowPlanBuilder:
         queried_linkable_specs: LinkableSpecSet,
         filter_spec_factory: WhereFilterSpecFactory,
         predicate_pushdown_state: PredicatePushdownState,
-        output_group_by_metric_instances: bool = False,
+        option_set: DataflowPlanOptionSet,
     ) -> DataflowPlanNode:
         """Builds a node to compute a metric that is not defined from other metrics."""
         metric_reference = metric_spec.reference
@@ -835,12 +849,13 @@ class DataflowPlanBuilder:
             simple_metric_recipe=simple_metric_recipe,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
+            option_set=option_set,
         )
 
         return self.build_computed_metrics_node(
             metric_spec=metric_spec,
             aggregated_node=aggregated_simple_metric_input_node,
-            output_group_by_metric_instances=output_group_by_metric_instances,
+            option_set=option_set,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
@@ -850,7 +865,7 @@ class DataflowPlanBuilder:
         passthrough_metric_specs: OrderedSet[MetricSpec],
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
-        output_group_by_metric_instances: bool,
+        option_set: DataflowPlanOptionSet,
         input_dataflow_plan_nodes: Sequence[DataflowPlanNode],
     ) -> DataflowPlanNode:
         logger.debug(LazyFormat("Building derived metric output node", metric_spec=metric_spec))
@@ -864,7 +879,7 @@ class DataflowPlanBuilder:
             parent_node=input_node,
             computed_metric_specs=[metric_spec],
             passthrough_metric_specs=tuple(passthrough_metric_specs),
-            output_group_by_metric_instances=output_group_by_metric_instances,
+            output_group_by_metric_instances=option_set.output_group_by_metric_instances,
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
@@ -894,13 +909,18 @@ class DataflowPlanBuilder:
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
-        self._optimizations = optimizations
+        option_set = DataflowPlanOptionSet(
+            optimizations=frozenset(optimizations),
+            output_group_by_metric_instances=False,
+        )
         # Workaround for a Pycharm type inspection issue with decorators.
         # noinspection PyArgumentList
-        return self._build_plan_for_no_metrics_query(query_spec)
+        return self._build_plan_for_no_metrics_query(query_spec=query_spec, option_set=option_set)
 
     @log_runtime()
-    def _build_plan_for_no_metrics_query(self, query_spec: MetricFlowQuerySpec) -> DataflowPlan:
+    def _build_plan_for_no_metrics_query(
+        self, query_spec: MetricFlowQuerySpec, option_set: DataflowPlanOptionSet
+    ) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
 
         # Remove aliases for easier spec-matching. Will be added back in sink node.
@@ -933,6 +953,7 @@ class DataflowPlanBuilder:
                 simple_metric_input_specs=None,
                 linkable_spec_set=required_linkable_specs,
                 predicate_pushdown_state=predicate_pushdown_state,
+                optimizations=option_set.optimizations,
             )
         )
         if not dataflow_recipe:
@@ -962,7 +983,7 @@ class DataflowPlanBuilder:
         )
 
         plan = DataflowPlan(sink_nodes=[sink_node])
-        return self._optimize_plan(plan)
+        return self._optimize_plan(plan=plan, option_set=option_set)
 
     @staticmethod
     def build_sink_node(
@@ -1205,7 +1226,10 @@ class DataflowPlanBuilder:
         for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs:
             query_output_node = self._build_query_output_node(
                 query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
-                output_group_by_metric_instances=True,
+                option_set=DataflowPlanOptionSet(
+                    optimizations=find_source_node_recipe_input.optimizations,
+                    output_group_by_metric_instances=True,
+                ),
             )
             logger.debug(
                 LazyFormat(
@@ -1348,14 +1372,14 @@ class DataflowPlanBuilder:
         metric_spec: MetricSpec,
         aggregated_node: Union[AggregateSimpleMetricInputsNode, DataflowPlanNode],
         aggregated_to_elements: Set[LinkableInstanceSpec],
-        output_group_by_metric_instances: bool,
+        option_set: DataflowPlanOptionSet,
     ) -> ComputeMetricsNode:
         """Builds a ComputeMetricsNode from aggregated inputs."""
         return ComputeMetricsNode.create(
             parent_node=aggregated_node,
             computed_metric_specs=[metric_spec],
             passthrough_metric_specs=(),
-            output_group_by_metric_instances=output_group_by_metric_instances,
+            output_group_by_metric_instances=option_set.output_group_by_metric_instances,
             aggregated_to_elements=aggregated_to_elements,
         )
 
@@ -1563,6 +1587,7 @@ class DataflowPlanBuilder:
         simple_metric_recipe: SimpleMetricRecipe,
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
+        option_set: DataflowPlanOptionSet,
         source_node_recipe: Optional[SourceNodeRecipe] = None,
     ) -> DataflowPlanNode:
         """Returns a node where the simple-metric inputs are aggregated by the linkable specs and filtered.
@@ -1575,6 +1600,7 @@ class DataflowPlanBuilder:
             simple_metric_recipe=simple_metric_recipe,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
+            option_set=option_set,
             source_node_recipe=source_node_recipe,
         )
 
@@ -1812,6 +1838,7 @@ class DataflowPlanBuilder:
         simple_metric_recipe: SimpleMetricRecipe,
         queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
+        option_set: DataflowPlanOptionSet,
         source_node_recipe: Optional[SourceNodeRecipe] = None,
     ) -> DataflowPlanNode:
         logger.debug(
@@ -1916,6 +1943,7 @@ class DataflowPlanBuilder:
                         simple_metric_input_specs=spec_properties.simple_metric_input_specs,
                         predicate_pushdown_state=simple_metric_input_ppd_state,
                         linkable_spec_set=required_linkable_specs,
+                        optimizations=option_set.optimizations,
                     )
                 )
 
@@ -2320,12 +2348,12 @@ class DataflowPlanBuilder:
             dataflow_plan_builder: DataflowPlanBuilder,
             filter_spec_factory: WhereFilterSpecFactory,
             input_dataflow_plan_nodes: Iterable[DataflowPlanNode],
-            output_group_by_metric_instances: bool,
+            option_set: DataflowPlanOptionSet,
             simple_metric_node_cache: ResultCache[BuildAnyMetricOutputNodeInput, DataflowPlanNode],
         ) -> None:
             self._dataflow_plan_builder = dataflow_plan_builder
             self._filter_spec_factory = filter_spec_factory
-            self._output_group_by_metric_instances = output_group_by_metric_instances
+            self._option_set = option_set
             self._input_dataflow_plan_nodes = tuple(input_dataflow_plan_nodes)
             self._simple_metric_node_cache = simple_metric_node_cache
 
@@ -2341,7 +2369,7 @@ class DataflowPlanBuilder:
                         group_by_item_specs=node.query_properties.group_by_item_specs,
                         predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
                     ),
-                    output_group_by_metric_instances=self._output_group_by_metric_instances,
+                    optimizations=self._option_set.optimizations,
                 )
 
                 cache_entry = self._simple_metric_node_cache.get(build_node_input)
@@ -2355,7 +2383,7 @@ class DataflowPlanBuilder:
                             queried_linkable_specs=node.query_properties.group_by_item_spec_set,
                             filter_spec_factory=self._filter_spec_factory,
                             predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
-                            output_group_by_metric_instances=self._output_group_by_metric_instances,
+                            option_set=self._option_set,
                         ),
                     )
                 simple_metric_nodes.append(simple_metric_node)
@@ -2372,7 +2400,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=node.query_properties.group_by_item_spec_set,
                 filter_spec_factory=self._filter_spec_factory,
                 predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
-                output_group_by_metric_instances=self._output_group_by_metric_instances,
+                option_set=self._option_set,
             )
 
         @override
@@ -2382,7 +2410,7 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=node.query_properties.group_by_item_spec_set,
                 filter_spec_factory=self._filter_spec_factory,
                 predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
-                output_group_by_metric_instances=self._output_group_by_metric_instances,
+                option_set=self._option_set,
             )
 
         @override
@@ -2394,7 +2422,7 @@ class DataflowPlanBuilder:
                     passthrough_metric_specs=node.passthrough_metric_specs,
                     queried_linkable_specs=node.query_properties.group_by_item_spec_set,
                     predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
-                    output_group_by_metric_instances=self._output_group_by_metric_instances,
+                    option_set=self._option_set,
                     input_dataflow_plan_nodes=self._input_dataflow_plan_nodes,
                 )
                 derived_metric_nodes.append(result_for_one_computed_spec)
