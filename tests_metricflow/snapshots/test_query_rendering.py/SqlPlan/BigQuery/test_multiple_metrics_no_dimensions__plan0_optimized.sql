@@ -5,8 +5,8 @@ sql_engine: BigQuery
 -- Combine Aggregated Outputs
 -- Write to DataTable
 SELECT
-  MAX(subq_23.bookings) AS bookings
-  , MAX(subq_30.listings) AS listings
+  MAX(subq_25.bookings) AS bookings
+  , MAX(subq_32.listings) AS listings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -19,7 +19,7 @@ FROM (
     SUM(1) AS bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
   WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_23
+) subq_25
 CROSS JOIN (
   -- Read Elements From Semantic Model 'listings_latest'
   -- Metric Time Dimension 'ds'
@@ -32,4 +32,4 @@ CROSS JOIN (
     SUM(1) AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   WHERE DATETIME_TRUNC(created_at, day) BETWEEN '2020-01-01' AND '2020-01-01'
-) subq_30
+) subq_32

@@ -25,15 +25,15 @@ FROM (
   -- Join Standard Outputs
   -- Select: ['__bookers', 'guest__booking_value']
   SELECT
-    subq_25.guest__booking_value AS guest__booking_value
-    , subq_19.__bookers AS bookers
+    subq_29.guest__booking_value AS guest__booking_value
+    , subq_23.__bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       guest
       , __bookers
     FROM sma_28009_cte
-  ) subq_19
+  ) subq_23
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Select: ['__booking_value', 'guest']
@@ -47,8 +47,8 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       guest
-  ) subq_25
+  ) subq_29
   ON
-    subq_19.guest = subq_25.guest
-) subq_27
+    subq_23.guest = subq_29.guest
+) subq_31
 WHERE guest__booking_value > 1.00
