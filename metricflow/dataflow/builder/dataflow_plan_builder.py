@@ -894,9 +894,9 @@ class DataflowPlanBuilder:
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
+        self._optimizations = optimizations
         # Workaround for a Pycharm type inspection issue with decorators.
         # noinspection PyArgumentList
-        self._optimizations = optimizations
         return self._build_plan_for_no_metrics_query(query_spec)
 
     @log_runtime()
