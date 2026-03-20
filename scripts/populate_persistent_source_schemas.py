@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from tests_metricflow.generate_snapshots import (
+from scripts.generate_snapshots import (
     ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME,
     ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS,
     MetricFlowEngineConfiguration,
