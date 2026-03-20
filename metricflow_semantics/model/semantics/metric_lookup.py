@@ -119,7 +119,7 @@ class MetricLookup:
             )
 
         return self._result_cache_for_derived_from_semantic_models.set_and_get(
-            metric_reference, FrozenOrderedSet(sorted(model_references))
+            metric_reference, model_references.as_frozen()
         )
 
     def get_common_group_by_items(
