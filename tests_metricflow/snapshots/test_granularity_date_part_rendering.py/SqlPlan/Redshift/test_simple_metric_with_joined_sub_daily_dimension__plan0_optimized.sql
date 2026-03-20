@@ -9,8 +9,8 @@ sql_engine: Redshift
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_34.user__bio_added_ts__minute AS listing__user__bio_added_ts__minute
-  , SUM(subq_27.__bookings) AS bookings
+  subq_46.user__bio_added_ts__minute AS listing__user__bio_added_ts__minute
+  , SUM(subq_39.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
@@ -19,7 +19,7 @@ FROM (
     , listing_id AS listing
     , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_27
+) subq_39
 LEFT OUTER JOIN (
   -- Join Standard Outputs
   -- Select: ['user__ds_partitioned__day', 'user__bio_added_ts__minute', 'listing']
@@ -32,12 +32,12 @@ LEFT OUTER JOIN (
     ***************************.dim_users users_ds_source_src_28000
   ON
     listings_latest_src_28000.user_id = users_ds_source_src_28000.user_id
-) subq_34
+) subq_46
 ON
   (
-    subq_27.listing = subq_34.listing
+    subq_39.listing = subq_46.listing
   ) AND (
-    subq_27.ds_partitioned__day = subq_34.user__ds_partitioned__day
+    subq_39.ds_partitioned__day = subq_46.user__ds_partitioned__day
   )
 GROUP BY
-  subq_34.user__bio_added_ts__minute
+  subq_46.user__bio_added_ts__minute
