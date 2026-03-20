@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Set
 from enum import Enum
 from typing import FrozenSet, List, Sequence
 
@@ -13,19 +14,23 @@ from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import Dataflow
 class DataflowPlanOptimization(Enum):
     """Enumeration of optimization types available for execution.
 
-    Values indicate order of application. We apply the source scan optimizer first because it reduces input branches,
-    making for maximally parsimonious queries prior to application of predicate pushdown. Note this is safe only
-    because the SourceScanOptimizer combines from the CombineAggregatedOutputNode, and will only combine branches
-    from there to source if they are functionally identical (i.e., they have all of the same WhereFilterNode
-    configurations).
+    Values indicate order of application. Passthrough metric evaluation is applied first as the metric evaluation plan
+    is used to generate the initial dataflow plan. The resulting dataflow plan can be fed into the source scan
+    optimizer.
     """
 
     SOURCE_SCAN = 0
+    PASSTHROUGH_METRIC_EVALUATION = 1
 
     @staticmethod
     def all_optimizations() -> FrozenSet[DataflowPlanOptimization]:
         """Convenience method for getting a set of all available optimizations."""
-        return frozenset((DataflowPlanOptimization.SOURCE_SCAN,))
+        return frozenset(
+            (
+                DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION,
+                DataflowPlanOptimization.SOURCE_SCAN,
+            )
+        )
 
     @staticmethod
     def enabled_optimizations() -> FrozenSet[DataflowPlanOptimization]:
@@ -50,11 +55,14 @@ class DataflowPlanOptimizerFactory:
         """
         self._node_data_set_resolver = node_data_set_resolver
 
-    def get_optimizers(self, optimizations: FrozenSet[DataflowPlanOptimization]) -> Sequence[DataflowPlanOptimizer]:
+    def get_optimizers(self, optimizations: Set[DataflowPlanOptimization]) -> Sequence[DataflowPlanOptimizer]:
         """Initializes and returns a sequence of optimizers matching the input optimization requests."""
         optimizers: List[DataflowPlanOptimizer] = []
         for optimization in sorted(list(optimizations), key=lambda x: x.value):
-            if optimization is DataflowPlanOptimization.SOURCE_SCAN:
+            if optimization is DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION:
+                # This optimization is handled through a separate step in plan generation.
+                pass
+            elif optimization is DataflowPlanOptimization.SOURCE_SCAN:
                 optimizers.append(SourceScanOptimizer())
             else:
                 assert_values_exhausted(optimization)
