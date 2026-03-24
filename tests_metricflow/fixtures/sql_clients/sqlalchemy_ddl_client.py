@@ -43,6 +43,12 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
         create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)})"
 
+        # Doris requires DISTRIBUTED BY clause for explicit CREATE TABLE statements.
+        if self.sql_engine_type is SqlEngine.DORIS:
+            first_col = df.column_descriptions[0].column_name
+            create_stmt += f" DISTRIBUTED BY HASH({first_col}) BUCKETS 1"
+            create_stmt += " PROPERTIES ('replication_num' = '1')"
+
         # Execute CREATE TABLE
         self.execute(create_stmt)
 
@@ -108,6 +114,8 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
+            if self.sql_engine_type is SqlEngine.DORIS:
+                return "VARCHAR(65533)"
             return "text"
         elif column_type is bool:
             return "boolean"
@@ -122,7 +130,7 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
     def _quote_escape_value(self, value: str) -> str:
         """Escape quotes in string values."""
-        if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY):
+        if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY, SqlEngine.DORIS):
             return value.replace("'", "\\'")
         return value.replace("'", "''")
 
@@ -132,5 +140,9 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
         """Drop schema if it exists."""
-        cascade_clause = " CASCADE" if cascade else ""
-        self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")
+        # Doris does not support CASCADE keyword but drops all tables by default.
+        if self.sql_engine_type is SqlEngine.DORIS:
+            self.execute(f"DROP SCHEMA IF EXISTS {schema_name}")
+        else:
+            cascade_clause = " CASCADE" if cascade else ""
+            self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")

@@ -20,8 +20,12 @@ logger = logging.getLogger(__name__)
 def populate_schemas(test_configuration: MetricFlowEngineConfiguration) -> None:  # noqa: D103
     set_engine_env_variables(test_configuration)
 
-    if test_configuration.engine is SqlEngine.DUCKDB or test_configuration.engine is SqlEngine.POSTGRES:
-        # DuckDB & Postgres don't use persistent source schema
+    if (
+        test_configuration.engine is SqlEngine.DUCKDB
+        or test_configuration.engine is SqlEngine.POSTGRES
+        or test_configuration.engine is SqlEngine.DORIS
+    ):
+        # DuckDB, Postgres & Doris don't use persistent source schema
         return None
     elif (
         test_configuration.engine is SqlEngine.SNOWFLAKE

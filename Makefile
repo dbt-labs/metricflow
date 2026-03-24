@@ -87,6 +87,14 @@ populate-persistent-source-schema-snowflake:
 test-trino:
 	hatch -v run trino-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
+.PHONY: test-doris
+test-doris:
+	hatch -v run doris-env:pytest -vv -n $(PARALLELISM) -p tests_metricflow.doris_pytest_plugin $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
+.PHONY: populate-persistent-source-schema-doris
+populate-persistent-source-schema-doris:
+	hatch -v run doris-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)

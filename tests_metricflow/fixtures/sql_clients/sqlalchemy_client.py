@@ -113,14 +113,33 @@ class SqlAlchemyBasedSqlClient:
                 # Execute query - SqlAlchemy automatically starts a transaction
                 result = conn.execute(sa_text(stmt))
 
+                # Doris (MySQL protocol) returns BOOLEAN as TINYINT (0/1).
+                # Capture cursor description before fetchall() clears it.
+                bool_col_indices = []
+                if self._sql_engine_type is SqlEngine.DORIS and result.cursor and hasattr(result.cursor, "description"):
+                    for i, desc in enumerate(result.cursor.description):
+                        # Doris BOOLEAN maps to MySQL FIELD_TYPE.TINY (type_code=1)
+                        # with precision=1. Other TINYINT/EXTRACT results have precision>1.
+                        if desc[1] == 1 and desc[4] == 1:
+                            bool_col_indices.append(i)
+
                 # Fetch all rows
                 rows = result.fetchall()
                 column_names = list(result.keys())
 
                 # Convert to MetricFlowDataTable format
+                raw_rows = [list(row) for row in rows]
+
+                # Convert TINYINT back to Python bool for Doris BOOLEAN columns
+                if bool_col_indices:
+                    for row in raw_rows:
+                        for idx in bool_col_indices:
+                            if row[idx] is not None:
+                                row[idx] = bool(row[idx])
+
                 data_table = MetricFlowDataTable.create_from_rows(
                     column_names=column_names,
-                    rows=[list(row) for row in rows],
+                    rows=raw_rows,
                 )
 
                 # Transaction is automatically rolled back on context exit
@@ -218,6 +237,22 @@ class SqlAlchemyBasedSqlClient:
                     ):
                         raise RuntimeError(f"Databricks dry run failed: {plan_output}")
 
+                elif self._sql_engine_type is SqlEngine.DORIS:
+                    # Doris supports EXPLAIN for SELECT but not for DDL (CREATE TABLE AS, etc.).
+                    # For DDL, extract the SELECT portion and explain that instead.
+                    stmt_upper = stmt.strip().upper()
+                    if stmt_upper.startswith("CREATE"):
+                        # Find the AS keyword that precedes the SELECT
+                        as_idx = stmt_upper.find(" AS ")
+                        if as_idx != -1:
+                            select_part = stmt[as_idx + 4:]
+                            conn.execute(sa_text(f"EXPLAIN {select_part}"))
+                        else:
+                            # Pure DDL without SELECT - just validate syntax isn't possible
+                            # via EXPLAIN, so we do nothing
+                            pass
+                    else:
+                        conn.execute(sa_text(f"EXPLAIN {stmt}"))
                 else:
                     # Default: Use EXPLAIN for other engines
                     conn.execute(sa_text(f"EXPLAIN {stmt}"))

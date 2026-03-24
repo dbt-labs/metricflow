@@ -1,0 +1,3 @@
+# pydoris requires mysqlclient as its DBAPI driver
+mysqlclient>=2.1.0,<3
+pydoris>=1.2.0
