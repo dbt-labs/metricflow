@@ -7,8 +7,6 @@ from collections.abc import Set
 from functools import cached_property
 from typing import Mapping, Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -53,6 +51,7 @@ from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import Metric
 from metricflow_semantics.toolkit.mf_graph.path_finding.traversal_profile_differ import TraversalProfileDiffer
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

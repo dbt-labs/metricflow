@@ -4,7 +4,6 @@ import logging
 from typing import List, Optional, Sequence
 
 import jinja2
-
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter, WhereFilterIntersection
 from metricflow_semantics.errors.error_classes import RenderSqlTemplateException

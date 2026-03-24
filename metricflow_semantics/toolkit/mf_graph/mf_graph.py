@@ -10,8 +10,6 @@ from abc import ABC, abstractmethod
 from functools import cached_property
 from typing import ClassVar, Generic, Optional, TypeVar
 
-from typing_extensions import Self, override
-
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.comparable import Comparable
@@ -36,6 +34,7 @@ from metricflow_semantics.toolkit.mf_logging.pretty_formatter import (
     PrettyFormatContext,
 )
 from metricflow_semantics.toolkit.mf_type_aliases import Pair
+from typing_extensions import Self, override
 
 logger = logging.getLogger(__name__)
 

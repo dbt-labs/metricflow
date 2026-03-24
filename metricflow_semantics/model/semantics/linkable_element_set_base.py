@@ -7,8 +7,6 @@ from abc import ABC, abstractmethod
 from functools import cached_property
 from typing import Iterable, Optional, Sequence, Tuple
 
-from typing_extensions import Self
-
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
@@ -29,6 +27,7 @@ from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSe
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from typing_extensions import Self
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName

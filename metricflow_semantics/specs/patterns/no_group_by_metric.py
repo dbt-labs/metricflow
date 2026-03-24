@@ -3,13 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Sequence
 
-from typing_extensions import override
-
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_set import group_specs_by_type
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

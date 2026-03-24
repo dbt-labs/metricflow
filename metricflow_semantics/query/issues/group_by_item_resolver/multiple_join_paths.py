@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
-from typing_extensions import override
-
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -15,6 +13,7 @@ from metricflow_semantics.query.issues.issues_base import (
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

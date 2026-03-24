@@ -4,8 +4,6 @@ import logging
 from collections.abc import Mapping
 from functools import cached_property
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import SemanticModel
 from dbt_semantic_interfaces.type_enums import DimensionType, TimeGranularity
@@ -15,6 +13,7 @@ from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_non_none_or_raise
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

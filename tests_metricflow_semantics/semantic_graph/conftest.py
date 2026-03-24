@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 
 import pytest
-
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from metricflow_semantics.test_helpers.synthetic_manifest.semantic_manifest_generator import SyntheticManifestGenerator

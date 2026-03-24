@@ -24,6 +24,7 @@ from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 from metricflow_semantics.toolkit.time_helpers import PrettyDuration
+
 from tests_metricflow_semantics.semantic_graph.sg_fixtures import SemanticGraphTestFixture
 
 logger = logging.getLogger(__name__)

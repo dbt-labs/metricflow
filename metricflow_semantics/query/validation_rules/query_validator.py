@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from typing_extensions import override
-
 from metricflow_semantics.query.group_by_item.candidate_push_down.push_down_visitor import DagTraversalPathTracker
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
@@ -25,6 +23,7 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.si
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
+from typing_extensions import override
 
 
 class PostResolutionQueryValidator:

@@ -4,9 +4,8 @@ import html
 import logging
 from enum import Enum
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

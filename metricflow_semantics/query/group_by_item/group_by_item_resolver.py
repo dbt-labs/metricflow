@@ -4,8 +4,6 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import TimeDimensionCallParameterSet
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
@@ -41,6 +39,7 @@ from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

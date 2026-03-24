@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 from metricflow_semantics.sql.sql_table import SqlTable
 
 

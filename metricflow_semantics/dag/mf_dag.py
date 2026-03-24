@@ -10,14 +10,13 @@ from dataclasses import dataclass
 from typing import Any, Generic, Optional, Sequence, Tuple, TypeVar
 
 import jinja2
-from typing_extensions import override
-
 from metricflow_semantics.dag.dag_to_text import MetricFlowDagTextFormatter
 from metricflow_semantics.dag.id_prefix import IdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

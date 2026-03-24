@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 
 import pytest
-
 from metricflow_semantics.test_helpers.performance.performance_helpers import assert_performance_factor
 from metricflow_semantics.toolkit.string_helpers import mf_dedent, mf_newline_join
+
 from tests_metricflow_semantics.toolkit.singleton_test_classes import (
     PATH_TO_SINGLETON_TEST_CLASS_PY_FILE,
     SingletonIdElement,

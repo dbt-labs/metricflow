@@ -6,9 +6,8 @@ import time
 from contextlib import contextmanager
 from typing import Callable, Iterator, TypeVar
 
-from typing_extensions import ParamSpec
-
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import ParamSpec
 
 logger = logging.getLogger(__name__)
 

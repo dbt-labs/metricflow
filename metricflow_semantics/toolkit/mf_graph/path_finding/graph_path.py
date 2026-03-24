@@ -6,13 +6,12 @@ from collections.abc import Sequence, Set
 from dataclasses import dataclass
 from typing import Generic, Optional, Sized, TypeVar
 
-from typing_extensions import Self, override
-
 from metricflow_semantics.toolkit.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraphEdge, MetricFlowGraphNode
 from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
+from typing_extensions import Self, override
 
 logger = logging.getLogger(__name__)
 

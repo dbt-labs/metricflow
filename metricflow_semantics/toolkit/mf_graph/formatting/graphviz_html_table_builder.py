@@ -4,8 +4,6 @@ import html
 from contextlib import contextmanager
 from typing import Iterator, Optional
 
-from typing_extensions import Self
-
 from metricflow_semantics.toolkit.mf_graph.formatting.graphviz_html import (
     GraphvizHtmlAlignment,
     GraphvizHtmlText,
@@ -13,6 +11,7 @@ from metricflow_semantics.toolkit.mf_graph.formatting.graphviz_html import (
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from typing_extensions import Self
 
 
 class GraphvizHtmlTableBuilder:

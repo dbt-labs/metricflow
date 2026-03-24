@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator

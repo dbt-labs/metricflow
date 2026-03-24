@@ -4,7 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
@@ -17,6 +16,7 @@ from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifest
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
+
 from tests_metricflow_semantics.model.modify.modify_manifest import modify_manifest
 from tests_metricflow_semantics.model.modify.modify_metric_filter import ModifyMetricFilterTransform
 

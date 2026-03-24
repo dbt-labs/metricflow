@@ -4,14 +4,13 @@ import logging
 import typing
 from typing import Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.errors.error_classes import GraphvizException
 from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
 from metricflow_semantics.toolkit.mf_graph.formatting.mf_to_graphical_dot import (
     MetricFlowGraphToGraphicalDotConverter,
 )
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.toolkit.mf_graph.mf_graph import (

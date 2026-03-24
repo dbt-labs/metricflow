@@ -4,7 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup

@@ -4,7 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from dbt_semantic_interfaces.references import EntityReference, MetricReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup

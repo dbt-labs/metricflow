@@ -10,8 +10,6 @@ from typing import Optional, Sequence
 
 import graphviz
 from graphviz import Digraph
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotEdgeAttributeSet,
     DotGraphAttributeSet,
@@ -23,6 +21,7 @@ from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.toolkit.syntactic_sugar import (
     mf_ensure_mapping,
 )
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.toolkit.mf_graph.mf_graph import (

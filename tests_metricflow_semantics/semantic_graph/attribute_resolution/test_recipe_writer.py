@@ -4,7 +4,6 @@ import logging
 
 import tabulate
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.naming.keywords import DUNDER
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (

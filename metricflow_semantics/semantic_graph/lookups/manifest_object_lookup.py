@@ -6,9 +6,6 @@ from enum import Enum
 from functools import cached_property
 from typing import Iterable, Mapping, Optional, Sequence
 
-from more_itertools import peekable
-from typing_extensions import override
-
 from dbt_semantic_interfaces.protocols import Metric, SemanticManifest, SemanticModel
 from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
@@ -25,6 +22,8 @@ from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import Attr
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple, Pair, T
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item, mf_flatten
+from more_itertools import peekable
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

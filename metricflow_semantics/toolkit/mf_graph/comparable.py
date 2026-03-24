@@ -6,10 +6,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Union
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.comparison_helpers import ComparisonOtherType, SupportsLessThan
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

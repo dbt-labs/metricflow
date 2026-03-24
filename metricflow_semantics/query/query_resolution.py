@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Sized, Tuple
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -16,6 +14,7 @@ from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import Metr
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

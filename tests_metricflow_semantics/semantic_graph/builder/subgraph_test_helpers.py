@@ -4,7 +4,6 @@ import logging
 from typing import Iterable, Optional, Type
 
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.semantic_graph.builder.partial_graph_builder import PartialSemanticGraphBuilder
 from metricflow_semantics.semantic_graph.builder.subgraph_generator import (
@@ -17,6 +16,7 @@ from metricflow_semantics.semantic_graph.sg_interfaces import (
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration
 from metricflow_semantics.test_helpers.svg_snapshot import write_svg_snapshot_for_review
 from metricflow_semantics.toolkit.mf_graph.formatting.svg_formatter import SvgFormatter
+
 from tests_metricflow_semantics.helpers.graph_helpers import assert_graph_snapshot_equal
 
 logger = logging.getLogger(__name__)

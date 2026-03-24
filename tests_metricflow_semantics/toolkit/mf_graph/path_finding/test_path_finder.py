@@ -4,7 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
@@ -12,6 +11,7 @@ from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.path_finding.graph_path import MutableGraphPath
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import EdgeCountWeightFunction
+
 from tests_metricflow_semantics.toolkit.mf_graph.flow_graph import (
     FlowEdge,
     FlowGraph,

@@ -10,9 +10,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from io import StringIO
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

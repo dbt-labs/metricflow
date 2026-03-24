@@ -4,10 +4,9 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Generic, Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_graph.mutable_graph import EdgeT, NodeT
 from metricflow_semantics.toolkit.mf_graph.path_finding.graph_path import MutablePathT
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

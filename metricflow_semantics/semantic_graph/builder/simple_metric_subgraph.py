@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from typing_extensions import override
-
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )
@@ -21,6 +19,7 @@ from metricflow_semantics.semantic_graph.nodes.entity_nodes import (
 from metricflow_semantics.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
 )
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

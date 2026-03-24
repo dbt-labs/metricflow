@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Union
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.protocols import ProtocolHint
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
@@ -30,6 +28,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     SpecPatternParameterSet,
 )
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

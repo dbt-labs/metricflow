@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Sequence
 
 import pytest
-
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.metric_scheme import MetricNamingScheme
 from metricflow_semantics.specs.dimension_spec import DimensionSpec

@@ -5,8 +5,6 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
 
-from typing_extensions import Optional, override
-
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStepProvider,
@@ -25,6 +23,7 @@ from metricflow_semantics.toolkit.mf_graph.mutable_graph import MutableGraph
 from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from typing_extensions import Optional, override
 
 logger = logging.getLogger(__name__)
 

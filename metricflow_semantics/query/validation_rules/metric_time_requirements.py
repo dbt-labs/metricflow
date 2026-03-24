@@ -3,8 +3,6 @@ from __future__ import annotations
 import typing
 from typing import List, Sequence
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import Metric, WhereFilterIntersection
 from dbt_semantic_interfaces.references import (
@@ -29,6 +27,7 @@ from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import Res
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.toolkit.collections.ordered_set import OrderedSet
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult, ResolveMetricsResult

@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Optional, Sequence, Tuple
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import (
     TimeDimensionCallParameterSet,
 )
@@ -23,6 +21,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from metricflow_semantics.specs.where_filter.where_filter_dimension import WhereFilterDimension
+from typing_extensions import override
 
 
 class WhereFilterTimeDimension(WhereFilterDimension):

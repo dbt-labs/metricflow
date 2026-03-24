@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
+from typing_extensions import override
 
 
 class ModifyMetricFilterTransform(SemanticManifestTransformRule[PydanticSemanticManifest]):

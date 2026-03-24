@@ -5,8 +5,6 @@ from collections import defaultdict
 from functools import cached_property
 from typing import Iterable, Mapping, Optional, Sequence
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import Metric, SemanticModel
 from dbt_semantic_interfaces.type_enums import DimensionType, MetricType, TimeGranularity
@@ -20,6 +18,7 @@ from metricflow_semantics.semantic_graph.lookups.model_object_lookup import Mode
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

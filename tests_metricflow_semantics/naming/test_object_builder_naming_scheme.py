@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Sequence
 
 import pytest
-
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from dbt_semantic_interfaces.type_enums.date_part import DatePart

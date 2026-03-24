@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Optional, Sequence
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import (
     EntityCallParameterSet,
 )
@@ -21,6 +19,7 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
+from typing_extensions import override
 
 
 class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):

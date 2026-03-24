@@ -5,8 +5,6 @@ import logging
 from collections import defaultdict
 from typing import Dict, List, Optional, Sequence, Set, Union
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import JinjaCallParameterSets, MetricCallParameterSet
 from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
 from dbt_semantic_interfaces.protocols import WhereFilter
@@ -53,6 +51,7 @@ from metricflow_semantics.query.issues.issues_base import (
 )
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

@@ -8,8 +8,6 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Iterable
 
-from typing_extensions import override
-
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
@@ -27,6 +25,7 @@ from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import Metric
 from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.toolkit.singleton import Singleton
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

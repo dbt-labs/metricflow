@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from enum import Enum
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import Metric
 from dbt_semantic_interfaces.type_enums import MetricType
@@ -36,6 +34,7 @@ from metricflow_semantics.semantic_graph.sg_interfaces import (
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

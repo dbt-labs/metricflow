@@ -4,7 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser

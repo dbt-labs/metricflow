@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from typing import List, Sequence, Set
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
@@ -12,6 +10,7 @@ from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolut
 from metricflow_semantics.query.issues.parsing.duplicate_column_names import DuplicateOutputColumnIssue
 from metricflow_semantics.query.validation_rules.base_validation_rule import PostResolutionQueryValidationRule
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

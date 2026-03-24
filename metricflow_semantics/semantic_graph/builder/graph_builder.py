@@ -4,8 +4,6 @@ import logging
 from collections.abc import Sequence
 from typing import Type
 
-from typing_extensions import override
-
 from metricflow_semantics.semantic_graph.builder.categorical_dimension_subgraph import (
     CategoricalDimensionSubgraphGenerator,
 )
@@ -27,6 +25,7 @@ from metricflow_semantics.semantic_graph.sg_interfaces import MutableSemanticGra
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

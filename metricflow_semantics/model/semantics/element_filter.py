@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import FrozenSet, Iterable, Optional
 
-from typing_extensions import Self, override
-
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.merger import Mergeable
+from typing_extensions import Self, override
 
 
 @fast_frozen_dataclass()

@@ -4,9 +4,8 @@ import logging
 from functools import cached_property
 from typing import Any, Callable, Mapping, Union
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat_dict
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

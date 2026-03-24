@@ -4,8 +4,6 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple, Union
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
@@ -22,6 +20,7 @@ from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

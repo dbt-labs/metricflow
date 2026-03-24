@@ -5,7 +5,6 @@ from typing import Dict
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -17,6 +16,7 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.qu
 )
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
+
 from tests_metricflow_semantics.query.group_by_item.conftest import AmbiguousResolutionQueryId
 
 logger = logging.getLogger(__name__)

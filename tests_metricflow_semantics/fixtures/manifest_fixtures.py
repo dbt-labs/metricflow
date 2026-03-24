@@ -4,7 +4,6 @@ import logging
 from typing import Dict
 
 import pytest
-
 from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver

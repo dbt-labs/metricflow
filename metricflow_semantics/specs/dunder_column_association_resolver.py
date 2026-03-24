@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.column_assoc import (
     ColumnAssociation,
@@ -17,6 +15,7 @@ from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from typing_extensions import override
 
 
 class DunderColumnAssociationResolver(ColumnAssociationResolver):

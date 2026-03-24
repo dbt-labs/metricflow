@@ -5,12 +5,11 @@ from typing import Optional
 
 import dateutil.relativedelta
 from dateutil.relativedelta import relativedelta
-from typing_extensions import override
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.time.time_period import TimePeriodAdjuster
+from typing_extensions import override
 
 
 class DateutilTimePeriodAdjuster(TimePeriodAdjuster):

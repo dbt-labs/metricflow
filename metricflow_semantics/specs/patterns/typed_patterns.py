@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
@@ -24,6 +22,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
     SpecPatternParameterSet,
 )
 from metricflow_semantics.specs.spec_set import group_specs_by_type
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

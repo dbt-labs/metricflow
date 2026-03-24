@@ -3,9 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.merger import Mergeable
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

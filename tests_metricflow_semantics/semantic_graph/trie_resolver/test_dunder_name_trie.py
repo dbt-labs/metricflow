@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.semantic_graph.trie_resolver.dunder_name_descriptor import DunderNameDescriptor

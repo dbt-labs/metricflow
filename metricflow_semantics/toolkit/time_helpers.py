@@ -4,11 +4,10 @@ import logging
 from functools import cached_property
 from typing import Final, Iterable, Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

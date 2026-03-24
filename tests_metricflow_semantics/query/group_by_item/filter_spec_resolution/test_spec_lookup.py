@@ -11,7 +11,6 @@ from typing import Dict, Optional, Sequence
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
@@ -33,6 +32,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
+
 from tests_metricflow_semantics.model.modify.modify_input_metric_filter import ModifyInputMetricFilterTransform
 from tests_metricflow_semantics.model.modify.modify_manifest import modify_manifest
 from tests_metricflow_semantics.model.modify.modify_metric_filter import ModifyMetricFilterTransform

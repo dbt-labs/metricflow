@@ -5,8 +5,6 @@ from abc import ABC
 from functools import cached_property
 from typing import Optional
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
@@ -17,6 +15,7 @@ from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.comparable import Comparable, ComparisonKey
 from metricflow_semantics.toolkit.mf_graph.graph_element import HasDisplayedProperty
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

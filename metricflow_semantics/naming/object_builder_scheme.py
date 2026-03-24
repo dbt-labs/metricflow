@@ -4,8 +4,6 @@ import logging
 import re
 from typing import Optional
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import ParseJinjaObjectException
 from dbt_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser, QueryItemLocation
 from dbt_semantic_interfaces.references import EntityReference
@@ -22,6 +20,7 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 from metricflow_semantics.specs.patterns.metric_pattern import MetricSpecPattern
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.patterns.typed_patterns import DimensionPattern, TimeDimensionPattern
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

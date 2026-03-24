@@ -6,12 +6,11 @@ from collections.abc import Mapping
 from functools import cached_property
 from typing import Iterable
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.protocols import Entity
 from dbt_semantic_interfaces.type_enums import EntityType
 from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet, OrderedSet
 from metricflow_semantics.toolkit.mf_logging.attribute_pretty_format import AttributeMapping, AttributePrettyFormattable
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

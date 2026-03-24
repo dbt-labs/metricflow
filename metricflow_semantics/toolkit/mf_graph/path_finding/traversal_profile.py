@@ -5,10 +5,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

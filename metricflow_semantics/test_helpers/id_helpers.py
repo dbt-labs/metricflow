@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import Generator
 
 import pytest
-
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 
 

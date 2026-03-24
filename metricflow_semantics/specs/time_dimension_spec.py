@@ -4,8 +4,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
 from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
@@ -18,6 +16,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.toolkit.cache.lru_cache import typed_lru_cache
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+from typing_extensions import override
 
 
 class TimeDimensionSpecField(Enum):

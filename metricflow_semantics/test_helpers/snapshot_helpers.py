@@ -12,7 +12,6 @@ from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
 import _pytest.fixtures
 import tabulate
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme

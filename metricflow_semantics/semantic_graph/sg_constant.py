@@ -3,10 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Final, final
 
-from typing_extensions import override
-
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 
 import pytest
-
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
@@ -53,6 +52,7 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec_factory import WhereFilterSpecFactory
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+
 from tests_metricflow_semantics.specs.conftest import EXAMPLE_FILTER_LOCATION
 
 logger = logging.getLogger(__name__)

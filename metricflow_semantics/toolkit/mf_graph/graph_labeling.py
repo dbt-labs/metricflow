@@ -3,9 +3,8 @@ from __future__ import annotations
 from abc import ABC
 from functools import cached_property
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_graph.comparable import Comparable, ComparisonKey
+from typing_extensions import override
 
 
 class MetricFlowGraphLabel(Comparable, ABC):

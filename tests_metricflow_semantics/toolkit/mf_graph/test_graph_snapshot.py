@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+
 from tests_metricflow_semantics.helpers.graph_helpers import assert_graph_snapshot_equal
 from tests_metricflow_semantics.toolkit.mf_graph.flow_graph import FlowGraph
 

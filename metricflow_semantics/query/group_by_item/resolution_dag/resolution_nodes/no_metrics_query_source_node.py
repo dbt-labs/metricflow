@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from typing_extensions import override
-
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import (
     GroupByItemResolutionNode,
@@ -11,6 +9,7 @@ from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.ba
     GroupByItemResolutionNodeVisitor,
 )
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

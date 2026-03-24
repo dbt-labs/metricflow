@@ -5,9 +5,8 @@ import logging
 import typing
 from abc import ABC, abstractmethod
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.table_helpers import IsolatedTabulateRunner
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.test_helpers.performance.profiling import SessionReport

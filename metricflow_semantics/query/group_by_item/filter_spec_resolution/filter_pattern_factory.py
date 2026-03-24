@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,
@@ -17,6 +15,7 @@ from metricflow_semantics.specs.patterns.typed_patterns import (
     GroupByMetricPattern,
     TimeDimensionPattern,
 )
+from typing_extensions import override
 
 
 class WhereFilterPatternFactory(ABC):

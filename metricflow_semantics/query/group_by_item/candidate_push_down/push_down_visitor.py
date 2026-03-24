@@ -6,8 +6,6 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Dict, Iterator, List, Optional, Sequence
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols import Metric
 from dbt_semantic_interfaces.references import MetricReference
@@ -58,6 +56,7 @@ from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat, mf_pformat_dict
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver

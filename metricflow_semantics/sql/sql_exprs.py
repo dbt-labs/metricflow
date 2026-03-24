@@ -8,8 +8,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, Generic, List, Mapping, Optional, Sequence, Tuple
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
@@ -23,6 +21,7 @@ from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
+from typing_extensions import override
 
 
 @dataclass(frozen=True, eq=False)

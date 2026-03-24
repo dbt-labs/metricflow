@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Dict, Optional, Sequence
 
 import pytest
-
 from dbt_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
@@ -17,6 +16,7 @@ from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamin
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.group_by_item.resolution_dag.dag_builder import GroupByItemResolutionDagBuilder
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+
 from tests_metricflow_semantics.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
 
 

@@ -4,7 +4,6 @@ import logging
 import re
 
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.performance.profiling import PerformanceTracker
 from metricflow_semantics.test_helpers.performance.report_formatter import TableTextFormatter

@@ -4,14 +4,13 @@ import logging
 import time
 from typing import Iterable, Type
 
-from typing_extensions import override
-
 from metricflow_semantics.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
 )
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.sg_interfaces import MutableSemanticGraph, SemanticGraph
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

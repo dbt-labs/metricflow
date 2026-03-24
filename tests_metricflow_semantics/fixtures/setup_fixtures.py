@@ -5,7 +5,6 @@ import logging
 import _pytest.config
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     DISPLAY_SNAPSHOTS_CLI_FLAG,
@@ -13,6 +12,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     add_display_snapshots_cli_flag,
     add_overwrite_snapshots_cli_flag,
 )
+
 from tests_metricflow_semantics import TESTS_METRICFLOW_SEMANTICS_DIRECTORY_ANCHOR
 
 logger = logging.getLogger(__name__)

@@ -7,8 +7,6 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import ClassVar, DefaultDict, Iterable, Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotColor,
@@ -44,6 +42,7 @@ from metricflow_semantics.toolkit.string_helpers import mf_indent
 from metricflow_semantics.toolkit.syntactic_sugar import (
     mf_ensure_mapping,
 )
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

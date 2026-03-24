@@ -3,10 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
-from typing_extensions import override
-
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

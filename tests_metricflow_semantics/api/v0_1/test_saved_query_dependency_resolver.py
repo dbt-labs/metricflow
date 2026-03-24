@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 from dbt_semantic_interfaces.implementations.project_configuration import PydanticProjectConfiguration
 from dbt_semantic_interfaces.implementations.semantic_manifest import (
     PydanticSemanticManifest,

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration

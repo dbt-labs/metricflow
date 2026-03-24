@@ -10,7 +10,6 @@ are not supposed to be doing that anyway that's actually a reasonably handy feat
 from __future__ import annotations
 
 import pytest
-
 from dbt_semantic_interfaces.references import (
     EntityReference,
     SemanticModelReference,

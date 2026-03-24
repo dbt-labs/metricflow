@@ -5,11 +5,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, Tuple
 
-from typing_extensions import override
-
 from metricflow_semantics.dag.mf_dag import DagNode
 from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
+from typing_extensions import override
 
 if TYPE_CHECKING:
     from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.metric_resolution_node import (

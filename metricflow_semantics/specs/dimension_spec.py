@@ -3,12 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import DimensionReference, EntityReference
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

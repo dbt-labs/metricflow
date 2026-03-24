@@ -6,7 +6,6 @@ from typing import Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser

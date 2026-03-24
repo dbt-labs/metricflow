@@ -3,10 +3,9 @@ from __future__ import annotations
 import logging
 import typing
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import MetricFlowGraphFormatter
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
+from typing_extensions import override
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph

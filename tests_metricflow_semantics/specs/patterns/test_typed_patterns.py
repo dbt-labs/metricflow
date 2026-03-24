@@ -4,7 +4,6 @@ import logging
 from typing import Sequence
 
 import pytest
-
 from dbt_semantic_interfaces.call_parameter_sets import (
     DimensionCallParameterSet,
     EntityCallParameterSet,

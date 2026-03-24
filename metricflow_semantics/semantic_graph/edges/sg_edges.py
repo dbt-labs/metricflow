@@ -4,8 +4,6 @@ import logging
 from functools import cached_property
 from typing import Optional
 
-from typing_extensions import override
-
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
 )
@@ -16,6 +14,7 @@ from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.comparable import ComparisonKey
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

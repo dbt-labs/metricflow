@@ -6,10 +6,9 @@ from collections.abc import Hashable, MutableSet, Reversible, Set
 from functools import cached_property
 from typing import Generic, Iterable, Iterator, Optional, TypeVar
 
-from typing_extensions import Self, override
-
 from metricflow_semantics.toolkit.comparison_helpers import ComparisonOtherType
 from metricflow_semantics.toolkit.mf_type_aliases import HashableT, HashableT_co
+from typing_extensions import Self, override
 
 logger = logging.getLogger(__name__)
 

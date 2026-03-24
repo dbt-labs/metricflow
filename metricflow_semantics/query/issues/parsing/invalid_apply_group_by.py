@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Tuple
 
-from typing_extensions import override
-
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -14,6 +12,7 @@ from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import Metr
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import (
     ResolverInputForMetric,
 )
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

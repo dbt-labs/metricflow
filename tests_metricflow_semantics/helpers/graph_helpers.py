@@ -4,7 +4,6 @@ import logging
 from typing import Callable, Optional
 
 from _pytest.fixtures import FixtureRequest
-
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     SnapshotConfiguration,
     assert_str_snapshot_equal,

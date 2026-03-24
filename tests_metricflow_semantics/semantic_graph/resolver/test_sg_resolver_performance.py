@@ -4,8 +4,6 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from typing_extensions import override
-
 from dbt_semantic_interfaces.protocols import SemanticManifest
 from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
@@ -16,6 +14,8 @@ from metricflow_semantics.test_helpers.performance.benchmark_helpers import (
     OneSecondFunction,
     PerformanceBenchmark,
 )
+from typing_extensions import override
+
 from tests_metricflow_semantics.semantic_graph.sg_fixtures import SemanticGraphTestFixture
 
 logger = logging.getLogger(__name__)

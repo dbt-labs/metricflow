@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing_extensions import override
-
 from metricflow_semantics.toolkit.mf_graph.formatting.graph_formatter import (
     MetricFlowGraphFormatter,
 )
@@ -9,6 +7,7 @@ from metricflow_semantics.toolkit.mf_graph.formatting.mf_to_dot import (
     MetricFlowGraphToDotConverter,
 )
 from metricflow_semantics.toolkit.mf_graph.mf_graph import MetricFlowGraph
+from typing_extensions import override
 
 
 class DotNotationFormatter(MetricFlowGraphFormatter):

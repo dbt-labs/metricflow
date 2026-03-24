@@ -3,11 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Tuple
 
-from typing_extensions import override
-
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_dag.resolution_nodes.base_node import GroupByItemResolutionNode
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from typing_extensions import override
 
 
 @dataclass(frozen=True)

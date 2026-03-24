@@ -5,7 +5,6 @@ import os
 from typing import TypeVar
 
 import graphviz
-
 from metricflow_semantics.dag.mf_dag import DagNode, MetricFlowDag
 from metricflow_semantics.toolkit.id_helpers import mf_random_id
 

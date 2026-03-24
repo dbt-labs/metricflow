@@ -32,8 +32,7 @@ inputs:
     default: >-
       {
         "configs": [
-          {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
-          {"hatch_project_directory": "./metricflow-semantics", "hatch_environment_name": "dev-env"}
+          {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"}
         ]
       }
 

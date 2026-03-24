@@ -6,8 +6,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Generic, List, Sequence, Tuple, TypeVar
 
-from typing_extensions import override
-
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from dbt_semantic_interfaces.references import EntityReference, MetricModelReference, SemanticModelElementReference
 from metricflow_semantics.aggregation_properties import AggregationState
@@ -22,6 +20,7 @@ from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInpu
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+from typing_extensions import override
 
 # Type for the specification used in the instance.
 SpecT = TypeVar("SpecT", bound=InstanceSpec)

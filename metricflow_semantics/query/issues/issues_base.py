@@ -5,12 +5,11 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Sequence, Sized, Tuple
 
-from typing_extensions import override
-
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
 from metricflow_semantics.toolkit.merger import Mergeable
+from typing_extensions import override
 
 
 class MetricFlowQueryIssueType(Enum):

@@ -3,11 +3,10 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from typing_extensions import Self, override
-
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_non_none, mf_first_non_none_or_raise
+from typing_extensions import Self, override
 
 logger = logging.getLogger(__name__)
 

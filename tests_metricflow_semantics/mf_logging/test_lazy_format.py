@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import logging
 
-from typing_extensions import override
-
 from metricflow_semantics.test_helpers.recorded_logging_context import RecordingLogHandler, recorded_logging_context
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 logger = logging.getLogger(__name__)
 

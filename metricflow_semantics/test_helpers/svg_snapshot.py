@@ -4,7 +4,6 @@ import logging
 import os
 
 import _pytest.fixtures
-
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration, snapshot_path_prefix
 from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat

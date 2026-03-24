@@ -5,7 +5,6 @@ from dataclasses import asdict
 from typing import Sequence
 
 import pytest
-
 from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from dbt_semantic_interfaces.references import EntityReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
