@@ -140,7 +140,7 @@ def test_merge_two_model_validation_results(list_of_issues: List[ValidationIssue
     assert merged.errors == validation_results.errors + validation_results_dup.errors
 
 
-def test_validate_safely_handles_exceptions():  # noqa: D103
+def test_validate_safely_handles_exceptions() -> None:  # noqa: D103
     @validate_safely("testing validate safely handles exceptions gracefully")
     def checking_validate_safely() -> Sequence[ValidationIssue]:
         raise (Exception("Oh no an exception!"))

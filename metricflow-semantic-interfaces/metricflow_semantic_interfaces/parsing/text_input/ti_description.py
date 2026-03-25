@@ -131,7 +131,7 @@ class QueryItemType(Enum):
     ENTITY = "Entity"
     METRIC = "Metric"
 
-    def __lt__(self, other) -> bool:  # type: ignore[misc]
+    def __lt__(self, other: "QueryItemType") -> bool:
         """Allow for ordering so that a sequence of these can be consistently represented for test snapshots."""
         if self.__class__ is other.__class__:
             return self.value < other.value

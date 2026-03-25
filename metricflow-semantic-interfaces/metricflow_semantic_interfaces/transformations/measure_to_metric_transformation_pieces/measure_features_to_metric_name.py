@@ -25,7 +25,7 @@ class MeasureFeaturesToMetricNameMapper:
     _MetricNameKey = Tuple[str, Optional[int], bool]
     _metric_name_dict: Dict[_MetricNameKey, str]
 
-    def __init__(self):  # noqa: D107
+    def __init__(self) -> None:  # noqa: D107
         self._metric_name_dict = {}
 
     def _get_stored_metric_name(
