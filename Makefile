@@ -105,12 +105,12 @@ trino:
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
-	hatch -v run dev-env:python tests_metricflow/generate_snapshots.py
+	python3 -m scripts.generate_snapshots
 
 # Populate persistent source schemas for all relevant SQL engines.
 .PHONY: populate-persistent-source-schemas
 populate-persistent-source-schemas:
-	hatch -v run dev-env:python $(TESTS_METRICFLOW)/populate_persistent_source_schemas.py
+	python3 -m scripts.populate_persistent_source_schemas
 
 # Sync dbt-semantic-interfaces files to metricflow-semantic-interfaces folder
 .PHONY: sync-dsi
