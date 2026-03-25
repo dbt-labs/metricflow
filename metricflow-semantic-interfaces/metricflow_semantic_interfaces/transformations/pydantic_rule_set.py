@@ -29,6 +29,9 @@ from metricflow_semantic_interfaces.transformations.convert_median import (
 from metricflow_semantic_interfaces.transformations.cumulative_type_params import (
     SetCumulativeTypeParamsRule,
 )
+from metricflow_semantic_interfaces.transformations.fix_proxy_metrics import (
+    FixProxyMetricsRule,
+)
 from metricflow_semantic_interfaces.transformations.flatten_simple_metrics_with_measure_inputs import (
     FlattenSimpleMetricsWithMeasureInputsRule,
 )
@@ -88,6 +91,7 @@ class PydanticSemanticManifestTransformRuleSet(
             AddInputMetricMeasuresRule(),
             FlattenSimpleMetricsWithMeasureInputsRule(),
             ReplaceInputMeasuresWithSimpleMetricsTransformationRule(),
+            FixProxyMetricsRule(),
         )
 
     @property

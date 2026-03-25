@@ -66,6 +66,14 @@ class TimeSpineRule(SemanticManifestValidationRule[SemanticManifestT], Generic[S
             for dimension in semantic_model.dimensions
             if dimension.type_params
         }
+        if len(dimension_granularities) == 0:
+            issues.append(
+                ValidationWarning(
+                    message="No time dimensions configured. To avoid unexpected query errors, configuring a "
+                    "time spine at or below the smallest time dimension granularity is recommended."
+                )
+            )
+            return issues
         smallest_dim_granularity = min(dimension_granularities)
         smallest_time_spine_granularity = min(time_spines_by_granularity.keys())
         if smallest_dim_granularity < smallest_time_spine_granularity:

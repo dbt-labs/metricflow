@@ -37,6 +37,7 @@ from metricflow_semantic_interfaces.type_enums import (
 from metricflow_semantic_interfaces.validations.semantic_manifest_validator import (
     SemanticManifestValidator,
 )
+from metricflow_semantic_interfaces.validations.time_spines import TimeSpineRule
 
 
 def test_valid_time_spines() -> None:  # noqa: D103
@@ -143,6 +144,11 @@ def test_no_time_spine_config() -> None:  # noqa: D103
                         metadata=None,
                         type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.SECOND),
                     )
+                ],
+                measures=[
+                    PydanticMeasure(
+                        name="sum_measure", agg=AggregationType.SUM, agg_time_dimension="dim", create_metric=True
+                    ),
                 ],
                 entities=[PydanticEntity(name="entity", type=EntityType.PRIMARY)],
             ),
@@ -332,3 +338,32 @@ def test_time_spines_with_invalid_names() -> None:  # noqa: D103
         ),
     ]:
         assert msg in error_messages
+
+
+def test_warning_when_no_time_dimensions_configured() -> None:  # noqa: D103
+    validator = SemanticManifestValidator[PydanticSemanticManifest]([TimeSpineRule()])
+    semantic_manifest = PydanticSemanticManifest(
+        semantic_models=[
+            semantic_model_with_guaranteed_meta(
+                name="sm",
+                dimensions=[],
+                measures=[],
+                entities=[PydanticEntity(name="entity", type=EntityType.PRIMARY)],
+            ),
+        ],
+        metrics=[],
+        project_configuration=PydanticProjectConfiguration(
+            time_spine_table_configurations=[],
+            time_spines=[
+                PydanticTimeSpine(
+                    node_relation=PydanticNodeRelation(alias="time_spine", schema_name="schema"),
+                    primary_column=PydanticTimeSpinePrimaryColumn(name="ds", time_granularity=TimeGranularity.DAY),
+                    custom_granularities=[],
+                ),
+            ],
+        ),
+    )
+    issues = validator.validate_semantic_manifest(semantic_manifest)
+    assert not issues.has_blocking_issues
+    assert len(issues.warnings) == 1
+    assert issues.warnings[0].message.startswith("No time dimensions configured. To avoid unexpected query errors,")

@@ -283,8 +283,9 @@ class PydanticMetric(HashableBaseModel, ModelWithMetadataParsing, ProtocolHint[M
         if self.type is MetricType.SIMPLE or self.type is MetricType.CUMULATIVE or self.type is MetricType.CONVERSION:
             return ()
         elif self.type is MetricType.DERIVED:
-            assert self.type_params.metrics is not None, f"{MetricType.DERIVED} should have type_params.metrics set"
-            return self.type_params.metrics
+            # There should always be input metrics for derived metrics, and this gets validated at parse time. Don't
+            # error here for lack of input metrics or it will disrupt the validation flow.
+            return self.type_params.metrics or []
         elif self.type is MetricType.RATIO:
             assert (
                 self.type_params.numerator is not None and self.type_params.denominator is not None

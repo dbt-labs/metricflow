@@ -43,6 +43,16 @@ def simple_semantic_manifest(template_mapping: Dict[str, str]) -> PydanticSemant
 
 
 @pytest.fixture(scope="session")
+def measure_migrated_manifest(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
+    """`simple_semantic_manifest` that has been migrated to replace measures with simple metrics."""
+    model_build_result = parse_directory_of_yaml_files_to_semantic_manifest(
+        os.path.join(os.path.dirname(__file__), "semantic_manifest_yamls/measure_migrated_manifest"),
+        template_mapping=template_mapping,
+    )
+    return model_build_result.semantic_manifest
+
+
+@pytest.fixture(scope="session")
 def simple_semantic_manifest__with_primary_transforms(template_mapping: Dict[str, str]) -> PydanticSemanticManifest:
     """Semantic Manifest used for tests pre-transformations."""
     model_build_result = parse_directory_of_yaml_files_to_semantic_manifest(
