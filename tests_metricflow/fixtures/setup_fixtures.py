@@ -17,11 +17,11 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 )
 from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from tests_metricflow_semantics.fixtures.setup_fixtures import mf_add_slow_marker
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from tests_metricflow import TESTS_METRICFLOW_DIRECTORY_ANCHOR
 from tests_metricflow.table_snapshot.table_snapshots import SqlTableSnapshotHash, SqlTableSnapshotRepository
+from tests_metricflow_semantics.fixtures.setup_fixtures import mf_add_slow_marker
 
 logger = logging.getLogger(__name__)
 
