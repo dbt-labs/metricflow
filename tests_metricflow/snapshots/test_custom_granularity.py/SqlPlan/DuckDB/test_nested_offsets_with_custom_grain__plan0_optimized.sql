@@ -17,15 +17,14 @@ WITH rss_28018_cte AS (
 )
 
 SELECT
-  metric_time__day AS metric_time__day
-  , metric_time__alien_day AS metric_time__alien_day
+  metric_time__alien_day AS metric_time__alien_day
   , 2 * bookings_offset_once AS bookings_offset_twice
 FROM (
   -- Join to Time Spine Dataset
+  -- Select: ['metric_time__alien_day', 'bookings_offset_once']
   SELECT
-    subq_35.metric_time__alien_day AS metric_time__alien_day
-    , subq_31.metric_time__day AS metric_time__day
-    , subq_31.bookings_offset_once AS bookings_offset_once
+    subq_36.metric_time__alien_day AS metric_time__alien_day
+    , subq_32.bookings_offset_once AS bookings_offset_once
   FROM (
     -- Read From CTE For node_id=rss_28018
     -- Change Column Aliases
@@ -36,12 +35,11 @@ FROM (
     FROM rss_28018_cte
     GROUP BY
       ds__alien_day
-  ) subq_35
+  ) subq_36
   INNER JOIN (
     -- Compute Metrics via Expressions
     SELECT
-      metric_time__day
-      , metric_time__alien_day
+      metric_time__alien_day
       , 2 * bookings AS bookings_offset_once
     FROM (
       -- Join to Time Spine Dataset
@@ -49,7 +47,7 @@ FROM (
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
         , rss_28018_cte.ds__alien_day AS metric_time__alien_day
-        , subq_24.__bookings AS bookings
+        , subq_25.__bookings AS bookings
       FROM rss_28018_cte
       INNER JOIN (
         -- Metric Time Dimension 'ds'
@@ -58,28 +56,28 @@ FROM (
         -- Select: ['__bookings', 'metric_time__alien_day', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         SELECT
-          subq_20.alien_day AS metric_time__alien_day
-          , subq_19.ds__day AS metric_time__day
-          , SUM(subq_19.__bookings) AS __bookings
+          subq_21.alien_day AS metric_time__alien_day
+          , subq_20.ds__day AS metric_time__day
+          , SUM(subq_20.__bookings) AS __bookings
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
           SELECT
             1 AS __bookings
             , DATE_TRUNC('day', ds) AS ds__day
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_19
+        ) subq_20
         LEFT OUTER JOIN
-          ***************************.mf_time_spine subq_20
+          ***************************.mf_time_spine subq_21
         ON
-          subq_19.ds__day = subq_20.ds
+          subq_20.ds__day = subq_21.ds
         GROUP BY
-          subq_20.alien_day
-          , subq_19.ds__day
-      ) subq_24
+          subq_21.alien_day
+          , subq_20.ds__day
+      ) subq_25
       ON
-        rss_28018_cte.ds__day - INTERVAL 5 day = subq_24.metric_time__day
-    ) subq_30
-  ) subq_31
+        rss_28018_cte.ds__day - INTERVAL 5 day = subq_25.metric_time__day
+    ) subq_31
+  ) subq_32
   ON
-    subq_35.metric_time__alien_day - INTERVAL 2 day = subq_31.metric_time__alien_day
-) subq_36
+    subq_36.metric_time__alien_day - INTERVAL 2 day = subq_32.metric_time__alien_day
+) subq_38
