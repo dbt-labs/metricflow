@@ -4,7 +4,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from metricflow_semantics.specs.spec_set import group_specs_by_type
@@ -16,6 +15,8 @@ from metricflow_semantics.specs.time_dimension_spec import (
 )
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 
 @dataclass(frozen=True)

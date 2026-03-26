@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Dict, List, Sequence, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -17,6 +16,8 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.toolkit.merger import Mergeable
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.specs.metadata_spec import MetadataSpec

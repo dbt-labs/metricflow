@@ -6,14 +6,15 @@ import re
 from collections.abc import Sequence
 from typing import Optional
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
-from dbt_semantic_interfaces.type_enums import DimensionType, MetricType
 from metricflow_semantics.sql.sql_table import SqlTable
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from metricflow_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
+from metricflow_semantic_interfaces.type_enums import DimensionType, MetricType
 
 logger = logging.getLogger(__name__)
 

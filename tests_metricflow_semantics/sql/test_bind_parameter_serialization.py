@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import pytest
-from dbt_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameter, SqlBindParameterSet, SqlBindParameterValue
+
+from metricflow_semantic_interfaces.dataclass_serialization import DataClassDeserializer, DataclassSerializer
 
 
 @pytest.fixture

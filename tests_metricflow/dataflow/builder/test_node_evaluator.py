@@ -4,8 +4,6 @@ import logging
 from typing import Mapping, Sequence
 
 import pytest
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
@@ -26,6 +24,8 @@ from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)

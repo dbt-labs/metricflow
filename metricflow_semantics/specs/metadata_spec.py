@@ -3,10 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from dbt_semantic_interfaces.naming.keywords import DUNDER
-from dbt_semantic_interfaces.type_enums import AggregationType
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+
+from metricflow_semantic_interfaces.naming.keywords import DUNDER
+from metricflow_semantic_interfaces.type_enums import AggregationType
 
 
 @dataclass(frozen=True)

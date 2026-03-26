@@ -4,8 +4,6 @@ import logging
 
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.naming.keywords import DUNDER
-from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
     AttributeRecipeWriterPath,
     RecipeWriterPathfinder,
@@ -26,6 +24,9 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+
+from metricflow_semantic_interfaces.naming.keywords import DUNDER
+from metricflow_semantic_interfaces.protocols import SemanticManifest
 
 logger = logging.getLogger(__name__)
 

@@ -3,19 +3,20 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
-from dbt_semantic_interfaces.implementations.metric import (
-    PydanticMetric,
-    PydanticMetricAggregationParams,
-    PydanticMetricInput,
-    PydanticMetricTypeParams,
-)
-from dbt_semantic_interfaces.type_enums import AggregationType, MetricType
 from metricflow_semantics.test_helpers.synthetic_manifest.simple_metric_semantic_model_generator import (
     SimpleMetricSemanticModelGenerator,
 )
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
     SyntheticManifestParameterSet,
 )
+
+from metricflow_semantic_interfaces.implementations.metric import (
+    PydanticMetric,
+    PydanticMetricAggregationParams,
+    PydanticMetricInput,
+    PydanticMetricTypeParams,
+)
+from metricflow_semantic_interfaces.type_enums import AggregationType, MetricType
 
 
 @dataclass(frozen=True)

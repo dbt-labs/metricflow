@@ -4,12 +4,13 @@ import typing
 from abc import ABC, abstractmethod
 from typing import Sequence
 
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.resolver_inputs.query_resolver_inputs import ResolverInputForQuery
+
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
+from metricflow_semantic_interfaces.references import MetricReference
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.query.query_resolver import ResolveGroupByItemsResult, ResolveMetricsResult

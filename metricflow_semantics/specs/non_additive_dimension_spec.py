@@ -4,9 +4,6 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -15,6 +12,10 @@ from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums import AggregationType, TimeGranularity
 
 if TYPE_CHECKING:
     from metricflow.dataflow.builder.simple_metric_input_spec_properties import SimpleMetricInputSpecProperties

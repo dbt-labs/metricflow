@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set import (
     GroupByItemSet,
 )
@@ -12,6 +11,8 @@ from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
 
 @dataclass(frozen=True)

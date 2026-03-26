@@ -3,13 +3,6 @@ from __future__ import annotations
 from typing import Dict, Optional, Sequence
 
 import pytest
-from dbt_semantic_interfaces.implementations.filters.where_filter import (
-    PydanticWhereFilter,
-    PydanticWhereFilterIntersection,
-)
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
-from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.naming_scheme import QueryItemNamingScheme
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
@@ -17,6 +10,13 @@ from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByI
 from metricflow_semantics.query.group_by_item.resolution_dag.dag_builder import GroupByItemResolutionDagBuilder
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
+    PydanticWhereFilterIntersection,
+)
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
+from metricflow_semantic_interfaces.references import MetricReference
 from tests_metricflow_semantics.query.group_by_item.ambiguous_resolution_query_id import AmbiguousResolutionQueryId
 
 

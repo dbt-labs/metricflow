@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Mapping
 
 import pytest
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.sql.sql_table import SqlTable
@@ -12,6 +11,7 @@ from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
 

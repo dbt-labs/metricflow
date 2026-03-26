@@ -4,9 +4,6 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -22,6 +19,10 @@ from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilterIntersection
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
 
 
 @fast_frozen_dataclass()

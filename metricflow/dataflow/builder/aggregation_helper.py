@@ -5,7 +5,6 @@ from collections.abc import Mapping, Sequence
 from functools import cached_property
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec, SimpleMetricRecipe
 from metricflow_semantics.toolkit.collections.mapping_helpers import mf_common_keys
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
@@ -14,6 +13,8 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_formattable import MetricFlowPrettyFormattable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
 
 logger = logging.getLogger(__name__)
 

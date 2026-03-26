@@ -12,7 +12,7 @@ from tests_metricflow_semantic_interfaces.example_project_configuration import E
 
 
 def test_interfaces_version_matches() -> None:
-    """Test that the interfaces_version property returns the installed version of dbt_semantic_interfaces."""
+    """Test that the interfaces_version property returns the installed version of metricflow."""
     semantic_manifest = PydanticSemanticManifest(
         semantic_models=[],
         metrics=[],
@@ -20,7 +20,7 @@ def test_interfaces_version_matches() -> None:
     )
 
     # get the actual installed version
-    installed_version = version("dbt_semantic_interfaces")
+    installed_version = version("metricflow")
     assert semantic_manifest.project_configuration.dsi_package_version == PydanticSemanticVersion.create_from_string(
         installed_version
     )

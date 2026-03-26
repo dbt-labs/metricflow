@@ -3,14 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    DimensionCallParameterSet,
-    EntityCallParameterSet,
-    MetricCallParameterSet,
-    TimeDimensionCallParameterSet,
-)
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -23,6 +15,15 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 )
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    DimensionCallParameterSet,
+    EntityCallParameterSet,
+    MetricCallParameterSet,
+    TimeDimensionCallParameterSet,
+)
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 
 
 @dataclass(frozen=True)

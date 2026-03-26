@@ -8,7 +8,6 @@ from collections.abc import Set
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference, SemanticModelReference
 from metricflow_semantics.errors.error_classes import InvalidManifestException
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
@@ -73,6 +72,8 @@ from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedS
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
+
+from metricflow_semantic_interfaces.references import MetricReference, SemanticModelReference
 
 logger = logging.getLogger(__name__)
 

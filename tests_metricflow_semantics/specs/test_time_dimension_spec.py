@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec, TimeDimensionSpecField
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
+
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

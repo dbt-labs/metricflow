@@ -3,7 +3,6 @@ from __future__ import annotations
 import traceback
 from dataclasses import dataclass
 
-from dbt_semantic_interfaces.protocols import WhereFilter
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -12,6 +11,8 @@ from metricflow_semantics.query.issues.issues_base import (
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.protocols import WhereFilter
 
 
 @dataclass(frozen=True)

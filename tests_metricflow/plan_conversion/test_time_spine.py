@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import textwrap
 
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 
 def test_date_spine_date_range(  # noqa: D103

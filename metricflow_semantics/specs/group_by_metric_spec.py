@@ -3,13 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Optional, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import EntityReference, GroupByMetricReference
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpecVisitor, LinkableInstanceSpec
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.references import EntityReference, GroupByMetricReference
 
 
 @dataclass(frozen=True)

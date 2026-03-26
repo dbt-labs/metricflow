@@ -8,10 +8,6 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_param_implementations import TimeDimensionParameter
@@ -24,6 +20,10 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 metric_time_with_custom_grain = TimeDimensionSpec(

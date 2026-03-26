@@ -4,8 +4,6 @@ import logging
 from functools import cached_property
 from typing import Optional, Set
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -18,6 +16,9 @@ from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSe
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
+
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
 logger = logging.getLogger(__name__)
 

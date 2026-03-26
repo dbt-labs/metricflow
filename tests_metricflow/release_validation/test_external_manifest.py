@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.release_validation.explain_results_snapshot import assert_explain_tester_results_equal
 from tests_metricflow.release_validation.explain_runner import ExplainQueryStatus

@@ -4,7 +4,6 @@ import logging
 from collections.abc import Mapping
 from typing import Callable, Iterable, Optional, Sequence
 
-from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
@@ -25,6 +24,7 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 from metricflow_semantics.toolkit.time_helpers import PrettyDuration
 
+from metricflow_semantic_interfaces.references import MetricReference
 from tests_metricflow_semantics.semantic_graph.sg_fixtures import SemanticGraphTestFixture
 
 logger = logging.getLogger(__name__)

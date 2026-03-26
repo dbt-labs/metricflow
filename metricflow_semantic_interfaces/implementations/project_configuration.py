@@ -41,4 +41,4 @@ class PydanticProjectConfiguration(HashableBaseModel, ModelWithMetadataParsing, 
         """Returns the version of the dbt_semantic_interfaces package that generated this manifest."""
         if value is not None and value != UNKNOWN_VERSION_SENTINEL:
             return value
-        return PydanticSemanticVersion.create_from_string(version("dbt_semantic_interfaces"))
+        return PydanticSemanticVersion.create_from_string(version("metricflow"))

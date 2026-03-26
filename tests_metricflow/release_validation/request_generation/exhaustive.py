@@ -4,11 +4,6 @@ import itertools
 from collections import defaultdict
 from typing import Mapping, Sequence
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.protocols import SemanticManifest
-from dbt_semantic_interfaces.references import MetricReference
-from dbt_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -26,6 +21,11 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.protocols import SemanticManifest
+from metricflow_semantic_interfaces.references import MetricReference
+from metricflow_semantic_interfaces.type_enums import MetricType
 from tests_metricflow.release_validation.request_generation.request_generator import MetricFlowRequestGenerator
 
 

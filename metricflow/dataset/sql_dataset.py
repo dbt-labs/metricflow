@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums import DatePart
 from metricflow_semantics.instances import EntityInstance, InstanceSet, MdoInstance, TimeDimensionInstance
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -19,6 +17,8 @@ from metricflow.sql.sql_plan import (
     SqlPlanNode,
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference
+from metricflow_semantic_interfaces.type_enums import DatePart
 
 
 class SqlDataSet(DataSet):

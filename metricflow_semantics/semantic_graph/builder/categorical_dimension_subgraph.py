@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.semantic_graph.builder.subgraph_generator import (
     SemanticSubgraphGenerator,
 )
@@ -23,6 +21,9 @@ from metricflow_semantics.semantic_graph.sg_interfaces import (
     SemanticGraphEdge,
 )
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import DimensionType
 
 logger = logging.getLogger(__name__)
 

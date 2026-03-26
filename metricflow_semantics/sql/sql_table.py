@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
-from dbt_semantic_interfaces.protocols.node_relation import NodeRelation
+from metricflow_semantic_interfaces.protocols.node_relation import NodeRelation
 
 
 class SqlTableType(Enum):  # noqa: D101

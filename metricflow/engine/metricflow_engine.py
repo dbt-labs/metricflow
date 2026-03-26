@@ -8,17 +8,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import (
-    DimensionReference,
-    EntityReference,
-    MetricReference,
-    SemanticModelElementReference,
-)
-from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import (
     ExecutionException,
@@ -85,6 +74,17 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.elements.dimension import PydanticDimensionTypeParams
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.references import (
+    DimensionReference,
+    EntityReference,
+    MetricReference,
+    SemanticModelElementReference,
+)
+from metricflow_semantic_interfaces.type_enums import DimensionType
 
 logger = logging.getLogger(__name__)
 _telemetry_reporter = TelemetryReporter(report_levels_higher_or_equal_to=TelemetryLevel.USAGE)

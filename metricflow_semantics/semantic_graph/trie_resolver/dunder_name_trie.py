@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Iterable, Optional, Sequence
 
-from dbt_semantic_interfaces.naming.keywords import DUNDER
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
@@ -18,6 +17,8 @@ from metricflow_semantics.toolkit.collections.mapping_helpers import mf_common_k
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from typing_extensions import Self, override
+
+from metricflow_semantic_interfaces.naming.keywords import DUNDER
 
 logger = logging.getLogger(__name__)
 

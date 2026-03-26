@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
-from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
@@ -14,6 +12,8 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.references import EntityReference
 from tests_metricflow.dataflow.optimizer.source_scan.source_scan_optimizer_helpers import check_source_scan_optimization
 
 logger = logging.getLogger(__name__)

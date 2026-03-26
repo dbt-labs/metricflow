@@ -9,10 +9,6 @@ from typing import List, Mapping, Optional, Sequence, Tuple
 import jinja2
 import pytest
 from dateutil import parser
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.protocols.query_parameter import DimensionOrEntityQueryParameter
 from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, TimeDimensionParameter
 from metricflow_semantics.sql.sql_exprs import (
@@ -37,6 +33,10 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.integration.configured_test_case import (
     CONFIGURED_INTEGRATION_TESTS_REPOSITORY,

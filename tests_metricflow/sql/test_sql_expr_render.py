@@ -6,8 +6,6 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
     SqlBetweenExpression,
@@ -34,6 +32,8 @@ from metricflow_semantics.sql.sql_exprs import (
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.sql.render.expr_renderer import DefaultSqlExpressionRenderer
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 
 logger = logging.getLogger(__name__)
