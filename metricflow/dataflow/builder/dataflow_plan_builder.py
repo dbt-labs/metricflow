@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import logging
 import time
 from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple, Union
@@ -818,7 +819,9 @@ class DataflowPlanBuilder:
 
         # For ratio / derived metrics with time offset, apply offset join here. Constraints will be applied after the offset
         # to avoid filtering out values that will be changed.
-        queried_agg_time_dimension_specs = FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
+        queried_agg_time_dimension_specs: FrozenOrderedSet[TimeDimensionSpec] = FrozenOrderedSet(
+            queried_linkable_specs.time_dimension_specs
+        ).intersection(
             self._metric_lookup.get_aggregation_time_dimension_specs(
                 metric_reference=metric_spec.reference,
             )
@@ -1684,6 +1687,7 @@ class DataflowPlanBuilder:
             custom_offset_window=metric_spec.custom_offset_window,
             join_on_time_dimension_spec=join_spec,
         )
+
         output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
             metric_source_node=metric_source_node,
             time_spine_node=time_spine_node,
@@ -1693,6 +1697,26 @@ class DataflowPlanBuilder:
             offset_to_grain=metric_spec.offset_to_grain,
             join_type=SqlJoinType.INNER,
         )
+        # The `JoinToTimeSpineNode` required base grains for `queried_agg_time_dimension_specs` to be present in
+        # the output of `metric_source_node` to do the join. Because the `JoinToTimeSpineNode` passes those to the
+        # output, they need to be removed if they were not in the query.
+        # Some additional work is needed to consolidate handling of time offset query flow.
+        base_grains_for_queried_agg_time_dimension_specs = set(
+            spec.with_base_grain() for spec in queried_agg_time_dimension_specs
+        )
+        specs_added_to_output = base_grains_for_queried_agg_time_dimension_specs.difference(
+            queried_agg_time_dimension_specs
+        )
+        if specs_added_to_output:
+            output_node = SelectorNode.create(
+                parent_node=output_node,
+                include_specs=InstanceSpecSet.create_from_specs(
+                    itertools.chain(
+                        [metric_spec],
+                        queried_linkable_specs,
+                    )
+                ),
+            )
 
         # TODO: fix bug here where filter specs are being included in when aggregating.
         if len(metric_spec.where_filter_specs) > 0 or time_range_constraint:
@@ -1960,15 +1984,16 @@ class DataflowPlanBuilder:
         time_range_constraint_to_apply = None
         if cumulative_metric_adjusted_time_constraint or before_aggregation_time_spine_join_description:
             time_range_constraint_to_apply = predicate_pushdown_state.time_range_constraint
+        specs_to_keep_for_aggregation = InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,)).merge(
+            InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
+        )
         unaggregated_simple_metric_input_node = self._build_pre_aggregation_plan(
             source_node=unaggregated_simple_metric_input_node,
             join_targets=source_node_recipe.join_targets,
             custom_granularity_specs=custom_granularity_specs_to_join,
             where_filter_specs=simple_metric_recipe.combined_filter_specs,
             time_range_constraint=time_range_constraint_to_apply,
-            specs_to_keep_for_aggregation=InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,)).merge(
-                InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
-            ),
+            specs_to_keep_for_aggregation=specs_to_keep_for_aggregation,
             spec_properties=spec_properties,
             queried_linkable_specs_for_semi_additive_join=queried_linkable_specs,
         )
