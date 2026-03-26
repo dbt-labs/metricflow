@@ -32,6 +32,10 @@ export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
         "engine_url": trino://...",
         "engine_password": "..."
     },
+    "doris": {
+        "engine_url": "doris://...",
+        "engine_password": "..."
+    },
 }
 EOF
 )
@@ -67,6 +71,7 @@ ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
     "databricks": "databricks-env",
     "postgres": "postgres-env",
     "trino": "trino-env",
+    "doris": "doris-env",
 }
 
 ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(
