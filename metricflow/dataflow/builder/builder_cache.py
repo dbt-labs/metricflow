@@ -1,18 +1,39 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
-from typing import Optional
+from typing import Iterable, Optional
 
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
-from metricflow_semantics.specs.where_filter.where_filter_spec_factory import WhereFilterSpecFactory
 from metricflow_semantics.toolkit.cache.lru_cache import LruCache
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
+from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
 from metricflow.dataflow.builder.source_node_recipe import SourceNodeRecipe
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.plan_conversion.node_processor import PredicatePushdownState
+
+logger = logging.getLogger(__name__)
+
+
+@fast_frozen_dataclass()
+class DataflowPlanOptionSet:
+    """Options that affect how a dataflow plan is built."""
+
+    optimizations: frozenset[DataflowPlanOptimization]
+    output_group_by_metric_instances: bool
+
+    def with_output_group_by_metric_instances(self, output_group_by_metric_instances: bool) -> DataflowPlanOptionSet:
+        """Return a copy with an updated `output_group_by_metric_instances` value."""
+        return DataflowPlanOptionSet(
+            optimizations=self.optimizations,
+            output_group_by_metric_instances=output_group_by_metric_instances,
+        )
 
 
 @dataclass(frozen=True)
@@ -22,6 +43,7 @@ class FindSourceNodeRecipeInput:
     simple_metric_input_specs: Optional[AnyLengthTuple[SimpleMetricInputSpec]]
     linkable_spec_set: LinkableSpecSet
     predicate_pushdown_state: PredicatePushdownState
+    optimizations: frozenset[DataflowPlanOptimization]
 
 
 @dataclass(frozen=True)
@@ -35,11 +57,8 @@ class FindSourceNodeRecipeResult:
 class BuildAnyMetricOutputNodeInput:
     """Parameters for `DataflowPlanBuilder._build_any_metric_output_node()`."""
 
-    metric_spec: MetricSpec
-    queried_linkable_specs: LinkableSpecSet
-    filter_spec_factory: WhereFilterSpecFactory
-    predicate_pushdown_state: PredicatePushdownState
-    output_group_by_metric_instances: bool
+    metric_query_descriptor: MetricQueryDescriptor
+    optimizations: frozenset[DataflowPlanOptimization]
 
 
 class DataflowPlanBuilderCache:
@@ -77,3 +96,27 @@ class DataflowPlanBuilderCache:
         self, cache_key: BuildAnyMetricOutputNodeInput, dataflow_plan_node: DataflowPlanNode
     ) -> None:
         self._build_any_metric_output_node_cache.set(cache_key, dataflow_plan_node)
+
+
+@fast_frozen_dataclass()
+class MetricQueryDescriptor:
+    """Describes a metric query to use as a cache key."""
+
+    computed_metric_specs: FrozenOrderedSet[MetricSpec]
+    passthrough_metric_specs: FrozenOrderedSet[MetricSpec]
+    group_by_item_specs: FrozenOrderedSet[LinkableInstanceSpec]
+    predicate_pushdown_state: PredicatePushdownState
+
+    @staticmethod
+    def create(  # noqa: D102
+        computed_metric_specs: Iterable[MetricSpec],
+        passthrough_metric_specs: Iterable[MetricSpec],
+        group_by_item_specs: Iterable[LinkableInstanceSpec],
+        predicate_pushdown_state: PredicatePushdownState,
+    ) -> MetricQueryDescriptor:
+        return MetricQueryDescriptor(
+            computed_metric_specs=FrozenOrderedSet.from_iterable(computed_metric_specs),
+            passthrough_metric_specs=FrozenOrderedSet.from_iterable(passthrough_metric_specs),
+            group_by_item_specs=FrozenOrderedSet.from_iterable(group_by_item_specs),
+            predicate_pushdown_state=predicate_pushdown_state,
+        )

@@ -1,0 +1,44 @@
+test_name: test_cases_with_passthrough_planner[00__simple_metric]
+test_filename: test_passthrough_planner.py
+docstring:
+  Test enumerated cases using the `PassThroughMetricEvaluationPlanner`.
+---
+Query for a simple metric.
+
+  Metric Names: ['booking_value']
+  Group-By Names: ['metric_time']
+  Metric Evaluation Overview:
+    ┌───────┬───────────┬────────────────────┬───────────────────────┬──────────────────┬──────────────────┐
+    │ id    │ src_ids   │ computed_outputs   │ passthrough_outputs   │ source_metrics   │ semantic_model   │
+    ├───────┼───────────┼────────────────────┼───────────────────────┼──────────────────┼──────────────────┤
+    │ smp_0 │           │ booking_value      │                       │                  │ bookings_source  │
+    ├───────┼───────────┼────────────────────┼───────────────────────┼──────────────────┼──────────────────┤
+    │ tpl_0 │ smp_0     │                    │ booking_value         │ booking_value    │                  │
+    └───────┴───────────┴────────────────────┴───────────────────────┴──────────────────┴──────────────────┘
+  Metric Query Output:
+    ┌───────┬──────────────────────────────────────────┬─────────────────────────────────────────────┐
+    │ id    │ output_specs                             │ output_properties                           │
+    ├───────┼──────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ smp_0 │ MetricSpec(element_name='booking_value') │ MetricQueryPropertySet(                     │
+    │       │                                          │   group_by_item_specs=['metric_time__day'], │
+    │       │                                          │   pushdown_enabled_types={                  │
+    │       │                                          │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                          │     CATEGORICAL_DIMENSION,                  │
+    │       │                                          │   },                                        │
+    │       │                                          │ )                                           │
+    ├───────┼──────────────────────────────────────────┼─────────────────────────────────────────────┤
+    │ tpl_0 │ MetricSpec(element_name='booking_value') │ MetricQueryPropertySet(                     │
+    │       │                                          │   group_by_item_specs=['metric_time__day'], │
+    │       │                                          │   pushdown_enabled_types={                  │
+    │       │                                          │     TIME_RANGE_CONSTRAINT,                  │
+    │       │                                          │     CATEGORICAL_DIMENSION,                  │
+    │       │                                          │   },                                        │
+    │       │                                          │ )                                           │
+    └───────┴──────────────────────────────────────────┴─────────────────────────────────────────────┘
+  SQL:
+    SELECT
+      DATE_TRUNC('day', ds) AS metric_time__day
+      , SUM(booking_value) AS booking_value
+    FROM ***************************.fct_bookings bookings_source_src_28000
+    GROUP BY
+      DATE_TRUNC('day', ds)

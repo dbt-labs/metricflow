@@ -25,9 +25,9 @@ FROM (
   -- Join Standard Outputs
   -- Select: ['__listings', 'listing__bookings', 'listing__bookers']
   SELECT
-    subq_37.listing__bookings AS listing__bookings
-    , subq_43.listing__bookers AS listing__bookers
-    , subq_30.__listings AS listings
+    subq_45.listing__bookings AS listing__bookings
+    , subq_51.listing__bookers AS listing__bookers
+    , subq_38.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -35,7 +35,7 @@ FROM (
       listing_id AS listing
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_30
+  ) subq_38
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Select: ['__bookings', 'listing']
@@ -49,9 +49,9 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_37
+  ) subq_45
   ON
-    subq_30.listing = subq_37.listing
+    subq_38.listing = subq_45.listing
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
     -- Select: ['__bookers', 'listing']
@@ -65,8 +65,8 @@ FROM (
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_43
+  ) subq_51
   ON
-    subq_30.listing = subq_43.listing
-) subq_45
+    subq_38.listing = subq_51.listing
+) subq_53
 WHERE listing__bookings > 2 AND listing__bookers > 1

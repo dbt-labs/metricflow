@@ -49,7 +49,17 @@ query_1ee34d0e:
   explain_sql:
     -- Combine Aggregated Outputs
     -- Write to DataTable
-    WITH cm_3_cte AS (
+    WITH sma_10014_cte AS (
+      -- Read Elements From Semantic Model 'listings_latest'
+      -- Metric Time Dimension 'ds'
+      SELECT
+        listing_id AS listing
+        , is_lux AS is_lux_latest
+        , capacity AS capacity_latest
+      FROM default_schema.dim_listings_latest listings_latest_src_10000
+    )
+
+    , cm_3_cte AS (
       -- Constrain Output with WHERE
       -- Select: ['__bookings', 'listing__capacity_latest']
       -- Aggregate Inputs for Simple Metrics
@@ -62,8 +72,8 @@ query_1ee34d0e:
         -- Select: ['__bookings', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
         SELECT
           subq_1.metric_time__day AS metric_time__day
-          , listings_latest_src_10000.is_lux AS listing__is_lux_latest
-          , listings_latest_src_10000.capacity AS listing__capacity_latest
+          , sma_10014_cte.is_lux_latest AS listing__is_lux_latest
+          , sma_10014_cte.capacity_latest AS listing__capacity_latest
           , subq_1.__bookings AS bookings
         FROM (
           -- Read Elements From Semantic Model 'bookings_source'
@@ -75,9 +85,9 @@ query_1ee34d0e:
           FROM default_schema.fct_bookings bookings_source_src_10000
         ) subq_1
         LEFT OUTER JOIN
-          default_schema.dim_listings_latest listings_latest_src_10000
+          sma_10014_cte
         ON
-          subq_1.listing = listings_latest_src_10000.listing_id
+          subq_1.listing = sma_10014_cte.listing
       ) subq_6
       WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
       GROUP BY
@@ -97,8 +107,8 @@ query_1ee34d0e:
         -- Select: ['__views', 'listing__capacity_latest', 'listing__is_lux_latest', 'metric_time__day']
         SELECT
           subq_12.metric_time__day AS metric_time__day
-          , listings_latest_src_10000.is_lux AS listing__is_lux_latest
-          , listings_latest_src_10000.capacity AS listing__capacity_latest
+          , sma_10014_cte.is_lux_latest AS listing__is_lux_latest
+          , sma_10014_cte.capacity_latest AS listing__capacity_latest
           , subq_12.__views AS views
         FROM (
           -- Read Elements From Semantic Model 'views_source'
@@ -110,9 +120,9 @@ query_1ee34d0e:
           FROM default_schema.fct_views views_source_src_10000
         ) subq_12
         LEFT OUTER JOIN
-          default_schema.dim_listings_latest listings_latest_src_10000
+          sma_10014_cte
         ON
-          subq_12.listing = listings_latest_src_10000.listing_id
+          subq_12.listing = sma_10014_cte.listing
       ) subq_16
       WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
       GROUP BY

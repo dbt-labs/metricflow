@@ -26,6 +26,9 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.cyclic_join_manif
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.data_warehouse_validation_manifest import (
     DW_VALIDATION_MANIFEST_ANCHOR,
 )
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.derived_metrics_manifest import (
+    DERIVED_METRICS_MANIFEST_ANCHOR,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.extended_date_manifest import (
     EXTENDED_DATE_MANIFEST_ANCHOR,
 )
@@ -54,9 +57,11 @@ from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
+from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 
 logger = logging.getLogger(__name__)
 
@@ -139,6 +144,11 @@ class SemanticManifestSetup(Enum):
         id_number_space=IdNumberSpace.for_block(11),
         yaml_file_dir=NAME_EDGE_CASE_MANIFEST_ANCHOR.directory,
     )
+    DERIVED_METRICS_MANIFEST = SemanticManifestSetupPropertySet(
+        semantic_manifest_name="derived_metrics_manifest",
+        id_number_space=IdNumberSpace.for_block(12),
+        yaml_file_dir=DERIVED_METRICS_MANIFEST_ANCHOR.directory,
+    )
 
     @property
     def id_number_space(self) -> IdNumberSpace:  # noqa: D102
@@ -165,6 +175,7 @@ class MetricFlowEngineTestFixture:
     read_node_mapping: OrderedDict[str, ReadSqlSourceNode]
     source_node_set: SourceNodeSet
     dataflow_to_sql_converter: DataflowToSqlPlanConverter
+    dataflow_to_execution_converter: DataflowToExecutionPlanConverter
     query_parser: MetricFlowQueryParser
     metricflow_engine: MetricFlowEngine
     source_node_builder: SourceNodeBuilder
@@ -189,6 +200,18 @@ class MetricFlowEngineTestFixture:
         )
         node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
         query_parser = MetricFlowQueryParser(semantic_manifest_lookup=semantic_manifest_lookup)
+
+        dataflow_to_sql_converter = DataflowToSqlPlanConverter(
+            column_association_resolver=column_association_resolver,
+            semantic_manifest_lookup=semantic_manifest_lookup,
+        )
+
+        dataflow_to_execution_converter = DataflowToExecutionPlanConverter(
+            sql_plan_converter=dataflow_to_sql_converter,
+            sql_plan_renderer=sql_client.sql_plan_renderer,
+            sql_client=sql_client,
+            sql_optimization_level=SqlOptimizationLevel.default_level(),
+        )
         return MetricFlowEngineTestFixture(
             semantic_manifest=semantic_manifest,
             manifest_object_lookup=manifest_object_lookup,
@@ -198,10 +221,8 @@ class MetricFlowEngineTestFixture:
             read_node_mapping=read_node_mapping,
             source_node_set=source_node_set,
             _node_output_resolver=node_output_resolver,
-            dataflow_to_sql_converter=DataflowToSqlPlanConverter(
-                column_association_resolver=column_association_resolver,
-                semantic_manifest_lookup=semantic_manifest_lookup,
-            ),
+            dataflow_to_sql_converter=dataflow_to_sql_converter,
+            dataflow_to_execution_converter=dataflow_to_execution_converter,
             query_parser=query_parser,
             metricflow_engine=MetricFlowEngine(
                 semantic_manifest_lookup=semantic_manifest_lookup,

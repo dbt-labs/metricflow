@@ -36,13 +36,13 @@ perf-compare:
 # Testing and linting
 .PHONY: test
 test:
-	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) -m "not slow" $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: test-include-slow
 test-include-slow:
 	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_DBT_METRICFLOW)/
-	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 .PHONY: test-postgresql
@@ -113,12 +113,12 @@ trino:
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
-	hatch -v run dev-env:python tests_metricflow/generate_snapshots.py
+	python3 -m scripts.generate_snapshots
 
 # Populate persistent source schemas for all relevant SQL engines.
 .PHONY: populate-persistent-source-schemas
 populate-persistent-source-schemas:
-	hatch -v run dev-env:python $(TESTS_METRICFLOW)/populate_persistent_source_schemas.py
+	python3 -m scripts.populate_persistent_source_schemas
 
 # Sync dbt-semantic-interfaces files to metricflow-semantic-interfaces folder
 .PHONY: sync-dsi
@@ -141,7 +141,7 @@ testx-snap:
 .PHONY: test-snap-slow
 test-snap-slow:
 	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_DBT_METRICFLOW)/
-	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW)/
 
 .PHONY: test-build-packages

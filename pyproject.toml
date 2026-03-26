@@ -35,42 +35,34 @@ path = "metricflow/__about__.py"
 
 [tool.hatch.metadata.hooks.requirements_txt]
 files = [
-  "metricflow-semantics/requirements-files/requirements.txt",
   "requirements-files/requirements.txt",
 ]
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 dev-env-requirements = [
-  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
 ]
 postgres-env-requirements = [
-  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-postgres.txt",
 ]
 bigquery-env-requirements = [
-  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-bigquery.txt",
 ]
 databricks-env-requirements = [
-  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-databricks.txt",
 ]
 redshift-env-requirements = [
-  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-redshift.txt",
 ]
 snowflake-env-requirements = [
-  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-snowflake.txt",
 ]
 trino-env-requirements = [
-  "metricflow-semantics/requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-trino.txt",
 ]
@@ -89,14 +81,14 @@ Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
 # There are files that hatch will always include as well (e.g. the LICENSE file).
 # See hatch build docs for more details.
 [tool.hatch.build.targets.sdist]
-packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
+packages = ["metricflow", "metricflow_semantics"]
 
 # include doesn't seem to work with packages, so using force include.
 [tool.hatch.build.targets.sdist.force-include]
 "ATTRIBUTION.md" = "ATTRIBUTION.md"
 
 [tool.hatch.build.targets.wheel]
-packages = ["metricflow", "metricflow-semantics/metricflow_semantics"]
+packages = ["metricflow", "metricflow_semantics"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "ATTRIBUTION.md" = "ATTRIBUTION.md"
@@ -112,11 +104,9 @@ features = ["dev-env-requirements"]
 
 [tool.hatch.envs.dev-env.env-vars]
 MF_SQL_ENGINE_URL="duckdb://"
-PYTHONPATH="metricflow-semantics"
 
 
 [tool.hatch.envs.postgres-env.env-vars]
-PYTHONPATH="metricflow-semantics"
 MF_SQL_ENGINE_URL="postgresql://metricflow@localhost:5432/metricflow"
 MF_SQL_ENGINE_PASSWORD="metricflowing"
 
@@ -129,17 +119,10 @@ features = ["postgres-env-requirements"]
 ## NOTE: All environments below should have their authentication credentials
 ## configured independently of the hatch env construction
 
-[tool.hatch.envs.bigquery-env.env-vars]
-PYTHONPATH="metricflow-semantics"
-
 [tool.hatch.envs.bigquery-env]
 description = "Dev environment for working with BigQuery"
 template = "dev-env"
 features = ["bigquery-env-requirements"]
-
-[tool.hatch.envs.databricks-env.env-vars]
-PYTHONPATH="metricflow-semantics"
-
 
 [tool.hatch.envs.databricks-env]
 description = "Dev environment for working with Databricks"
@@ -147,17 +130,11 @@ template = "dev-env"
 features = ["databricks-env-requirements"]
 
 
-[tool.hatch.envs.redshift-env.env-vars]
-PYTHONPATH="metricflow-semantics"
-
 [tool.hatch.envs.redshift-env]
 description = "Dev environment for working with Redshift"
 template = "dev-env"
 features = ["redshift-env-requirements"]
 
-
-[tool.hatch.envs.snowflake-env.env-vars]
-PYTHONPATH="metricflow-semantics"
 
 [tool.hatch.envs.snowflake-env]
 description = "Dev environment for working with Snowflake"
@@ -166,7 +143,6 @@ features = ["snowflake-env-requirements"]
 
 
 [tool.hatch.envs.trino-env.env-vars]
-PYTHONPATH="metricflow-semantics"
 MF_SQL_ENGINE_URL = "trino://trino@localhost:8080/memory"
 MF_SQL_ENGINE_PASSWORD=""
 

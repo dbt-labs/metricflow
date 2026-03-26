@@ -34,7 +34,7 @@ FROM (
     -- Select: ['__booking_value', 'metric_time__day', 'listing__booking_fees']
     SELECT
       sma_28009_cte.metric_time__day AS metric_time__day
-      , subq_31.listing__booking_fees AS listing__booking_fees
+      , subq_36.listing__booking_fees AS listing__booking_fees
       , sma_28009_cte.__booking_value AS booking_value
     FROM sma_28009_cte
     LEFT OUTER JOIN (
@@ -55,13 +55,13 @@ FROM (
         FROM sma_28009_cte
         GROUP BY
           listing
-      ) subq_29
-    ) subq_31
+      ) subq_34
+    ) subq_36
     ON
-      sma_28009_cte.listing = subq_31.listing
-  ) subq_33
+      sma_28009_cte.listing = subq_36.listing
+  ) subq_38
   WHERE listing__booking_fees > 2
   GROUP BY
     metric_time__day
-) subq_37
+) subq_42
 ORDER BY bookings_alias

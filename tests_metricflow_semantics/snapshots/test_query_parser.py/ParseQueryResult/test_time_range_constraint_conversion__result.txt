@@ -1,0 +1,40 @@
+test_name: test_time_range_constraint_conversion
+test_filename: test_query_parser.py
+docstring:
+  Test that the returned time constraint in the query spec is adjusted to match the granularity of the query.
+---
+ParseQueryResult(
+  query_spec=MetricFlowQuerySpec(
+    metric_specs=(MetricSpec(element_name='bookings'), MetricSpec(element_name='revenue')),
+    time_dimension_specs=(
+      TimeDimensionSpec(
+        element_name='metric_time',
+        time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH),
+      ),
+    ),
+    time_range_constraint=TimeRangeConstraint(
+      start_time=datetime.datetime(2020, 1, 1, 0, 0),
+      end_time=datetime.datetime(2020, 2, 29, 0, 0),
+    ),
+    filter_intersection=PydanticWhereFilterIntersection(),
+    filter_spec_resolution_lookup=FilterSpecResolutionLookUp(),
+    min_max_only=False,
+    apply_group_by=True,
+    input_spec_order=InputSpecOrder(
+      group_by_item_specs=(
+        TimeDimensionSpec(
+          element_name='metric_time',
+          time_granularity=ExpandedTimeGranularity(
+            name='month',
+            base_granularity=MONTH,
+          ),
+        ),
+      ),
+      metric_specs=(MetricSpec(element_name='bookings'), MetricSpec(element_name='revenue')),
+    ),
+  ),
+  queried_semantic_models=(
+    SemanticModelReference(semantic_model_name='bookings_source'),
+    SemanticModelReference(semantic_model_name='revenue_source'),
+  ),
+)

@@ -67,7 +67,7 @@ dbt-trino = [
   "requirements-files/requirements-dbt-trino.txt"
 ]
 dev-env-requirements = [
-  "../metricflow-semantics/requirements-files/dev-env-requirements.txt",
+  "../requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt"
 ]
 

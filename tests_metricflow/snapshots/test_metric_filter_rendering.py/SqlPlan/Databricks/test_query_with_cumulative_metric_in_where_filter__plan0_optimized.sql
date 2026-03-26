@@ -17,8 +17,8 @@ FROM (
   -- Join Standard Outputs
   -- Select: ['__listings', 'user__revenue_all_time']
   SELECT
-    subq_30.user__revenue_all_time AS user__revenue_all_time
-    , subq_22.__listings AS listings
+    subq_35.user__revenue_all_time AS user__revenue_all_time
+    , subq_27.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
@@ -26,7 +26,7 @@ FROM (
       user_id AS user
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_22
+  ) subq_27
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
@@ -42,8 +42,8 @@ FROM (
     FROM ***************************.fct_revenue revenue_src_28000
     GROUP BY
       user_id
-  ) subq_30
+  ) subq_35
   ON
-    subq_22.user = subq_30.user
-) subq_32
+    subq_27.user = subq_35.user
+) subq_37
 WHERE user__revenue_all_time > 1
