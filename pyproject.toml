@@ -76,17 +76,19 @@ Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
 # There are files that hatch will always include as well (e.g. the LICENSE file).
 # See hatch build docs for more details.
 [tool.hatch.build.targets.sdist]
-packages = ["metricflow", "metricflow_semantics"]
+packages = ["metricflow", "metricflow_semantics", "metricflow_semantic_interfaces"]
 
 # include doesn't seem to work with packages, so using force include.
 [tool.hatch.build.targets.sdist.force-include]
 "ATTRIBUTION.md" = "ATTRIBUTION.md"
+"msi_pydantic_shim.py" = "msi_pydantic_shim.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["metricflow", "metricflow_semantics"]
+packages = ["metricflow", "metricflow_semantics", "metricflow_semantic_interfaces"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "ATTRIBUTION.md" = "ATTRIBUTION.md"
+"msi_pydantic_shim.py" = "msi_pydantic_shim.py"
 
 
 # Environment setup
