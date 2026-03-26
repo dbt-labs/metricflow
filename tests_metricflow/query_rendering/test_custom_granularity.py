@@ -743,8 +743,8 @@ def test_multiple_time_spines_in_query_for_cumulative_metric(  # noqa: D103
     )
 
 
-@pytest.mark.skip("Raises assertion error.")
 @pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_offset_to_grain_metric(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -753,6 +753,7 @@ def test_offset_to_grain_metric(  # noqa: D103
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
+    """Test a nested offset-to-grain metric with metric time at a custom grain."""
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("booking_fees_since_start_of_month",),
         group_by_names=("metric_time__alien_day",),
