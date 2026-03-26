@@ -72,6 +72,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
 
@@ -1412,10 +1413,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_data_set = self.get_output_data_set(node.time_spine_node)
         time_spine_alias = self._next_unique_table_alias()
 
-        required_agg_time_dimension_specs = tuple(node.requested_agg_time_dimension_specs)
-        join_spec_was_requested = node.join_on_time_dimension_spec in node.requested_agg_time_dimension_specs
-        if not join_spec_was_requested:
-            required_agg_time_dimension_specs += (node.join_on_time_dimension_spec,)
+        requested_agg_time_dimension_specs = FrozenOrderedSet(node.requested_agg_time_dimension_specs)
+        time_dimension_specs_to_pass_from_time_spine = requested_agg_time_dimension_specs.union(
+            (node.join_on_time_dimension_spec,)
+        )
 
         # Build join expression.
         parent_join_column_name = self._column_association_resolver.resolve_spec(
@@ -1435,13 +1436,12 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         # Build new instances and columns.
-        time_spine_required_spec_set = InstanceSpecSet(time_dimension_specs=required_agg_time_dimension_specs)
         output_parent_instance_set = parent_data_set.instance_set.transform(
             SelectElementsTransform(
                 exclude_specs=InstanceSpecSet.create_from_specs(
                     tuple(
                         spec
-                        for spec in time_spine_required_spec_set.time_dimension_specs
+                        for spec in time_dimension_specs_to_pass_from_time_spine
                         if spec in parent_data_set.instance_set.spec_set.time_dimension_specs
                     )
                 )
@@ -1451,8 +1451,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         output_time_spine_columns: Tuple[SqlSelectColumn, ...] = ()
         for old_instance in time_spine_data_set.instance_set.time_dimension_instances:
             new_spec = old_instance.spec.with_window_functions(())
-            if new_spec not in required_agg_time_dimension_specs:
+
+            if new_spec not in time_dimension_specs_to_pass_from_time_spine:
                 continue
+
             if old_instance.spec.window_functions:
                 new_instance = old_instance.with_new_spec(
                     new_spec=new_spec, column_association_resolver=self._column_association_resolver
@@ -1482,7 +1484,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # If offset_to_grain is used, will need to filter down to rows that match selected granularities.
         # Does not apply if one of the granularities selected matches the time spine column granularity.
         where_filter: Optional[SqlExpressionNode] = None
-        need_where_filter = node.offset_to_grain and not join_spec_was_requested
+        need_where_filter = (
+            node.offset_to_grain and node.join_on_time_dimension_spec not in requested_agg_time_dimension_specs
+        )
 
         # Filter down to one row per granularity period requested in the group by. Any other granularities
         # included here will be filtered out before aggregation and so should not be included in where filter.
