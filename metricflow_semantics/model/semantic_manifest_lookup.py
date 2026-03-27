@@ -14,7 +14,7 @@ from metricflow_semantics.semantic_graph.attribute_resolution.sg_linkable_spec_r
 )
 from metricflow_semantics.semantic_graph.builder.graph_builder import SemanticGraphBuilder
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
-from metricflow_semantics.semantic_graph.sg_interfaces import SemanticGraphEdge, SemanticGraphNode
+from metricflow_semantics.semantic_graph.sg_interfaces import SemanticGraph, SemanticGraphEdge, SemanticGraphNode
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
 
@@ -40,11 +40,11 @@ class SemanticManifestLookup:
         pathfinder = MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath]()
         self._manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
         graph_builder = SemanticGraphBuilder(manifest_object_lookup=self._manifest_object_lookup)
-        semantic_graph = graph_builder.build()
+        self._semantic_graph = graph_builder.build()
 
         group_by_item_set_resolver = SemanticGraphGroupByItemSetResolver(
             manifest_object_lookup=self._manifest_object_lookup,
-            semantic_graph=semantic_graph,
+            semantic_graph=self._semantic_graph,
             path_finder=pathfinder,
         )
 
@@ -69,3 +69,7 @@ class SemanticManifestLookup:
     @cached_property
     def manifest_object_lookup(self) -> ManifestObjectLookup:  # noqa: D102
         return self._manifest_object_lookup
+
+    @cached_property
+    def semantic_graph(self) -> SemanticGraph:  # noqa: D102
+        return self._semantic_graph

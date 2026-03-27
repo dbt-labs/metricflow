@@ -223,7 +223,7 @@ class DepthFirstSearchMetricEvaluationPlanner(MetricEvaluationPlanner):
         predicate_pushdown_state_for_inputs = predicate_pushdown_state
 
         if metric_spec.has_time_offset:
-            group_by_item_specs_for_inputs = self._required_group_by_items_for_inputs_to_a_time_offset_metric(
+            group_by_item_specs_for_inputs = self._query_helper.resolve_group_by_specs_for_time_offset_metric_input(
                 queried_group_by_specs=group_by_item_specs,
                 filter_specs=metric_spec.where_filter_specs,
             )
