@@ -7,11 +7,11 @@ from typing import Iterator, Protocol
 import pytest
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.test_helpers.config_helpers import DirectoryPathAnchor
 from metricflow_semantics.test_helpers.performance.profiling import (
     PerformanceTracker,
     SessionReport,
 )
+from metricflow_semantics.toolkit.directory_anchor import DirectoryPathAnchor
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization

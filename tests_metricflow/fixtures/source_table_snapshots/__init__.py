@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from metricflow_semantics.test_helpers.config_helpers import DirectoryPathAnchor
+from metricflow_semantics.toolkit.directory_anchor import DirectoryPathAnchor
 
 logger = logging.getLogger(__name__)
 
