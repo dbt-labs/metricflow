@@ -4,7 +4,6 @@ import logging
 import time
 from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple, Union
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.protocols.metric import (
     ConstantPropertyInput,
     ConversionTypeParams,
@@ -373,72 +372,6 @@ class DataflowPlanBuilder:
             )
 
         return output_node
-
-    def _build_node_for_base_metrics(
-        self,
-        metric_query_descriptor: MetricQueryDescriptor,
-        filter_spec_factory: WhereFilterSpecFactory,
-        option_set: DataflowPlanOptionSet,
-    ) -> DataflowPlanNode:
-        if len(metric_query_descriptor.passthrough_metric_specs) > 0:
-            raise MetricFlowInternalError(
-                LazyFormat(
-                    "Can't build base metric output node using the query descriptor as it specifies passthrough metrics",
-                    metric_query_descriptor=metric_query_descriptor,
-                )
-            )
-        metric_specs = metric_query_descriptor.computed_metric_specs
-
-        output_nodes: list[DataflowPlanNode] = []
-        for metric_spec in metric_specs:
-            metric_name = metric_spec.element_name
-            metric = self._manifest_object_lookup.get_metric(metric_name)
-            metric_type = metric.type
-
-            if metric_type is MetricType.SIMPLE:
-                output_node = self._build_simple_metric_output_node(
-                    metric_spec=metric_spec,
-                    queried_linkable_specs=LinkableSpecSet.create_from_specs(
-                        metric_query_descriptor.group_by_item_specs
-                    ),
-                    filter_spec_factory=filter_spec_factory,
-                    predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
-                    option_set=option_set,
-                )
-            elif metric_type is MetricType.CUMULATIVE:
-                output_node = self._build_cumulative_metric_output_node(
-                    metric_spec=metric_spec,
-                    queried_linkable_specs=LinkableSpecSet.create_from_specs(
-                        metric_query_descriptor.group_by_item_specs
-                    ),
-                    filter_spec_factory=filter_spec_factory,
-                    predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
-                    option_set=option_set,
-                )
-            elif metric_type is MetricType.CONVERSION:
-                output_node = self._build_conversion_metric_output_node(
-                    metric_spec=metric_spec,
-                    queried_linkable_specs=LinkableSpecSet.create_from_specs(
-                        metric_query_descriptor.group_by_item_specs
-                    ),
-                    filter_spec_factory=filter_spec_factory,
-                    predicate_pushdown_state=metric_query_descriptor.predicate_pushdown_state,
-                    option_set=option_set,
-                )
-            elif metric_type is MetricType.RATIO or metric_type is MetricType.DERIVED:
-                raise MetricFlowInternalError("This should have only been called with base metrics")
-            else:
-                assert_values_exhausted(metric_type)
-
-            output_nodes.append(output_node)
-
-        output_node_count = len(output_nodes)
-        if output_node_count == 0:
-            raise MetricFlowInternalError("No base metrics provided")
-        elif output_node_count == 1:
-            return output_nodes[0]
-        else:
-            return CombineAggregatedOutputsNode.create(output_nodes)
 
     def _optimize_plan(self, plan: DataflowPlan, option_set: DataflowPlanOptionSet) -> DataflowPlan:
         optimizer_factory = DataflowPlanOptimizerFactory(self._node_data_set_resolver)
