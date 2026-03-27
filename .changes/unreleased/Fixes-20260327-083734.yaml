@@ -1,0 +1,6 @@
+kind: Fixes
+body: Prevent base-grain time dimensions from leaking into time-offset metric output
+time: 2026-03-27T08:37:34.769523-07:00
+custom:
+  Author: plypaul
+  Issue: "2004"

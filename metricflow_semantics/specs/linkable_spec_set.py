@@ -3,8 +3,9 @@ from __future__ import annotations
 import dataclasses
 import itertools
 import typing
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable, Iterator, Set
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Dict, List, Sequence, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
@@ -24,7 +25,7 @@ if typing.TYPE_CHECKING:
 
 
 @dataclass(frozen=True)
-class LinkableSpecSet(Mergeable, SerializableDataclass):
+class LinkableSpecSet(Mergeable, SerializableDataclass, Collection[LinkableInstanceSpec]):
     """Groups linkable specs."""
 
     dimension_specs: Tuple[DimensionSpec, ...] = ()
@@ -61,7 +62,7 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             if time_dimension_spec.is_metric_time
         )
 
-    @property
+    @cached_property
     def as_tuple(self) -> Tuple[LinkableInstanceSpec, ...]:  # noqa: D102
         return tuple(
             itertools.chain(
@@ -147,6 +148,22 @@ class LinkableSpecSet(Mergeable, SerializableDataclass):
             time_dimension_specs=self.time_dimension_specs,
             group_by_metric_specs=self.group_by_metric_specs,
         )
+
+    @override
+    def __len__(self) -> int:
+        return len(self.as_tuple)
+
+    @override
+    def __iter__(self) -> Iterator[LinkableInstanceSpec]:
+        return iter(self.as_tuple)
+
+    @cached_property
+    def _item_set(self) -> Set[LinkableInstanceSpec]:
+        return set(self.as_tuple)
+
+    @override
+    def __contains__(self, x: object, /) -> bool:
+        return x in self._item_set
 
 
 @dataclass
