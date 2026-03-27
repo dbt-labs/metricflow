@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-from metricflow_semantics.toolkit.directory_anchor import DirectoryPathAnchor
+from metricflow_semantics.toolkit.directory_anchor import DirectoryAnchor
 
-DW_VALIDATION_MANIFEST_ANCHOR = DirectoryPathAnchor()
+DW_VALIDATION_MANIFEST_ANCHOR = DirectoryAnchor()

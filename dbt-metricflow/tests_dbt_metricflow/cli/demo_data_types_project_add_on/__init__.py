@@ -1,6 +1,6 @@
 """Directory containing files that can be added to a dbt project to query dimension of various data types."""
 from __future__ import annotations
 
-from metricflow_semantics.toolkit.directory_anchor import DirectoryPathAnchor
+from metricflow_semantics.toolkit.directory_anchor import DirectoryAnchor
 
-DEMO_DATA_TYPES_ADD_ON_PATH_ANCHOR = DirectoryPathAnchor()
+DEMO_DATA_TYPES_ADD_ON_PATH_ANCHOR = DirectoryAnchor()
