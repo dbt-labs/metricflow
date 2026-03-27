@@ -7,7 +7,7 @@ import traceback
 logger = logging.getLogger(__name__)
 
 
-class DirectoryPathAnchor:
+class DirectoryAnchor:
     """Defines a directory inside the repo.
 
     Using this object allows you to avoid using hard-coded paths and instead use objects that will be handled properly

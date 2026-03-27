@@ -11,7 +11,7 @@ from metricflow_semantics.test_helpers.performance.profiling import (
     PerformanceTracker,
     SessionReport,
 )
-from metricflow_semantics.toolkit.directory_anchor import DirectoryPathAnchor
+from metricflow_semantics.toolkit.directory_anchor import DirectoryAnchor
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
@@ -19,7 +19,7 @@ from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSql
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 
-ANCHOR = DirectoryPathAnchor()
+ANCHOR = DirectoryAnchor()
 
 GLOBAL_TRACKING_CONTEXT = "global"
 
