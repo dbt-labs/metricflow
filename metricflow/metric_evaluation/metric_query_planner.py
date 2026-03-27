@@ -8,6 +8,7 @@ from typing import Optional
 from dbt_semantic_interfaces.references import MetricReference
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -30,11 +31,14 @@ class MetricEvaluationPlanner(ABC):
     """ABC for a planner that creates a metric evaluation plan."""
 
     def __init__(  # noqa: D107
-        self, manifest_object_lookup: ManifestObjectLookup, column_association_resolver: ColumnAssociationResolver
+        self,
+        manifest_object_lookup: ManifestObjectLookup,
+        metric_lookup: MetricLookup,
+        column_association_resolver: ColumnAssociationResolver,
     ) -> None:
         self._manifest_object_lookup = manifest_object_lookup
         self._column_association_resolver = column_association_resolver
-        self._query_helper = MetricQueryHelper(manifest_object_lookup)
+        self._query_helper = MetricQueryHelper(metric_lookup)
 
     @abstractmethod
     def build_plan(

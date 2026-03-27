@@ -8,6 +8,7 @@ from collections.abc import Mapping, Sequence, Set
 from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from dbt_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -102,10 +103,15 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
     """
 
     def __init__(  # noqa: D107
-        self, manifest_object_lookup: ManifestObjectLookup, column_association_resolver: ColumnAssociationResolver
+        self,
+        manifest_object_lookup: ManifestObjectLookup,
+        metric_lookup: MetricLookup,
+        column_association_resolver: ColumnAssociationResolver,
     ) -> None:
         super().__init__(
-            manifest_object_lookup=manifest_object_lookup, column_association_resolver=column_association_resolver
+            manifest_object_lookup=manifest_object_lookup,
+            metric_lookup=metric_lookup,
+            column_association_resolver=column_association_resolver,
         )
 
         self._level_resolver: MetricEvaluationLevelResolver = MetricEvaluationLevelResolver(manifest_object_lookup)

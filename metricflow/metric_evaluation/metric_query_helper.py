@@ -4,7 +4,7 @@ import itertools
 import logging
 from collections.abc import Iterable
 
-from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
@@ -19,8 +19,8 @@ class MetricQueryHelper:
     This is a WIP as additional consolidation / restructuring is needed.
     """
 
-    def __init__(self, manifest_object_lookup: ManifestObjectLookup) -> None:  # noqa: D107
-        self._manifest_object_lookup = manifest_object_lookup
+    def __init__(self, metric_lookup: MetricLookup) -> None:  # noqa: D107
+        self._metric_lookup = metric_lookup
 
     def resolve_group_by_specs_for_time_offset_metric_input(
         self,
