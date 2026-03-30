@@ -844,3 +844,31 @@ def test_derived_metric_that_defines_the_same_alias_in_different_components(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_metric_time_filter_on_offset_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_once",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template=("{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' "))
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

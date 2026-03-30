@@ -9,11 +9,13 @@ from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.specs.where_filter.where_filter_spec_factory import WhereFilterSpecFactory
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat_dict
 from metricflow_semantics.toolkit.string_helpers import mf_wrap
 
@@ -142,6 +144,16 @@ METRIC_EVALUATION_TEST_CASES = (
             group_by_names=["metric_time"],
         ),
     ),
+    MetricEvaluationTestCase(
+        case_id_suffix="time_offset_metric_with_metric_time_filter",
+        description="Query for a time offset metric with a `metric_time` filter",
+        request=MetricFlowQueryRequest.create(
+            request_id=_get_next_request_id(),
+            metric_names=["bookings_offset_once"],
+            group_by_names=["metric_time"],
+            where_constraints=["{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' "],
+        ),
+    ),
 )
 
 
@@ -209,21 +221,44 @@ def check_metric_evaluation_plan_test_case(
     query_spec = query_parser.parse_and_validate_query(
         metric_names=me_test_case.request.metric_names,
         group_by_names=me_test_case.request.group_by_names,
+        where_constraint_strs=me_test_case.request.where_constraints,
     ).query_spec
+
+    filter_spec_factory = _create_filter_spec_factory(
+        query_spec=query_spec,
+        manifest_object_lookup=engine_test_fixture.manifest_object_lookup,
+        column_association_resolver=engine_test_fixture.column_association_resolver,
+    )
+
+    query_level_filter_specs = tuple(
+        filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=WhereFilterLocation.for_query(
+                tuple(metric_spec.reference for metric_spec in query_spec.metric_specs)
+            ),
+            filter_intersection=query_spec.filter_intersection,
+        )
+    )
+
+    metric_specs = tuple(
+        MetricSpec.create(
+            element_name=metric_spec.element_name,
+            where_filter_specs=query_level_filter_specs,
+        )
+        for metric_spec in query_spec.metric_specs
+    )
 
     predicate_pushdown_state = PredicatePushdownState.create(
         time_range_constraint=query_spec.time_range_constraint,
         where_filter_specs=(),
     )
+
+    logger.info(LazyFormat("Using query spec", query_spec=query_spec))
+
     me_plan = me_planner.build_plan(
-        metric_specs=query_spec.metric_specs,
+        metric_specs=metric_specs,
         group_by_item_specs=query_spec.linkable_specs.as_tuple,
         predicate_pushdown_state=predicate_pushdown_state,
-        filter_spec_factory=_create_filter_spec_factory(
-            query_spec=query_spec,
-            manifest_object_lookup=engine_test_fixture.manifest_object_lookup,
-            column_association_resolver=engine_test_fixture.column_association_resolver,
-        ),
+        filter_spec_factory=filter_spec_factory,
     )
     execution_plan = engine_test_fixture.dataflow_to_execution_converter.convert_to_execution_plan(
         dataflow_plan=engine_test_fixture.dataflow_plan_builder.build_plan(

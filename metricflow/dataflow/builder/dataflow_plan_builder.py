@@ -117,6 +117,7 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import (
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.metric_evaluation.dfs_me_planner import DepthFirstSearchMetricEvaluationPlanner
 from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
+from metricflow.metric_evaluation.metric_query_helper import MetricQueryHelper
 from metricflow.metric_evaluation.metric_query_planner import MetricEvaluationPlanner
 from metricflow.metric_evaluation.passthrough.passthrough_me_planner import PassThroughMetricEvaluationPlanner
 from metricflow.metric_evaluation.plan.me_edges import MetricQueryDependencyEdge
@@ -168,6 +169,7 @@ class DataflowPlanBuilder:
         self._time_period_adjuster = DateutilTimePeriodAdjuster()
         self._cache = dataflow_plan_builder_cache or DataflowPlanBuilderCache()
         self._metric_evaluation_plan_formatter = MetricEvaluationPlanTableFormatter()
+        self._query_helper = MetricQueryHelper(metric_lookup=semantic_manifest_lookup.metric_lookup)
 
     def build_plan(
         self,
@@ -1826,6 +1828,7 @@ class DataflowPlanBuilder:
         )
         spec_properties = SimpleMetricInputSpecProperties.create_from_simple_metric_inputs((simple_metric_input,))
 
+        # Adjust the time constraint for cumulative metrics.
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and predicate_pushdown_state.time_range_constraint is not None:
             logger.debug(

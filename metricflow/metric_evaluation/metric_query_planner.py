@@ -87,6 +87,17 @@ class MetricEvaluationPlanner(ABC):
                     input_granularity=input_metric.offset_to_grain,
                 )
 
+            # input_metric_is_time_offset = (
+            #     input_metric.offset_window is not None or input_metric.offset_to_grain is not None
+            # )
+            #
+            # if input_metric_is_time_offset:
+            #     filter_application = self._query_helper.resolve_filter_application_for_time_offset_metric(
+            #         metric_reference=MetricReference(element_name=input_metric.name),
+            #         filter_specs=where_filter_specs,
+            #     )
+            #     where_filter_specs = filter_application.filters_before_time_spine_join
+
             spec = MetricSpec.create(
                 element_name=input_metric.name,
                 where_filter_specs=where_filter_specs,

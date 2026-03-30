@@ -222,6 +222,7 @@ class DepthFirstSearchMetricEvaluationPlanner(MetricEvaluationPlanner):
         group_by_item_specs_for_inputs = group_by_item_specs
         predicate_pushdown_state_for_inputs = predicate_pushdown_state
 
+        # time_offset_filter_application: Optional[TimeOffsetFilterApplication] = None
         if metric_spec.has_time_offset:
             group_by_item_specs_for_inputs = self._query_helper.resolve_group_by_specs_for_time_offset_metric_input(
                 queried_group_by_specs=group_by_item_specs,
@@ -234,6 +235,20 @@ class DepthFirstSearchMetricEvaluationPlanner(MetricEvaluationPlanner):
             # is about post-join to pre-join for dimension access, and relies on the builder to collect
             # predicates from query and metric specs and make them available at simple-metric-input level.
             additional_filter_specs = ()
+
+            # time_offset_filter_application = self._query_helper.resolve_filter_application_for_time_offset_metric(
+            #     metric_reference=metric_spec.reference,
+            #     filter_specs=metric_spec.where_filter_specs,
+            # )
+            # additional_filter_specs = time_offset_filter_application.filters_before_time_spine_join
+
+        logger.info(
+            LazyFormat(
+                "Additional filter specs",
+                metric_name=metric_spec.element_name,
+                additional_filter_specs=additional_filter_specs,
+            )
+        )
 
         input_metric_specs = self._build_input_metric_specs_for_derived_metric(
             metric_name=metric_spec.element_name,

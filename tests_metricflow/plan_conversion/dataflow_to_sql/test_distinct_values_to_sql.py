@@ -70,3 +70,32 @@ def test_dimension_values_with_a_join_and_a_filter(
         sql_client=sql_client,
         node=dataflow_plan.sink_node,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_dimensions_with_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    """Tests querying 2 dimensions that require a join."""
+    query_spec = query_parser.parse_and_validate_query(
+        group_by_names=("listing__capacity_latest",),
+        where_constraints=[
+            PydanticWhereFilter(
+                where_sql_template="{{ Dimension('user__home_state_latest') }} = 'us'",
+            )
+        ],
+    ).query_spec
+    dataflow_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec)
+
+    convert_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        node=dataflow_plan.sink_node,
+    )
