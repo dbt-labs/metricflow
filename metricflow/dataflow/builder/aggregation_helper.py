@@ -6,7 +6,11 @@ from functools import cached_property
 from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec, SimpleMetricRecipe
+from metricflow_semantics.specs.simple_metric_input_spec import (
+    SimpleMetricInputSpec,
+    SimpleMetricRecipe,
+    SimpleMetricRecipe2,
+)
 from metricflow_semantics.toolkit.collections.mapping_helpers import mf_common_keys
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.merger import Mergeable
@@ -101,6 +105,19 @@ class NullFillValueMapping(Mergeable, MetricFlowPrettyFormattable, SerializableD
     @staticmethod
     def create_from_simple_metric_recipe(  # noqa: D102
         simple_metric_recipe: SimpleMetricRecipe,
+    ) -> NullFillValueMapping:
+        return NullFillValueMapping(
+            _element_name_and_null_fill_value_items=(
+                (
+                    simple_metric_recipe.simple_metric_input.name,
+                    simple_metric_recipe.simple_metric_input.fill_nulls_with,
+                ),
+            )
+        )
+
+    @staticmethod
+    def create_from_simple_metric_recipe2(  # noqa: D102
+        simple_metric_recipe: SimpleMetricRecipe2,
     ) -> NullFillValueMapping:
         return NullFillValueMapping(
             _element_name_and_null_fill_value_items=(

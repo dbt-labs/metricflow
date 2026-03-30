@@ -333,3 +333,31 @@ def test_join_to_time_spine_with_filter_not_in_group_by_using_agg_time_and_metri
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_simple_fill_nulls_with_0_and_dimension_filter(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_fill_nulls_with_0",),
+        group_by_names=("metric_time__day",),
+        where_constraints=[
+            PydanticWhereFilter(where_sql_template="{{ Dimension('listing__capacity_latest') }} > 3")
+            # PydanticWhereFilter(where_sql_template="{{ TimeDimension('metric_time__day') }} > '2020-01-01' AND {{ Dimension('listing__capacity_latest') }} > 3")
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

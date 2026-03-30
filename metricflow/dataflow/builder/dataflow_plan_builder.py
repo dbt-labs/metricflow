@@ -45,6 +45,7 @@ from metricflow_semantics.specs.simple_metric_input_spec import (
     JoinToTimeSpineDescription,
     SimpleMetricInputSpec,
     SimpleMetricRecipe,
+    SimpleMetricRecipe2,
 )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -773,7 +774,7 @@ class DataflowPlanBuilder:
         if metric.type is not MetricType.SIMPLE:
             raise RuntimeError(LazyFormat("This method should have been called with a simple metric", metric=metric))
 
-        simple_metric_recipe = self._build_simple_metric_recipe(
+        simple_metric_recipe = self._build_simple_metric_recipe2(
             simple_metric_input=self._manifest_object_lookup.simple_metric_name_to_input[metric.name],
             queried_linkable_specs=queried_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
@@ -781,12 +782,13 @@ class DataflowPlanBuilder:
             cumulative_description=None,
             filter_spec_factory=filter_spec_factory,
             additional_filter_specs=metric_spec.where_filter_specs,
+            predicate_pushdown_state=predicate_pushdown_state,
         )
 
-        aggregated_simple_metric_input_node = self.build_aggregated_simple_metric_input(
+        aggregated_simple_metric_input_node = self.build_aggregated_simple_metric_input2(
             simple_metric_recipe=simple_metric_recipe,
-            queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_state=predicate_pushdown_state,
+            # queried_linkable_specs=queried_linkable_specs,
+            # predicate_pushdown_state=predicate_pushdown_state,
             option_set=option_set,
         )
 
@@ -1477,6 +1479,132 @@ class DataflowPlanBuilder:
             after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
         )
 
+    def _build_simple_metric_recipe2(
+        self,
+        simple_metric_input: SimpleMetricInput,
+        queried_linkable_specs: LinkableSpecSet,
+        predicate_pushdown_state: PredicatePushdownState,
+        child_metric_offset_window: Optional[TimeWindow],
+        child_metric_offset_to_grain: Optional[TimeGranularity],
+        cumulative_description: Optional[CumulativeDescription],
+        filter_spec_factory: WhereFilterSpecFactory,
+        additional_filter_specs: Sequence[WhereFilterSpec],
+    ) -> SimpleMetricRecipe2:
+        """Return the recipe required to compute the simple metric with modifications as specified by args.
+
+        "child" refers to the derived metric that uses the metric specified by metric_reference in the definition.
+        descendant_filter_specs includes all filter specs required to compute the metric in the query. This includes the
+        filters in the query and any filter in the definition of metrics in between.
+        """
+        queried_agg_time_dimension_specs = FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
+            self._metric_lookup.get_aggregation_time_dimension_specs(
+                metric_reference=MetricReference(simple_metric_input.name),
+            )
+        )
+
+        before_aggregation_time_spine_join_description = None
+        after_aggregation_time_spine_join_description = None
+        is_time_offset = child_metric_offset_window is not None or child_metric_offset_to_grain is not None
+
+        if is_time_offset:
+            if child_metric_offset_window is not None:
+                offset_grain_name = child_metric_offset_window.granularity
+                if ExpandedTimeGranularity.is_standard_granularity_name(offset_grain_name):
+                    offset_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity(offset_grain_name))
+                else:
+                    offset_grain = ExpandedTimeGranularity(
+                        name=offset_grain_name,
+                        base_granularity=self._get_base_grain_for_custom_grain(offset_grain_name),
+                    )
+            else:
+                assert (
+                    child_metric_offset_to_grain is not None
+                ), "Offset to grain must be specified if no offset window is specified."
+                offset_grain = ExpandedTimeGranularity.from_time_granularity(child_metric_offset_to_grain)
+
+            # Determine the smallest queried agg time dimension grain (this is the grain we'll aggregate to)
+            if len(queried_agg_time_dimension_specs) == 0:
+                raise ValueError(
+                    LazyFormat(
+                        "No agg_time_dimension requested in offset metric query. This should have been validated earlier.",
+                        simple_metric_input=simple_metric_input,
+                        queried_linkable_specs=queried_linkable_specs,
+                    )
+                )
+            smallest_queried_agg_time_grain = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[
+                0
+            ].time_granularity
+
+            # If the smallest queried grain is less than or equal to the offset grain, join after aggregation.
+            # Otherwise, the grain needed for offset will not be available anymore, so join before aggregation.
+            join_to_time_spine_description = JoinToTimeSpineDescription(
+                join_type=SqlJoinType.INNER,
+                offset_window=child_metric_offset_window,
+                offset_to_grain=child_metric_offset_to_grain,
+            )
+            if (
+                offset_grain
+                and smallest_queried_agg_time_grain
+                # We can't know if the custom grain, once aggregated, will be larger or smaller than the offset grain.
+                and not smallest_queried_agg_time_grain.is_custom_granularity
+                # Custom offset windows have special logic handled later.
+                and not offset_grain.is_custom_granularity
+                # If queried grain > offset grain, offset grain won't be available after aggregation.
+                and smallest_queried_agg_time_grain.base_granularity.to_int() <= offset_grain.base_granularity.to_int()
+                # Special case: WEEK does not roll up to the larger granularities cleanly, so we can't apply WEEK
+                # aggregation before offset_to_grain join.
+                and not (
+                    smallest_queried_agg_time_grain.base_granularity is TimeGranularity.WEEK
+                    and child_metric_offset_to_grain
+                )
+            ):
+                after_aggregation_time_spine_join_description = join_to_time_spine_description
+            else:
+                before_aggregation_time_spine_join_description = join_to_time_spine_description
+
+        # * Simple metrics configured to join to time spine will join to time spine after aggregation using
+        #   LEFT OUTER JOIN.
+        # * If there's no agg_time_dimension in the query, skip time spine join since all time will be aggregated.
+        # * If we already need to join to time spine after aggregation due to offset, and the simple metric is also
+        #   configured to join to time spine, update to use LEFT OUTER JOIN.
+        if simple_metric_input.join_to_timespine and (len(queried_agg_time_dimension_specs) > 0):
+            if after_aggregation_time_spine_join_description is not None:
+                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
+                    join_type=SqlJoinType.LEFT_OUTER,
+                    offset_window=after_aggregation_time_spine_join_description.offset_window,
+                    offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
+                )
+            else:
+                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
+                    join_type=SqlJoinType.LEFT_OUTER, offset_window=None, offset_to_grain=None
+                )
+
+        # Handle filters.
+        metric_defined_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=WhereFilterLocation.for_metric(simple_metric_input.metric_reference),
+            filter_intersection=simple_metric_input.filter,
+        )
+
+        source_filter_specs = list(metric_defined_filter_specs)
+        final_filter_specs: list[WhereFilterSpec] = []
+
+        if is_time_offset:
+            final_filter_specs.extend(additional_filter_specs)
+        else:
+            source_filter_specs.extend(additional_filter_specs)
+
+        return SimpleMetricRecipe2(
+            simple_metric_input=simple_metric_input,
+            cumulative_description=cumulative_description,
+            before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
+            after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
+            source_filter_specs=tuple(source_filter_specs),
+            final_filter_specs=tuple(final_filter_specs),
+            queried_linkable_specs=queried_linkable_specs,
+            predicate_pushdown_state=predicate_pushdown_state,
+            queried_agg_time_dimension_specs=queried_agg_time_dimension_specs.as_frozen(),
+        )
+
     def _build_input_metric_specs_for_derived_metric(
         self,
         metric_reference: MetricReference,
@@ -1538,6 +1666,24 @@ class DataflowPlanBuilder:
             simple_metric_recipe=simple_metric_recipe,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
+            option_set=option_set,
+            source_node_recipe=source_node_recipe,
+        )
+
+    def build_aggregated_simple_metric_input2(
+        self,
+        simple_metric_recipe: SimpleMetricRecipe2,
+        option_set: DataflowPlanOptionSet,
+        source_node_recipe: Optional[SourceNodeRecipe] = None,
+    ) -> DataflowPlanNode:
+        """Returns a node where the simple-metric inputs are aggregated by the linkable specs and filtered.
+
+        This might be a node representing a single aggregation over one semantic model, or a node representing
+        a composite set of aggregations originating from multiple semantic models, and joined into a single
+        aggregated set.
+        """
+        return self._build_aggregated_simple_metric_input2(
+            simple_metric_recipe=simple_metric_recipe,
             option_set=option_set,
             source_node_recipe=source_node_recipe,
         )
@@ -2015,6 +2161,235 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs.as_tuple,
                 metric_where_filter_specs=simple_metric_recipe.metric_filter_specs,
                 after_aggregation_where_filter_specs=simple_metric_recipe.additional_filter_specs,
+                time_range_constraint=predicate_pushdown_state.time_range_constraint,
+            )
+
+        return aggregate_node
+
+    def _build_aggregated_simple_metric_input2(
+        self,
+        simple_metric_recipe: SimpleMetricRecipe2,
+        option_set: DataflowPlanOptionSet,
+        source_node_recipe: Optional[SourceNodeRecipe] = None,
+    ) -> DataflowPlanNode:
+        logger.debug(
+            LazyFormat(
+                "Building aggregate node",
+                simple_metric_recipe=simple_metric_recipe,
+            )
+        )
+
+        cumulative = simple_metric_recipe.cumulative_description is not None
+        cumulative_window = (
+            simple_metric_recipe.cumulative_description.cumulative_window
+            if simple_metric_recipe.cumulative_description is not None
+            else None
+        )
+        cumulative_grain_to_date = (
+            simple_metric_recipe.cumulative_description.cumulative_grain_to_date
+            if simple_metric_recipe.cumulative_description
+            else None
+        )
+
+        simple_metric_input = simple_metric_recipe.simple_metric_input
+        simple_metric_input_spec = SimpleMetricInputSpec(
+            element_name=simple_metric_input.name,
+        )
+        spec_properties = SimpleMetricInputSpecProperties.create_from_simple_metric_inputs((simple_metric_input,))
+
+        predicate_pushdown_state = simple_metric_recipe.predicate_pushdown_state
+        queried_linkable_specs = simple_metric_recipe.queried_linkable_specs
+
+        # Adjust the time constraint for cumulative metrics.
+        cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
+        if cumulative and simple_metric_recipe.predicate_pushdown_state.time_range_constraint is not None:
+            logger.debug(
+                LazyFormat(
+                    lambda: f"Time range constraint before adjustment is {predicate_pushdown_state.time_range_constraint}"
+                )
+            )
+            granularity: Optional[TimeGranularity] = None
+            count = 0
+            if cumulative_window is not None:
+                granularity = error_if_not_standard_grain(
+                    context="CumulativeMetric.window.granularity", input_granularity=cumulative_window.granularity
+                )
+                count = cumulative_window.count
+            elif cumulative_grain_to_date is not None:
+                count = 1
+                granularity = cumulative_grain_to_date
+
+            assert predicate_pushdown_state.time_range_constraint is not None
+            cumulative_metric_adjusted_time_constraint = (
+                self._time_period_adjuster.expand_time_constraint_for_cumulative_metric(
+                    predicate_pushdown_state.time_range_constraint, granularity, count
+                )
+            )
+            logger.debug(
+                LazyFormat(lambda: f"Adjusted time range constraint to: {cumulative_metric_adjusted_time_constraint}")
+            )
+
+        required_linkable_specs = self.__get_required_linkable_specs(
+            queried_linkable_specs=queried_linkable_specs,
+            filter_specs=simple_metric_recipe.combined_filter_specs,
+            spec_properties=spec_properties,
+        )
+
+        before_aggregation_time_spine_join_description = (
+            simple_metric_recipe.before_aggregation_time_spine_join_description
+        )
+        after_aggregation_time_spine_join_description = (
+            simple_metric_recipe.after_aggregation_time_spine_join_description
+        )
+        uses_offset = (
+            before_aggregation_time_spine_join_description
+            and before_aggregation_time_spine_join_description.uses_offset
+        ) or (
+            after_aggregation_time_spine_join_description and after_aggregation_time_spine_join_description.uses_offset
+        )
+
+        if source_node_recipe is None:
+            logger.debug(
+                LazyFormat(
+                    "Looking for a simple metric recipe",
+                    simple_metric=simple_metric_recipe.simple_metric_input.name,
+                    spec_properties=spec_properties,
+                    required_linkable_specs=required_linkable_specs,
+                )
+            )
+
+            time_constraint = (
+                (cumulative_metric_adjusted_time_constraint or predicate_pushdown_state.time_range_constraint)
+                if not uses_offset  # Time constraints will be applied after offset
+                else None
+            )
+            if time_constraint is None:
+                simple_metric_input_ppd_state = PredicatePushdownState.without_time_range_constraint(
+                    predicate_pushdown_state
+                )
+            else:
+                simple_metric_input_ppd_state = PredicatePushdownState.with_time_range_constraint(
+                    predicate_pushdown_state, time_range_constraint=time_constraint
+                )
+
+            with ExecutionTimer() as execution_timer:
+                source_node_recipe = self._find_source_node_recipe(
+                    FindSourceNodeRecipeInput(
+                        simple_metric_input_specs=spec_properties.simple_metric_input_specs,
+                        predicate_pushdown_state=simple_metric_input_ppd_state,
+                        linkable_spec_set=required_linkable_specs,
+                        optimizations=option_set.optimizations,
+                    )
+                )
+
+            logger.debug(
+                LazyFormat(
+                    "Finished source node recipe search",
+                    source_node_count=len(self._source_node_set.source_nodes_for_metric_queries),
+                    duration=execution_timer.total_duration,
+                )
+            )
+
+        logger.debug(LazyFormat("Found source node recipe", source_node_recipe=source_node_recipe))
+
+        if source_node_recipe is None:
+            raise UnableToSatisfyQueryError(
+                LazyFormat(
+                    "Unable to join all items in request.",
+                    simple_metric_recipe=simple_metric_recipe,
+                    required_linkable_specs=required_linkable_specs,
+                ).evaluated_value
+            )
+
+        queried_agg_time_dimension_specs = tuple(
+            FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
+                self._metric_lookup.get_aggregation_time_dimension_specs(
+                    metric_reference=MetricReference(simple_metric_input.name),
+                )
+            )
+        )
+        required_agg_time_dimension_specs = tuple(
+            FrozenOrderedSet(required_linkable_specs.time_dimension_specs).intersection(
+                self._metric_lookup.get_aggregation_time_dimension_specs(
+                    metric_reference=MetricReference(simple_metric_input.name),
+                )
+            )
+        )
+        base_required_agg_time_dimension_specs = tuple(
+            TimeDimensionSpec.with_base_grains(required_agg_time_dimension_specs)
+        )
+
+        # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
+        # Otherwise, the simple-metric input will be aggregated over all time.
+        unaggregated_simple_metric_input_node: DataflowPlanNode = source_node_recipe.source_node
+        if cumulative and base_required_agg_time_dimension_specs:
+            unaggregated_simple_metric_input_node = JoinOverTimeRangeNode.create(
+                parent_node=unaggregated_simple_metric_input_node,
+                queried_agg_time_dimension_specs=base_required_agg_time_dimension_specs,
+                window=cumulative_window,
+                grain_to_date=cumulative_grain_to_date,
+                # Note: we use the original constraint here because the JoinOverTimeRangeNode will eventually get
+                # rendered with an interval that expands the join window
+                time_range_constraint=(predicate_pushdown_state.time_range_constraint if not uses_offset else None),
+            )
+
+        # If querying an offset metric, join to time spine before aggregation.
+        use_offset_custom_granularity_node = bool(
+            before_aggregation_time_spine_join_description
+            and before_aggregation_time_spine_join_description.custom_offset_window
+            and {spec.time_granularity_name for spec in queried_agg_time_dimension_specs}
+            == {before_aggregation_time_spine_join_description.custom_offset_window.granularity}
+        )
+        if before_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
+            unaggregated_simple_metric_input_node = self._build_time_spine_join_node_for_before_aggregation(
+                join_description=before_aggregation_time_spine_join_description,
+                spec_properties=spec_properties,
+                queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                metric_source_node=unaggregated_simple_metric_input_node,
+                use_offset_custom_granularity_node=use_offset_custom_granularity_node,
+            )
+
+        custom_granularity_specs_to_join = [
+            spec
+            for spec in required_linkable_specs.time_dimension_specs_with_custom_grain
+            # In some circumstances, the custom grain has already been joined.
+            if (not use_offset_custom_granularity_node)
+            and (spec not in source_node_recipe.all_linkable_specs_required_for_source_nodes.as_tuple)
+        ]
+        # Apply original time constraint if it wasn't applied to the source node recipe. For cumulative metrics, the constraint
+        # may have been expanded and needs to be narrowed here. For offsets, the constraint was deferred to after the offset.
+        # TODO - Pushdown: Encapsulate all of this window sliding bookkeeping in the pushdown params object
+        time_range_constraint_to_apply = None
+        if cumulative_metric_adjusted_time_constraint or before_aggregation_time_spine_join_description:
+            time_range_constraint_to_apply = predicate_pushdown_state.time_range_constraint
+        specs_to_keep_for_aggregation = InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,)).merge(
+            InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
+        )
+        unaggregated_simple_metric_input_node = self._build_pre_aggregation_plan(
+            source_node=unaggregated_simple_metric_input_node,
+            join_targets=source_node_recipe.join_targets,
+            custom_granularity_specs=custom_granularity_specs_to_join,
+            where_filter_specs=simple_metric_recipe.combined_filter_specs,
+            time_range_constraint=time_range_constraint_to_apply,
+            specs_to_keep_for_aggregation=specs_to_keep_for_aggregation,
+            spec_properties=spec_properties,
+            queried_linkable_specs_for_semi_additive_join=queried_linkable_specs,
+        )
+
+        aggregate_node = AggregateSimpleMetricInputsNode.create(
+            parent_node=unaggregated_simple_metric_input_node,
+            null_fill_value_mapping=NullFillValueMapping.create_from_simple_metric_recipe2(simple_metric_recipe),
+        )
+
+        if after_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
+            return self._build_time_spine_join_node_for_after_aggregation(
+                join_description=after_aggregation_time_spine_join_description,
+                metric_reference=MetricReference(simple_metric_input_spec.element_name),
+                source_node=aggregate_node,
+                queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
+                queried_linkable_specs=queried_linkable_specs.as_tuple,
+                metric_where_filter_specs=simple_metric_recipe.source_filter_specs,
+                after_aggregation_where_filter_specs=simple_metric_recipe.final_filter_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
             )
 

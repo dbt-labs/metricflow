@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import cached_property
@@ -7,12 +8,17 @@ from typing import Optional, Tuple
 
 from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
-from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
+from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor, LinkableInstanceSpec
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+
+if typing.TYPE_CHECKING:
+    from metricflow.plan_conversion.node_processor import PredicatePushdownState
 
 
 @dataclass(frozen=True)
@@ -56,6 +62,27 @@ class SimpleMetricRecipe:
         return self.metric_filter_specs + self.additional_filter_specs
 
 
+@fast_frozen_dataclass()
+class SimpleMetricRecipe2:
+    """Describes how to build a simple metric but with modifications."""
+
+    simple_metric_input: SimpleMetricInput
+
+    queried_linkable_specs: LinkableSpecSet
+    queried_agg_time_dimension_specs: FrozenOrderedSet[LinkableInstanceSpec]
+    predicate_pushdown_state: PredicatePushdownState
+
+    source_filter_specs: Tuple[WhereFilterSpec, ...]
+    cumulative_description: Optional[CumulativeDescription]
+    before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
+    after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
+    final_filter_specs: Tuple[WhereFilterSpec, ...]
+
+    @cached_property
+    def combined_filter_specs(self) -> Sequence[WhereFilterSpec]:  # noqa: D102
+        return self.source_filter_specs + self.final_filter_specs
+
+
 @dataclass(frozen=True)
 class JoinToTimeSpineDescription:
     """Describes how a time spine join should be performed."""
@@ -63,6 +90,7 @@ class JoinToTimeSpineDescription:
     join_type: SqlJoinType
     offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
+    time_spine_filters: Tuple[WhereFilterSpec, ...] = ()
 
     @property
     def standard_offset_window(self) -> Optional[TimeWindow]:
