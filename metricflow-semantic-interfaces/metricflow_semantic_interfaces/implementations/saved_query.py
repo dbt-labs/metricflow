@@ -58,7 +58,7 @@ class PydanticSavedQuery(
     )
 
     @classmethod
-    def parse_obj(cls, input: HashableBaseModel) -> Self:  # noqa: D102
+    def parse_obj(cls, input: object) -> Self:  # noqa
         data = deepcopy(input)
         if isinstance(data, dict):
             if isinstance(data.get("tags"), str):

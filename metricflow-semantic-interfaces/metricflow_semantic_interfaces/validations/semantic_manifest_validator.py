@@ -29,6 +29,7 @@ from metricflow_semantic_interfaces.validations.metrics import (
     ConversionMetricRule,
     CumulativeMetricRule,
     DerivedMetricRule,
+    SimpleMetricExprRule,
 )
 from metricflow_semantic_interfaces.validations.non_empty import NonEmptyRule
 from metricflow_semantic_interfaces.validations.primary_entity import PrimaryEntityRule
@@ -37,6 +38,9 @@ from metricflow_semantic_interfaces.validations.saved_query import SavedQueryRul
 from metricflow_semantic_interfaces.validations.semantic_models import (
     SemanticModelDefaultsRule,
     SemanticModelValidityWindowRule,
+)
+from metricflow_semantic_interfaces.validations.time_dimension_has_granularity import (
+    TimeDimensionHasGranularityRule,
 )
 from metricflow_semantic_interfaces.validations.time_spines import TimeSpineRule
 from metricflow_semantic_interfaces.validations.unique_valid_name import (
@@ -95,6 +99,8 @@ class SemanticManifestValidator(Generic[SemanticManifestT]):
         EntityLabelsRule[SemanticManifestT](),
         ConversionMetricRule[SemanticManifestT](),
         TimeSpineRule[SemanticManifestT](),
+        TimeDimensionHasGranularityRule[SemanticManifestT](),
+        SimpleMetricExprRule[SemanticManifestT](),
     )
 
     def __init__(

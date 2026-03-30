@@ -1484,3 +1484,48 @@ def test_time_granularity() -> None:
         "`time_granularity` for metric 'derived_metric_with_invalid_time_granularity' must be >= MONTH.",
     ]
     check_error_in_issues(error_substrings=expected_substrings, issues=build_issues)
+
+
+def test_simple_metric_with_expr_generates_warning() -> None:
+    """Test that a simple metric with expr set generates a validation warning."""
+    from metricflow_semantic_interfaces.validations.metrics import SimpleMetricExprRule
+
+    model_validator = SemanticManifestValidator[PydanticSemanticManifest]([SimpleMetricExprRule()])
+
+    # Create a simple metric with a measure and an expr (which should trigger the warning)
+    metric = metric_with_guaranteed_meta(
+        name="simple_metric_with_expr",
+        type=MetricType.SIMPLE,
+        type_params=PydanticMetricTypeParams(
+            measure=PydanticMetricInputMeasure(name="my_measure"),
+            expr="some_expression",  # This should trigger a warning
+            metric_aggregation_params=PydanticMetricAggregationParams(
+                semantic_model="test_model",
+                agg=AggregationType.SUM,
+            ),
+        ),
+    )
+
+    validation_results = model_validator.validate_semantic_manifest(
+        PydanticSemanticManifest(
+            semantic_models=[
+                semantic_model_with_guaranteed_meta(
+                    name="test_model",
+                    measures=[
+                        PydanticMeasure(
+                            name="my_measure",
+                            agg=AggregationType.SUM,
+                        )
+                    ],
+                )
+            ],
+            metrics=[metric],
+            project_configuration=EXAMPLE_PROJECT_CONFIGURATION,
+        )
+    )
+
+    # Should have a warning about the expr being set
+    check_error_in_issues(
+        error_substrings=["should not have an expr set if it's proxy from measures"],
+        issues=validation_results.all_issues,
+    )

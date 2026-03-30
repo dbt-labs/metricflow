@@ -41,6 +41,9 @@
                 "base_measure": {
                     "$ref": "#/definitions/metric_input_measure_schema"
                 },
+                "base_metric": {
+                    "type:": "string"
+                },
                 "calculation": {
                     "enum": [
                         "CONVERSIONS",
@@ -58,6 +61,9 @@
                 "conversion_measure": {
                     "$ref": "#/definitions/metric_input_measure_schema"
                 },
+                "conversion_metric": {
+                    "type:": "string"
+                },
                 "entity": {
                     "type": "string"
                 },
@@ -66,8 +72,6 @@
                 }
             },
             "required": [
-                "base_measure",
-                "conversion_measure",
                 "entity"
             ],
             "type": "object"
@@ -78,6 +82,9 @@
             "properties": {
                 "grain_to_date": {
                     "type": "string"
+                },
+                "metric": {
+                    "type:": "string"
                 },
                 "period_agg": {
                     "enum": [
@@ -428,6 +435,65 @@
             ],
             "type": "object"
         },
+        "metric_aggregation_params_schema": {
+            "$id": "metric_aggregation_params_schema",
+            "additionalProperties": false,
+            "properties": {
+                "agg": {
+                    "enum": [
+                        "SUM",
+                        "MIN",
+                        "MAX",
+                        "AVERAGE",
+                        "COUNT_DISTINCT",
+                        "SUM_BOOLEAN",
+                        "COUNT",
+                        "PERCENTILE",
+                        "MEDIAN",
+                        "sum",
+                        "min",
+                        "max",
+                        "average",
+                        "count_distinct",
+                        "sum_boolean",
+                        "count",
+                        "percentile",
+                        "median"
+                    ]
+                },
+                "agg_params": {
+                    "$ref": "#/definitions/aggregation_type_params_schema"
+                },
+                "agg_time_dimension": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                },
+                "grain_to_date": {
+                    "type": "string"
+                },
+                "non_additive_dimension": {
+                    "$ref": "#/definitions/non_additive_dimension_schema"
+                },
+                "period_agg": {
+                    "enum": [
+                        "FIRST",
+                        "LAST",
+                        "AVERAGE",
+                        "first",
+                        "last",
+                        "average"
+                    ]
+                },
+                "semantic_model": {
+                    "type": "string"
+                },
+                "window": {
+                    "type": "string"
+                }
+            },
+            "required": [],
+            "type": "object"
+        },
         "metric_config_schema": {
             "$id": "metric_config_schema",
             "additionalProperties": false,
@@ -559,11 +625,23 @@
                         "boolean"
                     ]
                 },
+                "fill_nulls_with": {
+                    "type": "integer"
+                },
                 "grain_to_date": {
                     "type": "string"
                 },
+                "is_private": {
+                    "type": "boolean"
+                },
+                "join_to_timespine": {
+                    "type": "boolean"
+                },
                 "measure": {
                     "$ref": "#/definitions/metric_input_measure_schema"
+                },
+                "metric_aggregation_params": {
+                    "$ref": "#/definitions/metric_aggregation_params_schema"
                 },
                 "metrics": {
                     "items": {

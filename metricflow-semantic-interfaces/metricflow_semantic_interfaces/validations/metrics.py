@@ -13,6 +13,7 @@ from metricflow_semantic_interfaces.protocols import (
     SemanticManifestT,
     SemanticModel,
 )
+from metricflow_semantic_interfaces.protocols.measure import Measure
 from metricflow_semantic_interfaces.protocols.metadata import Metadata
 from metricflow_semantic_interfaces.protocols.metric import MetricInput
 from metricflow_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
@@ -1219,4 +1220,50 @@ class MetricTimeGranularityRule(SemanticManifestValidationRule[SemanticManifestT
                 metric_index=metric_index,
                 measure_to_agg_time_dimension=measure_to_agg_time_dimension,
             )
+        return issues
+
+
+class SimpleMetricExprRule(SemanticManifestValidationRule[SemanticManifestT], Generic[SemanticManifestT]):
+    """Checks that simple metrics expr is configured correctly for old specs."""
+
+    @staticmethod
+    @validate_safely(whats_being_done="validating the expr for simple metrics for old specs")
+    def validate_manifest(semantic_manifest: SemanticManifestT) -> Sequence[ValidationIssue]:  # noqa: D102
+        issues: List[ValidationIssue] = []
+
+        measures_in_semantic_manifest: Dict[MeasureReference, Measure] = {}
+        for sm in semantic_manifest.semantic_models:
+            for measure in sm.measures:
+                measures_in_semantic_manifest[measure.reference] = measure
+        for metric in semantic_manifest.metrics or []:
+            if metric.type != MetricType.SIMPLE:
+                continue
+            if metric.type_params.measure is None:
+                # Likely the new spec where measures are removed
+                continue
+            referenced_measure = measures_in_semantic_manifest.get(metric.type_params.measure.measure_reference)
+            if referenced_measure is None:
+                issues.append(
+                    ValidationError(
+                        context=MetricContext(
+                            file_context=FileContext.from_metadata(metadata=metric.metadata),
+                            metric=MetricModelReference(metric_name=metric.name),
+                        ),
+                        message=f"Measure '{metric.type_params.measure.measure_reference.element_name}'"
+                        "not found in semantic manifest",
+                    )
+                )
+                continue
+            metric_expr = metric.type_params.expr
+            if metric_expr is not None and metric_expr not in (referenced_measure.expr, referenced_measure.name):
+                issues.append(
+                    ValidationWarning(
+                        context=MetricContext(
+                            file_context=FileContext.from_metadata(metadata=metric.metadata),
+                            metric=MetricModelReference(metric_name=metric.name),
+                        ),
+                        message=f"Metric '{metric.name}' should not have an expr set if it's proxy from measures",
+                    )
+                )
+                continue
         return issues

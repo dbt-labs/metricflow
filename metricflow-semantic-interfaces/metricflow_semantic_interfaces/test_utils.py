@@ -193,8 +193,10 @@ def check_expected_issues(  # noqa: D103
     results: SemanticManifestValidationResults,
     num_expected_errors: int = 0,
     num_expected_warnings: int = 0,
+    num_expected_future_errors: int = 0,
     expected_error_msgs: Sequence[str] = [],
     expected_warning_msgs: Sequence[str] = [],
+    expected_future_error_msgs: Sequence[str] = [],
 ) -> None:
     """Validates the number, type, and content of ValidationIssues.
 
@@ -203,12 +205,14 @@ def check_expected_issues(  # noqa: D103
     """
     assert len(results.warnings) == num_expected_warnings
     assert len(results.errors) == num_expected_errors
-    assert len(results.future_errors) == 0, "validation function expects zero future_errors to be implemented."
+    assert len(results.future_errors) == num_expected_future_errors
 
     for expected_error_msg in expected_error_msgs:
         _assert_expected_validation_message(issues=results.errors, message_fragment=expected_error_msg)
     for expected_warning_msg in expected_warning_msgs:
         _assert_expected_validation_message(issues=results.warnings, message_fragment=expected_warning_msg)
+    for expected_future_error_msg in expected_future_error_msgs:
+        _assert_expected_validation_message(issues=results.future_errors, message_fragment=expected_future_error_msg)
 
 
 def check_only_one_error_with_message(  # noqa: D103
@@ -228,6 +232,16 @@ def check_only_one_warning_with_message(  # noqa: D103
         results=results,
         num_expected_warnings=1,
         expected_warning_msgs=[target_message],
+    )
+
+
+def check_only_one_future_error_with_message(  # noqa: D103
+    results: SemanticManifestValidationResults, target_message: str
+) -> None:
+    check_expected_issues(
+        results=results,
+        num_expected_future_errors=1,
+        expected_future_error_msgs=[target_message],
     )
 
 
