@@ -4,11 +4,12 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import FrozenSet
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.toolkit.cache.lru_cache import typed_lru_cache
 from metricflow_semantics.toolkit.mf_graph.comparable import Comparable, ComparisonKey
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @dataclass(frozen=True)

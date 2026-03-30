@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Sequence
 
-from dbt_semantic_interfaces.references import SemanticModelReference
+from metricflow_semantic_interfaces.references import SemanticModelReference
 
 
 class SemanticModelDerivation(ABC):

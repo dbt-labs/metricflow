@@ -4,7 +4,6 @@ import logging
 from functools import cached_property
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path import (
     RecipeWriterPathfinder,
 )
@@ -19,6 +18,8 @@ from metricflow_semantics.semantic_graph.sg_interfaces import (
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import MetricFlowPathfinder
+
+from metricflow_semantic_interfaces.protocols import SemanticManifest
 
 logger = logging.getLogger(__name__)
 

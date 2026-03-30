@@ -4,7 +4,6 @@ import logging
 from collections import defaultdict
 from typing import Iterable, Optional
 
-from dbt_semantic_interfaces.references import ElementReference, MetricReference
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError, UnknownMetricError
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
@@ -46,6 +45,8 @@ from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import Metric
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.references import ElementReference, MetricReference
 
 logger = logging.getLogger(__name__)
 

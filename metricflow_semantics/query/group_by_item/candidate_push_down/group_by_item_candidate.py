@@ -5,7 +5,6 @@ import logging
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
-from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
@@ -16,6 +15,8 @@ from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set 
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.references import SemanticModelReference
 
 logger = logging.getLogger(__name__)
 

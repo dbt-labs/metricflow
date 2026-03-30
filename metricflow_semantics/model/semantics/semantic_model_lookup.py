@@ -4,17 +4,6 @@ import logging
 from functools import cached_property
 from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.protocols.entity import Entity
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
-from dbt_semantic_interfaces.references import (
-    DimensionReference,
-    EntityReference,
-    SemanticModelElementReference,
-    SemanticModelReference,
-    TimeDimensionReference,
-)
-from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.errors.error_classes import InvalidSemanticModelError
 from metricflow_semantics.model.semantics.dimension_lookup import DimensionLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -24,6 +13,18 @@ from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import DEFAULT_TIME_GRANULARITY, TimeDimensionSpec
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+
+from metricflow_semantic_interfaces.protocols.entity import Entity
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
+from metricflow_semantic_interfaces.references import (
+    DimensionReference,
+    EntityReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
+    TimeDimensionReference,
+)
+from metricflow_semantic_interfaces.type_enums import DimensionType
 
 logger = logging.getLogger(__name__)
 

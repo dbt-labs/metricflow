@@ -5,9 +5,6 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Optional, Tuple
 
-from dbt_semantic_interfaces.protocols import MetricInput
-from dbt_semantic_interfaces.references import MetricReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
 from metricflow_semantics.specs.time_window import TimeWindow
@@ -15,6 +12,10 @@ from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilte
 from metricflow_semantics.specs.where_filter.where_filter_spec_factory import WhereFilterSpecFactory
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
+
+from metricflow_semantic_interfaces.protocols import MetricInput
+from metricflow_semantic_interfaces.references import MetricReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 
 @dataclass(frozen=True, order=True)

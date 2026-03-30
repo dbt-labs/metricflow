@@ -2,12 +2,6 @@ from __future__ import annotations
 
 from typing import List
 
-from dbt_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
-from dbt_semantic_interfaces.implementations.project_configuration import PydanticProjectConfiguration
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
-from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpine, PydanticTimeSpinePrimaryColumn
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_generator import (
     CategoricalDimensionGenerator,
 )
@@ -22,6 +16,13 @@ from metricflow_semantics.test_helpers.synthetic_manifest.simple_metric_semantic
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
     SyntheticManifestParameterSet,
 )
+
+from metricflow_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
+from metricflow_semantic_interfaces.implementations.project_configuration import PydanticProjectConfiguration
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
+from metricflow_semantic_interfaces.implementations.time_spine import PydanticTimeSpine, PydanticTimeSpinePrimaryColumn
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 
 class SyntheticManifestGenerator:

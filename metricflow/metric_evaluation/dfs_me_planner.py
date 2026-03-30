@@ -4,9 +4,6 @@ import logging
 from collections.abc import Iterable, Sequence
 from typing import Optional
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.protocols import Metric
-from dbt_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -30,6 +27,9 @@ from metricflow.metric_evaluation.plan.me_plan import (
 )
 from metricflow.metric_evaluation.plan.query_element import MetricQueryElement, MetricQueryPropertySet
 from metricflow.plan_conversion.node_processor import PredicatePushdownState
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.protocols import Metric
+from metricflow_semantic_interfaces.type_enums import MetricType
 
 logger = logging.getLogger(__name__)
 

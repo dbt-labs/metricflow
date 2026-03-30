@@ -3,10 +3,11 @@ from __future__ import annotations
 import logging
 from functools import cached_property
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.protocols import MetricTimeWindow
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.protocols import MetricTimeWindow
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

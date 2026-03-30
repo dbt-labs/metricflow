@@ -6,8 +6,6 @@ from collections.abc import Iterable
 from enum import Enum
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 from metricflow_semantics.errors.error_classes import FeatureNotSupportedError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -33,6 +31,8 @@ from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionT
 from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 
 logger = logging.getLogger(__name__)
 

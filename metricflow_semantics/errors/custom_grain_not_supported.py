@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import FeatureNotSupportedError
+
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 def error_if_not_standard_grain(input_granularity: str, context: Optional[str] = None) -> TimeGranularity:

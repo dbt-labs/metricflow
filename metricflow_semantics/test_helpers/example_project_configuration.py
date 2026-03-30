@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import textwrap
 
-from dbt_semantic_interfaces.implementations.project_configuration import (
+from metricflow_semantic_interfaces.implementations.project_configuration import (
     PydanticProjectConfiguration,
 )
-from dbt_semantic_interfaces.implementations.time_spine_table_configuration import (
+from metricflow_semantic_interfaces.implementations.time_spine_table_configuration import (
     PydanticTimeSpineTableConfiguration,
 )
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from dbt_semantic_interfaces.type_enums import TimeGranularity
+from metricflow_semantic_interfaces.parsing.objects import YamlConfigFile
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 EXAMPLE_PROJECT_CONFIGURATION = PydanticProjectConfiguration(
     time_spine_table_configurations=[

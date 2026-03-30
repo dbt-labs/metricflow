@@ -5,8 +5,6 @@ import logging
 from collections import defaultdict
 from collections.abc import Mapping, Sequence, Set
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -45,6 +43,8 @@ from metricflow.metric_evaluation.plan.query_element import (
     MetricQueryPropertySet,
 )
 from metricflow.plan_conversion.node_processor import PredicatePushdownState
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import MetricType
 
 logger = logging.getLogger(__name__)
 

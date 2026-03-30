@@ -3,8 +3,6 @@ from __future__ import annotations
 import re
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.naming.keywords import DUNDER
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -17,6 +15,9 @@ from metricflow_semantics.specs.patterns.entity_link_pattern import (
 from metricflow_semantics.specs.patterns.typed_patterns import TimeDimensionPattern
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, InstanceSpecSetTransform, group_spec_by_type
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.naming.keywords import DUNDER
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 
 
 class DunderNamingScheme(QueryItemNamingScheme):

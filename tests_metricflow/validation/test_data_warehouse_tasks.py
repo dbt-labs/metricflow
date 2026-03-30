@@ -5,19 +5,6 @@ from typing import Tuple
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
-from dbt_semantic_interfaces.implementations.elements.entity import PydanticEntity
-from dbt_semantic_interfaces.implementations.metric import (
-    PydanticMetric,
-    PydanticMetricAggregationParams,
-    PydanticMetricTypeParams,
-)
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.protocols.dimension import DimensionType
-from dbt_semantic_interfaces.protocols.entity import EntityType
-from dbt_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
-from dbt_semantic_interfaces.type_enums import MetricType
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
@@ -28,6 +15,19 @@ from metricflow.validation.data_warehouse_model_validator import (
     DataWarehouseTaskBuilder,
     DataWarehouseValidationTask,
 )
+from metricflow_semantic_interfaces.implementations.elements.dimension import PydanticDimension
+from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
+from metricflow_semantic_interfaces.implementations.metric import (
+    PydanticMetric,
+    PydanticMetricAggregationParams,
+    PydanticMetricTypeParams,
+)
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.protocols.dimension import DimensionType
+from metricflow_semantic_interfaces.protocols.entity import EntityType
+from metricflow_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
+from metricflow_semantic_interfaces.type_enums import MetricType
+from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from tests_metricflow.snapshot_utils import (
     assert_sql_snapshot_equal,
 )

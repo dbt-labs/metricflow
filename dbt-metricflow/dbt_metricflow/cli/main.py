@@ -15,9 +15,6 @@ from typing import Callable, List, Optional, Sequence
 
 import click
 import jinja2
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
-from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
 from metricflow_semantics.dag.dag_visualization import display_dag_as_svg
 from update_checker import UpdateChecker
@@ -39,6 +36,9 @@ from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricF
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.validation.data_warehouse_model_validator import DataWarehouseModelValidator
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from metricflow_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 
 logger = logging.getLogger(__name__)
 

@@ -3,9 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Optional
 
-from dbt_semantic_interfaces.parsing.where_filter.jinja_object_parser import QueryItemLocation
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
+
+from metricflow_semantic_interfaces.parsing.where_filter.jinja_object_parser import QueryItemLocation
 
 if TYPE_CHECKING:
     from metricflow_semantics.specs.instance_spec import InstanceSpec

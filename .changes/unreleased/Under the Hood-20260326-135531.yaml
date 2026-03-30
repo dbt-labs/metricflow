@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Begin depending on metricflow-semantic-interfaces instead of dbt-semantic-interfaces
+time: 2026-03-26T13:55:31.705426-07:00
+custom:
+  Author: QMalcolm
+  Issue: "2002"

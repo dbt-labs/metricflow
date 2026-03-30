@@ -2,17 +2,18 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
-from dbt_semantic_interfaces.implementations.elements.entity import PydanticEntity
-from dbt_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
-from dbt_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
-from dbt_semantic_interfaces.type_enums import DimensionType, EntityType
 from metricflow_semantics.test_helpers.synthetic_manifest.categorical_dimension_generator import (
     CategoricalDimensionGenerator,
 )
 from metricflow_semantics.test_helpers.synthetic_manifest.synthetic_manifest_parameter_set import (
     SyntheticManifestParameterSet,
 )
+
+from metricflow_semantic_interfaces.implementations.elements.dimension import PydanticDimension
+from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
+from metricflow_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
+from metricflow_semantic_interfaces.implementations.semantic_model import PydanticSemanticModel
+from metricflow_semantic_interfaces.type_enums import DimensionType, EntityType
 
 
 class DimensionSemanticModelGenerator:

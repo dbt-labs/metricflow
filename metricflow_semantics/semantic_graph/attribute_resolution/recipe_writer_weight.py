@@ -5,8 +5,6 @@ import logging
 from functools import cached_property
 from typing import Mapping, Optional, Set
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -29,6 +27,9 @@ from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import W
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
 logger = logging.getLogger(__name__)
 

@@ -4,11 +4,10 @@ from collections.abc import Set
 from enum import Enum
 from typing import FrozenSet, List, Sequence
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-
 from metricflow.dataflow.optimizer.dataflow_plan_optimizer import DataflowPlanOptimizer
 from metricflow.dataflow.optimizer.source_scan.source_scan_optimizer import SourceScanOptimizer
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 
 
 class DataflowPlanOptimization(Enum):

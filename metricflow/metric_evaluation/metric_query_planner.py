@@ -6,8 +6,6 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterable, Sequence
 from typing import Optional
 
-from dbt_semantic_interfaces.references import MetricReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
@@ -24,6 +22,8 @@ from metricflow.metric_evaluation.plan.me_plan import (
     MetricEvaluationPlan,
 )
 from metricflow.plan_conversion.node_processor import PredicatePushdownState
+from metricflow_semantic_interfaces.references import MetricReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

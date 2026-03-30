@@ -5,8 +5,6 @@ from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from typing import Optional
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import MetricType, TimeGranularity
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.semantic_graph.model_id import SemanticModelId
@@ -24,6 +22,8 @@ from metricflow.metric_evaluation.plan.me_nodes import (
     SimpleMetricsQueryNode,
 )
 from metricflow.metric_evaluation.plan.query_element import MetricQueryElement, MetricQueryPropertySet
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import MetricType, TimeGranularity
 
 logger = logging.getLogger(__name__)
 

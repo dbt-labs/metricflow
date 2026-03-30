@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC
 from functools import cached_property
 
-from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
@@ -30,6 +29,8 @@ from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraph
 from metricflow_semantics.toolkit.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
 from metricflow_semantics.toolkit.singleton import Singleton
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
 
 @fast_frozen_dataclass(order=False)
