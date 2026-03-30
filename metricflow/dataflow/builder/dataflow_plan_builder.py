@@ -1468,8 +1468,6 @@ class DataflowPlanBuilder:
 
         return SimpleMetricRecipe(
             simple_metric_input=simple_metric_input,
-            offset_window=child_metric_offset_window,
-            offset_to_grain=child_metric_offset_to_grain,
             cumulative_description=cumulative_description,
             metric_filter_specs=metric_filter_specs,
             additional_filter_specs=tuple(additional_filter_specs),

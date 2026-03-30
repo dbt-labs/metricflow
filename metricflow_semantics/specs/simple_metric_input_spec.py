@@ -48,8 +48,6 @@ class SimpleMetricRecipe:
     # For additional filters that might be needed (e.g. a filter defined in a derived metric or query).
     additional_filter_specs: Tuple[WhereFilterSpec, ...]
 
-    offset_window: Optional[TimeWindow]
-    offset_to_grain: Optional[TimeGranularity]
     cumulative_description: Optional[CumulativeDescription]
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
     after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
