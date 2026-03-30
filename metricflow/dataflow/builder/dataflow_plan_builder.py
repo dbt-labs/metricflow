@@ -1589,9 +1589,11 @@ class DataflowPlanBuilder:
         final_filter_specs: list[WhereFilterSpec] = []
 
         if is_time_offset:
+            source_filter_specs.extend(additional_filter_specs)
             final_filter_specs.extend(additional_filter_specs)
         else:
             source_filter_specs.extend(additional_filter_specs)
+            final_filter_specs.extend(additional_filter_specs)
 
         return SimpleMetricRecipe2(
             simple_metric_input=simple_metric_input,
@@ -2369,7 +2371,7 @@ class DataflowPlanBuilder:
             source_node=unaggregated_simple_metric_input_node,
             join_targets=source_node_recipe.join_targets,
             custom_granularity_specs=custom_granularity_specs_to_join,
-            where_filter_specs=simple_metric_recipe.combined_filter_specs,
+            where_filter_specs=simple_metric_recipe.source_filter_specs,
             time_range_constraint=time_range_constraint_to_apply,
             specs_to_keep_for_aggregation=specs_to_keep_for_aggregation,
             spec_properties=spec_properties,

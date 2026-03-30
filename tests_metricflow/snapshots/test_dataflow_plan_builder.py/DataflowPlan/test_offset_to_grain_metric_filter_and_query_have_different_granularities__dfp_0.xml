@@ -198,6 +198,28 @@ docstring:
                             <!--       ),                                                    -->
                             <!--     ),                                                      -->
                             <!--   )                                                         -->
+                            <!-- filter_spec =                                               -->
+                            <!--   WhereFilterSpec(                                          -->
+                            <!--     where_sql="metric_time__day = '2020-01-01'",            -->
+                            <!--     bind_parameters=SqlBindParameterSet(),                  -->
+                            <!--     element_set=GroupByItemSet(                             -->
+                            <!--       annotated_specs=(                                     -->
+                            <!--         AnnotatedSpec(                                      -->
+                            <!--           element_type=TIME_DIMENSION,                      -->
+                            <!--           element_name='metric_time',                       -->
+                            <!--           time_grain=ExpandedTimeGranularity(               -->
+                            <!--             name='day',                                     -->
+                            <!--             base_granularity=DAY,                           -->
+                            <!--           ),                                                -->
+                            <!--           element_properties=(METRIC_TIME,),                -->
+                            <!--           origin_semantic_model_names=('bookings_source',), -->
+                            <!--           derived_from_semantic_model_names=(               -->
+                            <!--             'bookings_source',                              -->
+                            <!--           ),                                                -->
+                            <!--         ),                                                  -->
+                            <!--       ),                                                    -->
+                            <!--     ),                                                      -->
+                            <!--   )                                                         -->
                             <SelectorNode>
                                 <!-- description = "Select: ['metric_time__month', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='pfe_2') -->
