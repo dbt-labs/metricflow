@@ -1415,6 +1415,20 @@ class DataflowPlanBuilder:
         if child_metric_offset_window is not None or child_metric_offset_to_grain is not None:
             time_spine_filters = tuple(filters_with_only_agg_time_dimension_references)
 
+            # Since filters referencing only aggregation time dimensions are applied to the time spine,
+            # those don't need to be added pre-aggregation since the filtered time-spine + inner join
+            # effectively applies the filters.
+            pre_aggregation_filter_specs = tuple(
+                itertools.chain(
+                    metric_filter_split.filters_without_agg_time_dimension_references,
+                    additional_filter_split.filters_without_agg_time_dimension_references,
+                    # It is incorrect to apply filters referencing both aggregation time dimensions and non-aggregation
+                    # time dimensions. However, this reproduces existing behavior until a fix can be made.
+                    metric_filter_split.filters_with_mixed_references,
+                    additional_filter_split.filters_with_mixed_references,
+                )
+            )
+
             if child_metric_offset_window is not None:
                 offset_grain_name = child_metric_offset_window.granularity
                 if ExpandedTimeGranularity.is_standard_granularity_name(offset_grain_name):
@@ -1796,6 +1810,7 @@ class DataflowPlanBuilder:
         time_spine_node = self._build_time_spine_node(
             queried_time_spine_specs=required_time_spine_specs,
             custom_offset_window=join_description.custom_offset_window,
+            where_filter_specs=join_description.time_spine_filter_specs,
             join_on_time_dimension_spec=join_on_time_dimension_spec,
             use_offset_custom_granularity_node=use_offset_custom_granularity_node,
         )
