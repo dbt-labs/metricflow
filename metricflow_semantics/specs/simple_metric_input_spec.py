@@ -72,15 +72,18 @@ class SimpleMetricRecipe2:
     queried_agg_time_dimension_specs: FrozenOrderedSet[LinkableInstanceSpec]
     predicate_pushdown_state: PredicatePushdownState
 
-    source_filter_specs: Tuple[WhereFilterSpec, ...]
+    pre_aggregation_filter_specs: Tuple[WhereFilterSpec, ...]
     cumulative_description: Optional[CumulativeDescription]
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
-    after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
-    final_filter_specs: Tuple[WhereFilterSpec, ...]
+    after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescriptionWithFilters]
+    # final_filter_specs: Tuple[WhereFilterSpec, ...]
 
     @cached_property
     def combined_filter_specs(self) -> Sequence[WhereFilterSpec]:  # noqa: D102
-        return self.source_filter_specs + self.final_filter_specs
+        if self.after_aggregation_time_spine_join_description is None:
+            return self.pre_aggregation_filter_specs
+
+        return self.pre_aggregation_filter_specs + self.after_aggregation_time_spine_join_description.time_spine_filters
 
 
 @dataclass(frozen=True)
@@ -90,7 +93,6 @@ class JoinToTimeSpineDescription:
     join_type: SqlJoinType
     offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
-    time_spine_filters: Tuple[WhereFilterSpec, ...] = ()
 
     @property
     def standard_offset_window(self) -> Optional[TimeWindow]:
@@ -110,3 +112,9 @@ class JoinToTimeSpineDescription:
     def uses_offset(self) -> bool:
         """Return True if the simple-metric input uses an offset."""
         return self.offset_window is not None or self.offset_to_grain is not None
+
+
+@dataclass(frozen=True)
+class JoinToTimeSpineDescriptionWithFilters(JoinToTimeSpineDescription):
+    time_spine_filters: Tuple[WhereFilterSpec, ...]
+    filter_specs_after_time_spine_Join: Tuple[WhereFilterSpec, ...]

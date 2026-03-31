@@ -40,13 +40,10 @@ from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
-from metricflow_semantics.specs.simple_metric_input_spec import (
-    CumulativeDescription,
-    JoinToTimeSpineDescription,
-    SimpleMetricInputSpec,
-    SimpleMetricRecipe,
-    SimpleMetricRecipe2,
-)
+from metricflow_semantics.specs.simple_metric_input_spec import (CumulativeDescription, JoinToTimeSpineDescription,
+                                                                 SimpleMetricInputSpec, SimpleMetricRecipe,
+                                                                 SimpleMetricRecipe2,
+                                                                 JoinToTimeSpineDescriptionWithFilters, )
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.time_window import TimeWindow
@@ -1562,50 +1559,90 @@ class DataflowPlanBuilder:
             else:
                 before_aggregation_time_spine_join_description = join_to_time_spine_description
 
-        # * Simple metrics configured to join to time spine will join to time spine after aggregation using
-        #   LEFT OUTER JOIN.
-        # * If there's no agg_time_dimension in the query, skip time spine join since all time will be aggregated.
-        # * If we already need to join to time spine after aggregation due to offset, and the simple metric is also
-        #   configured to join to time spine, update to use LEFT OUTER JOIN.
-        if simple_metric_input.join_to_timespine and (len(queried_agg_time_dimension_specs) > 0):
-            if after_aggregation_time_spine_join_description is not None:
-                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
-                    join_type=SqlJoinType.LEFT_OUTER,
-                    offset_window=after_aggregation_time_spine_join_description.offset_window,
-                    offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
-                )
-            else:
-                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
-                    join_type=SqlJoinType.LEFT_OUTER, offset_window=None, offset_to_grain=None
-                )
-
-        # Handle filters.
         metric_defined_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
             filter_location=WhereFilterLocation.for_metric(simple_metric_input.metric_reference),
             filter_intersection=simple_metric_input.filter,
         )
 
-        source_filter_specs = list(metric_defined_filter_specs)
-        final_filter_specs: list[WhereFilterSpec] = []
+        pre_aggregation_filter_specs = tuple(
+            itertools.chain(
+                metric_defined_filter_specs,
+                additional_filter_specs,
+            )
+        )
+        if not(simple_metric_input.join_to_timespine and (len(queried_agg_time_dimension_specs) > 0)):
+            return SimpleMetricRecipe2(
+                simple_metric_input=simple_metric_input,
+                cumulative_description=cumulative_description,
+                before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
+                after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
+                pre_aggregation_filter_specs=pre_aggregation_filter_specs,
+                queried_linkable_specs=queried_linkable_specs,
+                predicate_pushdown_state=predicate_pushdown_state,
+                queried_agg_time_dimension_specs=queried_agg_time_dimension_specs.as_frozen(),
+            )
 
-        if is_time_offset:
-            source_filter_specs.extend(additional_filter_specs)
-            final_filter_specs.extend(additional_filter_specs)
+        # * Simple metrics configured to join to time spine will join to time spine after aggregation using
+        #   LEFT OUTER JOIN.
+        # * If there's no agg_time_dimension in the query, skip time spine join since all time will be aggregated.
+        # * If we already need to join to time spine after aggregation due to offset, and the simple metric is also
+        #   configured to join to time spine, update to use LEFT OUTER JOIN.
+
+        metric_filter_application = self._query_helper.resolve_filters_on_aggregation_time(
+            metric_reference=simple_metric_input.metric_reference,
+            filter_specs=metric_defined_filter_specs,
+        )
+        additional_filter_application = self._query_helper.resolve_filters_on_aggregation_time(
+            metric_reference=simple_metric_input.metric_reference,
+            filter_specs=additional_filter_specs,
+        )
+        time_spine_filters=tuple(
+            itertools.chain(
+                metric_filter_application.filters_referencing_agg_time_dimension,
+                additional_filter_application.filters_referencing_agg_time_dimension,
+            )
+        )
+
+        # Since new rows might have been added due to time spine join, re-apply constraints here. Only re-apply filters
+        # for specs that are also in the queried specs, since those are the only ones that could change after the time
+        # spine join. Exclude filters that contain only metric_time or an agg time dimension, since were already applied
+        # to the time spine table.
+        # Filters in `metric_where_filter_specs` don't need to be applied since those should have been applied in
+        # `source_node`
+        filters_after_time_spine_join: list[WhereFilterSpec] = []
+        for filter_spec in additional_filter_application.filters_not_referencing_agg_time_dimension:
+            if set(filter_spec.linkable_specs).issubset(queried_linkable_specs):
+                filters_after_time_spine_join.append(filter_spec)
+
+        if after_aggregation_time_spine_join_description is not None:
+            after_aggregation_time_spine_join_description = JoinToTimeSpineDescriptionWithFilters(
+                join_type=SqlJoinType.LEFT_OUTER,
+                offset_window=after_aggregation_time_spine_join_description.offset_window,
+                offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
+                time_spine_filters=time_spine_filters,
+                filter_specs_after_time_spine_Join=tuple(filters_after_time_spine_join)
+            )
         else:
-            source_filter_specs.extend(additional_filter_specs)
-            final_filter_specs.extend(additional_filter_specs)
+            after_aggregation_time_spine_join_description = JoinToTimeSpineDescriptionWithFilters(
+                join_type=SqlJoinType.LEFT_OUTER,
+                offset_window=None,
+                offset_to_grain=None,
+                time_spine_filters=time_spine_filters,
+                filter_specs_after_time_spine_Join=tuple(filters_after_time_spine_join)
+            )
+
 
         return SimpleMetricRecipe2(
             simple_metric_input=simple_metric_input,
             cumulative_description=cumulative_description,
             before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
             after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
-            source_filter_specs=tuple(source_filter_specs),
-            final_filter_specs=tuple(final_filter_specs),
+            pre_aggregation_filter_specs=pre_aggregation_filter_specs,
             queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
             queried_agg_time_dimension_specs=queried_agg_time_dimension_specs.as_frozen(),
         )
+
 
     def _build_input_metric_specs_for_derived_metric(
         self,

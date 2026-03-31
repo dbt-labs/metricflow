@@ -90,6 +90,26 @@ class MetricQueryHelper:
             filters_after_time_spine_join=tuple(filters_on_agg_time_dimension_specs),
         )
 
+    def resolve_filters_on_aggregation_time(  # noqa: D102
+        self, metric_reference: MetricReference, filter_specs: Sequence[WhereFilterSpec]
+    ) -> AggregationTimeFilterApplication:
+        agg_time_dimension_specs: OrderedSet[
+            LinkableInstanceSpec
+        ] = self._metric_lookup.get_aggregation_time_dimension_specs(metric_reference)
+
+        filters_on_agg_time_dimension_specs = []
+        filters_not_on_agg_time_dimension_specs = []
+        for filter_spec in filter_specs:
+            if agg_time_dimension_specs.intersection(filter_spec.linkable_specs):
+                filters_on_agg_time_dimension_specs.append(filter_spec)
+            else:
+                filters_not_on_agg_time_dimension_specs.append(filter_spec)
+
+        return AggregationTimeFilterApplication(
+            filters_referencing_agg_time_dimension=tuple(filters_on_agg_time_dimension_specs),
+            filters_not_referencing_agg_time_dimension=tuple(filters_not_on_agg_time_dimension_specs),
+        )
+
     def get_specs_for_non_additive_dimension(  # noqa: D102
         self, non_additive_dimension_spec: NonAdditiveDimensionSpec, non_additive_dimension_grain: TimeGranularity
     ) -> Sequence[LinkableInstanceSpec]:
@@ -140,3 +160,11 @@ class TimeOffsetFilterApplication:
 
     filters_before_time_spine_join: AnyLengthTuple[WhereFilterSpec]
     filters_after_time_spine_join: AnyLengthTuple[WhereFilterSpec]
+
+
+@fast_frozen_dataclass()
+class AggregationTimeFilterApplication:
+    """Describes how filters should be applied."""
+
+    filters_referencing_agg_time_dimension: AnyLengthTuple[WhereFilterSpec]
+    filters_not_referencing_agg_time_dimension: AnyLengthTuple[WhereFilterSpec]
