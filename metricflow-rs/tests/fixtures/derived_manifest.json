@@ -1,0 +1,54 @@
+{
+  "semantic_models": [
+    {
+      "name": "bookings_source",
+      "node_relation": {
+        "alias": "fct_bookings",
+        "schema_name": "demo",
+        "database": null
+      },
+      "defaults": {
+        "agg_time_dimension": "ds"
+      },
+      "primary_entity": "booking",
+      "entities": [
+        { "name": "booking", "type": "primary", "expr": null }
+      ],
+      "measures": [
+        { "name": "bookings", "agg": "sum", "expr": "1", "agg_time_dimension": "ds" },
+        { "name": "instant_bookings", "agg": "sum_boolean", "expr": "is_instant", "agg_time_dimension": "ds" }
+      ],
+      "dimensions": [
+        { "name": "ds", "type": "time", "type_params": { "time_granularity": "day" }, "expr": null },
+        { "name": "is_instant", "type": "categorical", "expr": null }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "name": "bookings",
+      "type": "simple",
+      "type_params": { "measure": { "name": "bookings", "join_to_timespine": false } }
+    },
+    {
+      "name": "instant_bookings",
+      "type": "simple",
+      "type_params": { "measure": { "name": "instant_bookings", "join_to_timespine": false } }
+    },
+    {
+      "name": "bookings_growth",
+      "type": "derived",
+      "type_params": {
+        "expr": "bookings - instant_bookings",
+        "metrics": [
+          { "name": "bookings", "alias": "bookings" },
+          { "name": "instant_bookings", "alias": "instant_bookings" }
+        ]
+      }
+    }
+  ],
+  "project_configuration": {
+    "time_spine_table_configurations": [],
+    "time_spines": []
+  }
+}
