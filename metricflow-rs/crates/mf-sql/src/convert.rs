@@ -449,8 +449,11 @@ fn convert_combine_aggregated_outputs<'a>(
         parent_sqls.push(convert_node(plan, parent, subquery_counter, graph)?);
     }
 
-    // Determine group_by column names from first parent's group_by
-    let group_by_cols: Vec<String> = parent_sqls[0]
+    // Determine group_by column names from first parent's group_by.
+    // If the parent has no explicit group_by (e.g., ComputeMetric wraps its result
+    // without GROUP BY), infer group-by columns from select_columns: ColumnRef entries
+    // are pass-through group-by columns, Alias entries are metric columns.
+    let mut group_by_cols: Vec<String> = parent_sqls[0]
         .group_by
         .iter()
         .filter_map(|expr| match expr {
@@ -458,6 +461,17 @@ fn convert_combine_aggregated_outputs<'a>(
             _ => None,
         })
         .collect();
+
+    if group_by_cols.is_empty() {
+        group_by_cols = parent_sqls[0]
+            .select_columns
+            .iter()
+            .filter_map(|expr| match expr {
+                SqlExpr::ColumnRef { column_name, .. } => Some(column_name.clone()),
+                _ => None,
+            })
+            .collect();
+    }
 
     // Collect metric column names from each parent (select cols that are NOT group-by,
     // and not ColumnRef without alias — only Alias entries whose alias is not in group_by).
@@ -720,17 +734,18 @@ fn convert_compute_metric<'a>(
         .collect();
 
     if group_by_cols.is_empty() {
-        // Infer from select_columns (CombineAggregatedOutputs case)
+        // Infer from select_columns when parent has no explicit GROUP BY
+        // (e.g., ComputeMetric or CombineAggregatedOutputs).
+        // ColumnRef entries are pass-through group-by columns.
+        // Alias entries that aren't the metric itself are also group-by columns.
         group_by_cols = parent_sql
             .select_columns
             .iter()
             .filter_map(|e| match e {
+                SqlExpr::ColumnRef { column_name, .. } => Some(column_name.clone()),
                 SqlExpr::Alias { alias, .. }
                     if alias != metric_name && !alias.starts_with("__") =>
                 {
-                    // Exclude known metric column names — they come from the input metrics.
-                    // A heuristic: metric columns are those that match an input metric alias
-                    // (referenced in the expression). For now, just exclude the metric_name itself.
                     Some(alias.clone())
                 }
                 _ => None,
@@ -1017,6 +1032,95 @@ mod tests {
         assert!(
             rendered.contains("region AS customer__region"),
             "should project second filter column: {rendered}"
+        );
+    }
+
+    #[test]
+    fn test_combine_compute_metric_parents_uses_full_outer_join() {
+        // Regression test: when CombineAggregatedOutputs has ComputeMetric parents
+        // (e.g., multi-metric query with derived metrics), the combine should use
+        // FULL OUTER JOIN on shared group-by columns, not CROSS JOIN.
+        let mut plan = DataflowPlan::new();
+
+        // Build two independent metric subplans: read → agg → compute_metric
+        let read1 = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "src".into(),
+            table: "demo.fct".into(),
+        });
+        let agg1 = plan.add_node(DataflowNode::Aggregate {
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
+            aggregations: vec![MeasureAggregation {
+                measure_name: "m1".into(),
+                agg_type: AggregationType::Sum,
+                expr: "val1".into(),
+                alias: "m1".into(),
+            }],
+        });
+        plan.add_edge(read1, agg1);
+        let compute1 = plan.add_node(DataflowNode::ComputeMetric {
+            metric_name: "metric_a".to_string(),
+            expr: Some("m1".to_string()),
+        });
+        plan.add_edge(agg1, compute1);
+
+        let read2 = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "src".into(),
+            table: "demo.fct".into(),
+        });
+        let agg2 = plan.add_node(DataflowNode::Aggregate {
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
+            aggregations: vec![MeasureAggregation {
+                measure_name: "m2".into(),
+                agg_type: AggregationType::Sum,
+                expr: "val2".into(),
+                alias: "m2".into(),
+            }],
+        });
+        plan.add_edge(read2, agg2);
+        let compute2 = plan.add_node(DataflowNode::ComputeMetric {
+            metric_name: "metric_b".to_string(),
+            expr: Some("m2".to_string()),
+        });
+        plan.add_edge(agg2, compute2);
+
+        // Combine the two ComputeMetric outputs
+        let combine = plan.add_node(DataflowNode::CombineAggregatedOutputs);
+        plan.add_edge(compute1, combine);
+        plan.add_edge(compute2, combine);
+        plan.set_sink(combine);
+
+        let sql = to_sql_standalone(&plan).unwrap();
+        let renderer = crate::render::renderer_for_dialect(mf_core::dialect::SqlDialect::DuckDB);
+        let rendered = renderer.render(&sql);
+
+        eprintln!("Rendered SQL:\n{rendered}");
+
+        // Must use FULL OUTER JOIN (not CROSS JOIN) because both parents share metric_time__day
+        assert!(
+            rendered.contains("FULL OUTER JOIN"),
+            "should use FULL OUTER JOIN when ComputeMetric parents share group-by columns: {rendered}"
+        );
+        assert!(
+            !rendered.contains("CROSS JOIN"),
+            "should NOT use CROSS JOIN: {rendered}"
+        );
+        // Should COALESCE the shared group-by column
+        assert!(
+            rendered.contains("COALESCE"),
+            "should COALESCE shared group-by columns: {rendered}"
+        );
+        assert!(
+            rendered.contains("metric_time__day"),
+            "should include metric_time__day: {rendered}"
+        );
+        // Both metrics should appear
+        assert!(
+            rendered.contains("metric_a"),
+            "should contain metric_a: {rendered}"
+        );
+        assert!(
+            rendered.contains("metric_b"),
+            "should contain metric_b: {rendered}"
         );
     }
 }
