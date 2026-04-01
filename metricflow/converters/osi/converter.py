@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from itertools import combinations
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from metricflow.converters.osi.models import (
     OSIDataset,
@@ -15,6 +16,28 @@ from metricflow.converters.osi.models import (
     OSIMetric,
     OSIRelationship,
     OSISemanticModel,
+)
+from metricflow_semantic_interfaces.implementations.elements.dimension import (
+    PydanticDimension,
+    PydanticDimensionTypeParams,
+)
+from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
+from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasure
+from metricflow_semantic_interfaces.implementations.metric import (
+    PydanticMetric,
+    PydanticMetricInput,
+    PydanticMetricInputMeasure,
+    PydanticMetricTypeParams,
+)
+from metricflow_semantic_interfaces.implementations.project_configuration import (
+    PydanticProjectConfiguration,
+)
+from metricflow_semantic_interfaces.implementations.semantic_manifest import (
+    PydanticSemanticManifest,
+)
+from metricflow_semantic_interfaces.implementations.semantic_model import (
+    PydanticNodeRelation,
+    PydanticSemanticModel,
 )
 from metricflow_semantic_interfaces.protocols.dimension import Dimension
 from metricflow_semantic_interfaces.protocols.entity import Entity
@@ -30,6 +53,7 @@ from metricflow_semantic_interfaces.type_enums import (
     DimensionType,
     EntityType,
     MetricType,
+    TimeGranularity,
 )
 
 
@@ -354,3 +378,401 @@ class MSIToOSIConverter:
 
     def _make_expression(self, expr: str) -> OSIExpression:
         return OSIExpression(dialects=[OSIDialectExpression(dialect=self._dialect, expression=expr)])
+
+
+# ---------------------------------------------------------------------------
+# Reverse converter: OSI → MSI
+# ---------------------------------------------------------------------------
+
+# Keyed by (dataset_name_or_None, col_name) → (AggregationType, bare_col_expr).
+# None as dataset name means the column reference was unqualified in the expression.
+_MeasureKey = Tuple[Optional[str], str]
+
+_SIMPLE_AGG_MAP: Dict[str, AggregationType] = {
+    "SUM": AggregationType.SUM,
+    "COUNT": AggregationType.COUNT,
+    "AVG": AggregationType.AVERAGE,
+    "MIN": AggregationType.MIN,
+    "MAX": AggregationType.MAX,
+}
+
+
+def _strip_qualifier(col: str) -> str:
+    """Strip a leading dataset qualifier, e.g. 'orders.amount' → 'amount'."""
+    return col.rsplit(".", 1)[-1] if "." in col else col
+
+
+def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str]]:
+    """Parse a simple SQL aggregation expression.
+
+    Returns ``(agg_type, bare_col)`` for recognised patterns, ``None`` otherwise.
+    The returned column name has any dataset qualifier stripped.
+    """
+    expr = expression.strip()
+
+    # COUNT(DISTINCT col)
+    m = re.fullmatch(r"COUNT\s*\(\s*DISTINCT\s+(.+?)\s*\)", expr, re.IGNORECASE)
+    if m:
+        return AggregationType.COUNT_DISTINCT, _strip_qualifier(m.group(1))
+
+    # SUM(CASE WHEN col THEN 1 ELSE 0 END)
+    m = re.fullmatch(r"SUM\s*\(\s*CASE\s+WHEN\s+(.+?)\s+THEN\s+1\s+ELSE\s+0\s+END\s*\)", expr, re.IGNORECASE)
+    if m:
+        return AggregationType.SUM_BOOLEAN, _strip_qualifier(m.group(1))
+
+    # PERCENTILE_CONT/DISC(p) WITHIN GROUP (ORDER BY col)
+    m = re.fullmatch(
+        r"(PERCENTILE_CONT|PERCENTILE_DISC)\s*\(\s*([0-9.]+)\s*\)\s*WITHIN\s+GROUP\s*\(\s*ORDER\s+BY\s+(.+?)\s*\)",
+        expr,
+        re.IGNORECASE,
+    )
+    if m:
+        p = float(m.group(2))
+        col = _strip_qualifier(m.group(3))
+        if p == 0.5 and m.group(1).upper() == "PERCENTILE_CONT":
+            return AggregationType.MEDIAN, col
+        return AggregationType.PERCENTILE, col
+
+    # Simple: SUM(col), COUNT(col), AVG(col), MIN(col), MAX(col)
+    # Use [^()]+ to reject expressions with nested parentheses (e.g. SUM(a) + SUM(b)).
+    m = re.fullmatch(r"([A-Za-z_]+)\s*\(\s*([^()]+?)\s*\)", expr)
+    if m:
+        func = m.group(1).upper()
+        col = _strip_qualifier(m.group(2))
+        if func in _SIMPLE_AGG_MAP:
+            return _SIMPLE_AGG_MAP[func], col
+
+    return None
+
+
+def _try_parse_ratio(expr_str: str) -> Optional[Tuple[str, str]]:
+    """Try to parse ``(expr_a) / (expr_b)`` returning ``(num_expr, den_expr)`` or None."""
+    s = expr_str.strip()
+    if not s.startswith("("):
+        return None
+    depth = 0
+    for i, ch in enumerate(s):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                rest = s[i + 1 :].strip()
+                if rest.startswith("/"):
+                    num_expr = s[1:i].strip()
+                    den_part = rest[1:].strip()
+                    if den_part.startswith("(") and den_part.endswith(")"):
+                        den_expr = den_part[1:-1].strip()
+                    else:
+                        den_expr = den_part
+                    return num_expr, den_expr
+                break
+    return None
+
+
+class OSIToMSIConverter:
+    """Converts an OSI Document into a PydanticSemanticManifest.
+
+    The conversion is inherently lossy: OSI stores metrics as raw SQL expressions
+    and carries no metric-type metadata (SIMPLE / RATIO / CUMULATIVE / …).  The
+    converter reconstructs a best-effort MSI manifest using the following rules:
+
+    * Datasets → one PydanticSemanticModel each.
+    * Fields are classified as entities, dimensions, or measures using key and
+      relationship metadata plus metric-expression scanning (see below).
+    * Time dimensions always receive ``TimeGranularity.DAY`` — OSI has no
+      granularity field.
+    * Metric expressions are parsed with regex:
+      - single-agg patterns (``SUM(col)``, ``COUNT(DISTINCT col)``, …) → SIMPLE
+      - ``(expr_a) / (expr_b)`` → RATIO (with auto-generated sub-metrics)
+      - anything else → SIMPLE pointing to a synthetic measure
+    """
+
+    def __init__(self, dialect: OSIDialect = OSIDialect.ANSI_SQL) -> None:  # noqa: D107
+        self._dialect = dialect
+
+    def convert(self, document: OSIDocument) -> PydanticSemanticManifest:  # noqa: D102
+        semantic_models: List[PydanticSemanticModel] = []
+        metrics: List[PydanticMetric] = []
+
+        for osi_sm in document.semantic_model:
+            measure_index = self._build_measure_index(osi_sm)
+            for dataset in osi_sm.datasets:
+                semantic_models.append(self._convert_dataset(dataset, osi_sm, measure_index))
+            metrics.extend(self._convert_metrics(osi_sm))
+
+        return PydanticSemanticManifest(
+            semantic_models=semantic_models,
+            metrics=metrics,
+            project_configuration=PydanticProjectConfiguration(),
+        )
+
+    # ------------------------------------------------------------------
+    # Dataset conversion
+    # ------------------------------------------------------------------
+
+    def _convert_dataset(
+        self,
+        dataset: OSIDataset,
+        osi_sm: OSISemanticModel,
+        measure_index: Dict[_MeasureKey, Tuple[AggregationType, str]],
+    ) -> PydanticSemanticModel:
+        primary_key_cols: Set[str] = set(dataset.primary_key or [])
+        unique_key_cols: Set[str] = {col for keys in (dataset.unique_keys or []) for col in keys}
+        foreign_key_cols: Set[str] = {
+            col for rel in (osi_sm.relationships or []) if rel.from_dataset == dataset.name for col in rel.from_columns
+        }
+
+        entities: List[PydanticEntity] = []
+        dimensions: List[PydanticDimension] = []
+        measures: List[PydanticMeasure] = []
+
+        for field in dataset.fields or []:
+            expr = self._get_expression(field.expression)
+            # Prefer None if the expression is identical to the field name (MSI default).
+            expr_or_none = expr if expr != field.name else None
+
+            if field.name in primary_key_cols:
+                entities.append(
+                    PydanticEntity(
+                        name=field.name,
+                        type=EntityType.PRIMARY,
+                        expr=expr_or_none,
+                        description=field.description,
+                        label=field.label,
+                        role=None,
+                        config=None,
+                    )
+                )
+            elif field.name in unique_key_cols:
+                entities.append(
+                    PydanticEntity(
+                        name=field.name,
+                        type=EntityType.UNIQUE,
+                        expr=expr_or_none,
+                        description=field.description,
+                        label=field.label,
+                        role=None,
+                        config=None,
+                    )
+                )
+            elif field.name in foreign_key_cols:
+                entities.append(
+                    PydanticEntity(
+                        name=field.name,
+                        type=EntityType.FOREIGN,
+                        expr=expr_or_none,
+                        description=field.description,
+                        label=field.label,
+                        role=None,
+                        config=None,
+                    )
+                )
+            elif field.dimension is not None and field.dimension.is_time:
+                dimensions.append(
+                    PydanticDimension(
+                        name=field.name,
+                        type=DimensionType.TIME,
+                        # OSI carries no granularity; default to DAY.
+                        type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
+                        expr=expr_or_none,
+                        description=field.description,
+                        label=field.label,
+                        config=None,
+                    )
+                )
+            elif self._in_measure_index(field.name, expr, dataset.name, measure_index):
+                agg, _ = (
+                    measure_index.get((dataset.name, field.name))
+                    or measure_index.get((None, field.name))
+                    or measure_index.get((dataset.name, _strip_qualifier(expr)))
+                    or measure_index[(None, _strip_qualifier(expr))]
+                )
+                measures.append(
+                    PydanticMeasure(
+                        name=field.name,
+                        agg=agg,
+                        expr=expr_or_none,
+                        description=field.description,
+                        label=field.label,
+                        create_metric=None,
+                        agg_params=None,
+                    )
+                )
+            else:
+                # Fallback: categorical dimension.
+                dimensions.append(
+                    PydanticDimension(
+                        name=field.name,
+                        type=DimensionType.CATEGORICAL,
+                        type_params=None,
+                        expr=expr_or_none,
+                        description=field.description,
+                        label=field.label,
+                        config=None,
+                    )
+                )
+
+        return PydanticSemanticModel(
+            name=dataset.name,
+            node_relation=self._parse_source(dataset.source),
+            description=dataset.description,
+            entities=entities,
+            dimensions=dimensions,
+            measures=measures,
+        )
+
+    # ------------------------------------------------------------------
+    # Metric conversion
+    # ------------------------------------------------------------------
+
+    def _convert_metrics(self, osi_sm: OSISemanticModel) -> List[PydanticMetric]:
+        metrics: List[PydanticMetric] = []
+        for metric in osi_sm.metrics or []:
+            expr_str = self._get_expression(metric.expression)
+            metrics.extend(self._convert_metric(metric.name, expr_str, metric.description))
+        return metrics
+
+    def _convert_metric(self, name: str, expr_str: str, description: Optional[str]) -> List[PydanticMetric]:
+        """Return one or more PydanticMetric objects for the given OSI expression.
+
+        Multiple metrics are returned when a RATIO metric requires auto-generated
+        sub-metrics for its numerator and denominator.
+        """
+        # --- SIMPLE: single aggregation ---
+        agg_result = _extract_agg_info(expr_str)
+        if agg_result is not None:
+            _agg, col = agg_result
+            return [
+                PydanticMetric(
+                    name=name,
+                    description=description,
+                    type=MetricType.SIMPLE,
+                    type_params=PydanticMetricTypeParams(
+                        measure=PydanticMetricInputMeasure(name=col, filter=None, alias=None),
+                    ),
+                    filter=None,
+                    metadata=None,
+                    config=None,
+                )
+            ]
+
+        # --- RATIO: (num_expr) / (den_expr) ---
+        ratio_result = _try_parse_ratio(expr_str)
+        if ratio_result is not None:
+            num_expr, den_expr = ratio_result
+            num_name = f"{name}__numerator"
+            den_name = f"{name}__denominator"
+            num_metrics = self._convert_metric(num_name, num_expr, None)
+            den_metrics = self._convert_metric(den_name, den_expr, None)
+            ratio_metric = PydanticMetric(
+                name=name,
+                description=description,
+                type=MetricType.RATIO,
+                type_params=PydanticMetricTypeParams(
+                    numerator=PydanticMetricInput(name=num_name, filter=None, alias=None),
+                    denominator=PydanticMetricInput(name=den_name, filter=None, alias=None),
+                ),
+                filter=None,
+                metadata=None,
+                config=None,
+            )
+            return [*num_metrics, *den_metrics, ratio_metric]
+
+        # --- Fallback: create a synthetic measure reference ---
+        # The expression is too complex to decompose.  We produce a SIMPLE metric
+        # that points to a synthetic measure named ``{name}__expr``.  The caller is
+        # responsible for ensuring a matching measure exists in the manifest.
+        synthetic_measure_name = f"{name}__expr"
+        return [
+            PydanticMetric(
+                name=name,
+                description=description,
+                type=MetricType.SIMPLE,
+                type_params=PydanticMetricTypeParams(
+                    measure=PydanticMetricInputMeasure(name=synthetic_measure_name, filter=None, alias=None),
+                ),
+                filter=None,
+                metadata=None,
+                config=None,
+            )
+        ]
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _in_measure_index(
+        field_name: str,
+        field_expr: str,
+        dataset_name: str,
+        measure_index: Dict[_MeasureKey, Tuple[AggregationType, str]],
+    ) -> bool:
+        """Return True if this field should be classified as a measure.
+
+        Checks both the field name and the field's bare expression so that a field
+        named ``revenue`` with ``expr="amount"`` is still recognised when the metric
+        references ``SUM(amount)``.
+        """
+        bare_expr = _strip_qualifier(field_expr)
+        return (
+            (dataset_name, field_name) in measure_index
+            or (None, field_name) in measure_index
+            or (dataset_name, bare_expr) in measure_index
+            or (None, bare_expr) in measure_index
+        )
+
+    def _get_expression(self, osi_expr: OSIExpression) -> str:
+        """Return the expression string for the preferred dialect (fallback: first available)."""
+        for dialect_expr in osi_expr.dialects:
+            if dialect_expr.dialect == self._dialect:
+                return dialect_expr.expression
+        return osi_expr.dialects[0].expression if osi_expr.dialects else ""
+
+    @staticmethod
+    def _parse_source(source: str) -> PydanticNodeRelation:
+        """Parse ``schema.table`` or ``db.schema.table`` into a PydanticNodeRelation."""
+        parts = source.split(".")
+        if len(parts) >= 3:
+            database, schema, alias = parts[0], parts[1], ".".join(parts[2:])
+            return PydanticNodeRelation(alias=alias, schema_name=schema, database=database)
+        if len(parts) == 2:
+            schema, alias = parts
+            return PydanticNodeRelation(alias=alias, schema_name=schema)
+        return PydanticNodeRelation(alias=source, schema_name="")
+
+    @staticmethod
+    def _build_measure_index(
+        osi_sm: OSISemanticModel,
+    ) -> Dict[_MeasureKey, Tuple[AggregationType, str]]:
+        """Scan metric expressions and build a map of column references to aggregation info.
+
+        Keys are ``(dataset_name_or_None, col_name)``.  A ``None`` dataset key means
+        the column reference in the expression had no dataset qualifier.
+        """
+        index: Dict[_MeasureKey, Tuple[AggregationType, str]] = {}
+        for metric in osi_sm.metrics or []:
+            for dialect_expr in metric.expression.dialects:
+                result = _extract_agg_info(dialect_expr.expression)
+                if result is None:
+                    continue
+                agg_type, col = result
+                # col might still retain a qualifier if _extract_agg_info didn't strip it;
+                # _strip_qualifier is already applied inside _extract_agg_info, so col is bare.
+                # Try to recover original qualified form to determine dataset.
+                raw_inner = _get_raw_inner_col(dialect_expr.expression)
+                if raw_inner and "." in raw_inner:
+                    ds, bare = raw_inner.rsplit(".", 1)
+                    index.setdefault((ds, bare), (agg_type, bare))
+                index.setdefault((None, col), (agg_type, col))
+        return index
+
+
+def _get_raw_inner_col(expression: str) -> Optional[str]:
+    """Extract the raw column reference from inside a simple aggregation, before stripping qualifiers."""
+    expr = expression.strip()
+    m = re.fullmatch(r"[A-Za-z_]+\s*\(\s*(.+?)\s*\)", expr)
+    if m:
+        return m.group(1).strip()
+    return None
