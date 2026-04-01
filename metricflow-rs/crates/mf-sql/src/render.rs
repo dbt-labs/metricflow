@@ -118,6 +118,13 @@ impl SqlRenderer for DefaultRenderer {
             SqlExpr::Alias { expr, alias } => {
                 format!("{} AS {alias}", self.render_expr(expr))
             }
+            SqlExpr::BinaryOp { left, op, right } => {
+                format!(
+                    "{} {op} {}",
+                    self.render_expr(left),
+                    self.render_expr(right)
+                )
+            }
         }
     }
 }
@@ -255,5 +262,54 @@ mod tests {
         let sql = renderer.render(&select);
         assert!(sql.contains("GROUP BY"));
         assert!(sql.contains("metric_time__day"));
+    }
+
+    #[test]
+    fn test_render_binary_op() {
+        let expr = SqlExpr::BinaryOp {
+            left: Box::new(SqlExpr::ColumnRef {
+                table_alias: "subq_0".into(),
+                column_name: "bookings".into(),
+            }),
+            op: "-".into(),
+            right: Box::new(SqlExpr::ColumnRef {
+                table_alias: "subq_0".into(),
+                column_name: "instant_bookings".into(),
+            }),
+        };
+        let renderer = DefaultRenderer;
+        assert_eq!(
+            renderer.render_expr(&expr),
+            "subq_0.bookings - subq_0.instant_bookings"
+        );
+    }
+
+    #[test]
+    fn test_render_ratio_expression() {
+        let expr = SqlExpr::BinaryOp {
+            left: Box::new(SqlExpr::ColumnRef {
+                table_alias: "subq_0".into(),
+                column_name: "instant_bookings".into(),
+            }),
+            op: "/".into(),
+            right: Box::new(SqlExpr::FunctionCall {
+                function: "NULLIF".into(),
+                args: vec![
+                    SqlExpr::ColumnRef {
+                        table_alias: "subq_0".into(),
+                        column_name: "bookings".into(),
+                    },
+                    SqlExpr::Literal("0".into()),
+                ],
+            }),
+        };
+        let renderer = DefaultRenderer;
+        let rendered = renderer.render_expr(&expr);
+        assert!(rendered.contains("NULLIF"), "rendered: {rendered}");
+        assert!(rendered.contains("/"), "rendered: {rendered}");
+        assert_eq!(
+            rendered,
+            "subq_0.instant_bookings / NULLIF(subq_0.bookings, 0)"
+        );
     }
 }

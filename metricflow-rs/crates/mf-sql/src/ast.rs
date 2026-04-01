@@ -21,6 +21,12 @@ pub enum SqlExpr {
     Literal(String),
     /// An aliased expression: `expr AS alias`
     Alias { expr: Box<SqlExpr>, alias: String },
+    /// A binary operation: `left op right` (e.g., `a - b`, `a / NULLIF(b, 0)`)
+    BinaryOp {
+        left: Box<SqlExpr>,
+        op: String,
+        right: Box<SqlExpr>,
+    },
 }
 
 /// A SQL FROM source.
