@@ -41,9 +41,9 @@ pub struct SemanticGraph<'a> {
     models_by_name: HashMap<&'a str, &'a SemanticModel>,
     /// Maps primary/unique entity name → model ref
     models_by_entity: HashMap<&'a str, &'a SemanticModel>,
-    /// Maps (left_model_name, entity_name) → EntityJoin
-    /// Key: (foreign model name, entity name), value describes the full join.
-    entity_joins: HashMap<(&'a str, &'a str), EntityJoin<'a>>,
+    /// Maps (left_model_name, entity_name) → list of EntityJoins.
+    /// Multiple right-side models may match the same foreign entity name.
+    entity_joins: HashMap<(&'a str, &'a str), Vec<EntityJoin<'a>>>,
 }
 
 impl<'a> SemanticGraph<'a> {
@@ -83,11 +83,15 @@ impl<'a> SemanticGraph<'a> {
                     models_by_entity.insert(entity.name.as_str(), model);
                 }
             }
+            // Also index via top-level primary_entity field (may not appear in entities list)
+            if let Some(ref pe) = model.primary_entity {
+                models_by_entity.entry(pe.as_str()).or_insert(model);
+            }
         }
 
         // Build entity join index: pair FOREIGN entities on one model with PRIMARY
         // entities of the same name on another model.
-        let mut entity_joins: HashMap<(&str, &str), EntityJoin> = HashMap::new();
+        let mut entity_joins: HashMap<(&str, &str), Vec<EntityJoin>> = HashMap::new();
 
         // Collect (entity_name, EntityType, expr, model) for all entities
         let mut primary_entities: Vec<(&str, &str, &SemanticModel)> = Vec::new(); // (entity_name, expr, model)
@@ -107,22 +111,20 @@ impl<'a> SemanticGraph<'a> {
             }
         }
 
-        // For each foreign entity, find a matching primary entity with the same name
+        // For each foreign entity, find ALL matching primary entities with the same name
         for (foreign_name, foreign_expr, foreign_model) in &foreign_entities {
             for (primary_name, primary_expr, primary_model) in &primary_entities {
                 if *foreign_name == *primary_name && foreign_model.name != primary_model.name {
-                    entity_joins.insert(
-                        (foreign_model.name.as_str(), foreign_name),
-                        EntityJoin {
+                    entity_joins
+                        .entry((foreign_model.name.as_str(), foreign_name))
+                        .or_default()
+                        .push(EntityJoin {
                             entity_name: foreign_name,
                             left_model: foreign_model,
                             left_expr: foreign_expr,
                             right_model: primary_model,
                             right_expr: primary_expr,
-                        },
-                    );
-                    // Only record first match; could be extended later
-                    break;
+                        });
                 }
             }
         }
@@ -195,7 +197,7 @@ impl<'a> SemanticGraph<'a> {
         self.entity_joins
             .iter()
             .filter(|((model_name, _), _)| *model_name == left_model_name)
-            .map(|(_, join)| join)
+            .flat_map(|(_, joins)| joins.iter())
             .collect()
     }
 
@@ -325,13 +327,34 @@ mod tests {
     }
 
     #[test]
-    fn test_entity_join_index_no_joins_for_single_model() {
+    fn test_entity_join_index_for_bookings_source() {
         let json = include_str!("../../../tests/fixtures/simple_manifest.json");
         let manifest = parse::from_json(json).unwrap();
         let graph = SemanticGraph::build(&manifest).unwrap();
 
+        // The full simple_manifest has multiple models sharing entities,
+        // so bookings_source should have joins available.
         let joins = graph.find_entity_joins("bookings_source");
-        assert_eq!(joins.len(), 0);
+        assert!(
+            !joins.is_empty(),
+            "bookings_source should have entity joins in the full manifest"
+        );
+
+        // Specifically check: bookings_source has 'listing' joins
+        let listing_joins: Vec<_> = joins.iter().filter(|j| j.entity_name == "listing").collect();
+        assert!(
+            !listing_joins.is_empty(),
+            "bookings_source should have 'listing' joins. Available: {:?}",
+            joins.iter().map(|j| (j.entity_name, &j.right_model.name)).collect::<Vec<_>>()
+        );
+
+        // find_join_path should find country_latest via the listings_latest join
+        let path = graph.find_join_path("bookings_source", "country_latest");
+        assert!(
+            path.is_some(),
+            "should find join path from bookings_source to country_latest. Listing joins: {:?}",
+            listing_joins.iter().map(|j| (&j.right_model.name, j.right_model.dimensions.iter().map(|d| &d.name).collect::<Vec<_>>())).collect::<Vec<_>>()
+        );
     }
 
     #[test]
@@ -398,13 +421,16 @@ mod tests {
     }
 
     #[test]
-    fn test_find_time_spine_no_matching_grain() {
+    fn test_find_time_spine_day_grain_simple_manifest() {
         let json = include_str!("../../../tests/fixtures/simple_manifest.json");
         let manifest = parse::from_json(json).unwrap();
         let graph = SemanticGraph::build(&manifest).unwrap();
 
-        // simple_manifest has no time spine configured
+        // The full simple_manifest has time spines configured (including day grain).
         let info = graph.find_time_spine(TimeGrain::Day);
-        assert!(info.is_none());
+        assert!(
+            info.is_some(),
+            "full simple_manifest should have a day-grain time spine"
+        );
     }
 }
