@@ -40,6 +40,8 @@ pub fn compile_query(
 
 ### Fusion Integration Point
 
+**Note:** The `metrics()` Jinja function is currently on the `b-per/metrics-jinja-function` feature branch in Fusion, not yet on main.
+
 In `fs/sa/crates/dbt-jinja-utils/src/phases/compile/compile_node_context.rs`, the current subprocess call:
 
 ```rust
