@@ -243,6 +243,135 @@ fn test_end_to_end_ratio_metric() {
     assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
 }
 
+// ─── Cumulative metric tests (Phase 4, Tasks 8-10) ───────────────────────────
+
+#[test]
+fn test_end_to_end_trailing_7d_bookings() {
+    let manifest_json = include_str!("fixtures/cumulative_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["trailing_7d_bookings".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (trailing_7d_bookings):\n{sql}");
+
+    assert!(
+        sql.contains("demo.mf_time_spine"),
+        "should reference time spine table: {sql}"
+    );
+    assert!(
+        sql.contains("INTERVAL"),
+        "should have INTERVAL for trailing window: {sql}"
+    );
+    assert!(sql.contains("7"), "should have window count of 7: {sql}");
+    assert!(
+        sql.contains("INNER JOIN"),
+        "should have INNER JOIN to source: {sql}"
+    );
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+    assert!(
+        sql.contains("metric_time__day"),
+        "should have metric_time dimension: {sql}"
+    );
+    assert!(sql.contains("GROUP BY"), "should have GROUP BY: {sql}");
+}
+
+#[test]
+fn test_end_to_end_bookings_mtd() {
+    let manifest_json = include_str!("fixtures/cumulative_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings_mtd".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (bookings_mtd):\n{sql}");
+
+    assert!(
+        sql.contains("demo.mf_time_spine"),
+        "should reference time spine table: {sql}"
+    );
+    assert!(
+        sql.contains("DATE_TRUNC"),
+        "should have DATE_TRUNC for grain_to_date: {sql}"
+    );
+    assert!(sql.contains("month"), "should reference month grain: {sql}");
+    assert!(
+        sql.contains("INNER JOIN"),
+        "should have INNER JOIN to source: {sql}"
+    );
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+    assert!(
+        sql.contains("metric_time__day"),
+        "should have metric_time dimension: {sql}"
+    );
+}
+
+#[test]
+fn test_end_to_end_bookings_all_time() {
+    let manifest_json = include_str!("fixtures/cumulative_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings_all_time".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (bookings_all_time):\n{sql}");
+
+    assert!(
+        sql.contains("demo.mf_time_spine"),
+        "should reference time spine table: {sql}"
+    );
+    // All-time has no INTERVAL or DATE_TRUNC
+    assert!(
+        !sql.contains("INTERVAL"),
+        "all-time should not have INTERVAL: {sql}"
+    );
+    assert!(
+        !sql.contains("DATE_TRUNC"),
+        "all-time should not have DATE_TRUNC: {sql}"
+    );
+    assert!(
+        sql.contains("INNER JOIN"),
+        "should have INNER JOIN to source: {sql}"
+    );
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 
 #[test]
