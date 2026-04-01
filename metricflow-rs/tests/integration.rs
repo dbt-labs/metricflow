@@ -759,3 +759,423 @@ fn test_end_to_end_query_level_where_filter() {
         "SQL should reference plan_type column: {sql}"
     );
 }
+
+// ─── FULL OUTER JOIN NULL deduplication tests ───────────────────────────────
+
+#[test]
+fn test_combine_aggregated_outputs_reaggregates_for_null_dedup() {
+    // When combining 2+ aggregated subqueries via FULL OUTER JOIN with group-by columns,
+    // the result must be wrapped in a GROUP BY + MAX to handle NULL = NULL not matching.
+    let manifest_json = include_str!("fixtures/derived_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings".into(), "instant_bookings".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (combine reaggregation):\n{sql}");
+
+    // The FULL OUTER JOIN must be wrapped in a re-aggregation GROUP BY
+    // to handle NULL dimension values (NULL = NULL returns NULL in SQL).
+    assert!(
+        sql.contains("MAX("),
+        "should wrap metric columns in MAX() for NULL dedup: {sql}"
+    );
+    // The outer query should GROUP BY the coalesced dimension column
+    let combine_idx = sql.find("combine_subq_").expect("should have combine_subq_ alias");
+    let after_combine = &sql[combine_idx..];
+    assert!(
+        after_combine.contains("GROUP BY"),
+        "should GROUP BY the coalesced columns after FULL OUTER JOIN: {sql}"
+    );
+}
+
+#[test]
+fn test_combine_aggregated_outputs_no_reaggregation_without_groupby() {
+    // When there's no group-by (CROSS JOIN), no re-aggregation is needed.
+    let manifest_json = include_str!("fixtures/derived_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings".into(), "instant_bookings".into()],
+        group_by: vec![],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (combine no group-by):\n{sql}");
+
+    // CROSS JOIN, no re-aggregation needed
+    assert!(
+        sql.contains("CROSS JOIN"),
+        "should use CROSS JOIN without group-by: {sql}"
+    );
+    assert!(
+        !sql.contains("MAX("),
+        "should NOT wrap in MAX() without group-by: {sql}"
+    );
+}
+
+#[test]
+fn test_three_way_full_outer_join_uses_coalesce_in_on_clause() {
+    // When 3+ aggregated subqueries are combined, the ON clause for the 3rd+ join
+    // should use COALESCE of previously-seen aliases, not just the first alias.
+    let manifest_json = include_str!("fixtures/filter_pushdown_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    // nps_score is a derived metric with 3 inputs → 3-way FULL OUTER JOIN
+    let query = QuerySpec {
+        metrics: vec!["nps_score".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (3-way FULL OUTER JOIN):\n{sql}");
+
+    // Count FULL OUTER JOINs — should be at least 2 (for 3 subqueries)
+    let foj_count = sql.matches("FULL OUTER JOIN").count();
+    assert!(
+        foj_count >= 2,
+        "should have at least 2 FULL OUTER JOINs for 3 inputs, got {foj_count}: {sql}"
+    );
+
+    // The second FULL OUTER JOIN's ON clause should use COALESCE of the first two aliases.
+    // Pattern: COALESCE(agg_subq_N.col, agg_subq_M.col) = agg_subq_K.col
+    // Find the second FULL OUTER JOIN and check its ON clause has COALESCE.
+    let second_foj = sql
+        .match_indices("FULL OUTER JOIN")
+        .nth(1)
+        .expect("should have 2nd FULL OUTER JOIN");
+    let after_second_foj = &sql[second_foj.0..];
+    let on_pos = after_second_foj
+        .find("\n")
+        .and_then(|_| after_second_foj.find("ON"))
+        .expect("should have ON after 2nd FULL OUTER JOIN");
+    let on_clause = &after_second_foj[on_pos..on_pos + 200.min(after_second_foj.len() - on_pos)];
+    assert!(
+        on_clause.contains("COALESCE("),
+        "second FULL OUTER JOIN ON clause should use COALESCE: {on_clause}"
+    );
+}
+
+// ─── Derived metric filter pushdown tests ───────────────────────────────────
+
+#[test]
+fn test_derived_metric_filter_pushdown_to_child_metrics() {
+    // nps_enterprise has a filter (plan_tier = 'enterprise') that must be pushed
+    // down to all 3 child simple metrics (respondents, promoters, detractors).
+    let manifest_json = include_str!("fixtures/filter_pushdown_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["nps_enterprise".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (filter pushdown):\n{sql}");
+
+    // The derived metric filter should appear in each child metric's WHERE clause.
+    // Count occurrences of the filter — should be 3 (once per child).
+    let filter_count = sql.matches("plan_tier").count();
+    assert!(
+        filter_count >= 3,
+        "derived metric filter should be pushed to all 3 child metrics, found {filter_count} occurrences: {sql}"
+    );
+    assert!(
+        sql.contains("'enterprise'"),
+        "should filter on enterprise: {sql}"
+    );
+}
+
+#[test]
+fn test_different_derived_metrics_produce_different_filters() {
+    // nps_enterprise filters on 'enterprise', nps_developer filters on 'developer'.
+    // They must produce different SQL.
+    let manifest_json = include_str!("fixtures/filter_pushdown_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let enterprise_query = QuerySpec {
+        metrics: vec!["nps_enterprise".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let developer_query = QuerySpec {
+        metrics: vec!["nps_developer".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let enterprise_sql =
+        mf_sql::compile_query(&manifest, &enterprise_query, SqlDialect::DuckDB).unwrap();
+    let developer_sql =
+        mf_sql::compile_query(&manifest, &developer_query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Enterprise SQL:\n{enterprise_sql}");
+    eprintln!("Developer SQL:\n{developer_sql}");
+
+    // Enterprise SQL should contain 'enterprise' but not 'developer'
+    assert!(
+        enterprise_sql.contains("'enterprise'"),
+        "enterprise SQL should filter on enterprise: {enterprise_sql}"
+    );
+    assert!(
+        !enterprise_sql.contains("'developer'"),
+        "enterprise SQL should NOT contain developer filter: {enterprise_sql}"
+    );
+
+    // Developer SQL should contain 'developer' but not 'enterprise'
+    assert!(
+        developer_sql.contains("'developer'"),
+        "developer SQL should filter on developer: {developer_sql}"
+    );
+    assert!(
+        !developer_sql.contains("'enterprise'"),
+        "developer SQL should NOT contain enterprise filter: {developer_sql}"
+    );
+}
+
+#[test]
+fn test_derived_metric_without_filter_has_no_extra_where() {
+    // nps_score has no filter — only the child metrics' own filters should appear.
+    let manifest_json = include_str!("fixtures/filter_pushdown_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["nps_score".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (no pushdown):\n{sql}");
+
+    // plan_tier should NOT appear (no derived-level filter)
+    assert!(
+        !sql.contains("plan_tier"),
+        "unfiltered nps_score should not have plan_tier filter: {sql}"
+    );
+    // But child metric filters (nps_category) should still be present
+    assert!(
+        sql.contains("nps_category"),
+        "child metric filters should still be present: {sql}"
+    );
+}
+
+// ─── Per-input-metric filter tests ──────────────────────────────────────────
+
+#[test]
+fn test_per_input_metric_filters() {
+    // nps_with_input_filters has per-input filters (survey_type = 'cloud')
+    // on each input metric.
+    let manifest_json = include_str!("fixtures/filter_pushdown_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["nps_with_input_filters".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (per-input filters):\n{sql}");
+
+    // The per-input filter (survey_type = 'cloud') should appear for each input.
+    let cloud_count = sql.matches("'cloud'").count();
+    assert!(
+        cloud_count >= 3,
+        "per-input filter should appear for all 3 inputs, found {cloud_count} occurrences: {sql}"
+    );
+    // The child metric filters (nps_category) should also be present for promoters/detractors
+    let nps_cat_count = sql.matches("nps_category").count();
+    assert!(
+        nps_cat_count >= 2,
+        "child metric nps_category filters should be present, found {nps_cat_count}: {sql}"
+    );
+}
+
+#[test]
+fn test_derived_metric_filter_combined_with_child_metric_filter() {
+    // nps_enterprise pushes plan_tier='enterprise' to child metrics.
+    // The 'promoters' child already has its own filter (nps_category='promoter').
+    // Both filters should appear together in the promoters subquery.
+    let manifest_json = include_str!("fixtures/filter_pushdown_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["nps_enterprise".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (combined filters):\n{sql}");
+
+    // Find WHERE clauses that contain BOTH the derived-level filter AND child filter.
+    // The promoters subquery should have: nps_category = 'promoter' AND plan_tier = 'enterprise'
+    // Split on WHERE to find individual filter blocks.
+    let where_blocks: Vec<&str> = sql.split("WHERE").collect();
+    let combined_filter_blocks: Vec<&&str> = where_blocks
+        .iter()
+        .filter(|block| block.contains("'promoter'") && block.contains("'enterprise'"))
+        .collect();
+    assert!(
+        !combined_filter_blocks.is_empty(),
+        "promoters subquery should have BOTH nps_category='promoter' AND plan_tier='enterprise': {sql}"
+    );
+
+    let detractor_blocks: Vec<&&str> = where_blocks
+        .iter()
+        .filter(|block| block.contains("'detractor'") && block.contains("'enterprise'"))
+        .collect();
+    assert!(
+        !detractor_blocks.is_empty(),
+        "detractors subquery should have BOTH nps_category='detractor' AND plan_tier='enterprise': {sql}"
+    );
+}
+
+// ─── fill_nulls_with in FULL OUTER JOIN re-aggregation ──────────────────────
+
+#[test]
+fn test_fill_nulls_with_in_combine_reaggregation() {
+    // When child metrics have fill_nulls_with=0, the re-aggregation after
+    // FULL OUTER JOIN should use COALESCE(MAX(col), 0) instead of just MAX(col).
+    // This handles the case where a dimension value has no matching rows in one
+    // branch (e.g., no detractors for is_reseller=true → detractors should be 0, not NULL).
+    let manifest_json = include_str!("fixtures/filter_pushdown_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["nps_score".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (fill_nulls_with in combine):\n{sql}");
+
+    // All three metric columns should be wrapped in COALESCE(MAX(...), 0)
+    let coalesce_max_count = sql.matches("COALESCE(MAX(").count();
+    assert!(
+        coalesce_max_count >= 3,
+        "all 3 metric columns should use COALESCE(MAX(...), 0), found {coalesce_max_count}: {sql}"
+    );
+    // Verify the fill value is 0
+    assert!(
+        sql.contains("COALESCE(MAX(") && sql.contains("), 0)"),
+        "should use fill value 0: {sql}"
+    );
+}
+
+#[test]
+fn test_no_fill_nulls_with_uses_plain_max() {
+    // When metrics do NOT have fill_nulls_with, the re-aggregation uses plain MAX().
+    let manifest_json = include_str!("fixtures/derived_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings".into(), "instant_bookings".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (no fill_nulls_with):\n{sql}");
+
+    // Should have MAX but NOT COALESCE(MAX(...))
+    assert!(
+        sql.contains("MAX("),
+        "should use MAX in re-aggregation: {sql}"
+    );
+    assert!(
+        !sql.contains("COALESCE(MAX("),
+        "should NOT use COALESCE(MAX(...)) without fill_nulls_with: {sql}"
+    );
+}

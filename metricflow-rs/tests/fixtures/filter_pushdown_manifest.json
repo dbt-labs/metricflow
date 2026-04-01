@@ -1,0 +1,285 @@
+{
+  "semantic_models": [
+    {
+      "name": "survey_source",
+      "node_relation": {
+        "alias": "fct_surveys",
+        "schema_name": "demo",
+        "database": null
+      },
+      "defaults": {
+        "agg_time_dimension": "ds"
+      },
+      "primary_entity": "survey",
+      "entities": [
+        {
+          "name": "survey",
+          "type": "primary",
+          "expr": null
+        },
+        {
+          "name": "account",
+          "type": "foreign",
+          "expr": "account_id"
+        }
+      ],
+      "measures": [
+        {
+          "name": "total_respondents",
+          "agg": "count",
+          "expr": "respondent_id",
+          "agg_time_dimension": "ds"
+        },
+        {
+          "name": "promoter_respondents",
+          "agg": "count",
+          "expr": "respondent_id",
+          "agg_time_dimension": "ds"
+        },
+        {
+          "name": "detractor_respondents",
+          "agg": "count",
+          "expr": "respondent_id",
+          "agg_time_dimension": "ds"
+        }
+      ],
+      "dimensions": [
+        {
+          "name": "ds",
+          "type": "time",
+          "type_params": {
+            "time_granularity": "day"
+          },
+          "expr": null
+        },
+        {
+          "name": "survey_type",
+          "type": "categorical",
+          "expr": null
+        },
+        {
+          "name": "plan_tier",
+          "type": "categorical",
+          "expr": null
+        },
+        {
+          "name": "nps_category",
+          "type": "categorical",
+          "expr": null
+        }
+      ]
+    },
+    {
+      "name": "accounts_source",
+      "node_relation": {
+        "alias": "dim_accounts",
+        "schema_name": "demo",
+        "database": null
+      },
+      "defaults": {
+        "agg_time_dimension": "created_at"
+      },
+      "primary_entity": "account",
+      "entities": [
+        {
+          "name": "account",
+          "type": "primary",
+          "expr": "account_id"
+        }
+      ],
+      "measures": [],
+      "dimensions": [
+        {
+          "name": "created_at",
+          "type": "time",
+          "type_params": {
+            "time_granularity": "day"
+          },
+          "expr": null
+        },
+        {
+          "name": "is_enterprise",
+          "type": "categorical",
+          "expr": null
+        },
+        {
+          "name": "region",
+          "type": "categorical",
+          "expr": null
+        }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "name": "respondents",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "total_respondents",
+          "join_to_timespine": false
+        },
+        "fill_nulls_with": 0
+      }
+    },
+    {
+      "name": "promoters",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "promoter_respondents",
+          "join_to_timespine": false
+        },
+        "fill_nulls_with": 0
+      },
+      "filter": {
+        "where_filters": [
+          {
+            "where_sql_template": "{{ Dimension('survey__nps_category') }} = 'promoter'"
+          }
+        ]
+      }
+    },
+    {
+      "name": "detractors",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "detractor_respondents",
+          "join_to_timespine": false
+        },
+        "fill_nulls_with": 0
+      },
+      "filter": {
+        "where_filters": [
+          {
+            "where_sql_template": "{{ Dimension('survey__nps_category') }} = 'detractor'"
+          }
+        ]
+      }
+    },
+    {
+      "name": "nps_score",
+      "type": "derived",
+      "type_params": {
+        "expr": "(promoters - detractors) * 100 / respondents",
+        "metrics": [
+          {
+            "name": "respondents",
+            "alias": "respondents"
+          },
+          {
+            "name": "promoters",
+            "alias": "promoters"
+          },
+          {
+            "name": "detractors",
+            "alias": "detractors"
+          }
+        ]
+      }
+    },
+    {
+      "name": "nps_enterprise",
+      "type": "derived",
+      "type_params": {
+        "expr": "(promoters - detractors) * 100 / respondents",
+        "metrics": [
+          {
+            "name": "respondents",
+            "alias": "respondents"
+          },
+          {
+            "name": "promoters",
+            "alias": "promoters"
+          },
+          {
+            "name": "detractors",
+            "alias": "detractors"
+          }
+        ]
+      },
+      "filter": {
+        "where_filters": [
+          {
+            "where_sql_template": "{{ Dimension('survey__plan_tier') }} = 'enterprise'"
+          }
+        ]
+      }
+    },
+    {
+      "name": "nps_developer",
+      "type": "derived",
+      "type_params": {
+        "expr": "(promoters - detractors) * 100 / respondents",
+        "metrics": [
+          {
+            "name": "respondents",
+            "alias": "respondents"
+          },
+          {
+            "name": "promoters",
+            "alias": "promoters"
+          },
+          {
+            "name": "detractors",
+            "alias": "detractors"
+          }
+        ]
+      },
+      "filter": {
+        "where_filters": [
+          {
+            "where_sql_template": "{{ Dimension('survey__plan_tier') }} = 'developer'"
+          }
+        ]
+      }
+    },
+    {
+      "name": "nps_with_input_filters",
+      "type": "derived",
+      "type_params": {
+        "expr": "(cloud_promoters - cloud_detractors) * 100 / cloud_respondents",
+        "metrics": [
+          {
+            "name": "respondents",
+            "alias": "cloud_respondents",
+            "filter": {
+              "where_filters": [
+                {
+                  "where_sql_template": "{{ Dimension('survey__survey_type') }} = 'cloud'"
+                }
+              ]
+            }
+          },
+          {
+            "name": "promoters",
+            "alias": "cloud_promoters",
+            "filter": {
+              "where_filters": [
+                {
+                  "where_sql_template": "{{ Dimension('survey__survey_type') }} = 'cloud'"
+                }
+              ]
+            }
+          },
+          {
+            "name": "detractors",
+            "alias": "cloud_detractors",
+            "filter": {
+              "where_filters": [
+                {
+                  "where_sql_template": "{{ Dimension('survey__survey_type') }} = 'cloud'"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "project_configuration": {
+    "time_spine_table_configurations": [],
+    "time_spines": []
+  }
+}
