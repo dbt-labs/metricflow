@@ -23,13 +23,9 @@ enum Commands {
         #[arg(long, value_delimiter = ',')]
         metrics: Vec<String>,
 
-        /// Group-by dimensions (comma-separated, e.g., "metric_time,is_instant")
+        /// Group-by dimensions (comma-separated, e.g., "metric_time__day,listing__country")
         #[arg(long, value_delimiter = ',')]
         group_by: Vec<String>,
-
-        /// Time grain
-        #[arg(long)]
-        grain: Option<String>,
 
         /// SQL dialect
         #[arg(long, default_value = "duckdb")]
@@ -74,7 +70,6 @@ fn main() {
             manifest,
             metrics,
             group_by,
-            grain,
             dialect,
             limit,
         } => {
@@ -92,14 +87,13 @@ fn main() {
             // Parse group-by specs following Python MetricFlow's dundered name convention.
             // Split on "__" and check if the last part is a time granularity.
             // Examples:
-            //   "metric_time" → TimeDimension { name: "metric_time", grain }
-            //   "ds__month" → TimeDimension { name: "ds", grain: Month }
-            //   "customer_arr_waterfall__close_month" → TimeDimension { name: "close", grain: Month, entity: ["customer_arr_waterfall"] }
-            //     BUT "close_month" is not a grain → Dimension { name: "close_month", entity: ["customer_arr_waterfall"] }
+            //   "metric_time" → TimeDimension { name: "metric_time", grain: Day }
+            //   "metric_time__month" → TimeDimension { name: "metric_time", grain: Month }
             //   "listing__country" → Dimension { name: "country", entity: ["listing"] }
+            //   "listing__ds__week" → TimeDimension { name: "ds", grain: Week, entity: ["listing"] }
             let group_by_specs: Vec<GroupBySpec> = group_by
                 .iter()
-                .map(|g| parse_group_by_spec(g, grain.as_deref()))
+                .map(|g| parse_group_by_spec(g))
                 .collect();
 
             let query = QuerySpec {
@@ -124,11 +118,12 @@ fn main() {
 /// Parse a dundered group-by name following Python MetricFlow's convention.
 ///
 /// Split on `__` and check if the last part is a time granularity:
-/// - `"metric_time"` with --grain day → TimeDimension { name: "metric_time", grain: Day }
+/// - `"metric_time"` → TimeDimension { name: "metric_time", grain: Day }
+/// - `"metric_time__month"` → TimeDimension { name: "metric_time", grain: Month }
 /// - `"ds__month"` → TimeDimension { name: "ds", grain: Month }
 /// - `"listing__country"` → Dimension { name: "country", entity_path: ["listing"] }
 /// - `"listing__ds__week"` → TimeDimension { name: "ds", grain: Week, entity_path: ["listing"] }
-fn parse_group_by_spec(input: &str, cli_grain: Option<&str>) -> GroupBySpec {
+fn parse_group_by_spec(input: &str) -> GroupBySpec {
     let parts: Vec<&str> = input.split("__").collect();
 
     // Single part, no dunder
@@ -136,20 +131,9 @@ fn parse_group_by_spec(input: &str, cli_grain: Option<&str>) -> GroupBySpec {
         let name = parts[0];
         // metric_time is always a time dimension (default grain: day)
         if name == "metric_time" {
-            let grain = cli_grain
-                .and_then(|g| g.parse().ok())
-                .unwrap_or(TimeGrain::Day);
             return GroupBySpec::TimeDimension {
                 name: name.to_string(),
-                grain,
-                entity_path: vec![],
-            };
-        }
-        // Other names: if --grain provided, treat as time dimension
-        if let Some(gr) = cli_grain {
-            return GroupBySpec::TimeDimension {
-                name: name.to_string(),
-                grain: gr.parse().unwrap_or(TimeGrain::Day),
+                grain: TimeGrain::Day,
                 entity_path: vec![],
             };
         }
@@ -186,15 +170,6 @@ fn parse_group_by_spec(input: &str, cli_grain: Option<&str>) -> GroupBySpec {
     let entity_path: Vec<String> = parts[..parts.len() - 1].iter().map(|s| s.to_string()).collect();
     let name = parts[parts.len() - 1].to_string();
 
-    // If --grain is provided, check if this dimension should be treated as a time dimension
-    if let Some(gr) = cli_grain {
-        return GroupBySpec::TimeDimension {
-            name,
-            grain: gr.parse().unwrap_or(TimeGrain::Day),
-            entity_path,
-        };
-    }
-
     GroupBySpec::Dimension {
         name,
         entity_path,
@@ -207,21 +182,14 @@ mod tests {
 
     #[test]
     fn test_parse_simple_dimension() {
-        let spec = parse_group_by_spec("is_instant", None);
+        let spec = parse_group_by_spec("is_instant");
         assert!(matches!(spec, GroupBySpec::Dimension { ref name, ref entity_path } if name == "is_instant" && entity_path.is_empty()));
     }
 
     #[test]
-    fn test_parse_metric_time_no_grain_defaults_to_day() {
-        // "metric_time" without --grain → TimeDimension with Day grain
-        let spec = parse_group_by_spec("metric_time", None);
-        assert!(matches!(spec, GroupBySpec::TimeDimension { ref name, grain, ref entity_path }
-            if name == "metric_time" && grain == TimeGrain::Day && entity_path.is_empty()));
-    }
-
-    #[test]
-    fn test_parse_metric_time_with_grain_flag() {
-        let spec = parse_group_by_spec("metric_time", Some("day"));
+    fn test_parse_metric_time_defaults_to_day() {
+        // "metric_time" → TimeDimension with Day grain
+        let spec = parse_group_by_spec("metric_time");
         assert!(matches!(spec, GroupBySpec::TimeDimension { ref name, grain, ref entity_path }
             if name == "metric_time" && grain == TimeGrain::Day && entity_path.is_empty()));
     }
@@ -229,15 +197,23 @@ mod tests {
     #[test]
     fn test_parse_metric_time_with_dunder_grain() {
         // "metric_time__day" → TimeDimension, grain from dunder
-        let spec = parse_group_by_spec("metric_time__day", None);
+        let spec = parse_group_by_spec("metric_time__day");
         assert!(matches!(spec, GroupBySpec::TimeDimension { ref name, grain, ref entity_path }
             if name == "metric_time" && grain == TimeGrain::Day && entity_path.is_empty()));
     }
 
     #[test]
+    fn test_parse_metric_time_year() {
+        // "metric_time__year" → TimeDimension with Year grain
+        let spec = parse_group_by_spec("metric_time__year");
+        assert!(matches!(spec, GroupBySpec::TimeDimension { ref name, grain, ref entity_path }
+            if name == "metric_time" && grain == TimeGrain::Year && entity_path.is_empty()));
+    }
+
+    #[test]
     fn test_parse_entity_dunder_dimension() {
         // "listing__country" → Dimension with entity path
-        let spec = parse_group_by_spec("listing__country", None);
+        let spec = parse_group_by_spec("listing__country");
         match spec {
             GroupBySpec::Dimension { name, entity_path } => {
                 assert_eq!(name, "country");
@@ -250,7 +226,7 @@ mod tests {
     #[test]
     fn test_parse_entity_dunder_dimension_not_a_grain() {
         // "customer_arr_waterfall__close_month" — "close_month" is NOT a grain
-        let spec = parse_group_by_spec("customer_arr_waterfall__close_month", None);
+        let spec = parse_group_by_spec("customer_arr_waterfall__close_month");
         match spec {
             GroupBySpec::Dimension { name, entity_path } => {
                 assert_eq!(name, "close_month");
@@ -263,7 +239,7 @@ mod tests {
     #[test]
     fn test_parse_entity_dunder_time_dimension_with_grain() {
         // "listing__ds__week" → TimeDimension with entity path and grain
-        let spec = parse_group_by_spec("listing__ds__week", None);
+        let spec = parse_group_by_spec("listing__ds__week");
         match spec {
             GroupBySpec::TimeDimension { name, grain, entity_path } => {
                 assert_eq!(name, "ds");
@@ -277,7 +253,7 @@ mod tests {
     #[test]
     fn test_parse_ds_dunder_month() {
         // "ds__month" → TimeDimension, no entity path
-        let spec = parse_group_by_spec("ds__month", None);
+        let spec = parse_group_by_spec("ds__month");
         match spec {
             GroupBySpec::TimeDimension { name, grain, entity_path } => {
                 assert_eq!(name, "ds");
