@@ -79,6 +79,26 @@ fn build_single_metric_plan(
     }
 }
 
+/// Build a subplan for a metric input (used by derived/ratio metrics).
+/// Simple metrics use `build_input_metric_subplan` (which supports output aliasing);
+/// non-simple metrics dispatch through `build_single_metric_plan` (recursive).
+fn build_metric_input(
+    graph: &SemanticGraph,
+    query: &QuerySpec,
+    metric_name: &str,
+    alias: &str,
+    plan: &mut DataflowPlan,
+) -> Result<NodeIndex, PlanError> {
+    let metric = graph
+        .find_metric(metric_name)
+        .ok_or_else(|| ResolveError::UnknownMetric(metric_name.to_string()))?;
+
+    match metric.metric_type {
+        MetricKind::Simple => build_input_metric_subplan(graph, query, metric_name, alias, plan),
+        _ => build_single_metric_plan(graph, query, metric_name, plan),
+    }
+}
+
 /// Build the subgraph for a simple metric (ReadFromSource → optional joins → Aggregate).
 /// Returns the NodeIndex of the Aggregate node.
 fn build_simple_metric_plan(
@@ -337,16 +357,7 @@ fn build_derived_metric_plan(
     // nested derived metrics (not just simple inputs).
     let mut agg_nodes: Vec<NodeIndex> = Vec::new();
     for (input_metric_name, alias) in &resolved.inputs {
-        let input_metric = graph
-            .find_metric(input_metric_name)
-            .ok_or_else(|| ResolveError::UnknownMetric(input_metric_name.clone()))?;
-
-        let agg_node = match input_metric.metric_type {
-            MetricKind::Simple => {
-                build_input_metric_subplan(graph, query, input_metric_name, alias, plan)?
-            }
-            _ => build_single_metric_plan(graph, query, input_metric_name, plan)?,
-        };
+        let agg_node = build_metric_input(graph, query, input_metric_name, alias, plan)?;
         agg_nodes.push(agg_node);
     }
 
@@ -384,9 +395,10 @@ fn build_ratio_metric_plan(
     let (num_metric_name, num_alias) = &resolved.numerator;
     let (den_metric_name, den_alias) = &resolved.denominator;
 
-    // Build numerator and denominator subplans
-    let num_agg = build_input_metric_subplan(graph, query, num_metric_name, num_alias, plan)?;
-    let den_agg = build_input_metric_subplan(graph, query, den_metric_name, den_alias, plan)?;
+    // Build numerator and denominator subplans, dispatching by type to support
+    // non-simple inputs (e.g., derived metrics as numerator/denominator).
+    let num_agg = build_metric_input(graph, query, num_metric_name, num_alias, plan)?;
+    let den_agg = build_metric_input(graph, query, den_metric_name, den_alias, plan)?;
 
     // Combine the two via CombineAggregatedOutputs
     let combine = plan.add_node(DataflowNode::CombineAggregatedOutputs);
