@@ -1,5 +1,5 @@
 use mf_core::manifest::*;
-use mf_core::types::EntityType;
+use mf_core::types::{EntityType, TimeGrain};
 use std::collections::HashMap;
 use thiserror::Error;
 
@@ -205,6 +205,45 @@ impl<'a> SemanticGraph<'a> {
     pub fn manifest(&self) -> &'a SemanticManifest {
         self.manifest
     }
+
+    /// Find the time spine table configuration for a given grain.
+    /// Checks `time_spines` (newer format) first, then falls back to
+    /// `time_spine_table_configurations` (older format).
+    pub fn find_time_spine(&self, grain: TimeGrain) -> Option<TimeSpineInfo> {
+        // Check time_spines first (newer format)
+        for ts in &self.manifest.project_configuration.time_spines {
+            if ts.primary_column.time_granularity <= grain {
+                return Some(TimeSpineInfo {
+                    table: ts.node_relation.fully_qualified(),
+                    column: ts.primary_column.name.clone(),
+                    grain: ts.primary_column.time_granularity,
+                });
+            }
+        }
+        // Fall back to time_spine_table_configurations (older format)
+        for cfg in &self
+            .manifest
+            .project_configuration
+            .time_spine_table_configurations
+        {
+            if cfg.grain <= grain {
+                return Some(TimeSpineInfo {
+                    table: cfg.location.clone(),
+                    column: cfg.column_name.clone(),
+                    grain: cfg.grain,
+                });
+            }
+        }
+        None
+    }
+}
+
+/// Information about a time spine usable for cumulative metric computation.
+#[derive(Debug, Clone)]
+pub struct TimeSpineInfo {
+    pub table: String,
+    pub column: String,
+    pub grain: TimeGrain,
 }
 
 #[cfg(test)]
@@ -310,5 +349,44 @@ mod tests {
 
         let path = graph.find_join_path("bookings_source", "nonexistent_dim");
         assert!(path.is_none());
+    }
+
+    #[test]
+    fn test_find_time_spine_day_grain() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        // The cumulative manifest has a day-grain time spine at demo.mf_time_spine
+        let info = graph.find_time_spine(TimeGrain::Day);
+        assert!(info.is_some(), "should find a day-grain time spine");
+        let info = info.unwrap();
+        assert_eq!(info.table, "demo.mf_time_spine");
+        assert_eq!(info.column, "ds");
+        assert_eq!(info.grain, TimeGrain::Day);
+    }
+
+    #[test]
+    fn test_find_time_spine_month_uses_day_spine() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        // Day spine (grain <= Month) can serve a month-grain query
+        let info = graph.find_time_spine(TimeGrain::Month);
+        assert!(info.is_some(), "day spine should serve month grain queries");
+        let info = info.unwrap();
+        assert_eq!(info.table, "demo.mf_time_spine");
+    }
+
+    #[test]
+    fn test_find_time_spine_no_matching_grain() {
+        let json = include_str!("../../../tests/fixtures/simple_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        // simple_manifest has no time spine configured
+        let info = graph.find_time_spine(TimeGrain::Day);
+        assert!(info.is_none());
     }
 }
