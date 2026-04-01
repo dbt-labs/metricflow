@@ -63,7 +63,8 @@ impl GroupBySpec {
 
 #[derive(Debug, Clone)]
 pub struct OrderBySpec {
-    pub column: GroupBySpec,
+    /// Column name to order by (e.g., "metric_time__day", "bookings").
+    pub column_name: String,
     pub descending: bool,
 }
 

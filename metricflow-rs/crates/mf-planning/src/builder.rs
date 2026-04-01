@@ -391,7 +391,7 @@ fn add_order_by_and_limit(
         let order_specs: Vec<(String, bool)> = query
             .order_by
             .iter()
-            .map(|o| (o.column.column_name(), o.descending))
+            .map(|o| (o.column_name.clone(), o.descending))
             .collect();
         let order_node = plan.add_node(DataflowNode::OrderBy { specs: order_specs });
         plan.add_edge(current, order_node);

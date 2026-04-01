@@ -35,6 +35,10 @@ enum Commands {
         #[arg(long = "where", value_delimiter = ',')]
         where_clauses: Vec<String>,
 
+        /// Order by columns (comma-separated, prefix with - for descending, e.g., "metric_time__day,-bookings")
+        #[arg(long, value_delimiter = ',', allow_hyphen_values = true)]
+        order_by: Vec<String>,
+
         /// Row limit
         #[arg(long)]
         limit: Option<u64>,
@@ -76,6 +80,7 @@ fn main() {
             group_by,
             dialect,
             where_clauses,
+            order_by,
             limit,
         } => {
             let manifest_json = std::fs::read_to_string(&manifest).unwrap_or_else(|e| {
@@ -101,11 +106,28 @@ fn main() {
                 .map(|g| parse_group_by_spec(g))
                 .collect();
 
+            let order_by_specs: Vec<OrderBySpec> = order_by
+                .iter()
+                .map(|s| {
+                    if let Some(col) = s.strip_prefix('-') {
+                        OrderBySpec {
+                            column_name: col.to_string(),
+                            descending: true,
+                        }
+                    } else {
+                        OrderBySpec {
+                            column_name: s.to_string(),
+                            descending: false,
+                        }
+                    }
+                })
+                .collect();
+
             let query = QuerySpec {
                 metrics,
                 group_by: group_by_specs,
                 where_clauses,
-                order_by: vec![],
+                order_by: order_by_specs,
                 limit,
             };
 
