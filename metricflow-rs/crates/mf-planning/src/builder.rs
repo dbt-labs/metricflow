@@ -1,7 +1,9 @@
 use crate::dataflow::*;
 use crate::resolve::{self, ResolveError};
 use mf_core::spec::*;
+use mf_core::types::*;
 use mf_manifest::graph::SemanticGraph;
+use petgraph::graph::NodeIndex;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -15,8 +17,7 @@ pub enum PlanError {
 }
 
 /// Build a dataflow plan for the given query.
-/// Phase 3: supports simple metrics with dimensions on the same model OR via a
-/// one-hop entity join (FOREIGN → PRIMARY on the same entity name).
+/// Phase 4: supports simple, derived, and ratio metrics.
 pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPlan, PlanError> {
     // For now: support exactly one metric
     // (Multi-metric queries are a later phase)
@@ -25,9 +26,58 @@ pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPl
     }
 
     let metric_name = &query.metrics[0];
-    let resolved = resolve::resolve_simple_metric(graph, metric_name)?;
+    let metric = graph
+        .find_metric(metric_name)
+        .ok_or_else(|| ResolveError::UnknownMetric(metric_name.clone()))?;
 
     let mut plan = DataflowPlan::new();
+
+    match metric.metric_type {
+        MetricKind::Simple => {
+            let current =
+                build_simple_metric_plan(graph, query, metric_name, metric_name, &mut plan)?;
+            let current = add_order_by_and_limit(&mut plan, current, query);
+            plan.set_sink(current);
+        }
+        MetricKind::Derived => {
+            let current = build_derived_metric_plan(graph, query, metric_name, &mut plan)?;
+            let current = add_order_by_and_limit(&mut plan, current, query);
+            plan.set_sink(current);
+        }
+        MetricKind::Ratio => {
+            let current = build_ratio_metric_plan(graph, query, metric_name, &mut plan)?;
+            let current = add_order_by_and_limit(&mut plan, current, query);
+            plan.set_sink(current);
+        }
+        _ => return Err(PlanError::UnsupportedMetricType),
+    }
+
+    Ok(plan)
+}
+
+/// Build the subgraph for a simple metric (ReadFromSource → optional joins → Aggregate).
+/// Returns the NodeIndex of the Aggregate node.
+fn build_simple_metric_plan(
+    graph: &SemanticGraph,
+    query: &QuerySpec,
+    metric_name: &str,
+    output_alias: &str,
+    plan: &mut DataflowPlan,
+) -> Result<NodeIndex, PlanError> {
+    let agg_node = build_input_metric_subplan(graph, query, metric_name, output_alias, plan)?;
+    Ok(agg_node)
+}
+
+/// Build a subgraph for an input metric used by derived/ratio metrics.
+/// Returns the NodeIndex of the Aggregate node.
+fn build_input_metric_subplan(
+    graph: &SemanticGraph,
+    query: &QuerySpec,
+    metric_name: &str,
+    output_alias: &str,
+    plan: &mut DataflowPlan,
+) -> Result<NodeIndex, PlanError> {
+    let resolved = resolve::resolve_simple_metric(graph, metric_name)?;
     let left_model_name = resolved.model.name.as_str();
 
     // Step 1: ReadFromSource for the primary (measure) model
@@ -37,9 +87,7 @@ pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPl
     });
 
     // Step 2: Determine which group-by columns require joins.
-    // Collect unique (entity_name, right_model) pairs that are needed.
-    // Key: entity_name; value: (join node index) — built lazily.
-    let mut join_nodes: std::collections::HashMap<String, petgraph::graph::NodeIndex> =
+    let mut join_nodes: std::collections::HashMap<String, NodeIndex> =
         std::collections::HashMap::new();
 
     // Validate all dimensions and prepare join nodes
@@ -47,7 +95,6 @@ pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPl
         let dim_name = match group {
             GroupBySpec::Dimension { name, .. } => name.as_str(),
             GroupBySpec::TimeDimension { name, .. } => {
-                // metric_time is a virtual name; underlying dimension name is the agg_time_dimension
                 if name == "metric_time" {
                     continue; // handled via agg_time_dimension; no join needed
                 }
@@ -105,15 +152,13 @@ pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPl
         measure_name: resolved.measure.name.clone(),
         agg_type: resolved.measure.agg,
         expr: resolved.measure.sql_expr().to_string(),
-        alias: resolved.metric.name.clone(),
+        alias: output_alias.to_string(),
     }];
 
-    // Step 4: Aggregate node. Its parent is either the last join node or the read node.
+    // Step 4: Aggregate node.
     let agg_input = if join_nodes.is_empty() {
         read_node
     } else {
-        // Use the last join node as aggregate input.
-        // (In a multi-join scenario we'd chain joins; for Phase 3 single-hop is enough.)
         *join_nodes.values().next().unwrap()
     };
 
@@ -123,8 +168,17 @@ pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPl
     });
     plan.add_edge(agg_input, agg_node);
 
-    // Step 5: Optional ORDER BY
-    let mut current = agg_node;
+    Ok(agg_node)
+}
+
+/// Add optional ORDER BY and LIMIT nodes to the plan, returning the final node.
+fn add_order_by_and_limit(
+    plan: &mut DataflowPlan,
+    current: NodeIndex,
+    query: &QuerySpec,
+) -> NodeIndex {
+    let mut current = current;
+
     if !query.order_by.is_empty() {
         let order_specs: Vec<(String, bool)> = query
             .order_by
@@ -136,15 +190,84 @@ pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPl
         current = order_node;
     }
 
-    // Step 6: Optional LIMIT
     if let Some(count) = query.limit {
         let limit_node = plan.add_node(DataflowNode::Limit { count });
         plan.add_edge(current, limit_node);
         current = limit_node;
     }
 
-    plan.set_sink(current);
-    Ok(plan)
+    current
+}
+
+/// Build the plan for a derived metric.
+/// Returns the NodeIndex of the ComputeMetric node.
+fn build_derived_metric_plan(
+    graph: &SemanticGraph,
+    query: &QuerySpec,
+    metric_name: &str,
+    plan: &mut DataflowPlan,
+) -> Result<NodeIndex, PlanError> {
+    let resolved = resolve::resolve_derived_metric(graph, metric_name)?;
+
+    // Build a subplan for each input metric
+    let mut agg_nodes: Vec<NodeIndex> = Vec::new();
+    for (input_metric_name, alias) in &resolved.inputs {
+        let agg_node = build_input_metric_subplan(graph, query, input_metric_name, alias, plan)?;
+        agg_nodes.push(agg_node);
+    }
+
+    // If 2+ inputs: create CombineAggregatedOutputs node
+    let combine_or_agg = if agg_nodes.len() >= 2 {
+        let combine = plan.add_node(DataflowNode::CombineAggregatedOutputs);
+        for &agg in &agg_nodes {
+            plan.add_edge(agg, combine);
+        }
+        combine
+    } else {
+        agg_nodes[0]
+    };
+
+    // ComputeMetric node with the expression
+    let compute = plan.add_node(DataflowNode::ComputeMetric {
+        metric_name: metric_name.to_string(),
+        expr: Some(resolved.expr.clone()),
+    });
+    plan.add_edge(combine_or_agg, compute);
+
+    Ok(compute)
+}
+
+/// Build the plan for a ratio metric.
+/// Returns the NodeIndex of the ComputeMetric node.
+fn build_ratio_metric_plan(
+    graph: &SemanticGraph,
+    query: &QuerySpec,
+    metric_name: &str,
+    plan: &mut DataflowPlan,
+) -> Result<NodeIndex, PlanError> {
+    let resolved = resolve::resolve_ratio_metric(graph, metric_name)?;
+
+    let (num_metric_name, num_alias) = &resolved.numerator;
+    let (den_metric_name, den_alias) = &resolved.denominator;
+
+    // Build numerator and denominator subplans
+    let num_agg = build_input_metric_subplan(graph, query, num_metric_name, num_alias, plan)?;
+    let den_agg = build_input_metric_subplan(graph, query, den_metric_name, den_alias, plan)?;
+
+    // Combine the two via CombineAggregatedOutputs
+    let combine = plan.add_node(DataflowNode::CombineAggregatedOutputs);
+    plan.add_edge(num_agg, combine);
+    plan.add_edge(den_agg, combine);
+
+    // ComputeMetric: CAST(num / NULLIF(den, 0))
+    let expr = format!("CAST({num_alias} AS DOUBLE) / CAST(NULLIF({den_alias}, 0) AS DOUBLE)");
+    let compute = plan.add_node(DataflowNode::ComputeMetric {
+        metric_name: metric_name.to_string(),
+        expr: Some(expr),
+    });
+    plan.add_edge(combine, compute);
+
+    Ok(compute)
 }
 
 #[cfg(test)]
@@ -381,6 +504,104 @@ mod tests {
                 assert_eq!(model_name, "bookings_source");
             }
             other => panic!("expected ReadFromSource, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_build_derived_metric_plan() {
+        let json = include_str!("../../../tests/fixtures/derived_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["bookings_growth".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        assert!(plan.sink().is_some());
+
+        // Sink should be ComputeMetric
+        let sink = plan.sink().unwrap();
+        match plan.node(sink) {
+            DataflowNode::ComputeMetric { metric_name, expr } => {
+                assert_eq!(metric_name, "bookings_growth");
+                assert_eq!(expr.as_deref(), Some("bookings - instant_bookings"));
+            }
+            other => panic!("expected ComputeMetric, got {other:?}"),
+        }
+
+        // Parent of ComputeMetric should be CombineAggregatedOutputs
+        let compute_parents = plan.parents(sink);
+        assert_eq!(compute_parents.len(), 1);
+        match plan.node(compute_parents[0]) {
+            DataflowNode::CombineAggregatedOutputs => {}
+            other => panic!("expected CombineAggregatedOutputs, got {other:?}"),
+        }
+
+        // CombineAggregatedOutputs should have 2 Aggregate parents
+        let combine_parents = plan.parents(compute_parents[0]);
+        assert_eq!(combine_parents.len(), 2);
+        for &parent in &combine_parents {
+            match plan.node(parent) {
+                DataflowNode::Aggregate { .. } => {}
+                other => panic!("expected Aggregate, got {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn test_build_ratio_metric_plan() {
+        let json = include_str!("../../../tests/fixtures/ratio_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["instant_booking_rate".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        assert!(plan.sink().is_some());
+
+        // Sink should be ComputeMetric
+        let sink = plan.sink().unwrap();
+        match plan.node(sink) {
+            DataflowNode::ComputeMetric { metric_name, expr } => {
+                assert_eq!(metric_name, "instant_booking_rate");
+                let expr_str = expr.as_deref().unwrap_or("");
+                assert!(
+                    expr_str.contains("NULLIF"),
+                    "expr should contain NULLIF: {expr_str}"
+                );
+                assert!(
+                    expr_str.contains("CAST"),
+                    "expr should contain CAST: {expr_str}"
+                );
+            }
+            other => panic!("expected ComputeMetric, got {other:?}"),
+        }
+
+        // Parent should be CombineAggregatedOutputs
+        let compute_parents = plan.parents(sink);
+        assert_eq!(compute_parents.len(), 1);
+        match plan.node(compute_parents[0]) {
+            DataflowNode::CombineAggregatedOutputs => {}
+            other => panic!("expected CombineAggregatedOutputs, got {other:?}"),
         }
     }
 }
