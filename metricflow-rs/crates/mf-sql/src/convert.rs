@@ -1,5 +1,5 @@
 use crate::ast::*;
-use mf_core::types::AggregationType;
+use mf_core::types::{AggregationType, TimeGrain, TimeWindow};
 use mf_manifest::graph::SemanticGraph;
 use mf_planning::dataflow::*;
 use petgraph::graph::NodeIndex;
@@ -74,6 +74,25 @@ fn convert_node<'a>(
             left_key,
             right_key,
             right_model_name,
+            subquery_counter,
+            graph,
+        ),
+        DataflowNode::JoinOverTimeRange {
+            time_spine_table,
+            time_spine_column,
+            time_spine_grain,
+            window,
+            grain_to_date,
+            metric_time_column,
+        } => convert_join_over_time_range(
+            plan,
+            node_idx,
+            time_spine_table,
+            time_spine_column,
+            *time_spine_grain,
+            window.as_ref(),
+            *grain_to_date,
+            metric_time_column,
             subquery_counter,
             graph,
         ),
@@ -482,6 +501,116 @@ fn convert_combine_aggregated_outputs<'a>(
         select_columns,
         from: wrapped_froms.into_iter().next().unwrap(),
         joins,
+        where_clause: None,
+        group_by: vec![],
+        order_by: vec![],
+        limit: None,
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn convert_join_over_time_range<'a>(
+    plan: &DataflowPlan,
+    node_idx: NodeIndex,
+    time_spine_table: &str,
+    time_spine_column: &str,
+    _time_spine_grain: TimeGrain,
+    window: Option<&TimeWindow>,
+    grain_to_date: Option<TimeGrain>,
+    metric_time_column: &str,
+    subquery_counter: &mut u32,
+    graph: Option<&'a SemanticGraph<'a>>,
+) -> Result<SqlSelect, ConvertError> {
+    // The single parent is the ReadFromSource (or already-joined source).
+    let parents = plan.parents(node_idx);
+    let source_sql = convert_node(plan, parents[0], subquery_counter, graph)?;
+
+    // Alias for the source side
+    let source_alias = match &source_sql.from {
+        SqlFrom::Table { alias, .. } => alias.clone(),
+        SqlFrom::Subquery { alias, .. } => alias.clone(),
+    };
+
+    // Alias for the time spine table
+    let time_spine_alias = format!("{time_spine_table}_spine");
+
+    // Build ON condition based on window type:
+    //
+    // Window (trailing N days):
+    //   source.metric_time <= time_spine.ds
+    //   AND source.metric_time > time_spine.ds - INTERVAL 'N grain'
+    //
+    // Grain-to-date (e.g., month-to-date):
+    //   source.metric_time <= time_spine.ds
+    //   AND source.metric_time >= DATE_TRUNC('month', time_spine.ds)
+    //
+    // All-time (no window, no grain_to_date):
+    //   source.metric_time <= time_spine.ds
+    let on_expr = if let Some(w) = window {
+        SqlExpr::Literal(format!(
+            "{source_alias}.{metric_time_column} <= {time_spine_alias}.{time_spine_column} AND {source_alias}.{metric_time_column} > {time_spine_alias}.{time_spine_column} - INTERVAL '{count} {grain}'",
+            count = w.count,
+            grain = w.grain,
+        ))
+    } else if let Some(g) = grain_to_date {
+        SqlExpr::Literal(format!(
+            "{source_alias}.{metric_time_column} <= {time_spine_alias}.{time_spine_column} AND {source_alias}.{metric_time_column} >= DATE_TRUNC('{grain}', {time_spine_alias}.{time_spine_column})",
+            grain = g,
+        ))
+    } else {
+        // All-time: every source row is included up to and including the spine date
+        SqlExpr::Literal(format!(
+            "{source_alias}.{metric_time_column} <= {time_spine_alias}.{time_spine_column}"
+        ))
+    };
+
+    // The time spine is the driving table (FROM); the source is INNERJOINed.
+    // We project time_spine.ds AS metric_time__day plus all columns from source.
+    let grain_suffix = "day"; // Always day-level output for now
+    let metric_time_alias = format!("metric_time__{grain_suffix}");
+
+    let join = SqlJoin {
+        join_type: "INNER JOIN".into(),
+        source: source_sql.from.clone(),
+        on: on_expr,
+    };
+
+    let time_range_subq_alias = format!("time_range_subq_{subquery_counter}");
+    *subquery_counter += 1;
+
+    let inner_select = SqlSelect {
+        select_columns: vec![
+            // time_spine.ds AS metric_time__day
+            SqlExpr::Alias {
+                expr: Box::new(SqlExpr::ColumnRef {
+                    table_alias: time_spine_alias.clone(),
+                    column_name: time_spine_column.to_string(),
+                }),
+                alias: metric_time_alias.clone(),
+            },
+            // source.* (all source columns)
+            SqlExpr::Literal(format!("{source_alias}.*")),
+        ],
+        from: SqlFrom::Table {
+            table: time_spine_table.to_string(),
+            alias: time_spine_alias,
+        },
+        joins: vec![join],
+        where_clause: None,
+        group_by: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    // Return a SELECT * from the time-range subquery so the Aggregate node above
+    // can reference column names (including metric_time__day) uniformly.
+    Ok(SqlSelect {
+        select_columns: vec![SqlExpr::Literal("*".into())],
+        from: SqlFrom::Subquery {
+            query: Box::new(inner_select),
+            alias: time_range_subq_alias,
+        },
+        joins: vec![],
         where_clause: None,
         group_by: vec![],
         order_by: vec![],
