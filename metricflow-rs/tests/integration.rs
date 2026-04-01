@@ -174,6 +174,75 @@ fn test_end_to_end_join_dimension_projects_right_side_columns() {
     );
 }
 
+// ─── Derived metric tests (Phase 4) ──────────────────────────────────────────
+
+#[test]
+fn test_end_to_end_derived_metric() {
+    let manifest_json = include_str!("fixtures/derived_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings_growth".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (derived):\n{sql}");
+
+    assert!(
+        sql.contains("FULL OUTER JOIN"),
+        "should have FULL OUTER JOIN: {sql}"
+    );
+    assert!(
+        sql.contains("bookings - instant_bookings"),
+        "should contain derived expression: {sql}"
+    );
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+    assert!(
+        sql.contains("metric_time__day"),
+        "should have time dimension: {sql}"
+    );
+}
+
+#[test]
+fn test_end_to_end_ratio_metric() {
+    let manifest_json = include_str!("fixtures/ratio_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["instant_booking_rate".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (ratio):\n{sql}");
+
+    assert!(
+        sql.contains("FULL OUTER JOIN"),
+        "should have FULL OUTER JOIN: {sql}"
+    );
+    assert!(sql.contains("NULLIF"), "should have NULLIF: {sql}");
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 
 #[test]
