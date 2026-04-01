@@ -7,9 +7,12 @@ from typing import Optional, Tuple
 
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.specs.instance_spec import InstanceSpec, InstanceSpecVisitor
+from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
+from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
@@ -43,18 +46,38 @@ class SimpleMetricRecipe:
 
     simple_metric_input: SimpleMetricInput
 
-    # For the filter defined in `simple_metric_input`
-    metric_filter_specs: Tuple[WhereFilterSpec, ...]
-    # For additional filters that might be needed (e.g. a filter defined in a derived metric or query).
-    additional_filter_specs: Tuple[WhereFilterSpec, ...]
+    # The specs group-by items in the query
+    queried_linkable_specs: LinkableSpecSet
+    # Of the above, the ones that are aggregation time dimensions for the metric.
+    queried_agg_time_dimension_specs: FrozenOrderedSet[TimeDimensionSpec]
 
+    # Filters that should be applied before aggregation.
+    pre_aggregation_filter_specs: Tuple[WhereFilterSpec, ...]
+    # Describes the operation for cumulative metrics.
     cumulative_description: Optional[CumulativeDescription]
+    # For metrics with a time offset or with `join_to_timespine`, descriptions of how the time-spin join should
+    # be applied.
     before_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
     after_aggregation_time_spine_join_description: Optional[JoinToTimeSpineDescription]
 
+    # Filters intentionally deferred from pre-aggregation application. They are applied after aggregation and after
+    # an optional post-aggregation time-spine join.
+    deferred_filter_specs: Tuple[WhereFilterSpec, ...]
+
     @cached_property
-    def combined_filter_specs(self) -> Sequence[WhereFilterSpec]:  # noqa: D102
-        return self.metric_filter_specs + self.additional_filter_specs
+    def combined_filter_specs(self) -> Sequence[WhereFilterSpec]:
+        """All filters that are referenced in the recipe."""
+        combined_filter_specs = list(self.pre_aggregation_filter_specs)
+
+        for time_spine_join_description in (
+            self.before_aggregation_time_spine_join_description,
+            self.after_aggregation_time_spine_join_description,
+        ):
+            if time_spine_join_description is not None:
+                combined_filter_specs.extend(time_spine_join_description.time_spine_filter_specs)
+
+        combined_filter_specs.extend(self.deferred_filter_specs)
+        return tuple(combined_filter_specs)
 
 
 @dataclass(frozen=True)
@@ -64,6 +87,8 @@ class JoinToTimeSpineDescription:
     join_type: SqlJoinType
     offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
+    # Filters that should apply to the time spine.
+    time_spine_filter_specs: Tuple[WhereFilterSpec, ...] = ()
 
     @property
     def standard_offset_window(self) -> Optional[TimeWindow]:
