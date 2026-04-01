@@ -34,7 +34,10 @@ fn convert_node(
         DataflowNode::ReadFromSource { model_name, table } => {
             convert_read_source(model_name, table, subquery_counter)
         }
-        DataflowNode::Aggregate { group_by, aggregations } => {
+        DataflowNode::Aggregate {
+            group_by,
+            aggregations,
+        } => {
             let parents = plan.parents(node_idx);
             let parent_sql = convert_node(plan, parents[0], subquery_counter)?;
             convert_aggregate(&parent_sql, group_by, aggregations, subquery_counter)

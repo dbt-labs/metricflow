@@ -1,15 +1,12 @@
 use mf_core::types::*;
-use petgraph::graph::{DiGraph, NodeIndex};
 use petgraph::Direction;
+use petgraph::graph::{DiGraph, NodeIndex};
 
 /// A node in the dataflow plan DAG.
 #[derive(Debug, Clone)]
 pub enum DataflowNode {
     /// Read columns from a source table (semantic model).
-    ReadFromSource {
-        model_name: String,
-        table: String,
-    },
+    ReadFromSource { model_name: String, table: String },
     /// Aggregate measures with GROUP BY.
     Aggregate {
         group_by: Vec<String>,
@@ -21,21 +18,15 @@ pub enum DataflowNode {
         expr: Option<String>,
     },
     /// Select/rename columns.
-    SelectColumns {
-        columns: Vec<ColumnSelect>,
-    },
+    SelectColumns { columns: Vec<ColumnSelect> },
     /// Apply a WHERE filter.
-    WhereFilter {
-        sql: String,
-    },
+    WhereFilter { sql: String },
     /// ORDER BY.
     OrderBy {
         specs: Vec<(String, bool)>, // (column, descending)
     },
     /// LIMIT.
-    Limit {
-        count: u64,
-    },
+    Limit { count: u64 },
 }
 
 #[derive(Debug, Clone)]

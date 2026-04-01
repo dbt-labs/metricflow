@@ -44,7 +44,10 @@ mod tests {
         assert_eq!(model.dimensions[0].name, "ds");
         assert_eq!(model.dimensions[0].dimension_type, DimensionType::Time);
         assert_eq!(model.dimensions[1].name, "is_instant");
-        assert_eq!(model.dimensions[1].dimension_type, DimensionType::Categorical);
+        assert_eq!(
+            model.dimensions[1].dimension_type,
+            DimensionType::Categorical
+        );
 
         assert_eq!(model.entities.len(), 1);
         assert_eq!(model.entities[0].name, "booking");
@@ -53,6 +56,9 @@ mod tests {
         let metric = &manifest.metrics[0];
         assert_eq!(metric.name, "bookings");
         assert_eq!(metric.metric_type, MetricKind::Simple);
-        assert_eq!(metric.type_params.measure.as_ref().unwrap().name, "bookings");
+        assert_eq!(
+            metric.type_params.measure.as_ref().unwrap().name,
+            "bookings"
+        );
     }
 }

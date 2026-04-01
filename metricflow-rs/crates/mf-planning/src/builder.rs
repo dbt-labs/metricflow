@@ -88,13 +88,11 @@ mod tests {
 
         let query = QuerySpec {
             metrics: vec!["bookings".into()],
-            group_by: vec![
-                GroupBySpec::TimeDimension {
-                    name: "metric_time".into(),
-                    grain: TimeGrain::Day,
-                    entity_path: vec![],
-                },
-            ],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
             where_clauses: vec![],
             order_by: vec![],
             limit: None,
@@ -108,7 +106,10 @@ mod tests {
         // Walk from sink: should be Aggregate with a ReadFromSource parent
         let sink = plan.sink().unwrap();
         match plan.node(sink) {
-            DataflowNode::Aggregate { group_by, aggregations } => {
+            DataflowNode::Aggregate {
+                group_by,
+                aggregations,
+            } => {
                 assert_eq!(group_by, &["metric_time__day"]);
                 assert_eq!(aggregations.len(), 1);
                 assert_eq!(aggregations[0].measure_name, "bookings");

@@ -92,10 +92,17 @@ impl SqlRenderer for DefaultRenderer {
 
     fn render_expr(&self, expr: &SqlExpr) -> String {
         match expr {
-            SqlExpr::ColumnRef { table_alias, column_name } => {
+            SqlExpr::ColumnRef {
+                table_alias,
+                column_name,
+            } => {
                 format!("{table_alias}.{column_name}")
             }
-            SqlExpr::AggregateFunction { function, arg, distinct } => {
+            SqlExpr::AggregateFunction {
+                function,
+                arg,
+                distinct,
+            } => {
                 let arg_str = self.render_expr(arg);
                 if *distinct {
                     format!("{function}(DISTINCT {arg_str})")
@@ -167,27 +174,23 @@ mod tests {
     #[test]
     fn test_render_simple_select() {
         let select = SqlSelect {
-            select_columns: vec![
-                SqlExpr::Alias {
-                    expr: Box::new(SqlExpr::AggregateFunction {
-                        function: "SUM".into(),
-                        arg: Box::new(SqlExpr::ColumnRef {
-                            table_alias: "subq_0".into(),
-                            column_name: "__bookings".into(),
-                        }),
-                        distinct: false,
+            select_columns: vec![SqlExpr::Alias {
+                expr: Box::new(SqlExpr::AggregateFunction {
+                    function: "SUM".into(),
+                    arg: Box::new(SqlExpr::ColumnRef {
+                        table_alias: "subq_0".into(),
+                        column_name: "__bookings".into(),
                     }),
-                    alias: "bookings".into(),
-                },
-            ],
+                    distinct: false,
+                }),
+                alias: "bookings".into(),
+            }],
             from: SqlFrom::Subquery {
                 query: Box::new(SqlSelect {
-                    select_columns: vec![
-                        SqlExpr::Alias {
-                            expr: Box::new(SqlExpr::Literal("1".into())),
-                            alias: "__bookings".into(),
-                        },
-                    ],
+                    select_columns: vec![SqlExpr::Alias {
+                        expr: Box::new(SqlExpr::Literal("1".into())),
+                        alias: "__bookings".into(),
+                    }],
                     from: SqlFrom::Table {
                         table: "demo.fct_bookings".into(),
                         alias: "bookings_source_src".into(),
@@ -240,12 +243,10 @@ mod tests {
             },
             joins: vec![],
             where_clause: None,
-            group_by: vec![
-                SqlExpr::ColumnRef {
-                    table_alias: "subq_0".into(),
-                    column_name: "metric_time__day".into(),
-                },
-            ],
+            group_by: vec![SqlExpr::ColumnRef {
+                table_alias: "subq_0".into(),
+                column_name: "metric_time__day".into(),
+            }],
             order_by: vec![],
             limit: None,
         };

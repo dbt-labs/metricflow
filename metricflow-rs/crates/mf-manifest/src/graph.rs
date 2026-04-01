@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use mf_core::manifest::*;
+use std::collections::HashMap;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -28,7 +28,10 @@ impl<'a> SemanticGraph<'a> {
     pub fn build(manifest: &'a SemanticManifest) -> Result<Self, GraphError> {
         let mut metrics_by_name = HashMap::new();
         for metric in &manifest.metrics {
-            if metrics_by_name.insert(metric.name.as_str(), metric).is_some() {
+            if metrics_by_name
+                .insert(metric.name.as_str(), metric)
+                .is_some()
+            {
                 return Err(GraphError::DuplicateMetric(metric.name.clone()));
             }
         }
@@ -80,7 +83,10 @@ impl<'a> SemanticGraph<'a> {
         dim_name: &str,
         model_name: &str,
     ) -> Option<(&'a SemanticModel, &'a Dimension)> {
-        let dim = self.dimensions_by_model.get(&(model_name, dim_name)).copied()?;
+        let dim = self
+            .dimensions_by_model
+            .get(&(model_name, dim_name))
+            .copied()?;
         let model = self.models_by_name.get(model_name).copied()?;
         Some((model, dim))
     }

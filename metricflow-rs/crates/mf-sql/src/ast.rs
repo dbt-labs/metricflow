@@ -20,20 +20,14 @@ pub enum SqlExpr {
     /// A raw SQL literal or expression: `1`, `'day'`, etc.
     Literal(String),
     /// An aliased expression: `expr AS alias`
-    Alias {
-        expr: Box<SqlExpr>,
-        alias: String,
-    },
+    Alias { expr: Box<SqlExpr>, alias: String },
 }
 
 /// A SQL FROM source.
 #[derive(Debug, Clone)]
 pub enum SqlFrom {
     /// A table reference: `schema.table`
-    Table {
-        table: String,
-        alias: String,
-    },
+    Table { table: String, alias: String },
     /// A subquery: `(SELECT ...) AS alias`
     Subquery {
         query: Box<SqlSelect>,
@@ -75,19 +69,17 @@ mod tests {
     #[test]
     fn test_sql_select_construction() {
         let select = SqlSelect {
-            select_columns: vec![
-                SqlExpr::Alias {
-                    expr: Box::new(SqlExpr::AggregateFunction {
-                        function: "SUM".into(),
-                        arg: Box::new(SqlExpr::ColumnRef {
-                            table_alias: "subq_0".into(),
-                            column_name: "__bookings".into(),
-                        }),
-                        distinct: false,
+            select_columns: vec![SqlExpr::Alias {
+                expr: Box::new(SqlExpr::AggregateFunction {
+                    function: "SUM".into(),
+                    arg: Box::new(SqlExpr::ColumnRef {
+                        table_alias: "subq_0".into(),
+                        column_name: "__bookings".into(),
                     }),
-                    alias: "bookings".into(),
-                },
-            ],
+                    distinct: false,
+                }),
+                alias: "bookings".into(),
+            }],
             from: SqlFrom::Table {
                 table: "demo.fct_bookings".into(),
                 alias: "subq_0".into(),

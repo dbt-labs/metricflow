@@ -93,14 +93,14 @@ fn main() {
             let group_by_specs: Vec<GroupBySpec> = group_by
                 .iter()
                 .map(|g| {
-                    if let Some(ref gr) = grain {
-                        if g.contains("metric_time") || g.contains("time") {
-                            return GroupBySpec::TimeDimension {
-                                name: g.clone(),
-                                grain: gr.parse().unwrap_or(TimeGrain::Day),
-                                entity_path: vec![],
-                            };
-                        }
+                    if let Some(ref gr) = grain
+                        && (g.contains("metric_time") || g.contains("time"))
+                    {
+                        return GroupBySpec::TimeDimension {
+                            name: g.clone(),
+                            grain: gr.parse().unwrap_or(TimeGrain::Day),
+                            entity_path: vec![],
+                        };
                     }
                     GroupBySpec::Dimension {
                         name: g.clone(),

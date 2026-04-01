@@ -72,7 +72,10 @@ fn test_end_to_end_with_categorical_dimension() {
 
     let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
 
-    assert!(sql.contains("is_instant"), "should include dimension: {sql}");
+    assert!(
+        sql.contains("is_instant"),
+        "should include dimension: {sql}"
+    );
     assert!(sql.contains("LIMIT 10"), "should have LIMIT: {sql}");
 
     eprintln!("Generated SQL:\n{sql}");

@@ -174,9 +174,18 @@ mod tests {
 
     #[test]
     fn test_aggregation_type_from_str() {
-        assert_eq!("sum".parse::<AggregationType>().unwrap(), AggregationType::Sum);
-        assert_eq!("count_distinct".parse::<AggregationType>().unwrap(), AggregationType::CountDistinct);
-        assert_eq!("SUM".parse::<AggregationType>().unwrap(), AggregationType::Sum);
+        assert_eq!(
+            "sum".parse::<AggregationType>().unwrap(),
+            AggregationType::Sum
+        );
+        assert_eq!(
+            "count_distinct".parse::<AggregationType>().unwrap(),
+            AggregationType::CountDistinct
+        );
+        assert_eq!(
+            "SUM".parse::<AggregationType>().unwrap(),
+            AggregationType::Sum
+        );
     }
 
     #[test]
@@ -196,23 +205,47 @@ mod tests {
     #[test]
     fn test_metric_type_from_str() {
         assert_eq!("simple".parse::<MetricKind>().unwrap(), MetricKind::Simple);
-        assert_eq!("derived".parse::<MetricKind>().unwrap(), MetricKind::Derived);
-        assert_eq!("cumulative".parse::<MetricKind>().unwrap(), MetricKind::Cumulative);
-        assert_eq!("conversion".parse::<MetricKind>().unwrap(), MetricKind::Conversion);
+        assert_eq!(
+            "derived".parse::<MetricKind>().unwrap(),
+            MetricKind::Derived
+        );
+        assert_eq!(
+            "cumulative".parse::<MetricKind>().unwrap(),
+            MetricKind::Cumulative
+        );
+        assert_eq!(
+            "conversion".parse::<MetricKind>().unwrap(),
+            MetricKind::Conversion
+        );
         assert_eq!("ratio".parse::<MetricKind>().unwrap(), MetricKind::Ratio);
     }
 
     #[test]
     fn test_entity_type_from_str() {
-        assert_eq!("primary".parse::<EntityType>().unwrap(), EntityType::Primary);
-        assert_eq!("foreign".parse::<EntityType>().unwrap(), EntityType::Foreign);
+        assert_eq!(
+            "primary".parse::<EntityType>().unwrap(),
+            EntityType::Primary
+        );
+        assert_eq!(
+            "foreign".parse::<EntityType>().unwrap(),
+            EntityType::Foreign
+        );
         assert_eq!("unique".parse::<EntityType>().unwrap(), EntityType::Unique);
-        assert_eq!("natural".parse::<EntityType>().unwrap(), EntityType::Natural);
+        assert_eq!(
+            "natural".parse::<EntityType>().unwrap(),
+            EntityType::Natural
+        );
     }
 
     #[test]
     fn test_dimension_type_from_str() {
-        assert_eq!("categorical".parse::<DimensionType>().unwrap(), DimensionType::Categorical);
-        assert_eq!("time".parse::<DimensionType>().unwrap(), DimensionType::Time);
+        assert_eq!(
+            "categorical".parse::<DimensionType>().unwrap(),
+            DimensionType::Categorical
+        );
+        assert_eq!(
+            "time".parse::<DimensionType>().unwrap(),
+            DimensionType::Time
+        );
     }
 }

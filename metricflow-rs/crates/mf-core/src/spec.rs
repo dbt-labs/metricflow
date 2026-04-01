@@ -38,7 +38,11 @@ impl GroupBySpec {
                     format!("{}__{name}", entity_path.join("__"))
                 }
             }
-            GroupBySpec::TimeDimension { name, grain, entity_path } => {
+            GroupBySpec::TimeDimension {
+                name,
+                grain,
+                entity_path,
+            } => {
                 let base = if entity_path.is_empty() {
                     name.clone()
                 } else {
@@ -72,13 +76,11 @@ mod tests {
     fn test_query_spec_builder() {
         let spec = QuerySpec {
             metrics: vec!["bookings".into()],
-            group_by: vec![
-                GroupBySpec::TimeDimension {
-                    name: "metric_time".into(),
-                    grain: TimeGrain::Day,
-                    entity_path: vec![],
-                },
-            ],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
             where_clauses: vec![],
             order_by: vec![],
             limit: None,

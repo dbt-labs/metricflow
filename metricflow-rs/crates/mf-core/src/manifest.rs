@@ -1,5 +1,5 @@
-use serde::Deserialize;
 use crate::types::*;
+use serde::Deserialize;
 
 // --- Top-level manifest ---
 
