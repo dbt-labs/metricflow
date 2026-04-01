@@ -7,6 +7,18 @@ use petgraph::graph::{DiGraph, NodeIndex};
 pub enum DataflowNode {
     /// Read columns from a source table (semantic model).
     ReadFromSource { model_name: String, table: String },
+    /// Join two sources on entity keys (always LEFT OUTER join in MetricFlow convention).
+    /// The left source is the measure model; the right source provides dimensions.
+    JoinOnEntities {
+        /// The entity name used for the join (e.g. "listing")
+        entity_name: String,
+        /// SQL expression on the left side (e.g. "listing_id")
+        left_key: String,
+        /// SQL expression on the right side (e.g. "listing_id")
+        right_key: String,
+        /// The right-side model name (for column qualification)
+        right_model_name: String,
+    },
     /// Aggregate measures with GROUP BY.
     Aggregate {
         group_by: Vec<String>,
@@ -128,5 +140,47 @@ mod tests {
         let parents = plan.parents(agg);
         assert_eq!(parents.len(), 1);
         assert_eq!(parents[0], read);
+    }
+
+    #[test]
+    fn test_join_on_entities_node() {
+        let mut plan = DataflowPlan::new();
+
+        let left = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "bookings_source".into(),
+            table: "demo.fct_bookings".into(),
+        });
+        let right = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "listings_source".into(),
+            table: "demo.dim_listings_latest".into(),
+        });
+        let join = plan.add_node(DataflowNode::JoinOnEntities {
+            entity_name: "listing".into(),
+            left_key: "listing_id".into(),
+            right_key: "listing_id".into(),
+            right_model_name: "listings_source".into(),
+        });
+        plan.add_edge(left, join);
+        plan.add_edge(right, join);
+        plan.set_sink(join);
+
+        assert_eq!(plan.node_count(), 3);
+        let parents = plan.parents(join);
+        assert_eq!(parents.len(), 2);
+
+        match plan.node(join) {
+            DataflowNode::JoinOnEntities {
+                entity_name,
+                left_key,
+                right_key,
+                right_model_name,
+            } => {
+                assert_eq!(entity_name, "listing");
+                assert_eq!(left_key, "listing_id");
+                assert_eq!(right_key, "listing_id");
+                assert_eq!(right_model_name, "listings_source");
+            }
+            other => panic!("expected JoinOnEntities, got {other:?}"),
+        }
     }
 }
