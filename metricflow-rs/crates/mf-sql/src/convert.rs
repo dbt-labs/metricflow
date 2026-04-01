@@ -77,6 +77,12 @@ fn convert_node<'a>(
             subquery_counter,
             graph,
         ),
+        DataflowNode::CombineAggregatedOutputs => {
+            convert_combine_aggregated_outputs(plan, node_idx, subquery_counter, graph)
+        }
+        DataflowNode::ComputeMetric { metric_name, expr } => {
+            convert_compute_metric(plan, node_idx, metric_name, expr, subquery_counter, graph)
+        }
         other => Err(ConvertError::UnexpectedNode(format!("{other:?}"))),
     }
 }
@@ -328,6 +334,273 @@ fn convert_aggregate(
         joins: vec![],
         where_clause: None,
         group_by: outer_group_by,
+        order_by: vec![],
+        limit: None,
+    })
+}
+
+fn convert_combine_aggregated_outputs<'a>(
+    plan: &DataflowPlan,
+    node_idx: NodeIndex,
+    subquery_counter: &mut u32,
+    graph: Option<&'a SemanticGraph<'a>>,
+) -> Result<SqlSelect, ConvertError> {
+    let parents = plan.parents(node_idx);
+    if parents.is_empty() {
+        return Err(ConvertError::UnexpectedNode(
+            "CombineAggregatedOutputs has no parents".into(),
+        ));
+    }
+
+    // Convert each parent to SQL
+    let mut parent_sqls: Vec<SqlSelect> = Vec::new();
+    for &parent in &parents {
+        parent_sqls.push(convert_node(plan, parent, subquery_counter, graph)?);
+    }
+
+    // Determine group_by column names from first parent's group_by
+    let group_by_cols: Vec<String> = parent_sqls[0]
+        .group_by
+        .iter()
+        .filter_map(|expr| match expr {
+            SqlExpr::ColumnRef { column_name, .. } => Some(column_name.clone()),
+            _ => None,
+        })
+        .collect();
+
+    // Collect metric column names from each parent (select cols that are NOT group-by,
+    // and not ColumnRef without alias — only Alias entries whose alias is not in group_by).
+    let group_by_set: std::collections::HashSet<&str> =
+        group_by_cols.iter().map(|s| s.as_str()).collect();
+    let mut metric_cols_per_parent: Vec<Vec<String>> = Vec::new();
+    for sql in &parent_sqls {
+        let metric_cols: Vec<String> = sql
+            .select_columns
+            .iter()
+            .filter_map(|expr| match expr {
+                SqlExpr::Alias { alias, .. } if !group_by_set.contains(alias.as_str()) => {
+                    Some(alias.clone())
+                }
+                _ => None,
+            })
+            .collect();
+        metric_cols_per_parent.push(metric_cols);
+    }
+
+    // Wrap each parent SqlSelect as a subquery so that it can be used in a join.
+    // Assign fresh aliases for the wrapped subqueries.
+    let mut wrapped_aliases: Vec<String> = Vec::new();
+    let mut wrapped_froms: Vec<SqlFrom> = Vec::new();
+    for parent_sql in &parent_sqls {
+        let alias = format!("agg_subq_{subquery_counter}");
+        *subquery_counter += 1;
+        wrapped_froms.push(SqlFrom::Subquery {
+            query: Box::new(parent_sql.clone()),
+            alias: alias.clone(),
+        });
+        wrapped_aliases.push(alias);
+    }
+
+    // The combined subquery alias
+    let combine_alias = format!("combine_subq_{subquery_counter}");
+    *subquery_counter += 1;
+
+    let first_alias = wrapped_aliases[0].clone();
+
+    // Build SELECT columns for the combined subquery:
+    // - COALESCE(p1.col, p2.col, ...) AS col for each group-by column
+    // - pN.metric_col AS metric_col for each parent's metric column
+    let mut select_columns: Vec<SqlExpr> = Vec::new();
+
+    // Group-by columns: COALESCE across all parents
+    for col in &group_by_cols {
+        let coalesce_args: Vec<SqlExpr> = wrapped_aliases
+            .iter()
+            .map(|alias| SqlExpr::ColumnRef {
+                table_alias: alias.clone(),
+                column_name: col.clone(),
+            })
+            .collect();
+
+        let coalesce_expr = if coalesce_args.len() == 1 {
+            coalesce_args.into_iter().next().unwrap()
+        } else {
+            SqlExpr::FunctionCall {
+                function: "COALESCE".into(),
+                args: coalesce_args,
+            }
+        };
+
+        select_columns.push(SqlExpr::Alias {
+            expr: Box::new(coalesce_expr),
+            alias: col.clone(),
+        });
+    }
+
+    // Metric columns: project from each parent
+    for (i, metric_cols) in metric_cols_per_parent.iter().enumerate() {
+        let alias = &wrapped_aliases[i];
+        for metric_col in metric_cols {
+            select_columns.push(SqlExpr::Alias {
+                expr: Box::new(SqlExpr::ColumnRef {
+                    table_alias: alias.clone(),
+                    column_name: metric_col.clone(),
+                }),
+                alias: metric_col.clone(),
+            });
+        }
+    }
+
+    // Build FULL OUTER JOINs for remaining parents (or CROSS JOIN if no group_by)
+    let mut joins: Vec<SqlJoin> = Vec::new();
+    for (i, right_from) in wrapped_froms[1..].iter().enumerate() {
+        let right_alias = &wrapped_aliases[i + 1];
+        let join_type = if group_by_cols.is_empty() {
+            "CROSS JOIN".into()
+        } else {
+            "FULL OUTER JOIN".into()
+        };
+
+        let on_expr = if group_by_cols.is_empty() {
+            SqlExpr::Literal("1=1".into())
+        } else if group_by_cols.len() == 1 {
+            let col = &group_by_cols[0];
+            SqlExpr::Literal(format!("{first_alias}.{col} = {right_alias}.{col}"))
+        } else {
+            // Multiple group-by cols: join on all of them
+            let conditions: Vec<String> = group_by_cols
+                .iter()
+                .map(|col| format!("{first_alias}.{col} = {right_alias}.{col}"))
+                .collect();
+            SqlExpr::Literal(conditions.join(" AND "))
+        };
+
+        joins.push(SqlJoin {
+            join_type,
+            source: right_from.clone(),
+            on: on_expr,
+        });
+    }
+
+    let combined_inner = SqlSelect {
+        select_columns,
+        from: wrapped_froms.into_iter().next().unwrap(),
+        joins,
+        where_clause: None,
+        group_by: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    // Wrap in a passthrough subquery
+    Ok(SqlSelect {
+        select_columns: vec![SqlExpr::Literal("*".into())],
+        from: SqlFrom::Subquery {
+            query: Box::new(combined_inner),
+            alias: combine_alias,
+        },
+        joins: vec![],
+        where_clause: None,
+        group_by: vec![],
+        order_by: vec![],
+        limit: None,
+    })
+}
+
+fn convert_compute_metric<'a>(
+    plan: &DataflowPlan,
+    node_idx: NodeIndex,
+    metric_name: &str,
+    expr: &Option<String>,
+    subquery_counter: &mut u32,
+    graph: Option<&'a SemanticGraph<'a>>,
+) -> Result<SqlSelect, ConvertError> {
+    let parents = plan.parents(node_idx);
+    let parent_sql = convert_node(plan, parents[0], subquery_counter, graph)?;
+
+    // The parent subquery alias
+    let parent_alias = match &parent_sql.from {
+        SqlFrom::Subquery { alias, .. } => alias.clone(),
+        SqlFrom::Table { alias, .. } => alias.clone(),
+    };
+
+    // Collect group-by column names from parent
+    let group_by_cols: Vec<String> = parent_sql
+        .group_by
+        .iter()
+        .filter_map(|e| match e {
+            SqlExpr::ColumnRef { column_name, .. } => Some(column_name.clone()),
+            _ => None,
+        })
+        .collect();
+
+    // If parent has no group_by in the outer select, look at select columns that
+    // were passed through as group-by (from CombineAggregatedOutputs the outer
+    // is SELECT * so we need to look at the inner).
+    // For CombineAggregatedOutputs the outer is SELECT * FROM combine_subq,
+    // but the combine_subq already has the group-by cols COALESCEd.
+    // The group_by_cols from combine's outer is empty since we didn't set group_by
+    // on the wrapper. We need to detect the group-by cols from the parent's inner structure.
+    let group_by_cols = if group_by_cols.is_empty() {
+        // Infer group_by cols from the parent's select columns (those that are Alias
+        // wrapping COALESCE or ColumnRef with non-metric names)
+        // Look at parent's select_columns for columns that aren't the metric
+        parent_sql
+            .select_columns
+            .iter()
+            .filter_map(|e| match e {
+                SqlExpr::Alias { alias, .. }
+                    if alias != metric_name && !alias.starts_with("__") =>
+                {
+                    Some(alias.clone())
+                }
+                _ => None,
+            })
+            .collect()
+    } else {
+        group_by_cols
+    };
+
+    // Build SELECT: group-by pass-throughs + metric expression AS metric_name
+    let mut select_columns: Vec<SqlExpr> = Vec::new();
+
+    for col in &group_by_cols {
+        select_columns.push(SqlExpr::ColumnRef {
+            table_alias: parent_alias.clone(),
+            column_name: col.clone(),
+        });
+    }
+
+    // The metric expression references column names available in parent subquery
+    let metric_expr = match expr {
+        Some(e) => SqlExpr::Literal(e.clone()),
+        None => SqlExpr::Literal(metric_name.to_string()),
+    };
+
+    select_columns.push(SqlExpr::Alias {
+        expr: Box::new(metric_expr),
+        alias: metric_name.to_string(),
+    });
+
+    *subquery_counter += 1;
+
+    let group_by_exprs: Vec<SqlExpr> = group_by_cols
+        .iter()
+        .map(|col| SqlExpr::ColumnRef {
+            table_alias: parent_alias.clone(),
+            column_name: col.clone(),
+        })
+        .collect();
+
+    Ok(SqlSelect {
+        select_columns,
+        from: SqlFrom::Subquery {
+            query: Box::new(parent_sql),
+            alias: parent_alias,
+        },
+        joins: vec![],
+        where_clause: None,
+        group_by: group_by_exprs,
         order_by: vec![],
         limit: None,
     })
