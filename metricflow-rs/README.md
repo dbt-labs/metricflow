@@ -6,17 +6,20 @@ Built for native integration with [Fusion](https://github.com/sdf-labs/sdf) (Rus
 
 ## Status
 
-**Phase 1-2 (Foundation + Simple Metrics)** is complete. The pipeline supports:
+**Phase 1-4 (Foundation + Simple Metrics + Joins + Derived/Cumulative)** is complete. The pipeline supports:
 
 - Simple metrics (single measure with SUM, COUNT, AVG, etc.)
 - Group-by dimensions (categorical and time dimensions on the same semantic model)
+- Joins to dimensions on other semantic models (entity-based LEFT OUTER JOIN)
+- Derived metrics (arbitrary SQL expressions over input metrics)
+- Ratio metrics (numerator / denominator with NULLIF safety)
+- Cumulative metrics (windowed, grain-to-date, and all-time via time spine joins)
 - DuckDB SQL dialect (other dialects fall back to ANSI SQL)
 - ORDER BY and LIMIT
 
 Not yet supported (future phases):
 
-- Joins to dimensions on other semantic models (Phase 3)
-- Derived, cumulative, conversion, offset metrics (Phases 4-5)
+- Conversion and offset metrics (Phase 5)
 - All SQL dialects: Snowflake, BigQuery, Redshift, Postgres, Databricks, Trino (Phase 6)
 - Fusion integration (Phase 7)
 - SQL optimization passes (Phase 8)
@@ -81,8 +84,8 @@ cargo build --all
 
 ```bash
 cd metricflow-rs
-cargo test --all --lib        # unit tests (30 tests)
-cargo test --test integration # end-to-end tests (3 tests)
+cargo test --all --lib        # unit tests (59 tests)
+cargo test --test integration # end-to-end tests (10 tests)
 cargo clippy --all -- -D warnings
 cargo fmt --all -- --check
 ```

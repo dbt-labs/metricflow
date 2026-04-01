@@ -11,8 +11,8 @@
 | Phase | Name | Depends On | Produces | Detailed Plan |
 |-------|------|-----------|----------|---------------|
 | 1-2 | Foundation + Simple Metrics | — | Working pipeline: manifest → simple metric → DuckDB SQL | `2026-04-01-metricflow-rs-phase1-2.md` — **DONE** |
-| 3 | Joins & Dimensions | 1-2 | Multi-hop entity joins to reach dimensions on other semantic models | `2026-04-01-metricflow-rs-phase3.md` |
-| 4 | Derived & Cumulative Metrics | 3 | Derived metric expressions, cumulative window functions, time spine joins | Not yet written |
+| 3 | Joins & Dimensions | 1-2 | Multi-hop entity joins to reach dimensions on other semantic models | `2026-04-01-metricflow-rs-phase3.md` — **DONE** |
+| 4 | Derived & Cumulative Metrics | 3 | Derived metric expressions, cumulative window functions, time spine joins | `2026-04-01-metricflow-rs-phase4.md` — **DONE** |
 | 5 | Conversion & Offset Metrics | 4 | Conversion funnels, time-offset comparisons | Not yet written |
 | 6 | All SQL Dialects | 5 | Snowflake, BigQuery, Redshift, Postgres, Databricks, Trino renderers | Not yet written |
 | 7 | Fusion Integration | 6 | Replace subprocess in `compile_node_context.rs`, `From<FusionManifest>` | Not yet written |
@@ -56,15 +56,18 @@ Each phase gets a detailed implementation plan written just before execution. La
 
 ## Phase 4: Derived & Cumulative Metrics
 
+**Status:** DONE (2026-03-31)
+
 **What it builds:**
-- Derived metrics: plan each input metric independently, combine via `CombineAggregations` node, apply expression
-- Cumulative metrics: `JoinToTimeSpine` node, `WindowFunction` node for running aggregations
-- Time spine handling: read time spine table from project configuration, generate date series joins
-- Multi-metric query support (queries requesting >1 metric)
+- Derived metrics: plan each input metric independently, combine via `CombineAggregatedOutputs` node (FULL OUTER JOIN), apply expression via `ComputeMetric` node
+- Ratio metrics: same pipeline as derived, with `NULLIF`-safe division expression
+- Cumulative metrics: `JoinOverTimeRange` node joining source against time spine table with inequality conditions
+- Time spine lookup from `project_configuration` (both `time_spines` and `time_spine_table_configurations` formats)
+- Three cumulative variants: windowed (trailing N days), grain-to-date, all-time
 
-**Key complexity:** Derived metrics create recursive planning (a derived metric's inputs may themselves be derived). Cumulative metrics require time spine joins which generate significantly more complex SQL.
+**Scope limitation:** Input metrics for derived/ratio must be simple (no nested derived). Multi-metric queries (requesting >1 metric in a single query) deferred to future work.
 
-**Test focus:** Nested derived metrics, cumulative with and without windows, grain_to_date.
+**Validation:** 59 unit tests + 10 integration tests, all passing. Clippy clean.
 
 ---
 
