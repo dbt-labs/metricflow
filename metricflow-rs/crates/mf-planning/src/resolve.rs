@@ -191,6 +191,63 @@ pub fn resolve_ratio_metric<'a>(
     })
 }
 
+/// Resolved information needed to build a dataflow plan for a cumulative metric.
+#[derive(Debug)]
+pub struct ResolvedCumulativeMetric<'a> {
+    pub metric: &'a Metric,
+    pub measure: &'a Measure,
+    pub model: &'a SemanticModel,
+    pub agg_time_dimension: Option<&'a Dimension>,
+    pub window: Option<&'a MetricTimeWindow>,
+    pub grain_to_date: Option<TimeGrain>,
+}
+
+/// Resolve a cumulative metric: validate type, find measure + model + time dimension,
+/// and extract window/grain_to_date parameters.
+pub fn resolve_cumulative_metric<'a>(
+    graph: &'a SemanticGraph<'a>,
+    metric_name: &str,
+) -> Result<ResolvedCumulativeMetric<'a>, ResolveError> {
+    let metric = graph
+        .find_metric(metric_name)
+        .ok_or_else(|| ResolveError::UnknownMetric(metric_name.into()))?;
+
+    if metric.metric_type != MetricKind::Cumulative {
+        return Err(ResolveError::NotCumulativeMetric(metric_name.into()));
+    }
+
+    let measure_ref = metric
+        .type_params
+        .measure
+        .as_ref()
+        .ok_or_else(|| ResolveError::NoMeasure(metric_name.into()))?;
+
+    let models = graph.models_for_measure(&measure_ref.name);
+    let model = models
+        .first()
+        .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
+
+    let measure = model
+        .measures
+        .iter()
+        .find(|m| m.name == measure_ref.name)
+        .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
+
+    let agg_time_dimension = graph.agg_time_dimension(&measure_ref.name, &model.name);
+
+    let window = metric.type_params.window.as_ref();
+    let grain_to_date = metric.type_params.grain_to_date;
+
+    Ok(ResolvedCumulativeMetric {
+        metric,
+        measure,
+        model,
+        agg_time_dimension,
+        window,
+        grain_to_date,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -291,5 +348,58 @@ mod tests {
             result.unwrap_err(),
             ResolveError::NotRatioMetric(_)
         ));
+    }
+
+    #[test]
+    fn test_resolve_cumulative_metric_with_window() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let resolved = resolve_cumulative_metric(&graph, "trailing_7d_bookings").unwrap();
+        assert_eq!(resolved.metric.name, "trailing_7d_bookings");
+        assert_eq!(resolved.measure.name, "bookings");
+        assert_eq!(resolved.model.name, "bookings_source");
+        assert!(resolved.window.is_some());
+        let window = resolved.window.unwrap();
+        assert_eq!(window.count, 7);
+        assert_eq!(window.granularity, "day");
+        assert!(resolved.grain_to_date.is_none());
+    }
+
+    #[test]
+    fn test_resolve_cumulative_metric_grain_to_date() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let resolved = resolve_cumulative_metric(&graph, "bookings_mtd").unwrap();
+        assert_eq!(resolved.metric.name, "bookings_mtd");
+        assert!(resolved.window.is_none());
+        assert_eq!(resolved.grain_to_date, Some(TimeGrain::Month));
+    }
+
+    #[test]
+    fn test_resolve_cumulative_metric_all_time() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let resolved = resolve_cumulative_metric(&graph, "bookings_all_time").unwrap();
+        assert_eq!(resolved.metric.name, "bookings_all_time");
+        assert!(resolved.window.is_none());
+        assert!(resolved.grain_to_date.is_none());
+    }
+
+    #[test]
+    fn test_resolve_cumulative_metric_not_cumulative_error() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        // bookings is a simple metric, not cumulative
+        let result = resolve_cumulative_metric(&graph, "bookings");
+        // The metric doesn't exist in the cumulative manifest, so we get UnknownMetric
+        assert!(result.is_err());
     }
 }

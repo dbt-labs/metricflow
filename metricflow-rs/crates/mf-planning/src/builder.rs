@@ -14,6 +14,10 @@ pub enum PlanError {
     UnsupportedMetricType,
     #[error("dimension '{0}' not found on model '{1}' or any joined model")]
     DimensionNotFound(String, String),
+    #[error("no time spine configured for grain '{0}'")]
+    NoTimeSpine(String),
+    #[error("invalid time grain '{0}': {1}")]
+    InvalidTimeGrain(String, String),
 }
 
 /// Build a dataflow plan for the given query.
@@ -46,6 +50,11 @@ pub fn build_plan(graph: &SemanticGraph, query: &QuerySpec) -> Result<DataflowPl
         }
         MetricKind::Ratio => {
             let current = build_ratio_metric_plan(graph, query, metric_name, &mut plan)?;
+            let current = add_order_by_and_limit(&mut plan, current, query);
+            plan.set_sink(current);
+        }
+        MetricKind::Cumulative => {
+            let current = build_cumulative_metric_plan(graph, query, metric_name, &mut plan)?;
             let current = add_order_by_and_limit(&mut plan, current, query);
             plan.set_sink(current);
         }
@@ -270,11 +279,93 @@ fn build_ratio_metric_plan(
     Ok(compute)
 }
 
+/// Build the plan for a cumulative metric.
+/// Plan: ReadFromSource → JoinOverTimeRange → Aggregate.
+/// Returns the NodeIndex of the Aggregate node.
+fn build_cumulative_metric_plan(
+    graph: &SemanticGraph,
+    query: &QuerySpec,
+    metric_name: &str,
+    plan: &mut DataflowPlan,
+) -> Result<NodeIndex, PlanError> {
+    let resolved = resolve::resolve_cumulative_metric(graph, metric_name)?;
+
+    // Determine the query grain (default to Day if not specified).
+    let query_grain = query
+        .group_by
+        .iter()
+        .find_map(|g| match g {
+            GroupBySpec::TimeDimension { grain, .. } => Some(*grain),
+            _ => None,
+        })
+        .unwrap_or(TimeGrain::Day);
+
+    // Find time spine for the query grain.
+    let time_spine = graph
+        .find_time_spine(query_grain)
+        .ok_or_else(|| PlanError::NoTimeSpine(query_grain.to_string()))?;
+
+    // Convert MetricTimeWindow → TimeWindow if present.
+    let window = if let Some(mw) = resolved.window {
+        let grain = mw
+            .granularity
+            .parse::<TimeGrain>()
+            .map_err(|e| PlanError::InvalidTimeGrain(mw.granularity.clone(), e))?;
+        Some(TimeWindow {
+            count: mw.count as u64,
+            grain,
+        })
+    } else {
+        None
+    };
+
+    // Determine metric_time_column from agg_time_dimension or fallback to time spine column.
+    let metric_time_column = resolved
+        .agg_time_dimension
+        .map(|d| d.sql_expr().to_string())
+        .unwrap_or_else(|| time_spine.column.clone());
+
+    // Step 1: ReadFromSource for the measure model.
+    let read_node = plan.add_node(DataflowNode::ReadFromSource {
+        model_name: resolved.model.name.clone(),
+        table: resolved.model.node_relation.fully_qualified(),
+    });
+
+    // Step 2: JoinOverTimeRange (join source against time spine).
+    let join_node = plan.add_node(DataflowNode::JoinOverTimeRange {
+        time_spine_table: time_spine.table,
+        time_spine_column: time_spine.column,
+        time_spine_grain: time_spine.grain,
+        window,
+        grain_to_date: resolved.grain_to_date,
+        metric_time_column,
+    });
+    plan.add_edge(read_node, join_node);
+
+    // Step 3: Build group-by column names.
+    let group_by_columns: Vec<String> = query.group_by.iter().map(|g| g.column_name()).collect();
+
+    let aggregations = vec![MeasureAggregation {
+        measure_name: resolved.measure.name.clone(),
+        agg_type: resolved.measure.agg,
+        expr: resolved.measure.sql_expr().to_string(),
+        alias: metric_name.to_string(),
+    }];
+
+    // Step 4: Aggregate node.
+    let agg_node = plan.add_node(DataflowNode::Aggregate {
+        group_by: group_by_columns,
+        aggregations,
+    });
+    plan.add_edge(join_node, agg_node);
+
+    Ok(agg_node)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::dataflow::DataflowNode;
-    use mf_core::types::*;
     use mf_manifest::parse;
 
     #[test]
@@ -602,6 +693,127 @@ mod tests {
         match plan.node(compute_parents[0]) {
             DataflowNode::CombineAggregatedOutputs => {}
             other => panic!("expected CombineAggregatedOutputs, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_build_cumulative_metric_plan_trailing_window() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["trailing_7d_bookings".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        assert!(plan.sink().is_some());
+
+        // Sink should be Aggregate (3 nodes: ReadFromSource → JoinOverTimeRange → Aggregate)
+        let sink = plan.sink().unwrap();
+        match plan.node(sink) {
+            DataflowNode::Aggregate { aggregations, .. } => {
+                assert_eq!(aggregations[0].alias, "trailing_7d_bookings");
+            }
+            other => panic!("expected Aggregate, got {other:?}"),
+        }
+
+        // Parent of Aggregate should be JoinOverTimeRange
+        let parents = plan.parents(sink);
+        assert_eq!(parents.len(), 1);
+        match plan.node(parents[0]) {
+            DataflowNode::JoinOverTimeRange {
+                time_spine_table,
+                window,
+                grain_to_date,
+                ..
+            } => {
+                assert_eq!(time_spine_table, "demo.mf_time_spine");
+                assert!(window.is_some());
+                let w = window.as_ref().unwrap();
+                assert_eq!(w.count, 7);
+                assert_eq!(w.grain, TimeGrain::Day);
+                assert!(grain_to_date.is_none());
+            }
+            other => panic!("expected JoinOverTimeRange, got {other:?}"),
+        }
+
+        assert_eq!(plan.node_count(), 3);
+    }
+
+    #[test]
+    fn test_build_cumulative_metric_plan_grain_to_date() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["bookings_mtd".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        let sink = plan.sink().unwrap();
+        let parents = plan.parents(sink);
+        match plan.node(parents[0]) {
+            DataflowNode::JoinOverTimeRange {
+                window,
+                grain_to_date,
+                ..
+            } => {
+                assert!(window.is_none());
+                assert_eq!(*grain_to_date, Some(TimeGrain::Month));
+            }
+            other => panic!("expected JoinOverTimeRange, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_build_cumulative_metric_plan_all_time() {
+        let json = include_str!("../../../tests/fixtures/cumulative_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["bookings_all_time".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        let sink = plan.sink().unwrap();
+        let parents = plan.parents(sink);
+        match plan.node(parents[0]) {
+            DataflowNode::JoinOverTimeRange {
+                window,
+                grain_to_date,
+                ..
+            } => {
+                assert!(window.is_none());
+                assert!(grain_to_date.is_none());
+            }
+            other => panic!("expected JoinOverTimeRange, got {other:?}"),
         }
     }
 }
