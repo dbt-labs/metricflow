@@ -199,7 +199,6 @@ fn build_input_metric_subplan(
             GroupBySpec::Dimension {
                 name, entity_path, ..
             } => {
-                let alias = g.column_name();
                 let dim_name = name.as_str();
                 let model_name = if entity_path.is_empty() {
                     left_model_name
@@ -209,13 +208,31 @@ fn build_input_metric_subplan(
                         .map(|j| j.right_model.name.as_str())
                         .unwrap_or(left_model_name)
                 };
-                let dim_expr = graph
-                    .find_dimension(dim_name, model_name)
-                    .map(|(_, d)| d.sql_expr().to_string())
+                let dim = graph.find_dimension(dim_name, model_name).map(|(_, d)| d);
+                let dim_expr = dim
+                    .map(|d| d.sql_expr().to_string())
                     .unwrap_or_else(|| dim_name.to_string());
-                GroupByColumn {
-                    alias,
-                    expr: dim_expr,
+
+                // If the dimension is actually a time dimension, apply DATE_TRUNC
+                // using its default time_granularity and append the grain to the alias.
+                if let Some(d) = dim
+                    && d.dimension_type == DimensionType::Time
+                {
+                    let grain = d
+                        .type_params
+                        .as_ref()
+                        .map(|tp| tp.time_granularity)
+                        .unwrap_or(TimeGrain::Day);
+                    let base_alias = g.column_name();
+                    GroupByColumn {
+                        alias: format!("{base_alias}__{grain}"),
+                        expr: format!("DATE_TRUNC('{grain}', {dim_expr})"),
+                    }
+                } else {
+                    GroupByColumn {
+                        alias: g.column_name(),
+                        expr: dim_expr,
+                    }
                 }
             }
             GroupBySpec::Entity { .. } => GroupByColumn::simple(g.column_name()),
@@ -1005,6 +1022,54 @@ mod tests {
         match plan.node(parents[0]) {
             DataflowNode::ReadFromSource { .. } => {}
             other => panic!("expected ReadFromSource (no WhereFilter), got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_dimension_spec_auto_detects_time_dimension() {
+        // When a GroupBySpec::Dimension references a time-type dimension,
+        // the builder should apply DATE_TRUNC and append grain to alias.
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        // Use Dimension (not TimeDimension) for close_month — simulating what the
+        // CLI produces for "customer__close_month" where it can't tell from the
+        // string alone that close_month is a time dimension.
+        let query = QuerySpec {
+            metrics: vec!["arr_current".into()],
+            group_by: vec![GroupBySpec::Dimension {
+                name: "close_month".into(),
+                entity_path: vec!["customer".into()],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        let sink = plan.sink().unwrap();
+        match plan.node(sink) {
+            DataflowNode::Aggregate { group_by, .. } => {
+                assert_eq!(group_by.len(), 1);
+                // Alias should include the grain suffix
+                assert_eq!(
+                    group_by[0].alias, "customer__close_month__day",
+                    "time dimension alias should include grain"
+                );
+                // Expr should use DATE_TRUNC
+                assert!(
+                    group_by[0].expr.contains("DATE_TRUNC"),
+                    "time dimension expr should use DATE_TRUNC: {}",
+                    group_by[0].expr
+                );
+                assert!(
+                    group_by[0].expr.contains("date_month"),
+                    "should reference the physical column: {}",
+                    group_by[0].expr
+                );
+            }
+            other => panic!("expected Aggregate, got {other:?}"),
         }
     }
 }
