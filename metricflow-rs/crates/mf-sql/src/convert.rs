@@ -67,22 +67,21 @@ fn convert_node<'a>(
             left_key,
             right_key,
             right_model_name,
-        } => {
-            convert_join_on_entities(
-                plan,
-                node_idx,
-                entity_name,
-                left_key,
-                right_key,
-                right_model_name,
-                subquery_counter,
-                graph,
-            )
-        }
+        } => convert_join_on_entities(
+            plan,
+            node_idx,
+            entity_name,
+            left_key,
+            right_key,
+            right_model_name,
+            subquery_counter,
+            graph,
+        ),
         other => Err(ConvertError::UnexpectedNode(format!("{other:?}"))),
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn convert_join_on_entities<'a>(
     plan: &DataflowPlan,
     node_idx: NodeIndex,
@@ -159,19 +158,19 @@ fn convert_join_on_entities<'a>(
 
     // Project right-side dimension columns with entity__ prefix alias.
     // Use graph to enumerate right model dimensions if available.
-    if let Some(g) = graph {
-        if let Some(right_model) = g.find_model(right_model_name) {
-            for dim in &right_model.dimensions {
-                let physical_col = dim.sql_expr();
-                let logical_alias = format!("{entity_name}__{}", dim.name);
-                join_select_columns.push(SqlExpr::Alias {
-                    expr: Box::new(SqlExpr::ColumnRef {
-                        table_alias: right_alias.clone(),
-                        column_name: physical_col.to_string(),
-                    }),
-                    alias: logical_alias,
-                });
-            }
+    if let Some(g) = graph
+        && let Some(right_model) = g.find_model(right_model_name)
+    {
+        for dim in &right_model.dimensions {
+            let physical_col = dim.sql_expr();
+            let logical_alias = format!("{entity_name}__{}", dim.name);
+            join_select_columns.push(SqlExpr::Alias {
+                expr: Box::new(SqlExpr::ColumnRef {
+                    table_alias: right_alias.clone(),
+                    column_name: physical_col.to_string(),
+                }),
+                alias: logical_alias,
+            });
         }
     }
 
@@ -431,8 +430,14 @@ mod tests {
                 assert!(alias.starts_with("subq_"), "outer alias: {alias}");
                 // Inner subquery should be FROM a join subquery
                 match &query.from {
-                    SqlFrom::Subquery { query: join_q, alias: join_alias } => {
-                        assert!(join_alias.starts_with("join_subq_"), "join alias: {join_alias}");
+                    SqlFrom::Subquery {
+                        query: join_q,
+                        alias: join_alias,
+                    } => {
+                        assert!(
+                            join_alias.starts_with("join_subq_"),
+                            "join alias: {join_alias}"
+                        );
                         // The join subquery should have a LEFT OUTER JOIN
                         assert_eq!(join_q.joins.len(), 1);
                         assert_eq!(join_q.joins[0].join_type, "LEFT OUTER JOIN");

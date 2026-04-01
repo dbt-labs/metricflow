@@ -10,8 +10,8 @@
 
 | Phase | Name | Depends On | Produces | Detailed Plan |
 |-------|------|-----------|----------|---------------|
-| 1-2 | Foundation + Simple Metrics | — | Working pipeline: manifest → simple metric → DuckDB SQL | `2026-04-01-metricflow-rs-phase1-2.md` |
-| 3 | Joins & Dimensions | 1-2 | Multi-hop entity joins to reach dimensions on other semantic models | Not yet written |
+| 1-2 | Foundation + Simple Metrics | — | Working pipeline: manifest → simple metric → DuckDB SQL | `2026-04-01-metricflow-rs-phase1-2.md` — **DONE** |
+| 3 | Joins & Dimensions | 1-2 | Multi-hop entity joins to reach dimensions on other semantic models | `2026-04-01-metricflow-rs-phase3.md` |
 | 4 | Derived & Cumulative Metrics | 3 | Derived metric expressions, cumulative window functions, time spine joins | Not yet written |
 | 5 | Conversion & Offset Metrics | 4 | Conversion funnels, time-offset comparisons | Not yet written |
 | 6 | All SQL Dialects | 5 | Snowflake, BigQuery, Redshift, Postgres, Databricks, Trino renderers | Not yet written |
@@ -24,7 +24,7 @@ Each phase gets a detailed implementation plan written just before execution. La
 
 ## Phase 1-2: Foundation + Simple Metrics
 
-**Status:** Plan written
+**Status:** DONE (2026-04-01)
 
 **What it builds:**
 - `mf-core` crate: all shared types (enums, specs, manifest structs)

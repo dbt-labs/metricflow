@@ -121,10 +121,7 @@ fn test_end_to_end_join_dimension_generates_left_outer_join() {
         sql.contains("listing__country"),
         "should have prefixed dimension name: {sql}"
     );
-    assert!(
-        sql.contains("listing_id"),
-        "should include join key: {sql}"
-    );
+    assert!(sql.contains("listing_id"), "should include join key: {sql}");
     assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
     assert!(sql.contains("GROUP BY"), "should have GROUP BY: {sql}");
     assert!(

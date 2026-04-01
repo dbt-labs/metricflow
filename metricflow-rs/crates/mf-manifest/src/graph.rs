@@ -184,11 +184,7 @@ impl<'a> SemanticGraph<'a> {
     /// Find the join path from `left_model_name` to a model that has `dim_name`.
     /// Returns `Some(EntityJoin)` if a one-hop join exists; `None` if already on the
     /// left model or if no path is found.
-    pub fn find_join_path(
-        &self,
-        left_model_name: &str,
-        dim_name: &str,
-    ) -> Option<&EntityJoin<'a>> {
+    pub fn find_join_path(&self, left_model_name: &str, dim_name: &str) -> Option<&EntityJoin<'a>> {
         // If the dimension is local, no join needed
         if self
             .dimensions_by_model
@@ -198,16 +194,12 @@ impl<'a> SemanticGraph<'a> {
         }
 
         // Search all joins from left_model_name; find one whose right side has dim_name
-        for join in self.find_entity_joins(left_model_name) {
-            if self
-                .dimensions_by_model
-                .contains_key(&(join.right_model.name.as_str(), dim_name))
-            {
-                return Some(join);
-            }
-        }
-
-        None
+        self.find_entity_joins(left_model_name)
+            .into_iter()
+            .find(|join| {
+                self.dimensions_by_model
+                    .contains_key(&(join.right_model.name.as_str(), dim_name))
+            })
     }
 
     pub fn manifest(&self) -> &'a SemanticManifest {
