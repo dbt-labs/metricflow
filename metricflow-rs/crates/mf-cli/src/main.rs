@@ -134,15 +134,24 @@ fn parse_group_by_spec(input: &str, cli_grain: Option<&str>) -> GroupBySpec {
     // Single part, no dunder
     if parts.len() == 1 {
         let name = parts[0];
-        // If --grain provided and name looks like a time dimension, treat as TimeDimension
+        // metric_time is always a time dimension (default grain: day)
+        if name == "metric_time" {
+            let grain = cli_grain
+                .and_then(|g| g.parse().ok())
+                .unwrap_or(TimeGrain::Day);
+            return GroupBySpec::TimeDimension {
+                name: name.to_string(),
+                grain,
+                entity_path: vec![],
+            };
+        }
+        // Other names: if --grain provided, treat as time dimension
         if let Some(gr) = cli_grain {
-            if name == "metric_time" || name.contains("time") || name.contains("date") {
-                return GroupBySpec::TimeDimension {
-                    name: name.to_string(),
-                    grain: gr.parse().unwrap_or(TimeGrain::Day),
-                    entity_path: vec![],
-                };
-            }
+            return GroupBySpec::TimeDimension {
+                name: name.to_string(),
+                grain: gr.parse().unwrap_or(TimeGrain::Day),
+                entity_path: vec![],
+            };
         }
         return GroupBySpec::Dimension {
             name: name.to_string(),
@@ -200,6 +209,14 @@ mod tests {
     fn test_parse_simple_dimension() {
         let spec = parse_group_by_spec("is_instant", None);
         assert!(matches!(spec, GroupBySpec::Dimension { ref name, ref entity_path } if name == "is_instant" && entity_path.is_empty()));
+    }
+
+    #[test]
+    fn test_parse_metric_time_no_grain_defaults_to_day() {
+        // "metric_time" without --grain → TimeDimension with Day grain
+        let spec = parse_group_by_spec("metric_time", None);
+        assert!(matches!(spec, GroupBySpec::TimeDimension { ref name, grain, ref entity_path }
+            if name == "metric_time" && grain == TimeGrain::Day && entity_path.is_empty()));
     }
 
     #[test]
