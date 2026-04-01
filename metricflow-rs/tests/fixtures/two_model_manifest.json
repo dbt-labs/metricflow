@@ -1,0 +1,97 @@
+{
+  "semantic_models": [
+    {
+      "name": "bookings_source",
+      "node_relation": {
+        "alias": "fct_bookings",
+        "schema_name": "demo",
+        "database": null
+      },
+      "defaults": {
+        "agg_time_dimension": "ds"
+      },
+      "primary_entity": "booking",
+      "entities": [
+        {
+          "name": "booking",
+          "type": "primary",
+          "expr": null
+        },
+        {
+          "name": "listing",
+          "type": "foreign",
+          "expr": "listing_id"
+        }
+      ],
+      "measures": [
+        {
+          "name": "bookings",
+          "agg": "sum",
+          "expr": "1",
+          "agg_time_dimension": "ds"
+        }
+      ],
+      "dimensions": [
+        {
+          "name": "ds",
+          "type": "time",
+          "type_params": {
+            "time_granularity": "day"
+          },
+          "expr": null
+        },
+        {
+          "name": "is_instant",
+          "type": "categorical",
+          "expr": null
+        }
+      ]
+    },
+    {
+      "name": "listings_source",
+      "node_relation": {
+        "alias": "dim_listings_latest",
+        "schema_name": "demo",
+        "database": null
+      },
+      "defaults": null,
+      "primary_entity": "listing",
+      "entities": [
+        {
+          "name": "listing",
+          "type": "primary",
+          "expr": "listing_id"
+        }
+      ],
+      "measures": [],
+      "dimensions": [
+        {
+          "name": "country",
+          "type": "categorical",
+          "expr": null
+        },
+        {
+          "name": "is_lux_listing",
+          "type": "categorical",
+          "expr": null
+        }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "name": "bookings",
+      "type": "simple",
+      "type_params": {
+        "measure": {
+          "name": "bookings",
+          "join_to_timespine": false
+        }
+      }
+    }
+  ],
+  "project_configuration": {
+    "time_spine_table_configurations": [],
+    "time_spines": []
+  }
+}
