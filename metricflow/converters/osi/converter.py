@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Tuple
+from collections import defaultdict
+from itertools import combinations
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from metricflow.converters.osi.models import (
     OSIDataset,
@@ -10,6 +12,7 @@ from metricflow.converters.osi.models import (
     OSIDocument,
     OSIExpression,
     OSIField,
+    OSIRelationship,
     OSISemanticModel,
 )
 from metricflow_semantic_interfaces.protocols.dimension import Dimension
@@ -32,6 +35,9 @@ class MSIToOSIConverter:
     def convert(self, manifest: SemanticManifest, model_name: str = "semantic_model") -> OSIDocument:  # noqa: D102
         datasets = [self._convert_semantic_model(sm) for sm in manifest.semantic_models]
 
+        entity_index = self._build_entity_index(manifest.semantic_models)
+        relationships = self._build_relationships(entity_index)
+
         return OSIDocument(
             version="0.1.1",
             dialects=[self._dialect],
@@ -39,7 +45,7 @@ class MSIToOSIConverter:
                 OSISemanticModel(
                     name=model_name,
                     datasets=datasets,
-                    relationships=None,
+                    relationships=relationships if relationships else None,
                     metrics=None,
                 )
             ],
@@ -110,6 +116,70 @@ class MSIToOSIConverter:
                 unique_keys.append([col])
 
         return primary_key, unique_keys
+
+    @staticmethod
+    def _build_entity_index(
+        semantic_models: Sequence[SemanticModel],
+    ) -> Dict[str, List[Tuple[str, str, EntityType]]]:
+        """Map each entity name to the (dataset_name, column, entity_type) tuples that declare it."""
+        index: Dict[str, List[Tuple[str, str, EntityType]]] = defaultdict(list)
+        for sm in semantic_models:
+            for entity in sm.entities:
+                if entity.type == EntityType.NATURAL:
+                    continue
+                col = entity.expr if entity.expr is not None else entity.name
+                index[entity.name].append((sm.name, col, entity.type))
+        return dict(index)
+
+    @staticmethod
+    def _relationship_direction(
+        ds_a: str, col_a: str, type_a: EntityType, ds_b: str, col_b: str, type_b: EntityType
+    ) -> Tuple[str, str, str, str]:
+        """Return (from_ds, to_ds, from_col, to_col) obeying OSI directionality.
+
+        OSI spec: ``from`` is the many-side (FK holder), ``to`` is the one-side (PK holder).
+        FOREIGN entities are always the many-side; PRIMARY/UNIQUE are the one-side.
+        When both sides share the same cardinality tier, break ties alphabetically by dataset name.
+        """
+        one_side_types = {EntityType.PRIMARY, EntityType.UNIQUE}
+        a_is_one_side = type_a in one_side_types
+        b_is_one_side = type_b in one_side_types
+
+        if a_is_one_side and not b_is_one_side:
+            return ds_b, ds_a, col_b, col_a
+        if b_is_one_side and not a_is_one_side:
+            return ds_a, ds_b, col_a, col_b
+        # Same cardinality tier — use alphabetical order for determinism.
+        if ds_a <= ds_b:
+            return ds_a, ds_b, col_a, col_b
+        return ds_b, ds_a, col_b, col_a
+
+    @staticmethod
+    def _build_relationships(
+        entity_index: Dict[str, List[Tuple[str, str, EntityType]]],
+    ) -> List[OSIRelationship]:
+        """Resolve implicit MSI entity links into explicit OSI relationships.
+
+        Every pair of datasets sharing an entity name is a valid join path.
+        """
+        relationships: List[OSIRelationship] = []
+        for entity_name, entries in entity_index.items():
+            for (ds_a, col_a, type_a), (ds_b, col_b, type_b) in combinations(entries, 2):
+                if ds_a == ds_b:
+                    continue
+                from_ds, to_ds, from_col, to_col = MSIToOSIConverter._relationship_direction(
+                    ds_a, col_a, type_a, ds_b, col_b, type_b
+                )
+                relationships.append(
+                    OSIRelationship(
+                        name=f"{from_ds}__{to_ds}__{entity_name}",
+                        from_dataset=from_ds,
+                        to=to_ds,
+                        from_columns=[from_col],
+                        to_columns=[to_col],
+                    )
+                )
+        return relationships
 
     def _make_expression(self, expr: str) -> OSIExpression:
         return OSIExpression(dialects=[OSIDialectExpression(dialect=self._dialect, expression=expr)])

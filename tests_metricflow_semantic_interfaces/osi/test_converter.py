@@ -23,6 +23,7 @@ from metricflow_semantic_interfaces.implementations.semantic_manifest import (
 )
 from metricflow_semantic_interfaces.implementations.semantic_model import (
     PydanticNodeRelation,
+    PydanticSemanticModel,
 )
 from metricflow_semantic_interfaces.test_utils import (
     default_meta,
@@ -386,6 +387,189 @@ class TestDialectConfiguration:  # noqa: D101
         fields = result.semantic_model[0].datasets[0].fields
         assert fields is not None
         assert fields[0].expression.dialects[0].dialect == OSIDialect.SNOWFLAKE
+
+
+class TestRelationshipConversion:  # noqa: D101
+    def test_shared_entity_name_produces_relationship(self) -> None:  # noqa: D102
+        listings = semantic_model_with_guaranteed_meta(
+            name="listings",
+            entities=[_entity("listing", entity_type=EntityType.PRIMARY, expr="listing_id")],
+        )
+        bookings = semantic_model_with_guaranteed_meta(
+            name="bookings",
+            entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="listing_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        assert len(rels) == 1
+        rel = rels[0]
+        # bookings holds the FK (FOREIGN) → from; listings holds the PK (PRIMARY) → to
+        assert rel.from_dataset == "bookings"
+        assert rel.to == "listings"
+        assert rel.from_columns == ["listing_id"]
+        assert rel.to_columns == ["listing_id"]
+
+    def test_same_type_entities_produce_relationship(self) -> None:  # noqa: D102
+        users_a = semantic_model_with_guaranteed_meta(
+            name="users_a",
+            entities=[_entity("user", entity_type=EntityType.PRIMARY, expr="user_id")],
+        )
+        users_b = semantic_model_with_guaranteed_meta(
+            name="users_b",
+            entities=[_entity("user", entity_type=EntityType.PRIMARY, expr="uid")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users_a, users_b]))
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        assert len(rels) == 1
+        assert rels[0].from_columns == ["user_id"]
+        assert rels[0].to_columns == ["uid"]
+
+    def test_single_dataset_with_entity_produces_no_relationship(self) -> None:  # noqa: D102
+        bookings = semantic_model_with_guaranteed_meta(
+            name="bookings",
+            entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="listing_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[bookings]))
+
+        assert result.semantic_model[0].relationships is None
+
+    def test_same_dataset_entities_excluded(self) -> None:  # noqa: D102
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            entities=[
+                _entity("order", entity_type=EntityType.PRIMARY, expr="order_id"),
+                _entity("order", entity_type=EntityType.FOREIGN, expr="order_id"),
+            ],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[orders]))
+
+        assert result.semantic_model[0].relationships is None
+
+    def test_three_datasets_produce_all_pairs(self) -> None:  # noqa: D102
+        users_a = semantic_model_with_guaranteed_meta(
+            name="users_a",
+            entities=[_entity("user", entity_type=EntityType.PRIMARY, expr="user_id")],
+        )
+        users_b = semantic_model_with_guaranteed_meta(
+            name="users_b",
+            entities=[_entity("user", entity_type=EntityType.UNIQUE, expr="user_id")],
+        )
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            entities=[_entity("user", entity_type=EntityType.FOREIGN, expr="user_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users_a, users_b, orders]))
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        assert len(rels) == 3
+        pairs = {(r.from_dataset, r.to) for r in rels}
+        # orders (FOREIGN) is always the from-side; users_a/users_b (PRIMARY/UNIQUE) are to-side.
+        # users_a vs users_b are both one-side, so alphabetical tiebreaker applies.
+        assert pairs == {("users_a", "users_b"), ("orders", "users_a"), ("orders", "users_b")}
+
+    def test_columns_use_expr_when_present(self) -> None:  # noqa: D102
+        listings = semantic_model_with_guaranteed_meta(
+            name="listings",
+            entities=[_entity("listing", entity_type=EntityType.PRIMARY, expr="lid")],
+        )
+        bookings = semantic_model_with_guaranteed_meta(
+            name="bookings",
+            entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="fk_lid")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        rel = rels[0]
+        # bookings (FOREIGN) → from side; listings (PRIMARY) → to side
+        assert rel.from_columns == ["fk_lid"]
+        assert rel.to_columns == ["lid"]
+
+    def test_columns_fall_back_to_name_without_expr(self) -> None:  # noqa: D102
+        listings = semantic_model_with_guaranteed_meta(
+            name="listings",
+            entities=[_entity("listing", entity_type=EntityType.PRIMARY)],
+        )
+        bookings = semantic_model_with_guaranteed_meta(
+            name="bookings",
+            entities=[_entity("listing", entity_type=EntityType.FOREIGN)],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        assert rels[0].from_columns == ["listing"]
+        assert rels[0].to_columns == ["listing"]
+
+    def test_primary_entity_shorthand_does_not_produce_relationship(self) -> None:  # noqa: D102
+        bookings = PydanticSemanticModel(
+            name="bookings",
+            description=None,
+            node_relation=PydanticNodeRelation(schema_name="schema", alias="table"),
+            primary_entity="booking",
+            entities=[],
+            metadata=default_meta(),
+        )
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            entities=[_entity("booking", entity_type=EntityType.FOREIGN, expr="booking_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[bookings, orders]))
+
+        assert result.semantic_model[0].relationships is None
+
+    def test_relationship_name_format(self) -> None:  # noqa: D102
+        listings = semantic_model_with_guaranteed_meta(
+            name="listings",
+            entities=[_entity("listing", entity_type=EntityType.PRIMARY, expr="listing_id")],
+        )
+        bookings = semantic_model_with_guaranteed_meta(
+            name="bookings",
+            entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="listing_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        # Name is {from_ds}__{to_ds}__{entity}: bookings (FOREIGN) is from, listings (PRIMARY) is to
+        assert rels[0].name == "bookings__listings__listing"
+
+    def test_natural_entity_excluded(self) -> None:  # noqa: D102
+        users = semantic_model_with_guaranteed_meta(
+            name="users",
+            entities=[_entity("user", entity_type=EntityType.NATURAL, expr="user_id")],
+        )
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            entities=[_entity("user", entity_type=EntityType.FOREIGN, expr="user_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users, orders]))
+
+        assert result.semantic_model[0].relationships is None
+
+    def test_direction_based_on_entity_type_not_manifest_order(self) -> None:  # noqa: D102
+        # beta (PRIMARY) appears first in the manifest, alpha (FOREIGN) appears second.
+        # The converter must assign from=alpha (FK/many-side) and to=beta (PK/one-side),
+        # ignoring manifest order.
+        beta = semantic_model_with_guaranteed_meta(
+            name="beta",
+            entities=[_entity("shared", entity_type=EntityType.PRIMARY, expr="col_b")],
+        )
+        alpha = semantic_model_with_guaranteed_meta(
+            name="alpha",
+            entities=[_entity("shared", entity_type=EntityType.FOREIGN, expr="col_a")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[beta, alpha]))
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        assert rels[0].from_dataset == "alpha"
+        assert rels[0].to == "beta"
 
 
 class TestOSIJsonSerialization:  # noqa: D101
