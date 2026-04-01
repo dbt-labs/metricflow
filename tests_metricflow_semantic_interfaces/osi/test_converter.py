@@ -11,8 +11,13 @@ from metricflow_semantic_interfaces.implementations.elements.dimension import (
 from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
 from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasure
 from metricflow_semantic_interfaces.implementations.metric import (
+    PydanticConversionTypeParams,
+    PydanticCumulativeTypeParams,
     PydanticMetric,
+    PydanticMetricAggregationParams,
+    PydanticMetricInput,
     PydanticMetricInputMeasure,
+    PydanticMetricTimeWindow,
     PydanticMetricTypeParams,
 )
 from metricflow_semantic_interfaces.implementations.project_configuration import (
@@ -570,6 +575,301 @@ class TestRelationshipConversion:  # noqa: D101
         assert rels is not None
         assert rels[0].from_dataset == "alpha"
         assert rels[0].to == "beta"
+
+
+class TestMetricConversion:  # noqa: D101
+    # --- SIMPLE ---
+
+    def test_simple_metric_resolves_through_measure(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = _simple_metric("revenue", measure_name="revenue")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert len(metrics) == 1
+        assert metrics[0].name == "revenue"
+        assert metrics[0].expression.dialects[0].expression == "SUM(amount)"
+
+    def test_simple_metric_description_carried_over(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = _simple_metric("revenue", measure_name="revenue", description="Total revenue")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert metrics[0].description == "Total revenue"
+
+    def test_simple_metric_with_metric_aggregation_params(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(name="orders")
+        metric = PydanticMetric(
+            name="avg_price",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(
+                expr="price",
+                metric_aggregation_params=PydanticMetricAggregationParams(
+                    semantic_model="orders",
+                    agg=AggregationType.AVERAGE,
+                    agg_params=None,
+                    agg_time_dimension=None,
+                    non_additive_dimension=None,
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert metrics[0].expression.dialects[0].expression == "AVG(price)"
+
+    # --- RATIO ---
+
+    def test_ratio_metric_inlines_sub_expressions(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("order_count", agg=AggregationType.COUNT, expr="order_id"),
+            ],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        order_count_m = _simple_metric("order_count", "order_count")
+        arpu = PydanticMetric(
+            name="arpu",
+            description=None,
+            type=MetricType.RATIO,
+            type_params=PydanticMetricTypeParams(
+                numerator=PydanticMetricInput(name="revenue"),
+                denominator=PydanticMetricInput(name="order_count"),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, order_count_m, arpu]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        arpu_osi = next(m for m in metrics if m.name == "arpu")
+        assert arpu_osi.expression.dialects[0].expression == "(SUM(amount)) / (COUNT(order_id))"
+
+    # --- DERIVED ---
+
+    def test_derived_metric_inlines_sub_expressions(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("cost", agg=AggregationType.SUM, expr="cost_amount"),
+            ],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        cost_m = _simple_metric("cost", "cost")
+        profit = PydanticMetric(
+            name="profit",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue - cost",
+                metrics=[
+                    PydanticMetricInput(name="revenue"),
+                    PydanticMetricInput(name="cost"),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        profit_osi = next(m for m in metrics if m.name == "profit")
+        assert profit_osi.expression.dialects[0].expression == "SUM(amount) - SUM(cost_amount)"
+
+    def test_derived_metric_uses_alias_for_substitution(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("cost", agg=AggregationType.SUM, expr="cost_amount"),
+            ],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        cost_m = _simple_metric("cost", "cost")
+        profit = PydanticMetric(
+            name="profit",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="r - c",
+                metrics=[
+                    PydanticMetricInput(name="revenue", alias="r"),
+                    PydanticMetricInput(name="cost", alias="c"),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        profit_osi = next(m for m in metrics if m.name == "profit")
+        assert profit_osi.expression.dialects[0].expression == "SUM(amount) - SUM(cost_amount)"
+
+    def test_derived_metric_nested(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("cost", agg=AggregationType.SUM, expr="cost_amount"),
+                _measure("expenses", agg=AggregationType.SUM, expr="expense_amount"),
+            ],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        cost_m = _simple_metric("cost", "cost")
+        expenses_m = _simple_metric("expenses", "expenses")
+        gross_profit = PydanticMetric(
+            name="gross_profit",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue - cost",
+                metrics=[
+                    PydanticMetricInput(name="revenue"),
+                    PydanticMetricInput(name="cost"),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        net_profit = PydanticMetric(
+            name="net_profit",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="gross_profit - expenses",
+                metrics=[
+                    PydanticMetricInput(name="gross_profit"),
+                    PydanticMetricInput(name="expenses"),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(
+            _manifest(
+                semantic_models=[sm],
+                metrics=[revenue_m, cost_m, expenses_m, gross_profit, net_profit],
+            )
+        )
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        net_osi = next(m for m in metrics if m.name == "net_profit")
+        assert net_osi.expression.dialects[0].expression == "(SUM(amount) - SUM(cost_amount)) - SUM(expense_amount)"
+
+    # --- CUMULATIVE ---
+
+    def test_cumulative_metric_uses_base_aggregation(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        cumulative = PydanticMetric(
+            name="cumulative_revenue",
+            description=None,
+            type=MetricType.CUMULATIVE,
+            type_params=PydanticMetricTypeParams(
+                measure=PydanticMetricInputMeasure(name="revenue"),
+                cumulative_type_params=PydanticCumulativeTypeParams(
+                    window=PydanticMetricTimeWindow(count=7, granularity="day"),
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[cumulative]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert len(metrics) == 1
+        assert metrics[0].name == "cumulative_revenue"
+        assert metrics[0].expression.dialects[0].expression == "SUM(amount)"
+
+    # --- Edge cases ---
+
+    def test_no_metrics_produces_no_osi_metrics(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(name="orders")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+
+        assert result.semantic_model[0].metrics is None
+
+    def test_multiple_metrics_all_converted(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("order_count", agg=AggregationType.COUNT, expr="order_id"),
+            ],
+        )
+        result = MSIToOSIConverter().convert(
+            _manifest(
+                semantic_models=[sm],
+                metrics=[
+                    _simple_metric("revenue", "revenue"),
+                    _simple_metric("order_count", "order_count"),
+                ],
+            )
+        )
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert len(metrics) == 2
+        names = {m.name for m in metrics}
+        assert names == {"revenue", "order_count"}
+
+    def test_conversion_metric_skipped(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("visits", agg=AggregationType.COUNT, expr="visit_id"),
+                _measure("purchases", agg=AggregationType.COUNT, expr="purchase_id"),
+            ],
+        )
+        conversion = PydanticMetric(
+            name="purchase_rate",
+            description=None,
+            type=MetricType.CONVERSION,
+            type_params=PydanticMetricTypeParams(
+                conversion_type_params=PydanticConversionTypeParams(
+                    base_measure=PydanticMetricInputMeasure(name="visits"),
+                    conversion_measure=PydanticMetricInputMeasure(name="purchases"),
+                    entity="user",
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion]))
+
+        assert result.semantic_model[0].metrics is None
 
 
 class TestOSIJsonSerialization:  # noqa: D101

@@ -12,17 +12,24 @@ from metricflow.converters.osi.models import (
     OSIDocument,
     OSIExpression,
     OSIField,
+    OSIMetric,
     OSIRelationship,
     OSISemanticModel,
 )
 from metricflow_semantic_interfaces.protocols.dimension import Dimension
 from metricflow_semantic_interfaces.protocols.entity import Entity
-from metricflow_semantic_interfaces.protocols.measure import Measure
+from metricflow_semantic_interfaces.protocols.measure import (
+    Measure,
+    MeasureAggregationParameters,
+)
+from metricflow_semantic_interfaces.protocols.metric import Metric
 from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
 from metricflow_semantic_interfaces.type_enums import (
+    AggregationType,
     DimensionType,
     EntityType,
+    MetricType,
 )
 
 
@@ -38,6 +45,23 @@ class MSIToOSIConverter:
         entity_index = self._build_entity_index(manifest.semantic_models)
         relationships = self._build_relationships(entity_index)
 
+        measure_index = self._build_measure_index(manifest.semantic_models)
+        metric_index = self._build_metric_index(manifest.metrics)
+        expression_cache: Dict[str, str] = {}
+
+        osi_metrics: List[OSIMetric] = []
+        for metric in manifest.metrics:
+            if metric.type is MetricType.CONVERSION:
+                continue
+            expr = self._resolve_metric_expression(metric, metric_index, measure_index, expression_cache)
+            osi_metrics.append(
+                OSIMetric(
+                    name=metric.name,
+                    expression=self._make_expression(expr),
+                    description=metric.description,
+                )
+            )
+
         return OSIDocument(
             version="0.1.1",
             dialects=[self._dialect],
@@ -46,7 +70,7 @@ class MSIToOSIConverter:
                     name=model_name,
                     datasets=datasets,
                     relationships=relationships if relationships else None,
-                    metrics=None,
+                    metrics=osi_metrics if osi_metrics else None,
                 )
             ],
         )
@@ -118,6 +142,124 @@ class MSIToOSIConverter:
         return primary_key, unique_keys
 
     @staticmethod
+    def _build_measure_index(
+        semantic_models: Sequence[SemanticModel],
+    ) -> Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]]:
+        """Map measure name to (agg, col_expr, agg_params) for expression resolution."""
+        index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]] = {}
+        for sm in semantic_models:
+            for measure in sm.measures:
+                col = measure.expr if measure.expr is not None else measure.name
+                index[measure.name] = (measure.agg, col, measure.agg_params)
+        return index
+
+    @staticmethod
+    def _build_metric_index(metrics: Sequence[Metric]) -> Dict[str, Metric]:
+        """Map metric name to Metric for recursive resolution."""
+        return {metric.name: metric for metric in metrics}
+
+    def _resolve_metric_expression(
+        self,
+        metric: Metric,
+        metric_index: Dict[str, Metric],
+        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+        cache: Dict[str, str],
+    ) -> str:
+        """Recursively resolve a metric to a fully-inlined SQL expression string."""
+        if metric.name in cache:
+            return cache[metric.name]
+
+        if metric.type is MetricType.SIMPLE:
+            expr = self._resolve_simple(metric, measure_index)
+        elif metric.type is MetricType.CUMULATIVE:
+            expr = self._resolve_cumulative(metric, measure_index)
+        elif metric.type is MetricType.RATIO:
+            expr = self._resolve_ratio(metric, metric_index, measure_index, cache)
+        elif metric.type is MetricType.DERIVED:
+            expr = self._resolve_derived(metric, metric_index, measure_index, cache)
+        else:
+            expr = metric.name
+
+        cache[metric.name] = expr
+        return expr
+
+    def _resolve_simple(
+        self,
+        metric: Metric,
+        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+    ) -> str:
+        """Resolve a SIMPLE metric: look up its measure or use metric_aggregation_params."""
+        if metric.type_params.measure is not None:
+            measure_name = metric.type_params.measure.name
+            agg, col, agg_params = measure_index[measure_name]
+            return self._build_agg_expression(agg, col, agg_params)
+
+        # metric_aggregation_params path: aggregation info lives on the metric itself
+        agg_params_obj = metric.type_params.metric_aggregation_params
+        assert (
+            agg_params_obj is not None
+        ), f"SIMPLE metric '{metric.name}' has neither measure nor metric_aggregation_params"
+        col = metric.type_params.expr if metric.type_params.expr is not None else metric.name
+        return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params)
+
+    def _resolve_cumulative(
+        self,
+        metric: Metric,
+        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+    ) -> str:
+        """Resolve a CUMULATIVE metric to its base aggregation expression.
+
+        Window/grain semantics are not representable in an OSI expression string.
+        """
+        if metric.type_params.measure is not None:
+            measure_name = metric.type_params.measure.name
+            agg, col, agg_params = measure_index[measure_name]
+            return self._build_agg_expression(agg, col, agg_params)
+
+        # cumulative_type_params.metric path: resolve through a referenced metric
+        cumulative_params = metric.type_params.cumulative_type_params
+        assert (
+            cumulative_params is not None and cumulative_params.metric is not None
+        ), f"CUMULATIVE metric '{metric.name}' has no resolvable measure or sub-metric"
+        return metric.name  # cannot inline without recursing into metric_index; leave as name
+
+    def _resolve_ratio(
+        self,
+        metric: Metric,
+        metric_index: Dict[str, Metric],
+        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+        cache: Dict[str, str],
+    ) -> str:
+        """Resolve a RATIO metric as (numerator) / (denominator), both fully inlined."""
+        assert metric.type_params.numerator is not None and metric.type_params.denominator is not None
+        num_metric = metric_index[metric.type_params.numerator.name]
+        den_metric = metric_index[metric.type_params.denominator.name]
+        num_expr = self._resolve_metric_expression(num_metric, metric_index, measure_index, cache)
+        den_expr = self._resolve_metric_expression(den_metric, metric_index, measure_index, cache)
+        return f"({num_expr}) / ({den_expr})"
+
+    def _resolve_derived(
+        self,
+        metric: Metric,
+        metric_index: Dict[str, Metric],
+        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+        cache: Dict[str, str],
+    ) -> str:
+        """Resolve a DERIVED metric by substituting each input metric's expression into the expr string.
+
+        Compound sub-expressions (DERIVED/RATIO) are wrapped in parentheses to preserve operator precedence.
+        """
+        expr = metric.type_params.expr or ""
+        for input_metric in metric.type_params.metrics or []:
+            ref = input_metric.alias if input_metric.alias else input_metric.name
+            dep_metric = metric_index[input_metric.name]
+            resolved = self._resolve_metric_expression(dep_metric, metric_index, measure_index, cache)
+            if dep_metric.type in (MetricType.DERIVED, MetricType.RATIO):
+                resolved = f"({resolved})"
+            expr = expr.replace(ref, resolved)
+        return expr
+
+    @staticmethod
     def _build_entity_index(
         semantic_models: Sequence[SemanticModel],
     ) -> Dict[str, List[Tuple[str, str, EntityType]]]:
@@ -180,6 +322,35 @@ class MSIToOSIConverter:
                     )
                 )
         return relationships
+
+    @staticmethod
+    def _build_agg_expression(
+        agg: AggregationType,
+        col: str,
+        agg_params: Optional[MeasureAggregationParameters],
+    ) -> str:
+        if agg == AggregationType.SUM:
+            return f"SUM({col})"
+        if agg == AggregationType.MIN:
+            return f"MIN({col})"
+        if agg == AggregationType.MAX:
+            return f"MAX({col})"
+        if agg == AggregationType.COUNT:
+            return f"COUNT({col})"
+        if agg == AggregationType.COUNT_DISTINCT:
+            return f"COUNT(DISTINCT {col})"
+        if agg == AggregationType.AVERAGE:
+            return f"AVG({col})"
+        if agg == AggregationType.SUM_BOOLEAN:
+            return f"SUM(CASE WHEN {col} THEN 1 ELSE 0 END)"
+        if agg == AggregationType.MEDIAN:
+            return f"PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY {col})"
+        if agg == AggregationType.PERCENTILE:
+            percentile = agg_params.percentile if agg_params and agg_params.percentile is not None else 0.5
+            use_discrete = agg_params.use_discrete_percentile if agg_params else False
+            func = "PERCENTILE_DISC" if use_discrete else "PERCENTILE_CONT"
+            return f"{func}({percentile}) WITHIN GROUP (ORDER BY {col})"
+        return f"{agg.value.upper()}({col})"
 
     def _make_expression(self, expr: str) -> OSIExpression:
         return OSIExpression(dialects=[OSIDialectExpression(dialect=self._dialect, expression=expr)])
