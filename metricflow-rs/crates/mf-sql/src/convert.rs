@@ -896,4 +896,127 @@ mod tests {
         }
         assert_eq!(sql.group_by.len(), 1);
     }
+
+    #[test]
+    fn test_convert_where_filter_node_produces_where_clause() {
+        // Build plan: ReadFromSource → WhereFilter → Aggregate
+        let mut plan = DataflowPlan::new();
+
+        let read = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "orders_source".into(),
+            table: "demo.fct_orders".into(),
+        });
+
+        let filter = plan.add_node(DataflowNode::WhereFilter {
+            filters: vec![ResolvedFilterInfo {
+                sql: "customer__status = 'active'".into(),
+                required_columns: vec![("customer__status".into(), "status".into())],
+            }],
+        });
+        plan.add_edge(read, filter);
+
+        let agg = plan.add_node(DataflowNode::Aggregate {
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
+            aggregations: vec![MeasureAggregation {
+                measure_name: "orders".into(),
+                agg_type: AggregationType::Sum,
+                expr: "1".into(),
+                alias: "orders".into(),
+            }],
+        });
+        plan.add_edge(filter, agg);
+        plan.set_sink(agg);
+
+        let sql = to_sql_standalone(&plan).unwrap();
+        let renderer = crate::render::renderer_for_dialect(mf_core::dialect::SqlDialect::DuckDB);
+        let rendered = renderer.render(&sql);
+
+        // Should contain WHERE clause
+        assert!(
+            rendered.contains("WHERE"),
+            "should have WHERE clause: {rendered}"
+        );
+        assert!(
+            rendered.contains("customer__status = 'active'"),
+            "should have filter condition: {rendered}"
+        );
+        // Required column should be projected
+        assert!(
+            rendered.contains("status AS customer__status"),
+            "should project filter column: {rendered}"
+        );
+        // Should still have aggregation
+        assert!(
+            rendered.contains("SUM"),
+            "should have SUM aggregation: {rendered}"
+        );
+        assert!(
+            rendered.contains("GROUP BY"),
+            "should have GROUP BY: {rendered}"
+        );
+    }
+
+    #[test]
+    fn test_convert_where_filter_node_multiple_filters() {
+        // Build plan: ReadFromSource → WhereFilter (2 filters) → Aggregate
+        let mut plan = DataflowPlan::new();
+
+        let read = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "orders_source".into(),
+            table: "demo.fct_orders".into(),
+        });
+
+        let filter = plan.add_node(DataflowNode::WhereFilter {
+            filters: vec![
+                ResolvedFilterInfo {
+                    sql: "customer__status = 'active'".into(),
+                    required_columns: vec![("customer__status".into(), "status".into())],
+                },
+                ResolvedFilterInfo {
+                    sql: "customer__region = 'US'".into(),
+                    required_columns: vec![("customer__region".into(), "region".into())],
+                },
+            ],
+        });
+        plan.add_edge(read, filter);
+
+        let agg = plan.add_node(DataflowNode::Aggregate {
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
+            aggregations: vec![MeasureAggregation {
+                measure_name: "orders".into(),
+                agg_type: AggregationType::Sum,
+                expr: "1".into(),
+                alias: "orders".into(),
+            }],
+        });
+        plan.add_edge(filter, agg);
+        plan.set_sink(agg);
+
+        let sql = to_sql_standalone(&plan).unwrap();
+        let renderer = crate::render::renderer_for_dialect(mf_core::dialect::SqlDialect::DuckDB);
+        let rendered = renderer.render(&sql);
+
+        // Both filters should be ANDed in the WHERE clause
+        assert!(
+            rendered.contains("customer__status = 'active'"),
+            "should have first filter: {rendered}"
+        );
+        assert!(
+            rendered.contains("customer__region = 'US'"),
+            "should have second filter: {rendered}"
+        );
+        assert!(
+            rendered.contains(" AND "),
+            "filters should be ANDed: {rendered}"
+        );
+        // Both required columns should be projected
+        assert!(
+            rendered.contains("status AS customer__status"),
+            "should project first filter column: {rendered}"
+        );
+        assert!(
+            rendered.contains("region AS customer__region"),
+            "should project second filter column: {rendered}"
+        );
+    }
 }

@@ -910,4 +910,101 @@ mod tests {
             other => panic!("expected JoinOverTimeRange, got {other:?}"),
         }
     }
+
+    #[test]
+    fn test_build_plan_inserts_where_filter_node_for_filtered_metric() {
+        // arr_current_enterprise has filter: {{ Dimension('customer__plan_type') }} = 'Enterprise'
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["arr_current_enterprise".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        let sink = plan.sink().unwrap();
+
+        // Sink should be Aggregate
+        match plan.node(sink) {
+            DataflowNode::Aggregate { .. } => {}
+            other => panic!("expected Aggregate at sink, got {other:?}"),
+        }
+
+        // Parent of Aggregate should be WhereFilter (not ReadFromSource directly)
+        let agg_parents = plan.parents(sink);
+        assert_eq!(agg_parents.len(), 1);
+        match plan.node(agg_parents[0]) {
+            DataflowNode::WhereFilter { filters } => {
+                assert_eq!(filters.len(), 1);
+                assert!(
+                    filters[0].sql.contains("Enterprise"),
+                    "filter sql should mention Enterprise: {}",
+                    filters[0].sql
+                );
+                assert_eq!(filters[0].required_columns.len(), 1);
+                assert_eq!(filters[0].required_columns[0].0, "customer__plan_type");
+                assert_eq!(filters[0].required_columns[0].1, "plan_type");
+            }
+            other => panic!("expected WhereFilter, got {other:?}"),
+        }
+
+        // Parent of WhereFilter should be ReadFromSource
+        let filter_parents = plan.parents(agg_parents[0]);
+        assert_eq!(filter_parents.len(), 1);
+        match plan.node(filter_parents[0]) {
+            DataflowNode::ReadFromSource { model_name, .. } => {
+                assert_eq!(model_name, "fct_customer_arr_waterfall");
+            }
+            other => panic!("expected ReadFromSource, got {other:?}"),
+        }
+
+        // Plan should have 3 nodes: ReadFromSource → WhereFilter → Aggregate
+        assert_eq!(plan.node_count(), 3);
+    }
+
+    #[test]
+    fn test_build_plan_no_where_filter_node_when_metric_has_no_filter() {
+        // arr_current has no filter — plan should be ReadFromSource → Aggregate (2 nodes)
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["arr_current".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        assert_eq!(plan.node_count(), 2);
+
+        let sink = plan.sink().unwrap();
+        match plan.node(sink) {
+            DataflowNode::Aggregate { .. } => {}
+            other => panic!("expected Aggregate at sink, got {other:?}"),
+        }
+
+        // Parent should be ReadFromSource directly — no WhereFilter
+        let parents = plan.parents(sink);
+        assert_eq!(parents.len(), 1);
+        match plan.node(parents[0]) {
+            DataflowNode::ReadFromSource { .. } => {}
+            other => panic!("expected ReadFromSource (no WhereFilter), got {other:?}"),
+        }
+    }
 }
