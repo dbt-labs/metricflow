@@ -578,6 +578,128 @@ fn test_end_to_end_real_format_metric_with_filter() {
     );
 }
 
+// ─── Multi-metric query tests ────────────────────────────────────────────────
+
+#[test]
+fn test_end_to_end_multi_metric_two_simple() {
+    let manifest_json = include_str!("fixtures/derived_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings".into(), "instant_bookings".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (multi-metric):\n{sql}");
+
+    // Should use FULL OUTER JOIN to combine the two metrics
+    assert!(
+        sql.contains("FULL OUTER JOIN"),
+        "multi-metric should use FULL OUTER JOIN: {sql}"
+    );
+    // Should COALESCE the shared group-by dimension
+    assert!(
+        sql.contains("COALESCE"),
+        "should COALESCE group-by columns: {sql}"
+    );
+    // Both metrics should appear
+    assert!(
+        sql.contains("bookings"),
+        "should contain bookings metric: {sql}"
+    );
+    assert!(
+        sql.contains("instant_bookings"),
+        "should contain instant_bookings metric: {sql}"
+    );
+    // Each metric should have its own aggregation subquery
+    assert!(
+        sql.contains("SUM"),
+        "should have SUM aggregation: {sql}"
+    );
+    assert!(
+        sql.contains("GROUP BY"),
+        "should have GROUP BY: {sql}"
+    );
+}
+
+#[test]
+fn test_end_to_end_multi_metric_no_groupby() {
+    let manifest_json = include_str!("fixtures/derived_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["bookings".into(), "instant_bookings".into()],
+        group_by: vec![],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (multi-metric no group-by):\n{sql}");
+
+    // Without group-by, should use CROSS JOIN
+    assert!(
+        sql.contains("CROSS JOIN"),
+        "multi-metric without group-by should use CROSS JOIN: {sql}"
+    );
+    assert!(
+        sql.contains("bookings"),
+        "should contain bookings: {sql}"
+    );
+    assert!(
+        sql.contains("instant_bookings"),
+        "should contain instant_bookings: {sql}"
+    );
+}
+
+#[test]
+fn test_end_to_end_multi_metric_with_simple_and_derived() {
+    let manifest_json = include_str!("fixtures/derived_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    // Mix simple + derived in one query
+    let query = QuerySpec {
+        metrics: vec!["bookings".into(), "bookings_growth".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (simple + derived multi-metric):\n{sql}");
+
+    // Should have FULL OUTER JOIN at the top level to combine the two metrics
+    assert!(
+        sql.contains("FULL OUTER JOIN"),
+        "should use FULL OUTER JOIN: {sql}"
+    );
+    // The derived metric expression should appear
+    assert!(
+        sql.contains("bookings - instant_bookings"),
+        "should contain derived expression: {sql}"
+    );
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 
 #[test]
