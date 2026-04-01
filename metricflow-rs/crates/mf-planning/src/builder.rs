@@ -211,7 +211,8 @@ fn build_input_metric_subplan(
                 } else {
                     // Non-metric_time time dimension: find on model or joined model
                     let dim_name = name.as_str();
-                    let model_name = if entity_path.is_empty() {
+                    let is_joined = !entity_path.is_empty();
+                    let model_name = if !is_joined {
                         left_model_name
                     } else {
                         // If there's an entity path, the dimension is on a joined model
@@ -220,10 +221,18 @@ fn build_input_metric_subplan(
                             .map(|j| j.right_model.name.as_str())
                             .unwrap_or(left_model_name)
                     };
-                    let dim_expr = graph
-                        .find_dimension(dim_name, model_name)
-                        .map(|(_, d)| d.sql_expr().to_string())
-                        .unwrap_or_else(|| dim_name.to_string());
+                    // For joined dimensions, use the join-aliased name (entity__dim)
+                    // since the join subquery already projected it under that name.
+                    let dim_expr = if is_joined {
+                        // Build the entity__dim alias that the join subquery used
+                        let entity_prefix = entity_path.join("__");
+                        format!("{entity_prefix}__{dim_name}")
+                    } else {
+                        graph
+                            .find_dimension(dim_name, model_name)
+                            .map(|(_, d)| d.sql_expr().to_string())
+                            .unwrap_or_else(|| dim_name.to_string())
+                    };
                     GroupByColumn {
                         alias,
                         expr: format!("DATE_TRUNC('{grain}', {dim_expr})"),
@@ -234,7 +243,8 @@ fn build_input_metric_subplan(
                 name, entity_path, ..
             } => {
                 let dim_name = name.as_str();
-                let model_name = if entity_path.is_empty() {
+                let is_joined = !entity_path.is_empty();
+                let model_name = if !is_joined {
                     left_model_name
                 } else {
                     graph
@@ -243,7 +253,7 @@ fn build_input_metric_subplan(
                         .unwrap_or(left_model_name)
                 };
                 let dim = graph.find_dimension(dim_name, model_name).map(|(_, d)| d);
-                let dim_expr = dim
+                let raw_dim_expr = dim
                     .map(|d| d.sql_expr().to_string())
                     .unwrap_or_else(|| dim_name.to_string());
 
@@ -258,13 +268,28 @@ fn build_input_metric_subplan(
                         .map(|tp| tp.time_granularity)
                         .unwrap_or(TimeGrain::Day);
                     let base_alias = g.column_name();
+                    // For joined dimensions, the join subquery already aliased
+                    // the column as entity__dim, so reference that alias.
+                    let dim_expr = if is_joined {
+                        base_alias.clone()
+                    } else {
+                        raw_dim_expr
+                    };
                     GroupByColumn {
                         alias: format!("{base_alias}__{grain}"),
                         expr: format!("DATE_TRUNC('{grain}', {dim_expr})"),
                     }
                 } else {
+                    // For joined dimensions, the join subquery already aliased
+                    // the column as entity__dim, so use the alias as the expr.
+                    let alias = g.column_name();
+                    let dim_expr = if is_joined {
+                        alias.clone()
+                    } else {
+                        raw_dim_expr
+                    };
                     GroupByColumn {
-                        alias: g.column_name(),
+                        alias,
                         expr: dim_expr,
                     }
                 }
@@ -1263,9 +1288,10 @@ mod tests {
                     "time dimension expr should use DATE_TRUNC: {}",
                     group_by[0].expr
                 );
+                // For joined dimensions, the expr references the join-aliased name
                 assert!(
-                    group_by[0].expr.contains("date_month"),
-                    "should reference the physical column: {}",
+                    group_by[0].expr.contains("customer__close_month"),
+                    "should reference the join-aliased column: {}",
                     group_by[0].expr
                 );
             }
