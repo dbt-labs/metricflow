@@ -40,6 +40,7 @@ pub struct ResolvedMeasureInfo {
     pub name: String,
     pub agg: AggregationType,
     pub expr: String,
+    pub fill_nulls_with: Option<i64>,
 }
 
 /// Resolved information needed to build a dataflow plan for a simple metric.
@@ -82,12 +83,17 @@ pub fn resolve_simple_metric<'a>(
 
         let agg_time_dimension = graph.agg_time_dimension(&measure_ref.name, &model.name);
 
+        let fill_nulls_with = measure_ref
+            .fill_nulls_with
+            .or(metric.type_params.fill_nulls_with);
+
         return Ok(ResolvedSimpleMetric {
             metric,
             measure: ResolvedMeasureInfo {
                 name: measure.name.clone(),
                 agg: measure.agg,
                 expr: measure.sql_expr().to_string(),
+                fill_nulls_with,
             },
             model,
             agg_time_dimension,
@@ -124,6 +130,7 @@ pub fn resolve_simple_metric<'a>(
                 name: metric.name.clone(),
                 agg: params.agg,
                 expr,
+                fill_nulls_with: metric.type_params.fill_nulls_with,
             },
             model,
             agg_time_dimension,
@@ -296,6 +303,9 @@ pub fn resolve_cumulative_metric<'a>(
                 name: measure.name.clone(),
                 agg: measure.agg,
                 expr: measure.sql_expr().to_string(),
+                fill_nulls_with: measure_ref
+                    .fill_nulls_with
+                    .or(metric.type_params.fill_nulls_with),
             },
             model,
             agg_time_dimension,

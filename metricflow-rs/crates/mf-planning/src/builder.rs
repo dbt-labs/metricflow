@@ -278,6 +278,7 @@ fn build_input_metric_subplan(
         agg_type: resolved.measure.agg,
         expr: resolved.measure.expr.clone(),
         alias: output_alias.to_string(),
+        fill_nulls_with: resolved.measure.fill_nulls_with,
     }];
 
     // Step 4: Determine the input to the aggregate node.
@@ -287,22 +288,34 @@ fn build_input_metric_subplan(
         *join_nodes.values().next().unwrap()
     };
 
-    // Step 5: Insert WhereFilter node before aggregation if the metric has filters.
+    // Step 5: Insert WhereFilter node before aggregation for metric-level and query-level filters.
+    let mut all_filters: Vec<ResolvedFilterInfo> = Vec::new();
+
+    // Metric-level filters (from the metric definition in the manifest)
     if let Some(ref wfi) = resolved.metric.filter {
-        let resolved_filters: Vec<ResolvedFilterInfo> = filter::resolve_filters(graph, wfi)
-            .into_iter()
-            .map(|rf| ResolvedFilterInfo {
+        all_filters.extend(filter::resolve_filters(graph, wfi).into_iter().map(|rf| {
+            ResolvedFilterInfo {
                 sql: rf.sql,
                 required_columns: rf.required_columns,
-            })
-            .collect();
-        if !resolved_filters.is_empty() {
-            let filter_node = plan.add_node(DataflowNode::WhereFilter {
-                filters: resolved_filters,
-            });
-            plan.add_edge(agg_input, filter_node);
-            agg_input = filter_node;
-        }
+            }
+        }));
+    }
+
+    // Query-level filters (from the user's query WHERE clauses)
+    for clause in &query.where_clauses {
+        let rf = filter::resolve_single_filter_public(graph, clause);
+        all_filters.push(ResolvedFilterInfo {
+            sql: rf.sql,
+            required_columns: rf.required_columns,
+        });
+    }
+
+    if !all_filters.is_empty() {
+        let filter_node = plan.add_node(DataflowNode::WhereFilter {
+            filters: all_filters,
+        });
+        plan.add_edge(agg_input, filter_node);
+        agg_input = filter_node;
     }
 
     // Step 6: Aggregate node.
@@ -493,6 +506,7 @@ fn build_cumulative_metric_plan(
         agg_type: resolved.measure.agg,
         expr: resolved.measure.expr.clone(),
         alias: metric_name.to_string(),
+        fill_nulls_with: resolved.measure.fill_nulls_with,
     }];
 
     // Step 4: Aggregate node.
@@ -1132,6 +1146,83 @@ mod tests {
             other => panic!("expected Aggregate at sink (no combine for single metric), got {other:?}"),
         }
         assert_eq!(plan.node_count(), 2);
+    }
+
+    #[test]
+    fn test_query_level_where_filter() {
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let query = QuerySpec {
+            metrics: vec!["arr_current".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![
+                "{{ Dimension('customer__plan_type') }} = 'Enterprise'".into(),
+            ],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        let sink = plan.sink().unwrap();
+        // Sink should be Aggregate, and its parent should be WhereFilter
+        let agg_parents = plan.parents(sink);
+        assert_eq!(agg_parents.len(), 1);
+        match plan.node(agg_parents[0]) {
+            DataflowNode::WhereFilter { filters } => {
+                assert_eq!(filters.len(), 1);
+                assert_eq!(filters[0].sql, "customer__plan_type = 'Enterprise'");
+                assert_eq!(filters[0].required_columns.len(), 1);
+                assert_eq!(filters[0].required_columns[0].0, "customer__plan_type");
+            }
+            other => panic!("expected WhereFilter, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_query_level_where_combined_with_metric_filter() {
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        // Find a metric that has a metric-level filter to test combination
+        // arr_current on customer model with a query-level filter
+        let query = QuerySpec {
+            metrics: vec!["arr_current".into()],
+            group_by: vec![GroupBySpec::TimeDimension {
+                name: "metric_time".into(),
+                grain: TimeGrain::Day,
+                entity_path: vec![],
+            }],
+            where_clauses: vec![
+                "{{ Dimension('customer__plan_type') }} = 'Enterprise'".into(),
+                "{{ Entity('customer') }} IS NOT NULL".into(),
+            ],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let plan = build_plan(&graph, &query).unwrap();
+        let sink = plan.sink().unwrap();
+        let agg_parents = plan.parents(sink);
+        assert_eq!(agg_parents.len(), 1);
+        match plan.node(agg_parents[0]) {
+            DataflowNode::WhereFilter { filters } => {
+                // Should have at least the 2 query-level filters
+                // (plus any metric-level filters from the metric definition)
+                assert!(
+                    filters.len() >= 2,
+                    "expected at least 2 filters, got {}",
+                    filters.len()
+                );
+            }
+            other => panic!("expected WhereFilter, got {other:?}"),
+        }
     }
 
     #[test]

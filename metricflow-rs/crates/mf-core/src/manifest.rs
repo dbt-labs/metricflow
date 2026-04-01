@@ -166,6 +166,12 @@ pub struct MetricTypeParams {
     pub cumulative_type_params: Option<CumulativeTypeParams>,
     // Conversion
     pub conversion_type_params: Option<ConversionTypeParams>,
+    // Null filling: wrap metric output in COALESCE(metric, value)
+    pub fill_nulls_with: Option<i64>,
+    #[serde(default)]
+    pub join_to_timespine: bool,
+    #[serde(default)]
+    pub is_private: bool,
 }
 
 /// Inlined measure info for simple metrics (newer manifest format).

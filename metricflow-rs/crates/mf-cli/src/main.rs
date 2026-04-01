@@ -31,6 +31,10 @@ enum Commands {
         #[arg(long, default_value = "duckdb")]
         dialect: DialectArg,
 
+        /// WHERE filter templates (e.g., "{{ Dimension('customer__plan_type') }} = 'Enterprise'")
+        #[arg(long = "where", value_delimiter = ',')]
+        where_clauses: Vec<String>,
+
         /// Row limit
         #[arg(long)]
         limit: Option<u64>,
@@ -71,6 +75,7 @@ fn main() {
             metrics,
             group_by,
             dialect,
+            where_clauses,
             limit,
         } => {
             let manifest_json = std::fs::read_to_string(&manifest).unwrap_or_else(|e| {
@@ -99,7 +104,7 @@ fn main() {
             let query = QuerySpec {
                 metrics,
                 group_by: group_by_specs,
-                where_clauses: vec![],
+                where_clauses,
                 order_by: vec![],
                 limit,
             };

@@ -395,15 +395,27 @@ fn convert_aggregate(
         };
         let is_distinct = agg.agg_type == AggregationType::CountDistinct;
 
-        outer_columns.push(SqlExpr::Alias {
-            expr: Box::new(SqlExpr::AggregateFunction {
-                function: agg_func.into(),
-                arg: Box::new(SqlExpr::ColumnRef {
-                    table_alias: subq_alias.clone(),
-                    column_name: internal_col,
-                }),
-                distinct: is_distinct,
+        let agg_expr = SqlExpr::AggregateFunction {
+            function: agg_func.into(),
+            arg: Box::new(SqlExpr::ColumnRef {
+                table_alias: subq_alias.clone(),
+                column_name: internal_col,
             }),
+            distinct: is_distinct,
+        };
+
+        // Wrap in COALESCE(AGG(...), value) if fill_nulls_with is configured
+        let final_expr = if let Some(fill_value) = agg.fill_nulls_with {
+            SqlExpr::FunctionCall {
+                function: "COALESCE".into(),
+                args: vec![agg_expr, SqlExpr::Literal(fill_value.to_string())],
+            }
+        } else {
+            agg_expr
+        };
+
+        outer_columns.push(SqlExpr::Alias {
+            expr: Box::new(final_expr),
             alias: agg.alias.clone(),
         });
     }
@@ -816,6 +828,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "1".into(),
                 alias: "bookings".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(read, agg);
@@ -877,6 +890,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "1".into(),
                 alias: "bookings".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(join, agg);
@@ -937,6 +951,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "1".into(),
                 alias: "orders".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(filter, agg);
@@ -1002,6 +1017,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "1".into(),
                 alias: "orders".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(filter, agg);
@@ -1054,6 +1070,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "val1".into(),
                 alias: "m1".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(read1, agg1);
@@ -1074,6 +1091,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "val2".into(),
                 alias: "m2".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(read2, agg2);

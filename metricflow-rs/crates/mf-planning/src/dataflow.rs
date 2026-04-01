@@ -62,6 +62,7 @@ pub struct MeasureAggregation {
     pub agg_type: AggregationType,
     pub expr: String,
     pub alias: String,
+    pub fill_nulls_with: Option<i64>,
 }
 
 /// A resolved metric-level filter for the Aggregate node.
@@ -173,6 +174,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "1".into(),
                 alias: "bookings".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(read, agg);
@@ -242,6 +244,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "1".into(),
                 alias: "bookings".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(read1, agg1);
@@ -256,6 +259,7 @@ mod tests {
                 agg_type: AggregationType::Sum,
                 expr: "is_instant".into(),
                 alias: "instant_bookings".into(),
+                fill_nulls_with: None,
             }],
         });
         plan.add_edge(read2, agg2);

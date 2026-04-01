@@ -43,6 +43,12 @@ pub fn resolve_filters(
         .collect()
 }
 
+/// Resolve a single WHERE clause template string to SQL.
+/// Public wrapper for use by query-level WHERE clauses.
+pub fn resolve_single_filter_public(graph: &SemanticGraph, template: &str) -> ResolvedFilter {
+    resolve_single_filter(graph, template)
+}
+
 fn resolve_single_filter(graph: &SemanticGraph, template: &str) -> ResolvedFilter {
     let mut sql = template.to_string();
     let mut required_columns: Vec<(String, String)> = Vec::new();

@@ -12,7 +12,8 @@ The pipeline compiles **531/531 metrics** from the internal-analytics semantic m
 - **Multi-metric queries:** multiple metrics in a single query, combined via FULL OUTER JOIN
 - **Nested metrics:** derived/ratio metrics whose inputs are themselves derived
 - **Cross-model joins:** entity-based LEFT OUTER JOIN for dimensions on other semantic models
-- **Metric-level WHERE filters:** template resolution for `{{ Dimension(...) }}`, `{{ TimeDimension(...) }}`, `{{ Entity(...) }}`
+- **WHERE filters:** metric-level and query-level, with template resolution for `{{ Dimension(...) }}`, `{{ TimeDimension(...) }}`, `{{ Entity(...) }}`
+- **`fill_nulls_with`:** wraps aggregate output in `COALESCE(AGG(...), value)` when configured
 - **Time dimensions:** auto-detection from manifest, DATE_TRUNC with configurable grain
 - **Dundered group-by parsing:** `metric_time__month`, `listing__country`, `listing__ds__week`
 - **ORDER BY and LIMIT**
@@ -20,8 +21,6 @@ The pipeline compiles **531/531 metrics** from the internal-analytics semantic m
 
 ### Known Limitations
 
-- **No query-level WHERE filters** — only metric-level filters are supported; the `where_clauses` field on `QuerySpec` is not yet wired through
-- **No `fill_nulls_with`** — metrics with `fill_nulls_with` configured are compiled but the null-filling is not applied
 - **No multi-hop joins** — only single-hop entity joins (e.g., `listing__country`), not `listing__user__country`
 - **No conversion or offset metrics** — `offset_window`, `offset_to_grain`, conversion metric types
 - **Limited dialect support** — Snowflake, BigQuery, Redshift, Postgres, Databricks, Trino all fall back to ANSI SQL
@@ -67,10 +66,19 @@ println!("{sql}");
 ### CLI
 
 ```bash
+# Single metric
+cargo run -p mf-cli -- query \
+  --manifest path/to/semantic_manifest.json \
+  --metrics bookings \
+  --group-by metric_time__day \
+  --dialect duckdb
+
+# Multiple metrics in a single query (FULL OUTER JOIN on shared dimensions)
 cargo run -p mf-cli -- query \
   --manifest path/to/semantic_manifest.json \
   --metrics bookings,instant_bookings \
   --group-by metric_time__day,listing__country \
+  --where "{{ Dimension('listing__is_lux') }} = true" \
   --dialect duckdb
 ```
 
@@ -85,7 +93,7 @@ cargo build --all
 
 ```bash
 cd metricflow-rs
-cargo test --all            # all tests (101 tests)
+cargo test --all            # all tests (104 tests)
 cargo clippy --all -- -D warnings
 cargo fmt --all -- --check
 ```

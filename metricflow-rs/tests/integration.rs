@@ -724,3 +724,38 @@ fn test_end_to_end_unknown_metric_error() {
         "error should mention metric name: {err}"
     );
 }
+
+#[test]
+fn test_end_to_end_query_level_where_filter() {
+    let manifest_json = include_str!("fixtures/real_format_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["arr_current".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![
+            "{{ Dimension('customer__plan_type') }} = 'Enterprise'".into(),
+        ],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+    let sql_upper = sql.to_uppercase();
+
+    // The WHERE clause should appear in the SQL
+    assert!(
+        sql.contains("customer__plan_type = 'Enterprise'"),
+        "SQL should contain resolved WHERE filter: {sql}"
+    );
+    // The filter column should be projected
+    assert!(
+        sql_upper.contains("PLAN_TYPE"),
+        "SQL should reference plan_type column: {sql}"
+    );
+}
