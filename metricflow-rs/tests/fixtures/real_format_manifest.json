@@ -95,6 +95,35 @@
       }
     },
     {
+      "name": "arr_current_enterprise",
+      "type": "simple",
+      "type_params": {
+        "measure": null,
+        "numerator": null,
+        "denominator": null,
+        "expr": null,
+        "window": null,
+        "grain_to_date": null,
+        "metrics": null,
+        "conversion_type_params": null,
+        "cumulative_type_params": null,
+        "metric_aggregation_params": {
+          "semantic_model": "fct_customer_arr_waterfall",
+          "agg": "sum",
+          "expr": "month_ending_current_arr",
+          "agg_time_dimension": "close_month",
+          "non_additive_dimension": null
+        }
+      },
+      "filter": {
+        "where_filters": [
+          {
+            "where_sql_template": "{{ Dimension('customer__plan_type') }} = 'Enterprise'"
+          }
+        ]
+      }
+    },
+    {
       "name": "arr_growth",
       "type": "derived",
       "type_params": {

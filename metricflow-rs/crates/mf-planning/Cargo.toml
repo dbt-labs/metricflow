@@ -9,6 +9,7 @@ mf-core = { path = "../mf-core" }
 mf-manifest = { path = "../mf-manifest" }
 petgraph = { workspace = true }
 thiserror = { workspace = true }
+regex = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true }

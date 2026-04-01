@@ -17,6 +17,7 @@ thiserror = "2"
 clap = { version = "4", features = ["derive"] }
 itertools = "0.14"
 insta = { version = "1", features = ["yaml"] }
+regex = "1"
 
 [package]
 name = "metricflow-rs"

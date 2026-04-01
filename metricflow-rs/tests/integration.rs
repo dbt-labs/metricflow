@@ -534,6 +534,50 @@ fn test_end_to_end_real_format_cumulative_metric() {
     );
 }
 
+// ─── Metric-level filter tests ───────────────────────────────────────────────
+
+#[test]
+fn test_end_to_end_real_format_metric_with_filter() {
+    let manifest_json = include_str!("fixtures/real_format_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["arr_current_enterprise".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (filtered metric):\n{sql}");
+
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+    assert!(
+        sql.contains("month_ending_current_arr"),
+        "should use expr from metric_aggregation_params: {sql}"
+    );
+    // The metric-level filter should produce a WHERE clause
+    assert!(
+        sql.contains("WHERE"),
+        "should have WHERE clause from metric filter: {sql}"
+    );
+    assert!(
+        sql.contains("Enterprise"),
+        "should filter on Enterprise: {sql}"
+    );
+    assert!(
+        sql.contains("customer__plan_type"),
+        "should reference the resolved filter column: {sql}"
+    );
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 
 #[test]

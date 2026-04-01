@@ -1,4 +1,5 @@
 use crate::dataflow::*;
+use crate::filter;
 use crate::resolve::{self, ResolveError};
 use mf_core::spec::*;
 use mf_core::types::*;
@@ -228,13 +229,32 @@ fn build_input_metric_subplan(
         alias: output_alias.to_string(),
     }];
 
-    // Step 4: Aggregate node.
-    let agg_input = if join_nodes.is_empty() {
+    // Step 4: Determine the input to the aggregate node.
+    let mut agg_input = if join_nodes.is_empty() {
         read_node
     } else {
         *join_nodes.values().next().unwrap()
     };
 
+    // Step 5: Insert WhereFilter node before aggregation if the metric has filters.
+    if let Some(ref wfi) = resolved.metric.filter {
+        let resolved_filters: Vec<ResolvedFilterInfo> = filter::resolve_filters(graph, wfi)
+            .into_iter()
+            .map(|rf| ResolvedFilterInfo {
+                sql: rf.sql,
+                required_columns: rf.required_columns,
+            })
+            .collect();
+        if !resolved_filters.is_empty() {
+            let filter_node = plan.add_node(DataflowNode::WhereFilter {
+                filters: resolved_filters,
+            });
+            plan.add_edge(agg_input, filter_node);
+            agg_input = filter_node;
+        }
+    }
+
+    // Step 6: Aggregate node.
     let agg_node = plan.add_node(DataflowNode::Aggregate {
         group_by: group_by_columns,
         aggregations,
@@ -467,6 +487,7 @@ mod tests {
             DataflowNode::Aggregate {
                 group_by,
                 aggregations,
+                ..
             } => {
                 let aliases: Vec<&str> = group_by.iter().map(|g| g.alias.as_str()).collect();
                 assert_eq!(aliases, &["metric_time__day"]);

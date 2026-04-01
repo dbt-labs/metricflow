@@ -39,6 +39,8 @@ pub struct SemanticGraph<'a> {
     dimensions_by_model: HashMap<(&'a str, &'a str), &'a Dimension>,
     /// Maps model_name → model ref
     models_by_name: HashMap<&'a str, &'a SemanticModel>,
+    /// Maps primary/unique entity name → model ref
+    models_by_entity: HashMap<&'a str, &'a SemanticModel>,
     /// Maps (left_model_name, entity_name) → EntityJoin
     /// Key: (foreign model name, entity name), value describes the full join.
     entity_joins: HashMap<(&'a str, &'a str), EntityJoin<'a>>,
@@ -59,6 +61,7 @@ impl<'a> SemanticGraph<'a> {
         let mut models_by_measure: HashMap<&str, Vec<&SemanticModel>> = HashMap::new();
         let mut dimensions_by_model: HashMap<(&str, &str), &Dimension> = HashMap::new();
         let mut models_by_name = HashMap::new();
+        let mut models_by_entity: HashMap<&str, &SemanticModel> = HashMap::new();
 
         for model in &manifest.semantic_models {
             models_by_name.insert(model.name.as_str(), model);
@@ -70,6 +73,15 @@ impl<'a> SemanticGraph<'a> {
             }
             for dim in &model.dimensions {
                 dimensions_by_model.insert((model.name.as_str(), dim.name.as_str()), dim);
+            }
+            // Index primary/unique entities for filter resolution
+            for entity in &model.entities {
+                if matches!(
+                    entity.entity_type,
+                    EntityType::Primary | EntityType::Unique
+                ) {
+                    models_by_entity.insert(entity.name.as_str(), model);
+                }
             }
         }
 
@@ -121,6 +133,7 @@ impl<'a> SemanticGraph<'a> {
             models_by_measure,
             dimensions_by_model,
             models_by_name,
+            models_by_entity,
             entity_joins,
         })
     }
@@ -138,6 +151,11 @@ impl<'a> SemanticGraph<'a> {
 
     pub fn find_model(&self, name: &str) -> Option<&'a SemanticModel> {
         self.models_by_name.get(name).copied()
+    }
+
+    /// Find the model that has a primary/unique entity with the given name.
+    pub fn find_model_by_entity(&self, entity_name: &str) -> Option<&'a SemanticModel> {
+        self.models_by_entity.get(entity_name).copied()
     }
 
     /// Find a dimension on a specific model. Returns (model, dimension) if found.

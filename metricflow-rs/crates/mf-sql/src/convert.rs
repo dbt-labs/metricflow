@@ -102,6 +102,11 @@ fn convert_node<'a>(
         DataflowNode::ComputeMetric { metric_name, expr } => {
             convert_compute_metric(plan, node_idx, metric_name, expr, subquery_counter, graph)
         }
+        DataflowNode::WhereFilter { filters } => {
+            let parents = plan.parents(node_idx);
+            let parent_sql = convert_node(plan, parents[0], subquery_counter, graph)?;
+            convert_where_filter(&parent_sql, filters, subquery_counter)
+        }
         other => Err(ConvertError::UnexpectedNode(format!("{other:?}"))),
     }
 }
@@ -242,6 +247,63 @@ fn convert_read_source(
         from: SqlFrom::Table {
             table: table.to_string(),
             alias,
+        },
+        joins: vec![],
+        where_clause: None,
+        group_by: vec![],
+        order_by: vec![],
+        limit: None,
+    })
+}
+
+/// Convert a WhereFilter node: project required filter columns from the source,
+/// apply the WHERE clause, and pass through all existing columns.
+/// Following Python MetricFlow: WhereFilter is its own node BEFORE aggregation.
+fn convert_where_filter(
+    source: &SqlSelect,
+    filters: &[ResolvedFilterInfo],
+    subquery_counter: &mut u32,
+) -> Result<SqlSelect, ConvertError> {
+    if filters.is_empty() {
+        return Ok(source.clone());
+    }
+
+    let subq_alias = format!("filter_subq_{subquery_counter}");
+    *subquery_counter += 1;
+
+    // Build SELECT columns: pass through everything from source, plus add
+    // required filter columns that aren't already projected.
+    let mut select_columns: Vec<SqlExpr> = vec![SqlExpr::Literal("*".into())];
+
+    for filter in filters {
+        for (alias, expr) in &filter.required_columns {
+            select_columns.push(SqlExpr::Alias {
+                expr: Box::new(SqlExpr::Literal(expr.clone())),
+                alias: alias.clone(),
+            });
+        }
+    }
+
+    // Build WHERE from all filter clauses ANDed together.
+    let filter_clauses: Vec<String> = filters.iter().map(|f| f.sql.clone()).collect();
+    let where_sql = filter_clauses.join(" AND ");
+
+    let inner = SqlSelect {
+        select_columns,
+        from: source.from.clone(),
+        joins: source.joins.clone(),
+        where_clause: Some(SqlExpr::Literal(where_sql)),
+        group_by: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    // Wrap in a passthrough subquery so downstream nodes (Aggregate) see clean column names.
+    Ok(SqlSelect {
+        select_columns: vec![SqlExpr::Literal("*".into())],
+        from: SqlFrom::Subquery {
+            query: Box::new(inner),
+            alias: subq_alias,
         },
         joins: vec![],
         where_clause: None,

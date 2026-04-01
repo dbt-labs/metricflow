@@ -31,8 +31,12 @@ pub enum DataflowNode {
     },
     /// Select/rename columns.
     SelectColumns { columns: Vec<ColumnSelect> },
-    /// Apply a WHERE filter.
-    WhereFilter { sql: String },
+    /// Apply a WHERE filter (metric-level or query-level).
+    /// Inserted before aggregation to filter rows before GROUP BY.
+    WhereFilter {
+        /// Resolved WHERE clauses to apply (ANDed together).
+        filters: Vec<ResolvedFilterInfo>,
+    },
     /// ORDER BY.
     OrderBy {
         specs: Vec<(String, bool)>, // (column, descending)
@@ -58,6 +62,16 @@ pub struct MeasureAggregation {
     pub agg_type: AggregationType,
     pub expr: String,
     pub alias: String,
+}
+
+/// A resolved metric-level filter for the Aggregate node.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ResolvedFilterInfo {
+    /// The SQL WHERE clause text, e.g. "customer__plan_type = 'Enterprise'"
+    pub sql: String,
+    /// Columns that must be projected in the inner SELECT for the WHERE to reference.
+    /// Each entry is (alias, expr).
+    pub required_columns: Vec<(String, String)>,
 }
 
 /// A group-by column with both the output alias and the SQL expression.
