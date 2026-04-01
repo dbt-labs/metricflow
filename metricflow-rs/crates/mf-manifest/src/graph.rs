@@ -1,4 +1,5 @@
 use mf_core::manifest::*;
+use mf_core::types::EntityType;
 use std::collections::HashMap;
 use thiserror::Error;
 
@@ -8,6 +9,22 @@ pub enum GraphError {
     DuplicateMetric(String),
     #[error("metric '{0}' references unknown measure '{1}'")]
     UnknownMeasure(String, String),
+}
+
+/// Describes a single entity join: left model has a FOREIGN entity that pairs
+/// with a PRIMARY entity of the same name on the right model.
+#[derive(Debug, Clone)]
+pub struct EntityJoin<'a> {
+    /// The entity name shared by both sides (e.g. "listing")
+    pub entity_name: &'a str,
+    /// The model that holds the FOREIGN entity (join left side)
+    pub left_model: &'a SemanticModel,
+    /// SQL expression from the left side (e.g. "listing_id")
+    pub left_expr: &'a str,
+    /// The model that holds the PRIMARY entity (join right side)
+    pub right_model: &'a SemanticModel,
+    /// SQL expression from the right side (e.g. "listing_id")
+    pub right_expr: &'a str,
 }
 
 /// Index over a SemanticManifest for fast lookups.
@@ -22,6 +39,9 @@ pub struct SemanticGraph<'a> {
     dimensions_by_model: HashMap<(&'a str, &'a str), &'a Dimension>,
     /// Maps model_name → model ref
     models_by_name: HashMap<&'a str, &'a SemanticModel>,
+    /// Maps (left_model_name, entity_name) → EntityJoin
+    /// Key: (foreign model name, entity name), value describes the full join.
+    entity_joins: HashMap<(&'a str, &'a str), EntityJoin<'a>>,
 }
 
 impl<'a> SemanticGraph<'a> {
@@ -53,12 +73,55 @@ impl<'a> SemanticGraph<'a> {
             }
         }
 
+        // Build entity join index: pair FOREIGN entities on one model with PRIMARY
+        // entities of the same name on another model.
+        let mut entity_joins: HashMap<(&str, &str), EntityJoin> = HashMap::new();
+
+        // Collect (entity_name, EntityType, expr, model) for all entities
+        let mut primary_entities: Vec<(&str, &str, &SemanticModel)> = Vec::new(); // (entity_name, expr, model)
+        let mut foreign_entities: Vec<(&str, &str, &SemanticModel)> = Vec::new();
+
+        for model in &manifest.semantic_models {
+            for entity in &model.entities {
+                let expr = entity.sql_expr();
+                match entity.entity_type {
+                    EntityType::Primary | EntityType::Unique => {
+                        primary_entities.push((entity.name.as_str(), expr, model));
+                    }
+                    EntityType::Foreign | EntityType::Natural => {
+                        foreign_entities.push((entity.name.as_str(), expr, model));
+                    }
+                }
+            }
+        }
+
+        // For each foreign entity, find a matching primary entity with the same name
+        for (foreign_name, foreign_expr, foreign_model) in &foreign_entities {
+            for (primary_name, primary_expr, primary_model) in &primary_entities {
+                if *foreign_name == *primary_name && foreign_model.name != primary_model.name {
+                    entity_joins.insert(
+                        (foreign_model.name.as_str(), foreign_name),
+                        EntityJoin {
+                            entity_name: foreign_name,
+                            left_model: foreign_model,
+                            left_expr: foreign_expr,
+                            right_model: primary_model,
+                            right_expr: primary_expr,
+                        },
+                    );
+                    // Only record first match; could be extended later
+                    break;
+                }
+            }
+        }
+
         Ok(Self {
             manifest,
             metrics_by_name,
             models_by_measure,
             dimensions_by_model,
             models_by_name,
+            entity_joins,
         })
     }
 
@@ -109,6 +172,44 @@ impl<'a> SemanticGraph<'a> {
         model.dimensions.iter().find(|d| d.name == time_dim_name)
     }
 
+    /// Find all entity joins where `left_model_name` is the foreign side.
+    pub fn find_entity_joins(&self, left_model_name: &str) -> Vec<&EntityJoin<'a>> {
+        self.entity_joins
+            .iter()
+            .filter(|((model_name, _), _)| *model_name == left_model_name)
+            .map(|(_, join)| join)
+            .collect()
+    }
+
+    /// Find the join path from `left_model_name` to a model that has `dim_name`.
+    /// Returns `Some(EntityJoin)` if a one-hop join exists; `None` if already on the
+    /// left model or if no path is found.
+    pub fn find_join_path(
+        &self,
+        left_model_name: &str,
+        dim_name: &str,
+    ) -> Option<&EntityJoin<'a>> {
+        // If the dimension is local, no join needed
+        if self
+            .dimensions_by_model
+            .contains_key(&(left_model_name, dim_name))
+        {
+            return None;
+        }
+
+        // Search all joins from left_model_name; find one whose right side has dim_name
+        for join in self.find_entity_joins(left_model_name) {
+            if self
+                .dimensions_by_model
+                .contains_key(&(join.right_model.name.as_str(), dim_name))
+            {
+                return Some(join);
+            }
+        }
+
+        None
+    }
+
     pub fn manifest(&self) -> &'a SemanticManifest {
         self.manifest
     }
@@ -155,5 +256,67 @@ mod tests {
         let graph = SemanticGraph::build(&manifest).unwrap();
 
         assert!(graph.find_metric("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_entity_join_index_two_models() {
+        let json = include_str!("../../../tests/fixtures/two_model_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        // bookings_source has listing as FOREIGN; listings_source has listing as PRIMARY
+        let joins = graph.find_entity_joins("bookings_source");
+        assert_eq!(joins.len(), 1);
+        let join = joins[0];
+        assert_eq!(join.entity_name, "listing");
+        assert_eq!(join.left_model.name, "bookings_source");
+        assert_eq!(join.left_expr, "listing_id");
+        assert_eq!(join.right_model.name, "listings_source");
+        assert_eq!(join.right_expr, "listing_id");
+    }
+
+    #[test]
+    fn test_entity_join_index_no_joins_for_single_model() {
+        let json = include_str!("../../../tests/fixtures/simple_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        let joins = graph.find_entity_joins("bookings_source");
+        assert_eq!(joins.len(), 0);
+    }
+
+    #[test]
+    fn test_find_join_path_local_dimension_returns_none() {
+        let json = include_str!("../../../tests/fixtures/two_model_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        // is_instant is on bookings_source — no join needed
+        let path = graph.find_join_path("bookings_source", "is_instant");
+        assert!(path.is_none());
+    }
+
+    #[test]
+    fn test_find_join_path_cross_model_dimension() {
+        let json = include_str!("../../../tests/fixtures/two_model_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        // country is on listings_source — join via listing entity
+        let path = graph.find_join_path("bookings_source", "country");
+        assert!(path.is_some());
+        let join = path.unwrap();
+        assert_eq!(join.entity_name, "listing");
+        assert_eq!(join.right_model.name, "listings_source");
+    }
+
+    #[test]
+    fn test_find_join_path_unknown_dimension_returns_none() {
+        let json = include_str!("../../../tests/fixtures/two_model_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = SemanticGraph::build(&manifest).unwrap();
+
+        let path = graph.find_join_path("bookings_source", "nonexistent_dim");
+        assert!(path.is_none());
     }
 }
