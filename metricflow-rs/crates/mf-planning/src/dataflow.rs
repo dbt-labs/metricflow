@@ -39,6 +39,17 @@ pub enum DataflowNode {
     },
     /// LIMIT.
     Limit { count: u64 },
+    /// Combine multiple aggregated metric outputs via FULL OUTER JOIN on shared dimensions.
+    CombineAggregatedOutputs,
+    /// Join source data against a time spine for cumulative metric computation.
+    JoinOverTimeRange {
+        time_spine_table: String,
+        time_spine_column: String,
+        time_spine_grain: TimeGrain,
+        window: Option<TimeWindow>,
+        grain_to_date: Option<TimeGrain>,
+        metric_time_column: String,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -181,6 +192,79 @@ mod tests {
                 assert_eq!(right_model_name, "listings_source");
             }
             other => panic!("expected JoinOnEntities, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_combine_aggregated_outputs_node() {
+        let mut plan = DataflowPlan::new();
+        let read1 = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "bookings_source".into(),
+            table: "demo.fct_bookings".into(),
+        });
+        let agg1 = plan.add_node(DataflowNode::Aggregate {
+            group_by: vec!["metric_time__day".into()],
+            aggregations: vec![MeasureAggregation {
+                measure_name: "bookings".into(),
+                agg_type: AggregationType::Sum,
+                expr: "1".into(),
+                alias: "bookings".into(),
+            }],
+        });
+        plan.add_edge(read1, agg1);
+        let read2 = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "bookings_source".into(),
+            table: "demo.fct_bookings".into(),
+        });
+        let agg2 = plan.add_node(DataflowNode::Aggregate {
+            group_by: vec!["metric_time__day".into()],
+            aggregations: vec![MeasureAggregation {
+                measure_name: "instant_bookings".into(),
+                agg_type: AggregationType::Sum,
+                expr: "is_instant".into(),
+                alias: "instant_bookings".into(),
+            }],
+        });
+        plan.add_edge(read2, agg2);
+        let combine = plan.add_node(DataflowNode::CombineAggregatedOutputs);
+        plan.add_edge(agg1, combine);
+        plan.add_edge(agg2, combine);
+        plan.set_sink(combine);
+        assert_eq!(plan.node_count(), 5);
+        assert_eq!(plan.parents(combine).len(), 2);
+    }
+
+    #[test]
+    fn test_join_over_time_range_node() {
+        let mut plan = DataflowPlan::new();
+        let read = plan.add_node(DataflowNode::ReadFromSource {
+            model_name: "bookings_source".into(),
+            table: "demo.fct_bookings".into(),
+        });
+        let join_time = plan.add_node(DataflowNode::JoinOverTimeRange {
+            time_spine_table: "mf_time_spine".into(),
+            time_spine_column: "ds".into(),
+            time_spine_grain: TimeGrain::Day,
+            window: Some(TimeWindow {
+                count: 7,
+                grain: TimeGrain::Day,
+            }),
+            grain_to_date: None,
+            metric_time_column: "ds".into(),
+        });
+        plan.add_edge(read, join_time);
+        plan.set_sink(join_time);
+        assert_eq!(plan.node_count(), 2);
+        match plan.node(join_time) {
+            DataflowNode::JoinOverTimeRange {
+                window,
+                grain_to_date,
+                ..
+            } => {
+                assert!(window.is_some());
+                assert!(grain_to_date.is_none());
+            }
+            other => panic!("expected JoinOverTimeRange, got {other:?}"),
         }
     }
 }
