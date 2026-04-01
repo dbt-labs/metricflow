@@ -3,6 +3,7 @@ use mf_core::types::{AggregationType, TimeGrain, TimeWindow};
 use mf_manifest::graph::SemanticGraph;
 use mf_planning::dataflow::*;
 use petgraph::graph::NodeIndex;
+use std::collections::HashMap;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -442,6 +443,31 @@ fn convert_aggregate(
     })
 }
 
+/// Walk a plan subtree to find Aggregate nodes and collect fill_nulls_with values
+/// for each metric alias. This is used by CombineAggregatedOutputs to wrap metric
+/// columns in COALESCE(MAX(...), fill_value) in the re-aggregation.
+fn collect_fill_nulls_with(
+    plan: &DataflowPlan,
+    node_idx: NodeIndex,
+    out: &mut HashMap<String, i64>,
+) {
+    match plan.node(node_idx) {
+        DataflowNode::Aggregate { aggregations, .. } => {
+            for agg in aggregations {
+                if let Some(fill_value) = agg.fill_nulls_with {
+                    out.insert(agg.alias.clone(), fill_value);
+                }
+            }
+        }
+        _ => {
+            // Recurse into parents
+            for &parent in &plan.parents(node_idx) {
+                collect_fill_nulls_with(plan, parent, out);
+            }
+        }
+    }
+}
+
 fn convert_combine_aggregated_outputs<'a>(
     plan: &DataflowPlan,
     node_idx: NodeIndex,
@@ -504,6 +530,14 @@ fn convert_combine_aggregated_outputs<'a>(
         metric_cols_per_parent.push(metric_cols);
     }
 
+    // Extract fill_nulls_with for each metric column by walking the plan.
+    // Per Python: simple metric inputs with fill_nulls_with produce
+    // COALESCE(MAX(col), fill_value) in the re-aggregation.
+    let mut fill_nulls_map: std::collections::HashMap<String, i64> = std::collections::HashMap::new();
+    for &parent in &parents {
+        collect_fill_nulls_with(plan, parent, &mut fill_nulls_map);
+    }
+
     // Wrap each parent SqlSelect as a subquery so that it can be used in a join.
     // Assign fresh aliases for the wrapped subqueries.
     let mut wrapped_aliases: Vec<String> = Vec::new();
@@ -518,7 +552,7 @@ fn convert_combine_aggregated_outputs<'a>(
         wrapped_aliases.push(alias);
     }
 
-    let first_alias = wrapped_aliases[0].clone();
+    let _first_alias = wrapped_aliases[0].clone();
 
     // Build SELECT columns for the combined subquery:
     // - COALESCE(p1.col, p2.col, ...) AS col for each group-by column
@@ -564,7 +598,9 @@ fn convert_combine_aggregated_outputs<'a>(
         }
     }
 
-    // Build FULL OUTER JOINs for remaining parents (or CROSS JOIN if no group_by)
+    // Build FULL OUTER JOINs for remaining parents (or CROSS JOIN if no group_by).
+    // Per Python: use COALESCE of previously-seen aliases in the ON condition so that
+    // rows that didn't match earlier joins can still match later ones.
     let mut joins: Vec<SqlJoin> = Vec::new();
     for (i, right_from) in wrapped_froms[1..].iter().enumerate() {
         let right_alias = &wrapped_aliases[i + 1];
@@ -576,16 +612,27 @@ fn convert_combine_aggregated_outputs<'a>(
 
         let on_expr = if group_by_cols.is_empty() {
             SqlExpr::Literal("1=1".into())
-        } else if group_by_cols.len() == 1 {
-            let col = &group_by_cols[0];
-            SqlExpr::Literal(format!("{first_alias}.{col} = {right_alias}.{col}"))
         } else {
-            // Multiple group-by cols: join on all of them
+            // COALESCE all previously-seen aliases for each group-by column.
+            let prev_aliases = &wrapped_aliases[..=i]; // aliases 0..=i (all before right)
             let conditions: Vec<String> = group_by_cols
                 .iter()
-                .map(|col| format!("{first_alias}.{col} = {right_alias}.{col}"))
+                .map(|col| {
+                    if prev_aliases.len() == 1 {
+                        format!("{}.{col} = {right_alias}.{col}", prev_aliases[0])
+                    } else {
+                        let coalesce_args: Vec<String> = prev_aliases
+                            .iter()
+                            .map(|a| format!("{a}.{col}"))
+                            .collect();
+                        format!(
+                            "COALESCE({}) = {right_alias}.{col}",
+                            coalesce_args.join(", ")
+                        )
+                    }
+                })
                 .collect();
-            SqlExpr::Literal(conditions.join(" AND "))
+            SqlExpr::Literal(conditions.join("\n  AND "))
         };
 
         joins.push(SqlJoin {
@@ -595,15 +642,91 @@ fn convert_combine_aggregated_outputs<'a>(
         });
     }
 
-    Ok(SqlSelect {
-        select_columns,
-        from: wrapped_froms.into_iter().next().unwrap(),
-        joins,
-        where_clause: None,
-        group_by: vec![],
-        order_by: vec![],
-        limit: None,
-    })
+    // Per Python: add a GROUP BY re-aggregation to handle NULL deduplication.
+    // NULL = NULL returns NULL in SQL, so FULL OUTER JOINs can produce duplicate
+    // NULL rows from each parent. GROUP BY on the COALESCE'd columns + MAX on
+    // metric columns merges these into a single row.
+    if group_by_cols.is_empty() {
+        Ok(SqlSelect {
+            select_columns,
+            from: wrapped_froms.into_iter().next().unwrap(),
+            joins,
+            where_clause: None,
+            group_by: vec![],
+            order_by: vec![],
+            limit: None,
+        })
+    } else {
+        // Build the inner FULL OUTER JOIN query
+        let inner = SqlSelect {
+            select_columns,
+            from: wrapped_froms.into_iter().next().unwrap(),
+            joins,
+            where_clause: None,
+            group_by: vec![],
+            order_by: vec![],
+            limit: None,
+        };
+
+        let reagg_alias = format!("combine_subq_{subquery_counter}");
+        *subquery_counter += 1;
+
+        // Outer SELECT: group-by cols as-is, metric cols wrapped in MAX()
+        let mut outer_select: Vec<SqlExpr> = Vec::new();
+        for col in &group_by_cols {
+            outer_select.push(SqlExpr::ColumnRef {
+                table_alias: reagg_alias.clone(),
+                column_name: col.clone(),
+            });
+        }
+        for metric_cols in &metric_cols_per_parent {
+            for metric_col in metric_cols {
+                let max_expr = SqlExpr::FunctionCall {
+                    function: "MAX".into(),
+                    args: vec![SqlExpr::ColumnRef {
+                        table_alias: reagg_alias.clone(),
+                        column_name: metric_col.clone(),
+                    }],
+                };
+                // Per Python: wrap in COALESCE(MAX(...), fill_value) if fill_nulls_with is set.
+                // This handles the case where a dimension value has no matching rows in one
+                // of the FULL OUTER JOIN branches (e.g., no detractors for is_reseller=true).
+                let final_expr = if let Some(fill_value) = fill_nulls_map.get(metric_col) {
+                    SqlExpr::FunctionCall {
+                        function: "COALESCE".into(),
+                        args: vec![max_expr, SqlExpr::Literal(fill_value.to_string())],
+                    }
+                } else {
+                    max_expr
+                };
+                outer_select.push(SqlExpr::Alias {
+                    expr: Box::new(final_expr),
+                    alias: metric_col.clone(),
+                });
+            }
+        }
+
+        let outer_group_by: Vec<SqlExpr> = group_by_cols
+            .iter()
+            .map(|col| SqlExpr::ColumnRef {
+                table_alias: reagg_alias.clone(),
+                column_name: col.clone(),
+            })
+            .collect();
+
+        Ok(SqlSelect {
+            select_columns: outer_select,
+            from: SqlFrom::Subquery {
+                query: Box::new(inner),
+                alias: reagg_alias,
+            },
+            joins: vec![],
+            where_clause: None,
+            group_by: outer_group_by,
+            order_by: vec![],
+            limit: None,
+        })
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
