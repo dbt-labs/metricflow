@@ -6,23 +6,25 @@ Built for native integration with [Fusion](https://github.com/sdf-labs/sdf) (Rus
 
 ## Status
 
-**Phase 1-4 (Foundation + Simple Metrics + Joins + Derived/Cumulative)** is complete. The pipeline supports:
+The pipeline compiles **531/531 metrics** from the internal-analytics semantic manifest. Supported features:
 
-- Simple metrics (single measure with SUM, COUNT, AVG, etc.)
-- Group-by dimensions (categorical and time dimensions on the same semantic model)
-- Joins to dimensions on other semantic models (entity-based LEFT OUTER JOIN)
-- Derived metrics (arbitrary SQL expressions over input metrics)
-- Ratio metrics (numerator / denominator with NULLIF safety)
-- Cumulative metrics (windowed, grain-to-date, and all-time via time spine joins)
-- DuckDB SQL dialect (other dialects fall back to ANSI SQL)
-- ORDER BY and LIMIT
+- **All metric types:** simple, derived, ratio, cumulative (windowed, grain-to-date, all-time)
+- **Multi-metric queries:** multiple metrics in a single query, combined via FULL OUTER JOIN
+- **Nested metrics:** derived/ratio metrics whose inputs are themselves derived
+- **Cross-model joins:** entity-based LEFT OUTER JOIN for dimensions on other semantic models
+- **Metric-level WHERE filters:** template resolution for `{{ Dimension(...) }}`, `{{ TimeDimension(...) }}`, `{{ Entity(...) }}`
+- **Time dimensions:** auto-detection from manifest, DATE_TRUNC with configurable grain
+- **Dundered group-by parsing:** `metric_time__month`, `listing__country`, `listing__ds__week`
+- **ORDER BY and LIMIT**
+- **DuckDB SQL dialect** (other dialects fall back to ANSI SQL)
 
-Not yet supported (future phases):
+### Known Limitations
 
-- Conversion and offset metrics (Phase 5)
-- All SQL dialects: Snowflake, BigQuery, Redshift, Postgres, Databricks, Trino (Phase 6)
-- Fusion integration (Phase 7)
-- SQL optimization passes (Phase 8)
+- **No query-level WHERE filters** — only metric-level filters are supported; the `where_clauses` field on `QuerySpec` is not yet wired through
+- **No `fill_nulls_with`** — metrics with `fill_nulls_with` configured are compiled but the null-filling is not applied
+- **No multi-hop joins** — only single-hop entity joins (e.g., `listing__country`), not `listing__user__country`
+- **No conversion or offset metrics** — `offset_window`, `offset_to_grain`, conversion metric types
+- **Limited dialect support** — Snowflake, BigQuery, Redshift, Postgres, Databricks, Trino all fall back to ANSI SQL
 
 ## Crate Structure
 
@@ -67,9 +69,8 @@ println!("{sql}");
 ```bash
 cargo run -p mf-cli -- query \
   --manifest path/to/semantic_manifest.json \
-  --metrics bookings \
-  --group-by metric_time \
-  --grain day \
+  --metrics bookings,instant_bookings \
+  --group-by metric_time__day,listing__country \
   --dialect duckdb
 ```
 
@@ -84,8 +85,7 @@ cargo build --all
 
 ```bash
 cd metricflow-rs
-cargo test --all --lib        # unit tests (59 tests)
-cargo test --test integration # end-to-end tests (10 tests)
+cargo test --all            # all tests (101 tests)
 cargo clippy --all -- -D warnings
 cargo fmt --all -- --check
 ```
