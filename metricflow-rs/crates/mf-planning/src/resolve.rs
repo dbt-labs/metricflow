@@ -145,8 +145,8 @@ pub fn resolve_simple_metric<'a>(
 pub struct ResolvedDerivedMetric<'a> {
     pub metric: &'a Metric,
     pub expr: String,
-    /// (metric_name, alias) pairs for each input metric
-    pub inputs: Vec<(String, String)>,
+    /// (metric_name, alias, optional per-input filter) for each input metric
+    pub inputs: Vec<(String, String, Option<&'a WhereFilterIntersection>)>,
 }
 
 /// Resolve a derived metric: validate type, extract expression and input metrics.
@@ -182,7 +182,7 @@ pub fn resolve_derived_metric<'a>(
         .iter()
         .map(|input| {
             let alias = input.alias.clone().unwrap_or_else(|| input.name.clone());
-            (input.name.clone(), alias)
+            (input.name.clone(), alias, input.filter.as_ref())
         })
         .collect();
 
@@ -197,10 +197,10 @@ pub fn resolve_derived_metric<'a>(
 #[derive(Debug)]
 pub struct ResolvedRatioMetric<'a> {
     pub metric: &'a Metric,
-    /// (metric_name, alias) for numerator
-    pub numerator: (String, String),
-    /// (metric_name, alias) for denominator
-    pub denominator: (String, String),
+    /// (metric_name, alias, optional per-input filter) for numerator
+    pub numerator: (String, String, Option<&'a WhereFilterIntersection>),
+    /// (metric_name, alias, optional per-input filter) for denominator
+    pub denominator: (String, String, Option<&'a WhereFilterIntersection>),
 }
 
 /// Resolve a ratio metric: validate type, extract numerator and denominator.
@@ -234,6 +234,7 @@ pub fn resolve_ratio_metric<'a>(
             .alias
             .clone()
             .unwrap_or_else(|| numerator_input.name.clone()),
+        numerator_input.filter.as_ref(),
     );
 
     let denominator = (
@@ -242,6 +243,7 @@ pub fn resolve_ratio_metric<'a>(
             .alias
             .clone()
             .unwrap_or_else(|| denominator_input.name.clone()),
+        denominator_input.filter.as_ref(),
     );
 
     Ok(ResolvedRatioMetric {
@@ -380,17 +382,10 @@ mod tests {
         assert_eq!(resolved.metric.name, "bookings_growth");
         assert_eq!(resolved.expr, "bookings - instant_bookings");
         assert_eq!(resolved.inputs.len(), 2);
-        assert_eq!(
-            resolved.inputs[0],
-            ("bookings".to_string(), "bookings".to_string())
-        );
-        assert_eq!(
-            resolved.inputs[1],
-            (
-                "instant_bookings".to_string(),
-                "instant_bookings".to_string()
-            )
-        );
+        assert_eq!(resolved.inputs[0].0, "bookings");
+        assert_eq!(resolved.inputs[0].1, "bookings");
+        assert_eq!(resolved.inputs[1].0, "instant_bookings");
+        assert_eq!(resolved.inputs[1].1, "instant_bookings");
     }
 
     #[test]
@@ -415,17 +410,10 @@ mod tests {
 
         let resolved = resolve_ratio_metric(&graph, "instant_booking_rate").unwrap();
         assert_eq!(resolved.metric.name, "instant_booking_rate");
-        assert_eq!(
-            resolved.numerator,
-            (
-                "instant_bookings".to_string(),
-                "instant_bookings".to_string()
-            )
-        );
-        assert_eq!(
-            resolved.denominator,
-            ("bookings".to_string(), "bookings".to_string())
-        );
+        assert_eq!(resolved.numerator.0, "instant_bookings");
+        assert_eq!(resolved.numerator.1, "instant_bookings");
+        assert_eq!(resolved.denominator.0, "bookings");
+        assert_eq!(resolved.denominator.1, "bookings");
     }
 
     #[test]
@@ -566,13 +554,9 @@ mod tests {
         assert_eq!(resolved.inputs.len(), 2);
         // Input metrics use metric_aggregation_params format
         // but derived resolution just extracts names, doesn't resolve inputs
-        assert_eq!(
-            resolved.inputs[0],
-            ("arr_current".to_string(), "arr_current".to_string())
-        );
-        assert_eq!(
-            resolved.inputs[1],
-            ("arr_new".to_string(), "arr_new".to_string())
-        );
+        assert_eq!(resolved.inputs[0].0, "arr_current");
+        assert_eq!(resolved.inputs[0].1, "arr_current");
+        assert_eq!(resolved.inputs[1].0, "arr_new");
+        assert_eq!(resolved.inputs[1].1, "arr_new");
     }
 }

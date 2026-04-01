@@ -64,17 +64,33 @@ fn build_single_metric_plan(
     metric_name: &str,
     plan: &mut DataflowPlan,
 ) -> Result<NodeIndex, PlanError> {
+    build_single_metric_plan_with_filters(graph, query, metric_name, plan, &[])
+}
+
+fn build_single_metric_plan_with_filters(
+    graph: &SemanticGraph,
+    query: &QuerySpec,
+    metric_name: &str,
+    plan: &mut DataflowPlan,
+    parent_filters: &[ResolvedFilterInfo],
+) -> Result<NodeIndex, PlanError> {
     let metric = graph
         .find_metric(metric_name)
         .ok_or_else(|| ResolveError::UnknownMetric(metric_name.to_string()))?;
 
     match metric.metric_type {
         MetricKind::Simple => {
-            build_simple_metric_plan(graph, query, metric_name, metric_name, plan)
+            build_simple_metric_plan(graph, query, metric_name, metric_name, plan, parent_filters)
         }
-        MetricKind::Derived => build_derived_metric_plan(graph, query, metric_name, plan),
-        MetricKind::Ratio => build_ratio_metric_plan(graph, query, metric_name, plan),
-        MetricKind::Cumulative => build_cumulative_metric_plan(graph, query, metric_name, plan),
+        MetricKind::Derived => {
+            build_derived_metric_plan(graph, query, metric_name, plan, parent_filters)
+        }
+        MetricKind::Ratio => {
+            build_ratio_metric_plan(graph, query, metric_name, plan, parent_filters)
+        }
+        MetricKind::Cumulative => {
+            build_cumulative_metric_plan(graph, query, metric_name, plan, parent_filters)
+        }
         _ => Err(PlanError::UnsupportedMetricType),
     }
 }
@@ -88,14 +104,17 @@ fn build_metric_input(
     metric_name: &str,
     alias: &str,
     plan: &mut DataflowPlan,
+    parent_filters: &[ResolvedFilterInfo],
 ) -> Result<NodeIndex, PlanError> {
     let metric = graph
         .find_metric(metric_name)
         .ok_or_else(|| ResolveError::UnknownMetric(metric_name.to_string()))?;
 
     match metric.metric_type {
-        MetricKind::Simple => build_input_metric_subplan(graph, query, metric_name, alias, plan),
-        _ => build_single_metric_plan(graph, query, metric_name, plan),
+        MetricKind::Simple => {
+            build_input_metric_subplan(graph, query, metric_name, alias, plan, parent_filters)
+        }
+        _ => build_single_metric_plan_with_filters(graph, query, metric_name, plan, parent_filters),
     }
 }
 
@@ -107,8 +126,10 @@ fn build_simple_metric_plan(
     metric_name: &str,
     output_alias: &str,
     plan: &mut DataflowPlan,
+    parent_filters: &[ResolvedFilterInfo],
 ) -> Result<NodeIndex, PlanError> {
-    let agg_node = build_input_metric_subplan(graph, query, metric_name, output_alias, plan)?;
+    let agg_node =
+        build_input_metric_subplan(graph, query, metric_name, output_alias, plan, parent_filters)?;
     Ok(agg_node)
 }
 
@@ -120,6 +141,7 @@ fn build_input_metric_subplan(
     metric_name: &str,
     output_alias: &str,
     plan: &mut DataflowPlan,
+    parent_filters: &[ResolvedFilterInfo],
 ) -> Result<NodeIndex, PlanError> {
     let resolved = resolve::resolve_simple_metric(graph, metric_name)?;
     let left_model_name = resolved.model.name.as_str();
@@ -313,8 +335,12 @@ fn build_input_metric_subplan(
         *join_nodes.values().next().unwrap()
     };
 
-    // Step 5: Insert WhereFilter node before aggregation for metric-level and query-level filters.
+    // Step 5: Insert WhereFilter node before aggregation for metric-level, query-level,
+    // and parent (outer derived metric) filters.
     let mut all_filters: Vec<ResolvedFilterInfo> = Vec::new();
+
+    // Parent filters (from outer derived metrics, pushed down to simple metric level)
+    all_filters.extend_from_slice(parent_filters);
 
     // Metric-level filters (from the metric definition in the manifest)
     if let Some(ref wfi) = resolved.metric.filter {
@@ -388,14 +414,37 @@ fn build_derived_metric_plan(
     query: &QuerySpec,
     metric_name: &str,
     plan: &mut DataflowPlan,
+    parent_filters: &[ResolvedFilterInfo],
 ) -> Result<NodeIndex, PlanError> {
     let resolved = resolve::resolve_derived_metric(graph, metric_name)?;
 
+    // Collect this metric's own filter and combine with parent filters to push down.
+    let mut filters_for_children: Vec<ResolvedFilterInfo> = parent_filters.to_vec();
+    if let Some(ref wfi) = resolved.metric.filter {
+        filters_for_children.extend(filter::resolve_filters(graph, wfi).into_iter().map(|rf| {
+            ResolvedFilterInfo {
+                sql: rf.sql,
+                required_columns: rf.required_columns,
+            }
+        }));
+    }
+
     // Build a subplan for each input metric, dispatching by type to support
     // nested derived metrics (not just simple inputs).
+    // Per Python: each input gets parent filters + metric-level filters + its own per-input filter.
     let mut agg_nodes: Vec<NodeIndex> = Vec::new();
-    for (input_metric_name, alias) in &resolved.inputs {
-        let agg_node = build_metric_input(graph, query, input_metric_name, alias, plan)?;
+    for (input_metric_name, alias, input_filter) in &resolved.inputs {
+        let mut input_filters = filters_for_children.clone();
+        if let Some(wfi) = input_filter {
+            input_filters.extend(filter::resolve_filters(graph, wfi).into_iter().map(|rf| {
+                ResolvedFilterInfo {
+                    sql: rf.sql,
+                    required_columns: rf.required_columns,
+                }
+            }));
+        }
+        let agg_node =
+            build_metric_input(graph, query, input_metric_name, alias, plan, &input_filters)?;
         agg_nodes.push(agg_node);
     }
 
@@ -427,16 +476,30 @@ fn build_ratio_metric_plan(
     query: &QuerySpec,
     metric_name: &str,
     plan: &mut DataflowPlan,
+    parent_filters: &[ResolvedFilterInfo],
 ) -> Result<NodeIndex, PlanError> {
     let resolved = resolve::resolve_ratio_metric(graph, metric_name)?;
 
-    let (num_metric_name, num_alias) = &resolved.numerator;
-    let (den_metric_name, den_alias) = &resolved.denominator;
+    let (num_metric_name, num_alias, num_filter) = &resolved.numerator;
+    let (den_metric_name, den_alias, den_filter) = &resolved.denominator;
 
     // Build numerator and denominator subplans, dispatching by type to support
     // non-simple inputs (e.g., derived metrics as numerator/denominator).
-    let num_agg = build_metric_input(graph, query, num_metric_name, num_alias, plan)?;
-    let den_agg = build_metric_input(graph, query, den_metric_name, den_alias, plan)?;
+    // Per Python: each input gets parent filters + its own per-input filter.
+    let mut num_filters: Vec<ResolvedFilterInfo> = parent_filters.to_vec();
+    if let Some(wfi) = num_filter {
+        num_filters.extend(filter::resolve_filters(graph, wfi).into_iter().map(|rf| {
+            ResolvedFilterInfo { sql: rf.sql, required_columns: rf.required_columns }
+        }));
+    }
+    let mut den_filters: Vec<ResolvedFilterInfo> = parent_filters.to_vec();
+    if let Some(wfi) = den_filter {
+        den_filters.extend(filter::resolve_filters(graph, wfi).into_iter().map(|rf| {
+            ResolvedFilterInfo { sql: rf.sql, required_columns: rf.required_columns }
+        }));
+    }
+    let num_agg = build_metric_input(graph, query, num_metric_name, num_alias, plan, &num_filters)?;
+    let den_agg = build_metric_input(graph, query, den_metric_name, den_alias, plan, &den_filters)?;
 
     // Combine the two via CombineAggregatedOutputs
     let combine = plan.add_node(DataflowNode::CombineAggregatedOutputs);
@@ -462,6 +525,7 @@ fn build_cumulative_metric_plan(
     query: &QuerySpec,
     metric_name: &str,
     plan: &mut DataflowPlan,
+    _parent_filters: &[ResolvedFilterInfo],
 ) -> Result<NodeIndex, PlanError> {
     let resolved = resolve::resolve_cumulative_metric(graph, metric_name)?;
 
