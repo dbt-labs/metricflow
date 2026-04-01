@@ -372,6 +372,168 @@ fn test_end_to_end_bookings_all_time() {
     assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
 }
 
+// ─── Real manifest format tests (metric_aggregation_params) ─────────────────
+
+#[test]
+fn test_end_to_end_real_format_simple_metric() {
+    let manifest_json = include_str!("fixtures/real_format_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["arr_current".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (real format simple):\n{sql}");
+
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+    assert!(
+        sql.contains("month_ending_current_arr"),
+        "should use expr from metric_aggregation_params: {sql}"
+    );
+    assert!(
+        sql.contains("DATE_TRUNC('day', date_month)"),
+        "should DATE_TRUNC the actual time column (date_month), not a logical name: {sql}"
+    );
+    assert!(
+        sql.contains("metric_time__day"),
+        "should alias as metric_time__day: {sql}"
+    );
+    assert!(
+        sql.contains("fct_customer_arr_waterfall"),
+        "should reference the table: {sql}"
+    );
+    // Table alias should NOT have dots
+    assert!(
+        !sql.contains("analytics.dbt_demo.fct_customer_arr_waterfall_src"),
+        "table alias should not contain dots: {sql}"
+    );
+    assert!(sql.contains("GROUP BY"), "should have GROUP BY: {sql}");
+}
+
+#[test]
+fn test_end_to_end_real_format_simple_metric_no_groupby() {
+    let manifest_json = include_str!("fixtures/real_format_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["arr_current".into()],
+        group_by: vec![],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (real format no group-by):\n{sql}");
+
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+    assert!(
+        sql.contains("month_ending_current_arr"),
+        "should use expr from metric_aggregation_params: {sql}"
+    );
+    assert!(
+        !sql.contains("GROUP BY"),
+        "should not have GROUP BY: {sql}"
+    );
+}
+
+#[test]
+fn test_end_to_end_real_format_derived_metric() {
+    let manifest_json = include_str!("fixtures/real_format_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["arr_growth".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (real format derived):\n{sql}");
+
+    assert!(
+        sql.contains("FULL OUTER JOIN"),
+        "should have FULL OUTER JOIN: {sql}"
+    );
+    assert!(
+        sql.contains("arr_current - arr_new"),
+        "should contain derived expression: {sql}"
+    );
+    // Both input metrics should resolve through metric_aggregation_params
+    assert!(
+        sql.contains("month_ending_current_arr"),
+        "should use arr_current's expr: {sql}"
+    );
+    assert!(
+        sql.contains("new_arr_amount"),
+        "should use arr_new's expr: {sql}"
+    );
+}
+
+#[test]
+fn test_end_to_end_real_format_cumulative_metric() {
+    let manifest_json = include_str!("fixtures/real_format_manifest.json");
+    let manifest: mf_core::manifest::SemanticManifest =
+        serde_json::from_str(manifest_json).unwrap();
+
+    let query = QuerySpec {
+        metrics: vec!["trailing_30d_arr".into()],
+        group_by: vec![GroupBySpec::TimeDimension {
+            name: "metric_time".into(),
+            grain: TimeGrain::Day,
+            entity_path: vec![],
+        }],
+        where_clauses: vec![],
+        order_by: vec![],
+        limit: None,
+    };
+
+    let sql = mf_sql::compile_query(&manifest, &query, SqlDialect::DuckDB).unwrap();
+
+    eprintln!("Generated SQL (real format cumulative):\n{sql}");
+
+    assert!(
+        sql.contains("dbt_demo.mf_time_spine"),
+        "should reference time spine table: {sql}"
+    );
+    assert!(
+        sql.contains("INTERVAL"),
+        "should have INTERVAL for trailing window: {sql}"
+    );
+    assert!(sql.contains("30"), "should have window count of 30: {sql}");
+    assert!(
+        sql.contains("INNER JOIN"),
+        "should have INNER JOIN to source: {sql}"
+    );
+    assert!(sql.contains("SUM"), "should have SUM aggregation: {sql}");
+    // The underlying measure should come from the input metric's metric_aggregation_params
+    assert!(
+        sql.contains("month_ending_current_arr"),
+        "should use the underlying measure expr: {sql}"
+    );
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 
 #[test]

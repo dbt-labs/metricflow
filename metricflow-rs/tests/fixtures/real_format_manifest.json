@@ -1,0 +1,154 @@
+{
+  "semantic_models": [
+    {
+      "name": "fct_customer_arr_waterfall",
+      "node_relation": {
+        "alias": "fct_customer_arr_waterfall",
+        "schema_name": "dbt_demo",
+        "database": "analytics"
+      },
+      "defaults": {
+        "agg_time_dimension": "close_month"
+      },
+      "primary_entity": "customer",
+      "entities": [
+        {
+          "name": "customer",
+          "type": "primary",
+          "expr": "customer_id"
+        }
+      ],
+      "measures": [
+        {
+          "name": "current_arr",
+          "agg": "sum",
+          "expr": "month_ending_current_arr",
+          "agg_time_dimension": "close_month"
+        },
+        {
+          "name": "new_arr",
+          "agg": "sum",
+          "expr": "new_arr_amount",
+          "agg_time_dimension": "close_month"
+        }
+      ],
+      "dimensions": [
+        {
+          "name": "close_month",
+          "type": "time",
+          "type_params": {
+            "time_granularity": "day"
+          },
+          "expr": "date_month"
+        },
+        {
+          "name": "plan_type",
+          "type": "categorical",
+          "expr": "plan_type"
+        }
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "name": "arr_current",
+      "type": "simple",
+      "type_params": {
+        "measure": null,
+        "numerator": null,
+        "denominator": null,
+        "expr": null,
+        "window": null,
+        "grain_to_date": null,
+        "metrics": null,
+        "conversion_type_params": null,
+        "cumulative_type_params": null,
+        "metric_aggregation_params": {
+          "semantic_model": "fct_customer_arr_waterfall",
+          "agg": "sum",
+          "expr": "month_ending_current_arr",
+          "agg_time_dimension": "close_month",
+          "non_additive_dimension": null
+        }
+      }
+    },
+    {
+      "name": "arr_new",
+      "type": "simple",
+      "type_params": {
+        "measure": null,
+        "numerator": null,
+        "denominator": null,
+        "expr": null,
+        "window": null,
+        "grain_to_date": null,
+        "metrics": null,
+        "conversion_type_params": null,
+        "cumulative_type_params": null,
+        "metric_aggregation_params": {
+          "semantic_model": "fct_customer_arr_waterfall",
+          "agg": "sum",
+          "expr": "new_arr_amount",
+          "agg_time_dimension": "close_month",
+          "non_additive_dimension": null
+        }
+      }
+    },
+    {
+      "name": "arr_growth",
+      "type": "derived",
+      "type_params": {
+        "measure": null,
+        "numerator": null,
+        "denominator": null,
+        "expr": "arr_current - arr_new",
+        "window": null,
+        "grain_to_date": null,
+        "metrics": [
+          { "name": "arr_current", "alias": "arr_current" },
+          { "name": "arr_new", "alias": "arr_new" }
+        ],
+        "conversion_type_params": null,
+        "cumulative_type_params": null,
+        "metric_aggregation_params": null
+      }
+    },
+    {
+      "name": "trailing_30d_arr",
+      "type": "cumulative",
+      "type_params": {
+        "measure": null,
+        "numerator": null,
+        "denominator": null,
+        "expr": null,
+        "window": null,
+        "grain_to_date": null,
+        "metrics": null,
+        "conversion_type_params": null,
+        "cumulative_type_params": {
+          "window": { "count": 30, "granularity": "day" },
+          "grain_to_date": null,
+          "metric": { "name": "arr_current" }
+        },
+        "metric_aggregation_params": null
+      }
+    }
+  ],
+  "project_configuration": {
+    "time_spine_table_configurations": [],
+    "time_spines": [
+      {
+        "node_relation": {
+          "alias": "mf_time_spine",
+          "schema_name": "dbt_demo",
+          "database": null
+        },
+        "primary_column": {
+          "name": "ds",
+          "time_granularity": "day"
+        },
+        "custom_granularities": []
+      }
+    ]
+  }
+}

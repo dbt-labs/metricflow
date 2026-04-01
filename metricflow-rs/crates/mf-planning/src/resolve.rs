@@ -484,4 +484,85 @@ mod tests {
         // The metric doesn't exist in the cumulative manifest, so we get UnknownMetric
         assert!(result.is_err());
     }
+
+    // --- Tests for real manifest format (metric_aggregation_params / cumulative_type_params) ---
+
+    #[test]
+    fn test_resolve_simple_metric_real_format() {
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let resolved = resolve_simple_metric(&graph, "arr_current").unwrap();
+        assert_eq!(resolved.metric.name, "arr_current");
+        assert_eq!(resolved.measure.agg, AggregationType::Sum);
+        assert_eq!(resolved.measure.expr, "month_ending_current_arr");
+        assert_eq!(resolved.model.name, "fct_customer_arr_waterfall");
+        // agg_time_dimension should resolve to the "close_month" dimension
+        assert!(resolved.agg_time_dimension.is_some());
+        assert_eq!(resolved.agg_time_dimension.unwrap().name, "close_month");
+        // The dimension's SQL expr is "date_month"
+        assert_eq!(
+            resolved.agg_time_dimension.unwrap().sql_expr(),
+            "date_month"
+        );
+    }
+
+    #[test]
+    fn test_resolve_simple_metric_real_format_no_measure_field() {
+        // Verify that when measure is null and metric_aggregation_params is present, it works
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        // arr_current has "measure": null — must resolve via metric_aggregation_params
+        let metric = graph.find_metric("arr_current").unwrap();
+        assert!(metric.type_params.measure.is_none());
+        assert!(metric.type_params.metric_aggregation_params.is_some());
+
+        let resolved = resolve_simple_metric(&graph, "arr_current").unwrap();
+        assert_eq!(resolved.model.name, "fct_customer_arr_waterfall");
+    }
+
+    #[test]
+    fn test_resolve_cumulative_metric_real_format() {
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let resolved = resolve_cumulative_metric(&graph, "trailing_30d_arr").unwrap();
+        assert_eq!(resolved.metric.name, "trailing_30d_arr");
+        // Should resolve through the input metric (arr_current) to the underlying measure
+        assert_eq!(resolved.measure.agg, AggregationType::Sum);
+        assert_eq!(resolved.measure.expr, "month_ending_current_arr");
+        assert_eq!(resolved.model.name, "fct_customer_arr_waterfall");
+        // Window from cumulative_type_params
+        assert!(resolved.window.is_some());
+        let window = resolved.window.unwrap();
+        assert_eq!(window.count, 30);
+        assert_eq!(window.granularity, "day");
+        assert!(resolved.grain_to_date.is_none());
+    }
+
+    #[test]
+    fn test_resolve_derived_metric_with_real_format_inputs() {
+        let json = include_str!("../../../tests/fixtures/real_format_manifest.json");
+        let manifest = parse::from_json(json).unwrap();
+        let graph = mf_manifest::graph::SemanticGraph::build(&manifest).unwrap();
+
+        let resolved = resolve_derived_metric(&graph, "arr_growth").unwrap();
+        assert_eq!(resolved.metric.name, "arr_growth");
+        assert_eq!(resolved.expr, "arr_current - arr_new");
+        assert_eq!(resolved.inputs.len(), 2);
+        // Input metrics use metric_aggregation_params format
+        // but derived resolution just extracts names, doesn't resolve inputs
+        assert_eq!(
+            resolved.inputs[0],
+            ("arr_current".to_string(), "arr_current".to_string())
+        );
+        assert_eq!(
+            resolved.inputs[1],
+            ("arr_new".to_string(), "arr_new".to_string())
+        );
+    }
 }
