@@ -154,13 +154,77 @@ fn build_input_metric_subplan(
         }
     }
 
-    // Step 3: Build group-by column names
-    let group_by_columns: Vec<String> = query.group_by.iter().map(|g| g.column_name()).collect();
+    // Step 3: Build group-by columns with resolved SQL expressions
+    let group_by_columns: Vec<GroupByColumn> = query
+        .group_by
+        .iter()
+        .map(|g| match g {
+            GroupBySpec::TimeDimension {
+                name, grain, entity_path, ..
+            } => {
+                let alias = g.column_name();
+                if name == "metric_time" {
+                    // Resolve metric_time to the agg_time_dimension's SQL expression
+                    let dim_expr = resolved
+                        .agg_time_dimension
+                        .map(|d| d.sql_expr().to_string())
+                        .unwrap_or_else(|| name.clone());
+                    GroupByColumn {
+                        alias,
+                        expr: format!("DATE_TRUNC('{grain}', {dim_expr})"),
+                    }
+                } else {
+                    // Non-metric_time time dimension: find on model or joined model
+                    let dim_name = name.as_str();
+                    let model_name = if entity_path.is_empty() {
+                        left_model_name
+                    } else {
+                        // If there's an entity path, the dimension is on a joined model
+                        graph
+                            .find_join_path(left_model_name, dim_name)
+                            .map(|j| j.right_model.name.as_str())
+                            .unwrap_or(left_model_name)
+                    };
+                    let dim_expr = graph
+                        .find_dimension(dim_name, model_name)
+                        .map(|(_, d)| d.sql_expr().to_string())
+                        .unwrap_or_else(|| dim_name.to_string());
+                    GroupByColumn {
+                        alias,
+                        expr: format!("DATE_TRUNC('{grain}', {dim_expr})"),
+                    }
+                }
+            }
+            GroupBySpec::Dimension {
+                name, entity_path, ..
+            } => {
+                let alias = g.column_name();
+                let dim_name = name.as_str();
+                let model_name = if entity_path.is_empty() {
+                    left_model_name
+                } else {
+                    graph
+                        .find_join_path(left_model_name, dim_name)
+                        .map(|j| j.right_model.name.as_str())
+                        .unwrap_or(left_model_name)
+                };
+                let dim_expr = graph
+                    .find_dimension(dim_name, model_name)
+                    .map(|(_, d)| d.sql_expr().to_string())
+                    .unwrap_or_else(|| dim_name.to_string());
+                GroupByColumn {
+                    alias,
+                    expr: dim_expr,
+                }
+            }
+            GroupBySpec::Entity { .. } => GroupByColumn::simple(g.column_name()),
+        })
+        .collect();
 
     let aggregations = vec![MeasureAggregation {
         measure_name: resolved.measure.name.clone(),
         agg_type: resolved.measure.agg,
-        expr: resolved.measure.sql_expr().to_string(),
+        expr: resolved.measure.expr.clone(),
         alias: output_alias.to_string(),
     }];
 
@@ -342,13 +406,19 @@ fn build_cumulative_metric_plan(
     });
     plan.add_edge(read_node, join_node);
 
-    // Step 3: Build group-by column names.
-    let group_by_columns: Vec<String> = query.group_by.iter().map(|g| g.column_name()).collect();
+    // Step 3: Build group-by columns.
+    // For cumulative metrics, metric_time comes from the time spine (handled by JoinOverTimeRange),
+    // so we use simple column aliases here.
+    let group_by_columns: Vec<GroupByColumn> = query
+        .group_by
+        .iter()
+        .map(|g| GroupByColumn::simple(g.column_name()))
+        .collect();
 
     let aggregations = vec![MeasureAggregation {
         measure_name: resolved.measure.name.clone(),
         agg_type: resolved.measure.agg,
-        expr: resolved.measure.sql_expr().to_string(),
+        expr: resolved.measure.expr.clone(),
         alias: metric_name.to_string(),
     }];
 
@@ -398,7 +468,8 @@ mod tests {
                 group_by,
                 aggregations,
             } => {
-                assert_eq!(group_by, &["metric_time__day"]);
+                let aliases: Vec<&str> = group_by.iter().map(|g| g.alias.as_str()).collect();
+                assert_eq!(aliases, &["metric_time__day"]);
                 assert_eq!(aggregations.len(), 1);
                 assert_eq!(aggregations[0].measure_name, "bookings");
                 assert_eq!(aggregations[0].agg_type, AggregationType::Sum);
@@ -447,8 +518,9 @@ mod tests {
 
         match plan.node(sink) {
             DataflowNode::Aggregate { group_by, .. } => {
-                assert!(group_by.contains(&"metric_time__day".to_string()));
-                assert!(group_by.contains(&"is_instant".to_string()));
+                let aliases: Vec<&str> = group_by.iter().map(|g| g.alias.as_str()).collect();
+                assert!(aliases.contains(&"metric_time__day"));
+                assert!(aliases.contains(&"is_instant"));
             }
             other => panic!("expected Aggregate, got {other:?}"),
         }
@@ -507,8 +579,9 @@ mod tests {
         let sink = plan.sink().unwrap();
         match plan.node(sink) {
             DataflowNode::Aggregate { group_by, .. } => {
-                assert!(group_by.contains(&"listing__country".to_string()));
-                assert!(group_by.contains(&"metric_time__day".to_string()));
+                let aliases: Vec<&str> = group_by.iter().map(|g| g.alias.as_str()).collect();
+                assert!(aliases.contains(&"listing__country"));
+                assert!(aliases.contains(&"metric_time__day"));
             }
             other => panic!("expected Aggregate, got {other:?}"),
         }

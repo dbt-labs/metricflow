@@ -21,7 +21,7 @@ pub enum DataflowNode {
     },
     /// Aggregate measures with GROUP BY.
     Aggregate {
-        group_by: Vec<String>,
+        group_by: Vec<GroupByColumn>,
         aggregations: Vec<MeasureAggregation>,
     },
     /// Compute metric expression (e.g., for derived metrics).
@@ -58,6 +58,25 @@ pub struct MeasureAggregation {
     pub agg_type: AggregationType,
     pub expr: String,
     pub alias: String,
+}
+
+/// A group-by column with both the output alias and the SQL expression.
+#[derive(Debug, Clone, PartialEq)]
+pub struct GroupByColumn {
+    /// Output column name, e.g. "metric_time__day" or "is_instant"
+    pub alias: String,
+    /// SQL expression to compute this column, e.g. "DATE_TRUNC('day', close_month)" or "is_instant"
+    pub expr: String,
+}
+
+impl GroupByColumn {
+    pub fn simple(name: impl Into<String>) -> Self {
+        let n = name.into();
+        Self {
+            alias: n.clone(),
+            expr: n,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -134,7 +153,7 @@ mod tests {
             table: "demo.fct_bookings".into(),
         });
         let agg = plan.add_node(DataflowNode::Aggregate {
-            group_by: vec!["metric_time__day".into()],
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
             aggregations: vec![MeasureAggregation {
                 measure_name: "bookings".into(),
                 agg_type: AggregationType::Sum,
@@ -203,7 +222,7 @@ mod tests {
             table: "demo.fct_bookings".into(),
         });
         let agg1 = plan.add_node(DataflowNode::Aggregate {
-            group_by: vec!["metric_time__day".into()],
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
             aggregations: vec![MeasureAggregation {
                 measure_name: "bookings".into(),
                 agg_type: AggregationType::Sum,
@@ -217,7 +236,7 @@ mod tests {
             table: "demo.fct_bookings".into(),
         });
         let agg2 = plan.add_node(DataflowNode::Aggregate {
-            group_by: vec!["metric_time__day".into()],
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
             aggregations: vec![MeasureAggregation {
                 measure_name: "instant_bookings".into(),
                 agg_type: AggregationType::Sum,

@@ -149,19 +149,44 @@ pub struct Metric {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct MetricTypeParams {
-    // Simple
+    // Simple (older format: measure field set directly)
     pub measure: Option<MetricInputMeasure>,
+    // Simple (newer format: measure info inlined as aggregation params)
+    pub metric_aggregation_params: Option<MetricAggregationParams>,
     // Ratio
     pub numerator: Option<MetricInput>,
     pub denominator: Option<MetricInput>,
     // Derived
     pub metrics: Option<Vec<MetricInput>>,
     pub expr: Option<String>,
-    // Cumulative
+    // Cumulative (older format: window/grain_to_date at top level)
     pub window: Option<MetricTimeWindow>,
     pub grain_to_date: Option<TimeGrain>,
+    // Cumulative (newer format: cumulative_type_params)
+    pub cumulative_type_params: Option<CumulativeTypeParams>,
     // Conversion
     pub conversion_type_params: Option<ConversionTypeParams>,
+}
+
+/// Inlined measure info for simple metrics (newer manifest format).
+/// Replaces the older `measure` field that references a measure by name.
+#[derive(Debug, Clone, Deserialize)]
+pub struct MetricAggregationParams {
+    /// The semantic model name containing this measure
+    pub semantic_model: String,
+    pub agg: AggregationType,
+    pub expr: Option<String>,
+    pub agg_time_dimension: Option<String>,
+    pub non_additive_dimension: Option<NonAdditiveDimensionParameters>,
+}
+
+/// Cumulative metric parameters (newer manifest format).
+#[derive(Debug, Clone, Deserialize)]
+pub struct CumulativeTypeParams {
+    pub window: Option<MetricTimeWindow>,
+    pub grain_to_date: Option<TimeGrain>,
+    /// The input metric to accumulate
+    pub metric: Option<MetricInput>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

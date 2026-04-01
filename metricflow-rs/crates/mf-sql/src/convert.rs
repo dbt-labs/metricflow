@@ -230,7 +230,10 @@ fn convert_read_source(
     table: &str,
     _subquery_counter: &mut u32,
 ) -> Result<SqlSelect, ConvertError> {
-    let alias = format!("{table}_src");
+    // Use only the last segment of a fully qualified table name for the alias
+    // e.g., "db.schema.table" → "table_src"
+    let table_leaf = table.rsplit('.').next().unwrap_or(table);
+    let alias = format!("{table_leaf}_src");
 
     // Inner select: SELECT * FROM table alias
     // (The actual columns will be specified by the parent Aggregate node)
@@ -250,7 +253,7 @@ fn convert_read_source(
 
 fn convert_aggregate(
     source: &SqlSelect,
-    group_by: &[String],
+    group_by: &[GroupByColumn],
     aggregations: &[MeasureAggregation],
     subquery_counter: &mut u32,
 ) -> Result<SqlSelect, ConvertError> {
@@ -260,20 +263,27 @@ fn convert_aggregate(
     // Build inner SELECT: select measure expressions and group-by columns from source
     let mut inner_columns = Vec::new();
 
-    // Add group-by columns to inner select
+    // Add group-by columns to inner select using resolved SQL expressions
     for col in group_by {
-        inner_columns.push(SqlExpr::Alias {
-            expr: Box::new(match &source.from {
+        let expr = if col.alias == col.expr {
+            // Simple column reference — qualify with source alias
+            match &source.from {
                 SqlFrom::Table { alias, .. } => SqlExpr::ColumnRef {
                     table_alias: alias.clone(),
-                    column_name: col.clone(),
+                    column_name: col.expr.clone(),
                 },
                 SqlFrom::Subquery { alias, .. } => SqlExpr::ColumnRef {
                     table_alias: alias.clone(),
-                    column_name: col.clone(),
+                    column_name: col.expr.clone(),
                 },
-            }),
-            alias: col.clone(),
+            }
+        } else {
+            // Resolved SQL expression (e.g., DATE_TRUNC('day', close_month))
+            SqlExpr::Literal(col.expr.clone())
+        };
+        inner_columns.push(SqlExpr::Alias {
+            expr: Box::new(expr),
+            alias: col.alias.clone(),
         });
     }
 
@@ -299,11 +309,11 @@ fn convert_aggregate(
     // Build outer SELECT: aggregate + group by
     let mut outer_columns = Vec::new();
 
-    // Group-by columns pass through
+    // Group-by columns pass through using alias names
     for col in group_by {
         outer_columns.push(SqlExpr::ColumnRef {
             table_alias: subq_alias.clone(),
-            column_name: col.clone(),
+            column_name: col.alias.clone(),
         });
     }
 
@@ -340,7 +350,7 @@ fn convert_aggregate(
         .iter()
         .map(|col| SqlExpr::ColumnRef {
             table_alias: subq_alias.clone(),
-            column_name: col.clone(),
+            column_name: col.alias.clone(),
         })
         .collect();
 
@@ -712,7 +722,7 @@ fn convert_compute_metric<'a>(
 mod tests {
     use super::*;
     use mf_core::types::AggregationType;
-    use mf_planning::dataflow::{DataflowNode, DataflowPlan, MeasureAggregation};
+    use mf_planning::dataflow::{DataflowNode, DataflowPlan, GroupByColumn, MeasureAggregation};
 
     fn build_test_plan() -> DataflowPlan {
         let mut plan = DataflowPlan::new();
@@ -723,7 +733,7 @@ mod tests {
         });
 
         let agg = plan.add_node(DataflowNode::Aggregate {
-            group_by: vec!["metric_time__day".into()],
+            group_by: vec![GroupByColumn::simple("metric_time__day")],
             aggregations: vec![MeasureAggregation {
                 measure_name: "bookings".into(),
                 agg_type: AggregationType::Sum,
@@ -784,7 +794,7 @@ mod tests {
         plan.add_edge(right_read, join);
 
         let agg = plan.add_node(DataflowNode::Aggregate {
-            group_by: vec!["listing__country".into()],
+            group_by: vec![GroupByColumn::simple("listing__country")],
             aggregations: vec![MeasureAggregation {
                 measure_name: "bookings".into(),
                 agg_type: AggregationType::Sum,

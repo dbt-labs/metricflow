@@ -29,18 +29,32 @@ pub enum ResolveError {
     NoNumerator(String),
     #[error("ratio metric '{0}' has no denominator")]
     NoDenominator(String),
+    #[error("model '{0}' not found")]
+    ModelNotFound(String),
+}
+
+/// Owned measure information extracted from either the model's measures list
+/// (older manifest format) or from `metric_aggregation_params` (newer format).
+#[derive(Debug, Clone)]
+pub struct ResolvedMeasureInfo {
+    pub name: String,
+    pub agg: AggregationType,
+    pub expr: String,
 }
 
 /// Resolved information needed to build a dataflow plan for a simple metric.
 #[derive(Debug)]
 pub struct ResolvedSimpleMetric<'a> {
     pub metric: &'a Metric,
-    pub measure: &'a Measure,
+    pub measure: ResolvedMeasureInfo,
     pub model: &'a SemanticModel,
     pub agg_time_dimension: Option<&'a Dimension>,
 }
 
 /// Resolve a simple metric: find its measure, source model, and time dimension.
+/// Supports two manifest formats:
+/// - Older: `type_params.measure` references a named measure on a semantic model
+/// - Newer: `type_params.metric_aggregation_params` inlines measure info with a model reference
 pub fn resolve_simple_metric<'a>(
     graph: &'a SemanticGraph<'a>,
     metric_name: &str,
@@ -53,31 +67,70 @@ pub fn resolve_simple_metric<'a>(
         return Err(ResolveError::NotSimpleMetric(metric_name.into()));
     }
 
-    let measure_ref = metric
-        .type_params
-        .measure
-        .as_ref()
-        .ok_or_else(|| ResolveError::NoMeasure(metric_name.into()))?;
+    // Path 1: older format — `measure` field references a named measure
+    if let Some(measure_ref) = &metric.type_params.measure {
+        let models = graph.models_for_measure(&measure_ref.name);
+        let model = models
+            .first()
+            .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
 
-    let models = graph.models_for_measure(&measure_ref.name);
-    let model = models
-        .first()
-        .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
+        let measure = model
+            .measures
+            .iter()
+            .find(|m| m.name == measure_ref.name)
+            .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
 
-    let measure = model
-        .measures
-        .iter()
-        .find(|m| m.name == measure_ref.name)
-        .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
+        let agg_time_dimension = graph.agg_time_dimension(&measure_ref.name, &model.name);
 
-    let agg_time_dimension = graph.agg_time_dimension(&measure_ref.name, &model.name);
+        return Ok(ResolvedSimpleMetric {
+            metric,
+            measure: ResolvedMeasureInfo {
+                name: measure.name.clone(),
+                agg: measure.agg,
+                expr: measure.sql_expr().to_string(),
+            },
+            model,
+            agg_time_dimension,
+        });
+    }
 
-    Ok(ResolvedSimpleMetric {
-        metric,
-        measure,
-        model,
-        agg_time_dimension,
-    })
+    // Path 2: newer format — `metric_aggregation_params` inlines measure info
+    if let Some(params) = &metric.type_params.metric_aggregation_params {
+        let model = graph
+            .find_model(&params.semantic_model)
+            .ok_or_else(|| ResolveError::ModelNotFound(params.semantic_model.clone()))?;
+
+        let expr = params
+            .expr
+            .as_deref()
+            .unwrap_or(&metric.name)
+            .to_string();
+
+        // Find agg_time_dimension from params or model defaults
+        let agg_time_dimension = params
+            .agg_time_dimension
+            .as_deref()
+            .or_else(|| {
+                model
+                    .defaults
+                    .as_ref()
+                    .and_then(|d| d.agg_time_dimension.as_deref())
+            })
+            .and_then(|name| model.dimensions.iter().find(|d| d.name == name));
+
+        return Ok(ResolvedSimpleMetric {
+            metric,
+            measure: ResolvedMeasureInfo {
+                name: metric.name.clone(),
+                agg: params.agg,
+                expr,
+            },
+            model,
+            agg_time_dimension,
+        });
+    }
+
+    Err(ResolveError::NoMeasure(metric_name.into()))
 }
 
 /// Resolved information needed to build a dataflow plan for a derived metric.
@@ -195,15 +248,18 @@ pub fn resolve_ratio_metric<'a>(
 #[derive(Debug)]
 pub struct ResolvedCumulativeMetric<'a> {
     pub metric: &'a Metric,
-    pub measure: &'a Measure,
+    pub measure: ResolvedMeasureInfo,
     pub model: &'a SemanticModel,
     pub agg_time_dimension: Option<&'a Dimension>,
-    pub window: Option<&'a MetricTimeWindow>,
+    pub window: Option<MetricTimeWindow>,
     pub grain_to_date: Option<TimeGrain>,
 }
 
 /// Resolve a cumulative metric: validate type, find measure + model + time dimension,
 /// and extract window/grain_to_date parameters.
+/// Supports two manifest formats:
+/// - Older: `type_params.measure` + top-level `window`/`grain_to_date`
+/// - Newer: `type_params.cumulative_type_params` with nested `metric` reference
 pub fn resolve_cumulative_metric<'a>(
     graph: &'a SemanticGraph<'a>,
     metric_name: &str,
@@ -216,36 +272,62 @@ pub fn resolve_cumulative_metric<'a>(
         return Err(ResolveError::NotCumulativeMetric(metric_name.into()));
     }
 
-    let measure_ref = metric
-        .type_params
-        .measure
-        .as_ref()
-        .ok_or_else(|| ResolveError::NoMeasure(metric_name.into()))?;
+    // Path 1: older format — direct `measure` field + top-level window/grain_to_date
+    if let Some(measure_ref) = &metric.type_params.measure {
+        let models = graph.models_for_measure(&measure_ref.name);
+        let model = models
+            .first()
+            .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
 
-    let models = graph.models_for_measure(&measure_ref.name);
-    let model = models
-        .first()
-        .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
+        let measure = model
+            .measures
+            .iter()
+            .find(|m| m.name == measure_ref.name)
+            .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
 
-    let measure = model
-        .measures
-        .iter()
-        .find(|m| m.name == measure_ref.name)
-        .ok_or_else(|| ResolveError::NoModelForMeasure(measure_ref.name.clone()))?;
+        let agg_time_dimension = graph.agg_time_dimension(&measure_ref.name, &model.name);
 
-    let agg_time_dimension = graph.agg_time_dimension(&measure_ref.name, &model.name);
+        let window = metric.type_params.window.clone();
+        let grain_to_date = metric.type_params.grain_to_date;
 
-    let window = metric.type_params.window.as_ref();
-    let grain_to_date = metric.type_params.grain_to_date;
+        return Ok(ResolvedCumulativeMetric {
+            metric,
+            measure: ResolvedMeasureInfo {
+                name: measure.name.clone(),
+                agg: measure.agg,
+                expr: measure.sql_expr().to_string(),
+            },
+            model,
+            agg_time_dimension,
+            window,
+            grain_to_date,
+        });
+    }
 
-    Ok(ResolvedCumulativeMetric {
-        metric,
-        measure,
-        model,
-        agg_time_dimension,
-        window,
-        grain_to_date,
-    })
+    // Path 2: newer format — `cumulative_type_params` with nested metric reference
+    if let Some(cum_params) = &metric.type_params.cumulative_type_params {
+        let input_metric_ref = cum_params
+            .metric
+            .as_ref()
+            .ok_or_else(|| ResolveError::NoMeasure(metric_name.into()))?;
+
+        // Resolve the referenced input metric as a simple metric
+        let input_resolved = resolve_simple_metric(graph, &input_metric_ref.name)?;
+
+        let window = cum_params.window.clone();
+        let grain_to_date = cum_params.grain_to_date;
+
+        return Ok(ResolvedCumulativeMetric {
+            metric,
+            measure: input_resolved.measure,
+            model: input_resolved.model,
+            agg_time_dimension: input_resolved.agg_time_dimension,
+            window,
+            grain_to_date,
+        });
+    }
+
+    Err(ResolveError::NoMeasure(metric_name.into()))
 }
 
 #[cfg(test)]
