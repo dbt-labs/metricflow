@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -26,7 +24,6 @@ def assert_default_rendered_sql_equal(
     mf_test_configuration: MetricFlowTestConfiguration,
     plan_id: str,
     sql_plan_node: SqlPlanNode,
-    expectation_description: Optional[str] = None,
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
     sql_query_plan = SqlPlan(render_node=sql_plan_node, plan_id=DagId.from_str(plan_id))
@@ -41,7 +38,6 @@ def assert_default_rendered_sql_equal(
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_configuration.mf_system_schema, source_schema=mf_test_configuration.mf_source_schema
         ),
-        expectation_description=expectation_description,
     )
 
 
@@ -51,7 +47,6 @@ def assert_rendered_sql_equal(
     plan_id: str,
     sql_plan_node: SqlPlanNode,
     sql_client: SqlClient,
-    expectation_description: Optional[str] = None,
 ) -> None:
     """Helper function to render a select statement and compare with the one saved as a file."""
     sql_query_plan = SqlPlan(render_node=sql_plan_node, plan_id=DagId.from_str(plan_id))
@@ -61,7 +56,6 @@ def assert_rendered_sql_equal(
         mf_test_configuration=mf_test_configuration,
         sql_query_plan=sql_query_plan,
         sql_client=sql_client,
-        expectation_description=expectation_description,
     )
 
 
@@ -70,7 +64,6 @@ def assert_rendered_sql_from_plan_equal(
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_query_plan: SqlPlan,
     sql_client: SqlClient,
-    expectation_description: Optional[str] = None,
 ) -> None:
     """Similar to assert_rendered_sql_equal, but takes in a SQL query plan."""
     check_sql_engine_snapshot_marker(request)
@@ -91,7 +84,6 @@ def assert_rendered_sql_from_plan_equal(
         exclude_line_regex=_EXCLUDE_TABLE_ALIAS_REGEX,
         additional_sub_directories_for_snapshots=(sql_engine.value,),
         additional_header_fields={SQL_ENGINE_HEADER_NAME: sql_engine.value},
-        expectation_description=expectation_description,
     )
 
 
@@ -99,7 +91,6 @@ def assert_sql_plan_text_equal(  # noqa: D103
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_query_plan: SqlPlan,
-    expectation_description: Optional[str] = None,
 ) -> None:
     assert_plan_snapshot_text_equal(
         request=request,
@@ -109,5 +100,4 @@ def assert_sql_plan_text_equal(  # noqa: D103
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_configuration.mf_system_schema, source_schema=mf_test_configuration.mf_source_schema
         ),
-        expectation_description=expectation_description,
     )
