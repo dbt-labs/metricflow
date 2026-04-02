@@ -6,6 +6,7 @@ from collections import defaultdict
 from collections.abc import Mapping, Sequence, Set
 
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
@@ -102,10 +103,15 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
     """
 
     def __init__(  # noqa: D107
-        self, manifest_object_lookup: ManifestObjectLookup, column_association_resolver: ColumnAssociationResolver
+        self,
+        manifest_object_lookup: ManifestObjectLookup,
+        metric_lookup: MetricLookup,
+        column_association_resolver: ColumnAssociationResolver,
     ) -> None:
         super().__init__(
-            manifest_object_lookup=manifest_object_lookup, column_association_resolver=column_association_resolver
+            manifest_object_lookup=manifest_object_lookup,
+            metric_lookup=metric_lookup,
+            column_association_resolver=column_association_resolver,
         )
 
         self._level_resolver: MetricEvaluationLevelResolver = MetricEvaluationLevelResolver(manifest_object_lookup)
@@ -541,7 +547,7 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
             predicate_pushdown_state_for_inputs = query_element.predicate_pushdown_state
 
             if metric_spec.has_time_offset:
-                group_by_item_specs_for_inputs = self._required_group_by_items_for_inputs_to_a_time_offset_metric(
+                group_by_item_specs_for_inputs = self._query_helper.resolve_group_by_specs_for_time_offset_metric_input(
                     queried_group_by_specs=query_element.group_by_item_specs,
                     filter_specs=metric_spec.where_filter_specs,
                 )

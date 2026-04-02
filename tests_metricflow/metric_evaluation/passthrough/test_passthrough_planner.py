@@ -39,6 +39,7 @@ def test_cases_with_passthrough_planner(
         engine_test_fixture=mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MANIFEST],
         me_planner=PassThroughMetricEvaluationPlanner(
             manifest_object_lookup=engine_test_fixture.manifest_object_lookup,
+            metric_lookup=engine_test_fixture.semantic_manifest_lookup.metric_lookup,
             column_association_resolver=engine_test_fixture.column_association_resolver,
         ),
         me_test_case=me_test_case,

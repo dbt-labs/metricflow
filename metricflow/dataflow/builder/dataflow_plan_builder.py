@@ -264,11 +264,13 @@ class DataflowPlanBuilder:
             if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in option_set.optimizations:
                 me_planner = PassThroughMetricEvaluationPlanner(
                     manifest_object_lookup=self._manifest_object_lookup,
+                    metric_lookup=self._metric_lookup,
                     column_association_resolver=self._column_association_resolver,
                 )
             else:
                 me_planner = DepthFirstSearchMetricEvaluationPlanner(
                     manifest_object_lookup=self._manifest_object_lookup,
+                    metric_lookup=self._metric_lookup,
                     column_association_resolver=self._column_association_resolver,
                 )
 
