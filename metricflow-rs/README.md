@@ -100,7 +100,13 @@ cargo fmt --all -- --check
 
 ## Design
 
-See [`docs/roadmap.md`](docs/roadmap.md) for the phase roadmap and [`docs/sql-generation-research.md`](docs/sql-generation-research.md) for SQL generation architecture research.
+**Living docs** (in `metricflow-rs/docs/`):
+- [`docs/roadmap.md`](docs/roadmap.md) — phase roadmap and current status
+- [`docs/sql-generation-research.md`](docs/sql-generation-research.md) — SQL generation architecture research
+
+**Original design** (in parent repo `docs/superpowers/`):
+- [`../docs/superpowers/specs/2026-03-31-metricflow-rust-rewrite-design.md`](../docs/superpowers/specs/2026-03-31-metricflow-rust-rewrite-design.md) — initial design spec
+- [`../docs/superpowers/plans/`](../docs/superpowers/plans/) — step-by-step implementation plans (phases 1-4)
 
 ### Pipeline
 
