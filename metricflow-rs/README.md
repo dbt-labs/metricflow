@@ -100,7 +100,7 @@ cargo fmt --all -- --check
 
 ## Design
 
-See `docs/superpowers/specs/2026-03-31-metricflow-rust-rewrite-design.md` for the full design spec and `docs/superpowers/plans/2026-04-01-metricflow-rs-roadmap.md` for the phase roadmap.
+See [`docs/roadmap.md`](docs/roadmap.md) for the phase roadmap and [`docs/sql-generation-research.md`](docs/sql-generation-research.md) for SQL generation architecture research.
 
 ### Pipeline
 
