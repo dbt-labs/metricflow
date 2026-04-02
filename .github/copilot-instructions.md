@@ -14,7 +14,7 @@ PRs that modify an interface must reference an open GitHub issue before implemen
 
 > This PR appears to modify an interface but does not reference an open GitHub issue. Per [CONTRIBUTING.md](../CONTRIBUTING.md), interface changes should be proposed in an issue and discussed before implementation. Please open or link the relevant issue and allow time for maintainer feedback before requesting review.
 
-For interface changes specifically (see [Interface Changes](#interface-changes) below), the linked issue must also contain evidence that the `@dbt-labs/semantic-layer` codeowner team or an OSI maintainer has acknowledged the proposal before implementation began.
+For interface changes specifically (see [Interface Changes](#interface-changes) below), the linked issue must also contain evidence that the Semantic Layer engineering team or an OSI maintainer has acknowledged the proposal before implementation began.
 
 ### Contributor License Agreement
 
