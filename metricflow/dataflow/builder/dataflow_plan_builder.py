@@ -1661,7 +1661,7 @@ class DataflowPlanBuilder:
         queried_non_agg_time_filter_specs = [
             filter_spec
             for filter_spec in non_agg_time_only_filters
-            if filter_spec.linkable_specs and set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs))
+            if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs))
         ]
         if len(queried_non_agg_time_filter_specs) > 0:
             output_node = WhereFilterNode.create(
