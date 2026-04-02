@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from metricflow.converters.osi.converter import MSIToOSIConverter, OSIToMSIConverter
+from metricflow.converters.osi.converter import MSIToOSIConverter, OSIToMSIConverter, _render_filter_template
 from metricflow.converters.osi.models import (
     OSIDataset,
     OSIDialect,
@@ -21,6 +21,10 @@ from metricflow_semantic_interfaces.implementations.elements.dimension import (
 )
 from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
 from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasure
+from metricflow_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
+    PydanticWhereFilterIntersection,
+)
 from metricflow_semantic_interfaces.implementations.metric import (
     PydanticConversionTypeParams,
     PydanticCumulativeTypeParams,
@@ -881,6 +885,208 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion]))
 
         assert result.semantic_model[0].metrics is None
+
+
+# ---------------------------------------------------------------------------
+# Filter flattening helpers
+# ---------------------------------------------------------------------------
+
+
+def _filter(sql: str) -> PydanticWhereFilterIntersection:
+    return PydanticWhereFilterIntersection(where_filters=[PydanticWhereFilter(where_sql_template=sql)])
+
+
+class TestFilterRendering:  # noqa: D101
+    """Unit tests for the Jinja → SQL rendering of where-filter templates."""
+
+    def test_plain_sql_passthrough(self) -> None:  # noqa: D102
+        assert _render_filter_template("status = 'paid'") == "status = 'paid'"
+
+    def test_dimension_reference(self) -> None:  # noqa: D102
+        assert _render_filter_template("{{ Dimension('order__status') }} = 'paid'") == "order__status = 'paid'"
+
+    def test_dimension_with_grain(self) -> None:  # noqa: D102
+        result = _render_filter_template("{{ Dimension('order__ds').grain('day') }} >= '2023-01-01'")
+        assert result == "order__ds__day >= '2023-01-01'"
+
+    def test_time_dimension_with_grain_arg(self) -> None:  # noqa: D102
+        result = _render_filter_template("{{ TimeDimension('order__ds', 'week') }} >= '2023-01-01'")
+        assert result == "order__ds__week >= '2023-01-01'"
+
+    def test_time_dimension_without_grain(self) -> None:  # noqa: D102
+        assert _render_filter_template("{{ TimeDimension('metric_time') }} IS NOT NULL") == "metric_time IS NOT NULL"
+
+    def test_entity_reference(self) -> None:  # noqa: D102
+        assert _render_filter_template("{{ Entity('user') }} != 'bot'") == "user != 'bot'"
+
+    def test_metric_reference(self) -> None:  # noqa: D102
+        assert _render_filter_template("{{ Metric('revenue') }} > 0") == "revenue > 0"
+
+
+class TestMetricFilterFlattening:  # noqa: D101
+    def test_metric_level_filter_inlines_case_when(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = PydanticMetric(
+            name="paid_revenue",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(measure=PydanticMetricInputMeasure(name="revenue")),
+            filter=_filter("status = 'paid'"),
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert metrics[0].expression.dialects[0].expression == "SUM(CASE WHEN status = 'paid' THEN amount END)"
+
+    def test_measure_level_filter_inlines_case_when(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = PydanticMetric(
+            name="paid_revenue",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(
+                measure=PydanticMetricInputMeasure(name="revenue", filter=_filter("status = 'paid'")),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert metrics[0].expression.dialects[0].expression == "SUM(CASE WHEN status = 'paid' THEN amount END)"
+
+    def test_metric_and_measure_filters_combined_with_and(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = PydanticMetric(
+            name="paid_intl_revenue",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(
+                measure=PydanticMetricInputMeasure(name="revenue", filter=_filter("status = 'paid'")),
+            ),
+            filter=_filter("region = 'intl'"),
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert metrics[0].expression.dialects[0].expression == (
+            "SUM(CASE WHEN (region = 'intl') AND (status = 'paid') THEN amount END)"
+        )
+
+    def test_jinja_dimension_reference_rendered(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = PydanticMetric(
+            name="us_revenue",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(measure=PydanticMetricInputMeasure(name="revenue")),
+            filter=_filter("{{ Dimension('order__country') }} = 'US'"),
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert metrics[0].expression.dialects[0].expression == "SUM(CASE WHEN order__country = 'US' THEN amount END)"
+
+    def test_ratio_metric_filter_propagated_to_both_sides(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("order_count", agg=AggregationType.COUNT, expr="order_id"),
+            ],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        order_count_m = _simple_metric("order_count", "order_count")
+        arpu = PydanticMetric(
+            name="paid_arpu",
+            description=None,
+            type=MetricType.RATIO,
+            type_params=PydanticMetricTypeParams(
+                numerator=PydanticMetricInput(name="revenue"),
+                denominator=PydanticMetricInput(name="order_count"),
+            ),
+            filter=_filter("status = 'paid'"),
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, order_count_m, arpu]))
+
+        assert result.semantic_model[0].metrics is not None
+        paid_arpu = next(m for m in result.semantic_model[0].metrics if m.name == "paid_arpu")
+        expr = paid_arpu.expression.dialects[0].expression
+        assert expr == (
+            "(SUM(CASE WHEN status = 'paid' THEN amount END))"
+            " / "
+            "(COUNT(CASE WHEN status = 'paid' THEN order_id END))"
+        )
+
+    def test_derived_metric_filter_propagated_to_sub_expressions(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("cost", agg=AggregationType.SUM, expr="cost_amount"),
+            ],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        cost_m = _simple_metric("cost", "cost")
+        profit = PydanticMetric(
+            name="paid_profit",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue - cost",
+                metrics=[PydanticMetricInput(name="revenue"), PydanticMetricInput(name="cost")],
+            ),
+            filter=_filter("status = 'paid'"),
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
+
+        assert result.semantic_model[0].metrics is not None
+        paid_profit = next(m for m in result.semantic_model[0].metrics if m.name == "paid_profit")
+        expr = paid_profit.expression.dialects[0].expression
+        assert (
+            expr
+            == "SUM(CASE WHEN status = 'paid' THEN amount END) - SUM(CASE WHEN status = 'paid' THEN cost_amount END)"
+        )
+
+    def test_no_filter_produces_plain_expression(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        result = MSIToOSIConverter().convert(
+            _manifest(semantic_models=[sm], metrics=[_simple_metric("revenue", "revenue")])
+        )
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        assert metrics[0].expression.dialects[0].expression == "SUM(amount)"
 
 
 class TestOSIJsonSerialization:  # noqa: D101

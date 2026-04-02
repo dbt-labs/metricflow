@@ -5,6 +5,8 @@ from collections import defaultdict
 from itertools import combinations
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
+import jinja2
+
 from metricflow.converters.osi.models import (
     OSIDataset,
     OSIDialect,
@@ -48,6 +50,7 @@ from metricflow_semantic_interfaces.protocols.measure import (
 from metricflow_semantic_interfaces.protocols.metric import Metric
 from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
+from metricflow_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
     DimensionType,
@@ -71,7 +74,7 @@ class MSIToOSIConverter:
 
         measure_index = self._build_measure_index(manifest.semantic_models)
         metric_index = self._build_metric_index(manifest.metrics)
-        expression_cache: Dict[str, str] = {}
+        expression_cache: Dict[Tuple[str, Optional[str]], str] = {}
 
         osi_metrics: List[OSIMetric] = []
         for metric in manifest.metrics:
@@ -187,36 +190,43 @@ class MSIToOSIConverter:
         metric: Metric,
         metric_index: Dict[str, Metric],
         measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
-        cache: Dict[str, str],
+        cache: Dict[Tuple[str, Optional[str]], str],
+        parent_filter: Optional[str] = None,
     ) -> str:
         """Recursively resolve a metric to a fully-inlined SQL expression string."""
-        if metric.name in cache:
-            return cache[metric.name]
+        own_filter = _collect_filter_sql(metric.filter)
+        combined_filter = _merge_filter_sqls(parent_filter, own_filter)
+
+        cache_key = (metric.name, combined_filter)
+        if cache_key in cache:
+            return cache[cache_key]
 
         if metric.type is MetricType.SIMPLE:
-            expr = self._resolve_simple(metric, measure_index)
+            expr = self._resolve_simple(metric, measure_index, combined_filter)
         elif metric.type is MetricType.CUMULATIVE:
-            expr = self._resolve_cumulative(metric, measure_index)
+            expr = self._resolve_cumulative(metric, measure_index, combined_filter)
         elif metric.type is MetricType.RATIO:
-            expr = self._resolve_ratio(metric, metric_index, measure_index, cache)
+            expr = self._resolve_ratio(metric, metric_index, measure_index, cache, combined_filter)
         elif metric.type is MetricType.DERIVED:
-            expr = self._resolve_derived(metric, metric_index, measure_index, cache)
+            expr = self._resolve_derived(metric, metric_index, measure_index, cache, combined_filter)
         else:
             expr = metric.name
 
-        cache[metric.name] = expr
+        cache[cache_key] = expr
         return expr
 
     def _resolve_simple(
         self,
         metric: Metric,
         measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+        filter_sql: Optional[str] = None,
     ) -> str:
         """Resolve a SIMPLE metric: look up its measure or use metric_aggregation_params."""
         if metric.type_params.measure is not None:
             measure_name = metric.type_params.measure.name
             agg, col, agg_params = measure_index[measure_name]
-            return self._build_agg_expression(agg, col, agg_params)
+            measure_filter = _collect_filter_sql(metric.type_params.measure.filter)
+            return self._build_agg_expression(agg, col, agg_params, _merge_filter_sqls(filter_sql, measure_filter))
 
         # metric_aggregation_params path: aggregation info lives on the metric itself
         agg_params_obj = metric.type_params.metric_aggregation_params
@@ -224,12 +234,13 @@ class MSIToOSIConverter:
             agg_params_obj is not None
         ), f"SIMPLE metric '{metric.name}' has neither measure nor metric_aggregation_params"
         col = metric.type_params.expr if metric.type_params.expr is not None else metric.name
-        return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params)
+        return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params, filter_sql)
 
     def _resolve_cumulative(
         self,
         metric: Metric,
         measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+        filter_sql: Optional[str] = None,
     ) -> str:
         """Resolve a CUMULATIVE metric to its base aggregation expression.
 
@@ -238,7 +249,8 @@ class MSIToOSIConverter:
         if metric.type_params.measure is not None:
             measure_name = metric.type_params.measure.name
             agg, col, agg_params = measure_index[measure_name]
-            return self._build_agg_expression(agg, col, agg_params)
+            measure_filter = _collect_filter_sql(metric.type_params.measure.filter)
+            return self._build_agg_expression(agg, col, agg_params, _merge_filter_sqls(filter_sql, measure_filter))
 
         # cumulative_type_params.metric path: resolve through a referenced metric
         cumulative_params = metric.type_params.cumulative_type_params
@@ -252,14 +264,21 @@ class MSIToOSIConverter:
         metric: Metric,
         metric_index: Dict[str, Metric],
         measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
-        cache: Dict[str, str],
+        cache: Dict[Tuple[str, Optional[str]], str],
+        filter_sql: Optional[str] = None,
     ) -> str:
         """Resolve a RATIO metric as (numerator) / (denominator), both fully inlined."""
         assert metric.type_params.numerator is not None and metric.type_params.denominator is not None
-        num_metric = metric_index[metric.type_params.numerator.name]
-        den_metric = metric_index[metric.type_params.denominator.name]
-        num_expr = self._resolve_metric_expression(num_metric, metric_index, measure_index, cache)
-        den_expr = self._resolve_metric_expression(den_metric, metric_index, measure_index, cache)
+        num_input = metric.type_params.numerator
+        den_input = metric.type_params.denominator
+        num_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(num_input.filter))
+        den_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(den_input.filter))
+        num_expr = self._resolve_metric_expression(
+            metric_index[num_input.name], metric_index, measure_index, cache, num_filter
+        )
+        den_expr = self._resolve_metric_expression(
+            metric_index[den_input.name], metric_index, measure_index, cache, den_filter
+        )
         return f"({num_expr}) / ({den_expr})"
 
     def _resolve_derived(
@@ -267,7 +286,8 @@ class MSIToOSIConverter:
         metric: Metric,
         metric_index: Dict[str, Metric],
         measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
-        cache: Dict[str, str],
+        cache: Dict[Tuple[str, Optional[str]], str],
+        filter_sql: Optional[str] = None,
     ) -> str:
         """Resolve a DERIVED metric by substituting each input metric's expression into the expr string.
 
@@ -277,7 +297,8 @@ class MSIToOSIConverter:
         for input_metric in metric.type_params.metrics or []:
             ref = input_metric.alias if input_metric.alias else input_metric.name
             dep_metric = metric_index[input_metric.name]
-            resolved = self._resolve_metric_expression(dep_metric, metric_index, measure_index, cache)
+            input_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(input_metric.filter))
+            resolved = self._resolve_metric_expression(dep_metric, metric_index, measure_index, cache, input_filter)
             if dep_metric.type in (MetricType.DERIVED, MetricType.RATIO):
                 resolved = f"({resolved})"
             expr = expr.replace(ref, resolved)
@@ -352,32 +373,171 @@ class MSIToOSIConverter:
         agg: AggregationType,
         col: str,
         agg_params: Optional[MeasureAggregationParameters],
+        filter_sql: Optional[str] = None,
     ) -> str:
+        # Inject the filter as CASE WHEN inside the aggregation.  NULL values
+        # produced by CASE WHEN are ignored by all standard SQL aggregate
+        # functions, preserving correct filtering semantics.
+        fc = f"CASE WHEN {filter_sql} THEN {col} END" if filter_sql else col
+
         if agg == AggregationType.SUM:
-            return f"SUM({col})"
+            return f"SUM({fc})"
         if agg == AggregationType.MIN:
-            return f"MIN({col})"
+            return f"MIN({fc})"
         if agg == AggregationType.MAX:
-            return f"MAX({col})"
+            return f"MAX({fc})"
         if agg == AggregationType.COUNT:
-            return f"COUNT({col})"
+            return f"COUNT({fc})"
         if agg == AggregationType.COUNT_DISTINCT:
-            return f"COUNT(DISTINCT {col})"
+            return f"COUNT(DISTINCT {fc})"
         if agg == AggregationType.AVERAGE:
-            return f"AVG({col})"
+            return f"AVG({fc})"
         if agg == AggregationType.SUM_BOOLEAN:
+            # col is already a boolean condition; the filter becomes an extra AND term.
+            if filter_sql:
+                return f"SUM(CASE WHEN ({filter_sql}) AND ({col}) THEN 1 ELSE 0 END)"
             return f"SUM(CASE WHEN {col} THEN 1 ELSE 0 END)"
         if agg == AggregationType.MEDIAN:
-            return f"PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY {col})"
+            return f"PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY {fc})"
         if agg == AggregationType.PERCENTILE:
             percentile = agg_params.percentile if agg_params and agg_params.percentile is not None else 0.5
             use_discrete = agg_params.use_discrete_percentile if agg_params else False
             func = "PERCENTILE_DISC" if use_discrete else "PERCENTILE_CONT"
-            return f"{func}({percentile}) WITHIN GROUP (ORDER BY {col})"
-        return f"{agg.value.upper()}({col})"
+            return f"{func}({percentile}) WITHIN GROUP (ORDER BY {fc})"
+        return f"{agg.value.upper()}({fc})"
 
     def _make_expression(self, expr: str) -> OSIExpression:
         return OSIExpression(dialects=[OSIDialectExpression(dialect=self._dialect, expression=expr)])
+
+
+# ---------------------------------------------------------------------------
+# Where-filter rendering helpers
+# ---------------------------------------------------------------------------
+
+
+class _DimensionStub:
+    """Jinja sandbox stub for ``{{ Dimension('entity__dim') }}``.
+
+    Renders to the qualified column name, e.g. ``order__status``.
+    Method chaining (``grain``, ``date_part``) appends a ``__<suffix>`` part.
+    """
+
+    def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D107
+        self._col = "__".join(list(entity_path) + [name])
+        self._suffix = ""
+
+    def grain(self, time_granularity: str) -> "_DimensionStub":  # noqa: D102
+        self._suffix = f"__{time_granularity.lower()}"
+        return self
+
+    def date_part(self, date_part_name: str) -> "_DimensionStub":  # noqa: D102
+        self._suffix = f"__{date_part_name.lower()}"
+        return self
+
+    def descending(self, _is_descending: bool) -> "_DimensionStub":  # noqa: D102
+        return self
+
+    def __str__(self) -> str:
+        return f"{self._col}{self._suffix}"
+
+
+class _TimeDimensionStub:
+    """Jinja sandbox stub for ``{{ TimeDimension('entity__dim', 'grain') }}``.
+
+    Renders to ``entity__dim`` or ``entity__dim__grain`` when a granularity is provided.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        time_granularity_name: Optional[str] = None,
+        entity_path: Sequence[str] = (),
+        **_kwargs: object,
+    ) -> None:  # noqa: D107
+        self._col = "__".join(list(entity_path) + [name])
+        self._grain = time_granularity_name
+
+    def grain(self, time_granularity: str) -> "_TimeDimensionStub":  # noqa: D102
+        self._grain = time_granularity
+        return self
+
+    def date_part(self, date_part_name: str) -> "_TimeDimensionStub":  # noqa: D102
+        self._grain = date_part_name
+        return self
+
+    def descending(self, _is_descending: bool) -> "_TimeDimensionStub":  # noqa: D102
+        return self
+
+    def __str__(self) -> str:
+        if self._grain:
+            return f"{self._col}__{self._grain.lower()}"
+        return self._col
+
+
+class _EntityStub:
+    """Jinja sandbox stub for ``{{ Entity('name') }}``."""
+
+    def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D107
+        self._col = "__".join(list(entity_path) + [name])
+
+    def descending(self, _is_descending: bool) -> "_EntityStub":  # noqa: D102
+        return self
+
+    def __str__(self) -> str:
+        return self._col
+
+
+class _MetricStub:
+    """Jinja sandbox stub for ``{{ Metric('name') }}``."""
+
+    def __init__(self, name: str, group_by: Sequence[str] = ()) -> None:  # noqa: D107
+        self._name = name
+
+    def descending(self, _is_descending: bool) -> "_MetricStub":  # noqa: D102
+        return self
+
+    def __str__(self) -> str:
+        return self._name
+
+
+def _render_filter_template(template: str) -> str:
+    """Render an MSI where-filter Jinja template to a plain SQL fragment.
+
+    Jinja references such as ``{{ Dimension('order__status') }}``,
+    ``{{ TimeDimension('order__ds', 'day') }}``, ``{{ Entity('user') }}``,
+    and ``{{ Metric('revenue') }}`` are resolved to their column-name
+    equivalents using lightweight stubs.  The output is a best-effort SQL
+    string suitable for embedding in an OSI expression.
+    """
+    return jinja2.Template(template, undefined=jinja2.StrictUndefined).render(
+        Dimension=_DimensionStub,
+        TimeDimension=_TimeDimensionStub,
+        Entity=_EntityStub,
+        Metric=_MetricStub,
+    )
+
+
+def _collect_filter_sql(*filters: Optional[WhereFilterIntersection]) -> Optional[str]:
+    """Render and merge MSI WhereFilterIntersection objects into a single SQL fragment."""
+    parts: List[str] = []
+    for f in filters:
+        if f is None:
+            continue
+        for wf in f.where_filters:
+            rendered = _render_filter_template(wf.where_sql_template).strip()
+            if rendered:
+                parts.append(rendered)
+    return _merge_filter_sqls(*parts)
+
+
+def _merge_filter_sqls(*parts: Optional[str]) -> Optional[str]:
+    """Join non-None SQL filter strings with AND, wrapping each in parens when multiple."""
+    active = [p for p in parts if p]
+    if not active:
+        return None
+    if len(active) == 1:
+        return active[0]
+    return " AND ".join(f"({p})" for p in active)
 
 
 # ---------------------------------------------------------------------------
