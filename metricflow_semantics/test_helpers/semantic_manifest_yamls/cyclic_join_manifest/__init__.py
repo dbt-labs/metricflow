@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-from metricflow_semantics.test_helpers.config_helpers import DirectoryPathAnchor
+from metricflow_semantics.toolkit.directory_anchor import DirectoryAnchor
 
-CYCLIC_JOIN_MANIFEST_ANCHOR = DirectoryPathAnchor()
+CYCLIC_JOIN_MANIFEST_ANCHOR = DirectoryAnchor()
