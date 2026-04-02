@@ -10,9 +10,9 @@ The following are non-negotiable gates. Flag violations immediately; a PR that f
 
 ### Issue linkage
 
-Every PR that introduces behavioral change, fixes a bug, or modifies an interface must reference an open GitHub issue. If a PR description contains no issue reference, comment:
+PRs that modify an interface must reference an open GitHub issue before implementation. For other substantive changes, such as bug fixes or behavioral changes, issue linkage is encouraged but should not be treated as a hard merge gate based on [CONTRIBUTING.md](../CONTRIBUTING.md). If an interface-change PR description contains no issue reference, comment:
 
-> This PR does not appear to reference an open GitHub issue. Per [CONTRIBUTING.md](../CONTRIBUTING.md), code changes without an associated issue will not be merged. Please open an issue, allow time for maintainer feedback, and link it here before requesting review.
+> This PR appears to modify an interface but does not reference an open GitHub issue. Per [CONTRIBUTING.md](../CONTRIBUTING.md), interface changes should be proposed in an issue and discussed before implementation. Please open or link the relevant issue and allow time for maintainer feedback before requesting review.
 
 For interface changes specifically (see [Interface Changes](#interface-changes) below), the linked issue must also contain evidence that the `@dbt-labs/semantic-layer` codeowner team or an OSI maintainer has acknowledged the proposal before implementation began.
 
