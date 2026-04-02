@@ -153,6 +153,20 @@ METRIC_EVALUATION_TEST_CASES = (
             where_constraints=["{{ TimeDimension('metric_time', 'day') }} = '2020-01-01' "],
         ),
     ),
+    MetricEvaluationTestCase(
+        case_id_suffix="time_nested_offset_metric_with_non_queried_element_in_filter",
+        description="Query for a nested time offset metric with a `metric_time` filter",
+        request=MetricFlowQueryRequest.create(
+            request_id=_get_next_request_id(),
+            metric_names=["bookings_offset_twice"],
+            group_by_names=["metric_time"],
+            where_constraints=["{{ Entity('listing') }} = '1'"],
+        ),
+        expectation_description=mf_wrap(
+            "The query for `bookings` should contain the filter and only have `metric_time` in the group-by items."
+            " The current snapshot does not reflect the correct result."
+        ),
+    ),
 )
 
 
