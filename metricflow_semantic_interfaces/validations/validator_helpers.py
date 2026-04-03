@@ -18,7 +18,6 @@ from typing import (
     Union,
 )
 
-import click
 from typing_extensions import ParamSpec
 
 from metricflow_semantic_interfaces.implementations.base import FrozenBaseModel
@@ -212,12 +211,6 @@ class ValidationIssue(ABC, BaseModel):
 
         return issue_str
 
-    def as_cli_formatted_str(self, verbose: bool = False) -> str:
-        """Returns a color-coded readable string for rendering issues in the CLI."""
-        return self.as_readable_str(
-            verbose=verbose, prefix=click.style(self.level.name, bold=True, fg=ISSUE_COLOR_MAP[self.level])
-        )
-
     @property
     @abstractmethod
     def as_issue_set(self) -> ValidationIssueSet:  # noqa: D102
@@ -347,22 +340,6 @@ class SemanticManifestValidationResults(FrozenBaseModel):
     def all_issues(self) -> Tuple[ValidationIssue, ...]:
         """For when a singular list of issues is needed."""
         return self.errors + self.future_errors + self.warnings
-
-    def summary(self) -> str:
-        """Returns a stylized summary string for issues."""
-        errors = click.style(
-            text=f"{ValidationIssueLevel.ERROR.name_plural}: {len(self.errors)}",
-            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.ERROR],
-        )
-        future_errors = click.style(
-            text=f"{ValidationIssueLevel.FUTURE_ERROR.name_plural}: {len(self.future_errors)}",
-            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.FUTURE_ERROR],
-        )
-        warnings = click.style(
-            text=f"{ValidationIssueLevel.WARNING.name_plural}: {len(self.warnings)}",
-            fg=ISSUE_COLOR_MAP[ValidationIssueLevel.WARNING],
-        )
-        return f"{errors}, {future_errors}, {warnings}"
 
 
 def generate_exception_issue(
