@@ -108,6 +108,10 @@ test-athena:
 populate-persistent-source-schema-athena:
 	hatch -v run athena-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
 
+.PHONY: test-clickhouse
+test-clickhouse:
+	hatch -v run clickhouse-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
@@ -125,6 +129,10 @@ trino:
 .PHONY: vertica
 vertica:
 	$(MAKE) -C local-data-warehouses vertica
+
+.PHONY: clickhouse
+clickhouse:
+	$(MAKE) -C local-data-warehouses clickhouse
 
 # Re-generate test snapshots using all supported SQL engines, or one engine when ENGINE is set.
 .PHONY: regenerate-test-snapshots

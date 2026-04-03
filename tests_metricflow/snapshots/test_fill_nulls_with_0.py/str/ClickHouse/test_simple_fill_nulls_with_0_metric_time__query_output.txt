@@ -1,0 +1,11 @@
+test_name: test_simple_fill_nulls_with_0_metric_time
+test_filename: test_fill_nulls_with_0.py
+---
+metric_time__week      bookings_fill_nulls_with_0
+-------------------  ----------------------------
+2019-11-25T00:00:00                             1
+2019-12-02T00:00:00                             0
+2019-12-09T00:00:00                             0
+2019-12-16T00:00:00                            30
+2019-12-23T00:00:00                             0
+2019-12-30T00:00:00                            15

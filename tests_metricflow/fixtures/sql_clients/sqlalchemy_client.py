@@ -137,8 +137,7 @@ class SqlAlchemyBasedSqlClient:
 
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
-                f"Bind parameters not yet supported in SqlAlchemy client. "
-                f"Params: {sql_bind_parameter_set.param_dict}"
+                f"Bind parameters not yet supported in SqlAlchemy client. Params: {sql_bind_parameter_set.param_dict}"
             )
 
         logger.info(
@@ -194,8 +193,7 @@ class SqlAlchemyBasedSqlClient:
         """
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
-                f"Bind parameters not yet supported in SqlAlchemy client. "
-                f"Params: {sql_bind_parameter_set.param_dict}"
+                f"Bind parameters not yet supported in SqlAlchemy client. Params: {sql_bind_parameter_set.param_dict}"
             )
 
         start = time.perf_counter()
@@ -259,11 +257,14 @@ class SqlAlchemyBasedSqlClient:
                         or "org.apache.spark.sql.AnalysisException" in plan_output
                     ):
                         raise RuntimeError(f"Databricks dry run failed: {plan_output}")
-
                 elif self.sql_engine_type is SqlEngine.VERTICA:
                     # Vertica: EXPLAIN does not support DDL, so validate the query part of CTAS statements
                     conn.execute(sa_text(f"EXPLAIN {VERTICA_CREATE_TABLE_AS_PREFIX.sub('', stmt, count=1)}"))
 
+                elif self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                    # ClickHouse can only EXPLAIN select statements.
+                    # EXPLAIN SYNTAX on the other hand can explain any statement.
+                    conn.execute(sa_text(f"EXPLAIN SYNTAX run_query_tree_passes = 1 {stmt}"))
                 else:
                     # Default: Use EXPLAIN for other engines
                     conn.execute(sa_text(f"EXPLAIN {stmt}"))
