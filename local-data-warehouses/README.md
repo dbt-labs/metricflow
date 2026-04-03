@@ -26,3 +26,32 @@ export MF_SQL_ENGINE_PASSWORD="metricflowing"
 
 poetry run pytest tests/
 ```
+
+## ClickHouse
+
+We assume that you have Docker installed in your environment.
+
+In a separate terminal window, run ClickHouse in the background. Note - you MUST have Docker running on localhost in order for the ClickHouse container to spin up.
+
+```sh
+make clickhouse
+```
+
+Then, when running `pytest`, ensure that `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` are setup
+to access the ClickHouse instance.
+
+```sh
+export MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
+export MF_SQL_ENGINE_PASSWORD="metricflowing"
+
+hatch run clickhouse-env:pytest tests/
+```
+
+The ClickHouse container exposes:
+- Port 8123: HTTP interface
+- Port 9000: Native protocol interface
+
+Default credentials:
+- Database: `metricflow`
+- User: `metricflow`
+- Password: `metricflowing`

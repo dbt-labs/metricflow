@@ -1,0 +1,16 @@
+test_name: test_min_max_only_time_quarter
+test_filename: test_query_rendering.py
+docstring:
+  Tests a min max only query with a time dimension and non-default granularity.
+sql_engine: ClickHouse
+---
+SELECT
+  MIN(booking__paid_at__quarter) AS booking__paid_at__quarter__min
+  , MAX(booking__paid_at__quarter) AS booking__paid_at__quarter__max
+FROM (
+  SELECT
+    toStartOfQuarter(paid_at) AS booking__paid_at__quarter
+  FROM ***************************.fct_bookings bookings_source_src_28000
+  GROUP BY
+    toStartOfQuarter(paid_at)
+) subq_6

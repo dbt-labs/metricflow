@@ -128,9 +128,23 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
     def create_schema(self, schema_name: str) -> None:
         """Create schema if it doesn't exist."""
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            self.execute(f"CREATE DATABASE IF NOT EXISTS {schema_name}")
+            return
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
         """Drop schema if it exists."""
         cascade_clause = " CASCADE" if cascade else ""
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            if cascade:
+                logger.warning(
+                    (
+                        "Cascading drop requested but not supported by "
+                        f"{self.sql_engine_type}; dropping without cascade."
+                    )
+                )
+
+            self.execute(f"DROP DATABASE IF EXISTS {schema_name}")
+            return
         self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")

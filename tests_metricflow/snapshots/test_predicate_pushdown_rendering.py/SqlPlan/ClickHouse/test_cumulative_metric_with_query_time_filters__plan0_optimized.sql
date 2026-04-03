@@ -1,0 +1,49 @@
+test_name: test_cumulative_metric_with_query_time_filters
+test_filename: test_predicate_pushdown_rendering.py
+docstring:
+  Tests pushdown optimizer behavior for a query against a cumulative metric.
+
+      TODO: support metric time filters
+sql_engine: ClickHouse
+---
+SELECT
+  metric_time__day
+  , listing__country_latest
+  , COUNT(DISTINCT __bookers) AS every_two_days_bookers
+FROM (
+  SELECT
+    metric_time__day
+    , listing__country_latest
+    , bookers AS __bookers
+  FROM (
+    SELECT
+      subq_19.metric_time__day AS metric_time__day
+      , subq_19.booking__is_instant AS booking__is_instant
+      , listings_latest_src_28000.country AS listing__country_latest
+      , subq_19.__bookers AS bookers
+    FROM (
+      SELECT
+        subq_18.ds AS metric_time__day
+        , bookings_source_src_28000.listing_id AS listing
+        , bookings_source_src_28000.is_instant AS booking__is_instant
+        , bookings_source_src_28000.guest_id AS __bookers
+      FROM ***************************.mf_time_spine subq_18
+      INNER JOIN
+        ***************************.fct_bookings bookings_source_src_28000
+      ON
+        (
+          toStartOfDay(bookings_source_src_28000.ds) <= subq_18.ds
+        ) AND (
+          toStartOfDay(bookings_source_src_28000.ds) > addDays(subq_18.ds, -2)
+        )
+    ) subq_19
+    LEFT OUTER JOIN
+      ***************************.dim_listings_latest listings_latest_src_28000
+    ON
+      subq_19.listing = listings_latest_src_28000.listing_id
+  ) subq_24
+  WHERE booking__is_instant
+) subq_26
+GROUP BY
+  metric_time__day
+  , listing__country_latest

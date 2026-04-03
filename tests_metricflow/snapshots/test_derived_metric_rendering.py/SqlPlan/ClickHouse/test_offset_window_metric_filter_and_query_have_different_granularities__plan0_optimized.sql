@@ -1,0 +1,72 @@
+test_name: test_offset_window_metric_filter_and_query_have_different_granularities
+test_filename: test_derived_metric_rendering.py
+docstring:
+  Test a query where an offset window metric is queried with one granularity and filtered by a different one.
+sql_engine: ClickHouse
+---
+WITH sma_28009_cte AS (
+  SELECT
+    toStartOfDay(ds) AS metric_time__day
+    , toStartOfMonth(ds) AS metric_time__month
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
+  FROM ***************************.fct_bookings bookings_source_src_28000
+)
+
+SELECT
+  metric_time__month AS metric_time__month
+  , booking_value * 0.05 / bookers AS booking_fees_last_week_per_booker_this_week
+FROM (
+  SELECT
+    COALESCE(subq_31.metric_time__month, subq_37.metric_time__month) AS metric_time__month
+    , MAX(subq_31.booking_value) AS booking_value
+    , MAX(subq_37.bookers) AS bookers
+  FROM (
+    SELECT
+      metric_time__month
+      , SUM(__booking_value) AS booking_value
+    FROM (
+      SELECT
+        metric_time__month
+        , booking_value AS __booking_value
+      FROM (
+        SELECT
+          time_spine_src_28006.ds AS metric_time__day
+          , toStartOfMonth(time_spine_src_28006.ds) AS metric_time__month
+          , sma_28009_cte.__booking_value AS booking_value
+        FROM ***************************.mf_time_spine time_spine_src_28006
+        INNER JOIN
+          sma_28009_cte
+        ON
+          addDays(time_spine_src_28006.ds, -7) = sma_28009_cte.metric_time__day
+      ) subq_27
+      WHERE metric_time__day = '2020-01-01'
+    ) subq_29
+    GROUP BY
+      metric_time__month
+  ) subq_31
+  FULL OUTER JOIN (
+    SELECT
+      metric_time__month
+      , COUNT(DISTINCT __bookers) AS bookers
+    FROM (
+      SELECT
+        metric_time__month
+        , bookers AS __bookers
+      FROM (
+        SELECT
+          metric_time__day
+          , metric_time__month
+          , __bookers AS bookers
+        FROM sma_28009_cte
+      ) subq_33
+      WHERE metric_time__day = '2020-01-01'
+    ) subq_35
+    GROUP BY
+      metric_time__month
+  ) subq_37
+  ON
+    subq_31.metric_time__month = subq_37.metric_time__month
+  GROUP BY
+    COALESCE(subq_31.metric_time__month, subq_37.metric_time__month)
+) subq_38
