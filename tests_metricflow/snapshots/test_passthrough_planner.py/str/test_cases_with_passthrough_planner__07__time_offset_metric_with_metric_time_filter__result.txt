@@ -124,8 +124,8 @@ Query for a time offset metric with a `metric_time` filter
       , 2 * bookings AS bookings_offset_once
     FROM (
       SELECT
-        subq_10.metric_time__day AS metric_time__day
-        , subq_5.__bookings AS bookings
+        subq_9.metric_time__day AS metric_time__day
+        , subq_4.__bookings AS bookings
       FROM (
         SELECT
           metric_time__day
@@ -133,23 +133,22 @@ Query for a time offset metric with a `metric_time` filter
           SELECT
             ds AS metric_time__day
           FROM ***************************.mf_time_spine time_spine_src_28006
-        ) subq_8
+        ) subq_7
         WHERE metric_time__day = '2020-01-01' 
-      ) subq_10
+      ) subq_9
       INNER JOIN (
         SELECT
           metric_time__day
-          , SUM(bookings) AS __bookings
+          , SUM(__bookings) AS __bookings
         FROM (
           SELECT
             DATE_TRUNC('day', ds) AS metric_time__day
-            , 1 AS bookings
+            , 1 AS __bookings
           FROM ***************************.fct_bookings bookings_source_src_28000
-        ) subq_2
-        WHERE metric_time__day = '2020-01-01' 
+        ) subq_3
         GROUP BY
           metric_time__day
-      ) subq_5
+      ) subq_4
       ON
-        subq_10.metric_time__day - INTERVAL 5 day = subq_5.metric_time__day
-    ) subq_12
+        subq_9.metric_time__day - INTERVAL 5 day = subq_4.metric_time__day
+    ) subq_11
