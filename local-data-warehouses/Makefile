@@ -16,4 +16,4 @@ vertica:
 
 .PHONY: clickhouse
 clickhouse:
-	docker-compose -f clickhouse/docker-compose.yaml up
+	docker-compose -f clickhouse/docker-compose.yaml up -d
