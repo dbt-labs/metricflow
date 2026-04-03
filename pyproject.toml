@@ -154,7 +154,7 @@ features = ["trino-env-requirements"]
 [tool.hatch.envs.clickhouse-env.env-vars]
 PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="clickhouse"
-MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
+MF_SQL_ENGINE_URL="clickhousedb://metricflow@localhost:8123/metricflow"
 MF_SQL_ENGINE_PASSWORD="metricflowing"
 
 [tool.hatch.envs.clickhouse-env]
