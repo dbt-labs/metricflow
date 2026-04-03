@@ -4,13 +4,6 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Sequence, Tuple, Union
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    DimensionCallParameterSet,
-    EntityCallParameterSet,
-    MetricCallParameterSet,
-    TimeDimensionCallParameterSet,
-)
-from dbt_semantic_interfaces.protocols import WhereFilterIntersection
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.path_prefixable import PathPrefixable
@@ -21,6 +14,14 @@ from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    DimensionCallParameterSet,
+    EntityCallParameterSet,
+    MetricCallParameterSet,
+    TimeDimensionCallParameterSet,
+)
+from metricflow_semantic_interfaces.protocols import WhereFilterIntersection
 
 logger = logging.getLogger(__name__)
 

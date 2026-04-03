@@ -4,11 +4,6 @@ from typing import List, Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.test_utils import as_datetime
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -55,6 +50,11 @@ from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
+from metricflow_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from metricflow_semantic_interfaces.references import EntityReference, TimeDimensionReference
+from metricflow_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal

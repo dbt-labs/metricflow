@@ -2,14 +2,6 @@ from __future__ import annotations
 
 from typing import Optional, Sequence
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    EntityCallParameterSet,
-)
-from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
-from dbt_semantic_interfaces.protocols.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums import TimeGranularity
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
@@ -20,6 +12,15 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    EntityCallParameterSet,
+)
+from metricflow_semantic_interfaces.protocols.protocol_hint import ProtocolHint
+from metricflow_semantic_interfaces.protocols.query_interface import QueryInterfaceEntity, QueryInterfaceEntityFactory
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 
 
 class WhereFilterEntity(ProtocolHint[QueryInterfaceEntity]):

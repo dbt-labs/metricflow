@@ -4,7 +4,6 @@ import logging
 from abc import ABC
 from functools import cached_property
 
-from dbt_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
@@ -36,6 +35,8 @@ from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraph
 from metricflow_semantics.toolkit.mf_graph.node_descriptor import MetricFlowGraphNodeDescriptor
 from metricflow_semantics.toolkit.singleton import Singleton
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
 
 logger = logging.getLogger(__name__)
 

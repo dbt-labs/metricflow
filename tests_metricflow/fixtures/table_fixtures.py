@@ -3,12 +3,12 @@ from __future__ import annotations
 import logging
 
 import pytest
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 from tests_metricflow.fixtures.source_table_snapshots import SOURCE_TABLE_SNAPSHOTS_DIRECTORY
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.source_schema_tools import create_tables_listed_in_table_snapshot_repository

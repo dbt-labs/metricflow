@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Mapping
 
 import pytest
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.instances import InstanceSet
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -11,6 +10,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.plan_conversion.instance_set_transforms.instance_converters import CreateValidityWindowJoinDescription
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 

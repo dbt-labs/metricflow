@@ -6,8 +6,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from dbt_semantic_interfaces.implementations.elements.dimension import PydanticDimension
-from dbt_semantic_interfaces.type_enums import DimensionType
 from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.format_option import PrettyFormatOption
@@ -19,6 +17,9 @@ from metricflow_semantics.toolkit.mf_logging.pretty_formatter import (
 from metricflow_semantics.toolkit.mf_logging.pretty_print import PrettyFormatDictOption, mf_pformat
 from metricflow_semantics.toolkit.string_helpers import mf_dedent, mf_indent
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.implementations.elements.dimension import PydanticDimension
+from metricflow_semantic_interfaces.type_enums import DimensionType
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,6 @@ import logging
 from collections.abc import Mapping
 from functools import cached_property
 
-from dbt_semantic_interfaces.type_enums import DatePart, TimeGranularity
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe_step import (
     AttributeRecipeStep,
@@ -27,6 +26,8 @@ from metricflow_semantics.semantic_graph.sg_interfaces import (
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.type_enums import DatePart, TimeGranularity
 
 logger = logging.getLogger(__name__)
 

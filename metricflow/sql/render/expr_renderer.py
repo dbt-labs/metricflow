@@ -8,8 +8,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Collection, List, Optional
 
 import jinja2
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
@@ -46,6 +44,8 @@ from typing_extensions import override
 
 from metricflow.sql.render.rendering_constants import SqlRenderingConstants
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 if TYPE_CHECKING:
     from metricflow.protocols.sql_client import SqlEngine

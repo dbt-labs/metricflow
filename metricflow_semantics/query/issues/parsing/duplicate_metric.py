@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
-from dbt_semantic_interfaces.references import MetricReference
 from metricflow_semantics.query.group_by_item.resolution_path import MetricFlowQueryResolutionPath
 from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryIssueType,
@@ -11,6 +10,8 @@ from metricflow_semantics.query.issues.issues_base import (
 )
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.references import MetricReference
 
 
 @dataclass(frozen=True)

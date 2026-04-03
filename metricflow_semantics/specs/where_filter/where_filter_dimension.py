@@ -3,17 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Optional, Sequence, Union
 
-from dbt_semantic_interfaces.call_parameter_sets import (
-    DimensionCallParameterSet,
-    TimeDimensionCallParameterSet,
-)
-from dbt_semantic_interfaces.protocols.protocol_hint import ProtocolHint
-from dbt_semantic_interfaces.protocols.query_interface import (
-    QueryInterfaceDimension,
-    QueryInterfaceDimensionFactory,
-)
-from dbt_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantics.errors.error_classes import InvalidQuerySyntax
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
@@ -24,6 +13,18 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.rendered_spec_tracker import RenderedSpecTracker
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.call_parameter_sets import (
+    DimensionCallParameterSet,
+    TimeDimensionCallParameterSet,
+)
+from metricflow_semantic_interfaces.protocols.protocol_hint import ProtocolHint
+from metricflow_semantic_interfaces.protocols.query_interface import (
+    QueryInterfaceDimension,
+    QueryInterfaceDimensionFactory,
+)
+from metricflow_semantic_interfaces.references import DimensionReference, EntityReference, TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 
 logger = logging.getLogger(__name__)
 

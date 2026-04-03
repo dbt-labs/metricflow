@@ -5,15 +5,6 @@ import logging
 from collections import OrderedDict, defaultdict
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
-from dbt_semantic_interfaces.references import (
-    MetricModelReference,
-    SemanticModelElementReference,
-    TimeDimensionReference,
-)
-from dbt_semantic_interfaces.type_enums import AggregationType, ConversionCalculationType, MetricType, PeriodAggregation
-from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
@@ -141,6 +132,20 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
+from metricflow_semantic_interfaces.references import (
+    MetricModelReference,
+    SemanticModelElementReference,
+    TimeDimensionReference,
+)
+from metricflow_semantic_interfaces.type_enums import (
+    AggregationType,
+    ConversionCalculationType,
+    MetricType,
+    PeriodAggregation,
+)
+from metricflow_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 logger = logging.getLogger(__name__)
 

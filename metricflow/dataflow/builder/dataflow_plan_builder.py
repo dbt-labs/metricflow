@@ -5,14 +5,6 @@ import logging
 import time
 from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple, Union
 
-from dbt_semantic_interfaces.protocols.metric import (
-    ConstantPropertyInput,
-    ConversionTypeParams,
-    MetricType,
-)
-from dbt_semantic_interfaces.references import MetricReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
@@ -140,6 +132,14 @@ from metricflow.plan_conversion.node_processor import (
     PreJoinNodeProcessor,
 )
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow_semantic_interfaces.protocols.metric import (
+    ConstantPropertyInput,
+    ConversionTypeParams,
+    MetricType,
+)
+from metricflow_semantic_interfaces.references import MetricReference, TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 
 logger = logging.getLogger(__name__)
 
@@ -264,11 +264,13 @@ class DataflowPlanBuilder:
             if DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in option_set.optimizations:
                 me_planner = PassThroughMetricEvaluationPlanner(
                     manifest_object_lookup=self._manifest_object_lookup,
+                    metric_lookup=self._metric_lookup,
                     column_association_resolver=self._column_association_resolver,
                 )
             else:
                 me_planner = DepthFirstSearchMetricEvaluationPlanner(
                     manifest_object_lookup=self._manifest_object_lookup,
+                    metric_lookup=self._metric_lookup,
                     column_association_resolver=self._column_association_resolver,
                 )
 

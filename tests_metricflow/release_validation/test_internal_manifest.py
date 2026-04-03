@@ -6,16 +6,16 @@ from pathlib import Path
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import (
-    PydanticWhereFilter,
-    PydanticWhereFilterIntersection,
-)
-from dbt_semantic_interfaces.implementations.saved_query import PydanticSavedQuery, PydanticSavedQueryQueryParams
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from varname import nameof
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
+    PydanticWhereFilterIntersection,
+)
+from metricflow_semantic_interfaces.implementations.saved_query import PydanticSavedQuery, PydanticSavedQueryQueryParams
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.release_validation.explain_results_snapshot import assert_explain_tester_results_equal
 from tests_metricflow.release_validation.explain_runner import ExplainQueryStatus

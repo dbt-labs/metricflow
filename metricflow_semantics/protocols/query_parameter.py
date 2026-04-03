@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Protocol, Union, runtime_checkable
 
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 
 if TYPE_CHECKING:
     from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup

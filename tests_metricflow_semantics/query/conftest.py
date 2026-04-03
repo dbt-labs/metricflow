@@ -5,10 +5,6 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
-from dbt_semantic_interfaces.parsing.objects import YamlConfigFile
-from dbt_semantic_interfaces.protocols import SemanticManifest
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -16,6 +12,10 @@ from metricflow_semantics.test_helpers.example_project_configuration import (
     EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
 )
 
+from metricflow_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
+from metricflow_semantic_interfaces.parsing.objects import YamlConfigFile
+from metricflow_semantic_interfaces.protocols import SemanticManifest
+from metricflow_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from tests_metricflow_semantics.query.parser_helpers import QueryParserTester
 
 BOOKINGS_YAML = textwrap.dedent(

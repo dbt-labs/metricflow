@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from dbt_semantic_interfaces.protocols import SemanticManifest
 from typing_extensions import override
 
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
+from metricflow_semantic_interfaces.protocols import SemanticManifest
 from tests_metricflow.release_validation.request_generation.request_generator import MetricFlowRequestGenerator
 
 

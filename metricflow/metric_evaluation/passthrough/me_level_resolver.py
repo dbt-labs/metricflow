@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import logging
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums import MetricType
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums import MetricType
 
 logger = logging.getLogger(__name__)
 

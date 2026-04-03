@@ -5,8 +5,6 @@ from collections.abc import Sequence
 from functools import cached_property
 from typing import Mapping, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 from metricflow_semantics.model.semantics.linkable_element_set_base import AnnotatedSpec, BaseGroupByItemSet
 from metricflow_semantics.semantic_graph.trie_resolver.dunder_name_trie import DunderNameTrie
@@ -17,6 +15,9 @@ from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.toolkit.syntactic_sugar import mf_flatten
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.references import SemanticModelReference
 
 logger = logging.getLogger(__name__)
 

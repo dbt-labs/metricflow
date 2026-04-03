@@ -7,10 +7,11 @@ from typing import Dict, List, Sequence, Tuple
 import pytest
 import tabulate
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.type_enums import TimeGranularity
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_str_snapshot_equal
 from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjuster
+
+from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

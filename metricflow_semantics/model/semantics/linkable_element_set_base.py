@@ -7,10 +7,6 @@ from abc import ABC, abstractmethod
 from functools import cached_property
 from typing import Iterable, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.dataclass_serialization import SerializableDataclass
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums import DatePart
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_model_derivation import SemanticModelDerivation
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -28,6 +24,11 @@ from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from typing_extensions import Self
+
+from metricflow_semantic_interfaces.dataclass_serialization import SerializableDataclass
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference
+from metricflow_semantic_interfaces.type_enums import DatePart
 
 if typing.TYPE_CHECKING:
     from metricflow_semantics.semantic_graph.attribute_resolution.attribute_recipe import IndexedDunderName

@@ -4,8 +4,9 @@ import html
 import logging
 from enum import Enum
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 
 logger = logging.getLogger(__name__)
 

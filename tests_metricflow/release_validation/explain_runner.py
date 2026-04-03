@@ -8,7 +8,6 @@ from functools import cached_property
 from pathlib import Path
 from typing import Iterator, Optional, TextIO
 
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.errors.error_classes import (
     UnsupportedEngineFeatureError,
 )
@@ -27,6 +26,7 @@ from metricflow_semantics.toolkit.time_helpers import PrettyDuration
 from typing_extensions import override
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
+from metricflow_semantic_interfaces.test_utils import as_datetime
 from tests_metricflow.fixtures.sql_client_fixtures import make_test_sql_client
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.release_validation.manifest_setup.manifest_setup import ManifestSetup

@@ -6,7 +6,6 @@ from typing import Optional
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.protocols import SemanticManifest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.test_helpers.snapshot_helpers import (
@@ -14,6 +13,8 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_object_snapshot_equal,
     assert_str_snapshot_equal,
 )
+
+from metricflow_semantic_interfaces.protocols import SemanticManifest
 
 logger = logging.getLogger(__name__)
 
