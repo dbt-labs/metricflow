@@ -41,7 +41,7 @@ Then, when running `pytest`, ensure that `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_
 to access the ClickHouse instance.
 
 ```sh
-export MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
+export MF_SQL_ENGINE_URL="clickhousedb://metricflow@localhost:8123/metricflow"
 export MF_SQL_ENGINE_PASSWORD="metricflowing"
 
 hatch run clickhouse-env:pytest tests/
