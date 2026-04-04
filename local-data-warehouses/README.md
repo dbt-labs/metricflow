@@ -41,17 +41,19 @@ Then, when running `pytest`, ensure that `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_
 to access the ClickHouse instance.
 
 ```sh
-export MF_SQL_ENGINE_URL="clickhousedb://metricflow@localhost:8123/metricflow"
+export MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
 export MF_SQL_ENGINE_PASSWORD="metricflowing"
 
 hatch run clickhouse-env:pytest tests/
 ```
 
 The ClickHouse container exposes:
+
 - Port 8123: HTTP interface
 - Port 9000: Native protocol interface
 
 Default credentials:
+
 - Database: `metricflow`
 - User: `metricflow`
 - Password: `metricflowing`

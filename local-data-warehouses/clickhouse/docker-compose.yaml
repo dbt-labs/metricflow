@@ -3,7 +3,7 @@ version: "3.7"
 services:
   clickhouse:
     container_name: clickhouse
-    image: clickhouse/clickhouse-server:24.3
+    image: clickhouse/clickhouse-server:26.3
     expose:
       - "8123"
       - "9000"
