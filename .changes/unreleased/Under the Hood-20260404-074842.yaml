@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Add a test case for time-offset metric with non-queried item in the filter
+time: 2026-04-04T07:48:42.469268-07:00
+custom:
+  Author: plypaul
+  Issue: "2009"
