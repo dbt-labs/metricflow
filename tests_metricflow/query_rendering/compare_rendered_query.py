@@ -27,6 +27,7 @@ def render_and_check(
     sql_client: SqlClient,
     query_spec: MetricFlowQuerySpec,
     expectation_description: Optional[str] = None,
+    snapshot_non_optimized_result: bool = False,
 ) -> None:
     """Renders an engine-specific query output from a given query, in both basic and optimized forms."""
     # Build and convert dataflow plan without optimizers
@@ -34,6 +35,9 @@ def render_and_check(
     # This wrapping behavior should be moved to the snapshot helpers in a separate PR as it will result in many
     # snapshot changes.
     expectation_description = mf_wrap(expectation_description) if expectation_description is not None else None
+
+    # Always generate the result even if `snapshot_non_optimized_result` is not set to keep sequentially-generated
+    # node IDs consistent.
     is_distinct_values_plan = not query_spec.metric_specs
     if is_distinct_values_plan:
         base_plan = dataflow_plan_builder.build_plan_for_distinct_values(query_spec=query_spec)
@@ -46,19 +50,21 @@ def render_and_check(
         sql_query_plan_id=DagId.from_str("plan0"),
     )
     sql_query_plan = conversion_result.sql_plan
-    display_graph_if_requested(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dag_graph=sql_query_plan,
-    )
 
-    assert_rendered_sql_from_plan_equal(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        sql_query_plan=sql_query_plan,
-        sql_client=sql_client,
-        expectation_description=expectation_description,
-    )
+    if snapshot_non_optimized_result:
+        display_graph_if_requested(
+            request=request,
+            mf_test_configuration=mf_test_configuration,
+            dag_graph=sql_query_plan,
+        )
+
+        assert_rendered_sql_from_plan_equal(
+            request=request,
+            mf_test_configuration=mf_test_configuration,
+            sql_query_plan=sql_query_plan,
+            sql_client=sql_client,
+            expectation_description=expectation_description,
+        )
 
     # Run dataflow -> sql conversion with all optimizers
     if is_distinct_values_plan:
