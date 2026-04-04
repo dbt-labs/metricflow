@@ -1619,7 +1619,9 @@ class DataflowPlanBuilder:
 
         for filter_spec in metric_where_filter_specs:
             included_agg_time_specs = agg_time_dimension_specs_for_metric.intersection(filter_spec.linkable_specs)
-            if len(included_agg_time_specs) == len(filter_spec.linkable_specs):
+            # The filter might contain no linkable specs, and we only want cases where it has only aggregation time
+            # dimension specs.
+            if filter_spec.linkable_specs and len(included_agg_time_specs) == len(filter_spec.linkable_specs):
                 agg_time_only_filters.append(filter_spec)
 
         # Filters that include group-by-items that are not aggregation time dimensions for the metric.
@@ -1628,7 +1630,7 @@ class DataflowPlanBuilder:
         non_agg_time_only_filters: List[WhereFilterSpec] = []
         for filter_spec in after_aggregation_where_filter_specs:
             included_agg_time_specs = agg_time_dimension_specs_for_metric.intersection(filter_spec.linkable_specs)
-            if len(included_agg_time_specs) == len(filter_spec.linkable_specs):
+            if filter_spec.linkable_specs and len(included_agg_time_specs) == len(filter_spec.linkable_specs):
                 agg_time_only_filters.append(filter_spec)
             else:
                 non_agg_time_only_filters.append(filter_spec)

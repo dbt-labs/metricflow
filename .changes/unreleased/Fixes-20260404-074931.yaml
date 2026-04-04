@@ -1,0 +1,6 @@
+kind: Fixes
+body: Fix check for aggregation time dimensions in filters
+time: 2026-04-04T07:49:31.096475-07:00
+custom:
+  Author: plypaul
+  Issue: "2012"
