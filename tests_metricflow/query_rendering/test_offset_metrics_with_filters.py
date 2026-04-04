@@ -128,6 +128,43 @@ def test_offset_metric_with_metric_time_and_dimension_filter(  # noqa: D103
 
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
+def test_offset_metric_with_separate_metric_time_and_dimension_filters(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Test querying a time-offset metric with separate filters that allow for different filter placement."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_once",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraint_strs=[
+            "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'",
+            "{{ Dimension('listing__country_latest') }} == 'us'",
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        expectation_description=(
+            "The metric_time portion of the filter (`{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'`) "
+            "should be applied on the time spine / output side of the offset join, ideally by pushing it to the "
+            "time spine before the join, while the dimension portion "
+            "(`{{ Dimension('listing__country_latest') }} == 'us'`) should stay on the pre-offset metric input."
+        ),
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_offset_cumulative_metric_with_metric_time_filter(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
