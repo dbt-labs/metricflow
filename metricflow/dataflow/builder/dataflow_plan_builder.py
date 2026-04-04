@@ -1980,10 +1980,10 @@ class DataflowPlanBuilder:
 
         # If a cumulative metric is queried with metric_time / agg_time_dimension, join over time range.
         # Otherwise, the simple-metric input will be aggregated over all time.
-        unaggregated_simple_metric_input_node: DataflowPlanNode = source_node_recipe.source_node
+        current_result_branch: DataflowPlanNode = source_node_recipe.source_node
         if cumulative and base_required_agg_time_dimension_specs:
-            unaggregated_simple_metric_input_node = JoinOverTimeRangeNode.create(
-                parent_node=unaggregated_simple_metric_input_node,
+            current_result_branch = JoinOverTimeRangeNode.create(
+                parent_node=current_result_branch,
                 queried_agg_time_dimension_specs=base_required_agg_time_dimension_specs,
                 window=cumulative_window,
                 grain_to_date=cumulative_grain_to_date,
@@ -2000,11 +2000,11 @@ class DataflowPlanBuilder:
             == {before_aggregation_time_spine_join_description.custom_offset_window.granularity}
         )
         if before_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
-            unaggregated_simple_metric_input_node = self._build_time_spine_join_node_for_before_aggregation(
+            current_result_branch = self._build_time_spine_join_node_for_before_aggregation(
                 join_description=before_aggregation_time_spine_join_description,
                 spec_properties=spec_properties,
                 queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-                metric_source_node=unaggregated_simple_metric_input_node,
+                metric_source_node=current_result_branch,
                 use_offset_custom_granularity_node=use_offset_custom_granularity_node,
             )
 
@@ -2024,8 +2024,8 @@ class DataflowPlanBuilder:
         specs_to_keep_for_aggregation = InstanceSpecSet(simple_metric_input_specs=(simple_metric_input_spec,)).merge(
             InstanceSpecSet.create_from_specs(queried_linkable_specs.as_tuple)
         )
-        unaggregated_simple_metric_input_node = self._build_pre_aggregation_plan(
-            source_node=unaggregated_simple_metric_input_node,
+        current_result_branch = self._build_pre_aggregation_plan(
+            source_node=current_result_branch,
             join_targets=source_node_recipe.join_targets,
             custom_granularity_specs=custom_granularity_specs_to_join,
             where_filter_specs=simple_metric_recipe.pre_aggregation_filter_specs,
@@ -2035,27 +2035,27 @@ class DataflowPlanBuilder:
             queried_linkable_specs_for_semi_additive_join=queried_linkable_specs,
         )
 
-        aggregate_node: DataflowPlanNode = AggregateSimpleMetricInputsNode.create(
-            parent_node=unaggregated_simple_metric_input_node,
+        current_result_branch = AggregateSimpleMetricInputsNode.create(
+            parent_node=current_result_branch,
             null_fill_value_mapping=NullFillValueMapping.create_from_simple_metric_recipe(simple_metric_recipe),
         )
 
         if after_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
-            aggregate_node = self._build_time_spine_join_node_for_after_aggregation(
+            current_result_branch = self._build_time_spine_join_node_for_after_aggregation(
                 join_description=after_aggregation_time_spine_join_description,
-                source_node=aggregate_node,
+                source_node=current_result_branch,
                 queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
             )
 
         if simple_metric_recipe.deferred_filter_specs:
-            aggregate_node = WhereFilterNode.create(
-                parent_node=aggregate_node,
+            current_result_branch = WhereFilterNode.create(
+                parent_node=current_result_branch,
                 filter_specs=simple_metric_recipe.deferred_filter_specs,
                 always_apply=True,
             )
 
-        return aggregate_node
+        return current_result_branch
 
     def _build_pre_aggregation_plan(
         self,
