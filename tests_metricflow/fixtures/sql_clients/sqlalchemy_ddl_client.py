@@ -139,10 +139,7 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
         if self.sql_engine_type is SqlEngine.CLICKHOUSE:
             if cascade:
                 logger.warning(
-                    (
-                        "Cascading drop requested but not supported by "
-                        f"{self.sql_engine_type}; dropping without cascade."
-                    )
+                    (f"Cascading drop requested but not supported by {self.sql_engine_type}; dropping without cascade.")
                 )
 
             self.execute(f"DROP DATABASE IF EXISTS {schema_name}")

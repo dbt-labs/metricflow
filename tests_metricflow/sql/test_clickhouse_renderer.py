@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import pytest
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlCastToTimestampExpression,
@@ -20,6 +18,8 @@ from metricflow_semantics.sql.sql_exprs import (
 )
 
 from metricflow.sql.render.clickhouse import ClickHouseSqlExpressionRenderer
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @pytest.fixture
