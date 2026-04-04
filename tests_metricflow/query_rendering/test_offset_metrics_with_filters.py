@@ -190,3 +190,37 @@ def test_offset_metric_with_string_filter(  # noqa: D103
             "branch. However, the appropriate behavior may be to not push at all."
         ),
     )
+
+
+@pytest.mark.duckdb_only
+@pytest.mark.sql_engine_snapshot
+def test_nested_offset_metric_with_non_queried_element_in_filter(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Tests that a non-queried filter element does not remain in the aggregation grain."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_twice",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraint_strs=["{{ Entity('listing') }} = '1'"],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        expectation_description=(
+            "The non-queried listing filter should be available for filtering the "
+            "nested offset metric, but it should not remain part of the aggregation "
+            "grain after filtering. The current snapshot does not reflect the "
+            "correct result."
+        ),
+    )

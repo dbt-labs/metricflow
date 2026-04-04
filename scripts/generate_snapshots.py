@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 
 
 MF_TEST_DIRECTORY = "tests_metricflow"
-MF_SEMANTICS_TEST_DIRECTORY = "metricflow-semantics/tests_metricflow_semantics"
+MF_SEMANTICS_TEST_DIRECTORY = "tests_metricflow_semantics"
 
 # Tests that generate SQL engine snapshots have this `pytest` marker set.
 SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
