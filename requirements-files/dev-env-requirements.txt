@@ -6,6 +6,7 @@ duckdb-engine>=0.13.0, <0.14.0
 # https://github.com/duckdb/duckdb/issues/16617
 # Version 1.4.0 seems to have issues as well, so pinning to <1.4.0 until those are resolved.
 duckdb !=1.2.1, <1.4.0
+graphviz>=0.18.2, <0.21
 tomli >=2.3.0, <3
 varname >=0.15.1, < 1
 # Developer tools
