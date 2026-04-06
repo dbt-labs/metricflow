@@ -306,7 +306,7 @@ class MSIToOSIConverter:
             resolved = self._resolve_metric_expression(dep_metric, metric_index, measure_index, cache, input_filter)
             if dep_metric.type in (MetricType.DERIVED, MetricType.RATIO):
                 resolved = f"({resolved})"
-            expr = expr.replace(ref, resolved)
+            expr = re.sub(rf"\b{re.escape(ref)}\b", resolved, expr)
         return expr
 
     @staticmethod

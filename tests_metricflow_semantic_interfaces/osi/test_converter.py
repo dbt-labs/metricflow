@@ -798,6 +798,41 @@ class TestMetricConversion:  # noqa: D101
         net_osi = next(m for m in metrics if m.name == "net_profit")
         assert net_osi.expression.dialects[0].expression == "(SUM(amount) - SUM(cost_amount)) - SUM(expense_amount)"
 
+    def test_derived_metric_ref_not_corrupted_by_prefix_match(self) -> None:  # noqa: D102
+        """Substituting 'revenue' must not corrupt 'revenue_adjusted' when it appears in the same expr."""
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("revenue", agg=AggregationType.SUM, expr="amount"),
+                _measure("revenue_adjusted", agg=AggregationType.SUM, expr="adjusted_amount"),
+            ],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        revenue_adjusted_m = _simple_metric("revenue_adjusted", "revenue_adjusted")
+        derived = PydanticMetric(
+            name="revenue_delta",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue - revenue_adjusted",
+                metrics=[
+                    PydanticMetricInput(name="revenue"),
+                    PydanticMetricInput(name="revenue_adjusted"),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(
+            _manifest(semantic_models=[sm], metrics=[revenue_m, revenue_adjusted_m, derived])
+        )
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        derived_osi = next(m for m in metrics if m.name == "revenue_delta")
+        assert derived_osi.expression.dialects[0].expression == "SUM(amount) - SUM(adjusted_amount)"
+
     # --- CUMULATIVE ---
 
     def test_cumulative_metric_uses_base_aggregation(self) -> None:  # noqa: D102
