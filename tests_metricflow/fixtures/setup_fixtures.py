@@ -26,8 +26,22 @@ from tests_metricflow_semantics.fixtures.setup_fixtures import mf_add_slow_marke
 logger = logging.getLogger(__name__)
 
 
+# `pytest` CLI options
 DISPLAY_GRAPHS_CLI_FLAG = "--display-graphs"
 USE_PERSISTENT_SOURCE_SCHEMA_CLI_FLAG = "--use-persistent-source-schema"
+
+# Name of the pytest marker for tests that generate SQL-engine specific snapshots.
+SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
+# Name of the pytest marker to indicate that the test should only be run when the test session is configured to use
+# DuckDB as the SQL engine.
+DUCKDB_ONLY_MARKER_NAME = "duckdb_only"
+
+# Environment variables to configure the SQL engine used for tests.
+SQL_ENGINE_URL_ENVIRONMENT_VARIABLE_NAME = "MF_SQL_ENGINE_URL"
+SQL_ENGINE_PASSWORD_ENVIRONMENT_VARIABLE_NAME = "MF_SQL_ENGINE_PASSWORD"
+
+# Default URL to use DuckDB.
+SQL_ENGINE_DEFAULT_URL = "duckdb://"
 
 
 def add_display_graphs_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
@@ -53,13 +67,6 @@ def pytest_addoption(parser: _pytest.config.argparsing.Parser) -> None:
     add_display_snapshots_cli_flag(parser)
     add_display_graphs_cli_flag(parser)
     add_use_persistent_source_schema_cli_flag(parser)
-
-
-# Name of the pytest marker for tests that generate SQL-engine specific snapshots.
-SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
-# Name of the pytest marker to indicate that the test should only be run when the test session is configured to use
-# DuckDB as the SQL engine.
-DUCKDB_ONLY_MARKER_NAME = "duckdb_only"
 
 
 def pytest_configure(config: _pytest.config.Config) -> None:
@@ -101,11 +108,18 @@ def mf_test_configuration(  # noqa: D103
     request: FixtureRequest,
     source_table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> MetricFlowTestConfiguration:
-    engine_url = os.environ.get("MF_SQL_ENGINE_URL")
-    assert engine_url is not None, (
-        "MF_SQL_ENGINE_URL environment variable has not been set! Are you running in a properly configured "
-        "environment? Check out our CONTRIBUTING.md for pointers to our environment configurations."
-    )
+    engine_url = os.environ.get(SQL_ENGINE_URL_ENVIRONMENT_VARIABLE_NAME)
+
+    if engine_url is None:
+        logger.info(
+            LazyFormat(
+                "The SQL engine URL environment variable is not set, so using the default.",
+                SQL_ENGINE_URL_ENVIRONMENT_VARIABLE_NAME=SQL_ENGINE_URL_ENVIRONMENT_VARIABLE_NAME,
+                SQL_ENGINE_DEFAULT_URL=SQL_ENGINE_DEFAULT_URL,
+            )
+        )
+        engine_url = SQL_ENGINE_DEFAULT_URL
+
     engine_password = os.environ.get("MF_SQL_ENGINE_PASSWORD", "")
 
     current_time = datetime.datetime.now().strftime("%Y_%m_%d")
