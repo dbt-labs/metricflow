@@ -204,7 +204,7 @@ class MSIToOSIConverter:
         if metric.type is MetricType.SIMPLE:
             expr = self._resolve_simple(metric, measure_index, combined_filter)
         elif metric.type is MetricType.CUMULATIVE:
-            expr = self._resolve_cumulative(metric, measure_index, combined_filter)
+            expr = self._resolve_cumulative(metric, metric_index, measure_index, cache, combined_filter)
         elif metric.type is MetricType.RATIO:
             expr = self._resolve_ratio(metric, metric_index, measure_index, cache, combined_filter)
         elif metric.type is MetricType.DERIVED:
@@ -239,7 +239,9 @@ class MSIToOSIConverter:
     def _resolve_cumulative(
         self,
         metric: Metric,
+        metric_index: Dict[str, Metric],
         measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
+        cache: Dict[Tuple[str, Optional[str]], str],
         filter_sql: Optional[str] = None,
     ) -> str:
         """Resolve a CUMULATIVE metric to its base aggregation expression.
@@ -252,12 +254,16 @@ class MSIToOSIConverter:
             measure_filter = _collect_filter_sql(metric.type_params.measure.filter)
             return self._build_agg_expression(agg, col, agg_params, _merge_filter_sqls(filter_sql, measure_filter))
 
-        # cumulative_type_params.metric path: resolve through a referenced metric
+        # cumulative_type_params.metric path: recurse into the referenced metric
         cumulative_params = metric.type_params.cumulative_type_params
         assert (
             cumulative_params is not None and cumulative_params.metric is not None
         ), f"CUMULATIVE metric '{metric.name}' has no resolvable measure or sub-metric"
-        return metric.name  # cannot inline without recursing into metric_index; leave as name
+        sub_input = cumulative_params.metric
+        sub_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(sub_input.filter))
+        return self._resolve_metric_expression(
+            metric_index[sub_input.name], metric_index, measure_index, cache, sub_filter
+        )
 
     def _resolve_ratio(
         self,

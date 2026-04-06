@@ -827,6 +827,40 @@ class TestMetricConversion:  # noqa: D101
         assert metrics[0].name == "cumulative_revenue"
         assert metrics[0].expression.dialects[0].expression == "SUM(amount)"
 
+    def test_cumulative_metric_via_sub_metric_reference(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        base = PydanticMetric(
+            name="total_revenue",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(measure=PydanticMetricInputMeasure(name="revenue")),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        cumulative = PydanticMetric(
+            name="cumulative_revenue",
+            description=None,
+            type=MetricType.CUMULATIVE,
+            type_params=PydanticMetricTypeParams(
+                cumulative_type_params=PydanticCumulativeTypeParams(
+                    metric=PydanticMetricInput(name="total_revenue"),
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[base, cumulative]))
+
+        metrics = result.semantic_model[0].metrics
+        assert metrics is not None
+        cumulative_osi = next(m for m in metrics if m.name == "cumulative_revenue")
+        assert cumulative_osi.expression.dialects[0].expression == "SUM(amount)"
+
     # --- Edge cases ---
 
     def test_no_metrics_produces_no_osi_metrics(self) -> None:  # noqa: D102
