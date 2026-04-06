@@ -523,7 +523,16 @@ def _render_filter_template(template: str) -> str:
 
 
 def _collect_filter_sql(*filters: Optional[WhereFilterIntersection]) -> Optional[str]:
-    """Render and merge MSI WhereFilterIntersection objects into a single SQL fragment."""
+    """Render and merge MSI WhereFilterIntersection objects into a single SQL fragment.
+
+    Jinja references (e.g. ``{{ Dimension('order__status') }}``) are resolved
+    using lightweight stubs that produce MetricFlow-qualified column names such
+    as ``order__status``.  These are *not* fully resolved SQL column aliases —
+    resolving to actual table column names would require ``WhereFilterSpecFactory``
+    and ``ColumnAssociationResolver`` from ``metricflow_semantics``, which is out
+    of scope here.  OSI consumers are expected to perform their own column
+    resolution against the source data.
+    """
     parts: List[str] = []
     for f in filters:
         if f is None:
