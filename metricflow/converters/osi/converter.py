@@ -230,9 +230,8 @@ class MSIToOSIConverter:
 
         # metric_aggregation_params path: aggregation info lives on the metric itself
         agg_params_obj = metric.type_params.metric_aggregation_params
-        assert (
-            agg_params_obj is not None
-        ), f"SIMPLE metric '{metric.name}' has neither measure nor metric_aggregation_params"
+        if agg_params_obj is None:
+            raise ValueError(f"SIMPLE metric '{metric.name}' has neither measure nor metric_aggregation_params")
         col = metric.type_params.expr if metric.type_params.expr is not None else metric.name
         return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params, filter_sql)
 
@@ -256,9 +255,8 @@ class MSIToOSIConverter:
 
         # cumulative_type_params.metric path: recurse into the referenced metric
         cumulative_params = metric.type_params.cumulative_type_params
-        assert (
-            cumulative_params is not None and cumulative_params.metric is not None
-        ), f"CUMULATIVE metric '{metric.name}' has no resolvable measure or sub-metric"
+        if cumulative_params is None or cumulative_params.metric is None:
+            raise ValueError(f"CUMULATIVE metric '{metric.name}' has no resolvable measure or sub-metric")
         sub_input = cumulative_params.metric
         sub_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(sub_input.filter))
         return self._resolve_metric_expression(
@@ -274,7 +272,8 @@ class MSIToOSIConverter:
         filter_sql: Optional[str] = None,
     ) -> str:
         """Resolve a RATIO metric as (numerator) / (denominator), both fully inlined."""
-        assert metric.type_params.numerator is not None and metric.type_params.denominator is not None
+        if metric.type_params.numerator is None or metric.type_params.denominator is None:
+            raise ValueError(f"RATIO metric '{metric.name}' is missing numerator or denominator")
         num_input = metric.type_params.numerator
         den_input = metric.type_params.denominator
         num_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(num_input.filter))
