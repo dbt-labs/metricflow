@@ -185,6 +185,14 @@ class MSIToOSIConverter:
         """Map metric name to Metric for recursive resolution."""
         return {metric.name: metric for metric in metrics}
 
+    @staticmethod
+    def _lookup_metric(metric_index: Dict[str, Metric], name: str, context: str) -> Metric:
+        """Look up a metric by name, raising a clear ValueError if not found."""
+        try:
+            return metric_index[name]
+        except KeyError:
+            raise ValueError(f"{context}: references unknown metric '{name}'")
+
     def _resolve_metric_expression(
         self,
         metric: Metric,
@@ -260,7 +268,11 @@ class MSIToOSIConverter:
         sub_input = cumulative_params.metric
         sub_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(sub_input.filter))
         return self._resolve_metric_expression(
-            metric_index[sub_input.name], metric_index, measure_index, cache, sub_filter
+            self._lookup_metric(metric_index, sub_input.name, f"CUMULATIVE metric '{metric.name}'"),
+            metric_index,
+            measure_index,
+            cache,
+            sub_filter,
         )
 
     def _resolve_ratio(
@@ -279,10 +291,18 @@ class MSIToOSIConverter:
         num_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(num_input.filter))
         den_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(den_input.filter))
         num_expr = self._resolve_metric_expression(
-            metric_index[num_input.name], metric_index, measure_index, cache, num_filter
+            self._lookup_metric(metric_index, num_input.name, f"RATIO metric '{metric.name}' numerator"),
+            metric_index,
+            measure_index,
+            cache,
+            num_filter,
         )
         den_expr = self._resolve_metric_expression(
-            metric_index[den_input.name], metric_index, measure_index, cache, den_filter
+            self._lookup_metric(metric_index, den_input.name, f"RATIO metric '{metric.name}' denominator"),
+            metric_index,
+            measure_index,
+            cache,
+            den_filter,
         )
         return f"({num_expr}) / ({den_expr})"
 
@@ -301,7 +321,7 @@ class MSIToOSIConverter:
         expr = metric.type_params.expr or ""
         for input_metric in metric.type_params.metrics or []:
             ref = input_metric.alias if input_metric.alias else input_metric.name
-            dep_metric = metric_index[input_metric.name]
+            dep_metric = self._lookup_metric(metric_index, input_metric.name, f"DERIVED metric '{metric.name}'")
             input_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(input_metric.filter))
             resolved = self._resolve_metric_expression(dep_metric, metric_index, measure_index, cache, input_filter)
             if dep_metric.type in (MetricType.DERIVED, MetricType.RATIO):
