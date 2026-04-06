@@ -2,29 +2,9 @@ from __future__ import annotations
 
 import json
 
-from metricflow.converters.osi.converter import MSIToOSIConverter, OSIToMSIConverter, _render_filter_template
-from metricflow.converters.osi.models import (
-    OSIDataset,
-    OSIDialect,
-    OSIDialectExpression,
-    OSIDimension,
-    OSIDocument,
-    OSIExpression,
-    OSIField,
-    OSIMetric,
-    OSIRelationship,
-    OSISemanticModel,
-)
-from metricflow_semantic_interfaces.implementations.elements.dimension import (
-    PydanticDimension,
-    PydanticDimensionTypeParams,
-)
-from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
-from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasure
-from metricflow_semantic_interfaces.implementations.filters.where_filter import (
-    PydanticWhereFilter,
-    PydanticWhereFilterIntersection,
-)
+from metricflow.converters.osi.filter_utils import _render_filter_template
+from metricflow.converters.osi.models import OSIDialect
+from metricflow.converters.osi.msi_to_osi import MSIToOSIConverter
 from metricflow_semantic_interfaces.implementations.metric import (
     PydanticConversionTypeParams,
     PydanticCumulativeTypeParams,
@@ -35,20 +15,11 @@ from metricflow_semantic_interfaces.implementations.metric import (
     PydanticMetricTimeWindow,
     PydanticMetricTypeParams,
 )
-from metricflow_semantic_interfaces.implementations.project_configuration import (
-    PydanticProjectConfiguration,
-)
-from metricflow_semantic_interfaces.implementations.semantic_manifest import (
-    PydanticSemanticManifest,
-)
 from metricflow_semantic_interfaces.implementations.semantic_model import (
     PydanticNodeRelation,
     PydanticSemanticModel,
 )
-from metricflow_semantic_interfaces.test_utils import (
-    default_meta,
-    semantic_model_with_guaranteed_meta,
-)
+from metricflow_semantic_interfaces.test_utils import default_meta, semantic_model_with_guaranteed_meta
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
     DimensionType,
@@ -56,90 +27,14 @@ from metricflow_semantic_interfaces.type_enums import (
     MetricType,
     TimeGranularity,
 )
-
-
-def _manifest(
-    semantic_models: list | None = None,
-    metrics: list[PydanticMetric] | None = None,
-) -> PydanticSemanticManifest:
-    return PydanticSemanticManifest(
-        semantic_models=semantic_models or [],
-        metrics=metrics or [],
-        project_configuration=PydanticProjectConfiguration(),
-    )
-
-
-def _simple_metric(
-    name: str,
-    measure_name: str,
-    description: str | None = None,
-) -> PydanticMetric:
-    return PydanticMetric(
-        name=name,
-        description=description,
-        type=MetricType.SIMPLE,
-        type_params=PydanticMetricTypeParams(
-            measure=PydanticMetricInputMeasure(name=measure_name),
-        ),
-        filter=None,
-        metadata=default_meta(),
-        config=None,
-    )
-
-
-def _dimension(
-    name: str,
-    dim_type: DimensionType = DimensionType.CATEGORICAL,
-    expr: str | None = None,
-    description: str | None = None,
-    label: str | None = None,
-    granularity: TimeGranularity | None = None,
-) -> PydanticDimension:
-    type_params = PydanticDimensionTypeParams(time_granularity=granularity) if granularity else None
-    return PydanticDimension(
-        name=name,
-        type=dim_type,
-        expr=expr,
-        description=description,
-        label=label,
-        type_params=type_params,
-        metadata=default_meta(),
-        config=None,
-    )
-
-
-def _measure(
-    name: str,
-    agg: AggregationType = AggregationType.SUM,
-    expr: str | None = None,
-    description: str | None = None,
-    label: str | None = None,
-) -> PydanticMeasure:
-    return PydanticMeasure(
-        name=name,
-        agg=agg,
-        expr=expr,
-        description=description,
-        label=label,
-        create_metric=None,
-        agg_params=None,
-        metadata=default_meta(),
-    )
-
-
-def _entity(
-    name: str,
-    entity_type: EntityType = EntityType.PRIMARY,
-    expr: str | None = None,
-) -> PydanticEntity:
-    return PydanticEntity(
-        name=name,
-        type=entity_type,
-        expr=expr,
-        description=None,
-        role=None,
-        config=None,
-    )
+from tests_metricflow_semantic_interfaces.osi.helpers import (
+    _dimension,
+    _entity,
+    _filter,
+    _manifest,
+    _measure,
+    _simple_metric,
+)
 
 
 class TestBasicConversion:  # noqa: D101
@@ -425,7 +320,6 @@ class TestRelationshipConversion:  # noqa: D101
         assert rels is not None
         assert len(rels) == 1
         rel = rels[0]
-        # bookings holds the FK (FOREIGN) → from; listings holds the PK (PRIMARY) → to
         assert rel.from_dataset == "bookings"
         assert rel.to == "listings"
         assert rel.from_columns == ["listing_id"]
@@ -488,8 +382,6 @@ class TestRelationshipConversion:  # noqa: D101
         assert rels is not None
         assert len(rels) == 3
         pairs = {(r.from_dataset, r.to) for r in rels}
-        # orders (FOREIGN) is always the from-side; users_a/users_b (PRIMARY/UNIQUE) are to-side.
-        # users_a vs users_b are both one-side, so alphabetical tiebreaker applies.
         assert pairs == {("users_a", "users_b"), ("orders", "users_a"), ("orders", "users_b")}
 
     def test_columns_use_expr_when_present(self) -> None:  # noqa: D102
@@ -506,7 +398,6 @@ class TestRelationshipConversion:  # noqa: D101
         rels = result.semantic_model[0].relationships
         assert rels is not None
         rel = rels[0]
-        # bookings (FOREIGN) → from side; listings (PRIMARY) → to side
         assert rel.from_columns == ["fk_lid"]
         assert rel.to_columns == ["lid"]
 
@@ -556,7 +447,6 @@ class TestRelationshipConversion:  # noqa: D101
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
-        # Name is {from_ds}__{to_ds}__{entity}: bookings (FOREIGN) is from, listings (PRIMARY) is to
         assert rels[0].name == "bookings__listings__listing"
 
     def test_natural_entity_excluded(self) -> None:  # noqa: D102
@@ -573,9 +463,6 @@ class TestRelationshipConversion:  # noqa: D101
         assert result.semantic_model[0].relationships is None
 
     def test_direction_based_on_entity_type_not_manifest_order(self) -> None:  # noqa: D102
-        # beta (PRIMARY) appears first in the manifest, alpha (FOREIGN) appears second.
-        # The converter must assign from=alpha (FK/many-side) and to=beta (PK/one-side),
-        # ignoring manifest order.
         beta = semantic_model_with_guaranteed_meta(
             name="beta",
             entities=[_entity("shared", entity_type=EntityType.PRIMARY, expr="col_b")],
@@ -956,15 +843,6 @@ class TestMetricConversion:  # noqa: D101
         assert result.semantic_model[0].metrics is None
 
 
-# ---------------------------------------------------------------------------
-# Filter flattening helpers
-# ---------------------------------------------------------------------------
-
-
-def _filter(sql: str) -> PydanticWhereFilterIntersection:
-    return PydanticWhereFilterIntersection(where_filters=[PydanticWhereFilter(where_sql_template=sql)])
-
-
 class TestFilterRendering:  # noqa: D101
     """Unit tests for the Jinja → SQL rendering of where-filter templates."""
 
@@ -1184,416 +1062,3 @@ class TestOSIJsonSerialization:  # noqa: D101
         assert "unique_keys" not in dataset
         assert "fields" not in dataset
         assert "description" not in dataset
-
-
-# ---------------------------------------------------------------------------
-# OSIToMSIConverter tests
-# ---------------------------------------------------------------------------
-
-
-def _osi_expr(expression: str, dialect: OSIDialect = OSIDialect.ANSI_SQL) -> OSIExpression:
-    return OSIExpression(dialects=[OSIDialectExpression(dialect=dialect, expression=expression)])
-
-
-def _osi_field(
-    name: str,
-    expression: str | None = None,
-    is_time: bool | None = None,
-    description: str | None = None,
-    label: str | None = None,
-) -> OSIField:
-    return OSIField(
-        name=name,
-        expression=_osi_expr(expression if expression is not None else name),
-        dimension=OSIDimension(is_time=is_time) if is_time is not None else None,
-        description=description,
-        label=label,
-    )
-
-
-def _osi_dataset(
-    name: str,
-    source: str = "schema.table",
-    fields: list[OSIField] | None = None,
-    primary_key: list[str] | None = None,
-    unique_keys: list[list[str]] | None = None,
-    description: str | None = None,
-) -> OSIDataset:
-    return OSIDataset(
-        name=name,
-        source=source,
-        fields=fields,
-        primary_key=primary_key,
-        unique_keys=unique_keys,
-        description=description,
-    )
-
-
-def _osi_metric(name: str, expression: str, description: str | None = None) -> OSIMetric:
-    return OSIMetric(name=name, expression=_osi_expr(expression), description=description)
-
-
-def _osi_relationship(
-    name: str, from_dataset: str, to_dataset: str, from_columns: list[str], to_columns: list[str]
-) -> OSIRelationship:
-    return OSIRelationship(
-        name=name,
-        from_dataset=from_dataset,
-        to=to_dataset,
-        from_columns=from_columns,
-        to_columns=to_columns,
-    )
-
-
-def _osi_doc(
-    datasets: list[OSIDataset] | None = None,
-    metrics: list[OSIMetric] | None = None,
-    relationships: list[OSIRelationship] | None = None,
-    model_name: str = "test",
-) -> OSIDocument:
-    return OSIDocument(
-        semantic_model=[
-            OSISemanticModel(
-                name=model_name,
-                datasets=datasets or [],
-                metrics=metrics if metrics else None,
-                relationships=relationships if relationships else None,
-            )
-        ]
-    )
-
-
-class TestOSIToMSIBasicConversion:  # noqa: D101
-    def test_empty_document_produces_empty_manifest(self) -> None:  # noqa: D102
-        result = OSIToMSIConverter().convert(_osi_doc())
-
-        assert result.semantic_models == []
-        assert result.metrics == []
-
-    def test_single_dataset_becomes_semantic_model(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", source="analytics.orders_table")])
-        result = OSIToMSIConverter().convert(doc)
-
-        assert len(result.semantic_models) == 1
-        sm = result.semantic_models[0]
-        assert sm.name == "orders"
-        assert sm.node_relation.schema_name == "analytics"
-        assert sm.node_relation.alias == "orders_table"
-        assert sm.node_relation.database is None
-
-    def test_description_carried_over(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", description="Order data")])
-        result = OSIToMSIConverter().convert(doc)
-
-        assert result.semantic_models[0].description == "Order data"
-
-    def test_source_two_parts(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("t", source="myschema.mytable")])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert sm.node_relation.schema_name == "myschema"
-        assert sm.node_relation.alias == "mytable"
-        assert sm.node_relation.database is None
-
-    def test_source_three_parts(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("t", source="mydb.myschema.mytable")])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert sm.node_relation.database == "mydb"
-        assert sm.node_relation.schema_name == "myschema"
-        assert sm.node_relation.alias == "mytable"
-
-    def test_source_bare_name(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("t", source="mytable")])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert sm.node_relation.alias == "mytable"
-        assert sm.node_relation.schema_name == ""
-
-    def test_multiple_datasets_become_multiple_models(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders"), _osi_dataset("users")])
-        result = OSIToMSIConverter().convert(doc)
-
-        names = [sm.name for sm in result.semantic_models]
-        assert names == ["orders", "users"]
-
-
-class TestOSIToMSIFieldClassification:  # noqa: D101
-    def test_primary_key_field_becomes_primary_entity(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[
-                _osi_dataset(
-                    "orders",
-                    fields=[_osi_field("order_id")],
-                    primary_key=["order_id"],
-                )
-            ]
-        )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.entities) == 1
-        assert sm.entities[0].name == "order_id"
-        assert sm.entities[0].type.value == "primary"
-
-    def test_unique_key_field_becomes_unique_entity(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[
-                _osi_dataset(
-                    "users",
-                    fields=[_osi_field("email")],
-                    unique_keys=[["email"]],
-                )
-            ]
-        )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.entities) == 1
-        assert sm.entities[0].name == "email"
-        assert sm.entities[0].type.value == "unique"
-
-    def test_relationship_from_column_becomes_foreign_entity(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[
-                _osi_dataset("orders", fields=[_osi_field("user_id")]),
-                _osi_dataset("users", primary_key=["user_id"]),
-            ],
-            relationships=[_osi_relationship("r", "orders", "users", ["user_id"], ["user_id"])],
-        )
-        orders_sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(orders_sm.entities) == 1
-        assert orders_sm.entities[0].name == "user_id"
-        assert orders_sm.entities[0].type.value == "foreign"
-
-    def test_is_time_true_becomes_time_dimension(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("created_at", is_time=True)])])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.dimensions) == 1
-        dim = sm.dimensions[0]
-        assert dim.name == "created_at"
-        from metricflow_semantic_interfaces.type_enums import DimensionType
-
-        assert dim.type == DimensionType.TIME
-        assert dim.type_params is not None
-
-    def test_is_time_false_becomes_categorical_dimension(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("status", is_time=False)])])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.dimensions) == 1
-        assert sm.dimensions[0].name == "status"
-        from metricflow_semantic_interfaces.type_enums import DimensionType
-
-        assert sm.dimensions[0].type == DimensionType.CATEGORICAL
-
-    def test_unmarked_field_becomes_categorical_dimension(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("region")])])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.dimensions) == 1
-        assert sm.dimensions[0].name == "region"
-
-    def test_field_referenced_in_metric_becomes_measure(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
-            metrics=[_osi_metric("revenue", "SUM(amount)")],
-        )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.measures) == 1
-        assert sm.measures[0].name == "amount"
-        from metricflow_semantic_interfaces.type_enums import AggregationType
-
-        assert sm.measures[0].agg == AggregationType.SUM
-
-    def test_expr_different_from_name_is_preserved(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[
-                _osi_dataset(
-                    "orders",
-                    fields=[_osi_field("order_id", expression="id")],
-                    primary_key=["order_id"],
-                )
-            ]
-        )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert sm.entities[0].expr == "id"
-
-    def test_expr_same_as_name_is_stored_as_none(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[
-                _osi_dataset(
-                    "orders",
-                    fields=[_osi_field("order_id")],
-                    primary_key=["order_id"],
-                )
-            ]
-        )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert sm.entities[0].expr is None
-
-    def test_description_and_label_carried_over_to_dimension(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[
-                _osi_dataset(
-                    "orders",
-                    fields=[_osi_field("status", description="Order status", label="Status")],
-                )
-            ]
-        )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        dim = sm.dimensions[0]
-        assert dim.description == "Order status"
-        assert dim.label == "Status"
-
-
-class TestOSIToMSIMetricConversion:  # noqa: D101
-    def test_sum_expression_produces_simple_metric(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
-            metrics=[_osi_metric("revenue", "SUM(amount)")],
-        )
-        result = OSIToMSIConverter().convert(doc)
-
-        assert len(result.metrics) == 1
-        m = result.metrics[0]
-        assert m.name == "revenue"
-        from metricflow_semantic_interfaces.type_enums import MetricType
-
-        assert m.type == MetricType.SIMPLE
-        assert m.type_params.measure is not None
-        assert m.type_params.measure.name == "amount"
-
-    def test_count_distinct_expression(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[_osi_dataset("orders", fields=[_osi_field("user_id")])],
-            metrics=[_osi_metric("unique_users", "COUNT(DISTINCT user_id)")],
-        )
-        result = OSIToMSIConverter().convert(doc)
-
-        m = result.metrics[0]
-        assert m.type_params.measure is not None
-        assert m.type_params.measure.name == "user_id"
-        # The measure should have COUNT_DISTINCT aggregation
-        sm = result.semantic_models[0]
-        assert sm.measures[0].agg.value == "count_distinct"
-
-    def test_ratio_expression_produces_ratio_metric(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[
-                _osi_dataset(
-                    "orders",
-                    fields=[_osi_field("amount"), _osi_field("order_id")],
-                )
-            ],
-            metrics=[_osi_metric("arpu", "(SUM(amount)) / (COUNT(order_id))")],
-        )
-        result = OSIToMSIConverter().convert(doc)
-
-        from metricflow_semantic_interfaces.type_enums import MetricType
-
-        ratio = next(m for m in result.metrics if m.type == MetricType.RATIO)
-        assert ratio.name == "arpu"
-        assert ratio.type_params.numerator is not None
-        assert ratio.type_params.denominator is not None
-        assert ratio.type_params.numerator.name == "arpu__numerator"
-        assert ratio.type_params.denominator.name == "arpu__denominator"
-
-    def test_ratio_sub_metrics_are_simple(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[_osi_dataset("orders", fields=[_osi_field("amount"), _osi_field("cnt")])],
-            metrics=[_osi_metric("ratio", "(SUM(amount)) / (COUNT(cnt))")],
-        )
-        result = OSIToMSIConverter().convert(doc)
-
-        from metricflow_semantic_interfaces.type_enums import MetricType
-
-        simple_metrics = [m for m in result.metrics if m.type == MetricType.SIMPLE]
-        assert len(simple_metrics) == 2
-        names = {m.name for m in simple_metrics}
-        assert names == {"ratio__numerator", "ratio__denominator"}
-
-    def test_complex_expression_falls_back_to_simple_with_synthetic_measure(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[_osi_dataset("orders")],
-            metrics=[_osi_metric("complex", "SUM(a) + SUM(b)")],
-        )
-        result = OSIToMSIConverter().convert(doc)
-
-        assert len(result.metrics) == 1
-        m = result.metrics[0]
-        from metricflow_semantic_interfaces.type_enums import MetricType
-
-        assert m.type == MetricType.SIMPLE
-        assert m.type_params.measure is not None
-        assert m.type_params.measure.name == "complex__expr"
-
-    def test_metric_description_carried_over(self) -> None:  # noqa: D102
-        doc = _osi_doc(
-            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
-            metrics=[_osi_metric("revenue", "SUM(amount)", description="Total revenue")],
-        )
-        result = OSIToMSIConverter().convert(doc)
-
-        assert result.metrics[0].description == "Total revenue"
-
-    def test_no_metrics_produces_empty_list(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders")])
-        result = OSIToMSIConverter().convert(doc)
-
-        assert result.metrics == []
-
-    def test_dataset_qualified_column_reference(self) -> None:  # noqa: D102
-        """A metric referencing 'dataset.col' should classify 'col' as a measure in that dataset."""
-        doc = _osi_doc(
-            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
-            metrics=[_osi_metric("revenue", "SUM(orders.amount)")],
-        )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.measures) == 1
-        assert sm.measures[0].name == "amount"
-
-
-class TestOSIToMSIRoundTrip:  # noqa: D101
-    def test_field_names_and_counts_survive_round_trip(self) -> None:  # noqa: D102
-        """MSI → OSI → MSI preserves dataset names, field counts, and entity types."""
-        original = _manifest(
-            semantic_models=[
-                semantic_model_with_guaranteed_meta(
-                    name="orders",
-                    node_relation=PydanticNodeRelation(schema_name="analytics", alias="orders"),
-                    entities=[_entity("order_id", entity_type=EntityType.PRIMARY)],
-                    dimensions=[
-                        _dimension("status"),
-                        _dimension("created_at", dim_type=DimensionType.TIME, granularity=TimeGranularity.DAY),
-                    ],
-                    measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
-                )
-            ],
-            metrics=[_simple_metric("revenue", "revenue")],
-        )
-
-        osi_doc = MSIToOSIConverter().convert(original, model_name="my_model")
-        recovered = OSIToMSIConverter().convert(osi_doc)
-
-        assert len(recovered.semantic_models) == 1
-        sm = recovered.semantic_models[0]
-        assert sm.name == "orders"
-
-        entity_names = {e.name for e in sm.entities}
-        assert "order_id" in entity_names
-
-        dim_names = {d.name for d in sm.dimensions}
-        assert "status" in dim_names
-        assert "created_at" in dim_names
-
-        measure_names = {m.name for m in sm.measures}
-        assert "revenue" in measure_names
-
-        assert len(recovered.metrics) == 1
-        assert recovered.metrics[0].name == "revenue"
