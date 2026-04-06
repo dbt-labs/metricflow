@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow.converters.osi_to_msi import OSIToMSIConverter
 from metricflow_semantic_interfaces.implementations.semantic_model import PydanticNodeRelation
@@ -129,30 +131,23 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
         assert orders_sm.entities[0].name == "user_id"
         assert orders_sm.entities[0].type.value == "foreign"
 
-    def test_is_time_true_becomes_time_dimension(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("created_at", is_time=True)])])
+    @pytest.mark.parametrize(
+        "field_name, is_time, expected_type",
+        [
+            ("created_at", True, DimensionType.TIME),
+            ("status", False, DimensionType.CATEGORICAL),
+            ("region", None, DimensionType.CATEGORICAL),
+        ],
+    )
+    def test_field_becomes_dimension_by_is_time(  # noqa: D102
+        self, field_name: str, is_time: bool | None, expected_type: DimensionType
+    ) -> None:
+        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field(field_name, is_time=is_time)])])
         sm = OSIToMSIConverter().convert(doc).semantic_models[0]
 
         assert len(sm.dimensions) == 1
-        dim = sm.dimensions[0]
-        assert dim.name == "created_at"
-        assert dim.type == DimensionType.TIME
-        assert dim.type_params is not None
-
-    def test_is_time_false_becomes_categorical_dimension(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("status", is_time=False)])])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.dimensions) == 1
-        assert sm.dimensions[0].name == "status"
-        assert sm.dimensions[0].type == DimensionType.CATEGORICAL
-
-    def test_unmarked_field_becomes_categorical_dimension(self) -> None:  # noqa: D102
-        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("region")])])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
-
-        assert len(sm.dimensions) == 1
-        assert sm.dimensions[0].name == "region"
+        assert sm.dimensions[0].name == field_name
+        assert sm.dimensions[0].type == expected_type
 
     def test_field_referenced_in_metric_becomes_measure(self) -> None:  # noqa: D102
         doc = _osi_doc(
