@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 
-from metricflow.converters.osi.filter_utils import _render_filter_template
-from metricflow.converters.osi.models import OSIDialect
-from metricflow.converters.osi.msi_to_osi import MSIToOSIConverter
+from metricflow.converters.filter_utils import _render_filter_template
+from metricflow.converters.models import OSIDialect
+from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow_semantic_interfaces.implementations.metric import (
     PydanticConversionTypeParams,
     PydanticCumulativeTypeParams,

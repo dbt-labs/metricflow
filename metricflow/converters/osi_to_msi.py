@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Set, Tuple, Union
 
-from metricflow.converters.osi.expression_utils import (
+from metricflow.converters.expression_utils import (
     _extract_agg_info,
     _get_raw_inner_col,
     _MeasureKey,
     _strip_qualifier,
     _try_parse_ratio,
 )
-from metricflow.converters.osi.models import (
+from metricflow.converters.models import (
     OSIDataset,
     OSIDialect,
     OSIDocument,

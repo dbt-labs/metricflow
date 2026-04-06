@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from metricflow.converters.osi.models import (
+from metricflow.converters.models import (
     OSIDataset,
     OSIDialect,
     OSIDialectExpression,

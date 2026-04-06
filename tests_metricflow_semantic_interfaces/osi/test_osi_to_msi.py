@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from metricflow.converters.osi.msi_to_osi import MSIToOSIConverter
-from metricflow.converters.osi.osi_to_msi import OSIToMSIConverter
+from metricflow.converters.msi_to_osi import MSIToOSIConverter
+from metricflow.converters.osi_to_msi import OSIToMSIConverter
 from metricflow_semantic_interfaces.implementations.semantic_model import PydanticNodeRelation
 from metricflow_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
 from metricflow_semantic_interfaces.type_enums import (

@@ -5,8 +5,8 @@ from collections import defaultdict
 from itertools import combinations
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from metricflow.converters.osi.filter_utils import _collect_filter_sql, _merge_filter_sqls
-from metricflow.converters.osi.models import (
+from metricflow.converters.filter_utils import _collect_filter_sql, _merge_filter_sqls
+from metricflow.converters.models import (
     OSIDataset,
     OSIDialect,
     OSIDialectExpression,
