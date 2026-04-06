@@ -109,6 +109,7 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import (
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.metric_evaluation.dfs_me_planner import DepthFirstSearchMetricEvaluationPlanner
 from metricflow.metric_evaluation.me_plan_table_formatter import MetricEvaluationPlanTableFormatter
+from metricflow.metric_evaluation.metric_query_helper import MetricQueryHelper
 from metricflow.metric_evaluation.metric_query_planner import MetricEvaluationPlanner
 from metricflow.metric_evaluation.passthrough.passthrough_me_planner import PassThroughMetricEvaluationPlanner
 from metricflow.metric_evaluation.plan.me_edges import MetricQueryDependencyEdge
@@ -168,6 +169,7 @@ class DataflowPlanBuilder:
         self._time_period_adjuster = DateutilTimePeriodAdjuster()
         self._cache = dataflow_plan_builder_cache or DataflowPlanBuilderCache()
         self._metric_evaluation_plan_formatter = MetricEvaluationPlanTableFormatter()
+        self._query_helper = MetricQueryHelper(metric_lookup=semantic_manifest_lookup.metric_lookup)
 
     def build_plan(
         self,
@@ -480,8 +482,7 @@ class DataflowPlanBuilder:
         # Gets the aggregated opportunities
         aggregated_base_metric_input_node = self.build_aggregated_simple_metric_input(
             simple_metric_recipe=base_simple_metric_recipe,
-            queried_linkable_specs=queried_linkable_specs,
-            predicate_pushdown_state=time_range_only_pushdown_state,
+            predicate_pushdown_state=predicate_pushdown_state,
             option_set=option_set,
         )
 
@@ -551,7 +552,6 @@ class DataflowPlanBuilder:
         # explicitly disable predicate pushdown until we are ready to fully support it for conversion metrics.
         aggregated_conversions_node = self.build_aggregated_simple_metric_input(
             simple_metric_recipe=conversion_simple_metric_recipe,
-            queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=disabled_pushdown_state,
             option_set=option_set,
             source_node_recipe=recipe_with_join_conversion_source_node,
@@ -708,7 +708,7 @@ class DataflowPlanBuilder:
 
         simple_metric_recipe = self._build_simple_metric_recipe(
             simple_metric_input=self._manifest_object_lookup.simple_metric_name_to_input[cumulative_metric_input.name],
-            queried_linkable_specs=queried_linkable_specs,
+            queried_linkable_specs=required_linkable_specs,
             child_metric_offset_window=metric_spec.offset_window,
             child_metric_offset_to_grain=metric_spec.offset_to_grain,
             cumulative_description=CumulativeDescription(
@@ -724,7 +724,6 @@ class DataflowPlanBuilder:
         )
         aggregated_node = self.build_aggregated_simple_metric_input(
             simple_metric_recipe=simple_metric_recipe,
-            queried_linkable_specs=required_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
             option_set=option_set,
         )
@@ -783,7 +782,6 @@ class DataflowPlanBuilder:
 
         aggregated_simple_metric_input_node = self.build_aggregated_simple_metric_input(
             simple_metric_recipe=simple_metric_recipe,
-            queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
             option_set=option_set,
         )
@@ -821,9 +819,7 @@ class DataflowPlanBuilder:
 
         # For ratio / derived metrics with time offset, apply offset join here. Constraints will be applied after the offset
         # to avoid filtering out values that will be changed.
-        queried_agg_time_dimension_specs: FrozenOrderedSet[TimeDimensionSpec] = FrozenOrderedSet(
-            queried_linkable_specs.time_dimension_specs
-        ).intersection(
+        queried_agg_time_dimension_specs = FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
             self._metric_lookup.get_aggregation_time_dimension_specs(
                 metric_reference=metric_spec.reference,
             )
@@ -1380,9 +1376,45 @@ class DataflowPlanBuilder:
             )
         )
 
+        metric_defined_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=WhereFilterLocation.for_metric(simple_metric_input.metric_reference),
+            filter_intersection=simple_metric_input.filter,
+        )
+
+        metric_filter_split = self._query_helper.split_filters_by_aggregation_time_dimension_references(
+            metric_reference=simple_metric_input.metric_reference,
+            filter_specs=metric_defined_filter_specs,
+        )
+
+        # Filters in `additional_filter_specs` are handled differently in join-to-time-spine case.
+        additional_filter_split = self._query_helper.split_filters_by_aggregation_time_dimension_references(
+            metric_reference=simple_metric_input.metric_reference,
+            filter_specs=additional_filter_specs,
+        )
+
+        filters_with_only_agg_time_dimension_references = FrozenOrderedSet(
+            itertools.chain(
+                metric_filter_split.filters_with_only_agg_time_dimension_references,
+                additional_filter_split.filters_with_only_agg_time_dimension_references,
+            )
+        )
+
+        # Defaults in the case where there is no time offset or time-spine join.
+        pre_aggregation_filter_specs = tuple(
+            itertools.chain(
+                metric_defined_filter_specs,
+                additional_filter_specs,
+            )
+        )
+        deferred_filter_specs: tuple[WhereFilterSpec, ...] = ()
+
         before_aggregation_time_spine_join_description = None
         after_aggregation_time_spine_join_description = None
+
+        # Handle time offset case.
         if child_metric_offset_window is not None or child_metric_offset_to_grain is not None:
+            time_spine_filters = tuple(filters_with_only_agg_time_dimension_references)
+
             if child_metric_offset_window is not None:
                 offset_grain_name = child_metric_offset_window.granularity
                 if ExpandedTimeGranularity.is_standard_granularity_name(offset_grain_name):
@@ -1417,6 +1449,7 @@ class DataflowPlanBuilder:
                 join_type=SqlJoinType.INNER,
                 offset_window=child_metric_offset_window,
                 offset_to_grain=child_metric_offset_to_grain,
+                time_spine_filter_specs=time_spine_filters,
             )
             if (
                 offset_grain
@@ -1438,43 +1471,84 @@ class DataflowPlanBuilder:
             else:
                 before_aggregation_time_spine_join_description = join_to_time_spine_description
 
+            # The below update to `deferred_filter_specs` reproduces a bug where filters are re-applied for time-offset
+            # joins. Since time-offset joins use an inner join, new rows cannot be produced by the join and filters
+            # do not need to be reapplied. The below will be removed in the bug fix PR.
+
+            deferred_filter_specs = tuple(
+                filter_spec
+                for filter_spec in itertools.chain(
+                    additional_filter_split.filters_without_agg_time_dimension_references,
+                    additional_filter_split.filters_with_mixed_references,
+                )
+                if set(filter_spec.linkable_specs).issubset(queried_linkable_specs)
+            )
+
+        # Handle case without `join_to_timespine` set.
+        if not (simple_metric_input.join_to_timespine and (len(queried_agg_time_dimension_specs) > 0)):
+            return SimpleMetricRecipe(
+                simple_metric_input=simple_metric_input,
+                cumulative_description=cumulative_description,
+                before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
+                after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
+                pre_aggregation_filter_specs=pre_aggregation_filter_specs,
+                queried_linkable_specs=queried_linkable_specs,
+                queried_agg_time_dimension_specs=queried_agg_time_dimension_specs.as_frozen(),
+                deferred_filter_specs=deferred_filter_specs,
+            )
+
+        # Handle case with `join_to_timespine` set.
+
+        # Comments below copied from prior implementation.
         # * Simple metrics configured to join to time spine will join to time spine after aggregation using
         #   LEFT OUTER JOIN.
         # * If there's no agg_time_dimension in the query, skip time spine join since all time will be aggregated.
         # * If we already need to join to time spine after aggregation due to offset, and the simple metric is also
         #   configured to join to time spine, update to use LEFT OUTER JOIN.
-        if simple_metric_input.join_to_timespine and (len(queried_agg_time_dimension_specs) > 0):
-            if after_aggregation_time_spine_join_description is not None:
-                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
-                    join_type=SqlJoinType.LEFT_OUTER,
-                    offset_window=after_aggregation_time_spine_join_description.offset_window,
-                    offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
-                )
-            else:
-                after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
-                    join_type=SqlJoinType.LEFT_OUTER, offset_window=None, offset_to_grain=None
-                )
 
-        metric_filter_intersection = simple_metric_input.filter
-        if metric_filter_intersection is not None:
-            metric_filter_specs = tuple(
-                filter_spec_factory.create_from_where_filter_intersection(
-                    filter_location=WhereFilterLocation.for_metric(simple_metric_input.metric_reference),
-                    filter_intersection=metric_filter_intersection,
-                )
+        if after_aggregation_time_spine_join_description is not None:
+            after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
+                join_type=SqlJoinType.LEFT_OUTER,
+                offset_window=after_aggregation_time_spine_join_description.offset_window,
+                offset_to_grain=after_aggregation_time_spine_join_description.offset_to_grain,
+                time_spine_filter_specs=tuple(filters_with_only_agg_time_dimension_references),
             )
         else:
-            metric_filter_specs = ()
+            after_aggregation_time_spine_join_description = JoinToTimeSpineDescription(
+                join_type=SqlJoinType.LEFT_OUTER,
+                offset_window=None,
+                offset_to_grain=None,
+                time_spine_filter_specs=tuple(filters_with_only_agg_time_dimension_references),
+            )
+
+        # Since new rows might have been added due to time spine join, re-apply constraints here. Only re-apply filters
+        # for specs that are also in the queried specs, since those are the only ones that could change after the time
+        # spine join. Exclude filters that contain only metric_time or an agg time dimension, since were already applied
+        # to the time spine table.
+        # Filters in `metric_where_filter_specs` don't need to be applied since those should have been applied in
+        # `source_node`
+
+        # An example where new rows can be added is if the time spine contains dates that are not present in the source.
+        # In that case, the result can contain rows where a group-by item (referenced by the filter) has NULL values.
+        # The new rows with the NULL values have to be reevaluated by the filter.
+        deferred_filter_specs = tuple(
+            filter_spec
+            for filter_spec in itertools.chain(
+                additional_filter_split.filters_without_agg_time_dimension_references,
+                additional_filter_split.filters_with_mixed_references,
+            )
+            if set(filter_spec.linkable_specs).issubset(queried_linkable_specs)
+        )
 
         return SimpleMetricRecipe(
             simple_metric_input=simple_metric_input,
-            offset_window=child_metric_offset_window,
-            offset_to_grain=child_metric_offset_to_grain,
             cumulative_description=cumulative_description,
-            metric_filter_specs=metric_filter_specs,
-            additional_filter_specs=tuple(additional_filter_specs),
             before_aggregation_time_spine_join_description=before_aggregation_time_spine_join_description,
             after_aggregation_time_spine_join_description=after_aggregation_time_spine_join_description,
+            pre_aggregation_filter_specs=pre_aggregation_filter_specs,
+            queried_linkable_specs=queried_linkable_specs,
+            queried_agg_time_dimension_specs=queried_agg_time_dimension_specs.as_frozen(),
+            deferred_filter_specs=deferred_filter_specs,
         )
 
     def _build_input_metric_specs_for_derived_metric(
@@ -1523,7 +1597,6 @@ class DataflowPlanBuilder:
     def build_aggregated_simple_metric_input(
         self,
         simple_metric_recipe: SimpleMetricRecipe,
-        queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
         option_set: DataflowPlanOptionSet,
         source_node_recipe: Optional[SourceNodeRecipe] = None,
@@ -1536,7 +1609,6 @@ class DataflowPlanBuilder:
         """
         return self._build_aggregated_simple_metric_input(
             simple_metric_recipe=simple_metric_recipe,
-            queried_linkable_specs=queried_linkable_specs,
             predicate_pushdown_state=predicate_pushdown_state,
             option_set=option_set,
             source_node_recipe=source_node_recipe,
@@ -1583,63 +1655,28 @@ class DataflowPlanBuilder:
     def _build_time_spine_join_node_for_after_aggregation(
         self,
         join_description: JoinToTimeSpineDescription,
-        metric_reference: MetricReference,
         source_node: DataflowPlanNode,
         queried_agg_time_dimension_specs: Sequence[TimeDimensionSpec],
-        queried_linkable_specs: Sequence[LinkableInstanceSpec],
-        metric_where_filter_specs: Sequence[WhereFilterSpec],
-        after_aggregation_where_filter_specs: Sequence[WhereFilterSpec],
         time_range_constraint: Optional[TimeRangeConstraint],
     ) -> DataflowPlanNode:
         """Build a node that joins the time spine to the aggregated input for the given simple metric.
 
         Args:
             join_description: Describes how to join the time spine.
-            metric_reference: The simple metric that is being constructed.
             source_node: The node that has the aggregated input for the metric.
             queried_agg_time_dimension_specs: The group-by-item specs in the query that are aggregation time dimensions
             for the metric.
-            queried_linkable_specs: The group-by-item specs in the query.
-            metric_where_filter_specs: The filters that are defined in the simple metric.
-            after_aggregation_where_filter_specs: The filters that should be applied after aggregation. These are
             filters that are specified in the query, or when building a derived metric, the filters specified in the
             derived metric.
             time_range_constraint: The time range that should be filtered.
 
         Returns: A sub-DAG with the time-spine join and appropriate filters.
         """
-        # Find filters that contain only metric_time or agg_time_dimension. They will be applied to the time spine table.
-
-        # Aggregation time dimension specs possible for the metric (e.g. `booking__ds__day`, `metric_time__dow`)
-        agg_time_dimension_specs_for_metric: OrderedSet[
-            LinkableInstanceSpec
-        ] = self._metric_lookup.get_aggregation_time_dimension_specs(metric_reference)
-        # Filters that only reference group-by items that are aggregation time dimensions for the metric.
-        agg_time_only_filters: List[WhereFilterSpec] = []
-
-        for filter_spec in metric_where_filter_specs:
-            included_agg_time_specs = agg_time_dimension_specs_for_metric.intersection(filter_spec.linkable_specs)
-            # The filter might contain no linkable specs, and we only want cases where it has only aggregation time
-            # dimension specs.
-            if filter_spec.linkable_specs and len(included_agg_time_specs) == len(filter_spec.linkable_specs):
-                agg_time_only_filters.append(filter_spec)
-
-        # Filters that include group-by-items that are not aggregation time dimensions for the metric.
-        # Could also contain group-by items that are aggregation time dimensions for the metric, but since the SQL
-        # can't be parsed, those can't be applied separately to the time spine.
-        non_agg_time_only_filters: List[WhereFilterSpec] = []
-        for filter_spec in after_aggregation_where_filter_specs:
-            included_agg_time_specs = agg_time_dimension_specs_for_metric.intersection(filter_spec.linkable_specs)
-            if filter_spec.linkable_specs and len(included_agg_time_specs) == len(filter_spec.linkable_specs):
-                agg_time_only_filters.append(filter_spec)
-            else:
-                non_agg_time_only_filters.append(filter_spec)
-
         join_spec = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[0]
         time_spine_node = self._build_time_spine_node(
             queried_time_spine_specs=queried_agg_time_dimension_specs,
             time_range_constraint=time_range_constraint,
-            where_filter_specs=agg_time_only_filters,
+            where_filter_specs=join_description.time_spine_filter_specs,
             join_on_time_dimension_spec=join_spec,
         )
         output_node: DataflowPlanNode = JoinToTimeSpineNode.create(
@@ -1651,22 +1688,6 @@ class DataflowPlanBuilder:
             standard_offset_window=join_description.standard_offset_window,
             offset_to_grain=join_description.offset_to_grain,
         )
-
-        # Since new rows might have been added due to time spine join, re-apply constraints here. Only re-apply filters
-        # for specs that are also in the queried specs, since those are the only ones that could change after the time
-        # spine join. Exclude filters that contain only metric_time or an agg time dimension, since were already applied
-        # to the time spine table.
-        # Filters in `metric_where_filter_specs` don't need to be applied since those should have been applied in
-        # `source_node`
-        queried_non_agg_time_filter_specs = [
-            filter_spec
-            for filter_spec in non_agg_time_only_filters
-            if set(filter_spec.linkable_specs).issubset(set(queried_linkable_specs))
-        ]
-        if len(queried_non_agg_time_filter_specs) > 0:
-            output_node = WhereFilterNode.create(
-                parent_node=output_node, filter_specs=queried_non_agg_time_filter_specs, always_apply=True
-            )
 
         # TODO: this will break if you query by agg_time_dimension but apply a time constraint on metric_time.
         # To fix when enabling time range constraints for agg_time_dimension.
@@ -1797,7 +1818,6 @@ class DataflowPlanBuilder:
     def _build_aggregated_simple_metric_input(
         self,
         simple_metric_recipe: SimpleMetricRecipe,
-        queried_linkable_specs: LinkableSpecSet,
         predicate_pushdown_state: PredicatePushdownState,
         option_set: DataflowPlanOptionSet,
         source_node_recipe: Optional[SourceNodeRecipe] = None,
@@ -1806,7 +1826,6 @@ class DataflowPlanBuilder:
             LazyFormat(
                 "Building aggregate node",
                 simple_metric_recipe=simple_metric_recipe,
-                combined_filter_specs=simple_metric_recipe.combined_filter_specs,
             )
         )
 
@@ -1828,6 +1847,9 @@ class DataflowPlanBuilder:
         )
         spec_properties = SimpleMetricInputSpecProperties.create_from_simple_metric_inputs((simple_metric_input,))
 
+        queried_linkable_specs = simple_metric_recipe.queried_linkable_specs
+
+        # Adjust the time constraint for cumulative metrics.
         cumulative_metric_adjusted_time_constraint: Optional[TimeRangeConstraint] = None
         if cumulative and predicate_pushdown_state.time_range_constraint is not None:
             logger.debug(
@@ -1846,6 +1868,7 @@ class DataflowPlanBuilder:
                 count = 1
                 granularity = cumulative_grain_to_date
 
+            assert predicate_pushdown_state.time_range_constraint is not None
             cumulative_metric_adjusted_time_constraint = (
                 self._time_period_adjuster.expand_time_constraint_for_cumulative_metric(
                     predicate_pushdown_state.time_range_constraint, granularity, count
@@ -1927,13 +1950,8 @@ class DataflowPlanBuilder:
                 ).evaluated_value
             )
 
-        queried_agg_time_dimension_specs = tuple(
-            FrozenOrderedSet(queried_linkable_specs.time_dimension_specs).intersection(
-                self._metric_lookup.get_aggregation_time_dimension_specs(
-                    metric_reference=MetricReference(simple_metric_input.name),
-                )
-            )
-        )
+        queried_agg_time_dimension_specs = tuple(simple_metric_recipe.queried_agg_time_dimension_specs)
+
         required_agg_time_dimension_specs = tuple(
             FrozenOrderedSet(required_linkable_specs.time_dimension_specs).intersection(
                 self._metric_lookup.get_aggregation_time_dimension_specs(
@@ -1995,28 +2013,31 @@ class DataflowPlanBuilder:
             source_node=unaggregated_simple_metric_input_node,
             join_targets=source_node_recipe.join_targets,
             custom_granularity_specs=custom_granularity_specs_to_join,
-            where_filter_specs=simple_metric_recipe.combined_filter_specs,
+            where_filter_specs=simple_metric_recipe.pre_aggregation_filter_specs,
             time_range_constraint=time_range_constraint_to_apply,
             specs_to_keep_for_aggregation=specs_to_keep_for_aggregation,
             spec_properties=spec_properties,
             queried_linkable_specs_for_semi_additive_join=queried_linkable_specs,
         )
 
-        aggregate_node = AggregateSimpleMetricInputsNode.create(
+        aggregate_node: DataflowPlanNode = AggregateSimpleMetricInputsNode.create(
             parent_node=unaggregated_simple_metric_input_node,
             null_fill_value_mapping=NullFillValueMapping.create_from_simple_metric_recipe(simple_metric_recipe),
         )
 
         if after_aggregation_time_spine_join_description and queried_agg_time_dimension_specs:
-            return self._build_time_spine_join_node_for_after_aggregation(
+            aggregate_node = self._build_time_spine_join_node_for_after_aggregation(
                 join_description=after_aggregation_time_spine_join_description,
-                metric_reference=MetricReference(simple_metric_input_spec.element_name),
                 source_node=aggregate_node,
                 queried_agg_time_dimension_specs=queried_agg_time_dimension_specs,
-                queried_linkable_specs=queried_linkable_specs.as_tuple,
-                metric_where_filter_specs=simple_metric_recipe.metric_filter_specs,
-                after_aggregation_where_filter_specs=simple_metric_recipe.additional_filter_specs,
                 time_range_constraint=predicate_pushdown_state.time_range_constraint,
+            )
+
+        if simple_metric_recipe.deferred_filter_specs:
+            aggregate_node = WhereFilterNode.create(
+                parent_node=aggregate_node,
+                filter_specs=simple_metric_recipe.deferred_filter_specs,
+                always_apply=True,
             )
 
         return aggregate_node

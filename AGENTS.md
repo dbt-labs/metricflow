@@ -16,6 +16,12 @@ This project uses **hatch** for dependency management and testing:
   previously reflected the type, rename the variable appropriately to 
   reflect the new type.
 - If `git_ignored/AGENTS.md` exists, append the rules in that file.
+- If a function's return type is not mutable, the returned object does
+  not need to be a copy.
+- When reviewing and updating code:
+  - Identify and fix correctness issues.
+  - Make updates to improve readability and clarity.
+  - Make updates to follow code standards.
 
 ## Python Code Standards
 
@@ -26,3 +32,8 @@ This project uses **hatch** for dependency management and testing:
 - Avoid the use of `isinstance()`.
 - Prefer to use immutable data types.
 - Prioritize code clarity and readability.
+- Docstrings should be concise, capture behavior, capture assumptions, and
+  explain any non-obvious behavior.
+- Code comments should capture non-obvious behavior.
+- Include appropriate comments that describe fields in dataclass-like classes.
+- Avoid the use of mocks unless another approach is not reasonable.
