@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from itertools import combinations
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 import jinja2
 
@@ -691,11 +691,7 @@ class OSIToMSIConverter:
         osi_sm: OSISemanticModel,
         measure_index: Dict[_MeasureKey, Tuple[AggregationType, str]],
     ) -> PydanticSemanticModel:
-        primary_key_cols: Set[str] = set(dataset.primary_key or [])
-        unique_key_cols: Set[str] = {col for keys in (dataset.unique_keys or []) for col in keys}
-        foreign_key_cols: Set[str] = {
-            col for rel in (osi_sm.relationships or []) if rel.from_dataset == dataset.name for col in rel.from_columns
-        }
+        primary_key_cols, unique_key_cols, foreign_key_cols = self._build_key_sets(dataset, osi_sm)
 
         entities: List[PydanticEntity] = []
         dimensions: List[PydanticDimension] = []
@@ -703,89 +699,23 @@ class OSIToMSIConverter:
 
         for field in dataset.fields or []:
             expr = self._get_expression(field.expression)
-            # Prefer None if the expression is identical to the field name (MSI default).
             expr_or_none = expr if expr != field.name else None
-
-            if field.name in primary_key_cols:
-                entities.append(
-                    PydanticEntity(
-                        name=field.name,
-                        type=EntityType.PRIMARY,
-                        expr=expr_or_none,
-                        description=field.description,
-                        label=field.label,
-                        role=None,
-                        config=None,
-                    )
-                )
-            elif field.name in unique_key_cols:
-                entities.append(
-                    PydanticEntity(
-                        name=field.name,
-                        type=EntityType.UNIQUE,
-                        expr=expr_or_none,
-                        description=field.description,
-                        label=field.label,
-                        role=None,
-                        config=None,
-                    )
-                )
-            elif field.name in foreign_key_cols:
-                entities.append(
-                    PydanticEntity(
-                        name=field.name,
-                        type=EntityType.FOREIGN,
-                        expr=expr_or_none,
-                        description=field.description,
-                        label=field.label,
-                        role=None,
-                        config=None,
-                    )
-                )
-            elif field.dimension is not None and field.dimension.is_time:
-                dimensions.append(
-                    PydanticDimension(
-                        name=field.name,
-                        type=DimensionType.TIME,
-                        # OSI carries no granularity; default to DAY.
-                        type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
-                        expr=expr_or_none,
-                        description=field.description,
-                        label=field.label,
-                        config=None,
-                    )
-                )
-            elif self._in_measure_index(field.name, expr, dataset.name, measure_index):
-                agg, _ = (
-                    measure_index.get((dataset.name, field.name))
-                    or measure_index.get((None, field.name))
-                    or measure_index.get((dataset.name, _strip_qualifier(expr)))
-                    or measure_index[(None, _strip_qualifier(expr))]
-                )
-                measures.append(
-                    PydanticMeasure(
-                        name=field.name,
-                        agg=agg,
-                        expr=expr_or_none,
-                        description=field.description,
-                        label=field.label,
-                        create_metric=None,
-                        agg_params=None,
-                    )
-                )
+            element = self._classify_field(
+                field,
+                expr,
+                expr_or_none,
+                dataset.name,
+                primary_key_cols,
+                unique_key_cols,
+                foreign_key_cols,
+                measure_index,
+            )
+            if isinstance(element, PydanticEntity):
+                entities.append(element)
+            elif isinstance(element, PydanticMeasure):
+                measures.append(element)
             else:
-                # Fallback: categorical dimension.
-                dimensions.append(
-                    PydanticDimension(
-                        name=field.name,
-                        type=DimensionType.CATEGORICAL,
-                        type_params=None,
-                        expr=expr_or_none,
-                        description=field.description,
-                        label=field.label,
-                        config=None,
-                    )
-                )
+                dimensions.append(element)
 
         return PydanticSemanticModel(
             name=dataset.name,
@@ -794,6 +724,104 @@ class OSIToMSIConverter:
             entities=entities,
             dimensions=dimensions,
             measures=measures,
+        )
+
+    @staticmethod
+    def _build_key_sets(dataset: OSIDataset, osi_sm: OSISemanticModel) -> Tuple[Set[str], Set[str], Set[str]]:
+        """Return (primary_key_cols, unique_key_cols, foreign_key_cols) for a dataset."""
+        primary_key_cols: Set[str] = set(dataset.primary_key or [])
+        unique_key_cols: Set[str] = {col for keys in (dataset.unique_keys or []) for col in keys}
+        foreign_key_cols: Set[str] = {
+            col for rel in (osi_sm.relationships or []) if rel.from_dataset == dataset.name for col in rel.from_columns
+        }
+        return primary_key_cols, unique_key_cols, foreign_key_cols
+
+    def _classify_field(
+        self,
+        field: OSIField,
+        expr: str,
+        expr_or_none: Optional[str],
+        dataset_name: str,
+        primary_key_cols: Set[str],
+        unique_key_cols: Set[str],
+        foreign_key_cols: Set[str],
+        measure_index: Dict[_MeasureKey, Tuple[AggregationType, str]],
+    ) -> Union[PydanticEntity, PydanticDimension, PydanticMeasure]:
+        """Classify a single OSI field into an MSI entity, dimension, or measure.
+
+        Classification order (first match wins):
+        1. primary_key → PRIMARY entity
+        2. unique_keys → UNIQUE entity
+        3. foreign key (from relationship) → FOREIGN entity
+        4. dimension.is_time → TIME dimension (granularity defaults to DAY)
+        5. referenced in a metric aggregation expression → measure
+        6. fallback → CATEGORICAL dimension
+        """
+        if field.name in primary_key_cols:
+            return PydanticEntity(
+                name=field.name,
+                type=EntityType.PRIMARY,
+                expr=expr_or_none,
+                description=field.description,
+                label=field.label,
+                role=None,
+                config=None,
+            )
+        if field.name in unique_key_cols:
+            return PydanticEntity(
+                name=field.name,
+                type=EntityType.UNIQUE,
+                expr=expr_or_none,
+                description=field.description,
+                label=field.label,
+                role=None,
+                config=None,
+            )
+        if field.name in foreign_key_cols:
+            return PydanticEntity(
+                name=field.name,
+                type=EntityType.FOREIGN,
+                expr=expr_or_none,
+                description=field.description,
+                label=field.label,
+                role=None,
+                config=None,
+            )
+        if field.dimension is not None and field.dimension.is_time:
+            # OSI carries no granularity metadata; default to DAY.
+            return PydanticDimension(
+                name=field.name,
+                type=DimensionType.TIME,
+                type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
+                expr=expr_or_none,
+                description=field.description,
+                label=field.label,
+                config=None,
+            )
+        if self._in_measure_index(field.name, expr, dataset_name, measure_index):
+            agg, _ = (
+                measure_index.get((dataset_name, field.name))
+                or measure_index.get((None, field.name))
+                or measure_index.get((dataset_name, _strip_qualifier(expr)))
+                or measure_index[(None, _strip_qualifier(expr))]
+            )
+            return PydanticMeasure(
+                name=field.name,
+                agg=agg,
+                expr=expr_or_none,
+                description=field.description,
+                label=field.label,
+                create_metric=None,
+                agg_params=None,
+            )
+        return PydanticDimension(
+            name=field.name,
+            type=DimensionType.CATEGORICAL,
+            type_params=None,
+            expr=expr_or_none,
+            description=field.description,
+            label=field.label,
+            config=None,
         )
 
     # ------------------------------------------------------------------
