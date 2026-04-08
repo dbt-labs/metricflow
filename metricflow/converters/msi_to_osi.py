@@ -195,8 +195,13 @@ class MSIToOSIConverter:
             expr = self._resolve_ratio(metric, metric_index, measure_index, cache, combined_filter)
         elif metric.type is MetricType.DERIVED:
             expr = self._resolve_derived(metric, metric_index, measure_index, cache, combined_filter)
+        elif metric.type is MetricType.CONVERSION:
+            # CONVERSION metrics are skipped in convert(); this branch should never be reached.
+            raise RuntimeError(
+                LazyFormat("Unexpected CONVERSION metric in expression resolver", metric_name=metric.name)
+            )
         else:
-            expr = metric.name
+            assert_values_exhausted(metric.type)
 
         cache[cache_key] = expr
         return expr
