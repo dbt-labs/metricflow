@@ -15,8 +15,8 @@ FROM (
   -- Join to Time Spine Dataset
   -- Compute Metrics via Expressions
   SELECT
-    subq_24.metric_time__day AS metric_time__day
-    , subq_19.__bookings AS bookings
+    subq_22.metric_time__day AS metric_time__day
+    , subq_17.__bookings AS bookings
   FROM (
     -- Constrain Output with WHERE
     -- Select: ['metric_time__day']
@@ -29,29 +29,27 @@ FROM (
       SELECT
         ds AS metric_time__day
       FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_22
+    ) subq_20
     WHERE metric_time__day = '2020-01-01' 
-  ) subq_24
+  ) subq_22
   INNER JOIN (
-    -- Constrain Output with WHERE
-    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(bookings) AS __bookings
+      , SUM(__bookings) AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_16
-    WHERE metric_time__day = '2020-01-01' 
     GROUP BY
       metric_time__day
-  ) subq_19
+  ) subq_17
   ON
-    subq_24.metric_time__day - INTERVAL 5 day = subq_19.metric_time__day
-) subq_26
+    subq_22.metric_time__day - INTERVAL 5 day = subq_17.metric_time__day
+) subq_24

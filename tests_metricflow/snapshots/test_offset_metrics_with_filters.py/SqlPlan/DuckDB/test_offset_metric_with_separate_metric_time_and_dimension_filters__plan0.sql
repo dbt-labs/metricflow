@@ -1,105 +1,109 @@
-test_name: test_offset_cumulative_metric_with_metric_time_filter
+test_name: test_offset_metric_with_separate_metric_time_and_dimension_filters
 test_filename: test_offset_metrics_with_filters.py
 docstring:
-  Tests querying a cumulative metric that is offset with a filter on metric time.
+  Test querying a time-offset metric with separate filters that allow for different filter placement.
 sql_engine: DuckDB
 expectation_description:
-  The metric_time filter should be applied on the time spine / output side of the
-  cumulative offset, ideally by pushing it to the time spine before the join
-  rather than inside the pre-offset cumulative input.
+  The metric_time portion of the filter (`{{ TimeDimension('metric_time', 'day')
+  }} = '2020-01-01'`) should be applied on the time spine / output side of the
+  offset join, ideally by pushing it to the time spine before the join, while the
+  dimension portion (`{{ Dimension('listing__country_latest') }} == 'us'`) should
+  stay on the pre-offset metric input.
 ---
 -- Write to DataTable
 SELECT
-  subq_16.metric_time__day
-  , subq_16.trailing_7_days_bookings_offset_1_week
+  subq_17.metric_time__day
+  , subq_17.bookings_offset_once
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_15.metric_time__day
-    , trailing_7_days_bookings_1_week_ago AS trailing_7_days_bookings_offset_1_week
+    subq_16.metric_time__day
+    , 2 * bookings AS bookings_offset_once
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_14.metric_time__day
-      , subq_14.bookings AS trailing_7_days_bookings_1_week_ago
+      subq_15.metric_time__day
+      , subq_15.__bookings AS bookings
     FROM (
-      -- Compute Metrics via Expressions
+      -- Join to Time Spine Dataset
       SELECT
-        subq_13.metric_time__day
-        , subq_13.__bookings AS bookings
+        subq_14.metric_time__day AS metric_time__day
+        , subq_9.__bookings AS __bookings
       FROM (
-        -- Join to Time Spine Dataset
+        -- Select: ['metric_time__day']
         SELECT
-          subq_12.metric_time__day AS metric_time__day
-          , subq_7.__bookings AS __bookings
+          subq_13.metric_time__day
         FROM (
-          -- Select: ['metric_time__day']
+          -- Constrain Output with WHERE
           SELECT
-            subq_11.metric_time__day
+            subq_12.metric_time__day
+          FROM (
+            -- Select: ['metric_time__day']
+            SELECT
+              subq_11.metric_time__day
+            FROM (
+              -- Change Column Aliases
+              SELECT
+                subq_10.ds__day AS metric_time__day
+                , subq_10.ds__week
+                , subq_10.ds__month
+                , subq_10.ds__quarter
+                , subq_10.ds__year
+                , subq_10.ds__extract_year
+                , subq_10.ds__extract_quarter
+                , subq_10.ds__extract_month
+                , subq_10.ds__extract_day
+                , subq_10.ds__extract_dow
+                , subq_10.ds__extract_doy
+                , subq_10.ds__alien_day
+              FROM (
+                -- Read From Time Spine 'mf_time_spine'
+                SELECT
+                  time_spine_src_28006.ds AS ds__day
+                  , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
+                  , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
+                  , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
+                  , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
+                  , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
+                  , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
+                  , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
+                  , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
+                  , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
+                  , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
+                  , time_spine_src_28006.alien_day AS ds__alien_day
+                FROM ***************************.mf_time_spine time_spine_src_28006
+              ) subq_10
+            ) subq_11
+          ) subq_12
+          WHERE metric_time__day = '2020-01-01'
+        ) subq_13
+      ) subq_14
+      INNER JOIN (
+        -- Aggregate Inputs for Simple Metrics
+        SELECT
+          subq_8.metric_time__day
+          , SUM(subq_8.__bookings) AS __bookings
+        FROM (
+          -- Select: ['__bookings', 'metric_time__day']
+          SELECT
+            subq_7.metric_time__day
+            , subq_7.__bookings
           FROM (
             -- Constrain Output with WHERE
             SELECT
-              subq_10.metric_time__day
+              subq_6.bookings AS __bookings
+              , subq_6.listing__country_latest
+              , subq_6.metric_time__day
             FROM (
-              -- Select: ['metric_time__day']
+              -- Select: ['__bookings', 'listing__country_latest', 'metric_time__day']
               SELECT
-                subq_9.metric_time__day
+                subq_5.metric_time__day
+                , subq_5.listing__country_latest
+                , subq_5.__bookings AS bookings
               FROM (
-                -- Change Column Aliases
+                -- Join Standard Outputs
                 SELECT
-                  subq_8.ds__day AS metric_time__day
-                  , subq_8.ds__week
-                  , subq_8.ds__month
-                  , subq_8.ds__quarter
-                  , subq_8.ds__year
-                  , subq_8.ds__extract_year
-                  , subq_8.ds__extract_quarter
-                  , subq_8.ds__extract_month
-                  , subq_8.ds__extract_day
-                  , subq_8.ds__extract_dow
-                  , subq_8.ds__extract_doy
-                  , subq_8.ds__alien_day
-                FROM (
-                  -- Read From Time Spine 'mf_time_spine'
-                  SELECT
-                    time_spine_src_28006.ds AS ds__day
-                    , DATE_TRUNC('week', time_spine_src_28006.ds) AS ds__week
-                    , DATE_TRUNC('month', time_spine_src_28006.ds) AS ds__month
-                    , DATE_TRUNC('quarter', time_spine_src_28006.ds) AS ds__quarter
-                    , DATE_TRUNC('year', time_spine_src_28006.ds) AS ds__year
-                    , EXTRACT(year FROM time_spine_src_28006.ds) AS ds__extract_year
-                    , EXTRACT(quarter FROM time_spine_src_28006.ds) AS ds__extract_quarter
-                    , EXTRACT(month FROM time_spine_src_28006.ds) AS ds__extract_month
-                    , EXTRACT(day FROM time_spine_src_28006.ds) AS ds__extract_day
-                    , EXTRACT(isodow FROM time_spine_src_28006.ds) AS ds__extract_dow
-                    , EXTRACT(doy FROM time_spine_src_28006.ds) AS ds__extract_doy
-                    , time_spine_src_28006.alien_day AS ds__alien_day
-                  FROM ***************************.mf_time_spine time_spine_src_28006
-                ) subq_8
-              ) subq_9
-            ) subq_10
-            WHERE metric_time__day = '2020-01-01'
-          ) subq_11
-        ) subq_12
-        INNER JOIN (
-          -- Aggregate Inputs for Simple Metrics
-          SELECT
-            subq_6.metric_time__day
-            , SUM(subq_6.__bookings) AS __bookings
-          FROM (
-            -- Select: ['__bookings', 'metric_time__day']
-            SELECT
-              subq_5.metric_time__day
-              , subq_5.__bookings
-            FROM (
-              -- Select: ['__bookings', 'metric_time__day']
-              SELECT
-                subq_4.metric_time__day
-                , subq_4.__bookings
-              FROM (
-                -- Join Self Over Time Range
-                SELECT
-                  subq_2.metric_time__day AS metric_time__day
+                  subq_4.country_latest AS listing__country_latest
                   , subq_1.ds__day AS ds__day
                   , subq_1.ds__week AS ds__week
                   , subq_1.ds__month AS ds__month
@@ -166,6 +170,7 @@ FROM (
                   , subq_1.booking__paid_at__extract_day AS booking__paid_at__extract_day
                   , subq_1.booking__paid_at__extract_dow AS booking__paid_at__extract_dow
                   , subq_1.booking__paid_at__extract_doy AS booking__paid_at__extract_doy
+                  , subq_1.metric_time__day AS metric_time__day
                   , subq_1.metric_time__week AS metric_time__week
                   , subq_1.metric_time__month AS metric_time__month
                   , subq_1.metric_time__quarter AS metric_time__quarter
@@ -207,12 +212,6 @@ FROM (
                   , subq_1.__bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
                   , subq_1.__bookers_fill_nulls_with_0_join_to_timespine AS __bookers_fill_nulls_with_0_join_to_timespine
                 FROM (
-                  -- Read From Time Spine 'mf_time_spine'
-                  SELECT
-                    subq_3.ds AS metric_time__day
-                  FROM ***************************.mf_time_spine subq_3
-                ) subq_2
-                INNER JOIN (
                   -- Metric Time Dimension 'ds'
                   SELECT
                     subq_0.ds__day
@@ -425,21 +424,160 @@ FROM (
                     FROM ***************************.fct_bookings bookings_source_src_28000
                   ) subq_0
                 ) subq_1
+                LEFT OUTER JOIN (
+                  -- Select: ['country_latest', 'listing']
+                  SELECT
+                    subq_3.listing
+                    , subq_3.country_latest
+                  FROM (
+                    -- Metric Time Dimension 'ds'
+                    SELECT
+                      subq_2.ds__day
+                      , subq_2.ds__week
+                      , subq_2.ds__month
+                      , subq_2.ds__quarter
+                      , subq_2.ds__year
+                      , subq_2.ds__extract_year
+                      , subq_2.ds__extract_quarter
+                      , subq_2.ds__extract_month
+                      , subq_2.ds__extract_day
+                      , subq_2.ds__extract_dow
+                      , subq_2.ds__extract_doy
+                      , subq_2.created_at__day
+                      , subq_2.created_at__week
+                      , subq_2.created_at__month
+                      , subq_2.created_at__quarter
+                      , subq_2.created_at__year
+                      , subq_2.created_at__extract_year
+                      , subq_2.created_at__extract_quarter
+                      , subq_2.created_at__extract_month
+                      , subq_2.created_at__extract_day
+                      , subq_2.created_at__extract_dow
+                      , subq_2.created_at__extract_doy
+                      , subq_2.listing__ds__day
+                      , subq_2.listing__ds__week
+                      , subq_2.listing__ds__month
+                      , subq_2.listing__ds__quarter
+                      , subq_2.listing__ds__year
+                      , subq_2.listing__ds__extract_year
+                      , subq_2.listing__ds__extract_quarter
+                      , subq_2.listing__ds__extract_month
+                      , subq_2.listing__ds__extract_day
+                      , subq_2.listing__ds__extract_dow
+                      , subq_2.listing__ds__extract_doy
+                      , subq_2.listing__created_at__day
+                      , subq_2.listing__created_at__week
+                      , subq_2.listing__created_at__month
+                      , subq_2.listing__created_at__quarter
+                      , subq_2.listing__created_at__year
+                      , subq_2.listing__created_at__extract_year
+                      , subq_2.listing__created_at__extract_quarter
+                      , subq_2.listing__created_at__extract_month
+                      , subq_2.listing__created_at__extract_day
+                      , subq_2.listing__created_at__extract_dow
+                      , subq_2.listing__created_at__extract_doy
+                      , subq_2.ds__day AS metric_time__day
+                      , subq_2.ds__week AS metric_time__week
+                      , subq_2.ds__month AS metric_time__month
+                      , subq_2.ds__quarter AS metric_time__quarter
+                      , subq_2.ds__year AS metric_time__year
+                      , subq_2.ds__extract_year AS metric_time__extract_year
+                      , subq_2.ds__extract_quarter AS metric_time__extract_quarter
+                      , subq_2.ds__extract_month AS metric_time__extract_month
+                      , subq_2.ds__extract_day AS metric_time__extract_day
+                      , subq_2.ds__extract_dow AS metric_time__extract_dow
+                      , subq_2.ds__extract_doy AS metric_time__extract_doy
+                      , subq_2.listing
+                      , subq_2.user
+                      , subq_2.listing__user
+                      , subq_2.country_latest
+                      , subq_2.is_lux_latest
+                      , subq_2.capacity_latest
+                      , subq_2.listing__country_latest
+                      , subq_2.listing__is_lux_latest
+                      , subq_2.listing__capacity_latest
+                      , subq_2.__listings
+                      , subq_2.__lux_listings
+                      , subq_2.__smallest_listing
+                      , subq_2.__largest_listing
+                      , subq_2.__active_listings
+                    FROM (
+                      -- Read Elements From Semantic Model 'listings_latest'
+                      SELECT
+                        1 AS __listings
+                        , 1 AS __lux_listings
+                        , listings_latest_src_28000.capacity AS __smallest_listing
+                        , listings_latest_src_28000.capacity AS __largest_listing
+                        , 1 AS __active_listings
+                        , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS ds__day
+                        , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS ds__week
+                        , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS ds__month
+                        , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS ds__quarter
+                        , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS ds__year
+                        , EXTRACT(year FROM listings_latest_src_28000.created_at) AS ds__extract_year
+                        , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS ds__extract_quarter
+                        , EXTRACT(month FROM listings_latest_src_28000.created_at) AS ds__extract_month
+                        , EXTRACT(day FROM listings_latest_src_28000.created_at) AS ds__extract_day
+                        , EXTRACT(isodow FROM listings_latest_src_28000.created_at) AS ds__extract_dow
+                        , EXTRACT(doy FROM listings_latest_src_28000.created_at) AS ds__extract_doy
+                        , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS created_at__day
+                        , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS created_at__week
+                        , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS created_at__month
+                        , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS created_at__quarter
+                        , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS created_at__year
+                        , EXTRACT(year FROM listings_latest_src_28000.created_at) AS created_at__extract_year
+                        , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS created_at__extract_quarter
+                        , EXTRACT(month FROM listings_latest_src_28000.created_at) AS created_at__extract_month
+                        , EXTRACT(day FROM listings_latest_src_28000.created_at) AS created_at__extract_day
+                        , EXTRACT(isodow FROM listings_latest_src_28000.created_at) AS created_at__extract_dow
+                        , EXTRACT(doy FROM listings_latest_src_28000.created_at) AS created_at__extract_doy
+                        , listings_latest_src_28000.country AS country_latest
+                        , listings_latest_src_28000.is_lux AS is_lux_latest
+                        , listings_latest_src_28000.capacity AS capacity_latest
+                        , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS listing__ds__day
+                        , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS listing__ds__week
+                        , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS listing__ds__month
+                        , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS listing__ds__quarter
+                        , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS listing__ds__year
+                        , EXTRACT(year FROM listings_latest_src_28000.created_at) AS listing__ds__extract_year
+                        , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS listing__ds__extract_quarter
+                        , EXTRACT(month FROM listings_latest_src_28000.created_at) AS listing__ds__extract_month
+                        , EXTRACT(day FROM listings_latest_src_28000.created_at) AS listing__ds__extract_day
+                        , EXTRACT(isodow FROM listings_latest_src_28000.created_at) AS listing__ds__extract_dow
+                        , EXTRACT(doy FROM listings_latest_src_28000.created_at) AS listing__ds__extract_doy
+                        , DATE_TRUNC('day', listings_latest_src_28000.created_at) AS listing__created_at__day
+                        , DATE_TRUNC('week', listings_latest_src_28000.created_at) AS listing__created_at__week
+                        , DATE_TRUNC('month', listings_latest_src_28000.created_at) AS listing__created_at__month
+                        , DATE_TRUNC('quarter', listings_latest_src_28000.created_at) AS listing__created_at__quarter
+                        , DATE_TRUNC('year', listings_latest_src_28000.created_at) AS listing__created_at__year
+                        , EXTRACT(year FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_year
+                        , EXTRACT(quarter FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_quarter
+                        , EXTRACT(month FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_month
+                        , EXTRACT(day FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_day
+                        , EXTRACT(isodow FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_dow
+                        , EXTRACT(doy FROM listings_latest_src_28000.created_at) AS listing__created_at__extract_doy
+                        , listings_latest_src_28000.country AS listing__country_latest
+                        , listings_latest_src_28000.is_lux AS listing__is_lux_latest
+                        , listings_latest_src_28000.capacity AS listing__capacity_latest
+                        , listings_latest_src_28000.listing_id AS listing
+                        , listings_latest_src_28000.user_id AS user
+                        , listings_latest_src_28000.user_id AS listing__user
+                      FROM ***************************.dim_listings_latest listings_latest_src_28000
+                    ) subq_2
+                  ) subq_3
+                ) subq_4
                 ON
-                  (
-                    subq_1.metric_time__day <= subq_2.metric_time__day
-                  ) AND (
-                    subq_1.metric_time__day > subq_2.metric_time__day - INTERVAL 7 day
-                  )
-              ) subq_4
-            ) subq_5
-          ) subq_6
-          GROUP BY
-            subq_6.metric_time__day
-        ) subq_7
-        ON
-          subq_12.metric_time__day - INTERVAL 1 week = subq_7.metric_time__day
-      ) subq_13
-    ) subq_14
-  ) subq_15
-) subq_16
+                  subq_1.listing = subq_4.listing
+              ) subq_5
+            ) subq_6
+            WHERE listing__country_latest == 'us'
+          ) subq_7
+        ) subq_8
+        GROUP BY
+          subq_8.metric_time__day
+      ) subq_9
+      ON
+        subq_14.metric_time__day - INTERVAL 5 day = subq_9.metric_time__day
+    ) subq_15
+  ) subq_16
+) subq_17
