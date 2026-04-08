@@ -5,6 +5,8 @@ from collections import defaultdict
 from itertools import combinations
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+
 from metricflow.converters.filter_utils import _collect_filter_sql, _merge_filter_sqls
 from metricflow.converters.models import (
     OSIDataset,
@@ -166,7 +168,7 @@ class MSIToOSIConverter:
         try:
             return metric_index[name]
         except KeyError:
-            raise ValueError(f"{context}: references unknown metric '{name}'")
+            raise ValueError(LazyFormat("references unknown metric", context=context, metric_name=name))
 
     def _resolve_metric_expression(
         self,
@@ -214,7 +216,12 @@ class MSIToOSIConverter:
         # metric_aggregation_params path: aggregation info lives on the metric itself
         agg_params_obj = metric.type_params.metric_aggregation_params
         if agg_params_obj is None:
-            raise ValueError(f"SIMPLE metric '{metric.name}' has neither measure nor metric_aggregation_params")
+            raise ValueError(
+                LazyFormat(
+                    "SIMPLE metric has neither measure nor metric_aggregation_params",
+                    metric_name=metric.name,
+                )
+            )
         col = metric.type_params.expr if metric.type_params.expr is not None else metric.name
         return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params, filter_sql)
 
@@ -239,7 +246,12 @@ class MSIToOSIConverter:
         # cumulative_type_params.metric path: recurse into the referenced metric
         cumulative_params = metric.type_params.cumulative_type_params
         if cumulative_params is None or cumulative_params.metric is None:
-            raise ValueError(f"CUMULATIVE metric '{metric.name}' has no resolvable measure or sub-metric")
+            raise ValueError(
+                LazyFormat(
+                    "CUMULATIVE metric has no resolvable measure or sub-metric",
+                    metric_name=metric.name,
+                )
+            )
         sub_input = cumulative_params.metric
         sub_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(sub_input.filter))
         return self._resolve_metric_expression(
@@ -260,7 +272,12 @@ class MSIToOSIConverter:
     ) -> str:
         """Resolve a RATIO metric as (numerator) / (denominator), both fully inlined."""
         if metric.type_params.numerator is None or metric.type_params.denominator is None:
-            raise ValueError(f"RATIO metric '{metric.name}' is missing numerator or denominator")
+            raise ValueError(
+                LazyFormat(
+                    "RATIO metric is missing numerator or denominator",
+                    metric_name=metric.name,
+                )
+            )
         num_input = metric.type_params.numerator
         den_input = metric.type_params.denominator
         num_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(num_input.filter))
