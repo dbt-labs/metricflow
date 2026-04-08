@@ -20,6 +20,7 @@ from metricflow.converters.models import (
     OSIRelationship,
     OSISemanticModel,
 )
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantic_interfaces.protocols.dimension import Dimension
 from metricflow_semantic_interfaces.protocols.entity import Entity
 from metricflow_semantic_interfaces.protocols.measure import (
@@ -399,29 +400,30 @@ class MSIToOSIConverter:
 
         if agg == AggregationType.SUM:
             return f"SUM({fc})"
-        if agg == AggregationType.MIN:
+        elif agg == AggregationType.MIN:
             return f"MIN({fc})"
-        if agg == AggregationType.MAX:
+        elif agg == AggregationType.MAX:
             return f"MAX({fc})"
-        if agg == AggregationType.COUNT:
+        elif agg == AggregationType.COUNT:
             return f"COUNT({fc})"
-        if agg == AggregationType.COUNT_DISTINCT:
+        elif agg == AggregationType.COUNT_DISTINCT:
             return f"COUNT(DISTINCT {fc})"
-        if agg == AggregationType.AVERAGE:
+        elif agg == AggregationType.AVERAGE:
             return f"AVG({fc})"
-        if agg == AggregationType.SUM_BOOLEAN:
+        elif agg == AggregationType.SUM_BOOLEAN:
             # col is already a boolean condition; the filter becomes an extra AND term.
             if filter_sql:
                 return f"SUM(CASE WHEN ({filter_sql}) AND ({col}) THEN 1 ELSE 0 END)"
             return f"SUM(CASE WHEN {col} THEN 1 ELSE 0 END)"
-        if agg == AggregationType.MEDIAN:
+        elif agg == AggregationType.MEDIAN:
             return f"PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY {fc})"
-        if agg == AggregationType.PERCENTILE:
+        elif agg == AggregationType.PERCENTILE:
             percentile = agg_params.percentile if agg_params and agg_params.percentile is not None else 0.5
             use_discrete = agg_params.use_discrete_percentile if agg_params else False
             func = "PERCENTILE_DISC" if use_discrete else "PERCENTILE_CONT"
             return f"{func}({percentile}) WITHIN GROUP (ORDER BY {fc})"
-        return f"{agg.value.upper()}({fc})"
+        else:
+            assert_values_exhausted(agg)
 
     def _make_expression(self, expr: str) -> OSIExpression:
         return OSIExpression(dialects=[OSIDialectExpression(dialect=self._dialect, expression=expr)])
