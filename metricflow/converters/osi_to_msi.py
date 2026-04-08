@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple
 
 from metricflow.converters.expression_utils import (
     _extract_agg_info,
@@ -103,23 +103,19 @@ class OSIToMSIConverter:
 
         for field in dataset.fields or []:
             expr = self._get_expression(field.expression)
-            expr_or_none = expr if expr != field.name else None
-            element = self._classify_field(
+            self._classify_field(
                 field,
                 expr,
-                expr_or_none,
+                expr if expr != field.name else None,
                 dataset.name,
                 primary_key_cols,
                 unique_key_cols,
                 foreign_key_cols,
                 measure_index,
+                entities,
+                dimensions,
+                measures,
             )
-            if isinstance(element, PydanticEntity):
-                entities.append(element)
-            elif isinstance(element, PydanticMeasure):
-                measures.append(element)
-            else:
-                dimensions.append(element)
 
         return PydanticSemanticModel(
             name=dataset.name,
@@ -150,8 +146,11 @@ class OSIToMSIConverter:
         unique_key_cols: Set[str],
         foreign_key_cols: Set[str],
         measure_index: Dict[_MeasureKey, Tuple[AggregationType, str]],
-    ) -> Union[PydanticEntity, PydanticDimension, PydanticMeasure]:
-        """Classify a single OSI field into an MSI entity, dimension, or measure.
+        entities: List[PydanticEntity],
+        dimensions: List[PydanticDimension],
+        measures: List[PydanticMeasure],
+    ) -> None:
+        """Classify a single OSI field and append it to the appropriate list.
 
         Classification order (first match wins):
         1. primary_key → PRIMARY entity
@@ -162,46 +161,58 @@ class OSIToMSIConverter:
         6. fallback → CATEGORICAL dimension
         """
         if field.name in primary_key_cols:
-            return PydanticEntity(
-                name=field.name,
-                type=EntityType.PRIMARY,
-                expr=expr_or_none,
-                description=field.description,
-                label=field.label,
-                role=None,
-                config=None,
+            entities.append(
+                PydanticEntity(
+                    name=field.name,
+                    type=EntityType.PRIMARY,
+                    expr=expr_or_none,
+                    description=field.description,
+                    label=field.label,
+                    role=None,
+                    config=None,
+                )
             )
+            return
         if field.name in unique_key_cols:
-            return PydanticEntity(
-                name=field.name,
-                type=EntityType.UNIQUE,
-                expr=expr_or_none,
-                description=field.description,
-                label=field.label,
-                role=None,
-                config=None,
+            entities.append(
+                PydanticEntity(
+                    name=field.name,
+                    type=EntityType.UNIQUE,
+                    expr=expr_or_none,
+                    description=field.description,
+                    label=field.label,
+                    role=None,
+                    config=None,
+                )
             )
+            return
         if field.name in foreign_key_cols:
-            return PydanticEntity(
-                name=field.name,
-                type=EntityType.FOREIGN,
-                expr=expr_or_none,
-                description=field.description,
-                label=field.label,
-                role=None,
-                config=None,
+            entities.append(
+                PydanticEntity(
+                    name=field.name,
+                    type=EntityType.FOREIGN,
+                    expr=expr_or_none,
+                    description=field.description,
+                    label=field.label,
+                    role=None,
+                    config=None,
+                )
             )
+            return
         if field.dimension is not None and field.dimension.is_time:
             # OSI carries no granularity metadata; default to DAY.
-            return PydanticDimension(
-                name=field.name,
-                type=DimensionType.TIME,
-                type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
-                expr=expr_or_none,
-                description=field.description,
-                label=field.label,
-                config=None,
+            dimensions.append(
+                PydanticDimension(
+                    name=field.name,
+                    type=DimensionType.TIME,
+                    type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
+                    expr=expr_or_none,
+                    description=field.description,
+                    label=field.label,
+                    config=None,
+                )
             )
+            return
         if self._in_measure_index(field.name, expr, dataset_name, measure_index):
             agg, _ = (
                 measure_index.get((dataset_name, field.name))
@@ -209,23 +220,28 @@ class OSIToMSIConverter:
                 or measure_index.get((dataset_name, _strip_qualifier(expr)))
                 or measure_index[(None, _strip_qualifier(expr))]
             )
-            return PydanticMeasure(
+            measures.append(
+                PydanticMeasure(
+                    name=field.name,
+                    agg=agg,
+                    expr=expr_or_none,
+                    description=field.description,
+                    label=field.label,
+                    create_metric=None,
+                    agg_params=None,
+                )
+            )
+            return
+        dimensions.append(
+            PydanticDimension(
                 name=field.name,
-                agg=agg,
+                type=DimensionType.CATEGORICAL,
+                type_params=None,
                 expr=expr_or_none,
                 description=field.description,
                 label=field.label,
-                create_metric=None,
-                agg_params=None,
+                config=None,
             )
-        return PydanticDimension(
-            name=field.name,
-            type=DimensionType.CATEGORICAL,
-            type_params=None,
-            expr=expr_or_none,
-            description=field.description,
-            label=field.label,
-            config=None,
         )
 
     # ------------------------------------------------------------------
