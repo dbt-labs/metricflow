@@ -6,26 +6,17 @@ import pytest
 
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow.converters.osi_to_msi import OSIToMSIConverter
-from metricflow_semantic_interfaces.implementations.semantic_model import PydanticNodeRelation
-from metricflow_semantic_interfaces.test_utils import semantic_model_with_guaranteed_meta
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
     DimensionType,
-    EntityType,
     MetricType,
-    TimeGranularity,
 )
 from tests_metricflow_semantic_interfaces.osi.helpers import (
-    _dimension,
-    _entity,
-    _manifest,
-    _measure,
     _osi_dataset,
     _osi_doc,
     _osi_field,
     _osi_metric,
     _osi_relationship,
-    _simple_metric,
 )
 
 
@@ -313,51 +304,40 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
 
 
 class TestOSIToMSIRoundTrip:  # noqa: D101
-    def test_field_names_and_counts_survive_round_trip(self) -> None:  # noqa: D102
-        """MSI → OSI → MSI preserves dataset names, fields, and metric expressions.
-
-        Measures are deprecated: after the round-trip the ``revenue`` measure field
-        becomes a categorical dimension (emitted as a plain OSI field), and the
-        recovered ``revenue`` metric carries its aggregation in
-        ``metric_aggregation_params`` rather than a measure reference.
-        """
-        original = _manifest(
-            semantic_models=[
-                semantic_model_with_guaranteed_meta(
-                    name="orders",
-                    node_relation=PydanticNodeRelation(schema_name="analytics", alias="orders"),
-                    entities=[_entity("order_id", entity_type=EntityType.PRIMARY)],
-                    dimensions=[
-                        _dimension("status"),
-                        _dimension("created_at", dim_type=DimensionType.TIME, granularity=TimeGranularity.DAY),
+    def test_osi_to_msi_to_osi_preserves_structure(self) -> None:  # noqa: D102
+        """OSI → MSI → OSI preserves dataset names, fields, and metric expressions."""
+        original = _osi_doc(
+            datasets=[
+                _osi_dataset(
+                    "orders",
+                    source="analytics.orders",
+                    fields=[
+                        _osi_field("order_id"),
+                        _osi_field("status"),
+                        _osi_field("created_at", is_time=True),
+                        _osi_field("amount"),
                     ],
-                    measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+                    primary_key=["order_id"],
                 )
             ],
-            metrics=[_simple_metric("revenue", "revenue")],
+            metrics=[_osi_metric("revenue", "SUM(orders.amount)")],
         )
 
-        osi_doc = MSIToOSIConverter().convert(original, model_name="my_model")
-        recovered = OSIToMSIConverter().convert(osi_doc)
+        msi = OSIToMSIConverter().convert(original)
+        assert msi.semantic_models[0].measures == []
 
-        assert len(recovered.semantic_models) == 1
-        sm = recovered.semantic_models[0]
-        assert sm.name == "orders"
+        osi_doc = MSIToOSIConverter().convert(msi)
 
-        entity_names = {e.name for e in sm.entities}
-        assert "order_id" in entity_names
+        dataset = osi_doc.semantic_model[0].datasets[0]
+        assert dataset.name == "orders"
 
-        dim_names = {d.name for d in sm.dimensions}
-        assert "status" in dim_names
-        assert "created_at" in dim_names
+        field_names = {f.name for f in dataset.fields or []}
+        assert "order_id" in field_names
+        assert "status" in field_names
+        assert "created_at" in field_names
+        assert "amount" in field_names
 
-        # Measures are deprecated; the revenue field becomes a categorical dimension.
-        assert len(sm.measures) == 0
-        assert "revenue" in dim_names
-
-        assert len(recovered.metrics) == 1
-        recovered_metric = recovered.metrics[0]
-        assert recovered_metric.name == "revenue"
-        assert recovered_metric.type == MetricType.SIMPLE
-        assert recovered_metric.type_params.metric_aggregation_params is not None
-        assert recovered_metric.type_params.metric_aggregation_params.agg == AggregationType.SUM
+        metrics = osi_doc.semantic_model[0].metrics or []
+        assert len(metrics) == 1
+        assert metrics[0].name == "revenue"
+        assert metrics[0].expression.dialects[0].expression == "SUM(orders.amount)"
