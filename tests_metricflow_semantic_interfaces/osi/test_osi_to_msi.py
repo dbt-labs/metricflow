@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 import pytest
+from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    SnapshotConfiguration,
+    assert_object_snapshot_equal,
+)
 
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow.converters.osi_to_msi import OSIToMSIConverter
@@ -304,7 +309,9 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
 
 
 class TestOSIToMSIRoundTrip:  # noqa: D101
-    def test_osi_to_msi_to_osi_preserves_structure(self) -> None:  # noqa: D102
+    def test_osi_to_msi_to_osi_preserves_structure(  # noqa: D102
+        self, request: FixtureRequest, snapshot_configuration: SnapshotConfiguration
+    ) -> None:
         """OSI → MSI → OSI preserves dataset names, fields, and metric expressions."""
         original = _osi_doc(
             datasets=[
@@ -341,3 +348,8 @@ class TestOSIToMSIRoundTrip:  # noqa: D101
         assert len(metrics) == 1
         assert metrics[0].name == "revenue"
         assert metrics[0].expression.dialects[0].expression == "SUM(orders.amount)"
+        assert_object_snapshot_equal(
+            request=request,
+            snapshot_configuration=snapshot_configuration,
+            obj=osi_doc,
+        )

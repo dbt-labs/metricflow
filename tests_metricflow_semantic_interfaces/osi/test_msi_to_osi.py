@@ -4,6 +4,11 @@ import json
 from typing import List, Optional
 
 import pytest
+from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.test_helpers.snapshot_helpers import (
+    SnapshotConfiguration,
+    assert_object_snapshot_equal,
+)
 
 from metricflow.converters.filter_utils import _render_filter_template
 from metricflow.converters.models import OSIDialect, OSIDocument
@@ -358,7 +363,9 @@ class TestRelationshipConversion:  # noqa: D101
 
         assert result.semantic_model[0].relationships is None
 
-    def test_three_datasets_produce_all_pairs(self) -> None:  # noqa: D102
+    def test_three_datasets_produce_all_pairs(  # noqa: D102
+        self, request: FixtureRequest, snapshot_configuration: SnapshotConfiguration
+    ) -> None:
         users_a = semantic_model_with_guaranteed_meta(
             name="users_a",
             entities=[_entity("user", entity_type=EntityType.PRIMARY, expr="user_id")],
@@ -378,6 +385,11 @@ class TestRelationshipConversion:  # noqa: D101
         assert len(rels) == 3
         pairs = {(r.from_dataset, r.to) for r in rels}
         assert pairs == {("users_a", "users_b"), ("orders", "users_a"), ("orders", "users_b")}
+        assert_object_snapshot_equal(
+            request=request,
+            snapshot_configuration=snapshot_configuration,
+            obj=result,
+        )
 
     def test_columns_use_expr_when_present(self) -> None:  # noqa: D102
         listings = semantic_model_with_guaranteed_meta(
@@ -526,7 +538,9 @@ class TestMetricConversion:  # noqa: D101
 
     # --- RATIO ---
 
-    def test_ratio_metric_inlines_sub_expressions(self) -> None:  # noqa: D102
+    def test_ratio_metric_inlines_sub_expressions(  # noqa: D102
+        self, request: FixtureRequest, snapshot_configuration: SnapshotConfiguration
+    ) -> None:
         sm = semantic_model_with_guaranteed_meta(
             name="orders",
             measures=[
@@ -552,6 +566,11 @@ class TestMetricConversion:  # noqa: D101
 
         arpu_osi = next(m for m in _osi_metrics(result) if m.name == "arpu")
         assert arpu_osi.expression.dialects[0].expression == "(SUM(amount)) / (COUNT(order_id))"
+        assert_object_snapshot_equal(
+            request=request,
+            snapshot_configuration=snapshot_configuration,
+            obj=result,
+        )
 
     # --- DERIVED ---
 
@@ -615,7 +634,9 @@ class TestMetricConversion:  # noqa: D101
         profit_osi = next(m for m in _osi_metrics(result) if m.name == "profit")
         assert profit_osi.expression.dialects[0].expression == "SUM(amount) - SUM(cost_amount)"
 
-    def test_derived_metric_nested(self) -> None:  # noqa: D102
+    def test_derived_metric_nested(  # noqa: D102
+        self, request: FixtureRequest, snapshot_configuration: SnapshotConfiguration
+    ) -> None:
         sm = semantic_model_with_guaranteed_meta(
             name="orders",
             measures=[
@@ -666,6 +687,11 @@ class TestMetricConversion:  # noqa: D101
 
         net_osi = next(m for m in _osi_metrics(result) if m.name == "net_profit")
         assert net_osi.expression.dialects[0].expression == "(SUM(amount) - SUM(cost_amount)) - SUM(expense_amount)"
+        assert_object_snapshot_equal(
+            request=request,
+            snapshot_configuration=snapshot_configuration,
+            obj=result,
+        )
 
     def test_derived_metric_ref_not_corrupted_by_prefix_match(self) -> None:  # noqa: D102
         """Substituting 'revenue' must not corrupt 'revenue_adjusted' when it appears in the same expr."""
@@ -890,7 +916,9 @@ class TestMetricFilterFlattening:  # noqa: D101
             == "SUM(CASE WHEN status = 'paid' THEN amount END)"
         )
 
-    def test_metric_and_measure_filters_combined_with_and(self) -> None:  # noqa: D102
+    def test_metric_and_measure_filters_combined_with_and(  # noqa: D102
+        self, request: FixtureRequest, snapshot_configuration: SnapshotConfiguration
+    ) -> None:
         sm = semantic_model_with_guaranteed_meta(
             name="orders",
             measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
@@ -910,6 +938,11 @@ class TestMetricFilterFlattening:  # noqa: D101
 
         assert _osi_metrics(result)[0].expression.dialects[0].expression == (
             "SUM(CASE WHEN (region = 'intl') AND (status = 'paid') THEN amount END)"
+        )
+        assert_object_snapshot_equal(
+            request=request,
+            snapshot_configuration=snapshot_configuration,
+            obj=result,
         )
 
     def test_jinja_dimension_reference_rendered(self) -> None:  # noqa: D102
