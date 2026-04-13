@@ -7,10 +7,6 @@ import sqlglot.expressions as exp
 
 from metricflow_semantic_interfaces.type_enums import AggregationType
 
-# Keyed by (dataset_name_or_None, col_name) → (AggregationType, bare_col_expr).
-# None as dataset name means the column reference was unqualified in the expression.
-_MeasureKey = Tuple[Optional[str], str]
-
 
 def _strip_qualifier(col: str) -> str:
     """Strip a leading dataset qualifier, e.g. 'orders.amount' → 'amount'."""

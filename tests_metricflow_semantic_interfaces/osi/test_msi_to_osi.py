@@ -522,7 +522,7 @@ class TestMetricConversion:  # noqa: D101
         )
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
 
-        assert _osi_metrics(result)[0].expression.dialects[0].expression == "AVG(price)"
+        assert _osi_metrics(result)[0].expression.dialects[0].expression == "AVG(orders.price)"
 
     # --- RATIO ---
 

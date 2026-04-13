@@ -229,6 +229,10 @@ class MSIToOSIConverter:
                 )
             )
         col = metric.type_params.expr if metric.type_params.expr is not None else metric.name
+        # Qualify the column with the semantic model name so the OSI expression is
+        # unambiguous and OSI→MSI conversion can recover the dataset from the qualifier.
+        if "." not in col:
+            col = f"{agg_params_obj.semantic_model}.{col}"
         return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params, filter_sql)
 
     def _resolve_cumulative(

@@ -149,16 +149,17 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
         assert sm.dimensions[0].name == field_name
         assert sm.dimensions[0].type == expected_type
 
-    def test_field_referenced_in_metric_becomes_measure(self) -> None:  # noqa: D102
+    def test_field_referenced_in_metric_stays_as_dimension(self) -> None:  # noqa: D102
+        """Fields referenced in metric expressions are no longer promoted to measures."""
         doc = _osi_doc(
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("revenue", "SUM(amount)")],
         )
         sm = OSIToMSIConverter().convert(doc).semantic_models[0]
 
-        assert len(sm.measures) == 1
-        assert sm.measures[0].name == "amount"
-        assert sm.measures[0].agg == AggregationType.SUM
+        assert len(sm.measures) == 0
+        assert len(sm.dimensions) == 1
+        assert sm.dimensions[0].name == "amount"
 
     def test_expr_different_from_name_is_preserved(self) -> None:  # noqa: D102
         doc = _osi_doc(
@@ -216,8 +217,11 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         m = result.metrics[0]
         assert m.name == "revenue"
         assert m.type == MetricType.SIMPLE
-        assert m.type_params.measure is not None
-        assert m.type_params.measure.name == "amount"
+        assert m.type_params.measure is None
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.SUM
+        assert m.type_params.expr == "amount"
+        assert m.type_params.metric_aggregation_params.semantic_model == "orders"
 
     def test_count_distinct_expression(self) -> None:  # noqa: D102
         doc = _osi_doc(
@@ -227,10 +231,12 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         result = OSIToMSIConverter().convert(doc)
 
         m = result.metrics[0]
-        assert m.type_params.measure is not None
-        assert m.type_params.measure.name == "user_id"
+        assert m.type_params.measure is None
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.COUNT_DISTINCT
+        assert m.type_params.expr == "user_id"
         sm = result.semantic_models[0]
-        assert sm.measures[0].agg.value == "count_distinct"
+        assert len(sm.measures) == 0
 
     def test_ratio_expression_produces_ratio_metric(self) -> None:  # noqa: D102
         doc = _osi_doc(
@@ -263,7 +269,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         names = {m.name for m in simple_metrics}
         assert names == {"ratio__numerator", "ratio__denominator"}
 
-    def test_complex_expression_falls_back_to_simple_with_synthetic_measure(self) -> None:  # noqa: D102
+    def test_complex_expression_falls_back_to_simple_with_raw_expr(self) -> None:  # noqa: D102
         doc = _osi_doc(
             datasets=[_osi_dataset("orders")],
             metrics=[_osi_metric("complex", "SUM(a) + SUM(b)")],
@@ -273,8 +279,9 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         assert len(result.metrics) == 1
         m = result.metrics[0]
         assert m.type == MetricType.SIMPLE
-        assert m.type_params.measure is not None
-        assert m.type_params.measure.name == "complex__expr"
+        assert m.type_params.measure is None
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.expr == "SUM(a) + SUM(b)"
 
     def test_metric_description_carried_over(self) -> None:  # noqa: D102
         doc = _osi_doc(
@@ -292,20 +299,28 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         assert result.metrics == []
 
     def test_dataset_qualified_column_reference(self) -> None:  # noqa: D102
-        """A metric referencing 'dataset.col' should classify 'col' as a measure in that dataset."""
+        """A metric referencing 'dataset.col' should resolve the semantic_model to that dataset."""
         doc = _osi_doc(
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("revenue", "SUM(orders.amount)")],
         )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        result = OSIToMSIConverter().convert(doc)
 
-        assert len(sm.measures) == 1
-        assert sm.measures[0].name == "amount"
+        m = result.metrics[0]
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.semantic_model == "orders"
+        assert m.type_params.expr == "amount"
 
 
 class TestOSIToMSIRoundTrip:  # noqa: D101
     def test_field_names_and_counts_survive_round_trip(self) -> None:  # noqa: D102
-        """MSI → OSI → MSI preserves dataset names, field counts, and entity types."""
+        """MSI → OSI → MSI preserves dataset names, fields, and metric expressions.
+
+        Measures are deprecated: after the round-trip the ``revenue`` measure field
+        becomes a categorical dimension (emitted as a plain OSI field), and the
+        recovered ``revenue`` metric carries its aggregation in
+        ``metric_aggregation_params`` rather than a measure reference.
+        """
         original = _manifest(
             semantic_models=[
                 semantic_model_with_guaranteed_meta(
@@ -336,8 +351,13 @@ class TestOSIToMSIRoundTrip:  # noqa: D101
         assert "status" in dim_names
         assert "created_at" in dim_names
 
-        measure_names = {m.name for m in sm.measures}
-        assert "revenue" in measure_names
+        # Measures are deprecated; the revenue field becomes a categorical dimension.
+        assert len(sm.measures) == 0
+        assert "revenue" in dim_names
 
         assert len(recovered.metrics) == 1
-        assert recovered.metrics[0].name == "revenue"
+        recovered_metric = recovered.metrics[0]
+        assert recovered_metric.name == "revenue"
+        assert recovered_metric.type == MetricType.SIMPLE
+        assert recovered_metric.type_params.metric_aggregation_params is not None
+        assert recovered_metric.type_params.metric_aggregation_params.agg == AggregationType.SUM
