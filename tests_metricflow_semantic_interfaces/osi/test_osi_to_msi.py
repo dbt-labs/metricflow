@@ -307,6 +307,33 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         assert m.type_params.metric_aggregation_params.semantic_model == "orders"
         assert m.type_params.expr == "amount"
 
+    def test_percentile_cont_0_5_produces_median(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
+            metrics=[_osi_metric("median_amount", "PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY amount)")],
+        )
+        result = OSIToMSIConverter().convert(doc)
+
+        m = result.metrics[0]
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.MEDIAN
+        assert m.type_params.metric_aggregation_params.agg_params is None
+        assert m.type_params.expr == "amount"
+
+    def test_percentile_cont_non_median_carries_percentile_param(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
+            metrics=[_osi_metric("p95_amount", "PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY amount)")],
+        )
+        result = OSIToMSIConverter().convert(doc)
+
+        m = result.metrics[0]
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.PERCENTILE
+        assert m.type_params.metric_aggregation_params.agg_params is not None
+        assert m.type_params.metric_aggregation_params.agg_params.percentile == 0.95
+        assert m.type_params.expr == "amount"
+
 
 class TestOSIToMSIRoundTrip:  # noqa: D101
     def test_osi_to_msi_to_osi_preserves_structure(  # noqa: D102

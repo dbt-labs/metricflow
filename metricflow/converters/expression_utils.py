@@ -21,10 +21,11 @@ def _col_name(node: exp.Expression) -> str:
     return _strip_qualifier(rendered)
 
 
-def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str]]:
+def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str, Optional[float]]]:
     """Parse a SQL aggregation expression using sqlglot.
 
-    Returns ``(agg_type, bare_col)`` for recognised patterns, ``None`` otherwise.
+    Returns ``(agg_type, bare_col, percentile)`` for recognised patterns, ``None`` otherwise.
+    ``percentile`` is only set for ``PERCENTILE`` aggregations; it is ``None`` for all others.
     The returned column name has any dataset qualifier stripped.
     """
     try:
@@ -36,12 +37,12 @@ def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str]]:
     if isinstance(tree, exp.Count) and isinstance(tree.this, exp.Distinct):
         cols = tree.this.expressions
         if len(cols) == 1:
-            return AggregationType.COUNT_DISTINCT, _col_name(cols[0])
+            return AggregationType.COUNT_DISTINCT, _col_name(cols[0]), None
         return None
 
     # COUNT(col)
     if isinstance(tree, exp.Count):
-        return AggregationType.COUNT, _col_name(tree.this)
+        return AggregationType.COUNT, _col_name(tree.this), None
 
     # SUM(CASE WHEN col THEN 1 ELSE 0 END) → SUM_BOOLEAN
     if isinstance(tree, exp.Sum) and isinstance(tree.this, exp.Case):
@@ -55,36 +56,42 @@ def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str]]:
             and isinstance(ifs[0].args.get("true"), exp.Literal)
             and ifs[0].args["true"].name == "1"
         ):
-            return AggregationType.SUM_BOOLEAN, ifs[0].this.sql()
+            return AggregationType.SUM_BOOLEAN, ifs[0].this.sql(), None
         return None
 
     # SUM(col)
     if isinstance(tree, exp.Sum):
-        return AggregationType.SUM, _col_name(tree.this)
+        return AggregationType.SUM, _col_name(tree.this), None
 
     if isinstance(tree, exp.Avg):
-        return AggregationType.AVERAGE, _col_name(tree.this)
+        return AggregationType.AVERAGE, _col_name(tree.this), None
 
     if isinstance(tree, exp.Min):
-        return AggregationType.MIN, _col_name(tree.this)
+        return AggregationType.MIN, _col_name(tree.this), None
 
     if isinstance(tree, exp.Max):
-        return AggregationType.MAX, _col_name(tree.this)
+        return AggregationType.MAX, _col_name(tree.this), None
 
     # PERCENTILE_CONT(p) WITHIN GROUP (ORDER BY col)
-    if isinstance(tree, (exp.PercentileCont, exp.PercentileDisc)):
+    # sqlglot parses this as WithinGroup(this=PercentileCont(...), expression=Order(...))
+    if isinstance(tree, exp.WithinGroup):
+        inner = tree.this
         order = tree.args.get("expression")
-        if isinstance(order, exp.Order) and order.expressions:
+        if (
+            isinstance(inner, (exp.PercentileCont, exp.PercentileDisc))
+            and isinstance(order, exp.Order)
+            and order.expressions
+        ):
             ordered = order.expressions[0]
             col_node = ordered.this if isinstance(ordered, exp.Ordered) else ordered
             col = _col_name(col_node)
-            if isinstance(tree, exp.PercentileCont):
-                try:
-                    p = float(tree.this.name)
-                except (AttributeError, ValueError):
-                    p = 0.5
-                return (AggregationType.MEDIAN if p == 0.5 else AggregationType.PERCENTILE), col
-            return AggregationType.PERCENTILE, col
+            try:
+                p = float(inner.this.name)
+            except (AttributeError, ValueError):
+                return None
+            if p == 0.5 and isinstance(inner, exp.PercentileCont):
+                return AggregationType.MEDIAN, col, None
+            return AggregationType.PERCENTILE, col, p
 
     return None
 

@@ -21,6 +21,9 @@ from metricflow_semantic_interfaces.implementations.elements.dimension import (
     PydanticDimensionTypeParams,
 )
 from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
+from metricflow_semantic_interfaces.implementations.elements.measure import (
+    PydanticMeasureAggregationParameters,
+)
 from metricflow_semantic_interfaces.implementations.metric import (
     PydanticMetric,
     PydanticMetricAggregationParams,
@@ -247,8 +250,9 @@ class OSIToMSIConverter:
         # --- SIMPLE: single aggregation ---
         agg_result = _extract_agg_info(expr_str)
         if agg_result is not None:
-            agg, col = agg_result
+            agg, col, percentile = agg_result
             semantic_model_name = self._find_dataset_for_col(expr_str, col, datasets)
+            agg_params = PydanticMeasureAggregationParameters(percentile=percentile) if percentile is not None else None
             return [
                 PydanticMetric(
                     name=name,
@@ -259,7 +263,7 @@ class OSIToMSIConverter:
                         metric_aggregation_params=PydanticMetricAggregationParams(
                             semantic_model=semantic_model_name,
                             agg=agg,
-                            agg_params=None,
+                            agg_params=agg_params,
                             agg_time_dimension=None,
                             non_additive_dimension=None,
                         ),
