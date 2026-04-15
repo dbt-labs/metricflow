@@ -3,13 +3,13 @@ test_filename: test_cli.py
 docstring:
   Tests the message output of the tutorial.
 
-      The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
-      so from an end user perspective it's little more than the output with -m.
+  The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
+  so from an end user perspective it's little more than the output with -m.
 
-      The tutorial currently requires execution from a dbt project path. Rather than go all the way on testing the
-      tutorial given the path and dbt project requirements, we simply check the message output. When we allow for
-      project path overrides it might warrant a more complete test of the semantic manifest building steps in the
-      tutorial flow.
+  The tutorial currently requires execution from a dbt project path. Rather than go all the way on testing the
+  tutorial given the path and dbt project requirements, we simply check the message output. When we allow for
+  project path overrides it might warrant a more complete test of the semantic manifest building steps in the
+  tutorial flow.
 ---
 🤓 Please run the following steps:
 

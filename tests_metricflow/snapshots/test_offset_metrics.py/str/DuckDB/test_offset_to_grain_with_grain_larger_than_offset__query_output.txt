@@ -3,7 +3,7 @@ test_filename: test_offset_metrics.py
 docstring:
   Test offset to grain metric queried with grain larger than offset grain.
 
-      Not likely a useful query, but still demonstrates that we do this correctly.
+  Not likely a useful query, but still demonstrates that we do this correctly.
 ---
 metric_time__year      bookings_all_time    bookings_all_time_at_start_of_month    bookings_since_start_of_month
 -------------------  -------------------  -------------------------------------  -------------------------------

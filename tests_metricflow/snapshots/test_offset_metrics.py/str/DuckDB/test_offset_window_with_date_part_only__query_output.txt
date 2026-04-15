@@ -3,8 +3,8 @@ test_filename: test_offset_metrics.py
 docstring:
   Test offset window metric queried with date part only (no grain specified).
 
-      Not a very useful query, but still demonstrates that we can handle this query.
-      Note: date part is allowed for offset_window but not for offset_to_grain.
+  Not a very useful query, but still demonstrates that we can handle this query.
+  Note: date part is allowed for offset_window but not for offset_to_grain.
 ---
   metric_time__extract_month    bookings    bookings_1_month_ago    bookings_mom
 ----------------------------  ----------  ----------------------  --------------

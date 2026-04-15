@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Update supported Python versions to `>=3.10, <3.14`
+time: 2026-04-15T15:45:08.34745-07:00
+custom:
+  Author: plypaul
+  Issue: "2020"

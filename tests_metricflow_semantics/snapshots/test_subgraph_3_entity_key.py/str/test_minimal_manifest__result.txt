@@ -3,7 +3,7 @@ test_filename: test_subgraph_3_entity_key.py
 docstring:
   Test generation of the entity-key subgraph using the minimal manifest.
 
-      The `EntityJoinSubgraphGenerator` is included in the graphs to show how the keys relate to the configured entities.
+  The `EntityJoinSubgraphGenerator` is included in the graphs to show how the keys relate to the configured entities.
 expectation_description:
   The graph should show an edge to the primary entity.
 ---
