@@ -22,6 +22,9 @@ This project uses **hatch** for dependency management and testing:
   - Identify and fix correctness issues.
   - Make updates to improve readability and clarity.
   - Make updates to follow code standards.
+- Code should be compatible with the lowest Python version supported by this
+  project.
+
 
 ## Python Code Standards
 
@@ -30,6 +33,7 @@ This project uses **hatch** for dependency management and testing:
 - Include `from __future__ import annotations` at the top of Python files.
 - Include `logger = logging.getLogger(__name__)` in Python files.
 - Avoid the use of `isinstance()`.
+- Avoid dynamic field access with `getattr`.
 - Prefer to use immutable data types.
 - Prioritize code clarity and readability.
 - Docstrings should be concise, capture behavior, capture assumptions, and
