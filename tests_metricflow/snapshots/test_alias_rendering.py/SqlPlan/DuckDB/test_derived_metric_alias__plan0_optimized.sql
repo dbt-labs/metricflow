@@ -1,5 +1,5 @@
 test_name: test_derived_metric_alias
-test_filename: test_query_rendering.py
+test_filename: test_alias_rendering.py
 docstring:
   Tests a plan with an aliased metric.
 sql_engine: DuckDB
