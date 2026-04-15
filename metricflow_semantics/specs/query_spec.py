@@ -120,8 +120,6 @@ class MetricFlowQuerySpec(SerializableDataclass):
             filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
             min_max_only=self.min_max_only,
             apply_group_by=self.apply_group_by,
-            input_spec_order=InputSpecOrder(
-                group_by_item_specs=tuple(spec.with_alias(None) for spec in self.input_spec_order.group_by_item_specs),
-                metric_specs=tuple(metric_spec.with_alias(None) for metric_spec in self.input_spec_order.metric_specs),
-            ),
+            # Preserve the original input order so duplicate selections remain distinguishable by alias.
+            input_spec_order=self.input_spec_order,
         )

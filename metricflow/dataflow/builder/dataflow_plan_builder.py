@@ -948,10 +948,23 @@ class DataflowPlanBuilder:
         output_metric_specs = tuple(
             MetricSpec.create(metric_spec.element_name, alias=metric_spec.alias) for metric_spec in metric_specs
         )
+        requested_output_specs: Tuple[InstanceSpec, ...] = (
+            output_metric_specs + dimension_specs + entity_specs + time_dimension_specs
+        )
+        input_spec_to_output_specs: dict[InstanceSpec, list[InstanceSpec]] = {}
+        for requested_output_spec in requested_output_specs:
+            input_spec = requested_output_spec.with_alias(None)
+            if input_spec not in input_spec_to_output_specs:
+                input_spec_to_output_specs[input_spec] = []
+            input_spec_to_output_specs[input_spec].append(requested_output_spec)
+
         alias_specs: Tuple[SpecToAlias, ...] = ()
-        for spec in output_metric_specs + dimension_specs + entity_specs + time_dimension_specs:
-            if spec.alias is not None:
-                alias_specs += (SpecToAlias(spec.with_alias(None), spec),)
+        for input_spec, output_specs in input_spec_to_output_specs.items():
+            if len(output_specs) == 1 and output_specs[0] == input_spec:
+                continue
+
+            for output_spec in output_specs:
+                alias_specs += (SpecToAlias(input_spec, output_spec),)
 
         if len(alias_specs) > 0:
             pre_result_node = AliasSpecsNode.create(

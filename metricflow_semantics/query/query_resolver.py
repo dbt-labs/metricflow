@@ -6,7 +6,7 @@ import time
 from collections import defaultdict
 from collections.abc import Set
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from metricflow_semantics.errors.error_classes import InvalidManifestException
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -320,11 +320,15 @@ class MetricFlowQueryResolver:
         # The pattern needs to be used because there are cases where the order-by-item is specified in a different way
         # from the group-by-item, so an equality comparison won't work.
         for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
-            matching_specs: set[InstanceSpec] = set()
+            matching_specs = MutableOrderedSet[InstanceSpec]()
             for possible_input in resolver_input_for_order_by.possible_inputs:
-                spec_pattern = possible_input.spec_pattern
-                matching_specs.update(spec_pattern.match(metric_specs))
-                matching_specs.update(spec_pattern.match(group_by_item_specs))
+                matching_specs.update(
+                    MetricFlowQueryResolver._resolve_matching_specs_for_order_by_input(
+                        possible_input=possible_input,
+                        metric_specs=metric_specs,
+                        group_by_item_specs=group_by_item_specs,
+                    )
+                )
 
             if len(matching_specs) != 1:
                 mapping_items.append(
@@ -342,7 +346,7 @@ class MetricFlowQueryResolver:
                 order_by_specs.append(
                     OrderBySpec(
                         # Ignore aliases in the order by since we'll render the expression instead of the alias.
-                        instance_spec=matching_specs.pop().with_alias(None),
+                        instance_spec=next(iter(matching_specs)).with_alias(None),
                         descending=resolver_input_for_order_by.descending,
                     )
                 )
@@ -351,6 +355,29 @@ class MetricFlowQueryResolver:
             input_to_issue_set_mapping=InputToIssueSetMapping(items=tuple(mapping_items)),
             order_by_specs=tuple(order_by_specs),
         )
+
+    @staticmethod
+    def _resolve_matching_specs_for_order_by_input(
+        possible_input: Union[ResolverInputForMetric, ResolverInputForGroupByItem],
+        metric_specs: Sequence[MetricSpec],
+        group_by_item_specs: Sequence[LinkableInstanceSpec],
+    ) -> MutableOrderedSet[InstanceSpec]:
+        expected_alias = possible_input.alias
+        matching_metric_spec_set = set(possible_input.spec_pattern.match(metric_specs))
+        matching_metric_specs = tuple(
+            metric_spec
+            for metric_spec in metric_specs
+            if metric_spec in matching_metric_spec_set
+            if metric_spec.alias == expected_alias
+        )
+        matching_group_by_item_spec_set = set(possible_input.spec_pattern.match(group_by_item_specs))
+        matching_group_by_item_specs = tuple(
+            group_by_item_spec
+            for group_by_item_spec in group_by_item_specs
+            if group_by_item_spec in matching_group_by_item_spec_set
+            if group_by_item_spec.alias == expected_alias
+        )
+        return MutableOrderedSet((*matching_metric_specs, *matching_group_by_item_specs))
 
     @staticmethod
     def _resolve_limit_input(
