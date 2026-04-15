@@ -22,6 +22,8 @@ This project uses **hatch** for dependency management and testing:
   - Identify and fix correctness issues.
   - Make updates to improve readability and clarity.
   - Make updates to follow code standards.
+- Code should be compatible with Python versions 3.9 to 3.12.
+- Prefer to avoid dynamic field access with `getattr`.
 
 ## Python Code Standards
 
