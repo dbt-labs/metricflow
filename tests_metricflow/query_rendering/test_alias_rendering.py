@@ -143,3 +143,41 @@ def test_derived_metric_alias(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_duplicate_dimension(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+) -> None:
+    """Tests querying the same dimension but with an alias."""
+    metric_param = MetricParameter(
+        name="bookings",
+    )
+    dimension_param = DimensionOrEntityParameter(
+        name="booking__is_instant",
+    )
+    aliased_dimension_param = DimensionOrEntityParameter(name="booking__is_instant", alias="aliased_is_instant")
+    query_spec = query_parser.parse_and_validate_query(
+        metrics=(metric_param,),
+        group_by=(dimension_param, aliased_dimension_param),
+        order_by=(
+            OrderByParameter(metric_param),
+            OrderByParameter(dimension_param),
+            OrderByParameter(aliased_dimension_param),
+        ),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
