@@ -5,7 +5,7 @@ inputs:
   python-version:
     description: "Version of Python to use for testing."
     required: False
-    default: "3.9"
+    default: "3.10"
   mf_sql_engine_url:
     description: "URL for configuring SQL engine connection."
     required: false
