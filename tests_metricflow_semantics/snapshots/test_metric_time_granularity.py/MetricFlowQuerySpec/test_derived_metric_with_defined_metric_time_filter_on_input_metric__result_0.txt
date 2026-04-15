@@ -3,8 +3,8 @@ test_filename: test_metric_time_granularity.py
 docstring:
   Tests a derived metric with a metric_time filter on its input metric.
 
-      Should use the outer metric's default granularity.
-      Should always use the default granularity for the object where the filter is defined.
+  Should use the outer metric's default granularity.
+  Should always use the default granularity for the object where the filter is defined.
 ---
 MetricFlowQuerySpec(
   metric_specs=(MetricSpec(element_name='derived_metric_with_time_granularity_and_inner_metric_time_filter'),),

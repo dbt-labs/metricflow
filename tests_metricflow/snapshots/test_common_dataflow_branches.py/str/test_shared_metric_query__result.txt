@@ -3,8 +3,8 @@ test_filename: test_common_dataflow_branches.py
 docstring:
   For a known case, test that a metric computation node is identified as a common branch.
 
-      A query for `bookings` and `bookings_per_booker` should have the computation for `bookings` as a common branch in
-      the dataflow plan.
+  A query for `bookings` and `bookings_per_booker` should have the computation for `bookings` as a common branch in
+  the dataflow plan.
 ---
 dataflow_plan:
   <DataflowPlan>

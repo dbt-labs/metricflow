@@ -3,9 +3,9 @@ test_filename: test_cte_sql.py
 docstring:
   Check generation of nested CTEs.
 
-      `metric_level_1_index_0` and `metric_level_1_index_1` share input metrics `metric_level_0_index_0` and
-      `metric_level_0_index_1`. This checks that CTEs are generated for `metric_level_0_index_0` and
-      `metric_level_0_index_1`. In addition, a CTE can be generated for `bookings` since it's an input metric to both.
+  `metric_level_1_index_0` and `metric_level_1_index_1` share input metrics `metric_level_0_index_0` and
+  `metric_level_0_index_1`. This checks that CTEs are generated for `metric_level_0_index_0` and
+  `metric_level_0_index_1`. In addition, a CTE can be generated for `bookings` since it's an input metric to both.
 ---
 sql_without_cte:
   -- Combine Aggregated Outputs

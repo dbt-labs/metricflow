@@ -3,7 +3,7 @@ test_filename: test_ambiguous_entity_path.py
 docstring:
   Tests an input with an ambiguous entity-path that can't be resolved due to a mismatch between metrics.
 
-      'entity_0__country' matches ['entity_1__entity_0__country', 'entity_0__country']
+  'entity_0__country' matches ['entity_1__entity_0__country', 'entity_0__country']
 ---
 Got error(s) during query resolution.
 
