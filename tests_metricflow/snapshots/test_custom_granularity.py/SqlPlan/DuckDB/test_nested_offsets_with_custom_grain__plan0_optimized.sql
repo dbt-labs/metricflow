@@ -3,7 +3,7 @@ test_filename: test_custom_granularity.py
 docstring:
   Check that a query for a nested offset metric does not select `metric_time` at different grains if not requested.
 
-      It should not have `metric_time__day` in the output query.
+  It should not have `metric_time__day` in the output query.
 sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions

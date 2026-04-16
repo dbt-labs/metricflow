@@ -3,8 +3,8 @@ test_filename: test_source_scan_optimizer.py
 docstring:
   Tests optimization of querying 2 metrics which give the same alias to the same thing in their components.
 
-      In this case we DO combine source nodes, since the components are the same exact thing so we don't need to
-      scan over it twice
+  In this case we DO combine source nodes, since the components are the same exact thing so we don't need to
+  scan over it twice
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>

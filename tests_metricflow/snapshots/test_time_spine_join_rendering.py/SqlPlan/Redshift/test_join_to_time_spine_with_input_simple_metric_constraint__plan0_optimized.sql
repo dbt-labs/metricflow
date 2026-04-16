@@ -3,7 +3,7 @@ test_filename: test_time_spine_join_rendering.py
 docstring:
   Check filter hierarchy.
 
-      Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+  Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
 sql_engine: Redshift
 ---
 -- Join to Time Spine Dataset

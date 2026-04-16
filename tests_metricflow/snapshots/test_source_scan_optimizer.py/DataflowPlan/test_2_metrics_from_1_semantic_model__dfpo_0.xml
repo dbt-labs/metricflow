@@ -3,7 +3,7 @@ test_filename: test_source_scan_optimizer.py
 docstring:
   Tests optimizing the plan for 2 simple-metrics that are defined from the same model.
 
-      Since they are defined from the same model, the number of scans should be halved.
+  Since they are defined from the same model, the number of scans should be halved.
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>
