@@ -991,6 +991,14 @@ class DataflowPlanBuilder:
                 input_spec = desired_output_spec.with_alias(None)
                 alias_changes.append(SpecToAlias(input_spec=input_spec, output_spec=desired_output_spec))
 
+                # It's possible to query an item with and without an alias.
+                # Since `AliasSpecsNode` does not pass the query item without the alias when making an
+                # alias change, add the query item without the alias as an identity operation.
+                if input_spec in desired_output_specs:
+                    alias_changes.append(
+                        SpecToAlias(input_spec=input_spec, output_spec=input_spec),
+                    )
+
         return AliasSpecsNode.create(parent_node, alias_changes)
 
     @staticmethod
