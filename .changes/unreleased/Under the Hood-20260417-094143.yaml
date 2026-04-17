@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Update `ruff.toml` and `AGENTS.md` for Python 3.10
+time: 2026-04-17T09:41:43.151272-07:00
+custom:
+  Author: plypaul
+  Issue: "2022"
