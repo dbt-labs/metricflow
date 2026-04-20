@@ -185,7 +185,7 @@ class TestMeasureConversion:  # noqa: D101
     def test_measure_without_expr_falls_back_to_name(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(
             name="orders",
-            measures=[_measure("num_orders", agg=AggregationType.COUNT)],
+            measures=[_measure("num_orders", agg=AggregationType.SUM)],
         )
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
 
@@ -500,7 +500,7 @@ class TestMetricConversion:  # noqa: D101
         metrics = _osi_metrics(result)
         assert len(metrics) == 1
         assert metrics[0].name == "revenue"
-        assert metrics[0].expression.dialects[0].expression == "SUM(amount)"
+        assert metrics[0].expression.dialects[0].expression == "SUM(orders.amount)"
 
     def test_simple_metric_description_carried_over(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(
@@ -565,7 +565,9 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, order_count_m, arpu]))
 
         arpu_osi = next(m for m in _osi_metrics(result) if m.name == "arpu")
-        assert arpu_osi.expression.dialects[0].expression == "(SUM(amount)) / (COUNT(order_id))"
+        assert arpu_osi.expression.dialects[0].expression == (
+            "(SUM(orders.amount)) / (SUM(CASE WHEN orders.order_id IS NOT NULL THEN 1 ELSE 0 END))"
+        )
         assert_object_snapshot_equal(
             request=request,
             snapshot_configuration=snapshot_configuration,
@@ -602,7 +604,7 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
 
         profit_osi = next(m for m in _osi_metrics(result) if m.name == "profit")
-        assert profit_osi.expression.dialects[0].expression == "SUM(amount) - SUM(cost_amount)"
+        assert profit_osi.expression.dialects[0].expression == "SUM(orders.amount) - SUM(orders.cost_amount)"
 
     def test_derived_metric_uses_alias_for_substitution(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(
@@ -632,7 +634,7 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
 
         profit_osi = next(m for m in _osi_metrics(result) if m.name == "profit")
-        assert profit_osi.expression.dialects[0].expression == "SUM(amount) - SUM(cost_amount)"
+        assert profit_osi.expression.dialects[0].expression == "SUM(orders.amount) - SUM(orders.cost_amount)"
 
     def test_derived_metric_nested(  # noqa: D102
         self, request: FixtureRequest, snapshot_configuration: SnapshotConfiguration
@@ -686,7 +688,10 @@ class TestMetricConversion:  # noqa: D101
         )
 
         net_osi = next(m for m in _osi_metrics(result) if m.name == "net_profit")
-        assert net_osi.expression.dialects[0].expression == "(SUM(amount) - SUM(cost_amount)) - SUM(expense_amount)"
+        assert (
+            net_osi.expression.dialects[0].expression
+            == "(SUM(orders.amount) - SUM(orders.cost_amount)) - SUM(orders.expense_amount)"
+        )
         assert_object_snapshot_equal(
             request=request,
             snapshot_configuration=snapshot_configuration,
@@ -724,7 +729,7 @@ class TestMetricConversion:  # noqa: D101
         )
 
         derived_osi = next(m for m in _osi_metrics(result) if m.name == "revenue_delta")
-        assert derived_osi.expression.dialects[0].expression == "SUM(amount) - SUM(adjusted_amount)"
+        assert derived_osi.expression.dialects[0].expression == "SUM(orders.amount) - SUM(orders.adjusted_amount)"
 
     # --- CUMULATIVE ---
 
@@ -752,7 +757,7 @@ class TestMetricConversion:  # noqa: D101
         metrics = _osi_metrics(result)
         assert len(metrics) == 1
         assert metrics[0].name == "cumulative_revenue"
-        assert metrics[0].expression.dialects[0].expression == "SUM(amount)"
+        assert metrics[0].expression.dialects[0].expression == "SUM(orders.amount)"
 
     def test_cumulative_metric_via_sub_metric_reference(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(
@@ -784,7 +789,7 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[base, cumulative]))
 
         cumulative_osi = next(m for m in _osi_metrics(result) if m.name == "cumulative_revenue")
-        assert cumulative_osi.expression.dialects[0].expression == "SUM(amount)"
+        assert cumulative_osi.expression.dialects[0].expression == "SUM(orders.amount)"
 
     # --- Edge cases ---
 
@@ -890,7 +895,7 @@ class TestMetricFilterFlattening:  # noqa: D101
 
         assert (
             _osi_metrics(result)[0].expression.dialects[0].expression
-            == "SUM(CASE WHEN status = 'paid' THEN amount END)"
+            == "SUM(CASE WHEN status = 'paid' THEN orders.amount END)"
         )
 
     def test_measure_level_filter_inlines_case_when(self) -> None:  # noqa: D102
@@ -913,7 +918,7 @@ class TestMetricFilterFlattening:  # noqa: D101
 
         assert (
             _osi_metrics(result)[0].expression.dialects[0].expression
-            == "SUM(CASE WHEN status = 'paid' THEN amount END)"
+            == "SUM(CASE WHEN status = 'paid' THEN orders.amount END)"
         )
 
     def test_metric_and_measure_filters_combined_with_and(  # noqa: D102
@@ -937,7 +942,7 @@ class TestMetricFilterFlattening:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
 
         assert _osi_metrics(result)[0].expression.dialects[0].expression == (
-            "SUM(CASE WHEN (region = 'intl') AND (status = 'paid') THEN amount END)"
+            "SUM(CASE WHEN (status = 'paid') AND (region = 'intl') THEN orders.amount END)"
         )
         assert_object_snapshot_equal(
             request=request,
@@ -963,7 +968,7 @@ class TestMetricFilterFlattening:  # noqa: D101
 
         assert (
             _osi_metrics(result)[0].expression.dialects[0].expression
-            == "SUM(CASE WHEN order__country = 'US' THEN amount END)"
+            == "SUM(CASE WHEN order__country = 'US' THEN orders.amount END)"
         )
 
     def test_ratio_metric_filter_propagated_to_both_sides(self) -> None:  # noqa: D102
@@ -992,9 +997,9 @@ class TestMetricFilterFlattening:  # noqa: D101
 
         paid_arpu = next(m for m in _osi_metrics(result) if m.name == "paid_arpu")
         assert paid_arpu.expression.dialects[0].expression == (
-            "(SUM(CASE WHEN status = 'paid' THEN amount END))"
+            "(SUM(CASE WHEN status = 'paid' THEN orders.amount END))"
             " / "
-            "(COUNT(CASE WHEN status = 'paid' THEN order_id END))"
+            "(SUM(CASE WHEN status = 'paid' THEN CASE WHEN orders.order_id IS NOT NULL THEN 1 ELSE 0 END END))"
         )
 
     def test_derived_metric_filter_propagated_to_sub_expressions(self) -> None:  # noqa: D102
@@ -1023,7 +1028,9 @@ class TestMetricFilterFlattening:  # noqa: D101
 
         paid_profit = next(m for m in _osi_metrics(result) if m.name == "paid_profit")
         assert paid_profit.expression.dialects[0].expression == (
-            "SUM(CASE WHEN status = 'paid' THEN amount END) - SUM(CASE WHEN status = 'paid' THEN cost_amount END)"
+            "SUM(CASE WHEN status = 'paid' THEN orders.amount END)"
+            " - "
+            "SUM(CASE WHEN status = 'paid' THEN orders.cost_amount END)"
         )
 
     def test_no_filter_produces_plain_expression(self) -> None:  # noqa: D102
@@ -1035,7 +1042,7 @@ class TestMetricFilterFlattening:  # noqa: D101
             _manifest(semantic_models=[sm], metrics=[_simple_metric("revenue", "revenue")])
         )
 
-        assert _osi_metrics(result)[0].expression.dialects[0].expression == "SUM(amount)"
+        assert _osi_metrics(result)[0].expression.dialects[0].expression == "SUM(orders.amount)"
 
 
 class TestOSIJsonSerialization:  # noqa: D101

@@ -33,8 +33,8 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression=("SUM(CASE WHEN (region = 'intl') AND (status = "
-                 "'paid') THEN amount END)"),
+                expression=("SUM(CASE WHEN (status = 'paid') AND (region = "
+                 "'intl') THEN orders.amount END)"),
               ),
             ],
           ),

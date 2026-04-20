@@ -55,7 +55,7 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression='SUM(amount)',
+                expression='SUM(orders.amount)',
               ),
             ],
           ),
@@ -66,7 +66,7 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression='SUM(cost_amount)',
+                expression='SUM(orders.cost_amount)',
               ),
             ],
           ),
@@ -77,7 +77,7 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression='SUM(expense_amount)',
+                expression='SUM(orders.expense_amount)',
               ),
             ],
           ),
@@ -88,7 +88,7 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression='SUM(amount) - SUM(cost_amount)',
+                expression='SUM(orders.amount) - SUM(orders.cost_amount)',
               ),
             ],
           ),
@@ -99,8 +99,8 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression=('(SUM(amount) - SUM(cost_amount)) - '
-                 'SUM(expense_amount)'),
+                expression=('(SUM(orders.amount) - SUM(orders.cost_amount)) '
+                 '- SUM(orders.expense_amount)'),
               ),
             ],
           ),

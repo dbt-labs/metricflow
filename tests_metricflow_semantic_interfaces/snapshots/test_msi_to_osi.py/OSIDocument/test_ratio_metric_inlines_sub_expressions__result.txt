@@ -29,7 +29,8 @@ OSIDocument(
                 dialects=[
                   OSIDialectExpression(
                     dialect=ANSI_SQL,
-                    expression='order_id',
+                    expression=('CASE WHEN order_id IS NOT NULL '
+                     'THEN 1 ELSE 0 END'),
                   ),
                 ],
               ),
@@ -44,7 +45,7 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression='SUM(amount)',
+                expression='SUM(orders.amount)',
               ),
             ],
           ),
@@ -55,7 +56,8 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression='COUNT(order_id)',
+                expression=('SUM(CASE WHEN orders.order_id IS NOT NULL THEN '
+                 '1 ELSE 0 END)'),
               ),
             ],
           ),
@@ -66,7 +68,9 @@ OSIDocument(
             dialects=[
               OSIDialectExpression(
                 dialect=ANSI_SQL,
-                expression='(SUM(amount)) / (COUNT(order_id))',
+                expression=('(SUM(orders.amount)) / (SUM(CASE WHEN '
+                 'orders.order_id IS NOT NULL THEN 1 ELSE 0 '
+                 'END))'),
               ),
             ],
           ),

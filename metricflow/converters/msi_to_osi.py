@@ -21,6 +21,7 @@ from metricflow.converters.models import (
     OSISemanticModel,
 )
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantic_interfaces.protocols.dimension import Dimension
 from metricflow_semantic_interfaces.protocols.entity import Entity
 from metricflow_semantic_interfaces.protocols.measure import (
@@ -28,8 +29,10 @@ from metricflow_semantic_interfaces.protocols.measure import (
     MeasureAggregationParameters,
 )
 from metricflow_semantic_interfaces.protocols.metric import Metric
-from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
+from metricflow_semantic_interfaces.transformations.semantic_manifest_transformer import (
+    PydanticSemanticManifestTransformer,
+)
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
     DimensionType,
@@ -44,13 +47,16 @@ class MSIToOSIConverter:
     def __init__(self, dialect: OSIDialect = OSIDialect.ANSI_SQL) -> None:  # noqa: D107
         self._dialect = dialect
 
-    def convert(self, manifest: SemanticManifest, model_name: str = "semantic_model") -> OSIDocument:  # noqa: D102
+    def convert(  # noqa: D102
+        self, manifest: PydanticSemanticManifest, model_name: str = "semantic_model"
+    ) -> OSIDocument:
+        manifest = PydanticSemanticManifestTransformer.transform(manifest)
+
         datasets = [self._convert_semantic_model(sm) for sm in manifest.semantic_models]
 
         entity_index = self._build_entity_index(manifest.semantic_models)
         relationships = self._build_relationships(entity_index)
 
-        measure_index = self._build_measure_index(manifest.semantic_models)
         metric_index = self._build_metric_index(manifest.metrics)
         expression_cache: Dict[Tuple[str, Optional[str]], str] = {}
 
@@ -58,7 +64,9 @@ class MSIToOSIConverter:
         for metric in manifest.metrics:
             if metric.type is MetricType.CONVERSION:
                 continue
-            expr = self._resolve_metric_expression(metric, metric_index, measure_index, expression_cache)
+            if metric.type_params.is_private:
+                continue
+            expr = self._resolve_metric_expression(metric, metric_index, expression_cache)
             osi_metrics.append(
                 OSIMetric(
                     name=metric.name,
@@ -147,18 +155,6 @@ class MSIToOSIConverter:
         return primary_key, unique_keys
 
     @staticmethod
-    def _build_measure_index(
-        semantic_models: Sequence[SemanticModel],
-    ) -> Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]]:
-        """Map measure name to (agg, col_expr, agg_params) for expression resolution."""
-        index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]] = {}
-        for sm in semantic_models:
-            for measure in sm.measures:
-                col = measure.expr if measure.expr is not None else measure.name
-                index[measure.name] = (measure.agg, col, measure.agg_params)
-        return index
-
-    @staticmethod
     def _build_metric_index(metrics: Sequence[Metric]) -> Dict[str, Metric]:
         """Map metric name to Metric for recursive resolution."""
         return {metric.name: metric for metric in metrics}
@@ -175,7 +171,6 @@ class MSIToOSIConverter:
         self,
         metric: Metric,
         metric_index: Dict[str, Metric],
-        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
         cache: Dict[Tuple[str, Optional[str]], str],
         parent_filter: Optional[str] = None,
     ) -> str:
@@ -188,13 +183,13 @@ class MSIToOSIConverter:
             return cache[cache_key]
 
         if metric.type is MetricType.SIMPLE:
-            expr = self._resolve_simple(metric, measure_index, combined_filter)
+            expr = self._resolve_simple(metric, combined_filter)
         elif metric.type is MetricType.CUMULATIVE:
-            expr = self._resolve_cumulative(metric, metric_index, measure_index, cache, combined_filter)
+            expr = self._resolve_cumulative(metric, metric_index, cache, combined_filter)
         elif metric.type is MetricType.RATIO:
-            expr = self._resolve_ratio(metric, metric_index, measure_index, cache, combined_filter)
+            expr = self._resolve_ratio(metric, metric_index, cache, combined_filter)
         elif metric.type is MetricType.DERIVED:
-            expr = self._resolve_derived(metric, metric_index, measure_index, cache, combined_filter)
+            expr = self._resolve_derived(metric, metric_index, cache, combined_filter)
         elif metric.type is MetricType.CONVERSION:
             # CONVERSION metrics are skipped in convert(); this branch should never be reached.
             raise RuntimeError(
@@ -209,37 +204,40 @@ class MSIToOSIConverter:
     def _resolve_simple(
         self,
         metric: Metric,
-        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
         filter_sql: Optional[str] = None,
     ) -> str:
-        """Resolve a SIMPLE metric: look up its measure or use metric_aggregation_params."""
-        if metric.type_params.measure is not None:
-            measure_name = metric.type_params.measure.name
-            agg, col, agg_params = measure_index[measure_name]
-            measure_filter = _collect_filter_sql(metric.type_params.measure.filter)
-            return self._build_agg_expression(agg, col, agg_params, _merge_filter_sqls(filter_sql, measure_filter))
-
-        # metric_aggregation_params path: aggregation info lives on the metric itself
+        """Resolve a SIMPLE metric using metric_aggregation_params (always set after transformation)."""
         agg_params_obj = metric.type_params.metric_aggregation_params
         if agg_params_obj is None:
             raise ValueError(
                 LazyFormat(
-                    "SIMPLE metric has neither measure nor metric_aggregation_params",
+                    "SIMPLE metric has no metric_aggregation_params after transformation",
                     metric_name=metric.name,
                 )
             )
         col = metric.type_params.expr if metric.type_params.expr is not None else metric.name
-        # Qualify the column with the semantic model name so the OSI expression is
-        # unambiguous and OSI→MSI conversion can recover the dataset from the qualifier.
-        if "." not in col:
-            col = f"{agg_params_obj.semantic_model}.{col}"
+        col = self._qualify_col(col, agg_params_obj.semantic_model)
         return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params, filter_sql)
+
+    # ConvertCountToSumRule rewrites COUNT measure exprs to this form before FlattenSimpleMetrics
+    # copies them to metric.type_params.expr, so the inner column arrives pre-wrapped and needs
+    # its own qualification pass.
+    _COUNT_CONVERSION_RE = re.compile(r"^CASE WHEN ([A-Za-z_][A-Za-z0-9_]*) IS NOT NULL THEN 1 ELSE 0 END$")
+
+    @staticmethod
+    def _qualify_col(col: str, semantic_model: str) -> str:
+        """Qualify col with semantic_model if it is an unqualified identifier or a COUNT-converted expr."""
+        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", col):
+            return f"{semantic_model}.{col}"
+        m = MSIToOSIConverter._COUNT_CONVERSION_RE.match(col)
+        if m:
+            return f"CASE WHEN {semantic_model}.{m.group(1)} IS NOT NULL THEN 1 ELSE 0 END"
+        return col
 
     def _resolve_cumulative(
         self,
         metric: Metric,
         metric_index: Dict[str, Metric],
-        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
         cache: Dict[Tuple[str, Optional[str]], str],
         filter_sql: Optional[str] = None,
     ) -> str:
@@ -247,18 +245,11 @@ class MSIToOSIConverter:
 
         Window/grain semantics are not representable in an OSI expression string.
         """
-        if metric.type_params.measure is not None:
-            measure_name = metric.type_params.measure.name
-            agg, col, agg_params = measure_index[measure_name]
-            measure_filter = _collect_filter_sql(metric.type_params.measure.filter)
-            return self._build_agg_expression(agg, col, agg_params, _merge_filter_sqls(filter_sql, measure_filter))
-
-        # cumulative_type_params.metric path: recurse into the referenced metric
         cumulative_params = metric.type_params.cumulative_type_params
         if cumulative_params is None or cumulative_params.metric is None:
             raise ValueError(
                 LazyFormat(
-                    "CUMULATIVE metric has no resolvable measure or sub-metric",
+                    "CUMULATIVE metric has no sub-metric after transformation",
                     metric_name=metric.name,
                 )
             )
@@ -267,7 +258,6 @@ class MSIToOSIConverter:
         return self._resolve_metric_expression(
             self._lookup_metric(metric_index, sub_input.name, f"CUMULATIVE metric '{metric.name}'"),
             metric_index,
-            measure_index,
             cache,
             sub_filter,
         )
@@ -276,7 +266,6 @@ class MSIToOSIConverter:
         self,
         metric: Metric,
         metric_index: Dict[str, Metric],
-        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
         cache: Dict[Tuple[str, Optional[str]], str],
         filter_sql: Optional[str] = None,
     ) -> str:
@@ -295,14 +284,12 @@ class MSIToOSIConverter:
         num_expr = self._resolve_metric_expression(
             self._lookup_metric(metric_index, num_input.name, f"RATIO metric '{metric.name}' numerator"),
             metric_index,
-            measure_index,
             cache,
             num_filter,
         )
         den_expr = self._resolve_metric_expression(
             self._lookup_metric(metric_index, den_input.name, f"RATIO metric '{metric.name}' denominator"),
             metric_index,
-            measure_index,
             cache,
             den_filter,
         )
@@ -312,7 +299,6 @@ class MSIToOSIConverter:
         self,
         metric: Metric,
         metric_index: Dict[str, Metric],
-        measure_index: Dict[str, Tuple[AggregationType, str, Optional[MeasureAggregationParameters]]],
         cache: Dict[Tuple[str, Optional[str]], str],
         filter_sql: Optional[str] = None,
     ) -> str:
@@ -325,7 +311,7 @@ class MSIToOSIConverter:
             ref = input_metric.alias if input_metric.alias else input_metric.name
             dep_metric = self._lookup_metric(metric_index, input_metric.name, f"DERIVED metric '{metric.name}'")
             input_filter = _merge_filter_sqls(filter_sql, _collect_filter_sql(input_metric.filter))
-            resolved = self._resolve_metric_expression(dep_metric, metric_index, measure_index, cache, input_filter)
+            resolved = self._resolve_metric_expression(dep_metric, metric_index, cache, input_filter)
             if dep_metric.type in (MetricType.DERIVED, MetricType.RATIO):
                 resolved = f"({resolved})"
             expr = re.sub(rf"\b{re.escape(ref)}\b", resolved, expr)
