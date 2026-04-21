@@ -23,7 +23,6 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.constant_property_spec import ConstantPropertySpec
-from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
@@ -190,16 +189,20 @@ class DataflowPlanBuilder:
             me_plan_override=me_plan_override,
         )
 
+        if output_selection_specs is not None:
+            metrics_output_node = SelectorNode.create(
+                parent_node=metrics_output_node, include_specs=output_selection_specs
+            )
+
         sink_node = DataflowPlanBuilder.build_sink_node(
             parent_node=metrics_output_node,
-            metric_specs=query_spec.metric_specs,
+            desired_output_metric_specs=query_spec.metric_specs,
+            desired_output_group_by_item_specs=(
+                query_spec.dimension_specs + query_spec.time_dimension_specs + query_spec.entity_specs
+            ),
             order_by_specs=query_spec.order_by_specs,
             output_sql_table=output_sql_table,
             limit=query_spec.limit,
-            output_selection_specs=output_selection_specs,
-            dimension_specs=query_spec.dimension_specs,
-            time_dimension_specs=query_spec.time_dimension_specs,
-            entity_specs=query_spec.entity_specs,
         )
 
         plan_id = DagId.from_id_prefix(StaticIdPrefix.DATAFLOW_PLAN_PREFIX)
@@ -908,65 +911,88 @@ class DataflowPlanBuilder:
 
         sink_node = self.build_sink_node(
             parent_node=output_node,
-            metric_specs=final_query_spec.metric_specs,
             order_by_specs=final_query_spec.order_by_specs,
+            desired_output_metric_specs=final_query_spec.metric_specs,
+            desired_output_group_by_item_specs=(
+                final_query_spec.dimension_specs + final_query_spec.time_dimension_specs + final_query_spec.entity_specs
+            ),
             limit=final_query_spec.limit,
-            dimension_specs=final_query_spec.dimension_specs,
-            entity_specs=final_query_spec.entity_specs,
-            time_dimension_specs=final_query_spec.time_dimension_specs,
         )
-
         plan = DataflowPlan(sink_nodes=[sink_node])
         return self._optimize_plan(plan=plan, option_set=option_set)
 
     @staticmethod
     def build_sink_node(
         parent_node: DataflowPlanNode,
-        metric_specs: Sequence[MetricSpec],
+        desired_output_metric_specs: Sequence[MetricSpec],
+        desired_output_group_by_item_specs: Sequence[LinkableInstanceSpec],
         order_by_specs: Sequence[OrderBySpec],
-        dimension_specs: Tuple[DimensionSpec, ...],
-        entity_specs: Tuple[EntitySpec, ...],
-        time_dimension_specs: Tuple[TimeDimensionSpec, ...],
         output_sql_table: Optional[SqlTable] = None,
         limit: Optional[int] = None,
-        output_selection_specs: Optional[InstanceSpecSet] = None,
     ) -> DataflowPlanNode:
-        """Adds order by / limit / write nodes."""
-        pre_result_node: Optional[DataflowPlanNode] = None
+        """Adds order by / limit / alias / write nodes.
+
+        Args:
+            parent_node: The parent node to use for added nodes.
+            desired_output_metric_specs: The metric specs with the desired aliases. This assumes that the output
+            of the parent node contains the non-aliased versions of these specs.
+            desired_output_group_by_item_specs: Similar to `desired_output_metric_specs` but for group-by-item specs.
+            order_by_specs: If specified, add an order-by node using these specs.
+            output_sql_table: If specified, add a node that writes the output to the given table.
+            limit: If specified, add a node that limits the number of rows.
+
+        Returns: A dataflow branch that represents the parent node with the added operations to produce a sink node.
+        """
+        sink_node = parent_node
 
         if order_by_specs or limit:
-            pre_result_node = OrderByLimitNode.create(
-                order_by_specs=list(order_by_specs), limit=limit, parent_node=parent_node
-            )
+            sink_node = OrderByLimitNode.create(order_by_specs=list(order_by_specs), limit=limit, parent_node=sink_node)
 
-        if output_selection_specs:
-            pre_result_node = SelectorNode.create(
-                parent_node=pre_result_node or parent_node, include_specs=output_selection_specs
-            )
+        output_specs = tuple(desired_output_metric_specs) + tuple(desired_output_group_by_item_specs)
 
-        # Recreate metric_specs to remove auxiliary fields that will interfere with AliasSpecsNode
-        output_metric_specs = tuple(
-            MetricSpec.create(metric_spec.element_name, alias=metric_spec.alias) for metric_spec in metric_specs
-        )
-        alias_specs: Tuple[SpecToAlias, ...] = ()
-        for spec in output_metric_specs + dimension_specs + entity_specs + time_dimension_specs:
-            if spec.alias is not None:
-                alias_specs += (SpecToAlias(spec.with_alias(None), spec),)
-
-        if len(alias_specs) > 0:
-            pre_result_node = AliasSpecsNode.create(
-                parent_node=pre_result_node or parent_node, change_specs=alias_specs
+        if any(spec.alias is not None for spec in output_specs):
+            sink_node = DataflowPlanBuilder._add_alias_node(
+                sink_node, desired_output_metric_specs, desired_output_group_by_item_specs
             )
 
         write_result_node: DataflowPlanNode
         if not output_sql_table:
-            write_result_node = WriteToResultDataTableNode.create(parent_node=pre_result_node or parent_node)
+            write_result_node = WriteToResultDataTableNode.create(parent_node=sink_node)
         else:
-            write_result_node = WriteToResultTableNode.create(
-                parent_node=pre_result_node or parent_node, output_sql_table=output_sql_table
-            )
+            write_result_node = WriteToResultTableNode.create(parent_node=sink_node, output_sql_table=output_sql_table)
 
         return write_result_node
+
+    @staticmethod
+    def _add_alias_node(
+        parent_node: DataflowPlanNode,
+        desired_output_metric_specs: Sequence[MetricSpec],
+        desired_output_group_by_item_specs: Sequence[LinkableInstanceSpec],
+    ) -> DataflowPlanNode:
+        """Add a `AliasSpecsNode` that creates aliased instances in the output.
+
+        The desired output specs specifies the alias to use for the spec. This assumes that `parent_node` outputs
+        instances that have the target specs without the alias.
+        """
+        # Recreate metric_specs to remove auxiliary fields that will interfere with `AliasSpecsNode`.
+        desired_output_metric_specs = tuple(
+            MetricSpec.create(metric_spec.element_name, alias=metric_spec.alias)
+            for metric_spec in desired_output_metric_specs
+        )
+
+        # Creates changes for output specs that have an alias.
+        desired_output_specs: FrozenOrderedSet[MetricSpec | LinkableInstanceSpec] = FrozenOrderedSet(
+            itertools.chain(desired_output_metric_specs, desired_output_group_by_item_specs)
+        )
+        alias_changes: list[SpecToAlias] = []
+
+        for desired_output_spec in desired_output_specs:
+            if desired_output_spec.alias is not None:
+                # Add a change from non-aliased item -> aliased item.
+                input_spec = desired_output_spec.with_alias(None)
+                alias_changes.append(SpecToAlias(input_spec=input_spec, output_spec=desired_output_spec))
+
+        return AliasSpecsNode.create(parent_node, alias_changes)
 
     @staticmethod
     def _contains_multihop_linkables(linkable_specs: Sequence[LinkableInstanceSpec]) -> bool:
