@@ -1,5 +1,5 @@
 test_name: test_aliases_without_metrics
-test_filename: test_query_rendering.py
+test_filename: test_alias_rendering.py
 docstring:
   Tests a plan with an aliased dimension.
 sql_engine: DuckDB

@@ -1,6 +1,6 @@
 test_name: test_simple_metric_constraint_with_single_expr_and_alias
-test_filename: test_query_rendering.py
-sql_engine: BigQuery
+test_filename: test_alias_rendering.py
+sql_engine: DuckDB
 ---
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -20,7 +20,7 @@ FROM (
     -- Metric Time Dimension 'ds'
     -- Select: ['__bookings', 'booking__is_instant', 'metric_time__day']
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
+      DATE_TRUNC('day', ds) AS metric_time__day
       , is_instant AS booking__is_instant
       , 1 AS bookings
     FROM ***************************.fct_bookings bookings_source_src_28000

@@ -1,5 +1,5 @@
 test_name: test_aliases_with_metrics
-test_filename: test_query_rendering.py
+test_filename: test_alias_rendering.py
 docstring:
   Tests a metric query with various aliases.
 sql_engine: DuckDB
