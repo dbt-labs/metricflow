@@ -43,6 +43,13 @@ from metricflow_semantic_interfaces.type_enums import (
 
 
 @dataclass(frozen=True)
+class _EntityEntry:
+    dataset: str
+    col: str
+    entity_type: EntityType
+
+
+@dataclass(frozen=True)
 class _RelationshipDirection:
     from_dataset: str
     to_dataset: str
@@ -329,15 +336,15 @@ class MSIToOSIConverter:
     @staticmethod
     def _build_entity_index(
         semantic_models: Sequence[SemanticModel],
-    ) -> Dict[str, List[Tuple[str, str, EntityType]]]:
-        """Map each entity name to the (dataset_name, column, entity_type) tuples that declare it."""
-        index: Dict[str, List[Tuple[str, str, EntityType]]] = defaultdict(list)
+    ) -> Dict[str, List[_EntityEntry]]:
+        """Map each entity name to the _EntityEntry objects that declare it."""
+        index: Dict[str, List[_EntityEntry]] = defaultdict(list)
         for sm in semantic_models:
             for entity in sm.entities:
                 if entity.type is EntityType.NATURAL:
                     continue
                 col = entity.expr if entity.expr is not None else entity.name
-                index[entity.name].append((sm.name, col, entity.type))
+                index[entity.name].append(_EntityEntry(dataset=sm.name, col=col, entity_type=entity.type))
         return dict(index)
 
     @staticmethod
@@ -365,7 +372,7 @@ class MSIToOSIConverter:
 
     @staticmethod
     def _build_relationships(
-        entity_index: Dict[str, List[Tuple[str, str, EntityType]]],
+        entity_index: Dict[str, List[_EntityEntry]],
     ) -> List[OSIRelationship]:
         """Resolve implicit MSI entity links into explicit OSI relationships.
 
@@ -373,10 +380,17 @@ class MSIToOSIConverter:
         """
         relationships: List[OSIRelationship] = []
         for entity_name, entries in entity_index.items():
-            for (ds_a, col_a, type_a), (ds_b, col_b, type_b) in combinations(entries, 2):
-                if ds_a == ds_b:
+            for entry_a, entry_b in combinations(entries, 2):
+                if entry_a.dataset == entry_b.dataset:
                     continue
-                direction = MSIToOSIConverter._relationship_direction(ds_a, col_a, type_a, ds_b, col_b, type_b)
+                direction = MSIToOSIConverter._relationship_direction(
+                    entry_a.dataset,
+                    entry_a.col,
+                    entry_a.entity_type,
+                    entry_b.dataset,
+                    entry_b.col,
+                    entry_b.entity_type,
+                )
                 relationships.append(
                     OSIRelationship(
                         name=f"{direction.from_dataset}__{direction.to_dataset}__{entity_name}",

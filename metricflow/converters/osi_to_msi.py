@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List, Optional, Set, Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Set
 
 from metricflow.converters.expression_utils import (
     _extract_agg_info,
@@ -47,6 +48,13 @@ from metricflow_semantic_interfaces.type_enums import (
     MetricType,
     TimeGranularity,
 )
+
+
+@dataclass(frozen=True)
+class _KeySets:
+    primary: Set[str]
+    unique: Set[str]
+    foreign: Set[str]
 
 
 class OSIToMSIConverter:
@@ -96,7 +104,7 @@ class OSIToMSIConverter:
         dataset: OSIDataset,
         osi_sm: OSISemanticModel,
     ) -> PydanticSemanticModel:
-        primary_key_cols, unique_key_cols, foreign_key_cols = self._build_key_sets(dataset, osi_sm)
+        key_sets = self._build_key_sets(dataset, osi_sm)
 
         entities: List[PydanticEntity] = []
         dimensions: List[PydanticDimension] = []
@@ -107,9 +115,9 @@ class OSIToMSIConverter:
                 field,
                 expr,
                 expr if expr != field.name else None,
-                primary_key_cols,
-                unique_key_cols,
-                foreign_key_cols,
+                key_sets.primary,
+                key_sets.unique,
+                key_sets.foreign,
                 entities,
                 dimensions,
             )
@@ -124,14 +132,18 @@ class OSIToMSIConverter:
         )
 
     @staticmethod
-    def _build_key_sets(dataset: OSIDataset, osi_sm: OSISemanticModel) -> Tuple[Set[str], Set[str], Set[str]]:
-        """Return (primary_key_cols, unique_key_cols, foreign_key_cols) for a dataset."""
-        primary_key_cols: Set[str] = set(dataset.primary_key or [])
-        unique_key_cols: Set[str] = {col for keys in (dataset.unique_keys or []) for col in keys}
-        foreign_key_cols: Set[str] = {
-            col for rel in (osi_sm.relationships or []) if rel.from_dataset == dataset.name for col in rel.from_columns
-        }
-        return primary_key_cols, unique_key_cols, foreign_key_cols
+    def _build_key_sets(dataset: OSIDataset, osi_sm: OSISemanticModel) -> _KeySets:
+        """Return a _KeySets with primary, unique, and foreign key column sets for a dataset."""
+        return _KeySets(
+            primary=set(dataset.primary_key or []),
+            unique={col for keys in (dataset.unique_keys or []) for col in keys},
+            foreign={
+                col
+                for rel in (osi_sm.relationships or [])
+                if rel.from_dataset == dataset.name
+                for col in rel.from_columns
+            },
+        )
 
     def _classify_field(
         self,
