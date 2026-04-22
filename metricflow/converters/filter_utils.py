@@ -8,10 +8,10 @@ from metricflow_semantic_interfaces.protocols.where_filter import WhereFilterInt
 
 
 class _DimensionStub:
-    """Jinja sandbox stub for ``{{ Dimension('entity__dim') }}``.
+    """Jinja sandbox stub for `{{ Dimension('entity__dim') }}`.
 
-    Renders to the qualified column name, e.g. ``order__status``.
-    Method chaining (``grain``, ``date_part``) appends a ``__<suffix>`` part.
+    Renders to the qualified column name, e.g. `order__status`.
+    Method chaining (`grain`, `date_part`) appends a `__<suffix>` part.
     """
 
     def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D107
@@ -34,9 +34,9 @@ class _DimensionStub:
 
 
 class _TimeDimensionStub:
-    """Jinja sandbox stub for ``{{ TimeDimension('entity__dim', 'grain') }}``.
+    """Jinja sandbox stub for `{{ TimeDimension('entity__dim', 'grain') }}`.
 
-    Renders to ``entity__dim`` or ``entity__dim__grain`` when a granularity is provided.
+    Renders to `entity__dim` or `entity__dim__grain` when a granularity is provided.
     """
 
     def __init__(
@@ -67,7 +67,7 @@ class _TimeDimensionStub:
 
 
 class _EntityStub:
-    """Jinja sandbox stub for ``{{ Entity('name') }}``."""
+    """Jinja sandbox stub for `{{ Entity('name') }}`."""
 
     def __init__(self, name: str, entity_path: Sequence[str] = ()) -> None:  # noqa: D107
         self._col = "__".join(list(entity_path) + [name])
@@ -80,7 +80,7 @@ class _EntityStub:
 
 
 class _MetricStub:
-    """Jinja sandbox stub for ``{{ Metric('name') }}``."""
+    """Jinja sandbox stub for `{{ Metric('name') }}`."""
 
     def __init__(self, name: str, group_by: Sequence[str] = ()) -> None:  # noqa: D107
         self._name = name
@@ -95,9 +95,9 @@ class _MetricStub:
 def _render_filter_template(template: str) -> str:
     """Render an MSI where-filter Jinja template to a plain SQL fragment.
 
-    Jinja references such as ``{{ Dimension('order__status') }}``,
-    ``{{ TimeDimension('order__ds', 'day') }}``, ``{{ Entity('user') }}``,
-    and ``{{ Metric('revenue') }}`` are resolved to their column-name
+    Jinja references such as `{{ Dimension('order__status') }}`,
+    `{{ TimeDimension('order__ds', 'day') }}`, `{{ Entity('user') }}`,
+    and `{{ Metric('revenue') }}` are resolved to their column-name
     equivalents using lightweight stubs.  The output is a best-effort SQL
     string suitable for embedding in an OSI expression.
     """
@@ -112,11 +112,11 @@ def _render_filter_template(template: str) -> str:
 def _collect_filter_sql(*filters: Optional[WhereFilterIntersection]) -> Optional[str]:
     """Render and merge MSI WhereFilterIntersection objects into a single SQL fragment.
 
-    Jinja references (e.g. ``{{ Dimension('order__status') }}``) are resolved
+    Jinja references (e.g. `{{ Dimension('order__status') }}`) are resolved
     using lightweight stubs that produce MetricFlow-qualified column names such
-    as ``order__status``.  These are *not* fully resolved SQL column aliases —
-    resolving to actual table column names would require ``WhereFilterSpecFactory``
-    and ``ColumnAssociationResolver`` from ``metricflow_semantics``, which is out
+    as `order__status`.  These are *not* fully resolved SQL column aliases —
+    resolving to actual table column names would require `WhereFilterSpecFactory`
+    and `ColumnAssociationResolver` from `metricflow_semantics`, which is out
     of scope here.  OSI consumers are expected to perform their own column
     resolution against the source data.
     """

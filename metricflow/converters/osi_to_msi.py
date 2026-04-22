@@ -67,14 +67,14 @@ class OSIToMSIConverter:
     * Datasets → one PydanticSemanticModel each.
     * Fields are classified as entities or dimensions using key and relationship
       metadata.  Aggregation info now lives directly on metrics (via
-      ``metric_aggregation_params``), not on semantic model measures.
-    * Time dimensions always receive ``TimeGranularity.DAY`` — OSI has no
+      `metric_aggregation_params`), not on semantic model measures.
+    * Time dimensions always receive `TimeGranularity.DAY` — OSI has no
       granularity field.
     * Metric expressions are parsed with sqlglot:
-      - single-agg patterns (``SUM(col)``, ``COUNT(DISTINCT col)``, …) → SIMPLE
-        metric with ``metric_aggregation_params`` (no measure reference needed)
-      - ``(expr_a) / (expr_b)`` → RATIO (with auto-generated sub-metrics)
-      - anything else → SIMPLE with the raw expression stored in ``expr``
+      - single-agg patterns (`SUM(col)`, `COUNT(DISTINCT col)`, …) → SIMPLE
+        metric with `metric_aggregation_params` (no measure reference needed)
+      - `(expr_a) / (expr_b)` → RATIO (with auto-generated sub-metrics)
+      - anything else → SIMPLE with the raw expression stored in `expr`
     """
 
     def __init__(self, dialect: OSIDialect = OSIDialect.ANSI_SQL) -> None:  # noqa: D107
@@ -165,7 +165,7 @@ class OSIToMSIConverter:
         4. dimension.is_time → TIME dimension (granularity defaults to DAY)
         5. fallback → CATEGORICAL dimension
 
-        Aggregation info lives on metrics (``metric_aggregation_params``), not on
+        Aggregation info lives on metrics (`metric_aggregation_params`), not on
         semantic model measures, so there is no measure classification step.
         """
         if field.name in primary_key_cols:
@@ -253,7 +253,7 @@ class OSIToMSIConverter:
     ) -> List[PydanticMetric]:
         """Return one or more PydanticMetric objects for the given OSI expression.
 
-        Simple metrics use ``metric_aggregation_params`` to store aggregation type
+        Simple metrics use `metric_aggregation_params` to store aggregation type
         and column expression directly — no intermediate measure is created.
 
         Multiple metrics are returned when a RATIO metric requires auto-generated
@@ -309,7 +309,7 @@ class OSIToMSIConverter:
             return [*num_metrics, *den_metrics, ratio_metric]
 
         # --- Fallback: complex expression that can't be decomposed ---
-        # Store the raw expression in ``expr`` with a best-guess aggregation type.
+        # Store the raw expression in `expr` with a best-guess aggregation type.
         # The caller is responsible for reviewing and correcting these metrics.
         fallback_dataset = datasets[0].name if datasets else ""
         return [
@@ -343,9 +343,9 @@ class OSIToMSIConverter:
         bare_col: str,
         datasets: List[OSIDataset],
     ) -> str:
-        """Determine which dataset a column belongs to for ``metric_aggregation_params.semantic_model``.
+        """Determine which dataset a column belongs to for `metric_aggregation_params.semantic_model`.
 
-        For qualified references like ``SUM(orders.amount)`` the qualifier is used directly.
+        For qualified references like `SUM(orders.amount)` the qualifier is used directly.
         For unqualified references the datasets are scanned for a matching field name.
         Falls back to the first dataset's name if no match is found.
         """
@@ -375,7 +375,7 @@ class OSIToMSIConverter:
 
     @staticmethod
     def _parse_source(source: str) -> PydanticNodeRelation:
-        """Parse ``schema.table`` or ``db.schema.table`` into a PydanticNodeRelation."""
+        """Parse `schema.table` or `db.schema.table` into a PydanticNodeRelation."""
         parts = source.split(".")
         if len(parts) >= 3:
             database, schema, alias = parts[0], parts[1], ".".join(parts[2:])

@@ -353,7 +353,7 @@ class MSIToOSIConverter:
     ) -> _RelationshipDirection:
         """Return a _RelationshipDirection obeying OSI directionality.
 
-        OSI spec: ``from`` is the many-side (FK holder), ``to`` is the one-side (PK holder).
+        OSI spec: `from` is the many-side (FK holder), `to` is the one-side (PK holder).
         FOREIGN entities are always the many-side; PRIMARY/UNIQUE are the one-side.
         When both sides share the same cardinality tier, break ties alphabetically by dataset name.
         """
