@@ -165,7 +165,7 @@ class MSIToOSIConverter:
         try:
             return metric_index[name]
         except KeyError:
-            raise ValueError(LazyFormat("references unknown metric", context=context, metric_name=name))
+            raise ValueError(LazyFormat("Unknown metric referenced", context=context, metric_name=name))
 
     def _resolve_metric_expression(
         self,
