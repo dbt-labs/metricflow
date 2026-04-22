@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Update `DataflowPlanBuilder` to use DFS metric evaluation plan
-time: 2026-03-17T12:02:44.784972-07:00
-custom:
-  Author: plypaul
-  Issue: "1989"
