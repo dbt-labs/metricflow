@@ -239,6 +239,8 @@ class MSIToOSIConverter:
     @staticmethod
     def _qualify_col(col: str, semantic_model: str) -> str:
         """Qualify col with semantic_model if it is an unqualified identifier or a COUNT-converted expr."""
+        # Quoted identifiers (e.g. "my col", `my col`) are not handled — qualifying
+        # them correctly requires dialect-aware parsing and is deferred as a follow-up.
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", col):
             return f"{semantic_model}.{col}"
         m = ConvertCountMetricToSumRule.COUNT_CONVERSION_RE.match(col)
