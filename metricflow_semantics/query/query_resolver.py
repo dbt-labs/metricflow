@@ -72,6 +72,7 @@ from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedS
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
+from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 
 from metricflow_semantic_interfaces.references import MetricReference, SemanticModelReference
 
@@ -314,19 +315,27 @@ class MetricFlowQueryResolver:
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> ResolveOrderByResult:
         mapping_items: List[InputToIssueSetMappingItem] = []
-        order_by_specs: List[OrderBySpec] = []
+        order_by_specs: MutableOrderedSet[OrderBySpec] = MutableOrderedSet()
 
         # Match the pattern from the order by input to one of the metric or group-by-item specs.
         # The pattern needs to be used because there are cases where the order-by-item is specified in a different way
         # from the group-by-item, so an equality comparison won't work.
-        for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
-            matching_specs: set[InstanceSpec] = set()
-            for possible_input in resolver_input_for_order_by.possible_inputs:
-                spec_pattern = possible_input.spec_pattern
-                matching_specs.update(spec_pattern.match(metric_specs))
-                matching_specs.update(spec_pattern.match(group_by_item_specs))
 
-            if len(matching_specs) != 1:
+        # Group the specs by the alias to aid later matching.
+        alias_to_specs: defaultdict[str | None, list[MetricSpec | LinkableInstanceSpec]] = defaultdict(list)
+
+        for metric_spec in metric_specs:
+            alias_to_specs[metric_spec.alias].append(metric_spec)
+        for group_by_item_spec in group_by_item_specs:
+            alias_to_specs[group_by_item_spec.alias].append(group_by_item_spec)
+
+        for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
+            specs_matching_order_by: set[InstanceSpec] = set()
+            for possible_input in resolver_input_for_order_by.possible_inputs:
+                specs_matching_alias = alias_to_specs[possible_input.alias]
+                specs_matching_order_by.update(possible_input.spec_pattern.match(specs_matching_alias))
+
+            if len(specs_matching_order_by) != 1:
                 mapping_items.append(
                     InputToIssueSetMappingItem(
                         resolver_input=resolver_input_for_order_by,
@@ -339,10 +348,10 @@ class MetricFlowQueryResolver:
                     )
                 )
             else:
-                order_by_specs.append(
+                order_by_specs.add(
                     OrderBySpec(
                         # Ignore aliases in the order by since we'll render the expression instead of the alias.
-                        instance_spec=matching_specs.pop().with_alias(None),
+                        instance_spec=mf_first_item(specs_matching_order_by).with_alias(None),
                         descending=resolver_input_for_order_by.descending,
                     )
                 )
