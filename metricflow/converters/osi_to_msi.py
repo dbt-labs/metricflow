@@ -357,7 +357,7 @@ class OSIToMSIConverter:
     def _get_expression(self, osi_expr: OSIExpression) -> str:
         """Return the expression string for the preferred dialect (fallback: first available)."""
         for dialect_expr in osi_expr.dialects:
-            if dialect_expr.dialect == self._dialect:
+            if dialect_expr.dialect is self._dialect:
                 return dialect_expr.expression
         return osi_expr.dialects[0].expression if osi_expr.dialects else ""
 

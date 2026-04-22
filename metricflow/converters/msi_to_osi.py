@@ -110,7 +110,7 @@ class MSIToOSIConverter:
 
     def _convert_dimension(self, dim: Dimension) -> OSIField:
         expr = dim.expr if dim.expr is not None else dim.name
-        is_time = dim.type == DimensionType.TIME
+        is_time = dim.type is DimensionType.TIME
 
         return OSIField(
             name=dim.name,
@@ -147,9 +147,9 @@ class MSIToOSIConverter:
 
         for entity in entities:
             col = entity.expr if entity.expr is not None else entity.name
-            if entity.type == EntityType.PRIMARY:
+            if entity.type is EntityType.PRIMARY:
                 primary_key = [col]
-            elif entity.type == EntityType.UNIQUE:
+            elif entity.type is EntityType.UNIQUE:
                 unique_keys.append([col])
 
         return primary_key, unique_keys
@@ -325,7 +325,7 @@ class MSIToOSIConverter:
         index: Dict[str, List[Tuple[str, str, EntityType]]] = defaultdict(list)
         for sm in semantic_models:
             for entity in sm.entities:
-                if entity.type == EntityType.NATURAL:
+                if entity.type is EntityType.NATURAL:
                     continue
                 col = entity.expr if entity.expr is not None else entity.name
                 index[entity.name].append((sm.name, col, entity.type))
@@ -393,26 +393,26 @@ class MSIToOSIConverter:
         # functions, preserving correct filtering semantics.
         fc = f"CASE WHEN {filter_sql} THEN {col} END" if filter_sql else col
 
-        if agg == AggregationType.SUM:
+        if agg is AggregationType.SUM:
             return f"SUM({fc})"
-        elif agg == AggregationType.MIN:
+        elif agg is AggregationType.MIN:
             return f"MIN({fc})"
-        elif agg == AggregationType.MAX:
+        elif agg is AggregationType.MAX:
             return f"MAX({fc})"
-        elif agg == AggregationType.COUNT:
+        elif agg is AggregationType.COUNT:
             return f"COUNT({fc})"
-        elif agg == AggregationType.COUNT_DISTINCT:
+        elif agg is AggregationType.COUNT_DISTINCT:
             return f"COUNT(DISTINCT {fc})"
-        elif agg == AggregationType.AVERAGE:
+        elif agg is AggregationType.AVERAGE:
             return f"AVG({fc})"
-        elif agg == AggregationType.SUM_BOOLEAN:
+        elif agg is AggregationType.SUM_BOOLEAN:
             # col is already a boolean condition; the filter becomes an extra AND term.
             if filter_sql:
                 return f"SUM(CASE WHEN ({filter_sql}) AND ({col}) THEN 1 ELSE 0 END)"
             return f"SUM(CASE WHEN {col} THEN 1 ELSE 0 END)"
-        elif agg == AggregationType.MEDIAN:
+        elif agg is AggregationType.MEDIAN:
             return f"PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY {fc})"
-        elif agg == AggregationType.PERCENTILE:
+        elif agg is AggregationType.PERCENTILE:
             percentile = agg_params.percentile if agg_params and agg_params.percentile is not None else 0.5
             use_discrete = agg_params.use_discrete_percentile if agg_params else False
             func = "PERCENTILE_DISC" if use_discrete else "PERCENTILE_CONT"
