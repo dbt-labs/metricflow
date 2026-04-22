@@ -31,6 +31,7 @@ from metricflow_semantic_interfaces.protocols.measure import (
 )
 from metricflow_semantic_interfaces.protocols.metric import Metric
 from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
+from metricflow_semantic_interfaces.transformations.convert_count import ConvertCountMetricToSumRule
 from metricflow_semantic_interfaces.transformations.semantic_manifest_transformer import (
     PydanticSemanticManifestTransformer,
 )
@@ -235,17 +236,12 @@ class MSIToOSIConverter:
         col = self._qualify_col(col, agg_params_obj.semantic_model)
         return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params, filter_sql)
 
-    # ConvertCountToSumRule rewrites COUNT measure exprs to this form before FlattenSimpleMetrics
-    # copies them to metric.type_params.expr, so the inner column arrives pre-wrapped and needs
-    # its own qualification pass.
-    _COUNT_CONVERSION_RE = re.compile(r"^CASE WHEN ([A-Za-z_][A-Za-z0-9_]*) IS NOT NULL THEN 1 ELSE 0 END$")
-
     @staticmethod
     def _qualify_col(col: str, semantic_model: str) -> str:
         """Qualify col with semantic_model if it is an unqualified identifier or a COUNT-converted expr."""
         if re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", col):
             return f"{semantic_model}.{col}"
-        m = MSIToOSIConverter._COUNT_CONVERSION_RE.match(col)
+        m = ConvertCountMetricToSumRule.COUNT_CONVERSION_RE.match(col)
         if m:
             return f"CASE WHEN {semantic_model}.{m.group(1)} IS NOT NULL THEN 1 ELSE 0 END"
         return col
