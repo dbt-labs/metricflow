@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add `.create()` initializer to spec / request classes
-time: 2026-03-06T14:31:06.728797-08:00
-custom:
-  Author: plypaul
-  Issue: "1983"
