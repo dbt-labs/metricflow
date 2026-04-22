@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from metricflow_semantic_interfaces.implementations.base import FrozenBaseModel
 from msi_pydantic_shim import Field
@@ -21,8 +21,8 @@ class OSIAIContextObject(FrozenBaseModel):
     """Structured AI context with instructions, synonyms, and examples."""
 
     instructions: Optional[str] = None
-    synonyms: Optional[List[str]] = None
-    examples: Optional[List[str]] = None
+    synonyms: Optional[Tuple[str, ...]] = None
+    examples: Optional[Tuple[str, ...]] = None
 
     class Config(FrozenBaseModel.Config):  # noqa: D106
         extra = "allow"
