@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from collections import defaultdict
+from dataclasses import dataclass
 from itertools import combinations
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -39,6 +40,14 @@ from metricflow_semantic_interfaces.type_enums import (
     EntityType,
     MetricType,
 )
+
+
+@dataclass(frozen=True)
+class _RelationshipDirection:
+    from_dataset: str
+    to_dataset: str
+    from_col: str
+    to_col: str
 
 
 class MSIToOSIConverter:
@@ -334,8 +343,8 @@ class MSIToOSIConverter:
     @staticmethod
     def _relationship_direction(
         ds_a: str, col_a: str, type_a: EntityType, ds_b: str, col_b: str, type_b: EntityType
-    ) -> Tuple[str, str, str, str]:
-        """Return (from_ds, to_ds, from_col, to_col) obeying OSI directionality.
+    ) -> _RelationshipDirection:
+        """Return a _RelationshipDirection obeying OSI directionality.
 
         OSI spec: ``from`` is the many-side (FK holder), ``to`` is the one-side (PK holder).
         FOREIGN entities are always the many-side; PRIMARY/UNIQUE are the one-side.
@@ -346,13 +355,13 @@ class MSIToOSIConverter:
         b_is_one_side = type_b in one_side_types
 
         if a_is_one_side and not b_is_one_side:
-            return ds_b, ds_a, col_b, col_a
+            return _RelationshipDirection(from_dataset=ds_b, to_dataset=ds_a, from_col=col_b, to_col=col_a)
         if b_is_one_side and not a_is_one_side:
-            return ds_a, ds_b, col_a, col_b
+            return _RelationshipDirection(from_dataset=ds_a, to_dataset=ds_b, from_col=col_a, to_col=col_b)
         # Same cardinality tier — use alphabetical order for determinism.
         if ds_a <= ds_b:
-            return ds_a, ds_b, col_a, col_b
-        return ds_b, ds_a, col_b, col_a
+            return _RelationshipDirection(from_dataset=ds_a, to_dataset=ds_b, from_col=col_a, to_col=col_b)
+        return _RelationshipDirection(from_dataset=ds_b, to_dataset=ds_a, from_col=col_b, to_col=col_a)
 
     @staticmethod
     def _build_relationships(
@@ -367,16 +376,14 @@ class MSIToOSIConverter:
             for (ds_a, col_a, type_a), (ds_b, col_b, type_b) in combinations(entries, 2):
                 if ds_a == ds_b:
                     continue
-                from_ds, to_ds, from_col, to_col = MSIToOSIConverter._relationship_direction(
-                    ds_a, col_a, type_a, ds_b, col_b, type_b
-                )
+                direction = MSIToOSIConverter._relationship_direction(ds_a, col_a, type_a, ds_b, col_b, type_b)
                 relationships.append(
                     OSIRelationship(
-                        name=f"{from_ds}__{to_ds}__{entity_name}",
-                        from_dataset=from_ds,
-                        to=to_ds,
-                        from_columns=[from_col],
-                        to_columns=[to_col],
+                        name=f"{direction.from_dataset}__{direction.to_dataset}__{entity_name}",
+                        from_dataset=direction.from_dataset,
+                        to=direction.to_dataset,
+                        from_columns=[direction.from_col],
+                        to_columns=[direction.to_col],
                     )
                 )
         return relationships
