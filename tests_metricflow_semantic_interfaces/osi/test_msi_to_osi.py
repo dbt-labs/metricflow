@@ -75,7 +75,7 @@ def _osi_metrics(result: OSIDocument) -> list:
 
 class TestBasicConversion:  # noqa: D101
     def test_empty_manifest_produces_empty_datasets(self) -> None:  # noqa: D102
-        result = MSIToOSIConverter().convert(_manifest(), model_name="test")
+        result = MSIToOSIConverter().convert(_manifest(), osi_model_name="test")
 
         assert result.version == "0.1.1"
         assert len(result.semantic_model) == 1
@@ -1054,7 +1054,7 @@ class TestOSIJsonSerialization:  # noqa: D101
             measures=[_measure("revenue", expr="amount")],
             entities=[_entity("order_id", entity_type=EntityType.PRIMARY)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]), model_name="my_project")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]), osi_model_name="my_project")
         parsed = json.loads(result.to_osi_json())
 
         assert parsed["version"] == "0.1.1"

@@ -64,7 +64,7 @@ class MSIToOSIConverter:
         self._dialect = dialect
 
     def convert(  # noqa: D102
-        self, manifest: PydanticSemanticManifest, model_name: str = "semantic_model"
+        self, manifest: PydanticSemanticManifest, osi_model_name: str = "semantic_model"
     ) -> OSIDocument:
         manifest = PydanticSemanticManifestTransformer.transform(manifest)
 
@@ -96,7 +96,7 @@ class MSIToOSIConverter:
             dialects=[self._dialect],
             semantic_model=[
                 OSISemanticModel(
-                    name=model_name,
+                    name=osi_model_name,
                     datasets=datasets,
                     relationships=relationships if relationships else None,
                     metrics=osi_metrics if osi_metrics else None,
