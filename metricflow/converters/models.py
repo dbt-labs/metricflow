@@ -24,9 +24,8 @@ class OSIAIContextObject(FrozenBaseModel):
     synonyms: Optional[List[str]] = None
     examples: Optional[List[str]] = None
 
-    class Config:  # noqa: D106
+    class Config(FrozenBaseModel.Config):  # noqa: D106
         extra = "allow"
-        allow_mutation = False
 
 
 OSIAIContext = Union[str, OSIAIContextObject]
