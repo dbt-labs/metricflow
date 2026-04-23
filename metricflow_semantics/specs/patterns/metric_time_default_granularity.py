@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, Optional, Sequence, Set, Tuple
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -47,11 +47,12 @@ class MetricTimeDefaultGranularityPattern(SpecPattern):
     max_metric_default_time_granularity: Optional[TimeGranularity]
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
-        spec_set = group_specs_by_type(candidate_specs)
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[InstanceSpec]:
+        candidate_specs_tuple = tuple(candidate_specs)
+        spec_set = group_specs_by_type(candidate_specs_tuple)
         # If there are no metric_time specs in the query, skip this filter.
         if not spec_set.metric_time_specs:
-            return candidate_specs
+            return candidate_specs_tuple
 
         # If there are metrics in the query, use max metric default. For no-metric queries, use standard default.
         # TODO: [custom granularity] allow custom granularities to be used as defaults if appropriate
