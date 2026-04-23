@@ -327,7 +327,6 @@ class MetricFlowQueryResolver:
         for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
             specs_matching_order_by: set[InstanceSpec] = set()
             for possible_input in resolver_input_for_order_by.possible_inputs:
-
                 # If the order-by does not specify an alias, the matching can be done with all specs in the query.
                 if possible_input.alias is None:
                     specs_matching_order_by.update(possible_input.spec_pattern.match(order_by_helper.all_specs))
