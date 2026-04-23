@@ -8,6 +8,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
+from metricflow.converters.converter_issues import ConverterIssue, ConverterIssueType, ConverterResult
 from metricflow.converters.filter_utils import _collect_filter_sql, _merge_filter_sqls
 from metricflow.converters.models import (
     OSIDataset,
@@ -66,12 +67,14 @@ class MSIToOSIConverter:
 
     def convert(  # noqa: D102
         self, manifest: PydanticSemanticManifest, osi_model_name: str = "semantic_model"
-    ) -> OSIDocument:
+    ) -> ConverterResult:
         manifest = PydanticSemanticManifestTransformer.transform(manifest)
+        issues: List[ConverterIssue] = []
 
         datasets = [self._convert_semantic_model(sm) for sm in manifest.semantic_models]
 
-        entity_index = self._build_entity_index(manifest.semantic_models)
+        entity_index, entity_issues = self._build_entity_index(manifest.semantic_models)
+        issues.extend(entity_issues)
         relationships = self._build_relationships(entity_index)
 
         metric_index = self._build_metric_index(manifest.metrics)
@@ -80,9 +83,19 @@ class MSIToOSIConverter:
         osi_metrics: List[OSIMetric] = []
         for metric in manifest.metrics:
             if metric.type is MetricType.CONVERSION:
+                issues.append(
+                    ConverterIssue(issue_type=ConverterIssueType.CONVERSION_METRIC_DROPPED, element_name=metric.name)
+                )
                 continue
             if metric.type_params.is_private:
+                issues.append(
+                    ConverterIssue(issue_type=ConverterIssueType.PRIVATE_METRIC_DROPPED, element_name=metric.name)
+                )
                 continue
+            if metric.type is MetricType.CUMULATIVE:
+                issues.append(
+                    ConverterIssue(issue_type=ConverterIssueType.CUMULATIVE_SEMANTICS_LOSS, element_name=metric.name)
+                )
             expr = self._resolve_metric_expression(metric, metric_index, expression_cache)
             osi_metrics.append(
                 OSIMetric(
@@ -92,17 +105,20 @@ class MSIToOSIConverter:
                 )
             )
 
-        return OSIDocument(
-            version="0.1.1",
-            dialects=[self._dialect],
-            semantic_model=[
-                OSISemanticModel(
-                    name=osi_model_name,
-                    datasets=datasets,
-                    relationships=relationships if relationships else None,
-                    metrics=osi_metrics if osi_metrics else None,
-                )
-            ],
+        return ConverterResult(
+            document=OSIDocument(
+                version="0.1.1",
+                dialects=[self._dialect],
+                semantic_model=[
+                    OSISemanticModel(
+                        name=osi_model_name,
+                        datasets=datasets,
+                        relationships=relationships if relationships else None,
+                        metrics=osi_metrics if osi_metrics else None,
+                    )
+                ],
+            ),
+            issues=issues,
         )
 
     def _convert_semantic_model(self, sm: SemanticModel) -> OSIDataset:
@@ -334,16 +350,20 @@ class MSIToOSIConverter:
     @staticmethod
     def _build_entity_index(
         semantic_models: Sequence[SemanticModel],
-    ) -> Dict[str, List[_EntityEntry]]:
+    ) -> Tuple[Dict[str, List[_EntityEntry]], List[ConverterIssue]]:
         """Map each entity name to the _EntityEntry objects that declare it."""
         index: Dict[str, List[_EntityEntry]] = defaultdict(list)
+        issues: List[ConverterIssue] = []
         for sm in semantic_models:
             for entity in sm.entities:
                 if entity.type is EntityType.NATURAL:
+                    issues.append(
+                        ConverterIssue(issue_type=ConverterIssueType.NATURAL_ENTITY_DROPPED, element_name=entity.name)
+                    )
                     continue
                 col = entity.expr if entity.expr is not None else entity.name
                 index[entity.name].append(_EntityEntry(dataset=sm.name, col=col, entity_type=entity.type))
-        return dict(index)
+        return dict(index), issues
 
     @staticmethod
     def _relationship_direction(

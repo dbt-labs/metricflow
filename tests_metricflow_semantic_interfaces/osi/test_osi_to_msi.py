@@ -360,7 +360,7 @@ class TestOSIToMSIRoundTrip:  # noqa: D101
         msi = OSIToMSIConverter().convert(original)
         assert msi.semantic_models[0].measures == []
 
-        osi_doc = MSIToOSIConverter().convert(msi)
+        osi_doc = MSIToOSIConverter().convert(msi).document
 
         dataset = osi_doc.semantic_model[0].datasets[0]
         assert dataset.name == "orders"
