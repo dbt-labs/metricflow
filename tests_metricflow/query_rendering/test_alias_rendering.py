@@ -6,6 +6,7 @@ import logging
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.query_param_implementations import (
     DimensionOrEntityParameter,
@@ -181,3 +182,64 @@ def test_items_with_and_without_alias(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_aliased_item_with_non_aliased_order_by(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+) -> None:
+    """Tests querying an item with an alias, but not specifying the alias in the order-by."""
+    metric_param = MetricParameter(
+        name="bookings",
+    )
+    dimension_param = DimensionOrEntityParameter(
+        name="booking__is_instant",
+    )
+    aliased_dimension_param = DimensionOrEntityParameter(name="booking__is_instant", alias="aliased_is_instant")
+    query_spec = query_parser.parse_and_validate_query(
+        metrics=(metric_param,),
+        group_by=(aliased_dimension_param,),
+        order_by=(OrderByParameter(dimension_param),),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+def test_order_by_alias_mismatch(
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+) -> None:
+    """Tests querying an item without an alias, but specifying an alias in the order-by.
+
+    This should raise an error as the order-by item doesn't correspond to one of inputs.
+    """
+    metric_param = MetricParameter(
+        name="bookings",
+    )
+    dimension_param = DimensionOrEntityParameter(
+        name="booking__is_instant",
+    )
+    aliased_dimension_param = DimensionOrEntityParameter(name="booking__is_instant", alias="aliased_is_instant")
+
+    with pytest.raises(InvalidQueryException):
+        query_parser.parse_and_validate_query(
+            metrics=(metric_param,),
+            group_by=(dimension_param,),
+            order_by=(OrderByParameter(aliased_dimension_param),),
+        )

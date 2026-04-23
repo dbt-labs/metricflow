@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Sequence, Set, Tuple
+from typing import Dict, Iterable, List, Sequence, Set, Tuple
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -43,7 +43,7 @@ class MinimumTimeGrainPattern(SpecPattern):
     """
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[InstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
 
         time_dimension_specs_with_no_grain: Tuple[TimeDimensionSpec, ...] = ()

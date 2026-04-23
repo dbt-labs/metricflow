@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Iterable, Optional, Sequence
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -20,7 +20,7 @@ class MetricSpecPattern(SpecPattern):
     descending: Optional[bool] = None
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[MetricSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[MetricSpec]:
         spec_set = group_specs_by_type(candidate_specs)
         return tuple(
             metric_name for metric_name in spec_set.metric_specs if metric_name.reference == self.metric_reference

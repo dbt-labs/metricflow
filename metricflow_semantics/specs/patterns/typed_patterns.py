@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence, Tuple
+from typing import Iterable, Optional, Sequence, Tuple
 
 from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
@@ -36,7 +36,7 @@ class DimensionPattern(EntityLinkPattern):
     include_time_dimensions: bool = True
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
         filtered_specs: Tuple[LinkableInstanceSpec, ...] = spec_set.dimension_specs
         if self.include_time_dimensions:
@@ -78,7 +78,7 @@ class TimeDimensionPattern(EntityLinkPattern):
     """
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
         return super().match(spec_set.time_dimension_specs)
 
@@ -139,7 +139,7 @@ class EntityPattern(EntityLinkPattern):
     """
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
         return super().match(spec_set.entity_specs)
 
@@ -168,7 +168,7 @@ class GroupByMetricPattern(EntityLinkPattern):
     """A pattern that matches metrics using the group by specifications."""
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         spec_set = group_specs_by_type(candidate_specs)
         return super().match(spec_set.group_by_metric_specs)
 

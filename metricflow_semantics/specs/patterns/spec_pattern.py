@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Iterable, Sequence
 
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
 
@@ -16,11 +16,11 @@ class SpecPattern(ABC):
     """
 
     @abstractmethod
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[InstanceSpec]:
         """Given candidate specs, return the ones that match this pattern."""
         raise NotImplementedError
 
-    def matches_any(self, candidate_specs: Sequence[InstanceSpec]) -> bool:
+    def matches_any(self, candidate_specs: Iterable[InstanceSpec]) -> bool:
         """Returns true if this spec matches any of the given specs."""
         return len(self.match(candidate_specs)) > 0
 

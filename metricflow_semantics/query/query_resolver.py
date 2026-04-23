@@ -38,6 +38,7 @@ from metricflow_semantics.query.issues.parsing.invalid_metric import InvalidMetr
 from metricflow_semantics.query.issues.parsing.invalid_min_max_only import InvalidMinMaxOnlyIssue
 from metricflow_semantics.query.issues.parsing.invalid_order import InvalidOrderByItemIssue
 from metricflow_semantics.query.issues.parsing.no_metric_or_group_by import NoMetricOrGroupByIssue
+from metricflow_semantics.query.order_by_helper import OrderByHelper
 from metricflow_semantics.query.query_resolution import (
     InputToIssueSetMapping,
     InputToIssueSetMappingItem,
@@ -321,19 +322,20 @@ class MetricFlowQueryResolver:
         # The pattern needs to be used because there are cases where the order-by-item is specified in a different way
         # from the group-by-item, so an equality comparison won't work.
 
-        # Group the specs by the alias to aid later matching.
-        alias_to_specs: defaultdict[str | None, list[MetricSpec | LinkableInstanceSpec]] = defaultdict(list)
-
-        for metric_spec in metric_specs:
-            alias_to_specs[metric_spec.alias].append(metric_spec)
-        for group_by_item_spec in group_by_item_specs:
-            alias_to_specs[group_by_item_spec.alias].append(group_by_item_spec)
+        order_by_helper = OrderByHelper(metric_specs, group_by_item_specs)
 
         for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
             specs_matching_order_by: set[InstanceSpec] = set()
             for possible_input in resolver_input_for_order_by.possible_inputs:
-                specs_matching_alias = alias_to_specs[possible_input.alias]
-                specs_matching_order_by.update(possible_input.spec_pattern.match(specs_matching_alias))
+                # If the order-by does not specify an alias, the matching can be done with all specs in the query.
+                if possible_input.alias is None:
+                    specs_matching_order_by.update(possible_input.spec_pattern.match(order_by_helper.all_specs))
+                # If an order-by specifies an alias, the matching can only be done with specs in the query that
+                # have the same alias.
+                else:
+                    specs_matching_order_by.update(
+                        possible_input.spec_pattern.match(order_by_helper.specs_with_alias(possible_input.alias))
+                    )
 
             if len(specs_matching_order_by) != 1:
                 mapping_items.append(
@@ -350,8 +352,7 @@ class MetricFlowQueryResolver:
             else:
                 order_by_specs.add(
                     OrderBySpec(
-                        # Ignore aliases in the order by since we'll render the expression instead of the alias.
-                        instance_spec=mf_first_item(specs_matching_order_by).with_alias(None),
+                        instance_spec=mf_first_item(specs_matching_order_by),
                         descending=resolver_input_for_order_by.descending,
                     )
                 )
