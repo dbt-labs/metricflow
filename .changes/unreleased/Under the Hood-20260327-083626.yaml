@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Remove unused code in `dataflow_plan_builder.py`
-time: 2026-03-27T08:36:26.492253-07:00
-custom:
-  Author: plypaul
-  Issue: "2003"

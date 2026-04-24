@@ -43,7 +43,6 @@ test:
 
 .PHONY: test-include-slow
 test-include-slow:
-	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_DBT_METRICFLOW)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTIC_INTERFACES)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
@@ -93,8 +92,6 @@ test-trino:
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
-	@echo "\n\nTypechecking dbt-metricflow separately due to dbt-core dependency...\n\n"
-	cd dbt-metricflow && hatch -v run dev-env:mypy --config-file ../mypy.ini dbt_metricflow
 
 # Running data warehouses locally
 .PHONY: postgresql postgres

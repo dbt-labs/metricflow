@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Expand dbt-core support to <1.12
-time: 2026-04-15T10:06:08.681284-04:00
-custom:
-    Author: TTMichaelA
-    Issue: '#2018'
