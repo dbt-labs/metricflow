@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
-
-from metricflow.converters.models import OSIDocument
+from typing import Generic, List, TypeVar
 
 
 class ConverterIssueType(Enum):
@@ -18,15 +16,18 @@ class ConverterIssueType(Enum):
 
 @dataclass(frozen=True)
 class ConverterIssue:
-    """Records a single instance of information loss during MSI→OSI conversion."""
+    """Records a single instance of information loss during conversion."""
 
     issue_type: ConverterIssueType
     element_name: str
 
 
-@dataclass(frozen=True)
-class ConverterResult:
-    """Return value of MSIToOSIConverter.convert(), pairing the output document with any conversion issues."""
+T = TypeVar("T")
 
-    document: OSIDocument
+
+@dataclass(frozen=True)
+class ConverterResult(Generic[T]):
+    """Return value of a converter's convert() method, pairing the output with any conversion issues."""
+
+    output: T
     issues: List[ConverterIssue]

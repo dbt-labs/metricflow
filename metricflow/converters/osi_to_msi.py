@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Set
 
+from metricflow.converters.converter_issues import ConverterResult
 from metricflow.converters.expression_utils import (
     _extract_agg_info,
     _get_raw_inner_col,
@@ -80,7 +81,7 @@ class OSIToMSIConverter:
     def __init__(self, dialect: OSIDialect = OSIDialect.ANSI_SQL) -> None:  # noqa: D107
         self._dialect = dialect
 
-    def convert(self, document: OSIDocument) -> PydanticSemanticManifest:  # noqa: D102
+    def convert(self, document: OSIDocument) -> ConverterResult[PydanticSemanticManifest]:  # noqa: D102
         semantic_models: List[PydanticSemanticModel] = []
         metrics: List[PydanticMetric] = []
 
@@ -89,10 +90,13 @@ class OSIToMSIConverter:
                 semantic_models.append(self._convert_dataset(dataset, osi_sm))
             metrics.extend(self._convert_metrics(osi_sm))
 
-        return PydanticSemanticManifest(
-            semantic_models=semantic_models,
-            metrics=metrics,
-            project_configuration=PydanticProjectConfiguration(),
+        return ConverterResult(
+            output=PydanticSemanticManifest(
+                semantic_models=semantic_models,
+                metrics=metrics,
+                project_configuration=PydanticProjectConfiguration(),
+            ),
+            issues=[],
         )
 
     # ------------------------------------------------------------------

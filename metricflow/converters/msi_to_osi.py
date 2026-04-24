@@ -67,7 +67,7 @@ class MSIToOSIConverter:
 
     def convert(  # noqa: D102
         self, manifest: PydanticSemanticManifest, osi_model_name: str = "semantic_model"
-    ) -> ConverterResult:
+    ) -> ConverterResult[OSIDocument]:
         manifest = PydanticSemanticManifestTransformer.transform(manifest)
         issues: List[ConverterIssue] = []
 
@@ -106,7 +106,7 @@ class MSIToOSIConverter:
             )
 
         return ConverterResult(
-            document=OSIDocument(
+            output=OSIDocument(
                 version="0.1.1",
                 dialects=[self._dialect],
                 semantic_model=[
