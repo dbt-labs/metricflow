@@ -6,15 +6,15 @@ sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
--- Select: ['__revenue', 'ds__month']
--- Select: ['__revenue', 'ds__month']
+-- Select: ['__revenue', 'ds__day']
+-- Select: ['__revenue', 'ds__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  DATE_TRUNC('month', created_at) AS ds__month
+  DATE_TRUNC('day', created_at) AS ds__day
   , SUM(revenue) AS revenue_mtd
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY
-  DATE_TRUNC('month', created_at)
+  DATE_TRUNC('day', created_at)
