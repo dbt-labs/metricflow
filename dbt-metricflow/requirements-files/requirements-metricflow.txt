@@ -1,1 +1,3 @@
-metricflow==0.209.0
+# Example of using SHA:
+# metricflow @ git+https://github.com/dbt-labs/metricflow.git@a6da9f861bb488af98577a6029ba0c9d17681a92
+metricflow==0.210.0
