@@ -10,6 +10,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_object_snapshot_equal,
 )
 
+from metricflow.converters.converter_issues import ConverterIssueType
 from metricflow.converters.filter_utils import _render_filter_template
 from metricflow.converters.models import OSIDialect, OSIDocument
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
@@ -865,6 +866,97 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion])).output
 
         assert result.semantic_model[0].metrics is None
+
+
+class TestConverterIssues:  # noqa: D101
+    def test_conversion_metric_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("visits", agg=AggregationType.COUNT, expr="visit_id"),
+                _measure("purchases", agg=AggregationType.COUNT, expr="purchase_id"),
+            ],
+        )
+        conversion = PydanticMetric(
+            name="purchase_rate",
+            description=None,
+            type=MetricType.CONVERSION,
+            type_params=PydanticMetricTypeParams(
+                conversion_type_params=PydanticConversionTypeParams(
+                    base_measure=PydanticMetricInputMeasure(name="visits"),
+                    conversion_measure=PydanticMetricInputMeasure(name="purchases"),
+                    entity="user",
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion]))
+
+        dropped = [i for i in result.issues if i.issue_type == ConverterIssueType.CONVERSION_METRIC_DROPPED]
+        assert len(dropped) == 1
+        assert dropped[0].element_name == "purchase_rate"
+
+    def test_private_metric_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        private_metric = PydanticMetric(
+            name="revenue_internal",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(
+                measure=PydanticMetricInputMeasure(name="revenue"),
+                is_private=True,
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[private_metric]))
+
+        assert len(result.issues) == 1
+        assert result.issues[0].issue_type == ConverterIssueType.PRIVATE_METRIC_DROPPED
+        assert result.issues[0].element_name == "revenue_internal"
+
+    def test_natural_entity_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="users",
+            entities=[_entity("user", entity_type=EntityType.NATURAL, expr="user_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+
+        assert len(result.issues) == 1
+        assert result.issues[0].issue_type == ConverterIssueType.NATURAL_ENTITY_DROPPED
+        assert result.issues[0].element_name == "user"
+
+    def test_cumulative_metric_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        base = _simple_metric("revenue", "revenue")
+        cumulative = PydanticMetric(
+            name="cumulative_revenue",
+            description=None,
+            type=MetricType.CUMULATIVE,
+            type_params=PydanticMetricTypeParams(
+                measure=PydanticMetricInputMeasure(name="revenue"),
+                cumulative_type_params=PydanticCumulativeTypeParams(
+                    window=PydanticMetricTimeWindow(count=7, granularity="day"),
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[base, cumulative]))
+
+        cumulative_issues = [i for i in result.issues if i.issue_type == ConverterIssueType.CUMULATIVE_SEMANTICS_LOSS]
+        assert len(cumulative_issues) == 1
+        assert cumulative_issues[0].element_name == "cumulative_revenue"
 
 
 class TestFilterRendering:  # noqa: D101
