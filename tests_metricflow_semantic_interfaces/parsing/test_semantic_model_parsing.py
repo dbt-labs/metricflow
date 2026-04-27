@@ -96,6 +96,48 @@ def test_semantic_model_node_relation_parsing() -> None:
     assert semantic_model.node_relation.relation_name == "some_schema.source_table"
 
 
+def test_semantic_model_node_relation_with_compiled_sql() -> None:
+    """Test for parsing a semantic model with compiled_sql set on the node_relation (ephemeral model)."""
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: ephemeral_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
+            compiled_sql: "SELECT id, name FROM raw.source_table WHERE active = true"
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+    assert len(build_result.semantic_manifest.semantic_models) == 1
+    semantic_model = build_result.semantic_manifest.semantic_models[0]
+    assert semantic_model.node_relation.compiled_sql == "SELECT id, name FROM raw.source_table WHERE active = true"
+    assert semantic_model.node_relation.relation_name == "some_schema.source_table"
+
+
+def test_semantic_model_node_relation_without_compiled_sql() -> None:
+    """Test that compiled_sql defaults to None when not provided."""
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: table_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+    assert len(build_result.semantic_manifest.semantic_models) == 1
+    semantic_model = build_result.semantic_manifest.semantic_models[0]
+    assert semantic_model.node_relation.compiled_sql is None
+
+
 def test_base_semantic_model_entity_parsing() -> None:
     """Test parsing base attributes of PydanticEntity object."""
     label = "Base Test Entity"

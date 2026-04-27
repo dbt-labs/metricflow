@@ -381,6 +381,7 @@ node_relation_schema = {
         "schema_name": {"type": "string"},
         "database": {"type": "string"},
         "relation_name": {"type": "string"},
+        "compiled_sql": {"type": "string"},
     },
     "additionalProperties": False,
     "required": ["alias", "schema_name"],
