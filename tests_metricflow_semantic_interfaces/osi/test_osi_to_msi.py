@@ -27,14 +27,14 @@ from tests_metricflow_semantic_interfaces.osi.helpers import (
 
 class TestOSIToMSIBasicConversion:  # noqa: D101
     def test_empty_document_produces_empty_manifest(self) -> None:  # noqa: D102
-        result = OSIToMSIConverter().convert(_osi_doc())
+        result = OSIToMSIConverter().convert(_osi_doc()).output
 
         assert result.semantic_models == []
         assert result.metrics == []
 
     def test_single_dataset_becomes_semantic_model(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("orders", source="analytics.orders_table")])
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         assert len(result.semantic_models) == 1
         sm = result.semantic_models[0]
@@ -45,13 +45,13 @@ class TestOSIToMSIBasicConversion:  # noqa: D101
 
     def test_description_carried_over(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("orders", description="Order data")])
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         assert result.semantic_models[0].description == "Order data"
 
     def test_source_two_parts(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("t", source="myschema.mytable")])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert sm.node_relation.schema_name == "myschema"
         assert sm.node_relation.alias == "mytable"
@@ -59,7 +59,7 @@ class TestOSIToMSIBasicConversion:  # noqa: D101
 
     def test_source_three_parts(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("t", source="mydb.myschema.mytable")])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert sm.node_relation.database == "mydb"
         assert sm.node_relation.schema_name == "myschema"
@@ -67,14 +67,14 @@ class TestOSIToMSIBasicConversion:  # noqa: D101
 
     def test_source_bare_name(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("t", source="mytable")])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert sm.node_relation.alias == "mytable"
         assert sm.node_relation.schema_name == ""
 
     def test_multiple_datasets_become_multiple_models(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("orders"), _osi_dataset("users")])
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         names = [sm.name for sm in result.semantic_models]
         assert names == ["orders", "users"]
@@ -91,7 +91,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
                 )
             ]
         )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert len(sm.entities) == 1
         assert sm.entities[0].name == "order_id"
@@ -107,7 +107,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
                 )
             ]
         )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert len(sm.entities) == 1
         assert sm.entities[0].name == "email"
@@ -121,7 +121,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
             ],
             relationships=[_osi_relationship("r", "orders", "users", ["user_id"], ["user_id"])],
         )
-        orders_sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        orders_sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert len(orders_sm.entities) == 1
         assert orders_sm.entities[0].name == "user_id"
@@ -139,7 +139,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
         self, field_name: str, is_time: bool | None, expected_type: DimensionType
     ) -> None:
         doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field(field_name, is_time=is_time)])])
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert len(sm.dimensions) == 1
         assert sm.dimensions[0].name == field_name
@@ -151,7 +151,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("revenue", "SUM(amount)")],
         )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert len(sm.measures) == 0
         assert len(sm.dimensions) == 1
@@ -167,7 +167,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
                 )
             ]
         )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert sm.entities[0].expr == "id"
 
@@ -181,7 +181,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
                 )
             ]
         )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         assert sm.entities[0].expr is None
 
@@ -194,7 +194,7 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
                 )
             ]
         )
-        sm = OSIToMSIConverter().convert(doc).semantic_models[0]
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
 
         dim = sm.dimensions[0]
         assert dim.description == "Order status"
@@ -207,7 +207,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("revenue", "SUM(amount)")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         assert len(result.metrics) == 1
         m = result.metrics[0]
@@ -224,7 +224,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("user_id")])],
             metrics=[_osi_metric("unique_users", "COUNT(DISTINCT user_id)")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         m = result.metrics[0]
         assert m.type_params.measure is None
@@ -244,7 +244,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             ],
             metrics=[_osi_metric("arpu", "(SUM(amount)) / (COUNT(order_id))")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         ratio = next(m for m in result.metrics if m.type == MetricType.RATIO)
         assert ratio.name == "arpu"
@@ -258,7 +258,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount"), _osi_field("cnt")])],
             metrics=[_osi_metric("ratio", "(SUM(amount)) / (COUNT(cnt))")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         simple_metrics = [m for m in result.metrics if m.type == MetricType.SIMPLE]
         assert len(simple_metrics) == 2
@@ -270,7 +270,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders")],
             metrics=[_osi_metric("complex", "SUM(a) + SUM(b)")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         assert len(result.metrics) == 1
         m = result.metrics[0]
@@ -284,13 +284,13 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("revenue", "SUM(amount)", description="Total revenue")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         assert result.metrics[0].description == "Total revenue"
 
     def test_no_metrics_produces_empty_list(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("orders")])
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         assert result.metrics == []
 
@@ -300,7 +300,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("revenue", "SUM(orders.amount)")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         m = result.metrics[0]
         assert m.type_params.metric_aggregation_params is not None
@@ -312,7 +312,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("median_amount", "PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY amount)")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         m = result.metrics[0]
         assert m.type_params.metric_aggregation_params is not None
@@ -325,7 +325,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
             datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
             metrics=[_osi_metric("p95_amount", "PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY amount)")],
         )
-        result = OSIToMSIConverter().convert(doc)
+        result = OSIToMSIConverter().convert(doc).output
 
         m = result.metrics[0]
         assert m.type_params.metric_aggregation_params is not None
@@ -357,10 +357,10 @@ class TestOSIToMSIRoundTrip:  # noqa: D101
             metrics=[_osi_metric("revenue", "SUM(orders.amount)")],
         )
 
-        msi = OSIToMSIConverter().convert(original)
+        msi = OSIToMSIConverter().convert(original).output
         assert msi.semantic_models[0].measures == []
 
-        osi_doc = MSIToOSIConverter().convert(msi)
+        osi_doc = MSIToOSIConverter().convert(msi).output
 
         dataset = osi_doc.semantic_model[0].datasets[0]
         assert dataset.name == "orders"

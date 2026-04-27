@@ -1,0 +1,6 @@
+kind: Features
+body: Return results from OSI<>MSI converters as a ConverterResult object
+time: 2026-04-24T16:14:24.492143-05:00
+custom:
+  Author: QMalcolm
+  Issue: "2031"

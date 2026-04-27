@@ -10,6 +10,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_object_snapshot_equal,
 )
 
+from metricflow.converters.converter_issues import ConverterIssueType
 from metricflow.converters.filter_utils import _render_filter_template
 from metricflow.converters.models import OSIDialect, OSIDocument
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
@@ -75,7 +76,7 @@ def _osi_metrics(result: OSIDocument) -> list:
 
 class TestBasicConversion:  # noqa: D101
     def test_empty_manifest_produces_empty_datasets(self) -> None:  # noqa: D102
-        result = MSIToOSIConverter().convert(_manifest(), osi_model_name="test")
+        result = MSIToOSIConverter().convert(_manifest(), osi_model_name="test").output
 
         assert result.version == "0.1.1"
         assert len(result.semantic_model) == 1
@@ -90,7 +91,7 @@ class TestBasicConversion:  # noqa: D101
             description="Order data",
             node_relation=PydanticNodeRelation(schema_name="analytics", alias="orders_table"),
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         dataset = result.semantic_model[0].datasets[0]
         assert dataset.name == "orders"
@@ -102,14 +103,14 @@ class TestBasicConversion:  # noqa: D101
             name="orders",
             node_relation=PydanticNodeRelation(schema_name="analytics", alias="orders_table", database="prod"),
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         assert result.semantic_model[0].datasets[0].source == "prod.analytics.orders_table"
 
     def test_multiple_semantic_models_become_multiple_datasets(self) -> None:  # noqa: D102
         sm_a = semantic_model_with_guaranteed_meta(name="orders")
         sm_b = semantic_model_with_guaranteed_meta(name="users")
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm_a, sm_b]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm_a, sm_b])).output
 
         names = [ds.name for ds in result.semantic_model[0].datasets]
         assert names == ["orders", "users"]
@@ -121,7 +122,7 @@ class TestDimensionConversion:  # noqa: D101
             name="orders",
             dimensions=[_dimension("status", dim_type=DimensionType.CATEGORICAL)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         field = _fields(result)[0]
         assert field.name == "status"
@@ -133,7 +134,7 @@ class TestDimensionConversion:  # noqa: D101
             name="orders",
             dimensions=[_dimension("ds", dim_type=DimensionType.TIME, granularity=TimeGranularity.DAY)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         field = _fields(result)[0]
         assert field.dimension is not None
@@ -144,7 +145,7 @@ class TestDimensionConversion:  # noqa: D101
             name="orders",
             dimensions=[_dimension("order_date", expr="DATE(created_at)")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         assert _field_expr(result) == "DATE(created_at)"
 
@@ -153,7 +154,7 @@ class TestDimensionConversion:  # noqa: D101
             name="orders",
             dimensions=[_dimension("status")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         assert _field_expr(result) == "status"
 
@@ -162,7 +163,7 @@ class TestDimensionConversion:  # noqa: D101
             name="orders",
             dimensions=[_dimension("status", description="Order status", label="Status")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         field = _fields(result)[0]
         assert field.description == "Order status"
@@ -175,7 +176,7 @@ class TestMeasureConversion:  # noqa: D101
             name="orders",
             measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         field = _fields(result)[0]
         assert field.name == "revenue"
@@ -187,7 +188,7 @@ class TestMeasureConversion:  # noqa: D101
             name="orders",
             measures=[_measure("num_orders", agg=AggregationType.SUM)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         assert _field_expr(result) == "num_orders"
 
@@ -196,7 +197,7 @@ class TestMeasureConversion:  # noqa: D101
             name="orders",
             measures=[_measure("revenue", description="Total revenue", label="Revenue")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         field = _fields(result)[0]
         assert field.description == "Total revenue"
@@ -209,7 +210,7 @@ class TestEntityConversion:  # noqa: D101
             name="orders",
             entities=[_entity("order_id", entity_type=EntityType.PRIMARY)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         field = _fields(result)[0]
         assert field.name == "order_id"
@@ -221,7 +222,7 @@ class TestEntityConversion:  # noqa: D101
             name="orders",
             entities=[_entity("order_id", entity_type=EntityType.PRIMARY, expr="id")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         field = _fields(result)[0]
         assert field.name == "order_id"
@@ -232,7 +233,7 @@ class TestEntityConversion:  # noqa: D101
             name="orders",
             entities=[_entity("user_id", entity_type=EntityType.FOREIGN)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         assert _fields(result)[0].name == "user_id"
 
@@ -259,7 +260,7 @@ class TestEntityKeyExtraction:  # noqa: D101
             name="orders",
             entities=[_entity(name, entity_type=entity_type, expr=expr)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         dataset = result.semantic_model[0].datasets[0]
         assert dataset.primary_key == expected_pk
@@ -274,7 +275,7 @@ class TestFieldOrdering:  # noqa: D101
             dimensions=[_dimension("status")],
             measures=[_measure("revenue", expr="amount")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         fields = _fields(result)
         assert fields[0].name == "order_id"
@@ -288,7 +289,7 @@ class TestDialectConfiguration:  # noqa: D101
             name="orders",
             dimensions=[_dimension("status")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         assert result.dialects == [OSIDialect.ANSI_SQL]
         assert _fields(result)[0].expression.dialects[0].dialect == OSIDialect.ANSI_SQL
@@ -298,7 +299,7 @@ class TestDialectConfiguration:  # noqa: D101
             name="orders",
             dimensions=[_dimension("status")],
         )
-        result = MSIToOSIConverter(dialect=OSIDialect.SNOWFLAKE).convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter(dialect=OSIDialect.SNOWFLAKE).convert(_manifest(semantic_models=[sm])).output
 
         assert result.dialects == [OSIDialect.SNOWFLAKE]
         assert _fields(result)[0].expression.dialects[0].dialect == OSIDialect.SNOWFLAKE
@@ -314,7 +315,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="bookings",
             entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="listing_id")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings])).output
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
@@ -334,7 +335,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="users_b",
             entities=[_entity("user", entity_type=EntityType.PRIMARY, expr="uid")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users_a, users_b]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users_a, users_b])).output
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
@@ -347,7 +348,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="bookings",
             entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="listing_id")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[bookings]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[bookings])).output
 
         assert result.semantic_model[0].relationships is None
 
@@ -359,7 +360,7 @@ class TestRelationshipConversion:  # noqa: D101
                 _entity("order", entity_type=EntityType.FOREIGN, expr="order_id"),
             ],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[orders]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[orders])).output
 
         assert result.semantic_model[0].relationships is None
 
@@ -378,7 +379,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="orders",
             entities=[_entity("user", entity_type=EntityType.FOREIGN, expr="user_id")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users_a, users_b, orders]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users_a, users_b, orders])).output
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
@@ -400,7 +401,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="bookings",
             entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="fk_lid")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings])).output
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
@@ -417,7 +418,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="bookings",
             entities=[_entity("listing", entity_type=EntityType.FOREIGN)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings])).output
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
@@ -437,7 +438,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="orders",
             entities=[_entity("booking", entity_type=EntityType.FOREIGN, expr="booking_id")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[bookings, orders]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[bookings, orders])).output
 
         assert result.semantic_model[0].relationships is None
 
@@ -450,7 +451,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="bookings",
             entities=[_entity("listing", entity_type=EntityType.FOREIGN, expr="listing_id")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[listings, bookings])).output
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
@@ -465,7 +466,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="orders",
             entities=[_entity("user", entity_type=EntityType.FOREIGN, expr="user_id")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users, orders]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[users, orders])).output
 
         assert result.semantic_model[0].relationships is None
 
@@ -478,7 +479,7 @@ class TestRelationshipConversion:  # noqa: D101
             name="alpha",
             entities=[_entity("shared", entity_type=EntityType.FOREIGN, expr="col_a")],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[beta, alpha]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[beta, alpha])).output
 
         rels = result.semantic_model[0].relationships
         assert rels is not None
@@ -495,7 +496,7 @@ class TestMetricConversion:  # noqa: D101
             measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
         )
         metric = _simple_metric("revenue", measure_name="revenue")
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         metrics = _osi_metrics(result)
         assert len(metrics) == 1
@@ -508,7 +509,7 @@ class TestMetricConversion:  # noqa: D101
             measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
         )
         metric = _simple_metric("revenue", measure_name="revenue", description="Total revenue")
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         assert _osi_metrics(result)[0].description == "Total revenue"
 
@@ -532,7 +533,7 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         assert _osi_metrics(result)[0].expression.dialects[0].expression == "AVG(orders.price)"
 
@@ -562,7 +563,11 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, order_count_m, arpu]))
+        result = (
+            MSIToOSIConverter()
+            .convert(_manifest(semantic_models=[sm], metrics=[revenue_m, order_count_m, arpu]))
+            .output
+        )
 
         arpu_osi = next(m for m in _osi_metrics(result) if m.name == "arpu")
         assert arpu_osi.expression.dialects[0].expression == (
@@ -601,7 +606,9 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
+        result = (
+            MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit])).output
+        )
 
         profit_osi = next(m for m in _osi_metrics(result) if m.name == "profit")
         assert profit_osi.expression.dialects[0].expression == "SUM(orders.amount) - SUM(orders.cost_amount)"
@@ -631,7 +638,9 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
+        result = (
+            MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit])).output
+        )
 
         profit_osi = next(m for m in _osi_metrics(result) if m.name == "profit")
         assert profit_osi.expression.dialects[0].expression == "SUM(orders.amount) - SUM(orders.cost_amount)"
@@ -680,11 +689,15 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(
-            _manifest(
-                semantic_models=[sm],
-                metrics=[revenue_m, cost_m, expenses_m, gross_profit, net_profit],
+        result = (
+            MSIToOSIConverter()
+            .convert(
+                _manifest(
+                    semantic_models=[sm],
+                    metrics=[revenue_m, cost_m, expenses_m, gross_profit, net_profit],
+                )
             )
+            .output
         )
 
         net_osi = next(m for m in _osi_metrics(result) if m.name == "net_profit")
@@ -724,8 +737,10 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(
-            _manifest(semantic_models=[sm], metrics=[revenue_m, revenue_adjusted_m, derived])
+        result = (
+            MSIToOSIConverter()
+            .convert(_manifest(semantic_models=[sm], metrics=[revenue_m, revenue_adjusted_m, derived]))
+            .output
         )
 
         derived_osi = next(m for m in _osi_metrics(result) if m.name == "revenue_delta")
@@ -752,7 +767,7 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[cumulative]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[cumulative])).output
 
         metrics = _osi_metrics(result)
         assert len(metrics) == 1
@@ -786,7 +801,7 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[base, cumulative]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[base, cumulative])).output
 
         cumulative_osi = next(m for m in _osi_metrics(result) if m.name == "cumulative_revenue")
         assert cumulative_osi.expression.dialects[0].expression == "SUM(orders.amount)"
@@ -795,7 +810,7 @@ class TestMetricConversion:  # noqa: D101
 
     def test_no_metrics_produces_no_osi_metrics(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(name="orders")
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
 
         assert result.semantic_model[0].metrics is None
 
@@ -807,14 +822,18 @@ class TestMetricConversion:  # noqa: D101
                 _measure("order_count", agg=AggregationType.COUNT, expr="order_id"),
             ],
         )
-        result = MSIToOSIConverter().convert(
-            _manifest(
-                semantic_models=[sm],
-                metrics=[
-                    _simple_metric("revenue", "revenue"),
-                    _simple_metric("order_count", "order_count"),
-                ],
+        result = (
+            MSIToOSIConverter()
+            .convert(
+                _manifest(
+                    semantic_models=[sm],
+                    metrics=[
+                        _simple_metric("revenue", "revenue"),
+                        _simple_metric("order_count", "order_count"),
+                    ],
+                )
             )
+            .output
         )
 
         metrics = _osi_metrics(result)
@@ -844,9 +863,100 @@ class TestMetricConversion:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion])).output
 
         assert result.semantic_model[0].metrics is None
+
+
+class TestConverterIssues:  # noqa: D101
+    def test_conversion_metric_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("visits", agg=AggregationType.COUNT, expr="visit_id"),
+                _measure("purchases", agg=AggregationType.COUNT, expr="purchase_id"),
+            ],
+        )
+        conversion = PydanticMetric(
+            name="purchase_rate",
+            description=None,
+            type=MetricType.CONVERSION,
+            type_params=PydanticMetricTypeParams(
+                conversion_type_params=PydanticConversionTypeParams(
+                    base_measure=PydanticMetricInputMeasure(name="visits"),
+                    conversion_measure=PydanticMetricInputMeasure(name="purchases"),
+                    entity="user",
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion]))
+
+        dropped = [i for i in result.issues if i.issue_type == ConverterIssueType.CONVERSION_METRIC_DROPPED]
+        assert len(dropped) == 1
+        assert dropped[0].element_name == "purchase_rate"
+
+    def test_private_metric_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        private_metric = PydanticMetric(
+            name="revenue_internal",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(
+                measure=PydanticMetricInputMeasure(name="revenue"),
+                is_private=True,
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[private_metric]))
+
+        assert len(result.issues) == 1
+        assert result.issues[0].issue_type == ConverterIssueType.PRIVATE_METRIC_DROPPED
+        assert result.issues[0].element_name == "revenue_internal"
+
+    def test_natural_entity_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="users",
+            entities=[_entity("user", entity_type=EntityType.NATURAL, expr="user_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+
+        assert len(result.issues) == 1
+        assert result.issues[0].issue_type == ConverterIssueType.NATURAL_ENTITY_DROPPED
+        assert result.issues[0].element_name == "user"
+
+    def test_cumulative_metric_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        base = _simple_metric("revenue", "revenue")
+        cumulative = PydanticMetric(
+            name="cumulative_revenue",
+            description=None,
+            type=MetricType.CUMULATIVE,
+            type_params=PydanticMetricTypeParams(
+                measure=PydanticMetricInputMeasure(name="revenue"),
+                cumulative_type_params=PydanticCumulativeTypeParams(
+                    window=PydanticMetricTimeWindow(count=7, granularity="day"),
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[base, cumulative]))
+
+        cumulative_issues = [i for i in result.issues if i.issue_type == ConverterIssueType.CUMULATIVE_SEMANTICS_LOSS]
+        assert len(cumulative_issues) == 1
+        assert cumulative_issues[0].element_name == "cumulative_revenue"
 
 
 class TestFilterRendering:  # noqa: D101
@@ -891,7 +1001,7 @@ class TestMetricFilterFlattening:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         assert (
             _osi_metrics(result)[0].expression.dialects[0].expression
@@ -914,7 +1024,7 @@ class TestMetricFilterFlattening:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         assert (
             _osi_metrics(result)[0].expression.dialects[0].expression
@@ -939,7 +1049,7 @@ class TestMetricFilterFlattening:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         assert _osi_metrics(result)[0].expression.dialects[0].expression == (
             "SUM(CASE WHEN (status = 'paid') AND (region = 'intl') THEN orders.amount END)"
@@ -964,7 +1074,7 @@ class TestMetricFilterFlattening:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         assert (
             _osi_metrics(result)[0].expression.dialects[0].expression
@@ -993,7 +1103,11 @@ class TestMetricFilterFlattening:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, order_count_m, arpu]))
+        result = (
+            MSIToOSIConverter()
+            .convert(_manifest(semantic_models=[sm], metrics=[revenue_m, order_count_m, arpu]))
+            .output
+        )
 
         paid_arpu = next(m for m in _osi_metrics(result) if m.name == "paid_arpu")
         assert paid_arpu.expression.dialects[0].expression == (
@@ -1024,7 +1138,9 @@ class TestMetricFilterFlattening:  # noqa: D101
             metadata=default_meta(),
             config=None,
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit]))
+        result = (
+            MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, cost_m, profit])).output
+        )
 
         paid_profit = next(m for m in _osi_metrics(result) if m.name == "paid_profit")
         assert paid_profit.expression.dialects[0].expression == (
@@ -1038,8 +1154,10 @@ class TestMetricFilterFlattening:  # noqa: D101
             name="orders",
             measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
         )
-        result = MSIToOSIConverter().convert(
-            _manifest(semantic_models=[sm], metrics=[_simple_metric("revenue", "revenue")])
+        result = (
+            MSIToOSIConverter()
+            .convert(_manifest(semantic_models=[sm], metrics=[_simple_metric("revenue", "revenue")]))
+            .output
         )
 
         assert _osi_metrics(result)[0].expression.dialects[0].expression == "SUM(orders.amount)"
@@ -1054,7 +1172,7 @@ class TestOSIJsonSerialization:  # noqa: D101
             measures=[_measure("revenue", expr="amount")],
             entities=[_entity("order_id", entity_type=EntityType.PRIMARY)],
         )
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]), osi_model_name="my_project")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]), osi_model_name="my_project").output
         parsed = json.loads(result.to_osi_json())
 
         assert parsed["version"] == "0.1.1"
@@ -1063,7 +1181,7 @@ class TestOSIJsonSerialization:  # noqa: D101
 
     def test_to_osi_json_excludes_none_fields(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(name="orders")
-        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
         parsed = json.loads(result.to_osi_json())
 
         dataset = parsed["semantic_model"][0]["datasets"][0]
