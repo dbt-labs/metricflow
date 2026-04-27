@@ -48,6 +48,8 @@ class SqlAlchemyUrlBuilder:
             return SqlAlchemyUrlBuilder._build_bigquery_url(password, schema)
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
+        elif dialect is SqlDialect.DORIS:
+            return SqlAlchemyUrlBuilder._build_doris_url(connection_params, password, schema)
         else:
             raise ValueError(f"Unsupported dialect: {dialect}")
 
@@ -205,6 +207,29 @@ class SqlAlchemyUrlBuilder:
             drivername="bigquery",
             host=project_id,
             database=database_value,
+        )
+
+    @staticmethod
+    def _build_doris_url(
+        connection_params: SqlEngineConnectionParameterSet,
+        password: str,
+        schema: Optional[str] = None,
+    ) -> SqlAlchemyURL:
+        """Build Doris URL.
+
+        Uses the pydoris SQLAlchemy dialect (local dev version).
+        URL format: doris://user:password@host:port/database
+
+        Note: In Doris, schema = database. We always connect to the database from the original URL
+        because the test schema may not exist yet (it gets created by the test setup fixtures).
+        """
+        return SqlAlchemyURL.create(
+            drivername="doris",
+            username=connection_params.username,
+            password=password,
+            host=connection_params.hostname,
+            port=connection_params.port or 9030,
+            database=connection_params.database,
         )
 
     @staticmethod

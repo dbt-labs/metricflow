@@ -744,7 +744,7 @@ integration_test:
           ON
             subq_1.metric_time__day = subq_2.ds
         ) subq_3
-        WHERE CAST(metric_time__alien_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+        WHERE {{ cast_expr_to_ts('metric_time__alien_day') }} >= {{ cast_to_ts('2019-12-20') }}
         GROUP BY
           metric_time__alien_day
       ) subq_6
@@ -822,7 +822,7 @@ integration_test:
               ON
                 subq_7.ds__day = subq_8.ds
             ) subq_9
-            WHERE CAST(metric_time__alien_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+            WHERE {{ cast_expr_to_ts('metric_time__alien_day') }} >= {{ cast_to_ts('2019-12-20') }}
           ) subq_11
           INNER JOIN (
             SELECT
@@ -863,7 +863,7 @@ integration_test:
         SUM(1) AS visits
       FROM {{ source_schema }}.fct_visits v1
       LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("v1.ds", TimeGranularity.DAY) }} = ts.ds
-      WHERE CAST(ts.alien_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+      WHERE {{ cast_expr_to_ts('ts.alien_day') }} >= {{ cast_to_ts('2019-12-20') }}
     ) subq_6
     CROSS JOIN (
       SELECT
@@ -921,7 +921,7 @@ integration_test:
             , subq_8.alien_day AS metric_time__alien_day
           FROM {{ source_schema }}.fct_visits v2
           LEFT OUTER JOIN {{ source_schema }}.mf_time_spine subq_8 ON {{ render_date_trunc("v2.ds", TimeGranularity.DAY) }} = subq_8.ds
-          WHERE CAST(subq_8.alien_day AS TIMESTAMP) >= CAST('2019-12-20' AS TIMESTAMP)
+          WHERE {{ cast_expr_to_ts('subq_8.alien_day') }} >= {{ cast_to_ts('2019-12-20') }}
         ) subq_11
         INNER JOIN (
           SELECT
