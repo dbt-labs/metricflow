@@ -26,6 +26,7 @@ This project uses **hatch** for dependency management and testing:
   project.
 - For prompts that are made from the CLI and the response includes a table, 
   use a formatting style that aligns columns vertically.
+- Avoid variable names that would shadow a name from an outer scope.
 
 ## Python Code Standards
 
