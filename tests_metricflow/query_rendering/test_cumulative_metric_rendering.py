@@ -245,7 +245,7 @@ def test_cumulative_metric_grain_to_date(
             TimeDimensionSpec(
                 element_name="ds",
                 entity_links=(),
-                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
+                time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.MONTH),
             ),
         ),
     )

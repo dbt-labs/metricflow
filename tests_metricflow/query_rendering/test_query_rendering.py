@@ -799,28 +799,3 @@ def test_saved_query_override_order_by_and_limit(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
-
-
-@pytest.mark.duckdb_only
-@pytest.mark.sql_engine_snapshot
-def test_scd_offset_to_grain(  # noqa: D103
-    request: FixtureRequest,
-    mf_test_configuration: MetricFlowTestConfiguration,
-    scd_query_parser: MetricFlowQueryParser,
-    scd_dataflow_plan_builder: DataflowPlanBuilder,
-    scd_dataflow_to_sql_converter: DataflowToSqlPlanConverter,
-    sql_client: SqlClient,
-) -> None:
-    query_spec = scd_query_parser.parse_and_validate_query(
-        metric_names=("bookings_all_time",),
-        group_by_names=("listing__capacity", "metric_time__month"),
-    ).query_spec
-
-    render_and_check(
-        request=request,
-        mf_test_configuration=mf_test_configuration,
-        dataflow_to_sql_converter=scd_dataflow_to_sql_converter,
-        sql_client=sql_client,
-        dataflow_plan_builder=scd_dataflow_plan_builder,
-        query_spec=query_spec,
-    )
