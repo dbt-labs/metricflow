@@ -66,6 +66,10 @@ trino-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-trino.txt",
 ]
+clickhouse-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-clickhouse.txt",
+]
 
 
 [project.urls]
@@ -143,6 +147,18 @@ MF_SQL_ENGINE_PASSWORD=""
 description = "Dev environment for working with Trino"
 template = "dev-env"
 features = ["trino-env-requirements"]
+
+
+[tool.hatch.envs.clickhouse-env.env-vars]
+PYTHONPATH="metricflow-semantics:dbt-metricflow"
+MF_TEST_ADAPTER_TYPE="clickhouse"
+MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
+MF_SQL_ENGINE_PASSWORD="metricflowing"
+
+[tool.hatch.envs.clickhouse-env]
+description = "Dev environment for working with ClickHouse adapter"
+template = "dev-env"
+features = ["clickhouse-env-requirements"]
 
 
 [tool.black]

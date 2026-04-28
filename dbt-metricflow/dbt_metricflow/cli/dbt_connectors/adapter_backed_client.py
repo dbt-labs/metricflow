@@ -14,6 +14,7 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
+from metricflow.sql.render.clickhouse import ClickHouseSqlPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlPlanRenderer
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
@@ -42,6 +43,7 @@ class SupportedAdapterTypes(enum.Enum):
     BIGQUERY = "bigquery"
     DUCKDB = "duckdb"
     TRINO = "trino"
+    CLICKHOUSE = "clickhouse"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -60,6 +62,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SqlEngine.DUCKDB
         elif self is SupportedAdapterTypes.TRINO:
             return SqlEngine.TRINO
+        elif self is SupportedAdapterTypes.CLICKHOUSE:
+            return SqlEngine.CLICKHOUSE
         else:
             assert_values_exhausted(self)
 
@@ -80,6 +84,8 @@ class SupportedAdapterTypes(enum.Enum):
             return DuckDbSqlPlanRenderer()
         elif self is SupportedAdapterTypes.TRINO:
             return TrinoSqlPlanRenderer()
+        elif self is SupportedAdapterTypes.CLICKHOUSE:
+            return ClickHouseSqlPlanRenderer()
         else:
             assert_values_exhausted(self)
 
@@ -231,6 +237,9 @@ class AdapterBackedSqlClient:
         elif self.sql_engine_type is SqlEngine.BIGQUERY:
             with self._adapter.connection_named(connection_name):
                 self._adapter.validate_sql(stmt)
+        elif self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            with self._adapter.connection_named(connection_name):
+                self._adapter.execute(f"EXPLAIN SYNTAX run_query_tree_passes = 1 {stmt}", auto_begin=True, fetch=True)
         else:
             is_databricks = self.sql_engine_type is SqlEngine.DATABRICKS
             with self._adapter.connection_named(connection_name):

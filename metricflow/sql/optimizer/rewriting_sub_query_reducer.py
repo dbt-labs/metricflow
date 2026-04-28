@@ -89,6 +89,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     Unlike SqlSubQueryReducerVisitor, this will re-write expressions to realize more reductions.
     """
 
+    def __init__(self, prevent_where_hoist_with_aggregates: bool = False) -> None:  # noqa: D107
+        self._prevent_where_hoist_with_aggregates = prevent_where_hoist_with_aggregates
+
     def _reduce_parents(
         self,
         node: SqlSelectStatementNode,
@@ -298,6 +301,18 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         # If the parent has a GROUP BY and this has a WHERE, avoid reducing as the WHERE could reference an
         # aggregation expression.
         if len(from_source_node_as_select_node.group_bys) > 0 and node.where:
+            return False
+
+        # ClickHouse-specific guard: if the inner (FROM) subquery has a WHERE and this SELECT has aggregate functions,
+        # hoisting the WHERE would place it alongside GROUP BY + aggregation in the merged node. ClickHouse's new query
+        # analyzer (enable_analyzer=1) resolves the WHERE column reference to the SELECT aggregate alias instead of the
+        # source column when the names match, causing Code 184 ILLEGAL_AGGREGATION. This guard is opt-in and only
+        # enabled for ClickHouse via the prevent_where_hoist_with_aggregates flag.
+        if (
+            self._prevent_where_hoist_with_aggregates
+            and from_source_node_as_select_node.where is not None
+            and any(col.expr.lineage.contains_aggregate_exprs for col in node.select_columns)
+        ):
             return False
 
         # If the parent has a GROUP BY, the case where it's easiest to merge this with the parent is if all select
@@ -870,11 +885,20 @@ class SqlRewritingSubQueryReducer(SqlPlanOptimizer):
     GROUP BY foo
     """
 
-    def __init__(self, use_column_alias_in_group_bys: bool = False) -> None:  # noqa: D107
+    def __init__(
+        self,
+        use_column_alias_in_group_bys: bool = False,
+        prevent_where_hoist_with_aggregates: bool = False,
+    ) -> None:  # noqa: D107
         self._use_column_alias_in_group_bys = use_column_alias_in_group_bys
+        self._prevent_where_hoist_with_aggregates = prevent_where_hoist_with_aggregates
 
     def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
-        result = node.accept(SqlRewritingSubQueryReducerVisitor())
+        result = node.accept(
+            SqlRewritingSubQueryReducerVisitor(
+                prevent_where_hoist_with_aggregates=self._prevent_where_hoist_with_aggregates,
+            )
+        )
         if self._use_column_alias_in_group_bys:
             return result.accept(SqlGroupByRewritingVisitor())
         return result

@@ -2,6 +2,7 @@ test_name: test_reduce_sub_query
 test_filename: test_rewriting_sub_query_reducer.py
 docstring:
   Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions.
+sql_engine: Postgres
 ---
 -- src1
 -- src2
