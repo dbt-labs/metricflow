@@ -24,7 +24,8 @@ This project uses **hatch** for dependency management and testing:
   - Make updates to follow code standards.
 - Code should be compatible with the lowest Python version supported by this
   project.
-
+- For prompts that are made from the CLI and the response includes a table, 
+  use a formatting style that aligns columns vertically.
 
 ## Python Code Standards
 
