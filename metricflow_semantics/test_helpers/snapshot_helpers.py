@@ -18,7 +18,7 @@ from metricflow_semantics.model.semantics.linkable_element_set_base import BaseG
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_spec_by_type
-from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
+from metricflow_semantics.test_helpers.terminal_helpers import mf_path_hyperlink
 from metricflow_semantics.toolkit.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
@@ -71,13 +71,12 @@ def assert_snapshot_text_equal(
     if incomparable_strings_replacement_function is not None:
         snapshot_text = incomparable_strings_replacement_function(snapshot_text)
 
-    open_snapshot_uri = file_path.resolve().as_uri()
     logger.debug(
         LazyFormat(
             "Generated snapshot text",
             snapshot_text=snapshot_text if log_snapshot_text else "<hidden in log output>",
             file_path=file_path,
-            open_link=mf_colored_link_text(open_snapshot_uri),
+            open_link=mf_path_hyperlink(file_path),
             iterm_hint="Link may be opened with <Command> + <Left Click>",
         )
     )
