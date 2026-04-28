@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Run lint / tests for `dbt-metricflow` in a separate environment
+time: 2026-04-28T12:58:22.154966-07:00
+custom:
+    Author: plypaul
+    Issue: "2039"
