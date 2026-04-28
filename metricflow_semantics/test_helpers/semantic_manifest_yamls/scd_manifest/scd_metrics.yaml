@@ -23,12 +23,3 @@ metric:
     "{{ Dimension('listing__is_lux') }} OR {{ Dimension('listing__is_lux') }} IS NULL"
   type_params:
     measure: bookings
----
-metric:
-  name: "bookings_all_time"
-  description: "bookings_all_time"
-  type: cumulative
-  type_params:
-    measure: bookings
-    cumulative_type_params:
-      period_agg: last
