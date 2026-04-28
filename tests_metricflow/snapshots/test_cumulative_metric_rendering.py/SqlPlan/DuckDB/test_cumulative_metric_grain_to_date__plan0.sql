@@ -6,32 +6,32 @@ sql_engine: DuckDB
 ---
 -- Write to DataTable
 SELECT
-  subq_6.ds__day
+  subq_6.ds__month
   , subq_6.revenue_mtd
 FROM (
   -- Compute Metrics via Expressions
   SELECT
-    subq_5.ds__day
+    subq_5.ds__month
     , subq_5.revenue AS revenue_mtd
   FROM (
     -- Compute Metrics via Expressions
     SELECT
-      subq_4.ds__day
+      subq_4.ds__month
       , subq_4.__revenue AS revenue
     FROM (
       -- Aggregate Inputs for Simple Metrics
       SELECT
-        subq_3.ds__day
+        subq_3.ds__month
         , SUM(subq_3.__revenue) AS __revenue
       FROM (
-        -- Select: ['__revenue', 'ds__day']
+        -- Select: ['__revenue', 'ds__month']
         SELECT
-          subq_2.ds__day
+          subq_2.ds__month
           , subq_2.__revenue
         FROM (
-          -- Select: ['__revenue', 'ds__day']
+          -- Select: ['__revenue', 'ds__month']
           SELECT
-            subq_1.ds__day
+            subq_1.ds__month
             , subq_1.__revenue
           FROM (
             -- Metric Time Dimension 'ds'
@@ -106,7 +106,7 @@ FROM (
         ) subq_2
       ) subq_3
       GROUP BY
-        subq_3.ds__day
+        subq_3.ds__month
     ) subq_4
   ) subq_5
 ) subq_6

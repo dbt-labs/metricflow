@@ -165,7 +165,6 @@ metric:
     measure: txn_revenue
     cumulative_type_params:
       grain_to_date: month
-      period_agg: last
 ---
 metric:
   name: booking_fees
