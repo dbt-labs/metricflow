@@ -26,3 +26,6 @@ isort>=5.12,<6
 black>=23.3,<24
 types-Jinja2>=2.11,<3
 types-jsonschema>=4.17,<5
+# For release tools.
+dulwich>=1.2, <2.0
+PyGithub>=2.9, <3.0

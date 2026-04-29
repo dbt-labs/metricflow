@@ -1,0 +1,57 @@
+test_name: test_step_2_all_operations_match_snapshot
+test_filename: test_step_2.py
+docstring:
+  Snapshot of the fake-operation log and final state file for ``step-2`` with ``--yes``.
+expectation_description:
+  Sequential log from fake git, GitHub, and CLI clients after a successful step-2 with --yes, with the final release state file appended.
+---
+FakeRunSnapshot(
+  exit_code=0,
+  operations=(
+    FakeGitPath(repository_path='<TMP>/metricflow'),
+    FakeGitHubTokens(access_tokens=('github-token',), repository_names=('dbt-labs/metricflow',)),
+    FakeGitOperation(name='switch_branch', branch_name='metricflow-user/release_pr/1.2.3/step_1'),
+    FakeGitOperation(name='delete_branch', branch_name='metricflow-user/release_pr/1.2.3/step_2'),
+    FakeGitOperation(name='create_branch', branch_name='metricflow-user/release_pr/1.2.3/step_2'),
+    FakeGitOperation(name='switch_branch', branch_name='metricflow-user/release_pr/1.2.3/step_2'),
+    FakeCliCommand(command=('hatch', 'version', '1.3.0.dev0'), current_directory='<TMP>/metricflow'),
+    FakeGitOperation(name='add_all_changes'),
+    FakeCliCommand(command=('make', 'lint'), current_directory='<TMP>/metricflow'),
+    FakeGitOperation(name='add_all_changes'),
+    FakeGitOperation(name='add_commit', message='Update `metricflow` version to 1.3.0.dev0'),
+    FakeGitOperation(name='push_branch', branch_name='metricflow-user/release_pr/1.2.3/step_2'),
+    FakeGitHubPullRequest(
+      source='create_or_update_create',
+      pull_request=CreatedPullRequest(
+        title='Update `metricflow` version to 1.3.0.dev0',
+        body='Update `metricflow` version to 1.3.0.dev0 to reflect in-progress development.',
+        head_branch='metricflow-user/release_pr/1.2.3/step_2',
+        base_branch='metricflow-user/release_pr/1.2.3/step_1',
+        draft=True,
+        labels=('Skip Changelog',),
+      ),
+    ),
+    FakeReleaseStateFileSnapshot(
+      file_path='<TMP>/metricflow/git_ignored/mf_release_tool_state.json',
+      file_text=('{\n'
+       '    "step_1": {\n'
+       '        "metricflow_package_version": "1.2.3",\n'
+       '        "branch_name": "metricflow-user/release_pr/1.2.3/step_1",\n'
+       '        "pr_number": 100,\n'
+       '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/100"\n'
+       '    },\n'
+       '    "step_2": {\n'
+       '        "metricflow_package_version": "1.3.0.dev0",\n'
+       '        "branch_name": "metricflow-user/release_pr/1.2.3/step_2",\n'
+       '        "commit_sha": "commit-sha",\n'
+       '        "pr_number": 456,\n'
+       '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/456"\n'
+       '    },\n'
+       '    "step_3": null,\n'
+       '    "step_4": null,\n'
+       '    "step_5": null,\n'
+       '    "step_6": null\n'
+       '}\n'),
+    ),
+  ),
+)
