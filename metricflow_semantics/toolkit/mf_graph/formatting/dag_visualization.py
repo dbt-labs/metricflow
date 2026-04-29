@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)
 
 
-def add_nodes_to_digraph(node: DagNodeT, dot: graphviz.Digraph) -> None:
+def _add_nodes_to_digraph(node: DagNodeT, dot: graphviz.Digraph) -> None:
     """Adds the node (and parent nodes) to the dot for visualization."""
     for parent_node in node.parent_nodes:
-        add_nodes_to_digraph(parent_node, dot)
+        _add_nodes_to_digraph(parent_node, dot)
 
     dot.node(name=node.node_id.id_str, label=node.graphviz_label)
     for parent_node in node.parent_nodes:
@@ -47,6 +47,6 @@ def render_via_graphviz(dag_graph: DagGraphT, file_path_without_svg_suffix: str)
     dot = graphviz.Digraph(comment=dag_graph.dag_id, node_attr={"shape": "box", "fontname": "Courier"})
     # Not quite correct if there are shared nodes.
     for sink_node in dag_graph.sink_nodes:
-        add_nodes_to_digraph(sink_node, dot)
+        _add_nodes_to_digraph(sink_node, dot)
     dot.format = "svg"
     dot.render(file_path_without_svg_suffix, view=True, format="svg", cleanup=True)
