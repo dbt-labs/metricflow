@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 import textwrap
 from pathlib import Path
 from typing import Optional
@@ -19,7 +20,11 @@ def _run_shell_command(command: str, cwd: Optional[Path] = None) -> None:
             """
         ).rstrip()
     )
+    sys.stdout.flush()
+    sys.stderr.flush()
     subprocess.check_call(command, shell=True, cwd=cwd.as_posix())
+    sys.stdout.flush()
+    sys.stderr.flush()
 
 
 if __name__ == "__main__":
