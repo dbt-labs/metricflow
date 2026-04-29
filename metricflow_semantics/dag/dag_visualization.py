@@ -51,7 +51,7 @@ def render_via_graphviz(dag_graph: DagGraphT, file_path_without_svg_suffix: str)
     # Since it's optional, import it locally only when needed.
     try:
         import graphviz
-    except ImportError as error:
+    except ModuleNotFoundError as error:
         raise RuntimeError(
             "The `graphviz` Python package is required for DAG visualization."
             " It can be installed with `pip install graphviz` or similar."
