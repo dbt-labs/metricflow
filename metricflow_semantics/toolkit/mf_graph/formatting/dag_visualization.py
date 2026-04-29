@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import logging
-import os
 from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
     import graphviz
 from metricflow_semantics.dag.mf_dag import DagNode, MetricFlowDag
-from metricflow_semantics.toolkit.id_helpers import mf_random_id
 
 logger = logging.getLogger(__name__)
 DagNodeT = TypeVar("DagNodeT", bound=DagNode)
@@ -24,17 +22,6 @@ def add_nodes_to_digraph(node: DagNodeT, dot: graphviz.Digraph) -> None:
 
 
 DagGraphT = TypeVar("DagGraphT", bound=MetricFlowDag)
-
-
-def display_dag_as_svg(dag_graph: DagGraphT, directory_path: str) -> str:
-    """Create and display the plan as an SVG in the browser.
-
-    Returns the path where the SVG file was created within "mf_config_dir".
-    """
-    svg_dir = os.path.join(directory_path, "generated_svg")
-    random_file_path = os.path.join(svg_dir, f"dag_{mf_random_id()}")
-    render_via_graphviz(dag_graph=dag_graph, file_path_without_svg_suffix=random_file_path)
-    return random_file_path + ".svg"
 
 
 def render_via_graphviz(dag_graph: DagGraphT, file_path_without_svg_suffix: str) -> None:
