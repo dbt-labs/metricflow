@@ -119,9 +119,12 @@ if __name__ == "__main__":
     )
 
     # Test the `dbt-metricflow` package.
+    dbt_metricflow_package_directory = metricflow_repo_directory.joinpath("dbt-metricflow")
     _run_package_test(
-        package_directory=metricflow_repo_directory.joinpath("dbt-metricflow"),
-        package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/dbt_metricflow_package_test.py"),
+        package_directory=dbt_metricflow_package_directory,
+        package_test_script=dbt_metricflow_package_directory.joinpath(
+            "scripts/ci_tests/dbt_metricflow_package_test.py"
+        ),
         optional_package_dependencies_to_install=("dbt-duckdb",),
         build_wheel=False,
     )
