@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Remove `graphviz` dependency from `dbt-metricflow`
+time: 2026-04-28T12:58:48.498579-07:00
+custom:
+    Author: plypaul
+    Issue: "2038"

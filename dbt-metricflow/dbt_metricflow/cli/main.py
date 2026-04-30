@@ -16,7 +16,6 @@ from typing import Callable, List, Optional, Sequence
 import click
 import jinja2
 from halo import Halo
-from metricflow_semantics.dag.dag_visualization import display_dag_as_svg
 from update_checker import UpdateChecker
 
 import dbt_metricflow.cli.custom_click_types as click_custom
@@ -24,6 +23,7 @@ from dbt_metricflow.cli import PACKAGE_NAME
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.constants import MAX_LIST_OBJECT_ELEMENTS
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
+from dbt_metricflow.cli.graph_svg_rendering import display_dag_as_svg
 from dbt_metricflow.cli.tutorial import (
     dbtMetricFlowTutorialHelper,
 )
