@@ -45,6 +45,10 @@ class ReleaseHelper:
     """Shared constants and operations used by release-tool steps."""
 
     RELEASE_PR_LABELS: ClassVar[tuple[str, ...]] = ("Skip Changelog",)
+    # Prefix for metricflow release version tags.
+    METRICFLOW_RELEASE_TAG_PREFIX: ClassVar[str] = "v"
+    # Prefix for dbt-metricflow release version tags.
+    DBT_METRICFLOW_RELEASE_TAG_PREFIX: ClassVar[str] = "dbt-metricflow/v"
     # GitHub Actions workflow file that publishes MetricFlow to PyPI after a release tag.
     CD_PUSH_METRICFLOW_TO_PYPI_WORKFLOW_FILE_NAME: ClassVar[str] = "cd-push-metricflow-to-pypi.yaml"
     # GitHub Actions workflow file that publishes dbt-metricflow to PyPI after a release tag.
