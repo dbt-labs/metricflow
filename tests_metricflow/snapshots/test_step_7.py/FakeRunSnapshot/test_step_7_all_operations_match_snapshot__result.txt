@@ -1,0 +1,52 @@
+test_name: test_step_7_all_operations_match_snapshot
+test_filename: test_step_7.py
+docstring:
+  Snapshot of the fake-operation log and final state file for ``step-7`` with ``--yes``.
+expectation_description:
+  Sequential log from fake git and GitHub clients after a successful step-7 with --yes, with the final release state file appended.
+---
+FakeRunSnapshot(
+  exit_code=0,
+  operations=(
+    FakeGitPath(repository_path='<TMP>/metricflow'),
+    FakeGitHubTokens(access_tokens=('github-token',), repository_names=('dbt-labs/metricflow',)),
+    FakeGitHubReleaseNote(
+      tag_name='v1.2.3',
+      title='MetricFlow 1.2.3',
+      body='## MetricFlow 1.2.3\n\n- Release note body.\n',
+      make_latest=TRUE,
+    ),
+    FakeReleaseStateFileSnapshot(
+      file_path='<TMP>/metricflow/git_ignored/mf_release_tool_state.json',
+      file_text=('{\n'
+       '    "step_1": {\n'
+       '        "metricflow_package_version": "1.2.3",\n'
+       '        "branch_name": "metricflow-user/release_pr/1.2.3/step_1",\n'
+       '        "pr_number": 100,\n'
+       '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/100"\n'
+       '    },\n'
+       '    "step_2": {\n'
+       '        "metricflow_package_version": "1.3.0.dev0",\n'
+       '        "branch_name": "metricflow-user/release_pr/1.2.3/step_2",\n'
+       '        "commit_sha": "fake-step-2-commit-sha",\n'
+       '        "pr_number": 200,\n'
+       '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/200"\n'
+       '    },\n'
+       '    "step_3": {\n'
+       '        "metricflow_release_tag_name": "v1.2.3",\n'
+       '        "metricflow_release_merge_commit_sha": "abc123",\n'
+       '        "metricflow_dev_version_commit_sha": "def456"\n'
+       '    },\n'
+       '    "step_4": null,\n'
+       '    "step_5": null,\n'
+       '    "step_6": null,\n'
+       '    "step_7": {\n'
+       '        "metricflow_release_tag_name": "v1.2.3",\n'
+       '        "change_log_file_path": ".changes/1.2.3.md",\n'
+       '        "release_note_link": '
+       '"https://github.com/dbt-labs/metricflow/releases/tag/v1.2.3"\n'
+       '    }\n'
+       '}\n'),
+    ),
+  ),
+)
