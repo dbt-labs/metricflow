@@ -1,3 +1,29 @@
+"""Tool to automate the release flow for `metricflow` / `dbt-metricflow`.
+
+Before running the tool, set the following environment variables:
+
+    export GITHUB_USERNAME=<GitHub username>
+    export GITHUB_API_TOKEN=<GitHub API token>
+    export FOSSA_API_KEY=<FOSSA API key>
+
+The GitHub API token should have the following permissions:
+
+    * Repository access to dbt-labs/metricflow.
+    * Read access to metadata.
+    * Read and write access to actions, code, and pull requests.
+
+Start the process with:
+
+    hatch run dev-env:python -m scripts.release_tool.mf_release_tool \
+    step-1 \
+    --metricflow-repo ~/repos/metricflow_release \
+    --version 1.2.3
+
+Then run similar commands for steps 2-7 (only steps 1 and 4 require the version
+argument as other steps can read from the state file).
+
+A `start-release` command could be added to run though all steps in sequence.
+"""
 from __future__ import annotations
 
 import logging
@@ -22,6 +48,12 @@ from scripts.release_tool.git_manager import DulwichGitManager, GitManager
 from scripts.release_tool.github_client import GitHubClient, PyGithubClient
 from scripts.release_tool.release_helper import ReleaseHelper, ReleaseHelperConsole
 from scripts.release_tool.release_step_1 import ReleaseStep1Runner, ReleaseStep1State
+from scripts.release_tool.release_step_2 import ReleaseStep2Runner, ReleaseStep2State
+from scripts.release_tool.release_step_3 import ReleaseStep3Runner, ReleaseStep3State
+from scripts.release_tool.release_step_4 import ReleaseStep4Runner, ReleaseStep4State
+from scripts.release_tool.release_step_5 import ReleaseStep5Runner, ReleaseStep5State
+from scripts.release_tool.release_step_6 import ReleaseStep6Runner, ReleaseStep6State
+from scripts.release_tool.release_step_7 import ReleaseStep7Runner, ReleaseStep7State
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +134,18 @@ class ReleaseToolState(BaseModel):
 
     # State captured during step 1, populated after step 1 completes.
     step_1: ReleaseStep1State | None = None
+    # State captured during step 2, populated after step 2 completes.
+    step_2: ReleaseStep2State | None = None
+    # State captured during step 3, populated after step 3 completes.
+    step_3: ReleaseStep3State | None = None
+    # State captured during step 4, populated after step 4 completes.
+    step_4: ReleaseStep4State | None = None
+    # State captured during step 5, populated after step 5 completes.
+    step_5: ReleaseStep5State | None = None
+    # State captured during step 6, populated after step 6 completes.
+    step_6: ReleaseStep6State | None = None
+    # State captured during step 7, populated after step 7 completes.
+    step_7: ReleaseStep7State | None = None
 
     class Config:
         """Pydantic configuration."""
@@ -111,10 +155,22 @@ class ReleaseToolState(BaseModel):
     def with_step_state(
         self,
         updated_step_1: ReleaseStep1State | None = None,
+        updated_step_2: ReleaseStep2State | None = None,
+        updated_step_3: ReleaseStep3State | None = None,
+        updated_step_4: ReleaseStep4State | None = None,
+        updated_step_5: ReleaseStep5State | None = None,
+        updated_step_6: ReleaseStep6State | None = None,
+        updated_step_7: ReleaseStep7State | None = None,
     ) -> ReleaseToolState:
         """Return a copy with the specified step states replaced, preserving unspecified ones."""
         return ReleaseToolState(
             step_1=updated_step_1 if updated_step_1 is not None else self.step_1,
+            step_2=updated_step_2 if updated_step_2 is not None else self.step_2,
+            step_3=updated_step_3 if updated_step_3 is not None else self.step_3,
+            step_4=updated_step_4 if updated_step_4 is not None else self.step_4,
+            step_5=updated_step_5 if updated_step_5 is not None else self.step_5,
+            step_6=updated_step_6 if updated_step_6 is not None else self.step_6,
+            step_7=updated_step_7 if updated_step_7 is not None else self.step_7,
         )
 
 
@@ -345,6 +401,326 @@ def step_1(ctx: click.Context, metricflow_repo: Path, version: str) -> None:
     base_state = existing_release_tool_state if existing_release_tool_state is not None else ReleaseToolState()
     release_tool_state = base_state.with_step_state(updated_step_1=step_1_state)
     _save_release_tool_state(state_file_path=state_file_path, state=release_tool_state, console=console)
+
+
+@cli.command(CLI_COMMAND_STEP_2)
+@click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.pass_context
+def step_2(ctx: click.Context, metricflow_repo: Path) -> None:
+    """Update the MetricFlow version for in-progress development."""
+    console = _ClickReleaseConsole()
+    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
+    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    git_manager = _run_release_step_prechecks(context=context)
+    state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
+    release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+
+    if release_tool_state.step_1 is None:
+        raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
+
+    step_1_state = release_tool_state.step_1
+    github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
+
+    release_helper = ReleaseHelper(
+        repository_name=GITHUB_REPOSITORY_NAME,
+        current_directory=context.current_directory,
+        confirm_all=context.confirm_all,
+        git_manager=git_manager,
+        cli_command_runner=context.cli_command_runner,
+        console=console,
+    )
+    step_2_runner = ReleaseStep2Runner(
+        step_1_state=step_1_state,
+        environment=context.environment,
+        github_client=github_client,
+        existing_state=release_tool_state.step_2,
+        release_helper=release_helper,
+    )
+    step_2_state = step_2_runner.run()
+
+    updated_state = release_tool_state.with_step_state(updated_step_2=step_2_state)
+    _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+
+
+@cli.command(CLI_COMMAND_STEP_3)
+@click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.pass_context
+def step_3(ctx: click.Context, metricflow_repo: Path) -> None:
+    """Merge the release pull requests from steps 1 and 2."""
+    console = _ClickReleaseConsole()
+    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
+    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    git_manager = _run_release_step_prechecks(context=context)
+    state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
+    release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+
+    if release_tool_state.step_1 is None:
+        raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
+    if release_tool_state.step_2 is None:
+        raise click.ClickException(f"Step 2 has not been completed. Run {CLI_COMMAND_STEP_2} first.")
+
+    github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
+    release_helper = ReleaseHelper(
+        repository_name=GITHUB_REPOSITORY_NAME,
+        current_directory=context.current_directory,
+        confirm_all=context.confirm_all,
+        git_manager=git_manager,
+        cli_command_runner=context.cli_command_runner,
+        console=console,
+    )
+    step_3_runner = ReleaseStep3Runner(
+        step_1_state=release_tool_state.step_1,
+        step_2_state=release_tool_state.step_2,
+        github_client=github_client,
+        release_helper=release_helper,
+        sleep=context.sleep,
+    )
+    step_3_state = step_3_runner.run()
+
+    updated_state = release_tool_state.with_step_state(updated_step_3=step_3_state)
+    _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+
+
+@cli.command(CLI_COMMAND_STEP_4)
+@click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.option(
+    CLI_OPTION_VERSION,
+    "dbt_metricflow_version",
+    required=True,
+    callback=_validate_semantic_version,
+    help="Semantic version for the new `dbt-metricflow` release.",
+)
+@click.pass_context
+def step_4(ctx: click.Context, metricflow_repo: Path, dbt_metricflow_version: str) -> None:
+    """Update `dbt-metricflow` to depend on the released `metricflow` version."""
+    console = _ClickReleaseConsole()
+    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
+    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    git_manager = _run_release_step_prechecks(context=context)
+    _check_required_cli_commands(
+        command_names=ReleaseStep4Runner.REQUIRED_CLI_COMMANDS,
+        is_cli_command_available=context.is_cli_command_available,
+    )
+    state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
+    release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+
+    if release_tool_state.step_1 is None:
+        raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
+
+    github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
+
+    release_helper = ReleaseHelper(
+        repository_name=GITHUB_REPOSITORY_NAME,
+        current_directory=context.current_directory,
+        confirm_all=context.confirm_all,
+        git_manager=git_manager,
+        cli_command_runner=context.cli_command_runner,
+        console=console,
+    )
+    step_4_runner = ReleaseStep4Runner(
+        dbt_metricflow_version=dbt_metricflow_version,
+        step_1_state=release_tool_state.step_1,
+        environment=context.environment,
+        github_client=github_client,
+        existing_state=release_tool_state.step_4,
+        release_helper=release_helper,
+    )
+    step_4_state = step_4_runner.run()
+
+    updated_state = release_tool_state.with_step_state(updated_step_4=step_4_state)
+    _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+
+
+@cli.command(CLI_COMMAND_STEP_5)
+@click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.pass_context
+def step_5(ctx: click.Context, metricflow_repo: Path) -> None:
+    """Update the dbt-metricflow version for in-progress development."""
+    console = _ClickReleaseConsole()
+    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
+    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    git_manager = _run_release_step_prechecks(context=context)
+    _check_required_cli_commands(
+        command_names=ReleaseStep5Runner.REQUIRED_CLI_COMMANDS,
+        is_cli_command_available=context.is_cli_command_available,
+    )
+    state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
+    release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+
+    if release_tool_state.step_4 is None:
+        raise click.ClickException(f"Step 4 has not been completed. Run {CLI_COMMAND_STEP_4} first.")
+
+    github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
+
+    release_helper = ReleaseHelper(
+        repository_name=GITHUB_REPOSITORY_NAME,
+        current_directory=context.current_directory,
+        confirm_all=context.confirm_all,
+        git_manager=git_manager,
+        cli_command_runner=context.cli_command_runner,
+        console=console,
+    )
+    step_5_runner = ReleaseStep5Runner(
+        step_4_state=release_tool_state.step_4,
+        environment=context.environment,
+        github_client=github_client,
+        existing_state=release_tool_state.step_5,
+        release_helper=release_helper,
+    )
+    step_5_state = step_5_runner.run()
+
+    updated_state = release_tool_state.with_step_state(updated_step_5=step_5_state)
+    _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+
+
+@cli.command(CLI_COMMAND_STEP_6)
+@click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.pass_context
+def step_6(ctx: click.Context, metricflow_repo: Path) -> None:
+    """Merge the dbt-metricflow release pull requests from steps 4 and 5."""
+    console = _ClickReleaseConsole()
+    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
+    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    git_manager = _run_release_step_prechecks(context=context)
+    state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
+    release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+
+    if release_tool_state.step_4 is None:
+        raise click.ClickException(f"Step 4 has not been completed. Run {CLI_COMMAND_STEP_4} first.")
+    if release_tool_state.step_5 is None:
+        raise click.ClickException(f"Step 5 has not been completed. Run {CLI_COMMAND_STEP_5} first.")
+
+    github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
+    release_helper = ReleaseHelper(
+        repository_name=GITHUB_REPOSITORY_NAME,
+        current_directory=context.current_directory,
+        confirm_all=context.confirm_all,
+        git_manager=git_manager,
+        cli_command_runner=context.cli_command_runner,
+        console=console,
+    )
+    step_6_runner = ReleaseStep6Runner(
+        step_4_state=release_tool_state.step_4,
+        step_5_state=release_tool_state.step_5,
+        github_client=github_client,
+        release_helper=release_helper,
+        sleep=context.sleep,
+    )
+    step_6_state = step_6_runner.run()
+
+    updated_state = release_tool_state.with_step_state(updated_step_6=step_6_state)
+    _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+
+
+@cli.command(CLI_COMMAND_STEP_7)
+@click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.pass_context
+def step_7(ctx: click.Context, metricflow_repo: Path) -> None:
+    """Create the GitHub release note for the MetricFlow release."""
+    console = _ClickReleaseConsole()
+    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
+    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    git_manager = _run_release_step_prechecks(context=context)
+    state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
+    release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+
+    if release_tool_state.step_1 is None:
+        raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
+    if release_tool_state.step_3 is None:
+        raise click.ClickException(f"Step 3 has not been completed. Run {CLI_COMMAND_STEP_3} first.")
+
+    github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
+    release_helper = ReleaseHelper(
+        repository_name=GITHUB_REPOSITORY_NAME,
+        current_directory=context.current_directory,
+        confirm_all=context.confirm_all,
+        git_manager=git_manager,
+        cli_command_runner=context.cli_command_runner,
+        console=console,
+    )
+    step_7_runner = ReleaseStep7Runner(
+        step_1_state=release_tool_state.step_1,
+        step_3_state=release_tool_state.step_3,
+        github_client=github_client,
+        release_helper=release_helper,
+    )
+    step_7_state = step_7_runner.run()
+
+    updated_state = release_tool_state.with_step_state(updated_step_7=step_7_state)
+    _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+
+
+@cli.command(CLI_COMMAND_CLEAN)
+@click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.pass_context
+def clean(ctx: click.Context, metricflow_repo: Path) -> None:
+    """Delete release branches and remove the state file."""
+    console = _ClickReleaseConsole()
+    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
+    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    git_manager = context.git_manager_factory(context.current_directory)
+    state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
+
+    if state_file_path.exists():
+        release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+        branch_names: list[str] = []
+        if release_tool_state.step_1 is not None:
+            branch_names.append(release_tool_state.step_1.branch_name)
+        if release_tool_state.step_2 is not None:
+            branch_names.append(release_tool_state.step_2.branch_name)
+        if release_tool_state.step_4 is not None:
+            branch_names.append(release_tool_state.step_4.branch_name)
+        if release_tool_state.step_5 is not None:
+            branch_names.append(release_tool_state.step_5.branch_name)
+
+        if branch_names:
+            console.echo(f"Switch to {GitManager.MAIN_BRANCH} to avoid attempts to delete the current branch")
+            git_manager.switch_branch(GitManager.MAIN_BRANCH)
+
+        for branch_name in branch_names:
+            console.echo(f"Delete branch {branch_name}")
+            git_manager.delete_branch(branch_name)
+
+    if state_file_path.exists():
+        console.echo(f"Delete state file {state_file_path}")
+        state_file_path.unlink()
+    else:
+        console.echo(f"State file {state_file_path} does not exist, nothing to delete")
 
 
 if __name__ == "__main__":
