@@ -110,11 +110,13 @@ class ReleaseStep1Runner:
         )
         return (
             ReleasePrCommitTask(
-                action=self._apply_changelog,
+                action=self._generate_changelog,
+                validate=self._check_only_changelog_changed,
                 commit_message=ReleaseStep1Runner.CHANGELOG_COMMIT_MESSAGE,
             ),
             ReleasePrCommitTask(
-                action=self._apply_fossa_attribution,
+                action=self._generate_fossa_attribution,
+                validate=self._check_only_attribution_changed,
                 commit_message=ReleaseStep1Runner.ATTRIBUTION_COMMIT_MESSAGE,
             ),
             package_version_update.as_release_pr_commit_task(
@@ -122,27 +124,17 @@ class ReleaseStep1Runner:
             ),
         )
 
-    def _apply_changelog(self) -> None:
-        """Generate changelog changes, then ensure only the allowed paths were touched."""
-        self._generate_changelog()
-        self._check_step_1_changes()
-
     def _generate_changelog(self) -> None:
         """Generate changelog changes for the release."""
         self.release_helper.run_cli_command(command=("changie", "batch", self.version))
         self.release_helper.run_cli_command(command=("changie", "merge"))
-
-    def _apply_fossa_attribution(self) -> None:
-        """Generate FOSSA attribution, then ensure only the attribution file was touched."""
-        self._generate_fossa_attribution()
-        self._check_step_1_attribution_changes()
 
     def _generate_fossa_attribution(self) -> None:
         """Generate FOSSA attribution changes for the release."""
         self.release_helper.run_cli_command(command=("fossa", "analyze"))
         self._run_fossa_report()
 
-    def _check_step_1_changes(self) -> None:
+    def _check_only_changelog_changed(self) -> None:
         """Raise if step 1 changed files outside the changelog inputs or output."""
         changed_file_paths = self.release_helper.git_manager.changed_file_paths()
         unexpected_file_paths = [
@@ -172,7 +164,7 @@ class ReleaseStep1Runner:
         attribution_path = self.release_helper.current_directory / ReleaseStep1Runner.ALLOWED_ATTRIBUTION_FILE_PATH
         attribution_path.write_bytes(result.stdout)
 
-    def _check_step_1_attribution_changes(self) -> None:
+    def _check_only_attribution_changed(self) -> None:
         """Raise if FOSSA attribution changed files outside ATTRIBUTION.md."""
         changed_file_paths = self.release_helper.git_manager.changed_file_paths()
         unexpected_file_paths = [

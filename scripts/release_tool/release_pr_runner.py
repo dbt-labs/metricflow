@@ -29,8 +29,10 @@ class ReleasePrResult:
 class ReleasePrCommitTask:
     """A single commit-producing task in a release pull-request branch."""
 
-    # Run the full task: generate changes, validate expected paths, and any user-visible work.
+    # Generate changes and perform any user-visible work.
     action: Callable[[], None]
+    # Validate the final changes that will be included in the task commit.
+    validate: Callable[[], None]
     # Commit message for the task's changes.
     commit_message: str
 
@@ -108,6 +110,10 @@ class ReleasePrRunner:
         self.release_helper.run(
             description="Add all changes in case lint made fixes",
             action=self.release_helper.git_manager.add_all_changes,
+        )
+        self.release_helper.run(
+            description="Validate release task changes",
+            action=task.validate,
         )
         commit_sha: str | None = None
 

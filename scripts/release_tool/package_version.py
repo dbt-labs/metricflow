@@ -66,12 +66,8 @@ class PackageVersionUpdate:
 
     def as_release_pr_commit_task(self, commit_message: str) -> ReleasePrCommitTask:
         """Return a release-PR commit task for updating this package version."""
-
-        def run_version_update() -> None:
-            self.run_hatch_version_update()
-            self.check_only_about_file_changed()
-
         return ReleasePrCommitTask(
-            action=run_version_update,
+            action=self.run_hatch_version_update,
+            validate=self.check_only_about_file_changed,
             commit_message=commit_message,
         )
