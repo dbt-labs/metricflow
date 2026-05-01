@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Update `dbt-metricflow` package tests to check log file
+time: 2026-04-29T14:19:38.462271-07:00
+custom:
+    Author: plypaul
+    Issue: "1934"
