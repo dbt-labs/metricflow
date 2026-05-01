@@ -1,0 +1,5 @@
+# pydoris requires mysqlclient as its DBAPI driver
+mysqlclient>=2.1.0,<3
+pydoris>=1.2.0
+# sqlparse is used for SQL statement type detection in dry-run logic
+sqlparse>=0.4.0

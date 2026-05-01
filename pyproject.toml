@@ -66,6 +66,10 @@ trino-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-trino.txt",
 ]
+doris-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-doris.txt",
+]
 
 
 [project.urls]
@@ -143,6 +147,12 @@ MF_SQL_ENGINE_PASSWORD=""
 description = "Dev environment for working with Trino"
 template = "dev-env"
 features = ["trino-env-requirements"]
+
+
+[tool.hatch.envs.doris-env]
+description = "Dev environment for working with Apache Doris"
+template = "dev-env"
+features = ["doris-env-requirements"]
 
 
 [tool.black]
