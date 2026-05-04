@@ -1,0 +1,6 @@
+kind: Features
+body: Adds python 3.14 support to metricflow package
+time: 2026-05-05T00:32:25.148845+05:30
+custom:
+    Author: ash2shukla
+    Issue: "12098"
