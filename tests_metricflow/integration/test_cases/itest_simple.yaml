@@ -26,9 +26,8 @@ integration_test:
       SUM(booking_value) AS booking_value
       , ds AS metric_time__day
     FROM {{ source_schema }}.fct_bookings
-    GROUP BY
-      ds
-    limit 0
+    GROUP BY ds
+    LIMIT 0
 ---
 integration_test:
   name: simple_query_with_time_constraint

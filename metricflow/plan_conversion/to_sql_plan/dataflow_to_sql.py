@@ -98,9 +98,15 @@ class DataflowToSqlPlanConverter:
                 # TODO: Make this a more generally accessible attribute instead of checking against the
                 # BigQuery-ness of the engine
                 use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
+                # ClickHouse's new query analyzer (enable_analyzer=1) resolves WHERE column references to SELECT
+                # aggregate aliases when names match, causing Code 184 ILLEGAL_AGGREGATION if a WHERE from an inner
+                # subquery is hoisted alongside GROUP BY + aggregation. Prevent that reduction for ClickHouse only.
+                prevent_where_hoist_with_aggregates = sql_engine_type is SqlEngine.CLICKHOUSE
 
                 option_set = SqlGenerationOptionSet.options_for_level(
-                    attempted_optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
+                    attempted_optimization_level,
+                    use_column_alias_in_group_by=use_column_alias_in_group_by,
+                    prevent_where_hoist_with_aggregates=prevent_where_hoist_with_aggregates,
                 )
 
                 logger.info(

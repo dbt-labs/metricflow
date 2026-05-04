@@ -1,0 +1,68 @@
+test_name: test_derived_fill_nulls_for_one_input_metric
+test_filename: test_fill_nulls_with_rendering.py
+sql_engine: ClickHouse
+---
+WITH sma_28009_cte AS (
+  SELECT
+    toStartOfDay(ds) AS metric_time__day
+    , 1 AS __bookings
+    , 1 AS __bookings_fill_nulls_with_0
+  FROM ***************************.fct_bookings bookings_source_src_28000
+)
+
+, rss_28018_cte AS (
+  SELECT
+    ds AS ds__day
+  FROM ***************************.mf_time_spine time_spine_src_28006
+)
+
+SELECT
+  metric_time__day AS metric_time__day
+  , bookings_fill_nulls_with_0 - bookings_2_weeks_ago AS bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset
+FROM (
+  SELECT
+    COALESCE(subq_33.metric_time__day, subq_43.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(subq_33.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , MAX(subq_43.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+  FROM (
+    SELECT
+      metric_time__day
+      , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
+    FROM (
+      SELECT
+        rss_28018_cte.ds__day AS metric_time__day
+        , subq_27.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+      FROM rss_28018_cte
+      LEFT OUTER JOIN (
+        SELECT
+          metric_time__day
+          , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
+        FROM sma_28009_cte
+        GROUP BY
+          metric_time__day
+      ) subq_27
+      ON
+        rss_28018_cte.ds__day = subq_27.metric_time__day
+    ) subq_32
+  ) subq_33
+  FULL OUTER JOIN (
+    SELECT
+      rss_28018_cte.ds__day AS metric_time__day
+      , subq_37.__bookings AS bookings_2_weeks_ago
+    FROM rss_28018_cte
+    INNER JOIN (
+      SELECT
+        metric_time__day
+        , SUM(__bookings) AS __bookings
+      FROM sma_28009_cte
+      GROUP BY
+        metric_time__day
+    ) subq_37
+    ON
+      addDays(rss_28018_cte.ds__day, -14) = subq_37.metric_time__day
+  ) subq_43
+  ON
+    subq_33.metric_time__day = subq_43.metric_time__day
+  GROUP BY
+    COALESCE(subq_33.metric_time__day, subq_43.metric_time__day)
+) subq_44
