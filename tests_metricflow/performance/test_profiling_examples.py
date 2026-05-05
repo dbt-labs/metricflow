@@ -140,15 +140,16 @@ def mf_simulate_validation(
         )
 
 
-@pytest.mark.skip("Example only.")
 def test_profile_explain(
     mf_test_configuration: MetricFlowTestConfiguration,
     manifest_with_50_models_25_metrics: SemanticManifest,
     sql_client: SqlClient,
 ) -> None:
     """Tests formatting a performance report to a text table."""
-    saved_query_names = (manifest_with_50_models_25_metrics.saved_queries[0].name,)
-    mf_explain_saved_query(manifest_with_50_models_25_metrics, sql_client, saved_query_names=saved_query_names)
+    saved_query_names = tuple(saved_query.name for saved_query in manifest_with_50_models_25_metrics.saved_queries[:1])
+    mf_explain_saved_query(
+        manifest_with_50_models_25_metrics, sql_client, saved_query_names=saved_query_names, profile=True
+    )
 
 
 @pytest.mark.skip("Example only.")
