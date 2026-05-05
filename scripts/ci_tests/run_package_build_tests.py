@@ -105,26 +105,32 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--metricflow-repo-directory", help="Path to the `metricflow` repo.", required=True)
+    parser.add_argument(
+        "--package",
+        choices=("metricflow", "dbt-metricflow", "both"),
+        default="both",
+        help="Which package(s) to test. Defaults to 'both' for back-compat.",
+    )
     args = parser.parse_args()
 
     metricflow_repo_directory = Path(args.metricflow_repo_directory).resolve()
 
     logger.info(f"Using {metricflow_repo_directory=}")
 
-    # Test the `metricflow` package.
-    _run_package_test(
-        package_directory=metricflow_repo_directory,
-        package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/metricflow_package_test.py"),
-        build_wheel=True,
-    )
+    if args.package in ("metricflow", "both"):
+        _run_package_test(
+            package_directory=metricflow_repo_directory,
+            package_test_script=metricflow_repo_directory.joinpath("scripts/ci_tests/metricflow_package_test.py"),
+            build_wheel=True,
+        )
 
-    # Test the `dbt-metricflow` package.
-    dbt_metricflow_package_directory = metricflow_repo_directory.joinpath("dbt-metricflow")
-    _run_package_test(
-        package_directory=dbt_metricflow_package_directory,
-        package_test_script=dbt_metricflow_package_directory.joinpath(
-            "scripts/ci_tests/dbt_metricflow_package_test.py"
-        ),
-        optional_package_dependencies_to_install=("dbt-duckdb",),
-        build_wheel=False,
-    )
+    if args.package in ("dbt-metricflow", "both"):
+        dbt_metricflow_package_directory = metricflow_repo_directory.joinpath("dbt-metricflow")
+        _run_package_test(
+            package_directory=dbt_metricflow_package_directory,
+            package_test_script=dbt_metricflow_package_directory.joinpath(
+                "scripts/ci_tests/dbt_metricflow_package_test.py"
+            ),
+            optional_package_dependencies_to_install=("dbt-duckdb",),
+            build_wheel=False,
+        )

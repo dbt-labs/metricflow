@@ -41,12 +41,18 @@ test:
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTIC_INTERFACES)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) -m "not slow" $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
-.PHONY: test-include-slow
-test-include-slow:
+.PHONY: test-include-slow-metricflow
+test-include-slow-metricflow:
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTIC_INTERFACES)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
+.PHONY: test-include-slow-dbt-metricflow
+test-include-slow-dbt-metricflow:
 	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_DBT_METRICFLOW)/
+
+.PHONY: test-include-slow
+test-include-slow: test-include-slow-metricflow test-include-slow-dbt-metricflow
 
 .PHONY: test-postgresql
 test-postgresql:
@@ -139,6 +145,13 @@ test-snap-slow:
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTIC_INTERFACES)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW)/
 
+.PHONY: test-build-packages-metricflow
+test-build-packages-metricflow:
+	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=. --package metricflow
+
+.PHONY: test-build-packages-dbt-metricflow
+test-build-packages-dbt-metricflow:
+	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=. --package dbt-metricflow
+
 .PHONY: test-build-packages
-test-build-packages:
-	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=.
+test-build-packages: test-build-packages-metricflow test-build-packages-dbt-metricflow

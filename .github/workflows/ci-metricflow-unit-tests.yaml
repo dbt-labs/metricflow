@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.13"]
+        python-version: ["3.10", "3.13", "3.14"]
     steps:
       - name: Check-out the repo
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       - uses: ./.github/actions/run-mf-tests
         with:
           python-version: ${{ matrix.python-version }}
-          make-target: "test-include-slow"
+          make-target: "test-include-slow-metricflow"
 
   metricflow-unit-tests-postgres:
     name: MetricFlow Tests (PostgreSQL)
@@ -56,6 +56,32 @@ jobs:
               ]
             }
 
+  metricflow-package-tests:
+    name: MetricFlow Packages Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.10", "3.13", "3.14" ]
+    steps:
+
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }} Environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "${{ matrix.python-version }}"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"}
+              ]
+            }
+
+      - name: Run Package-Build Tests
+        shell: bash
+        run: "make test-build-packages-metricflow"
+
   metricflow-unit-tests:
     # This step is used to simplify setup for branch protection. Branch protection is configured to check if this step
     # fails vs. checking all test steps.
@@ -68,8 +94,23 @@ jobs:
       - name: Check success
         run: test ${{ needs.metricflow-unit-tests-duckdb.result }} = 'success' -a ${{ needs.metricflow-unit-tests-postgres.result }} = 'success'
 
-  metricflow-package-tests:
-    name: MetricFlow Packages Tests
+  dbt-metricflow-unit-tests-duckdb:
+    name: dbt-MetricFlow Tests (DuckDB)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.13"]
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          python-version: ${{ matrix.python-version }}
+          make-target: "test-include-slow-dbt-metricflow"
+
+  dbt-metricflow-package-tests:
+    name: dbt-MetricFlow Packages Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -92,4 +133,15 @@ jobs:
 
       - name: Run Package-Build Tests
         shell: bash
-        run: "make test-build-packages"
+        run: "make test-build-packages-dbt-metricflow"
+
+  dbt-metricflow-unit-tests:
+    # Aggregator for branch protection — gates dbt-metricflow checks independently of metricflow.
+    name: dbt-MetricFlow Unit Tests
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [dbt-metricflow-unit-tests-duckdb]
+    steps:
+
+      - name: Check success
+        run: test ${{ needs.dbt-metricflow-unit-tests-duckdb.result }} = 'success'
