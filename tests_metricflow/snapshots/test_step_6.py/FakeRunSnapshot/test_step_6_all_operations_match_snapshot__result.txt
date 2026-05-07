@@ -1,0 +1,67 @@
+test_name: test_step_6_all_operations_match_snapshot
+test_filename: test_step_6.py
+docstring:
+  Snapshot of the fake-operation log and final state file for ``step-6`` with ``--yes``.
+expectation_description:
+  Sequential log from fake git, GitHub, and CLI clients after a successful step-6 with --yes, with the final release state file appended.
+---
+FakeRunSnapshot(
+  exit_code=0,
+  operations=(
+    FakeGitPath(repository_path='<TMP>/metricflow'),
+    FakeGitHubTokens(access_tokens=('github-token',), repository_names=('dbt-labs/metricflow',)),
+    FakeGitHubIsMerged(pr_number=300, result=False),
+    FakeGitHubMergeableState(pr_number=300),
+    FakeGitHubIsMerged(pr_number=400, result=False),
+    FakeGitHubMergeableState(pr_number=400),
+    FakeGitHubIsMerged(pr_number=300, result=False),
+    FakeGitHubMerge(pr_number=300, merge_method='squash'),
+    FakeGitHubIsMerged(pr_number=400, result=False),
+    FakeGitOperation(name='switch_branch', branch_name='main'),
+    FakeGitOperation(name='pull_current_branch'),
+    FakeGitOperation(name='delete_branch', branch_name='metricflow-user/release_pr/1.2.3/step_5'),
+    FakeGitOperation(name='create_branch', branch_name='metricflow-user/release_pr/1.2.3/step_5'),
+    FakeGitOperation(name='switch_branch', branch_name='metricflow-user/release_pr/1.2.3/step_5'),
+    FakeGitOperation(name='cherry_pick', commit_sha='fake-step-5-commit-sha'),
+    FakeGitOperation(name='push_branch', branch_name='metricflow-user/release_pr/1.2.3/step_5'),
+    FakeGitHubIsMerged(pr_number=400, result=False),
+    FakeGitHubMergeableState(pr_number=400),
+    FakeGitHubIsMerged(pr_number=400, result=False),
+    FakeGitHubMerge(pr_number=400, merge_method='squash'),
+    FakeGitOperation(name='push_tag', branch_name='dbt-metricflow/v0.12.0', commit_sha='abc123'),
+    FakeReleaseStateFileSnapshot(
+      file_path='<TMP>/metricflow/git_ignored/mf_release_tool_state.json',
+      file_text=('{\n'
+       '    "step_1": {\n'
+       '        "metricflow_package_version": "1.2.3",\n'
+       '        "branch_name": "metricflow-user/release_pr/1.2.3/step_1",\n'
+       '        "pr_number": 100,\n'
+       '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/100"\n'
+       '    },\n'
+       '    "step_2": null,\n'
+       '    "step_3": null,\n'
+       '    "step_4": {\n'
+       '        "metricflow_package_version": "1.2.3",\n'
+       '        "dbt_metricflow_package_version": "0.12.0",\n'
+       '        "branch_name": "metricflow-user/release_pr/1.2.3/step_4",\n'
+       '        "pr_number": 300,\n'
+       '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/300"\n'
+       '    },\n'
+       '    "step_5": {\n'
+       '        "metricflow_package_version": "1.2.3",\n'
+       '        "dbt_metricflow_package_version": "0.13.0.dev0",\n'
+       '        "branch_name": "metricflow-user/release_pr/1.2.3/step_5",\n'
+       '        "commit_sha": "fake-step-5-commit-sha",\n'
+       '        "pr_number": 400,\n'
+       '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/400"\n'
+       '    },\n'
+       '    "step_6": {\n'
+       '        "dbt_metricflow_release_tag_name": "dbt-metricflow/v0.12.0",\n'
+       '        "dbt_metricflow_release_merge_commit_sha": "abc123",\n'
+       '        "dbt_metricflow_dev_version_commit_sha": "def456"\n'
+       '    },\n'
+       '    "step_7": null\n'
+       '}\n'),
+    ),
+  ),
+)

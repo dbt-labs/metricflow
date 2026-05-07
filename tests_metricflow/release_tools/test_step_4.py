@@ -9,13 +9,16 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_snapshot_equal
 
 from scripts.release_tool.mf_release_tool import (
-    CLI_COMMAND_STEP_1,
-    CLI_OPTION_METRICFLOW_VERSION,
+    CLI_COMMAND_STEP_4,
+    CLI_OPTION_DBT_METRICFLOW_VERSION,
     RELEASE_TOOL_STATE_FILE_PATH,
     ReleaseToolContext,
     cli,
 )
 from tests_metricflow.release_tools.release_tool_test_helpers import (
+    _STEP_4_DBT_ABOUT_FILE_PATH,
+    _STEP_4_REQUIREMENTS_FILE_PATH,
+    _TEST_DBT_METRICFLOW_RELEASE_VERSION,
     RELEASE_TOOL_TEST_ENVIRONMENT,
     FakeCliCommandRunner,
     FakeGitHubClient,
@@ -28,33 +31,45 @@ from tests_metricflow.release_tools.release_tool_test_helpers import (
     _make_metricflow_repo,
     _release_tool_command,
 )
+from tests_metricflow.release_tools.test_step_7 import _write_step_1_step_2_and_step_3_state
 
 logger = logging.getLogger(__name__)
 
 
-def test_step_1_all_operations_match_snapshot(
+def _make_dbt_metricflow_requirements_file(
+    repo_path: Path,
+    initial_contents: str = "metricflow==0.0.0\n",
+) -> Path:
+    """Create the dbt-metricflow requirements file with initial contents."""
+    requirements_path = repo_path / _STEP_4_REQUIREMENTS_FILE_PATH
+    requirements_path.parent.mkdir(parents=True, exist_ok=True)
+    requirements_path.write_text(initial_contents)
+    return requirements_path
+
+
+def test_step_4_all_operations_match_snapshot(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     tmp_path: Path,
 ) -> None:
-    """Snapshot of the fake-operation log and final state file for ``step-1`` with ``--yes`` (``--yes`` → confirm_all)."""
+    """Snapshot of the fake-operation log and final state file for ``step-4`` with ``--yes``."""
     operation_log = FakeOperations()
     git_manager = FakeGitManager(
         changed_file_paths_sequence=(
-            ("CHANGELOG.md", ".changes/release.yaml"),
-            ("CHANGELOG.md", ".changes/release.yaml"),
-            ("ATTRIBUTION.md",),
-            ("ATTRIBUTION.md",),
-            ("metricflow/__about__.py",),
-            ("metricflow/__about__.py",),
+            (_STEP_4_REQUIREMENTS_FILE_PATH,),
+            (_STEP_4_REQUIREMENTS_FILE_PATH,),
+            (_STEP_4_DBT_ABOUT_FILE_PATH,),
+            (_STEP_4_DBT_ABOUT_FILE_PATH,),
         ),
         operation_log=operation_log,
     )
     cli_command_runner = FakeCliCommandRunner(operation_log=operation_log)
-    cli_command_runner.captured_outputs[("fossa", "report", "attribution", "--format", "markdown")] = b"# Attribution\n"
-    github_client = FakeGitHubClient(operation_log=operation_log)
+    github_client = FakeGitHubClient(pr_number=789, operation_log=operation_log)
     github_client_factory = FakeGitHubClientFactory(github_client=github_client, operation_log=operation_log)
     repo_path = _make_metricflow_repo(tmp_path)
+    _make_dbt_metricflow_requirements_file(repo_path)
+    _write_step_1_step_2_and_step_3_state(repo_path)
+    step_4_cli_commands = ("fossa", "changie", "hatch")
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager, operation_log=operation_log)
     release_tool_context = ReleaseToolContext(
         environment=RELEASE_TOOL_TEST_ENVIRONMENT,
@@ -62,14 +77,18 @@ def test_step_1_all_operations_match_snapshot(
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=github_client_factory.create_client,
-        is_cli_command_available=("fossa", "changie").__contains__,
+        is_cli_command_available=step_4_cli_commands.__contains__,
         cli_command_runner=cli_command_runner,
         sleep=FakeSleep().sleep,
     )
 
     result = CliRunner().invoke(
         cli,
-        _release_tool_command(repo_path, [CLI_COMMAND_STEP_1, CLI_OPTION_METRICFLOW_VERSION, "1.2.3"], yes=True),
+        _release_tool_command(
+            repo_path,
+            [CLI_COMMAND_STEP_4, CLI_OPTION_DBT_METRICFLOW_VERSION, _TEST_DBT_METRICFLOW_RELEASE_VERSION],
+            yes=True,
+        ),
         obj=release_tool_context,
     )
     assert result.exit_code == 0, result.output
@@ -88,7 +107,7 @@ def test_step_1_all_operations_match_snapshot(
         obj=operation_log.to_run_snapshot(tmp_path=tmp_path, exit_code=result.exit_code),
         obj_id="result",
         expectation_description=(
-            "Sequential log from fake git, GitHub, and CLI clients after a successful step-1 with --yes, "
+            "Sequential log from fake git, GitHub, and CLI clients after a successful step-4 with --yes, "
             "with the final release state file appended."
         ),
     )

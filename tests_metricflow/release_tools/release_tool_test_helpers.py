@@ -39,7 +39,7 @@ def write_release_tool_state_file(repo_path: Path, state: ReleaseToolState) -> N
 
 _STEP_4_REQUIREMENTS_FILE_PATH = "dbt-metricflow/requirements-files/requirements-metricflow.txt"
 _STEP_4_DBT_ABOUT_FILE_PATH = "dbt-metricflow/dbt_metricflow/__about__.py"
-# Semantic version passed to `step-4 --version` in tests.
+# Semantic version passed to `step-4 --dbt-metricflow-version` in tests.
 _TEST_DBT_METRICFLOW_RELEASE_VERSION = "0.12.0"
 
 

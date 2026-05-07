@@ -55,7 +55,13 @@ FakeRunSnapshot(
        '        "branch_name": "metricflow-user/release_pr/1.2.3/step_1",\n'
        '        "pr_number": 123,\n'
        '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/123"\n'
-       '    }\n'
+       '    },\n'
+       '    "step_2": null,\n'
+       '    "step_3": null,\n'
+       '    "step_4": null,\n'
+       '    "step_5": null,\n'
+       '    "step_6": null,\n'
+       '    "step_7": null\n'
        '}\n'),
     ),
   ),
