@@ -10,7 +10,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_sna
 
 from scripts.release_tool.mf_release_tool import (
     CLI_COMMAND_STEP_1,
-    CLI_OPTION_VERSION,
+    CLI_OPTION_METRICFLOW_VERSION,
     RELEASE_TOOL_STATE_FILE_PATH,
     ReleaseToolContext,
     cli,
@@ -69,7 +69,7 @@ def test_step_1_all_operations_match_snapshot(
 
     result = CliRunner().invoke(
         cli,
-        _release_tool_command(repo_path, [CLI_COMMAND_STEP_1, CLI_OPTION_VERSION, "1.2.3"], yes=True),
+        _release_tool_command(repo_path, [CLI_COMMAND_STEP_1, CLI_OPTION_METRICFLOW_VERSION, "1.2.3"], yes=True),
         obj=release_tool_context,
     )
     assert result.exit_code == 0, result.output

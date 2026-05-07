@@ -12,12 +12,21 @@ The GitHub API token should have the following permissions:
     * Read access to metadata.
     * Read and write access to actions, code, and pull requests.
 
+Also, checkout a clean version of the MF repo where the tool will create
+branches and make commits for the release. A separate checkout make it easier
+to make changes to the release tool independent of the release changes.
+
+Ensure `fossa` and `changie` CLI commands are installed. e.g.
+
+    brew install --cask fossa
+    brew install changie
+
 Start the process with:
 
     hatch run dev-env:python -m scripts.release_tool.mf_release_tool \
     step-1 \
-    --metricflow-repo ~/repos/metricflow_release \
-    --version 1.2.3
+    --metricflow-repo <separate repo checkout> \
+    --metricflow-version 1.2.3
 
 Then run similar commands for steps 2-7 (only steps 1 and 4 require the version
 argument as other steps can read from the state file).
@@ -75,7 +84,8 @@ CLI_COMMAND_CLEAN = "clean"
 CLI_OPTION_YES = "--yes"
 CLI_OPTION_YES_SHORT = "-y"
 CLI_OPTION_METRICFLOW_REPO = "--metricflow-repo"
-CLI_OPTION_VERSION = "--version"
+CLI_OPTION_METRICFLOW_VERSION = "--metricflow-version"
+CLI_OPTION_DBT_METRICFLOW_VERSION = "--dbt-metricflow-version"
 
 
 class _ClickReleaseConsole(ReleaseHelperConsole):
@@ -363,10 +373,13 @@ def cli(ctx: click.Context, confirm_all: bool) -> None:
     help="Path to the metricflow git repository.",
 )
 @click.option(
-    CLI_OPTION_VERSION, required=True, callback=_validate_semantic_version, help="Semantic version for the release."
+    CLI_OPTION_METRICFLOW_VERSION,
+    required=True,
+    callback=_validate_semantic_version,
+    help="Semantic version for the new `metricflow` release.",
 )
 @click.pass_context
-def step_1(ctx: click.Context, metricflow_repo: Path, version: str) -> None:
+def step_1(ctx: click.Context, metricflow_repo: Path, metricflow_version: str) -> None:
     """Prepare the first release pull-request branch."""
     console = _ClickReleaseConsole()
     console.echo(f"MetricFlow repo directory: {metricflow_repo}")
@@ -390,7 +403,7 @@ def step_1(ctx: click.Context, metricflow_repo: Path, version: str) -> None:
         console=console,
     )
     step_1_runner = ReleaseStep1Runner(
-        version=version,
+        version=metricflow_version,
         environment=context.environment,
         github_client=github_client,
         existing_state=existing_step_1_state,
@@ -499,7 +512,7 @@ def step_3(ctx: click.Context, metricflow_repo: Path) -> None:
     help="Path to the metricflow git repository.",
 )
 @click.option(
-    CLI_OPTION_VERSION,
+    CLI_OPTION_DBT_METRICFLOW_VERSION,
     "dbt_metricflow_version",
     required=True,
     callback=_validate_semantic_version,
@@ -519,8 +532,11 @@ def step_4(ctx: click.Context, metricflow_repo: Path, dbt_metricflow_version: st
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
 
-    if release_tool_state.step_1 is None:
-        raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
+    if release_tool_state.step_3 is None:
+        raise click.ClickException(f"Step 3 has not been completed. Run {CLI_COMMAND_STEP_3} first.")
+    step_1_state = release_tool_state.step_1
+    if step_1_state is None:
+        raise click.ClickException("Release tool state is missing step 1 details.")
 
     github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
 
@@ -534,7 +550,7 @@ def step_4(ctx: click.Context, metricflow_repo: Path, dbt_metricflow_version: st
     )
     step_4_runner = ReleaseStep4Runner(
         dbt_metricflow_version=dbt_metricflow_version,
-        step_1_state=release_tool_state.step_1,
+        step_1_state=step_1_state,
         environment=context.environment,
         github_client=github_client,
         existing_state=release_tool_state.step_4,

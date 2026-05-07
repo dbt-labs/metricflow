@@ -10,7 +10,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import assert_object_sna
 
 from scripts.release_tool.mf_release_tool import (
     CLI_COMMAND_STEP_4,
-    CLI_OPTION_VERSION,
+    CLI_OPTION_DBT_METRICFLOW_VERSION,
     RELEASE_TOOL_STATE_FILE_PATH,
     ReleaseToolContext,
     cli,
@@ -31,7 +31,7 @@ from tests_metricflow.release_tools.release_tool_test_helpers import (
     _make_metricflow_repo,
     _release_tool_command,
 )
-from tests_metricflow.release_tools.test_step_2 import _write_step_1_state
+from tests_metricflow.release_tools.test_step_7 import _write_step_1_step_2_and_step_3_state
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ def test_step_4_all_operations_match_snapshot(
     github_client_factory = FakeGitHubClientFactory(github_client=github_client, operation_log=operation_log)
     repo_path = _make_metricflow_repo(tmp_path)
     _make_dbt_metricflow_requirements_file(repo_path)
-    _write_step_1_state(repo_path)
+    _write_step_1_step_2_and_step_3_state(repo_path)
     step_4_cli_commands = ("fossa", "changie", "hatch")
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager, operation_log=operation_log)
     release_tool_context = ReleaseToolContext(
@@ -86,7 +86,7 @@ def test_step_4_all_operations_match_snapshot(
         cli,
         _release_tool_command(
             repo_path,
-            [CLI_COMMAND_STEP_4, CLI_OPTION_VERSION, _TEST_DBT_METRICFLOW_RELEASE_VERSION],
+            [CLI_COMMAND_STEP_4, CLI_OPTION_DBT_METRICFLOW_VERSION, _TEST_DBT_METRICFLOW_RELEASE_VERSION],
             yes=True,
         ),
         obj=release_tool_context,
