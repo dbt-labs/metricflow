@@ -32,6 +32,10 @@ class ReleaseHelperConsole(ABC):
         """Write a message to the user."""
 
     @abstractmethod
+    def warning(self, message: str) -> None:
+        """Write a warning message to the user."""
+
+    @abstractmethod
     def confirm(self, message: str) -> None:
         """Prompt the user to confirm a message."""
 

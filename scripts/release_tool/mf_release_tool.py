@@ -102,6 +102,11 @@ class _ClickReleaseConsole(ReleaseHelperConsole):
         click.secho(message, fg="green")
         self._flush_output()
 
+    def warning(self, message: str) -> None:
+        """Write a styled release-tool warning to stdout and flush immediately."""
+        click.secho(message, fg="yellow")
+        self._flush_output()
+
     def confirm(self, message: str) -> None:
         """Prompt for confirmation and flush immediately."""
         self._flush_output()
