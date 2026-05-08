@@ -24,8 +24,8 @@ Ensure `fossa` and `changie` CLI commands are installed. e.g.
 Start the process with:
 
     hatch run dev-env:python -m scripts.release_tool.mf_release_tool \
-    step-1 \
     --metricflow-repo <separate repo checkout> \
+    step-1 \
     --metricflow-version 1.2.3
 
 Then run similar commands for steps 2-7 (only steps 1 and 4 require the version
@@ -362,6 +362,12 @@ def _run_release_step_prechecks(context: ReleaseToolContext) -> GitManager:
 
 @click.group()
 @click.option(
+    CLI_OPTION_METRICFLOW_REPO,
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    required=True,
+    help="Path to the metricflow git repository.",
+)
+@click.option(
     CLI_OPTION_YES,
     CLI_OPTION_YES_SHORT,
     "confirm_all",
@@ -369,23 +375,17 @@ def _run_release_step_prechecks(context: ReleaseToolContext) -> GitManager:
     help="Answer yes to all confirmations.",
 )
 @click.pass_context
-def cli(ctx: click.Context, confirm_all: bool) -> None:
+def cli(ctx: click.Context, metricflow_repo: Path, confirm_all: bool) -> None:
     """Run MetricFlow release steps."""
     if ctx.obj is None:
-        ctx.obj = _default_release_tool_context(current_directory=Path.cwd()).copy(confirm_all=confirm_all)
+        ctx.obj = _default_release_tool_context(current_directory=metricflow_repo).copy(confirm_all=confirm_all)
         return
 
     release_tool_context = cast(ReleaseToolContext, ctx.obj)
-    ctx.obj = release_tool_context.copy(confirm_all=confirm_all)
+    ctx.obj = release_tool_context.copy(current_directory=metricflow_repo, confirm_all=confirm_all)
 
 
 @cli.command(CLI_COMMAND_STEP_1)
-@click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
 @click.option(
     CLI_OPTION_METRICFLOW_VERSION,
     required=True,
@@ -393,11 +393,11 @@ def cli(ctx: click.Context, confirm_all: bool) -> None:
     help="Semantic version for the new `metricflow` release.",
 )
 @click.pass_context
-def step_1(ctx: click.Context, metricflow_repo: Path, metricflow_version: str) -> None:
+def step_1(ctx: click.Context, metricflow_version: str) -> None:
     """Prepare the first release pull-request branch."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = _run_release_step_prechecks(context=context)
     _check_required_cli_commands(
         command_names=ReleaseStep1Runner.REQUIRED_CLI_COMMANDS,
@@ -432,18 +432,12 @@ def step_1(ctx: click.Context, metricflow_repo: Path, metricflow_version: str) -
 
 
 @cli.command(CLI_COMMAND_STEP_2)
-@click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
 @click.pass_context
-def step_2(ctx: click.Context, metricflow_repo: Path) -> None:
+def step_2(ctx: click.Context) -> None:
     """Update the MetricFlow version for in-progress development."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
@@ -477,18 +471,12 @@ def step_2(ctx: click.Context, metricflow_repo: Path) -> None:
 
 
 @cli.command(CLI_COMMAND_STEP_3)
-@click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
 @click.pass_context
-def step_3(ctx: click.Context, metricflow_repo: Path) -> None:
+def step_3(ctx: click.Context) -> None:
     """Merge the release pull requests from steps 1 and 2."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
@@ -523,12 +511,6 @@ def step_3(ctx: click.Context, metricflow_repo: Path) -> None:
 
 @cli.command(CLI_COMMAND_STEP_4)
 @click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
-@click.option(
     CLI_OPTION_DBT_METRICFLOW_VERSION,
     "dbt_metricflow_version",
     required=True,
@@ -536,11 +518,11 @@ def step_3(ctx: click.Context, metricflow_repo: Path) -> None:
     help="Semantic version for the new `dbt-metricflow` release.",
 )
 @click.pass_context
-def step_4(ctx: click.Context, metricflow_repo: Path, dbt_metricflow_version: str) -> None:
+def step_4(ctx: click.Context, dbt_metricflow_version: str) -> None:
     """Update `dbt-metricflow` to depend on the released `metricflow` version."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = _run_release_step_prechecks(context=context)
     _check_required_cli_commands(
         command_names=ReleaseStep4Runner.REQUIRED_CLI_COMMANDS,
@@ -581,18 +563,12 @@ def step_4(ctx: click.Context, metricflow_repo: Path, dbt_metricflow_version: st
 
 
 @cli.command(CLI_COMMAND_STEP_5)
-@click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
 @click.pass_context
-def step_5(ctx: click.Context, metricflow_repo: Path) -> None:
+def step_5(ctx: click.Context) -> None:
     """Update the dbt-metricflow version for in-progress development."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = _run_release_step_prechecks(context=context)
     _check_required_cli_commands(
         command_names=ReleaseStep5Runner.REQUIRED_CLI_COMMANDS,
@@ -629,18 +605,12 @@ def step_5(ctx: click.Context, metricflow_repo: Path) -> None:
 
 
 @cli.command(CLI_COMMAND_STEP_6)
-@click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
 @click.pass_context
-def step_6(ctx: click.Context, metricflow_repo: Path) -> None:
+def step_6(ctx: click.Context) -> None:
     """Merge the dbt-metricflow release pull requests from steps 4 and 5."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
@@ -674,18 +644,12 @@ def step_6(ctx: click.Context, metricflow_repo: Path) -> None:
 
 
 @cli.command(CLI_COMMAND_STEP_7)
-@click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
 @click.pass_context
-def step_7(ctx: click.Context, metricflow_repo: Path) -> None:
+def step_7(ctx: click.Context) -> None:
     """Create the GitHub release note for the MetricFlow release."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
@@ -718,18 +682,12 @@ def step_7(ctx: click.Context, metricflow_repo: Path) -> None:
 
 
 @cli.command(CLI_COMMAND_CLEAN)
-@click.option(
-    CLI_OPTION_METRICFLOW_REPO,
-    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
-    required=True,
-    help="Path to the metricflow git repository.",
-)
 @click.pass_context
-def clean(ctx: click.Context, metricflow_repo: Path) -> None:
+def clean(ctx: click.Context) -> None:
     """Delete release branches and remove the state file."""
     console = _ClickReleaseConsole()
-    console.echo(f"MetricFlow repo directory: {metricflow_repo}")
-    context = _release_tool_context(ctx).copy(current_directory=metricflow_repo)
+    context = _release_tool_context(ctx)
+    console.echo(f"MetricFlow repo directory: {context.current_directory}")
     git_manager = context.git_manager_factory(context.current_directory)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
 

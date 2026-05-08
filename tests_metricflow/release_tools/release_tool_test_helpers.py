@@ -697,7 +697,7 @@ def _release_tool_command(repo_path: Path, step_args: list[str], yes: bool = Tru
     command: list[str] = []
     if yes:
         command.append(CLI_OPTION_YES)
-    return [*command, step_args[0], CLI_OPTION_METRICFLOW_REPO, str(repo_path), *step_args[1:]]
+    return [*command, CLI_OPTION_METRICFLOW_REPO, str(repo_path), *step_args]
 
 
 class FakeSleep:
