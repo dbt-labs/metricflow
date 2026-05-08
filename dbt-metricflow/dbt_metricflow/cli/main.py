@@ -181,7 +181,7 @@ def query(
     cfg: CLIConfiguration,
     metrics: Optional[Sequence[str]] = None,
     group_by: Optional[Sequence[str]] = None,
-    where: Optional[str] = None,
+    where: Sequence[str] = (),
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
     order: Optional[List[str]] = None,
@@ -216,7 +216,7 @@ def query(
         limit=limit,
         time_constraint_start=start_time,
         time_constraint_end=end_time,
-        where_constraints=[where] if where else None,
+        where_constraints=where or None,
         order_by_names=order,
     )
 
