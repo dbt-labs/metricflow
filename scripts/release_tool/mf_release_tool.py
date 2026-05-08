@@ -343,6 +343,15 @@ def _load_release_tool_state(state_file_path: Path) -> ReleaseToolState:
     return ReleaseToolState.parse_raw(state_file_path.read_text())
 
 
+def _warn_if_step_previously_run(step_name: str, step_state: object | None, console: ReleaseHelperConsole) -> None:
+    """Warn if saved release-tool state indicates the step has already run."""
+    if step_state is not None:
+        console.warning(
+            f"Warning: {step_name} has already been run according to the release state file. "
+            f"Re-running {step_name} may update existing release work."
+        )
+
+
 def _run_release_step_prechecks(context: ReleaseToolContext) -> GitManager:
     """Run common release-step prechecks and return a Git manager."""
     _check_required_environment_variables(environment=context.environment)
@@ -397,6 +406,7 @@ def step_1(ctx: click.Context, metricflow_repo: Path, metricflow_version: str) -
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     existing_release_tool_state = _load_release_tool_state(state_file_path) if state_file_path.exists() else None
     existing_step_1_state = existing_release_tool_state.step_1 if existing_release_tool_state is not None else None
+    _warn_if_step_previously_run(CLI_COMMAND_STEP_1, existing_step_1_state, console)
     github_client = context.github_client_factory(context.environment["GITHUB_API_TOKEN"], GITHUB_REPOSITORY_NAME)
 
     release_helper = ReleaseHelper(
@@ -437,6 +447,7 @@ def step_2(ctx: click.Context, metricflow_repo: Path) -> None:
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+    _warn_if_step_previously_run(CLI_COMMAND_STEP_2, release_tool_state.step_2, console)
 
     if release_tool_state.step_1 is None:
         raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
@@ -481,6 +492,7 @@ def step_3(ctx: click.Context, metricflow_repo: Path) -> None:
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+    _warn_if_step_previously_run(CLI_COMMAND_STEP_3, release_tool_state.step_3, console)
 
     if release_tool_state.step_1 is None:
         raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
@@ -536,6 +548,7 @@ def step_4(ctx: click.Context, metricflow_repo: Path, dbt_metricflow_version: st
     )
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+    _warn_if_step_previously_run(CLI_COMMAND_STEP_4, release_tool_state.step_4, console)
 
     if release_tool_state.step_3 is None:
         raise click.ClickException(f"Step 3 has not been completed. Run {CLI_COMMAND_STEP_3} first.")
@@ -587,6 +600,7 @@ def step_5(ctx: click.Context, metricflow_repo: Path) -> None:
     )
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+    _warn_if_step_previously_run(CLI_COMMAND_STEP_5, release_tool_state.step_5, console)
 
     if release_tool_state.step_4 is None:
         raise click.ClickException(f"Step 4 has not been completed. Run {CLI_COMMAND_STEP_4} first.")
@@ -630,6 +644,7 @@ def step_6(ctx: click.Context, metricflow_repo: Path) -> None:
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+    _warn_if_step_previously_run(CLI_COMMAND_STEP_6, release_tool_state.step_6, console)
 
     if release_tool_state.step_4 is None:
         raise click.ClickException(f"Step 4 has not been completed. Run {CLI_COMMAND_STEP_4} first.")
@@ -674,6 +689,7 @@ def step_7(ctx: click.Context, metricflow_repo: Path) -> None:
     git_manager = _run_release_step_prechecks(context=context)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
     release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+    _warn_if_step_previously_run(CLI_COMMAND_STEP_7, release_tool_state.step_7, console)
 
     if release_tool_state.step_1 is None:
         raise click.ClickException(f"Step 1 has not been completed. Run {CLI_COMMAND_STEP_1} first.")
