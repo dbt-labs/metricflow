@@ -1,0 +1,6 @@
+kind: Fixes
+body: Isolate mypy cache between metricflow / dbt-metricflow
+time: 2026-05-08T10:37:51.18161-07:00
+custom:
+    Author: plypaul
+    Issue: "2046"
