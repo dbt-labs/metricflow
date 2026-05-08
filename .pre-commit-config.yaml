@@ -37,7 +37,8 @@ repos:
         # dbt-metricflow requires dbt-core, which is not installed in the main metricflow dev environment.
         # We typecheck dbt-metricflow separately via direct invocation inside the `make lint` command
         exclude: "^dbt-metricflow/"
-        args: [--show-error-codes]
+        # Keep mypy's incremental cache isolated to this Hatch environment's dependency set.
+        args: [--show-error-codes, --cache-dir=.mypy_cache/root_dev_env]
         verbose: true
         # "system" means that the current environment will be used to run the hook, not the environment installed by
         # pre-commit. This is set for mypy to use the specified package dependencies in Hatch (assuming pre-commit is

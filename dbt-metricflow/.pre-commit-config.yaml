@@ -35,7 +35,8 @@ repos:
     rev: v1.3.0
     hooks:
       - id: mypy
-        args: [--show-error-codes]
+        # Keep mypy's incremental cache isolated to this Hatch environment's dependency set.
+        args: [--show-error-codes, --cache-dir=.mypy_cache/dbt_metricflow_dev_env]
         verbose: true
         # "system" means that the current environment will be used to run the hook, not the environment installed by
         # pre-commit. This is set for mypy to use the specified package dependencies in Hatch (assuming pre-commit is
