@@ -132,7 +132,9 @@ class ReleasePrRunner:
     def _wait_for_user_review(self) -> None:
         """Prompt for a manual review pause before pushing."""
         if not self.release_helper.confirm_all:
-            self.release_helper.console.confirm("Make any edits to the commits now. Continue when ready?")
+            self.release_helper.console.confirm(
+                f"Make any edits to branch ({self.release_branch_name!r}) now. Continue when ready?"
+            )
 
     def _push_release_branch(self) -> None:
         """Force-push the release branch."""
