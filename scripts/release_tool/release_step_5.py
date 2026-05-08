@@ -102,7 +102,6 @@ class ReleaseStep5Runner:
             base_branch=step_4_branch_name,
             pull_base_branch=False,
         ).run()
-        self.release_helper.echo_pull_request_review_banner(pr_link=pr_result.pr_link)
         return ReleaseStep5State(
             metricflow_package_version=mf_version,
             dbt_metricflow_package_version=new_version,

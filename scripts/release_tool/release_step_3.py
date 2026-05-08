@@ -120,9 +120,6 @@ class ReleaseStep3Runner:
                 force=True,
             ),
         )
-        helper.echo_github_actions_workflow_approval_banner(
-            workflow_file_name=ReleaseHelper.CD_PUSH_METRICFLOW_TO_PYPI_WORKFLOW_FILE_NAME,
-        )
         return ReleaseStep3State(
             metricflow_release_tag_name=tag_name,
             metricflow_release_merge_commit_sha=step_1_merge_sha,

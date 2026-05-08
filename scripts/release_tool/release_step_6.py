@@ -120,9 +120,6 @@ class ReleaseStep6Runner:
                 force=True,
             ),
         )
-        helper.echo_github_actions_workflow_approval_banner(
-            workflow_file_name=ReleaseHelper.CD_PUSH_DBT_METRICFLOW_TO_PYPI_WORKFLOW_FILE_NAME,
-        )
         return ReleaseStep6State(
             dbt_metricflow_release_tag_name=tag_name,
             dbt_metricflow_release_merge_commit_sha=step_4_merge_sha,

@@ -102,7 +102,6 @@ class ReleaseStep4Runner:
             release_helper=self.release_helper,
         ).run()
 
-        self.release_helper.echo_pull_request_review_banner(pr_link=pr_result.pr_link)
         return ReleaseStep4State(
             metricflow_package_version=mf_version,
             dbt_metricflow_package_version=dbt_metricflow_version,

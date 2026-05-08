@@ -103,7 +103,6 @@ class ReleaseStep2Runner:
             base_branch=step_1_branch_name,
             pull_base_branch=False,
         ).run()
-        self.release_helper.echo_pull_request_review_banner(pr_link=pr_result.pr_link)
         return ReleaseStep2State(
             metricflow_package_version=new_version,
             branch_name=step_2_branch_name,
