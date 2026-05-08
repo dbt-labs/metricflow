@@ -92,7 +92,6 @@ class ReleaseStep1Runner:
             release_helper=self.release_helper,
         ).run()
 
-        self.release_helper.echo_pull_request_review_banner(pr_link=pr_result.pr_link)
         return ReleaseStep1State(
             metricflow_package_version=self.version,
             branch_name=release_branch_name,

@@ -97,9 +97,9 @@ class _ClickReleaseConsole(ReleaseHelperConsole):
         sys.stdout.flush()
         sys.stderr.flush()
 
-    def echo(self, message: str) -> None:
+    def echo(self, message: str, color: str = "green") -> None:
         """Write a styled release-tool message to stdout and flush immediately."""
-        click.secho(message, fg="green")
+        click.secho(message, fg=color)
         self._flush_output()
 
     def warning(self, message: str) -> None:
@@ -429,6 +429,7 @@ def step_1(ctx: click.Context, metricflow_version: str) -> None:
     base_state = existing_release_tool_state if existing_release_tool_state is not None else ReleaseToolState()
     release_tool_state = base_state.with_step_state(updated_step_1=step_1_state)
     _save_release_tool_state(state_file_path=state_file_path, state=release_tool_state, console=console)
+    release_helper.echo_pull_request_review_banner(pr_link=step_1_state.pr_link)
 
 
 @cli.command(CLI_COMMAND_STEP_2)
@@ -468,6 +469,7 @@ def step_2(ctx: click.Context) -> None:
 
     updated_state = release_tool_state.with_step_state(updated_step_2=step_2_state)
     _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+    release_helper.echo_pull_request_review_banner(pr_link=step_2_state.pr_link)
 
 
 @cli.command(CLI_COMMAND_STEP_3)
@@ -507,6 +509,9 @@ def step_3(ctx: click.Context) -> None:
 
     updated_state = release_tool_state.with_step_state(updated_step_3=step_3_state)
     _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+    release_helper.echo_github_actions_workflow_approval_banner(
+        workflow_file_name=ReleaseHelper.CD_PUSH_METRICFLOW_TO_PYPI_WORKFLOW_FILE_NAME,
+    )
 
 
 @cli.command(CLI_COMMAND_STEP_4)
@@ -560,6 +565,7 @@ def step_4(ctx: click.Context, dbt_metricflow_version: str) -> None:
 
     updated_state = release_tool_state.with_step_state(updated_step_4=step_4_state)
     _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+    release_helper.echo_pull_request_review_banner(pr_link=step_4_state.pr_link)
 
 
 @cli.command(CLI_COMMAND_STEP_5)
@@ -602,6 +608,7 @@ def step_5(ctx: click.Context) -> None:
 
     updated_state = release_tool_state.with_step_state(updated_step_5=step_5_state)
     _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+    release_helper.echo_pull_request_review_banner(pr_link=step_5_state.pr_link)
 
 
 @cli.command(CLI_COMMAND_STEP_6)
@@ -641,6 +648,9 @@ def step_6(ctx: click.Context) -> None:
 
     updated_state = release_tool_state.with_step_state(updated_step_6=step_6_state)
     _save_release_tool_state(state_file_path=state_file_path, state=updated_state, console=console)
+    release_helper.echo_github_actions_workflow_approval_banner(
+        workflow_file_name=ReleaseHelper.CD_PUSH_DBT_METRICFLOW_TO_PYPI_WORKFLOW_FILE_NAME,
+    )
 
 
 @cli.command(CLI_COMMAND_STEP_7)

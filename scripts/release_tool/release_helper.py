@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 _T = TypeVar("_T")
 
 _TRAILING_BANNER_SEPARATOR = "=" * 72
+_BANNER_TEXT_COLOR = "white"
 
 
 class ReleaseHelperConsole(ABC):
@@ -28,12 +29,17 @@ class ReleaseHelperConsole(ABC):
     """
 
     @abstractmethod
-    def echo(self, message: str) -> None:
+    def echo(self, message: str, color: str = "green") -> None:
         """Write a message to the user."""
 
     @abstractmethod
     def warning(self, message: str) -> None:
         """Write a warning message to the user."""
+
+    def banner(self, message: str) -> None:
+        """Write a trailing banner with consistent formatting."""
+        for banner_line in ("", _TRAILING_BANNER_SEPARATOR, *message.splitlines(), "", _TRAILING_BANNER_SEPARATOR):
+            self.echo(banner_line, color=_BANNER_TEXT_COLOR)
 
     @abstractmethod
     def confirm(self, message: str) -> None:
@@ -120,21 +126,15 @@ class ReleaseHelper:
 
     def echo_pull_request_review_banner(self, pr_link: str) -> None:
         """Echo a trailing banner with the pull request URL and a review reminder."""
-        self.console.echo("")
-        self.console.echo(_TRAILING_BANNER_SEPARATOR)
-        self.console.echo("Please have this pull request reviewed and approved before continuing:")
-        self.console.echo("")
-        self.console.echo(mf_indent(mf_hyperlink(pr_link)))
-        self.console.echo("")
-        self.console.echo(_TRAILING_BANNER_SEPARATOR)
+        self.console.banner(
+            "Please have this pull request reviewed and approved before continuing:\n\n"
+            f"{mf_indent(mf_hyperlink(pr_link))}"
+        )
 
     def echo_github_actions_workflow_approval_banner(self, workflow_file_name: str) -> None:
         """Echo a trailing banner with the workflow URL and an approval reminder."""
         workflow_url = f"https://github.com/{self.repository_name}/actions/workflows/{workflow_file_name}"
-        self.console.echo("")
-        self.console.echo(_TRAILING_BANNER_SEPARATOR)
-        self.console.echo("Please go to this workflow and approve it before continuing:")
-        self.console.echo("")
-        self.console.echo(mf_indent(mf_hyperlink(workflow_url)))
-        self.console.echo("")
-        self.console.echo(_TRAILING_BANNER_SEPARATOR)
+        self.console.banner(
+            "Please go to this workflow and approve it before continuing:\n\n"
+            f"{mf_indent(mf_hyperlink(workflow_url))}"
+        )
