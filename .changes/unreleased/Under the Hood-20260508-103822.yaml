@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add retries to `test_format_report_to_text_table`
-time: 2026-05-08T10:38:22.589085-07:00
-custom:
-    Author: plypaul
-    Issue: "2047"
