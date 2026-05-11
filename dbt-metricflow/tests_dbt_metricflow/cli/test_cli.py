@@ -233,9 +233,6 @@ def test_saved_query_with_where(  # noqa: D103
     cli_test_configuration: MetricFlowTestConfiguration,
     cli_runner: IsolatedCliCommandRunner,
 ) -> None:
-    where_argument_value = (
-        "{{ Dimension('customer__customer_country') }}  = 'US' AND {{ TimeDimension('metric_time') }} <= '2022-03-12'"
-    )
     run_and_check_cli_command(
         request=request,
         cli_test_configuration=cli_test_configuration,
@@ -245,7 +242,9 @@ def test_saved_query_with_where(  # noqa: D103
             "--saved-query",
             "core_transaction_metrics",
             "--where",
-            where_argument_value,
+            "{{ Dimension('customer__customer_country') }}  = 'US'",
+            "--where",
+            "{{ TimeDimension('metric_time') }} <= '2022-03-12'",
             "--order",
             "metric_time__day,customer__customer_country,transactions,quick_buy_transactions",
         ],
