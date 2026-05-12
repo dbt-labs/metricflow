@@ -67,7 +67,7 @@ class ReleaseStep3Runner:
         step_1_pr = self.step_1_state.pr_number
         step_2_pr = self.step_2_state.pr_number
         step_2_branch = self.step_2_state.branch_name
-        step_2_commit_sha = self.step_2_state.commit_sha
+        step_2_commit_sha = self.step_2_state.version_update_commit_sha
         helper = self.release_helper
         git = helper.git_manager
         tag_name = f"{ReleaseHelper.METRICFLOW_RELEASE_TAG_PREFIX}{self.step_1_state.metricflow_package_version}"

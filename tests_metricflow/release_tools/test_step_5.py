@@ -70,7 +70,12 @@ def test_step_5_all_operations_match_snapshot(
     """Snapshot of the fake-operation log and final state file for ``step-5`` with ``--yes``."""
     operation_log = FakeOperations()
     git_manager = FakeGitManager(
-        changed_file_paths=(_STEP_4_DBT_ABOUT_FILE_PATH,),
+        changed_file_paths_sequence=(
+            (_STEP_4_DBT_ABOUT_FILE_PATH,),
+            (_STEP_4_DBT_ABOUT_FILE_PATH,),
+            ("dbt-metricflow/requirements-files/requirements-metricflow.txt",),
+            ("dbt-metricflow/requirements-files/requirements-metricflow.txt",),
+        ),
         operation_log=operation_log,
     )
     cli_command_runner = FakeCliCommandRunner(operation_log=operation_log)

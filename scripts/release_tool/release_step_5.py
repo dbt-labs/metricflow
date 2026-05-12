@@ -6,11 +6,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar
 
+import click
+
 from msi_pydantic_shim import BaseModel
 from scripts.release_tool.github_client import GitHubClient
 from scripts.release_tool.package_version import PackageVersionUpdate
 from scripts.release_tool.release_helper import ReleaseHelper
-from scripts.release_tool.release_pr_runner import ReleasePrRunner
+from scripts.release_tool.release_pr_runner import ReleasePrCommitTask, ReleasePrRunner
 from scripts.release_tool.release_step_2 import ReleaseStep2Runner
 from scripts.release_tool.release_step_4 import ReleaseStep4Runner, ReleaseStep4State
 
@@ -27,7 +29,9 @@ class ReleaseStep5State(BaseModel):
     # Development version branch name.
     branch_name: str
     # Commit SHA for the version update.
-    commit_sha: str
+    version_update_commit_sha: str
+    # Commit SHA for setting dbt-metricflow's metricflow dependency back to the local monorepo package.
+    local_metricflow_requirement_commit_sha: str
     # Development version pull request number.
     pr_number: int
     # Development version pull request link.
@@ -37,6 +41,10 @@ class ReleaseStep5State(BaseModel):
         """Pydantic configuration."""
 
         allow_mutation = False
+
+    def commit_shas_for_branch_refresh(self) -> tuple[str, ...]:
+        """Return the step-5 commit SHAs that should be replayed when refreshing the branch."""
+        return (self.version_update_commit_sha, self.local_metricflow_requirement_commit_sha)
 
 
 @dataclass(frozen=True)
@@ -48,14 +56,23 @@ class ReleaseStep5Runner:
     * Creating the local step-5 branch from the step-4 branch
     * Updating the `dbt-metricflow` package version to the next dev version
     * Validating that only `dbt-metricflow/dbt_metricflow/__about__.py` changed
-    * Committing and force-pushing the version update
+    * Committing the version update
+    * Setting the `dbt-metricflow` package's `metricflow` requirement to use
+      the local monorepo package
+    * Committing the requirements update and force-pushing the branch
     * Creating or updating a PR against the step-4 branch
     """
 
     # File path that the `dbt-metricflow` version update is allowed to modify.
     ALLOWED_DBT_ABOUT_FILE_PATH: ClassVar[str] = ReleaseStep4Runner.ALLOWED_DBT_ABOUT_FILE_PATH
+    # Path to the dbt-metricflow requirements file that depends on the `metricflow` package.
+    REQUIREMENTS_FILE_PATH: ClassVar[str] = ReleaseStep4Runner.REQUIREMENTS_FILE_PATH
     # Name of the package updated in step 5.
     PACKAGE_NAME: ClassVar[str] = "dbt-metricflow"
+    # Requirement line used by dbt-metricflow development branches to depend on the local monorepo metricflow package.
+    LOCAL_METRICFLOW_REQUIREMENT_LINE: ClassVar[str] = "metricflow @ {root:parent:uri}"
+    # Commit message used when setting the local metricflow requirement.
+    LOCAL_METRICFLOW_REQUIREMENT_COMMIT_MESSAGE: ClassVar[str] = "Set local `metricflow` requirement"
     # CLI commands that must be available on PATH for step 5.
     REQUIRED_CLI_COMMANDS: ClassVar[tuple[str, ...]] = ("hatch",)
     # State saved from step 4.
@@ -94,7 +111,12 @@ class ReleaseStep5Runner:
             existing_pr_number=self.existing_state.pr_number if self.existing_state is not None else None,
             tasks=(
                 package_version_update.as_release_pr_commit_task(
-                    commit_message=pr_title,
+                    commit_message=self._development_version_pr_title(version=new_version),
+                ),
+                ReleasePrCommitTask(
+                    action=self._set_local_metricflow_requirement,
+                    validate=self._check_requirements_only_changes,
+                    commit_message=ReleaseStep5Runner.LOCAL_METRICFLOW_REQUIREMENT_COMMIT_MESSAGE,
                 ),
             ),
             github_client=self.github_client,
@@ -106,10 +128,40 @@ class ReleaseStep5Runner:
             metricflow_package_version=mf_version,
             dbt_metricflow_package_version=new_version,
             branch_name=step_5_branch_name,
-            commit_sha=pr_result.commit_shas[0],
+            version_update_commit_sha=pr_result.commit_shas[0],
+            local_metricflow_requirement_commit_sha=pr_result.commit_shas[1],
             pr_number=pr_result.pr_number,
             pr_link=pr_result.pr_link,
         )
+
+    def _set_local_metricflow_requirement(self) -> None:
+        """Set the local metricflow requirement for post-release dbt-metricflow development."""
+        self.release_helper.run(
+            description=(
+                f"Update {ReleaseStep5Runner.REQUIREMENTS_FILE_PATH} to use "
+                f"`{ReleaseStep5Runner.LOCAL_METRICFLOW_REQUIREMENT_LINE}`"
+            ),
+            action=lambda: self._write_requirements_file(
+                requirement_line=ReleaseStep5Runner.LOCAL_METRICFLOW_REQUIREMENT_LINE
+            ),
+        )
+
+    def _write_requirements_file(self, requirement_line: str) -> None:
+        """Write the `metricflow` requirement to the dbt-metricflow requirements file."""
+        requirements_path = self.release_helper.current_directory / ReleaseStep5Runner.REQUIREMENTS_FILE_PATH
+        requirements_path.write_text(f"{requirement_line}\n")
+
+    def _check_requirements_only_changes(self) -> None:
+        """Raise if setting the local requirement changed files outside the metricflow requirement file."""
+        changed_file_paths = self.release_helper.git_manager.changed_file_paths()
+        unexpected_file_paths = [
+            file_path for file_path in changed_file_paths if file_path != ReleaseStep5Runner.REQUIREMENTS_FILE_PATH
+        ]
+        if unexpected_file_paths:
+            raise click.ClickException(
+                f"Setting the local requirement may only change {ReleaseStep5Runner.REQUIREMENTS_FILE_PATH}. "
+                f"Unexpected changed paths: {', '.join(unexpected_file_paths)}"
+            )
 
     def _dbt_metricflow_root(self) -> Path:
         """Return the dbt-metricflow hatch project directory."""

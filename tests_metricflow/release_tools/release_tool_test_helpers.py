@@ -690,6 +690,9 @@ def _make_metricflow_repo(tmp_path: Path) -> Path:
     dbt_metricflow_path.joinpath("pyproject.toml").write_text(
         '[tool.hatch.version]\npath = "dbt_metricflow/__about__.py"\n'
     )
+    dbt_requirements_path = dbt_metricflow_path / "requirements-files"
+    dbt_requirements_path.mkdir()
+    dbt_requirements_path.joinpath("requirements-metricflow.txt").write_text("metricflow==1.2.3\n")
     return repo_path
 
 

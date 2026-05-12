@@ -25,7 +25,7 @@ class ReleaseStep2State(BaseModel):
     # Development version branch name.
     branch_name: str
     # Commit SHA for the version update.
-    commit_sha: str
+    version_update_commit_sha: str
     # Development version pull request number.
     pr_number: int
     # Development version pull request link.
@@ -106,7 +106,7 @@ class ReleaseStep2Runner:
         return ReleaseStep2State(
             metricflow_package_version=new_version,
             branch_name=step_2_branch_name,
-            commit_sha=pr_result.commit_shas[0],
+            version_update_commit_sha=pr_result.commit_shas[0],
             pr_number=pr_result.pr_number,
             pr_link=pr_result.pr_link,
         )
