@@ -41,7 +41,7 @@ class ReleaseStep6Runner:
     * Polling until both the step-4 and step-5 PRs are ready to merge
     * Merging the step-4 PR
     * Switching to main, pulling, then recreating the step-5 branch from main
-      and cherry-picking the step-5 commit onto it
+      and cherry-picking the step-5 commits onto it
     * Force-pushing the step-5 branch
     * Polling until the step-5 PR is ready to merge, then merging it
     * Creating or updating a lightweight ``dbt-metricflow/v$VERSION`` tag
@@ -66,7 +66,7 @@ class ReleaseStep6Runner:
         step_4_pr = self.step_4_state.pr_number
         step_5_pr = self.step_5_state.pr_number
         step_5_branch = self.step_5_state.branch_name
-        step_5_commit_sha = self.step_5_state.commit_sha
+        step_5_commit_shas = self.step_5_state.commit_shas_for_branch_refresh()
         dbt_metricflow_version = self.step_4_state.dbt_metricflow_package_version
         helper = self.release_helper
         git = helper.git_manager
@@ -97,10 +97,11 @@ class ReleaseStep6Runner:
             def _create_branch_and_cherry_pick() -> None:
                 git.create_branch(step_5_branch)
                 git.switch_branch(step_5_branch)
-                git.cherry_pick(step_5_commit_sha)
+                for commit_sha in step_5_commit_shas:
+                    git.cherry_pick(commit_sha)
 
             helper.run(
-                description=f"Create branch {step_5_branch} and cherry-pick {step_5_commit_sha}",
+                description=f"Create branch {step_5_branch} and cherry-pick step-5 commits",
                 action=_create_branch_and_cherry_pick,
             )
             helper.run_confirmed_remote_action(

@@ -66,6 +66,7 @@ def _write_step_1_and_step_4_and_step_5_state(
         dbt_metricflow_package_version=dbt_dev_version,
         branch_name=f"{username}/release_pr/{version}/step_5",
         commit_sha="fake-step-5-commit-sha",
+        local_metricflow_requirement_commit_sha="fake-step-5-requirement-commit-sha",
         pr_number=step_5_pr_number,
         pr_link=f"{GITHUB_REPOSITORY_HTML_BASE_URL}/pull/{step_5_pr_number}",
     )
