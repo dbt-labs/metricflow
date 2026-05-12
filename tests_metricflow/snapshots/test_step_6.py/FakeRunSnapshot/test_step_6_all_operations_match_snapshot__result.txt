@@ -52,7 +52,7 @@ FakeRunSnapshot(
        '        "metricflow_package_version": "1.2.3",\n'
        '        "dbt_metricflow_package_version": "0.13.0.dev0",\n'
        '        "branch_name": "metricflow-user/release_pr/1.2.3/step_5",\n'
-       '        "commit_sha": "fake-step-5-commit-sha",\n'
+       '        "version_update_commit_sha": "fake-step-5-commit-sha",\n'
        '        "local_metricflow_requirement_commit_sha": "fake-step-5-requirement-commit-sha",\n'
        '        "pr_number": 400,\n'
        '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/400"\n'

@@ -22,6 +22,10 @@ FakeRunSnapshot(
     FakeCliCommand(command=('make', 'lint'), current_directory='<TMP>/metricflow'),
     FakeGitOperation(name='add_all_changes'),
     FakeGitOperation(name='add_commit', message='Update `dbt-metricflow` version to 0.13.0.dev0'),
+    FakeGitOperation(name='add_all_changes'),
+    FakeCliCommand(command=('make', 'lint'), current_directory='<TMP>/metricflow'),
+    FakeGitOperation(name='add_all_changes'),
+    FakeGitOperation(name='add_commit', message='Set local `metricflow` requirement'),
     FakeGitOperation(name='push_branch', branch_name='metricflow-user/release_pr/1.2.3/step_5'),
     FakeGitHubPullRequest(
       source='create_or_update_create',
@@ -57,7 +61,8 @@ FakeRunSnapshot(
        '        "metricflow_package_version": "1.2.3",\n'
        '        "dbt_metricflow_package_version": "0.13.0.dev0",\n'
        '        "branch_name": "metricflow-user/release_pr/1.2.3/step_5",\n'
-       '        "commit_sha": "commit-sha",\n'
+       '        "version_update_commit_sha": "commit-sha",\n'
+       '        "local_metricflow_requirement_commit_sha": "commit-sha",\n'
        '        "pr_number": 901,\n'
        '        "pr_link": "https://github.com/dbt-labs/metricflow/pull/901"\n'
        '    },\n'
