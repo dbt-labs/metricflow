@@ -1,0 +1,10 @@
+test_name: test_custom_offset_window_with_matching_custom_grain
+test_filename: test_offset_metrics.py
+docstring:
+  Gives a side by side comparison of bookings and bookings_offset_one_alien_day.
+---
+metric_time__alien_day    booking__ds__alien_day      bookings    bookings_offset_one_alien_day
+------------------------  ------------------------  ----------  -------------------------------
+2020-01-02T00:00:00       2020-01-02T00:00:00               31
+2020-01-03T00:00:00       2020-01-03T00:00:00              256                               31
+2020-01-04T00:00:00       2020-01-04T00:00:00                                               256

@@ -19,6 +19,7 @@ from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
 from metricflow.sql.render.redshift import RedshiftSqlPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
+from metricflow.sql.render.doris import DorisSqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
@@ -78,6 +79,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         SqlDialect.REDSHIFT: (SqlEngine.REDSHIFT, RedshiftSqlPlanRenderer()),
         SqlDialect.BIGQUERY: (SqlEngine.BIGQUERY, BigQuerySqlPlanRenderer()),
         SqlDialect.TRINO: (SqlEngine.TRINO, TrinoSqlPlanRenderer()),
+        SqlDialect.DORIS: (SqlEngine.DORIS, DorisSqlPlanRenderer()),
     }
 
     if dialect not in dialect_mapping:

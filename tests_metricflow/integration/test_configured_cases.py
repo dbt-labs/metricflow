@@ -399,6 +399,7 @@ def _test_case(
             double_data_type_name=check_query_helpers.double_data_type_name,
             generate_random_uuid=check_query_helpers.generate_random_uuid,
             cast_to_ts=check_query_helpers.cast_to_ts,
+            cast_expr_to_ts=check_query_helpers.cast_expr_to_ts,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.

@@ -113,14 +113,54 @@ class SqlAlchemyBasedSqlClient:
                 # Execute query - SqlAlchemy automatically starts a transaction
                 result = conn.execute(sa_text(stmt))
 
+                # Doris (MySQL protocol) returns BOOLEAN as TINYINT (0/1).
+                # We need to detect BOOLEAN columns and convert them back to Python bool.
+                # Capture cursor description before fetchall() clears it.
+                #
+                # MySQL cursor description is a tuple of 7 fields per column (PEP 249):
+                #   (name, type_code, display_size, internal_size, precision, scale, null_ok)
+                #   Index 0: column name
+                #   Index 1: type_code   — MySQL FIELD_TYPE enum (e.g., TINY=1, SHORT=2, LONG=3, ...)
+                #   Index 2: display_size
+                #   Index 3: internal_size
+                #   Index 4: precision   — number of significant digits
+                #   Index 5: scale
+                #   Index 6: null_ok
+                #
+                # Doris maps BOOLEAN to MySQL FIELD_TYPE.TINY (type_code=1) with precision=1.
+                # Other TINYINT usages (e.g., EXTRACT results) have precision > 1,
+                # so we distinguish BOOLEAN by checking type_code=1 AND precision=1.
+                _MYSQL_TYPE_CODE_INDEX = 1
+                _MYSQL_PRECISION_INDEX = 4
+                _MYSQL_FIELD_TYPE_TINY = 1
+                _MYSQL_BOOLEAN_PRECISION = 1
+
+                bool_col_indices = []
+                if self._sql_engine_type is SqlEngine.DORIS and result.cursor and hasattr(result.cursor, "description"):
+                    for i, desc in enumerate(result.cursor.description):
+                        if (
+                            desc[_MYSQL_TYPE_CODE_INDEX] == _MYSQL_FIELD_TYPE_TINY
+                            and desc[_MYSQL_PRECISION_INDEX] == _MYSQL_BOOLEAN_PRECISION
+                        ):
+                            bool_col_indices.append(i)
+
                 # Fetch all rows
                 rows = result.fetchall()
                 column_names = list(result.keys())
 
                 # Convert to MetricFlowDataTable format
+                raw_rows = [list(row) for row in rows]
+
+                # Convert TINYINT back to Python bool for Doris BOOLEAN columns
+                if bool_col_indices:
+                    for row in raw_rows:
+                        for idx in bool_col_indices:
+                            if row[idx] is not None:
+                                row[idx] = bool(row[idx])
+
                 data_table = MetricFlowDataTable.create_from_rows(
                     column_names=column_names,
-                    rows=[list(row) for row in rows],
+                    rows=raw_rows,
                 )
 
                 # Transaction is automatically rolled back on context exit
@@ -218,6 +258,28 @@ class SqlAlchemyBasedSqlClient:
                     ):
                         raise RuntimeError(f"Databricks dry run failed: {plan_output}")
 
+                elif self._sql_engine_type is SqlEngine.DORIS:
+                    # Doris supports EXPLAIN for SELECT/INSERT but not for DDL
+                    # (CREATE TABLE, DROP TABLE, etc.). Use sqlparse to reliably
+                    # identify the statement type rather than fragile string matching.
+                    import sqlparse
+
+                    parsed = sqlparse.parse(stmt.strip())
+                    stmt_type = parsed[0].get_type() if parsed else None
+
+                    if stmt_type in ("SELECT", "INSERT"):
+                        conn.execute(sa_text(f"EXPLAIN {stmt}"))
+                    elif stmt_type == "CREATE":
+                        # CREATE TABLE ... AS SELECT ...: extract the sub-SELECT
+                        # and EXPLAIN that. Use case-insensitive search for the
+                        # "AS SELECT" boundary which is a stable SQL pattern.
+                        stmt_upper = stmt.strip().upper()
+                        as_idx = stmt_upper.find(" AS SELECT")
+                        if as_idx != -1:
+                            select_part = stmt.strip()[as_idx + 4:]
+                            conn.execute(sa_text(f"EXPLAIN {select_part}"))
+                        # Pure DDL (CREATE TABLE without AS SELECT): EXPLAIN not applicable
+                    # Other statement types (DROP, ALTER, etc.): EXPLAIN not applicable
                 else:
                     # Default: Use EXPLAIN for other engines
                     conn.execute(sa_text(f"EXPLAIN {stmt}"))

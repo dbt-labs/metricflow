@@ -35,13 +35,24 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
         logger.debug(LazyFormat(lambda: f"Creating table '{sql_table.sql}' from DataTable with {df.row_count} row(s)"))
         start_time = time.perf_counter()
 
-        # Build CREATE TABLE statement
+        # Build CREATE TABLE statement.
+        # Doris uses backtick-quoted identifiers to safely handle reserved words
+        # and special characters in column names.
         column_defs = []
         for col_desc in df.column_descriptions:
             sql_type = self._get_sql_type(col_desc)
-            column_defs.append(f"{col_desc.column_name} {sql_type}")
+            if self.sql_engine_type is SqlEngine.DORIS:
+                column_defs.append(f"`{col_desc.column_name}` {sql_type}")
+            else:
+                column_defs.append(f"{col_desc.column_name} {sql_type}")
 
         create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)})"
+
+        # Doris requires DISTRIBUTED BY clause for explicit CREATE TABLE statements.
+        if self.sql_engine_type is SqlEngine.DORIS:
+            first_col = df.column_descriptions[0].column_name
+            create_stmt += f" DISTRIBUTED BY HASH(`{first_col}`) BUCKETS 1"
+            create_stmt += " PROPERTIES ('replication_num' = '1')"
 
         # Execute CREATE TABLE
         self.execute(create_stmt)
@@ -108,6 +119,8 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
+            if self.sql_engine_type is SqlEngine.DORIS:
+                return "VARCHAR(65533)"
             return "text"
         elif column_type is bool:
             return "boolean"
@@ -122,15 +135,22 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
     def _quote_escape_value(self, value: str) -> str:
         """Escape quotes in string values."""
-        if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY):
+        if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY, SqlEngine.DORIS):
             return value.replace("'", "\\'")
         return value.replace("'", "''")
 
     def create_schema(self, schema_name: str) -> None:
         """Create schema if it doesn't exist."""
-        self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+        if self.sql_engine_type is SqlEngine.DORIS:
+            self.execute(f"CREATE SCHEMA IF NOT EXISTS `{schema_name}`")
+        else:
+            self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
         """Drop schema if it exists."""
-        cascade_clause = " CASCADE" if cascade else ""
-        self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")
+        if self.sql_engine_type is SqlEngine.DORIS:
+            # Doris does not support CASCADE keyword but drops all tables by default.
+            self.execute(f"DROP SCHEMA IF EXISTS `{schema_name}`")
+        else:
+            cascade_clause = " CASCADE" if cascade else ""
+            self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")
