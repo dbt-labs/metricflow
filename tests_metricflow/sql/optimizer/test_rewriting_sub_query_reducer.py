@@ -16,13 +16,14 @@ from metricflow_semantics.sql.sql_join_type import SqlJoinType
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.optimizer.rewriting_sub_query_reducer import SqlRewritingSubQueryReducer
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
-from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal
+from tests_metricflow.sql.compare_sql_plan import assert_default_rendered_sql_equal, assert_rendered_sql_equal
 
 
 @pytest.fixture
@@ -164,26 +165,32 @@ def base_select_statement() -> SqlSelectStatementNode:
     )
 
 
+@pytest.mark.sql_engine_snapshot
 def test_reduce_sub_query(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     base_select_statement: SqlSelectStatementNode,
+    sql_client: SqlClient,
 ) -> None:
     """Tests a case where an outer query should be reduced into its inner query with merged LIMIT expressions."""
-    assert_default_rendered_sql_equal(
+    assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         sql_plan_node=base_select_statement,
         plan_id="before_reducing",
+        sql_client=sql_client,
     )
 
-    sub_query_reducer = SqlRewritingSubQueryReducer()
+    sub_query_reducer = SqlRewritingSubQueryReducer(
+        prevent_where_hoist_with_aggregates=sql_client.sql_engine_type is SqlEngine.CLICKHOUSE,
+    )
 
-    assert_default_rendered_sql_equal(
+    assert_rendered_sql_equal(
         request=request,
         mf_test_configuration=mf_test_configuration,
         sql_plan_node=sub_query_reducer.optimize(base_select_statement),
         plan_id="after_reducing",
+        sql_client=sql_client,
     )
 
 
