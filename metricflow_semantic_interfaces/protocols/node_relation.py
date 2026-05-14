@@ -26,3 +26,9 @@ class NodeRelation(Protocol):
     @abstractmethod
     def relation_name(self) -> str:  # noqa: D102
         pass
+
+    @property
+    @abstractmethod
+    def compiled_sql(self) -> Optional[str]:
+        """The compiled SQL for ephemeral models. When set, this is used as the source instead of relation_name."""
+        pass
