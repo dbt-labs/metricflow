@@ -218,6 +218,17 @@ class SqlAlchemyBasedSqlClient:
                     ):
                         raise RuntimeError(f"Databricks dry run failed: {plan_output}")
 
+                elif self.sql_engine_type is SqlEngine.STARROCKS:
+                    # StarRocks EXPLAIN only supports SELECT statements, not DDL.
+                    # For CREATE TABLE ... AS SELECT ..., explain just the SELECT part.
+                    upper_stripped = stmt.upper().lstrip()
+                    as_select_idx = upper_stripped.find(" AS SELECT")
+                    if as_select_idx >= 0:
+                        select_stmt = stmt[as_select_idx + len(" AS ") :]
+                        conn.execute(sa_text(f"EXPLAIN {select_stmt}"))
+                    else:
+                        conn.execute(sa_text(f"EXPLAIN {stmt}"))
+
                 else:
                     # Default: Use EXPLAIN for other engines
                     conn.execute(sa_text(f"EXPLAIN {stmt}"))

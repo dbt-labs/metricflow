@@ -23,7 +23,10 @@ from metricflow_semantic_interfaces.implementations.filters.where_filter import 
 )
 from metricflow_semantic_interfaces.references import EntityReference
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
+from tests_metricflow.query_rendering.compare_rendered_query import (
+    render_and_check,
+    skip_if_time_granularity_not_supported,
+)
 
 
 @pytest.mark.sql_engine_snapshot
@@ -260,6 +263,8 @@ def test_join_to_time_spine_with_filter_smaller_than_group_by(  # noqa: D103
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("archived_users_join_to_time_spine",),
         group_by_names=("metric_time__day",),

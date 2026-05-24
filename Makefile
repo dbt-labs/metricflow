@@ -90,6 +90,10 @@ populate-persistent-source-schema-snowflake:
 test-trino:
 	hatch -v run trino-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
+.PHONY: test-starrocks
+test-starrocks:
+	hatch -v run starrocks-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
@@ -104,6 +108,10 @@ postgresql postgres:
 .PHONY: trino
 trino:
 	make -C local-data-warehouses trino
+
+.PHONY: starrocks
+starrocks:
+	make -C local-data-warehouses starrocks
 
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots

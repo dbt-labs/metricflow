@@ -26,7 +26,10 @@ from metricflow.protocols.sql_client import SqlClient
 from metricflow_semantic_interfaces.references import EntityReference
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
+from tests_metricflow.query_rendering.compare_rendered_query import (
+    render_and_check,
+    skip_if_time_granularity_not_supported,
+)
 
 
 @pytest.mark.sql_engine_snapshot
@@ -113,6 +116,8 @@ def test_sub_daily_metric_time(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         time_dimension_specs=(
             DataSet.metric_time_dimension_spec(
@@ -139,6 +144,8 @@ def test_sub_daily_dimension(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         time_dimension_specs=(
             TimeDimensionSpec(
@@ -167,6 +174,8 @@ def test_simple_metric_with_sub_daily_dimension(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("new_users"),),
         time_dimension_specs=(
@@ -196,6 +205,8 @@ def test_simple_metric_with_joined_sub_daily_dimension(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("bookings"),),
         time_dimension_specs=(
@@ -228,6 +239,8 @@ def test_subdaily_cumulative_window_metric(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("subdaily_cumulative_window_metric"),),
         time_dimension_specs=(
@@ -255,6 +268,8 @@ def test_subdaily_cumulative_grain_to_date_metric(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("subdaily_cumulative_grain_to_date_metric"),),
         time_dimension_specs=(
@@ -282,6 +297,8 @@ def test_subdaily_offset_window_metric(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("subdaily_offset_window_metric"),),
         time_dimension_specs=(
@@ -309,6 +326,8 @@ def test_subdaily_offset_to_grain_metric(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("subdaily_offset_grain_to_date_metric"),),
         time_dimension_specs=(
@@ -336,6 +355,8 @@ def test_subdaily_join_to_time_spine_metric(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("subdaily_join_to_time_spine_metric"),),
         time_dimension_specs=(
@@ -392,6 +413,8 @@ def test_subdaily_time_constraint_with_metric(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("subdaily_join_to_time_spine_metric"),),
         time_dimension_specs=(
@@ -422,6 +445,8 @@ def test_subdaily_granularity_overrides_metric_default_granularity(  # noqa: D10
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create("subdaily_join_to_time_spine_metric"),),
         time_dimension_specs=(
@@ -450,6 +475,8 @@ def test_date_part_with_non_default_grain(  # noqa: D103
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = query_parser.parse_and_validate_query(
         metric_names=["archived_users"],
         group_by=(

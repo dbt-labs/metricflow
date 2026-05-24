@@ -20,6 +20,7 @@ from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
 from metricflow.sql.render.redshift import RedshiftSqlPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow.sql.render.starrocks import StarRocksSqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
@@ -42,6 +43,7 @@ class SupportedAdapterTypes(enum.Enum):
     BIGQUERY = "bigquery"
     DUCKDB = "duckdb"
     TRINO = "trino"
+    STARROCKS = "starrocks"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -60,6 +62,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SqlEngine.DUCKDB
         elif self is SupportedAdapterTypes.TRINO:
             return SqlEngine.TRINO
+        elif self is SupportedAdapterTypes.STARROCKS:
+            return SqlEngine.STARROCKS
         else:
             assert_values_exhausted(self)
 
@@ -80,6 +84,8 @@ class SupportedAdapterTypes(enum.Enum):
             return DuckDbSqlPlanRenderer()
         elif self is SupportedAdapterTypes.TRINO:
             return TrinoSqlPlanRenderer()
+        elif self is SupportedAdapterTypes.STARROCKS:
+            return StarRocksSqlPlanRenderer()
         else:
             assert_values_exhausted(self)
 

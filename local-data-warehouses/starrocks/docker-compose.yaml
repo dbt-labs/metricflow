@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  starrocks:
+    container_name: starrocks
+    image: "starrocks/allin1-ubuntu:3.5-latest"
+    expose:
+      - "8030"
+      - "8040"
+      - "9020"
+      - "9030"
+    ports:
+      - "8030:8030"
+      - "8040:8040"
+      - "9020:9020"
+      - "9030:9030"
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -P 9030 -u root -e 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s

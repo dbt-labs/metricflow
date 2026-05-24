@@ -232,6 +232,9 @@ def filter_not_supported_features(
                 SqlPercentileFunctionType.APPROXIMATE_DISCRETE
             ):
                 not_supported_features.append(required_feature)
+        elif required_feature is RequiredDwEngineFeature.MILLISECOND_TIME_GRANULARITY:
+            if TimeGranularity.MILLISECOND in sql_client.sql_engine_type.unsupported_granularities:
+                not_supported_features.append(required_feature)
         else:
             assert_values_exhausted(required_feature)
     return not_supported_features
@@ -399,6 +402,7 @@ def _test_case(
             double_data_type_name=check_query_helpers.double_data_type_name,
             generate_random_uuid=check_query_helpers.generate_random_uuid,
             cast_to_ts=check_query_helpers.cast_to_ts,
+            cast_expr_to_ts=check_query_helpers.cast_expr_to_ts,
         )
     )
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.

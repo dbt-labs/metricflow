@@ -24,7 +24,10 @@ from metricflow_semantic_interfaces.implementations.filters.where_filter import 
 from metricflow_semantic_interfaces.references import EntityReference
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
+from tests_metricflow.query_rendering.compare_rendered_query import (
+    render_and_check,
+    skip_if_time_granularity_not_supported,
+)
 
 metric_time_with_custom_grain = TimeDimensionSpec(
     "metric_time",
@@ -198,6 +201,8 @@ def test_no_metric_custom_granularity_joined_to_non_default_grain(  # noqa: D103
     dataflow_to_sql_converter: DataflowToSqlPlanConverter,
     sql_client: SqlClient,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         time_dimension_specs=(
             MTD_SPEC_DAY,
@@ -394,6 +399,8 @@ def test_simple_metric_with_multi_hop_custom_granularity(
     query_parser: MetricFlowQueryParser,
 ) -> None:
     """Test simple metric with a multi hop dimension and custom grain."""
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("bookings",),
         group_by_names=("listing__user__ds__alien_day",),
@@ -704,6 +711,8 @@ def test_multiple_time_spines_in_query_for_join_to_time_spine_metric(  # noqa: D
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("subdaily_join_to_time_spine_metric",),
         group_by_names=("metric_time__alien_day", "metric_time__hour"),
@@ -728,6 +737,8 @@ def test_multiple_time_spines_in_query_for_cumulative_metric(  # noqa: D103
     sql_client: SqlClient,
     query_parser: MetricFlowQueryParser,
 ) -> None:
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = query_parser.parse_and_validate_query(
         metric_names=("subdaily_cumulative_window_metric",),
         group_by_names=("metric_time__alien_day", "metric_time__hour"),

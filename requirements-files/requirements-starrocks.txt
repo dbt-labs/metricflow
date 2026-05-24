@@ -1,0 +1,2 @@
+# StarRocks connector, ships with sqlalchemy dialect support
+starrocks>=1.0.0, <2.0.0

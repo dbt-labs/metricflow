@@ -120,6 +120,11 @@ class MetricFlowDataTable:
         def _cell_sort_key(cell: CellValue) -> str:
             if isinstance(cell, datetime.datetime):
                 return cell.isoformat()
+            # Normalize booleans to "0"/"1" so they sort consistently with integer
+            # representations returned by some engines (e.g. StarRocks returns TINYINT
+            # 0/1 for BOOLEAN columns, while Python booleans stringify as "False"/"True").
+            if isinstance(cell, bool):
+                return str(int(cell))
             return str(cell)
 
         def _row_sort_key(row: Tuple[CellValue, ...]) -> Tuple[str, ...]:

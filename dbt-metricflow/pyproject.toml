@@ -60,6 +60,9 @@ dbt-postgres = [
 dbt-redshift = [
   "requirements-files/requirements-dbt-redshift.txt"
 ]
+dbt-starrocks = [
+  "requirements-files/requirements-dbt-starrocks.txt"
+]
 dbt-snowflake = [
   "requirements-files/requirements-dbt-snowflake.txt"
 ]
