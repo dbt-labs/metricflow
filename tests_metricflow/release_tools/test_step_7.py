@@ -55,7 +55,7 @@ def _write_step_1_step_2_and_step_3_state(
     step_2 = ReleaseStep2State(
         metricflow_package_version=dev_version,
         branch_name=f"{username}/release_pr/{version}/step_2",
-        commit_sha="fake-step-2-commit-sha",
+        version_update_commit_sha="fake-step-2-commit-sha",
         pr_number=step_2_pr_number,
         pr_link=f"{GITHUB_REPOSITORY_HTML_BASE_URL}/pull/{step_2_pr_number}",
     )
