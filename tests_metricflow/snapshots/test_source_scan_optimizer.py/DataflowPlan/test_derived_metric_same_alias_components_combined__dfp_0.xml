@@ -3,8 +3,8 @@ test_filename: test_source_scan_optimizer.py
 docstring:
   Tests optimization of querying 2 metrics which give the same alias to the same thing in their components.
 
-      In this case we DO combine source nodes, since the components are the same exact thing so we don't need to
-      scan over it twice
+  In this case we DO combine source nodes, since the components are the same exact thing so we don't need to
+  scan over it twice
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>
@@ -24,11 +24,10 @@ docstring:
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
-                        <!-- alias_mapping = {'bookings': 'shared_alias'} -->
-                        <!-- null_fill_value_mapping = {} -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['bookings', 'booking__is_instant']" -->
-                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- null_fill_value_mapping = {'bookings': None} -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__bookings', 'booking__is_instant']" -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                             <!-- include_spec =                                               -->
                             <!--   DimensionSpec(                                             -->
@@ -36,17 +35,28 @@ docstring:
                             <!--     entity_links=(EntityReference(element_name='booking'),), -->
                             <!--   )                                                          -->
                             <!-- distinct = False -->
-                            <MetricTimeDimensionTransformNode>
-                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_28009') -->
-                                <!-- aggregation_time_dimension = 'ds' -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                    <!-- node_id = NodeId(id_str='rss_28020') -->
-                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                </ReadSqlSourceNode>
-                            </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
+                            <SelectorNode>
+                                <!-- description = "Select: ['__bookings', 'booking__is_instant']" -->
+                                <!-- node_id = NodeId(id_str='pfe_0') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                                <!-- include_spec =                                               -->
+                                <!--   DimensionSpec(                                             -->
+                                <!--     element_name='is_instant',                               -->
+                                <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                                <!--   )                                                          -->
+                                <!-- distinct = False -->
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
+                            </SelectorNode>
+                        </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>
             </ComputeMetricsNode>
@@ -61,11 +71,10 @@ docstring:
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
-                        <!-- alias_mapping = {'bookings': 'shared_alias'} -->
-                        <!-- null_fill_value_mapping = {} -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['bookings', 'booking__is_instant']" -->
-                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- null_fill_value_mapping = {'bookings': None} -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__bookings', 'booking__is_instant']" -->
+                            <!-- node_id = NodeId(id_str='pfe_1') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                             <!-- include_spec =                                               -->
                             <!--   DimensionSpec(                                             -->
@@ -73,17 +82,28 @@ docstring:
                             <!--     entity_links=(EntityReference(element_name='booking'),), -->
                             <!--   )                                                          -->
                             <!-- distinct = False -->
-                            <MetricTimeDimensionTransformNode>
-                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_28009') -->
-                                <!-- aggregation_time_dimension = 'ds' -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                    <!-- node_id = NodeId(id_str='rss_28020') -->
-                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                </ReadSqlSourceNode>
-                            </MetricTimeDimensionTransformNode>
-                        </FilterElementsNode>
+                            <SelectorNode>
+                                <!-- description = "Select: ['__bookings', 'booking__is_instant']" -->
+                                <!-- node_id = NodeId(id_str='pfe_0') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                                <!-- include_spec =                                               -->
+                                <!--   DimensionSpec(                                             -->
+                                <!--     element_name='is_instant',                               -->
+                                <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                                <!--   )                                                          -->
+                                <!-- distinct = False -->
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
+                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
+                            </SelectorNode>
+                        </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>
             </ComputeMetricsNode>

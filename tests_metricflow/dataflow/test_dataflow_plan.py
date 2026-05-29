@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference
 
 
 def test_source_semantic_models_accessor(
@@ -16,7 +16,7 @@ def test_source_semantic_models_accessor(
     """Tests source semantic models access for a simple query plan."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
         )
     )
 
@@ -31,7 +31,7 @@ def test_multi_hop_joined_source_semantic_models_accessor(
     """Tests source semantic models access for a multi-hop join plan."""
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="home_state_latest",

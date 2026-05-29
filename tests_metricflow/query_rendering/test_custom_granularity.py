@@ -8,22 +8,22 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_param_implementations import TimeDimensionParameter
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
-from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_DAY
+from metricflow_semantics.test_helpers.metric_time_dimension import MTD_SPEC_ALIEN_DAY, MTD_SPEC_DAY
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 metric_time_with_custom_grain = TimeDimensionSpec(
@@ -53,7 +53,7 @@ def test_simple_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings"),),
+        metric_specs=(MetricSpec.create("bookings"),),
         time_dimension_specs=(normal_time_dim_with_custom_grain1,),
     )
 
@@ -76,7 +76,7 @@ def test_cumulative_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("trailing_2_months_revenue"),),
+        metric_specs=(MetricSpec.create("trailing_2_months_revenue"),),
         time_dimension_specs=(metric_time_with_custom_grain,),
     )
 
@@ -99,7 +99,7 @@ def test_derived_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("booking_fees_per_booker"),),
+        metric_specs=(MetricSpec.create("booking_fees_per_booker"),),
         time_dimension_specs=(normal_time_dim_with_custom_grain1,),
     )
 
@@ -123,7 +123,7 @@ def test_multiple_metrics_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings"), MetricSpec("listings")),
+        metric_specs=(MetricSpec.create("bookings"), MetricSpec.create("listings")),
         time_dimension_specs=(metric_time_with_custom_grain,),
     )
 
@@ -147,7 +147,7 @@ def test_metric_custom_granularity_joined_to_non_default_grain(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("listings"),),
+        metric_specs=(MetricSpec.create("listings"),),
         time_dimension_specs=(
             metric_time_with_custom_grain,
             TimeDimensionSpec(
@@ -253,7 +253,7 @@ def test_simple_metric_with_custom_granularity_and_join(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings"),),
+        metric_specs=(MetricSpec.create("bookings"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="ds",
@@ -418,7 +418,7 @@ def test_offset_metric_with_custom_granularity(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec("bookings_5_day_lag"),),
+        metric_specs=(MetricSpec.create("bookings_5_day_lag"),),
         time_dimension_specs=(normal_time_dim_with_custom_grain1,),
     )
 
@@ -732,6 +732,94 @@ def test_multiple_time_spines_in_query_for_cumulative_metric(  # noqa: D103
         metric_names=("subdaily_cumulative_window_metric",),
         group_by_names=("metric_time__alien_day", "metric_time__hour"),
     ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_offset_to_grain_metric(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Test a nested offset-to-grain metric with metric time at a custom grain."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("booking_fees_since_start_of_month",),
+        group_by_names=("metric_time__alien_day",),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_nested_offsets_with_custom_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Check that a query for a nested offset metric does not select `metric_time` at different grains if not requested.
+
+    It should not have `metric_time__day` in the output query.
+    """
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(MetricSpec.create(element_name="bookings_offset_twice"),),
+        time_dimension_specs=(MTD_SPEC_ALIEN_DAY,),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )
+
+
+@pytest.mark.skip("Triggers bug - pending fix.")
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+def test_nested_offset_metric_and_simple_metric_with_custom_grain(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Check that metric with a nested offset metric can be queried with the associated simple metric.
+
+    This test is current skipped due to a bug.
+    """
+    query_spec = MetricFlowQuerySpec(
+        metric_specs=(
+            MetricSpec.create(element_name="bookings_offset_twice"),
+            MetricSpec.create(element_name="bookings"),
+        ),
+        time_dimension_specs=(MTD_SPEC_ALIEN_DAY,),
+    )
 
     render_and_check(
         request=request,

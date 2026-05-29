@@ -20,10 +20,10 @@ jobs:
     name: Check Batch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
 
       - name: Run `changie batch`
-        uses: miniscruff/changie-action@v2
+        uses: miniscruff/changie-action@6dcc2533cac0495148ed4046c438487e4dceaa23 # miniscruff/changie-action@v2
         with:
           version: latest
           # Using a dummy version.

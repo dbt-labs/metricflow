@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Sequence
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.toolkit.cache.result_cache import ResultCache
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.dataflow_plan import (
@@ -19,7 +20,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -32,7 +33,7 @@ from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGran
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -115,6 +116,9 @@ class SourceScanOptimizer(
 
     def __init__(self) -> None:  # noqa: D107
         self._node_to_result: Dict[DataflowPlanNode, OptimizeBranchResult] = {}
+        self._branch_combiner_cache: ResultCache[
+            tuple[DataflowPlanNode, DataflowPlanNode], ComputeMetricsBranchCombinerResult
+        ] = ResultCache()
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
         logger.debug(LazyFormat(lambda: f"Visiting {node.node_id}"))
@@ -171,8 +175,9 @@ class SourceScanOptimizer(
             result = OptimizeBranchResult(
                 optimized_branch=ComputeMetricsNode.create(
                     parent_node=optimized_parent_result.optimized_branch,
-                    metric_specs=node.metric_specs,
-                    for_group_by_source_node=node.for_group_by_source_node,
+                    computed_metric_specs=node.computed_metric_specs,
+                    passthrough_metric_specs=node.passthrough_metric_specs,
+                    output_group_by_metric_instances=node.output_group_by_metric_instances,
                     aggregated_to_elements=node.aggregated_to_elements,
                 )
             )
@@ -186,7 +191,7 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> OptimizeBranchResult:  # noqa: D102
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
@@ -200,13 +205,12 @@ class SourceScanOptimizer(
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> OptimizeBranchResult:  # noqa: D102
+    def visit_selector_node(self, node: SelectorNode) -> OptimizeBranchResult:  # noqa: D102
         self._log_visit_node_type(node)
         return self._default_base_output_handler(node)
 
-    @staticmethod
     def _combine_branches(
-        left_branches: Sequence[DataflowPlanNode], right_branch: DataflowPlanNode
+        self, left_branches: Sequence[DataflowPlanNode], right_branch: DataflowPlanNode
     ) -> Sequence[BranchCombinationResult]:
         """Combine the right branch with one of the left branches.
 
@@ -219,7 +223,9 @@ class SourceScanOptimizer(
         for left_branch in left_branches:
             # Try combining only if we haven't combined before.
             if not combined:
-                combiner = ComputeMetricsBranchCombiner(left_branch_node=left_branch)
+                combiner = ComputeMetricsBranchCombiner(
+                    left_branch_node=left_branch, branch_combiner_cache=self._branch_combiner_cache
+                )
                 combiner_result: ComputeMetricsBranchCombinerResult = right_branch.accept(combiner)
                 if combiner_result.combined_branch is not None:
                     combined = True
@@ -266,7 +272,7 @@ class SourceScanOptimizer(
         # the seemingly transitive properties of the combination operation, this seems reasonable.
         combined_parent_branches: List[DataflowPlanNode] = []
         for optimized_parent_branch in optimized_parent_branches:
-            combination_results = SourceScanOptimizer._combine_branches(
+            combination_results = self._combine_branches(
                 left_branches=combined_parent_branches, right_branch=optimized_parent_branch
             )
 

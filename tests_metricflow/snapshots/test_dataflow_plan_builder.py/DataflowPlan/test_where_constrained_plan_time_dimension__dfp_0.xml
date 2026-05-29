@@ -10,47 +10,42 @@ docstring:
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_0') -->
-            <!-- metric_spec =                                           -->
-            <!--   MetricSpec(                                           -->
-            <!--     element_name='bookings',                            -->
-            <!--     filter_spec_set=WhereFilterSpecSet(                 -->
-            <!--       query_level_filter_specs=(                        -->
-            <!--         WhereFilterSpec(                                -->
-            <!--           where_sql="metric_time__day >= '2020-01-01'", -->
-            <!--           bind_parameters=SqlBindParameterSet(),        -->
-            <!--           element_set=GroupByItemSet(                   -->
-            <!--             annotated_specs=(                           -->
-            <!--               AnnotatedSpec(                            -->
-            <!--                 element_type=TIME_DIMENSION,            -->
-            <!--                 element_name='metric_time',             -->
-            <!--                 time_grain=ExpandedTimeGranularity(     -->
-            <!--                   name='day',                           -->
-            <!--                   base_granularity=DAY,                 -->
-            <!--                 ),                                      -->
-            <!--                 element_properties=(                    -->
-            <!--                   METRIC_TIME,                          -->
-            <!--                 ),                                      -->
-            <!--                 origin_semantic_model_names=(           -->
-            <!--                   'bookings_source',                    -->
-            <!--                 ),                                      -->
-            <!--                 derived_from_semantic_model_names=(     -->
-            <!--                   'bookings_source',                    -->
-            <!--                 ),                                      -->
-            <!--               ),                                        -->
-            <!--             ),                                          -->
-            <!--           ),                                            -->
-            <!--         ),                                              -->
-            <!--       ),                                                -->
-            <!--     ),                                                  -->
-            <!--   )                                                     -->
+            <!-- metric_spec =                                         -->
+            <!--   MetricSpec(                                         -->
+            <!--     element_name='bookings',                          -->
+            <!--     where_filter_specs=(                              -->
+            <!--       WhereFilterSpec(                                -->
+            <!--         where_sql="metric_time__day >= '2020-01-01'", -->
+            <!--         bind_parameters=SqlBindParameterSet(),        -->
+            <!--         element_set=GroupByItemSet(                   -->
+            <!--           annotated_specs=(                           -->
+            <!--             AnnotatedSpec(                            -->
+            <!--               element_type=TIME_DIMENSION,            -->
+            <!--               element_name='metric_time',             -->
+            <!--               time_grain=ExpandedTimeGranularity(     -->
+            <!--                 name='day',                           -->
+            <!--                 base_granularity=DAY,                 -->
+            <!--               ),                                      -->
+            <!--               element_properties=(METRIC_TIME,),      -->
+            <!--               origin_semantic_model_names=(           -->
+            <!--                 'bookings_source',                    -->
+            <!--               ),                                      -->
+            <!--               derived_from_semantic_model_names=(     -->
+            <!--                 'bookings_source',                    -->
+            <!--               ),                                      -->
+            <!--             ),                                        -->
+            <!--           ),                                          -->
+            <!--         ),                                            -->
+            <!--       ),                                              -->
+            <!--     ),                                                -->
+            <!--   )                                                   -->
             <AggregateSimpleMetricInputsNode>
                 <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='am_0') -->
-                <!-- alias_mapping = {} -->
-                <!-- null_fill_value_mapping = {} -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['bookings', 'booking__is_instant']" -->
-                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                <!-- null_fill_value_mapping = {'bookings': None} -->
+                <SelectorNode>
+                    <!-- description = "Select: ['__bookings', 'booking__is_instant']" -->
+                    <!-- node_id = NodeId(id_str='pfe_1') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
                     <!-- include_spec =                                               -->
                     <!--   DimensionSpec(                                             -->
@@ -58,10 +53,10 @@ docstring:
                     <!--     entity_links=(EntityReference(element_name='booking'),), -->
                     <!--   )                                                          -->
                     <!-- distinct = False -->
-                    <WhereConstraintNode>
-                        <!-- description = 'Constrain Output with WHERE' -->
+                    <WhereFilterNode>
+                        <!-- description = 'Filter Output with WHERE' -->
                         <!-- node_id = NodeId(id_str='wcc_0') -->
-                        <!-- where_condition =                                                 -->
+                        <!-- filter_spec =                                                     -->
                         <!--   WhereFilterSpec(                                                -->
                         <!--     where_sql="metric_time__day >= '2020-01-01'",                 -->
                         <!--     bind_parameters=SqlBindParameterSet(),                        -->
@@ -81,18 +76,34 @@ docstring:
                         <!--       ),                                                          -->
                         <!--     ),                                                            -->
                         <!--   )                                                               -->
-                        <MetricTimeDimensionTransformNode>
-                            <!-- description = "Metric Time Dimension 'ds'" -->
-                            <!-- node_id = NodeId(id_str='sma_28009') -->
-                            <!-- aggregation_time_dimension = 'ds' -->
-                            <ReadSqlSourceNode>
-                                <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                <!-- node_id = NodeId(id_str='rss_28020') -->
-                                <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                            </ReadSqlSourceNode>
-                        </MetricTimeDimensionTransformNode>
-                    </WhereConstraintNode>
-                </FilterElementsNode>
+                        <SelectorNode>
+                            <!-- description = "Select: ['__bookings', 'booking__is_instant', 'metric_time__day']" -->
+                            <!-- node_id = NodeId(id_str='pfe_0') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                            <!-- include_spec =                                               -->
+                            <!--   DimensionSpec(                                             -->
+                            <!--     element_name='is_instant',                               -->
+                            <!--     entity_links=(EntityReference(element_name='booking'),), -->
+                            <!--   )                                                          -->
+                            <!-- include_spec =                                                                  -->
+                            <!--   TimeDimensionSpec(                                                            -->
+                            <!--     element_name='metric_time',                                                 -->
+                            <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                            <!--   )                                                                             -->
+                            <!-- distinct = False -->
+                            <MetricTimeDimensionTransformNode>
+                                <!-- description = "Metric Time Dimension 'ds'" -->
+                                <!-- node_id = NodeId(id_str='sma_28009') -->
+                                <!-- aggregation_time_dimension = 'ds' -->
+                                <ReadSqlSourceNode>
+                                    <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                    <!-- node_id = NodeId(id_str='rss_28020') -->
+                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                </ReadSqlSourceNode>
+                            </MetricTimeDimensionTransformNode>
+                        </SelectorNode>
+                    </WhereFilterNode>
+                </SelectorNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataTableNode>

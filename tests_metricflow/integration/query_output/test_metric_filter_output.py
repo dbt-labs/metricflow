@@ -18,7 +18,7 @@ def test_query_with_simple_metric_in_where_filter(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["listings", "bookings"],
             group_by_names=["listing"],
             order_by_names=["listing"],
@@ -44,7 +44,7 @@ def test_metric_with_metric_in_where_filter(  # noqa: D103
     it_helpers: IntegrationTestHelpers,
 ) -> None:
     query_result = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=["active_listings", "bookings"],
             group_by_names=["listing"],
             order_by_names=["listing"],

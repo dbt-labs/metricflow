@@ -3,7 +3,7 @@ test_filename: test_metric_filter_rendering.py
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -13,7 +13,7 @@ WITH sma_28019_cte AS (
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , user_id AS user
-    , 1 AS visits
+    , 1 AS __visits
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
@@ -21,70 +21,73 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Select: ['__listings', 'user__visit_buy_conversion_rate']
   SELECT
-    CAST(subq_50.buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_50.visits, 0) AS DOUBLE PRECISION) AS user__visit_buy_conversion_rate
-    , subq_36.listings AS listings
+    CAST(subq_75.__buys AS DOUBLE PRECISION) / CAST(NULLIF(subq_75.__visits, 0) AS DOUBLE PRECISION) AS user__visit_buy_conversion_rate
+    , subq_58.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       user_id AS user
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_36
+  ) subq_58
   LEFT OUTER JOIN (
     -- Combine Aggregated Outputs
     SELECT
-      COALESCE(subq_40.user, subq_49.user) AS user
-      , MAX(subq_40.visits) AS visits
-      , MAX(subq_49.buys) AS buys
+      COALESCE(subq_63.user, subq_74.user) AS user
+      , MAX(subq_63.__visits) AS __visits
+      , MAX(subq_74.__buys) AS __buys
     FROM (
       -- Read From CTE For node_id=sma_28019
-      -- Pass Only Elements: ['visits', 'user']
+      -- Select: ['__visits', 'user']
+      -- Select: ['__visits', 'user']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         sma_28019_cte.user
-        , SUM(visits) AS visits
+        , SUM(__visits) AS __visits
       FROM sma_28019_cte
       GROUP BY
         sma_28019_cte.user
-    ) subq_40
+    ) subq_63
     FULL OUTER JOIN (
       -- Find conversions for user within the range of INF
-      -- Pass Only Elements: ['buys', 'user']
+      -- Select: ['__buys', 'user']
+      -- Select: ['__buys', 'user']
       -- Aggregate Inputs for Simple Metrics
       SELECT
-        subq_46.user
-        , SUM(buys) AS buys
+        subq_70.user
+        , SUM(__buys) AS __buys
       FROM (
         -- Dedupe the fanout with mf_internal_uuid in the conversion data set
         SELECT DISTINCT
-          FIRST_VALUE(sma_28019_cte.visits) OVER (
+          FIRST_VALUE(sma_28019_cte.__visits) OVER (
             PARTITION BY
-              subq_45.user
-              , subq_45.metric_time__day
-              , subq_45.mf_internal_uuid
+              subq_69.user
+              , subq_69.metric_time__day
+              , subq_69.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-          ) AS visits
+          ) AS __visits
           , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
             PARTITION BY
-              subq_45.user
-              , subq_45.metric_time__day
-              , subq_45.mf_internal_uuid
+              subq_69.user
+              , subq_69.metric_time__day
+              , subq_69.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS metric_time__day
           , FIRST_VALUE(sma_28019_cte.user) OVER (
             PARTITION BY
-              subq_45.user
-              , subq_45.metric_time__day
-              , subq_45.mf_internal_uuid
+              subq_69.user
+              , subq_69.metric_time__day
+              , subq_69.mf_internal_uuid
             ORDER BY sma_28019_cte.metric_time__day DESC
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
-          , subq_45.mf_internal_uuid AS mf_internal_uuid
-          , subq_45.buys AS buys
+          , subq_69.mf_internal_uuid AS mf_internal_uuid
+          , subq_69.__buys AS __buys
         FROM sma_28019_cte
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
@@ -93,26 +96,26 @@ FROM (
           SELECT
             DATE_TRUNC('day', ds) AS metric_time__day
             , user_id AS user
-            , 1 AS buys
+            , 1 AS __buys
             , CONCAT(CAST(RANDOM()*100000000 AS INT)::VARCHAR,CAST(RANDOM()*100000000 AS INT)::VARCHAR) AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
-        ) subq_45
+        ) subq_69
         ON
           (
-            sma_28019_cte.user = subq_45.user
+            sma_28019_cte.user = subq_69.user
           ) AND (
-            (sma_28019_cte.metric_time__day <= subq_45.metric_time__day)
+            (sma_28019_cte.metric_time__day <= subq_69.metric_time__day)
           )
-      ) subq_46
+      ) subq_70
       GROUP BY
-        subq_46.user
-    ) subq_49
+        subq_70.user
+    ) subq_74
     ON
-      subq_40.user = subq_49.user
+      subq_63.user = subq_74.user
     GROUP BY
-      COALESCE(subq_40.user, subq_49.user)
-  ) subq_50
+      COALESCE(subq_63.user, subq_74.user)
+  ) subq_75
   ON
-    subq_36.user = subq_50.user
-) subq_53
+    subq_58.user = subq_75.user
+) subq_79
 WHERE user__visit_buy_conversion_rate > 2

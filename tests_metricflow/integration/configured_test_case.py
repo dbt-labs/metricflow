@@ -7,7 +7,8 @@ from enum import Enum
 from typing import Dict, Optional, Sequence, Tuple
 
 import yaml
-from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
+
+from metricflow_semantic_interfaces.implementations.base import FrozenBaseModel
 
 logger = logging.getLogger(__name__)
 

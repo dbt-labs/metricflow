@@ -3,6 +3,6 @@ test_filename: test_conversion_metrics.py
 docstring:
   Test query against a conversion metric with a filter that doesn't exist in group by.
 ---
-  VISIT_BUY_CONVERSION_RATE_WITH_MONTHLY_CONVERSION
+  visit_buy_conversion_rate_with_monthly_conversion
 ---------------------------------------------------
                                                 0.5

@@ -9,7 +9,7 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -19,12 +19,12 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_23.metric_time__day, subq_33.metric_time__day) AS metric_time__day
-    , MAX(subq_23.bookings) AS bookings
-    , MAX(subq_33.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_26.metric_time__day, subq_37.metric_time__day) AS metric_time__day
+    , MAX(subq_26.bookings) AS bookings
+    , MAX(subq_37.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -32,58 +32,54 @@ FROM (
       , SUM(bookings) AS bookings
     FROM (
       -- Read From CTE For node_id=sma_28009
+      -- Select: ['__bookings', 'metric_time__day']
       SELECT
         metric_time__day
-        , bookings
+        , __bookings AS bookings
       FROM sma_28009_cte
-    ) subq_19
+    ) subq_22
     WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
     GROUP BY
       metric_time__day
-  ) subq_23
+  ) subq_26
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
     SELECT
-      subq_31.metric_time__day AS metric_time__day
-      , subq_27.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      subq_35.metric_time__day AS metric_time__day
+      , subq_30.__bookings AS bookings_2_weeks_ago
     FROM (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['metric_time__day']
+      -- Select: ['metric_time__day']
       SELECT
         metric_time__day
       FROM (
         -- Read From Time Spine 'mf_time_spine'
         -- Change Column Aliases
+        -- Select: ['metric_time__day']
         SELECT
           ds AS metric_time__day
         FROM ***************************.mf_time_spine time_spine_src_28006
-      ) subq_29
+      ) subq_33
       WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
-    ) subq_31
+    ) subq_35
     INNER JOIN (
-      -- Constrain Output with WHERE
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Read From CTE For node_id=sma_28009
+      -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings_2_weeks_ago
-      FROM (
-        -- Read From CTE For node_id=sma_28009
-        SELECT
-          metric_time__day
-          , bookings
-        FROM sma_28009_cte
-      ) subq_24
-      WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
+        , SUM(__bookings) AS __bookings
+      FROM sma_28009_cte
       GROUP BY
         metric_time__day
-    ) subq_27
+    ) subq_30
     ON
-      subq_31.metric_time__day - MAKE_INTERVAL(days => 14) = subq_27.metric_time__day
-  ) subq_33
+      subq_35.metric_time__day - MAKE_INTERVAL(days => 14) = subq_30.metric_time__day
+  ) subq_37
   ON
-    subq_23.metric_time__day = subq_33.metric_time__day
+    subq_26.metric_time__day = subq_37.metric_time__day
   GROUP BY
-    COALESCE(subq_23.metric_time__day, subq_33.metric_time__day)
-) subq_34
+    COALESCE(subq_26.metric_time__day, subq_37.metric_time__day)
+) subq_38

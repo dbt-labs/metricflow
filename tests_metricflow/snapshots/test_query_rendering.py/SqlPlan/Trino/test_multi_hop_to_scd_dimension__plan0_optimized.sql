@@ -5,26 +5,27 @@ docstring:
 sql_engine: Trino
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+-- Select: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
+-- Select: ['__bookings', 'listing__lux_listing__is_confirmed_lux', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_15.metric_time__day AS metric_time__day
-  , subq_20.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
-  , SUM(subq_15.bookings) AS bookings
+  subq_19.metric_time__day AS metric_time__day
+  , subq_24.lux_listing__is_confirmed_lux AS listing__lux_listing__is_confirmed_lux
+  , SUM(subq_19.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_15
+) subq_19
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
+  -- Select: ['lux_listing__is_confirmed_lux', 'lux_listing__window_start__day', 'lux_listing__window_end__day', 'listing']
   SELECT
     lux_listings_src_26000.valid_from AS lux_listing__window_start__day
     , lux_listings_src_26000.valid_to AS lux_listing__window_end__day
@@ -35,21 +36,21 @@ LEFT OUTER JOIN (
     ***************************.dim_lux_listings lux_listings_src_26000
   ON
     lux_listing_mapping_src_26000.lux_listing_id = lux_listings_src_26000.lux_listing_id
-) subq_20
+) subq_24
 ON
   (
-    subq_15.listing = subq_20.listing
+    subq_19.listing = subq_24.listing
   ) AND (
     (
-      subq_15.metric_time__day >= subq_20.lux_listing__window_start__day
+      subq_19.metric_time__day >= subq_24.lux_listing__window_start__day
     ) AND (
       (
-        subq_15.metric_time__day < subq_20.lux_listing__window_end__day
+        subq_19.metric_time__day < subq_24.lux_listing__window_end__day
       ) OR (
-        subq_20.lux_listing__window_end__day IS NULL
+        subq_24.lux_listing__window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_15.metric_time__day
-  , subq_20.lux_listing__is_confirmed_lux
+  subq_19.metric_time__day
+  , subq_24.lux_listing__is_confirmed_lux

@@ -1,8 +1,5 @@
 # Internal dependencies
-dbt-core>=1.10.4, <1.11.0
-
-# dsi version should be fixed by MetricFlow/dbt-core, not set here
-dbt-semantic-interfaces
+dbt-core>=1.10.4, <1.12.0
 
 # CLI-related
 Jinja2>=3.1.6, <3.7.0

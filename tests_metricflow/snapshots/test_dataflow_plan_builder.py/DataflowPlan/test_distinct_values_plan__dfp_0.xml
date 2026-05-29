@@ -19,19 +19,19 @@ docstring:
             <!--     descending=True,                                           -->
             <!--   )                                                            -->
             <!-- limit = '100' -->
-            <FilterElementsNode>
-                <!-- description = "Pass Only Elements: ['listing__country_latest']" -->
-                <!-- node_id = NodeId(id_str='pfe_0') -->
+            <SelectorNode>
+                <!-- description = "Select: ['listing__country_latest']" -->
+                <!-- node_id = NodeId(id_str='pfe_1') -->
                 <!-- include_spec =                                               -->
                 <!--   DimensionSpec(                                             -->
                 <!--     element_name='country_latest',                           -->
                 <!--     entity_links=(EntityReference(element_name='listing'),), -->
                 <!--   )                                                          -->
                 <!-- distinct = True -->
-                <WhereConstraintNode>
-                    <!-- description = 'Constrain Output with WHERE' -->
+                <WhereFilterNode>
+                    <!-- description = 'Filter Output with WHERE' -->
                     <!-- node_id = NodeId(id_str='wcc_0') -->
-                    <!-- where_condition =                                                 -->
+                    <!-- filter_spec =                                                     -->
                     <!--   WhereFilterSpec(                                                -->
                     <!--     where_sql="listing__country_latest = 'us'",                   -->
                     <!--     bind_parameters=SqlBindParameterSet(),                        -->
@@ -48,13 +48,23 @@ docstring:
                     <!--       ),                                                          -->
                     <!--     ),                                                            -->
                     <!--   )                                                               -->
-                    <ReadSqlSourceNode>
-                        <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                        <!-- node_id = NodeId(id_str='rss_28024') -->
-                        <!-- data_set = SemanticModelDataSet('listings_latest') -->
-                    </ReadSqlSourceNode>
-                </WhereConstraintNode>
-            </FilterElementsNode>
+                    <SelectorNode>
+                        <!-- description = "Select: ['listing__country_latest']" -->
+                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                        <!-- include_spec =                                               -->
+                        <!--   DimensionSpec(                                             -->
+                        <!--     element_name='country_latest',                           -->
+                        <!--     entity_links=(EntityReference(element_name='listing'),), -->
+                        <!--   )                                                          -->
+                        <!-- distinct = False -->
+                        <ReadSqlSourceNode>
+                            <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                            <!-- node_id = NodeId(id_str='rss_28024') -->
+                            <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                        </ReadSqlSourceNode>
+                    </SelectorNode>
+                </WhereFilterNode>
+            </SelectorNode>
         </OrderByLimitNode>
     </WriteToResultDataTableNode>
 </DataflowPlan>

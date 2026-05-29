@@ -9,8 +9,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATETIME_TRUNC(ds, day) AS booking__ds__day
-    , booking_value
-    , guest_id AS bookers
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -20,44 +20,46 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_23.booking__ds__day, subq_27.booking__ds__day) AS booking__ds__day
-    , MAX(subq_23.booking_value) AS booking_value
-    , MAX(subq_27.bookers) AS bookers
+    COALESCE(subq_28.booking__ds__day, subq_33.booking__ds__day) AS booking__ds__day
+    , MAX(subq_28.booking_value) AS booking_value
+    , MAX(subq_33.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
     SELECT
       time_spine_src_28006.ds AS booking__ds__day
-      , subq_18.booking_value AS booking_value
+      , subq_22.__booking_value AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['booking_value', 'booking__ds__day']
+      -- Select: ['__booking_value', 'booking__ds__day']
+      -- Select: ['__booking_value', 'booking__ds__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         booking__ds__day
-        , SUM(booking_value) AS booking_value
+        , SUM(__booking_value) AS __booking_value
       FROM sma_28009_cte
       GROUP BY
         booking__ds__day
-    ) subq_18
+    ) subq_22
     ON
-      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = subq_18.booking__ds__day
-  ) subq_23
+      DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = subq_22.booking__ds__day
+  ) subq_28
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'booking__ds__day']
+    -- Select: ['__bookers', 'booking__ds__day']
+    -- Select: ['__bookers', 'booking__ds__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__ds__day
-      , COUNT(DISTINCT bookers) AS bookers
+      , COUNT(DISTINCT __bookers) AS bookers
     FROM sma_28009_cte
     GROUP BY
       booking__ds__day
-  ) subq_27
+  ) subq_33
   ON
-    subq_23.booking__ds__day = subq_27.booking__ds__day
+    subq_28.booking__ds__day = subq_33.booking__ds__day
   GROUP BY
     booking__ds__day
-) subq_28
+) subq_34

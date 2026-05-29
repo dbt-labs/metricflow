@@ -1,0 +1,31 @@
+---
+semantic_model:
+  name: revenue
+  defaults:
+    agg_time_dimension: ds
+  description: revenue
+  node_relation:
+    alias: fct_revenue
+    schema_name: $source_schema
+  primary_entity: end_of_day_revenue
+  entities:
+    - name: user
+      type: foreign
+      expr: user_id
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+      expr: created_at
+
+---
+metric:
+  name: revenue
+  description: revenue
+  type: simple
+  type_params:
+    expr: revenue
+    metric_aggregation_params:
+      semantic_model: revenue
+      agg: sum

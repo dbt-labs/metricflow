@@ -16,21 +16,18 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
-    SqlStringLiteralExpression,
     SqlStringExpression,
+    SqlStringLiteralExpression,
     SqlSubtractTimeIntervalExpression,
 )
 
 from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient, SupportedAdapterTypes
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.athena import AthenaSqlExpressionRenderer, AthenaSqlPlanRenderer
+from scripts.generate_snapshots import ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
 from tests_metricflow.fixtures import sql_client_fixtures
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 from tests_metricflow.fixtures.sql_client_fixtures import make_test_sql_client
-from tests_metricflow.generate_snapshots import (
-    MetricFlowTestCredentialSet,
-    MetricFlowTestCredentialSetForAllEngines,
-)
 
 
 def test_create_from_url_supports_athena() -> None:
@@ -216,20 +213,6 @@ def test_make_test_sql_client_supports_athena_profile_auth(monkeypatch: pytest.M
 
 
 def test_snapshot_engine_configurations_include_athena() -> None:
-    """Snapshot generation should iterate over Athena like the other SQL engines."""
-    empty_credentials = MetricFlowTestCredentialSet(engine_url=None, engine_password=None)
-    credential_sets = MetricFlowTestCredentialSetForAllEngines(
-        duck_db=empty_credentials,
-        athena=empty_credentials,
-        redshift=empty_credentials,
-        snowflake=empty_credentials,
-        big_query=empty_credentials,
-        databricks=empty_credentials,
-        postgres=empty_credentials,
-        trino=empty_credentials,
-    )
-
-    engine_types = [configuration.engine for configuration in credential_sets.as_configurations]
-
-    assert SqlEngine.ATHENA in engine_types
-    assert len(engine_types) == len(SqlEngine)
+    """Snapshot generation should include Athena in the engine registry."""
+    assert "athena" in ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
+    assert ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME["athena"] == "athena-env"

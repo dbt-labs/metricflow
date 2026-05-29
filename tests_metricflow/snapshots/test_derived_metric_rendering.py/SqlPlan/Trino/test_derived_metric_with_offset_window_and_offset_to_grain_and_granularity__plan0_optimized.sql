@@ -9,7 +9,7 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -27,17 +27,18 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.metric_time__year, subq_35.metric_time__year) AS metric_time__year
-    , MAX(subq_27.month_start_bookings) AS month_start_bookings
-    , MAX(subq_35.bookings_1_month_ago) AS bookings_1_month_ago
+    COALESCE(subq_33.metric_time__year, subq_43.metric_time__year) AS metric_time__year
+    , MAX(subq_33.month_start_bookings) AS month_start_bookings
+    , MAX(subq_43.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__year AS metric_time__year
-      , SUM(sma_28009_cte.bookings) AS month_start_bookings
+      , SUM(sma_28009_cte.__bookings) AS month_start_bookings
     FROM rss_28018_cte
     INNER JOIN
       sma_28009_cte
@@ -46,15 +47,16 @@ FROM (
     WHERE rss_28018_cte.ds__year = rss_28018_cte.ds__day
     GROUP BY
       rss_28018_cte.ds__year
-  ) subq_27
+  ) subq_33
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
-    -- Pass Only Elements: ['bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
+    -- Select: ['__bookings', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__year AS metric_time__year
-      , SUM(sma_28009_cte.bookings) AS bookings_1_month_ago
+      , SUM(sma_28009_cte.__bookings) AS bookings_1_month_ago
     FROM rss_28018_cte
     INNER JOIN
       sma_28009_cte
@@ -62,9 +64,9 @@ FROM (
       DATE_ADD('month', -1, rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
     GROUP BY
       rss_28018_cte.ds__year
-  ) subq_35
+  ) subq_43
   ON
-    subq_27.metric_time__year = subq_35.metric_time__year
+    subq_33.metric_time__year = subq_43.metric_time__year
   GROUP BY
-    COALESCE(subq_27.metric_time__year, subq_35.metric_time__year)
-) subq_36
+    COALESCE(subq_33.metric_time__year, subq_43.metric_time__year)
+) subq_44

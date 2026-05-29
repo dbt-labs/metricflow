@@ -6,44 +6,54 @@ sql_engine: BigQuery
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_19.metric_time__day AS metric_time__day
-  , subq_15.archived_users_join_to_time_spine AS archived_users_join_to_time_spine
+  subq_23.metric_time__day AS metric_time__day
+  , subq_18.__archived_users_join_to_time_spine AS archived_users_join_to_time_spine
 FROM (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['metric_time__day']
+  -- Select: ['metric_time__day']
   SELECT
     metric_time__day
   FROM (
     -- Read From Time Spine 'mf_time_spine_hour'
     -- Change Column Aliases
+    -- Select: ['metric_time__day', 'metric_time__hour']
     SELECT
       ts AS metric_time__hour
       , DATETIME_TRUNC(ts, day) AS metric_time__day
     FROM ***************************.mf_time_spine_hour time_spine_src_28005
-  ) subq_17
-  WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
+  ) subq_21
+  WHERE (
+    metric_time__hour > '2020-01-01 00:09:00'
+  ) AND (
+    metric_time__day = '2020-01-01'
+  )
   GROUP BY
     metric_time__day
-) subq_19
+) subq_23
 LEFT OUTER JOIN (
   -- Constrain Output with WHERE
-  -- Pass Only Elements: ['archived_users_join_to_time_spine', 'metric_time__day']
+  -- Select: ['__archived_users_join_to_time_spine', 'metric_time__day']
   -- Aggregate Inputs for Simple Metrics
   SELECT
     metric_time__day
-    , SUM(archived_users_join_to_time_spine) AS archived_users_join_to_time_spine
+    , SUM(archived_users_join_to_time_spine) AS __archived_users_join_to_time_spine
   FROM (
     -- Read Elements From Semantic Model 'users_ds_source'
     -- Metric Time Dimension 'archived_at'
+    -- Select: ['__archived_users_join_to_time_spine', 'metric_time__day', 'metric_time__hour']
     SELECT
       DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
       , DATETIME_TRUNC(archived_at, day) AS metric_time__day
       , 1 AS archived_users_join_to_time_spine
     FROM ***************************.dim_users users_ds_source_src_28000
-  ) subq_12
-  WHERE (metric_time__hour > '2020-01-01 00:09:00') AND (metric_time__day = '2020-01-01')
+  ) subq_15
+  WHERE (
+    metric_time__hour > '2020-01-01 00:09:00'
+  ) AND (
+    metric_time__day = '2020-01-01'
+  )
   GROUP BY
     metric_time__day
-) subq_15
+) subq_18
 ON
-  subq_19.metric_time__day = subq_15.metric_time__day
+  subq_23.metric_time__day = subq_18.metric_time__day

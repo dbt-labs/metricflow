@@ -12,15 +12,15 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     is_instant AS booking__is_instant
-    , 1 AS bookings
-    , CASE WHEN is_instant THEN 1 ELSE 0 END AS instant_bookings
+    , 1 AS __bookings
+    , CASE WHEN is_instant THEN 1 ELSE 0 END AS __instant_bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
 SELECT
-  COALESCE(subq_18.booking__is_instant, subq_23.booking__is_instant) AS booking__is_instant
-  , MAX(subq_18.derived_shared_alias_1a) AS derived_shared_alias_1a
-  , MAX(subq_23.derived_shared_alias_2) AS derived_shared_alias_2
+  COALESCE(subq_21.booking__is_instant, subq_27.booking__is_instant) AS booking__is_instant
+  , MAX(subq_21.derived_shared_alias_1a) AS derived_shared_alias_1a
+  , MAX(subq_27.derived_shared_alias_2) AS derived_shared_alias_2
 FROM (
   -- Compute Metrics via Expressions
   SELECT
@@ -28,17 +28,18 @@ FROM (
     , shared_alias - 10 AS derived_shared_alias_1a
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookings', 'booking__is_instant']
+    -- Select: ['__bookings', 'booking__is_instant']
+    -- Select: ['__bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__is_instant
-      , SUM(bookings) AS shared_alias
+      , SUM(__bookings) AS shared_alias
     FROM sma_28009_cte
     GROUP BY
       booking__is_instant
-  ) subq_17
-) subq_18
+  ) subq_20
+) subq_21
 FULL OUTER JOIN (
   -- Compute Metrics via Expressions
   SELECT
@@ -46,19 +47,20 @@ FULL OUTER JOIN (
     , shared_alias + 10 AS derived_shared_alias_2
   FROM (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['instant_bookings', 'booking__is_instant']
+    -- Select: ['__instant_bookings', 'booking__is_instant']
+    -- Select: ['__instant_bookings', 'booking__is_instant']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       booking__is_instant
-      , SUM(instant_bookings) AS shared_alias
+      , SUM(__instant_bookings) AS shared_alias
     FROM sma_28009_cte
     GROUP BY
       booking__is_instant
-  ) subq_22
-) subq_23
+  ) subq_26
+) subq_27
 ON
-  subq_18.booking__is_instant = subq_23.booking__is_instant
+  subq_21.booking__is_instant = subq_27.booking__is_instant
 GROUP BY
   booking__is_instant
 LIMIT 1

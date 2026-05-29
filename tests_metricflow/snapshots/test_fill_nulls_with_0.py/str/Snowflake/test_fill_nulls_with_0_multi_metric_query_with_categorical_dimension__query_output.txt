@@ -1,7 +1,7 @@
 test_name: test_fill_nulls_with_0_multi_metric_query_with_categorical_dimension
 test_filename: test_fill_nulls_with_0.py
 ---
-METRIC_TIME__DAY     LISTING__IS_LUX_LATEST      BOOKINGS_FILL_NULLS_WITH_0_WITHOUT_TIME_SPINE    VIEWS
+metric_time__day     listing__is_lux_latest      bookings_fill_nulls_with_0_without_time_spine    views
 -------------------  ------------------------  -----------------------------------------------  -------
 2019-12-01T00:00:00  True                                                                    1
 2019-12-18T00:00:00  False                                                                   4

@@ -12,7 +12,7 @@ import uuid
 from hashlib import sha256
 from typing import Callable, List, Optional, TypeVar
 
-from metricflow_semantics.toolkit.random_id import mf_random_id
+from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from typing_extensions import ParamSpec
 
 from metricflow.telemetry.handlers.handlers import (

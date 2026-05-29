@@ -24,7 +24,7 @@ def test_output_column_order(
     metric_names: AnyLengthTuple[str] = ("bookings", "listings")
     group_by_names: AnyLengthTuple[str] = ("metric_time__day", "listing", "listing__country_latest")
     query_result: MetricFlowQueryResult = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=metric_names,
             group_by_names=group_by_names,
             order_output_columns_by_input_order=True,
@@ -53,7 +53,7 @@ def test_output_column_order(
 
     for optimization_level in SqlOptimizationLevel:
         query_result = it_helpers.mf_engine.query(
-            MetricFlowQueryRequest.create_with_random_request_id(
+            MetricFlowQueryRequest.create(
                 metric_names=reversed_metric_names,
                 group_by_names=reversed_group_by_names,
                 order_output_columns_by_input_order=True,

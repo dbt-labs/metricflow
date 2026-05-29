@@ -13,29 +13,25 @@ docstring:
             <!-- metric_spec =                                                   -->
             <!--   MetricSpec(                                                   -->
             <!--     element_name='booking_fees_last_week_per_booker_this_week', -->
-            <!--     filter_spec_set=WhereFilterSpecSet(                         -->
-            <!--       query_level_filter_specs=(                                -->
-            <!--         WhereFilterSpec(                                        -->
-            <!--           where_sql="metric_time__day = '2020-01-01'",          -->
-            <!--           bind_parameters=SqlBindParameterSet(),                -->
-            <!--           element_set=GroupByItemSet(                           -->
-            <!--             annotated_specs=(                                   -->
-            <!--               AnnotatedSpec(                                    -->
-            <!--                 element_type=TIME_DIMENSION,                    -->
-            <!--                 element_name='metric_time',                     -->
-            <!--                 time_grain=ExpandedTimeGranularity(             -->
-            <!--                   name='day',                                   -->
-            <!--                   base_granularity=DAY,                         -->
-            <!--                 ),                                              -->
-            <!--                 element_properties=(                            -->
-            <!--                   METRIC_TIME,                                  -->
-            <!--                 ),                                              -->
-            <!--                 origin_semantic_model_names=(                   -->
-            <!--                   'bookings_source',                            -->
-            <!--                 ),                                              -->
-            <!--                 derived_from_semantic_model_names=(             -->
-            <!--                   'bookings_source',                            -->
-            <!--                 ),                                              -->
+            <!--     where_filter_specs=(                                        -->
+            <!--       WhereFilterSpec(                                          -->
+            <!--         where_sql="metric_time__day = '2020-01-01'",            -->
+            <!--         bind_parameters=SqlBindParameterSet(),                  -->
+            <!--         element_set=GroupByItemSet(                             -->
+            <!--           annotated_specs=(                                     -->
+            <!--             AnnotatedSpec(                                      -->
+            <!--               element_type=TIME_DIMENSION,                      -->
+            <!--               element_name='metric_time',                       -->
+            <!--               time_grain=ExpandedTimeGranularity(               -->
+            <!--                 name='day',                                     -->
+            <!--                 base_granularity=DAY,                           -->
+            <!--               ),                                                -->
+            <!--               element_properties=(METRIC_TIME,),                -->
+            <!--               origin_semantic_model_names=(                     -->
+            <!--                 'bookings_source',                              -->
+            <!--               ),                                                -->
+            <!--               derived_from_semantic_model_names=(               -->
+            <!--                 'bookings_source',                              -->
             <!--               ),                                                -->
             <!--             ),                                                  -->
             <!--           ),                                                    -->
@@ -49,48 +45,43 @@ docstring:
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                                            -->
-                    <!--   MetricSpec(                                                            -->
-                    <!--     element_name='booking_value',                                        -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(                                  -->
-                    <!--       query_level_filter_specs=(                                         -->
-                    <!--         WhereFilterSpec(                                                 -->
-                    <!--           where_sql="metric_time__day = '2020-01-01'",                   -->
-                    <!--           bind_parameters=SqlBindParameterSet(),                         -->
-                    <!--           element_set=GroupByItemSet(                                    -->
-                    <!--             annotated_specs=(                                            -->
-                    <!--               AnnotatedSpec(                                             -->
-                    <!--                 element_type=TIME_DIMENSION,                             -->
-                    <!--                 element_name='metric_time',                              -->
-                    <!--                 time_grain=ExpandedTimeGranularity(                      -->
-                    <!--                   name='day',                                            -->
-                    <!--                   base_granularity=DAY,                                  -->
-                    <!--                 ),                                                       -->
-                    <!--                 element_properties=(                                     -->
-                    <!--                   METRIC_TIME,                                           -->
-                    <!--                 ),                                                       -->
-                    <!--                 origin_semantic_model_names=(                            -->
-                    <!--                   'bookings_source',                                     -->
-                    <!--                 ),                                                       -->
-                    <!--                 derived_from_semantic_model_names=(                      -->
-                    <!--                   'bookings_source',                                     -->
-                    <!--                 ),                                                       -->
-                    <!--               ),                                                         -->
-                    <!--             ),                                                           -->
-                    <!--           ),                                                             -->
-                    <!--         ),                                                               -->
-                    <!--       ),                                                                 -->
-                    <!--     ),                                                                   -->
-                    <!--     offset_window=PydanticMetricTimeWindow(count=1, granularity='week'), -->
-                    <!--   )                                                                      -->
+                    <!-- metric_spec =                                              -->
+                    <!--   MetricSpec(                                              -->
+                    <!--     element_name='booking_value',                          -->
+                    <!--     where_filter_specs=(                                   -->
+                    <!--       WhereFilterSpec(                                     -->
+                    <!--         where_sql="metric_time__day = '2020-01-01'",       -->
+                    <!--         bind_parameters=SqlBindParameterSet(),             -->
+                    <!--         element_set=GroupByItemSet(                        -->
+                    <!--           annotated_specs=(                                -->
+                    <!--             AnnotatedSpec(                                 -->
+                    <!--               element_type=TIME_DIMENSION,                 -->
+                    <!--               element_name='metric_time',                  -->
+                    <!--               time_grain=ExpandedTimeGranularity(          -->
+                    <!--                 name='day',                                -->
+                    <!--                 base_granularity=DAY,                      -->
+                    <!--               ),                                           -->
+                    <!--               element_properties=(METRIC_TIME,),           -->
+                    <!--               origin_semantic_model_names=(                -->
+                    <!--                 'bookings_source',                         -->
+                    <!--               ),                                           -->
+                    <!--               derived_from_semantic_model_names=(          -->
+                    <!--                 'bookings_source',                         -->
+                    <!--               ),                                           -->
+                    <!--             ),                                             -->
+                    <!--           ),                                               -->
+                    <!--         ),                                                 -->
+                    <!--       ),                                                   -->
+                    <!--     ),                                                     -->
+                    <!--     offset_window=TimeWindow(count=1, granularity='week'), -->
+                    <!--   )                                                        -->
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
-                        <!-- alias_mapping = {} -->
-                        <!-- null_fill_value_mapping = {} -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['booking_value', 'metric_time__month']" -->
-                            <!-- node_id = NodeId(id_str='pfe_1') -->
+                        <!-- null_fill_value_mapping = {'booking_value': None} -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__booking_value', 'metric_time__month']" -->
+                            <!-- node_id = NodeId(id_str='pfe_3') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
                             <!-- include_spec =                                                                      -->
                             <!--   TimeDimensionSpec(                                                                -->
@@ -98,33 +89,16 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                             <!--   )                                                                                 -->
                             <!-- distinct = False -->
-                            <WhereConstraintNode>
-                                <!-- description = 'Constrain Output with WHERE' -->
-                                <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                                -->
-                                <!--   WhereFilterSpec(                               -->
-                                <!--     where_sql="metric_time__day = '2020-01-01'", -->
-                                <!--     bind_parameters=SqlBindParameterSet(),       -->
-                                <!--     element_set=GroupByItemSet(                  -->
-                                <!--       annotated_specs=(                          -->
-                                <!--         AnnotatedSpec(                           -->
-                                <!--           element_type=TIME_DIMENSION,           -->
-                                <!--           element_name='metric_time',            -->
-                                <!--           time_grain=ExpandedTimeGranularity(    -->
-                                <!--             name='day',                          -->
-                                <!--             base_granularity=DAY,                -->
-                                <!--           ),                                     -->
-                                <!--           element_properties=(METRIC_TIME,),     -->
-                                <!--           origin_semantic_model_names=(          -->
-                                <!--             'bookings_source',                   -->
-                                <!--           ),                                     -->
-                                <!--           derived_from_semantic_model_names=(    -->
-                                <!--             'bookings_source',                   -->
-                                <!--           ),                                     -->
-                                <!--         ),                                       -->
-                                <!--       ),                                         -->
-                                <!--     ),                                           -->
-                                <!--   )                                              -->
+                            <SelectorNode>
+                                <!-- description = "Select: ['__booking_value', 'metric_time__month']" -->
+                                <!-- node_id = NodeId(id_str='pfe_2') -->
+                                <!-- include_spec = SimpleMetricInputSpec(element_name='booking_value') -->
+                                <!-- include_spec =                                                                      -->
+                                <!--   TimeDimensionSpec(                                                                -->
+                                <!--     element_name='metric_time',                                                     -->
+                                <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
+                                <!--   )                                                                                 -->
+                                <!-- distinct = False -->
                                 <JoinToTimeSpineNode>
                                     <!-- description = 'Join to Time Spine Dataset' -->
                                     <!-- node_id = NodeId(id_str='jts_0') -->
@@ -144,7 +118,7 @@ docstring:
                                     <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                                     <!--   )                                                                             -->
                                     <!-- join_type = INNER -->
-                                    <!-- standard_offset_window = PydanticMetricTimeWindow(count=1, granularity='week') -->
+                                    <!-- standard_offset_window = TimeWindow(count=1, granularity='week') -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->
                                         <!-- node_id = NodeId(id_str='sma_28009') -->
@@ -155,10 +129,9 @@ docstring:
                                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
-                                    <FilterElementsNode>
-                                        <!-- description =                                                      -->
-                                        <!--   "Pass Only Elements: ['metric_time__day', 'metric_time__month']" -->
-                                        <!-- node_id = NodeId(id_str='pfe_0') -->
+                                    <SelectorNode>
+                                        <!-- description = "Select: ['metric_time__day', 'metric_time__month']" -->
+                                        <!-- node_id = NodeId(id_str='pfe_1') -->
                                         <!-- include_spec =                                -->
                                         <!--   TimeDimensionSpec(                          -->
                                         <!--     element_name='metric_time',               -->
@@ -176,100 +149,144 @@ docstring:
                                         <!--     ),                                        -->
                                         <!--   )                                           -->
                                         <!-- distinct = False -->
-                                        <AliasSpecsNode>
-                                            <!-- description = 'Change Column Aliases' -->
-                                            <!-- node_id = NodeId(id_str='as_0') -->
-                                            <!-- change_specs =                                    -->
-                                            <!--   (                                               -->
-                                            <!--     SpecToAlias(                                  -->
-                                            <!--       input_spec=TimeDimensionSpec(               -->
-                                            <!--         element_name='ds',                        -->
-                                            <!--         time_granularity=ExpandedTimeGranularity( -->
-                                            <!--           name='day',                             -->
-                                            <!--           base_granularity=DAY,                   -->
-                                            <!--         ),                                        -->
-                                            <!--       ),                                          -->
-                                            <!--       output_spec=TimeDimensionSpec(              -->
-                                            <!--         element_name='metric_time',               -->
-                                            <!--         time_granularity=ExpandedTimeGranularity( -->
-                                            <!--           name='day',                             -->
-                                            <!--           base_granularity=DAY,                   -->
-                                            <!--         ),                                        -->
-                                            <!--       ),                                          -->
-                                            <!--     ),                                            -->
-                                            <!--     SpecToAlias(                                  -->
-                                            <!--       input_spec=TimeDimensionSpec(               -->
-                                            <!--         element_name='ds',                        -->
-                                            <!--         time_granularity=ExpandedTimeGranularity( -->
-                                            <!--           name='month',                           -->
-                                            <!--           base_granularity=MONTH,                 -->
-                                            <!--         ),                                        -->
-                                            <!--       ),                                          -->
-                                            <!--       output_spec=TimeDimensionSpec(              -->
-                                            <!--         element_name='metric_time',               -->
-                                            <!--         time_granularity=ExpandedTimeGranularity( -->
-                                            <!--           name='month',                           -->
-                                            <!--           base_granularity=MONTH,                 -->
-                                            <!--         ),                                        -->
-                                            <!--       ),                                          -->
-                                            <!--     ),                                            -->
-                                            <!--   )                                               -->
-                                            <ReadSqlSourceNode>
-                                                <!-- description = 'Read From SqlDataSet()' -->
-                                                <!-- node_id = NodeId(id_str='rss_28018') -->
-                                                <!-- data_set = SqlDataSet() -->
-                                            </ReadSqlSourceNode>
-                                        </AliasSpecsNode>
-                                    </FilterElementsNode>
+                                        <WhereFilterNode>
+                                            <!-- description = 'Filter Output with WHERE' -->
+                                            <!-- node_id = NodeId(id_str='wcc_0') -->
+                                            <!-- filter_spec =                                    -->
+                                            <!--   WhereFilterSpec(                               -->
+                                            <!--     where_sql="metric_time__day = '2020-01-01'", -->
+                                            <!--     bind_parameters=SqlBindParameterSet(),       -->
+                                            <!--     element_set=GroupByItemSet(                  -->
+                                            <!--       annotated_specs=(                          -->
+                                            <!--         AnnotatedSpec(                           -->
+                                            <!--           element_type=TIME_DIMENSION,           -->
+                                            <!--           element_name='metric_time',            -->
+                                            <!--           time_grain=ExpandedTimeGranularity(    -->
+                                            <!--             name='day',                          -->
+                                            <!--             base_granularity=DAY,                -->
+                                            <!--           ),                                     -->
+                                            <!--           element_properties=(METRIC_TIME,),     -->
+                                            <!--           origin_semantic_model_names=(          -->
+                                            <!--             'bookings_source',                   -->
+                                            <!--           ),                                     -->
+                                            <!--           derived_from_semantic_model_names=(    -->
+                                            <!--             'bookings_source',                   -->
+                                            <!--           ),                                     -->
+                                            <!--         ),                                       -->
+                                            <!--       ),                                         -->
+                                            <!--     ),                                           -->
+                                            <!--   )                                              -->
+                                            <SelectorNode>
+                                                <!-- description = "Select: ['metric_time__day', 'metric_time__month']" -->
+                                                <!-- node_id = NodeId(id_str='pfe_0') -->
+                                                <!-- include_spec =                                -->
+                                                <!--   TimeDimensionSpec(                          -->
+                                                <!--     element_name='metric_time',               -->
+                                                <!--     time_granularity=ExpandedTimeGranularity( -->
+                                                <!--       name='day',                             -->
+                                                <!--       base_granularity=DAY,                   -->
+                                                <!--     ),                                        -->
+                                                <!--   )                                           -->
+                                                <!-- include_spec =                                -->
+                                                <!--   TimeDimensionSpec(                          -->
+                                                <!--     element_name='metric_time',               -->
+                                                <!--     time_granularity=ExpandedTimeGranularity( -->
+                                                <!--       name='month',                           -->
+                                                <!--       base_granularity=MONTH,                 -->
+                                                <!--     ),                                        -->
+                                                <!--   )                                           -->
+                                                <!-- distinct = False -->
+                                                <AliasSpecsNode>
+                                                    <!-- description = 'Change Column Aliases' -->
+                                                    <!-- node_id = NodeId(id_str='as_0') -->
+                                                    <!-- change_specs =                                    -->
+                                                    <!--   (                                               -->
+                                                    <!--     SpecToAlias(                                  -->
+                                                    <!--       input_spec=TimeDimensionSpec(               -->
+                                                    <!--         element_name='ds',                        -->
+                                                    <!--         time_granularity=ExpandedTimeGranularity( -->
+                                                    <!--           name='day',                             -->
+                                                    <!--           base_granularity=DAY,                   -->
+                                                    <!--         ),                                        -->
+                                                    <!--       ),                                          -->
+                                                    <!--       output_spec=TimeDimensionSpec(              -->
+                                                    <!--         element_name='metric_time',               -->
+                                                    <!--         time_granularity=ExpandedTimeGranularity( -->
+                                                    <!--           name='day',                             -->
+                                                    <!--           base_granularity=DAY,                   -->
+                                                    <!--         ),                                        -->
+                                                    <!--       ),                                          -->
+                                                    <!--     ),                                            -->
+                                                    <!--     SpecToAlias(                                  -->
+                                                    <!--       input_spec=TimeDimensionSpec(               -->
+                                                    <!--         element_name='ds',                        -->
+                                                    <!--         time_granularity=ExpandedTimeGranularity( -->
+                                                    <!--           name='month',                           -->
+                                                    <!--           base_granularity=MONTH,                 -->
+                                                    <!--         ),                                        -->
+                                                    <!--       ),                                          -->
+                                                    <!--       output_spec=TimeDimensionSpec(              -->
+                                                    <!--         element_name='metric_time',               -->
+                                                    <!--         time_granularity=ExpandedTimeGranularity( -->
+                                                    <!--           name='month',                           -->
+                                                    <!--           base_granularity=MONTH,                 -->
+                                                    <!--         ),                                        -->
+                                                    <!--       ),                                          -->
+                                                    <!--     ),                                            -->
+                                                    <!--   )                                               -->
+                                                    <ReadSqlSourceNode>
+                                                        <!-- description = 'Read From SqlDataSet()' -->
+                                                        <!-- node_id = NodeId(id_str='rss_28018') -->
+                                                        <!-- data_set = SqlDataSet() -->
+                                                    </ReadSqlSourceNode>
+                                                </AliasSpecsNode>
+                                            </SelectorNode>
+                                        </WhereFilterNode>
+                                    </SelectorNode>
                                 </JoinToTimeSpineNode>
-                            </WhereConstraintNode>
-                        </FilterElementsNode>
+                            </SelectorNode>
+                        </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec =                                          -->
-                    <!--   MetricSpec(                                          -->
-                    <!--     element_name='bookers',                            -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(                -->
-                    <!--       query_level_filter_specs=(                       -->
-                    <!--         WhereFilterSpec(                               -->
-                    <!--           where_sql="metric_time__day = '2020-01-01'", -->
-                    <!--           bind_parameters=SqlBindParameterSet(),       -->
-                    <!--           element_set=GroupByItemSet(                  -->
-                    <!--             annotated_specs=(                          -->
-                    <!--               AnnotatedSpec(                           -->
-                    <!--                 element_type=TIME_DIMENSION,           -->
-                    <!--                 element_name='metric_time',            -->
-                    <!--                 time_grain=ExpandedTimeGranularity(    -->
-                    <!--                   name='day',                          -->
-                    <!--                   base_granularity=DAY,                -->
-                    <!--                 ),                                     -->
-                    <!--                 element_properties=(                   -->
-                    <!--                   METRIC_TIME,                         -->
-                    <!--                 ),                                     -->
-                    <!--                 origin_semantic_model_names=(          -->
-                    <!--                   'bookings_source',                   -->
-                    <!--                 ),                                     -->
-                    <!--                 derived_from_semantic_model_names=(    -->
-                    <!--                   'bookings_source',                   -->
-                    <!--                 ),                                     -->
-                    <!--               ),                                       -->
-                    <!--             ),                                         -->
-                    <!--           ),                                           -->
-                    <!--         ),                                             -->
-                    <!--       ),                                               -->
-                    <!--     ),                                                 -->
-                    <!--   )                                                    -->
+                    <!-- metric_spec =                                        -->
+                    <!--   MetricSpec(                                        -->
+                    <!--     element_name='bookers',                          -->
+                    <!--     where_filter_specs=(                             -->
+                    <!--       WhereFilterSpec(                               -->
+                    <!--         where_sql="metric_time__day = '2020-01-01'", -->
+                    <!--         bind_parameters=SqlBindParameterSet(),       -->
+                    <!--         element_set=GroupByItemSet(                  -->
+                    <!--           annotated_specs=(                          -->
+                    <!--             AnnotatedSpec(                           -->
+                    <!--               element_type=TIME_DIMENSION,           -->
+                    <!--               element_name='metric_time',            -->
+                    <!--               time_grain=ExpandedTimeGranularity(    -->
+                    <!--                 name='day',                          -->
+                    <!--                 base_granularity=DAY,                -->
+                    <!--               ),                                     -->
+                    <!--               element_properties=(METRIC_TIME,),     -->
+                    <!--               origin_semantic_model_names=(          -->
+                    <!--                 'bookings_source',                   -->
+                    <!--               ),                                     -->
+                    <!--               derived_from_semantic_model_names=(    -->
+                    <!--                 'bookings_source',                   -->
+                    <!--               ),                                     -->
+                    <!--             ),                                       -->
+                    <!--           ),                                         -->
+                    <!--         ),                                           -->
+                    <!--       ),                                             -->
+                    <!--     ),                                               -->
+                    <!--   )                                                  -->
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_1') -->
-                        <!-- alias_mapping = {} -->
-                        <!-- null_fill_value_mapping = {} -->
-                        <FilterElementsNode>
-                            <!-- description = "Pass Only Elements: ['bookers', 'metric_time__month']" -->
-                            <!-- node_id = NodeId(id_str='pfe_2') -->
+                        <!-- null_fill_value_mapping = {'bookers': None} -->
+                        <SelectorNode>
+                            <!-- description = "Select: ['__bookers', 'metric_time__month']" -->
+                            <!-- node_id = NodeId(id_str='pfe_5') -->
                             <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
                             <!-- include_spec =                                                                      -->
                             <!--   TimeDimensionSpec(                                                                -->
@@ -277,10 +294,10 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='month', base_granularity=MONTH), -->
                             <!--   )                                                                                 -->
                             <!-- distinct = False -->
-                            <WhereConstraintNode>
-                                <!-- description = 'Constrain Output with WHERE' -->
+                            <WhereFilterNode>
+                                <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_1') -->
-                                <!-- where_condition =                                -->
+                                <!-- filter_spec =                                    -->
                                 <!--   WhereFilterSpec(                               -->
                                 <!--     where_sql="metric_time__day = '2020-01-01'", -->
                                 <!--     bind_parameters=SqlBindParameterSet(),       -->
@@ -304,18 +321,37 @@ docstring:
                                 <!--       ),                                         -->
                                 <!--     ),                                           -->
                                 <!--   )                                              -->
-                                <MetricTimeDimensionTransformNode>
-                                    <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_28009') -->
-                                    <!-- aggregation_time_dimension = 'ds' -->
-                                    <ReadSqlSourceNode>
-                                        <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_28020') -->
-                                        <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                    </ReadSqlSourceNode>
-                                </MetricTimeDimensionTransformNode>
-                            </WhereConstraintNode>
-                        </FilterElementsNode>
+                                <SelectorNode>
+                                    <!-- description = "Select: ['__bookers', 'metric_time__month', 'metric_time__day']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_4') -->
+                                    <!-- include_spec = SimpleMetricInputSpec(element_name='bookers') -->
+                                    <!-- include_spec =                                -->
+                                    <!--   TimeDimensionSpec(                          -->
+                                    <!--     element_name='metric_time',               -->
+                                    <!--     time_granularity=ExpandedTimeGranularity( -->
+                                    <!--       name='month',                           -->
+                                    <!--       base_granularity=MONTH,                 -->
+                                    <!--     ),                                        -->
+                                    <!--   )                                           -->
+                                    <!-- include_spec =                                                                  -->
+                                    <!--   TimeDimensionSpec(                                                            -->
+                                    <!--     element_name='metric_time',                                                 -->
+                                    <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
+                                    <!--   )                                                                             -->
+                                    <!-- distinct = False -->
+                                    <MetricTimeDimensionTransformNode>
+                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                        <!-- node_id = NodeId(id_str='sma_28009') -->
+                                        <!-- aggregation_time_dimension = 'ds' -->
+                                        <ReadSqlSourceNode>
+                                            <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
+                                            <!-- node_id = NodeId(id_str='rss_28020') -->
+                                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                        </ReadSqlSourceNode>
+                                    </MetricTimeDimensionTransformNode>
+                                </SelectorNode>
+                            </WhereFilterNode>
+                        </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>
             </CombineAggregatedOutputsNode>

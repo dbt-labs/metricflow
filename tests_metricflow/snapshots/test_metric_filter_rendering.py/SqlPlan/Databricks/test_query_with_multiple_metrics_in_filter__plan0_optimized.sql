@@ -5,7 +5,7 @@ docstring:
 sql_engine: Databricks
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,8 +14,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     listing_id AS listing
-    , 1 AS bookings
-    , guest_id AS bookers
+    , 1 AS __bookings
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -23,47 +23,50 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Select: ['__listings', 'listing__bookings', 'listing__bookers']
   SELECT
-    subq_31.listing__bookings AS listing__bookings
-    , subq_36.listing__bookers AS listing__bookers
-    , subq_25.listings AS listings
+    subq_45.listing__bookings AS listing__bookings
+    , subq_51.listing__bookers AS listing__bookers
+    , subq_38.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       listing_id AS listing
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_25
+  ) subq_38
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookings', 'listing']
+    -- Select: ['__bookings', 'listing']
+    -- Select: ['__bookings', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookings']
+    -- Select: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS listing__bookings
+      , SUM(__bookings) AS listing__bookings
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_31
+  ) subq_45
   ON
-    subq_25.listing = subq_31.listing
+    subq_38.listing = subq_45.listing
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'listing']
+    -- Select: ['__bookers', 'listing']
+    -- Select: ['__bookers', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookers']
+    -- Select: ['listing', 'listing__bookers']
     SELECT
       listing
-      , COUNT(DISTINCT bookers) AS listing__bookers
+      , COUNT(DISTINCT __bookers) AS listing__bookers
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_36
+  ) subq_51
   ON
-    subq_25.listing = subq_36.listing
-) subq_37
+    subq_38.listing = subq_51.listing
+) subq_53
 WHERE listing__bookings > 2 AND listing__bookers > 1

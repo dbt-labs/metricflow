@@ -5,26 +5,27 @@ docstring:
 sql_engine: Postgres
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['bookings', 'listing__user__home_state_latest', 'metric_time__day']
+-- Select: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
+-- Select: ['__bookings', 'listing__user__home_state_latest', 'metric_time__day']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_18.metric_time__day AS metric_time__day
-  , subq_23.user__home_state_latest AS listing__user__home_state_latest
-  , SUM(subq_18.bookings) AS bookings
+  subq_25.metric_time__day AS metric_time__day
+  , subq_30.user__home_state_latest AS listing__user__home_state_latest
+  , SUM(subq_25.__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
     DATE_TRUNC('day', ds) AS metric_time__day
     , listing_id AS listing
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_26000
-) subq_18
+) subq_25
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
+  -- Select: ['user__home_state_latest', 'window_start__day', 'window_end__day', 'listing']
   SELECT
     listings_src_26000.active_from AS window_start__day
     , listings_src_26000.active_to AS window_end__day
@@ -35,21 +36,21 @@ LEFT OUTER JOIN (
     ***************************.dim_users_latest users_latest_src_26000
   ON
     listings_src_26000.user_id = users_latest_src_26000.user_id
-) subq_23
+) subq_30
 ON
   (
-    subq_18.listing = subq_23.listing
+    subq_25.listing = subq_30.listing
   ) AND (
     (
-      subq_18.metric_time__day >= subq_23.window_start__day
+      subq_25.metric_time__day >= subq_30.window_start__day
     ) AND (
       (
-        subq_18.metric_time__day < subq_23.window_end__day
+        subq_25.metric_time__day < subq_30.window_end__day
       ) OR (
-        subq_23.window_end__day IS NULL
+        subq_30.window_end__day IS NULL
       )
     )
   )
 GROUP BY
-  subq_18.metric_time__day
-  , subq_23.user__home_state_latest
+  subq_25.metric_time__day
+  , subq_30.user__home_state_latest

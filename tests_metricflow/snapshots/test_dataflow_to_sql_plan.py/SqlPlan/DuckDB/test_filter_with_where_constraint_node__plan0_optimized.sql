@@ -6,11 +6,11 @@ sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
 SELECT
-  ds__day
-  , bookings
+  bookings AS __bookings
+  , ds__day
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
-  -- Pass Only Elements: ['bookings', 'ds__day']
+  -- Select: ['__bookings', 'ds__day']
   SELECT
     DATE_TRUNC('day', ds) AS ds__day
     , 1 AS bookings

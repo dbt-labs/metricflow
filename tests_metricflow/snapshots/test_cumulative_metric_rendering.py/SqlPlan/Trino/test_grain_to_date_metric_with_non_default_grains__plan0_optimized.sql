@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative grain to date metric queried with non-default grains.
 
-      Uses agg time dimension instead of metric_time. Excludes default grain.
+  Uses agg time dimension instead of metric_time. Excludes default grain.
 sql_engine: Trino
 ---
 -- Re-aggregate Metric via Group By
@@ -26,30 +26,31 @@ FROM (
     ) AS revenue_mtd
   FROM (
     -- Join Self Over Time Range
-    -- Pass Only Elements: ['revenue', 'revenue_instance__ds__quarter', 'revenue_instance__ds__year', 'metric_time__day']
+    -- Select: ['__revenue', 'revenue_instance__ds__quarter', 'revenue_instance__ds__year', 'metric_time__day']
+    -- Select: ['__revenue', 'revenue_instance__ds__quarter', 'revenue_instance__ds__year', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
     SELECT
-      DATE_TRUNC('quarter', subq_14.ds) AS revenue_instance__ds__quarter
-      , DATE_TRUNC('year', subq_14.ds) AS revenue_instance__ds__year
-      , subq_14.ds AS metric_time__day
+      DATE_TRUNC('quarter', subq_15.ds) AS revenue_instance__ds__quarter
+      , DATE_TRUNC('year', subq_15.ds) AS revenue_instance__ds__year
+      , subq_15.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
-    FROM ***************************.mf_time_spine subq_14
+    FROM ***************************.mf_time_spine subq_15
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_14.ds
+        DATE_TRUNC('day', revenue_src_28000.created_at) <= subq_15.ds
       ) AND (
-        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_14.ds)
+        DATE_TRUNC('day', revenue_src_28000.created_at) >= DATE_TRUNC('month', subq_15.ds)
       )
     GROUP BY
-      DATE_TRUNC('quarter', subq_14.ds)
-      , DATE_TRUNC('year', subq_14.ds)
-      , subq_14.ds
-  ) subq_19
-) subq_20
+      DATE_TRUNC('quarter', subq_15.ds)
+      , DATE_TRUNC('year', subq_15.ds)
+      , subq_15.ds
+  ) subq_21
+) subq_22
 GROUP BY
   revenue_instance__ds__quarter
   , revenue_instance__ds__year

@@ -66,10 +66,10 @@ class SqlEngineConnectionParameterSet:
         if url_extra is not None:
             field_name_value_separator = "="
             url_extra_split = url_extra.split(field_name_value_separator)
-            if len(field_name_value_separator) == 2:
+            if len(url_extra_split) == 2:
                 field_name = url_extra_split[0]
-                value = url_split[1]
-                if field_name.lower() == "http_path":
+                value = url_extra_split[1]
+                if field_name.lower() == "httppath":
                     http_path = value
 
         return SqlEngineConnectionParameterSet(

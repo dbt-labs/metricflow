@@ -15,8 +15,8 @@ from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 
 
 @dataclass(frozen=True, eq=False)
-class FilterElementsNode(DataflowPlanNode):
-    """Only passes the listed elements.
+class SelectorNode(DataflowPlanNode):
+    """Selectively pass elements from the input to the output.
 
     Attributes:
         include_specs: The specs for the elements that it should pass.
@@ -38,8 +38,8 @@ class FilterElementsNode(DataflowPlanNode):
         include_specs: InstanceSpecSet,
         replace_description: Optional[str] = None,
         distinct: bool = False,
-    ) -> FilterElementsNode:
-        return FilterElementsNode(
+    ) -> SelectorNode:
+        return SelectorNode(
             parent_nodes=(parent_node,),
             include_specs=include_specs,
             replace_description=replace_description,
@@ -48,10 +48,10 @@ class FilterElementsNode(DataflowPlanNode):
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102
-        return StaticIdPrefix.DATAFLOW_NODE_PASS_FILTER_ELEMENTS_ID_PREFIX
+        return StaticIdPrefix.DATAFLOW_NODE_SELECTOR_ID_PREFIX
 
     def accept(self, visitor: DataflowPlanNodeVisitor[VisitorOutputT]) -> VisitorOutputT:  # noqa: D102
-        return visitor.visit_filter_elements_node(self)
+        return visitor.visit_selector_node(self)
 
     @property
     def description(self) -> str:  # noqa: D102
@@ -59,7 +59,7 @@ class FilterElementsNode(DataflowPlanNode):
             return self.replace_description
 
         column_resolver = DunderColumnAssociationResolver()
-        return f"Pass Only Elements: {mf_pformat([column_resolver.resolve_spec(spec).column_name for spec in self.include_specs.all_specs])}"
+        return f"Select: {mf_pformat([column_resolver.resolve_spec(spec).column_name for spec in self.include_specs.all_specs])}"
 
     @property
     def displayed_properties(self) -> Sequence[DisplayedProperty]:  # noqa: D102
@@ -83,9 +83,9 @@ class FilterElementsNode(DataflowPlanNode):
             and other_node.distinct == self.distinct
         )
 
-    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> FilterElementsNode:  # noqa: D102
+    def with_new_parents(self, new_parent_nodes: Sequence[DataflowPlanNode]) -> SelectorNode:  # noqa: D102
         assert len(new_parent_nodes) == 1
-        return FilterElementsNode(
+        return SelectorNode(
             parent_nodes=tuple(new_parent_nodes),
             include_specs=self.include_specs,
             distinct=self.distinct,

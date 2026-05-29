@@ -1,0 +1,20 @@
+project_configuration:
+  time_spine_table_configurations:
+    - location: $source_schema.mf_time_spine
+      column_name: ds_quarter
+      grain: quarter
+  time_spines:
+    - node_relation:
+        alias: mf_time_spine
+        schema_name: $source_schema
+      primary_column:
+        name: ds_quarter
+        time_granularity: quarter
+    - node_relation:
+        alias: mf_time_spine
+        schema_name: $source_schema
+      primary_column:
+        name: ds_year
+        time_granularity: year
+      custom_granularities:
+        - name: custom_year

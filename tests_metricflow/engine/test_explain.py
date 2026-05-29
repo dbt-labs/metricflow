@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 def _explain_one_query(mf_engine: MetricFlowEngine) -> str:
     explain_result: MetricFlowExplainResult = mf_engine.explain(
-        MetricFlowQueryRequest.create_with_random_request_id(saved_query_name="p0_booking")
+        MetricFlowQueryRequest.create(saved_query_name="p0_booking")
     )
     return explain_result.sql_statement.sql
 
@@ -58,7 +58,7 @@ def test_optimization_level(
             continue
 
         explain_result: MetricFlowExplainResult = mf_engine.explain(
-            MetricFlowQueryRequest.create_with_random_request_id(
+            MetricFlowQueryRequest.create(
                 metric_names=("bookings", "views"),
                 group_by_names=("metric_time", "listing__country_latest"),
                 sql_optimization_level=optimization_level,

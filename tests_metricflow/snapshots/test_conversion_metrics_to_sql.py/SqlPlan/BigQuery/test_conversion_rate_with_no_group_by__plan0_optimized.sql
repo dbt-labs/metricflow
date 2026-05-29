@@ -13,55 +13,57 @@ WITH sma_28019_cte AS (
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
     , user_id AS user
-    , 1 AS visits
+    , 1 AS __visits
   FROM ***************************.fct_visits visits_source_src_28000
 )
 
 SELECT
-  CAST(MAX(subq_27.buys) AS FLOAT64) / CAST(NULLIF(MAX(subq_18.visits), 0) AS FLOAT64) AS visit_buy_conversion_rate_7days
+  CAST(MAX(subq_33.__buys) AS FLOAT64) / CAST(NULLIF(MAX(subq_22.__visits), 0) AS FLOAT64) AS visit_buy_conversion_rate_7days
 FROM (
   -- Read From CTE For node_id=sma_28019
-  -- Pass Only Elements: ['visits']
+  -- Select: ['__visits']
+  -- Select: ['__visits']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(visits) AS visits
+    SUM(__visits) AS __visits
   FROM sma_28019_cte
-) subq_18
+) subq_22
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Pass Only Elements: ['buys']
+  -- Select: ['__buys']
+  -- Select: ['__buys']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(buys) AS buys
+    SUM(__buys) AS __buys
   FROM (
     -- Dedupe the fanout with mf_internal_uuid in the conversion data set
     SELECT DISTINCT
-      FIRST_VALUE(sma_28019_cte.visits) OVER (
+      FIRST_VALUE(sma_28019_cte.__visits) OVER (
         PARTITION BY
-          subq_23.user
-          , subq_23.metric_time__day
-          , subq_23.mf_internal_uuid
+          subq_28.user
+          , subq_28.metric_time__day
+          , subq_28.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-      ) AS visits
+      ) AS __visits
       , FIRST_VALUE(sma_28019_cte.metric_time__day) OVER (
         PARTITION BY
-          subq_23.user
-          , subq_23.metric_time__day
-          , subq_23.mf_internal_uuid
+          subq_28.user
+          , subq_28.metric_time__day
+          , subq_28.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS metric_time__day
       , FIRST_VALUE(sma_28019_cte.user) OVER (
         PARTITION BY
-          subq_23.user
-          , subq_23.metric_time__day
-          , subq_23.mf_internal_uuid
+          subq_28.user
+          , subq_28.metric_time__day
+          , subq_28.mf_internal_uuid
         ORDER BY sma_28019_cte.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
-      , subq_23.mf_internal_uuid AS mf_internal_uuid
-      , subq_23.buys AS buys
+      , subq_28.mf_internal_uuid AS mf_internal_uuid
+      , subq_28.__buys AS __buys
     FROM sma_28019_cte
     INNER JOIN (
       -- Read Elements From Semantic Model 'buys_source'
@@ -70,19 +72,19 @@ CROSS JOIN (
       SELECT
         DATETIME_TRUNC(ds, day) AS metric_time__day
         , user_id AS user
-        , 1 AS buys
+        , 1 AS __buys
         , GENERATE_UUID() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
-    ) subq_23
+    ) subq_28
     ON
       (
-        sma_28019_cte.user = subq_23.user
+        sma_28019_cte.user = subq_28.user
       ) AND (
         (
-          sma_28019_cte.metric_time__day <= subq_23.metric_time__day
+          sma_28019_cte.metric_time__day <= subq_28.metric_time__day
         ) AND (
-          sma_28019_cte.metric_time__day > DATE_SUB(CAST(subq_23.metric_time__day AS DATETIME), INTERVAL 7 day)
+          sma_28019_cte.metric_time__day > DATE_SUB(CAST(subq_28.metric_time__day AS DATETIME), INTERVAL 7 day)
         )
       )
-  ) subq_24
-) subq_27
+  ) subq_29
+) subq_33

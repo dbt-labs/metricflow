@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
 
       - name: Populate Snowflake
         uses: ./.github/actions/run-mf-tests
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
 
       - name: Populate Redshift
         uses: ./.github/actions/run-mf-tests
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
 
       - name: Populate BigQuery
         uses: ./.github/actions/run-mf-tests
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
 
       - name: Populate Databricks
         uses: ./.github/actions/run-mf-tests
@@ -97,6 +97,6 @@ jobs:
     if: github.event.action == 'labeled' && github.event.label.name == 'Reload Test Data in SQL Engines'
     steps:
       - name: Remove Label
-        uses: actions-ecosystem/action-remove-labels@v1
+        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 # actions-ecosystem/action-remove-labels@v1
         with:
           labels: 'Reload Test Data in SQL Engines'

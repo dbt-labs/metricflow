@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.query_param_implementations import SavedQueryParameter
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -10,6 +9,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 

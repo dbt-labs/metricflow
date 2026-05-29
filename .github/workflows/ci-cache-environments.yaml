@@ -5,29 +5,29 @@ name: Cache Python Environments
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 jobs:
-
   cache-python-environments:
     name: Cache Python Environments
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.12"]
+        python-version: ["3.10", "3.13", "3.14"]
     steps:
       - name: Check-out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
 
       - name: Cache Python ${{ matrix.python-version }} Environment
         uses: ./.github/actions/setup-python-env
         with:
           python-version: ${{ matrix.python-version }}
           cache-pre-commit-environment: true
+          # Note: the dbt-metricflow dev env has to be rebuilt every time to pick up changes to the
+          # local metricflow and metricflow-semantics packages, so we do not include it here.
           hatch-environment-cache-config-json: >-
             {
               "configs": [
                 {"hatch_project_directory": ".", "hatch_environment_name": "dev-env"},
-                {"hatch_project_directory": ".", "hatch_environment_name": "postgres-env"},
-                {"hatch_project_directory": "./metricflow-semantics", "hatch_environment_name": "dev-env"}
+                {"hatch_project_directory": ".", "hatch_environment_name": "postgres-env"}
               ]
             }

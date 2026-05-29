@@ -5,7 +5,7 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookers']
+-- Select: ['__bookers']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,7 +14,7 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     listing_id AS listing
-    , guest_id AS bookers
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -22,30 +22,32 @@ SELECT
   COUNT(DISTINCT bookers) AS bookers
 FROM (
   -- Join Standard Outputs
+  -- Select: ['__bookers', 'listing__bookers']
   SELECT
-    subq_21.listing__bookers AS listing__bookers
-    , subq_16.bookers AS bookers
+    subq_29.listing__bookers AS listing__bookers
+    , subq_23.__bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       listing
-      , bookers
+      , __bookers
     FROM sma_28009_cte
-  ) subq_16
+  ) subq_23
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'listing']
+    -- Select: ['__bookers', 'listing']
+    -- Select: ['__bookers', 'listing']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookers']
+    -- Select: ['listing', 'listing__bookers']
     SELECT
       listing
-      , COUNT(DISTINCT bookers) AS listing__bookers
+      , COUNT(DISTINCT __bookers) AS listing__bookers
     FROM sma_28009_cte
     GROUP BY
       listing
-  ) subq_21
+  ) subq_29
   ON
-    subq_16.listing = subq_21.listing
-) subq_22
+    subq_23.listing = subq_29.listing
+) subq_31
 WHERE listing__bookers > 1.00

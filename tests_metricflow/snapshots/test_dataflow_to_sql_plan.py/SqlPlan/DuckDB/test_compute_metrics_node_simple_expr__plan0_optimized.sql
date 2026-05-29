@@ -15,7 +15,7 @@ FROM (
   SELECT
     bookings_source_src_28000.listing_id AS listing
     , listings_latest_src_28000.country AS listing__country_latest
-    , SUM(bookings_source_src_28000.booking_value) AS booking_value
+    , SUM(bookings_source_src_28000.booking_value) AS __booking_value
   FROM ***************************.fct_bookings bookings_source_src_28000
   LEFT OUTER JOIN
     ***************************.dim_listings_latest listings_latest_src_28000

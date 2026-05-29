@@ -8,14 +8,30 @@ from math import floor
 from time import perf_counter
 from typing import Callable, DefaultDict, Dict, List, Optional, Sequence, Tuple, TypeVar
 
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.protocols.semantic_model import SemanticModel
-from dbt_semantic_interfaces.references import (
+from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
+from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
+from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
+from metricflow_semantics.specs.spec_set import InstanceSpecSet
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+
+from metricflow.dataflow.builder.source_node import SourceNodeBuilder
+from metricflow.dataflow.dataflow_plan import DataflowPlanNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
+from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
+from metricflow.dataset.dataset_classes import DataSet
+from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
+from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
+from metricflow_semantic_interfaces.references import (
     MetricModelReference,
     SemanticModelElementReference,
     SemanticModelReference,
 )
-from dbt_semantic_interfaces.validations.validator_helpers import (
+from metricflow_semantic_interfaces.validations.validator_helpers import (
     FileContext,
     MetricContext,
     SavedQueryContext,
@@ -29,22 +45,6 @@ from dbt_semantic_interfaces.validations.validator_helpers import (
     ValidationIssue,
     ValidationWarning,
 )
-from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
-from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
-from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
-from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
-from metricflow_semantics.specs.spec_set import InstanceSpecSet
-from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
-
-from metricflow.dataflow.builder.source_node import SourceNodeBuilder
-from metricflow.dataflow.dataflow_plan import DataflowPlanNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
-from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
-from metricflow.dataset.dataset_classes import DataSet
-from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
-from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
-from metricflow.protocols.sql_client import SqlClient
 
 
 @dataclass
@@ -120,7 +120,7 @@ class DataWarehouseTaskBuilder:
 
     @staticmethod
     def renderize(
-        sql_client: SqlClient, plan_converter: DataflowToSqlPlanConverter, plan_id: str, nodes: FilterElementsNode
+        sql_client: SqlClient, plan_converter: DataflowToSqlPlanConverter, plan_id: str, nodes: SelectorNode
     ) -> Tuple[str, SqlBindParameterSet]:
         """Generates a sql query plan and returns the rendered sql and bind_parameter_set."""
         conversion_result = plan_converter.convert_to_sql_plan(
@@ -200,7 +200,7 @@ class DataWarehouseTaskBuilder:
                 spec_filter_tuples.append(
                     (
                         spec,
-                        FilterElementsNode.create(
+                        SelectorNode.create(
                             parent_node=source_node, include_specs=InstanceSpecSet(dimension_specs=(spec,))
                         ),
                     )
@@ -213,13 +213,13 @@ class DataWarehouseTaskBuilder:
                 spec_filter_tuples.append(
                     (
                         spec,
-                        FilterElementsNode.create(
+                        SelectorNode.create(
                             parent_node=source_node, include_specs=InstanceSpecSet(time_dimension_specs=(spec,))
                         ),
                     )
                 )
 
-            for spec, filter_elements_node in spec_filter_tuples:
+            for spec, selector_node in spec_filter_tuples:
                 semantic_model_sub_tasks.append(
                     DataWarehouseValidationTask(
                         query_and_params_callable=partial(
@@ -227,7 +227,7 @@ class DataWarehouseTaskBuilder:
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
                             plan_id=f"{semantic_model.name}_dim_{spec.element_name}_validation",
-                            nodes=filter_elements_node,
+                            nodes=selector_node,
                         ),
                         context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
@@ -241,7 +241,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode.create(
+            selector_node = SelectorNode.create(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
                     dimension_specs=dimension_specs,
@@ -255,7 +255,7 @@ class DataWarehouseTaskBuilder:
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
                         plan_id=f"{semantic_model.name}_all_dimensions_validation",
-                        nodes=filter_elements_node,
+                        nodes=selector_node,
                     ),
                     context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
@@ -301,7 +301,7 @@ class DataWarehouseTaskBuilder:
                 dataset.instance_set.spec_set.entity_specs
             )
             for spec in semantic_model_specs:
-                filter_elements_node = FilterElementsNode.create(
+                selector_node = SelectorNode.create(
                     parent_node=source_node, include_specs=InstanceSpecSet(entity_specs=(spec,))
                 )
                 semantic_model_sub_tasks.append(
@@ -311,7 +311,7 @@ class DataWarehouseTaskBuilder:
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
                             plan_id=f"{semantic_model.name}_entity_{spec.element_name}_validation",
-                            nodes=filter_elements_node,
+                            nodes=selector_node,
                         ),
                         context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
@@ -325,7 +325,7 @@ class DataWarehouseTaskBuilder:
                     )
                 )
 
-            filter_elements_node = FilterElementsNode.create(
+            selector_node = SelectorNode.create(
                 parent_node=source_node,
                 include_specs=InstanceSpecSet(
                     entity_specs=tuple(semantic_model_specs),
@@ -338,7 +338,7 @@ class DataWarehouseTaskBuilder:
                         sql_client=sql_client,
                         plan_converter=render_tools.plan_converter,
                         plan_id=f"{semantic_model.name}_all_entities_validation",
-                        nodes=filter_elements_node,
+                        nodes=selector_node,
                     ),
                     context=SemanticModelContext(
                         file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
@@ -401,7 +401,7 @@ class DataWarehouseTaskBuilder:
                     obtained_source_node
                 ), f"Unable to find generated source node for simple-metric input: {spec.element_name}"
 
-                filter_elements_node = FilterElementsNode.create(
+                selector_node = SelectorNode.create(
                     parent_node=obtained_source_node,
                     include_specs=InstanceSpecSet(
                         simple_metric_input_specs=(spec,),
@@ -414,7 +414,7 @@ class DataWarehouseTaskBuilder:
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
                             plan_id=f"{semantic_model.name}_simple_metric_{spec.element_name}_validation",
-                            nodes=filter_elements_node,
+                            nodes=selector_node,
                         ),
                         context=SemanticModelElementContext(
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
@@ -429,7 +429,7 @@ class DataWarehouseTaskBuilder:
                 )
 
             for simple_metric_input_specs, source_node in simple_metric_specs_and_source_node_pair:
-                filter_elements_node = FilterElementsNode.create(
+                selector_node = SelectorNode.create(
                     parent_node=source_node,
                     include_specs=InstanceSpecSet(simple_metric_input_specs=simple_metric_input_specs),
                 )
@@ -440,7 +440,7 @@ class DataWarehouseTaskBuilder:
                             sql_client=sql_client,
                             plan_converter=render_tools.plan_converter,
                             plan_id=f"{semantic_model.name}_all_simple_metric_inputs_validation",
-                            nodes=filter_elements_node,
+                            nodes=selector_node,
                         ),
                         context=SemanticModelContext(
                             file_context=FileContext.from_metadata(metadata=semantic_model.metadata),
@@ -484,7 +484,7 @@ class DataWarehouseTaskBuilder:
                     query_and_params_callable=partial(
                         cls._gen_explain_query_task_query_and_params,
                         mf_engine=mf_engine,
-                        mf_request=MetricFlowQueryRequest.create_with_random_request_id(
+                        mf_request=MetricFlowQueryRequest.create(
                             metric_names=[metric.name], group_by_names=[DataSet.metric_time_dimension_name()]
                         ),
                     ),
@@ -519,9 +519,7 @@ class DataWarehouseTaskBuilder:
                     query_and_params_callable=partial(
                         cls._gen_explain_query_task_query_and_params,
                         mf_engine=mf_engine,
-                        mf_request=MetricFlowQueryRequest.create_with_random_request_id(
-                            saved_query_name=saved_query.name
-                        ),
+                        mf_request=MetricFlowQueryRequest.create(saved_query_name=saved_query.name),
                     ),
                     context=SavedQueryContext(
                         file_context=FileContext.from_metadata(metadata=saved_query.metadata),

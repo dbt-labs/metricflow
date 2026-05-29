@@ -2,6 +2,7 @@
 
 This script should run without installing additional Python packages.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -21,7 +22,7 @@ def _install_hatch_environment_dependencies(hatch_project_directory: Path, hatch
     )
 
     MetricFlowScriptHelper.run_command(
-        ["hatch", "--verbose", "--env", hatch_environment_name, "run", "true"],
+        ["hatch", "--verbose", "run", f"{hatch_environment_name}:true"],
         working_directory=hatch_project_directory,
     )
 

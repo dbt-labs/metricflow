@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Sequence
+from typing import Optional
 
-from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from typing_extensions import override
 
@@ -18,7 +17,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -31,7 +30,7 @@ from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGran
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -44,6 +43,7 @@ from metricflow.execution.execution_plan import (
 )
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
+from metricflow.plan_conversion.to_sql_plan.output_column_orderer import OutputColumnOrderer
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer, SqlPlanRenderResult
@@ -73,7 +73,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         self._sql_plan_renderer = sql_plan_renderer
         self._sql_client = sql_client
         self._optimization_level = sql_optimization_level
-        self._spec_output_order: Sequence[InstanceSpec] = ()
+        self._output_column_orderer: Optional[OutputColumnOrderer] = None
 
     def _convert_to_sql_plan(self, node: DataflowPlanNode) -> ConvertToSqlPlanResult:
         logger.debug(LazyFormat("Generating SQL plan", node_id=node.node_id))
@@ -81,7 +81,7 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
             sql_engine_type=self._sql_client.sql_engine_type,
             optimization_level=self._optimization_level,
             dataflow_plan_node=node,
-            spec_output_order=self._spec_output_order,
+            output_column_orderer=self._output_column_orderer,
         )
         logger.debug(LazyFormat("Generated SQL plan", sql_plan=lambda: result.sql_plan.structure_text()))
         return result
@@ -132,13 +132,10 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
     def convert_to_execution_plan(
         self,
         dataflow_plan: DataflowPlan,
-        spec_output_order: Sequence[InstanceSpec] = (),
+        output_column_orderer: Optional[OutputColumnOrderer] = None,
     ) -> ConvertToExecutionPlanResult:
-        """Convert the dataflow plan to an execution plan.
-
-        See `MetricflowQueryParser` for details on `spec_output_order`.
-        """
-        self._spec_output_order = tuple(spec_output_order)
+        """Convert the dataflow plan to an execution plan."""
+        self._output_column_orderer = output_column_orderer
         return dataflow_plan.sink_node.accept(self)
 
     @override
@@ -168,11 +165,11 @@ class DataflowToExecutionPlanConverter(DataflowPlanNodeVisitor[ConvertToExecutio
         raise NotImplementedError
 
     @override
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> ConvertToExecutionPlanResult:
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> ConvertToExecutionPlanResult:
         raise NotImplementedError
 
     @override
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> ConvertToExecutionPlanResult:
+    def visit_selector_node(self, node: SelectorNode) -> ConvertToExecutionPlanResult:
         raise NotImplementedError
 
     @override

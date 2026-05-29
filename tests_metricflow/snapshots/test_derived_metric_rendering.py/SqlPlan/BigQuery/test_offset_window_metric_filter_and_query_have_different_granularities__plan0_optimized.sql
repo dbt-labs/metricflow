@@ -12,8 +12,8 @@ WITH sma_28009_cte AS (
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
     , DATETIME_TRUNC(ds, month) AS metric_time__month
-    , booking_value
-    , guest_id AS bookers
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -23,36 +23,45 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_26.metric_time__month, subq_31.metric_time__month) AS metric_time__month
-    , MAX(subq_26.booking_value) AS booking_value
-    , MAX(subq_31.bookers) AS bookers
+    COALESCE(subq_31.metric_time__month, subq_37.metric_time__month) AS metric_time__month
+    , MAX(subq_31.booking_value) AS booking_value
+    , MAX(subq_37.bookers) AS bookers
   FROM (
-    -- Constrain Output with WHERE
-    -- Pass Only Elements: ['booking_value', 'metric_time__month']
+    -- Join to Time Spine Dataset
+    -- Select: ['__booking_value', 'metric_time__month']
+    -- Select: ['__booking_value', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
-      metric_time__month
-      , SUM(booking_value) AS booking_value
+      subq_26.metric_time__month AS metric_time__month
+      , SUM(sma_28009_cte.__booking_value) AS booking_value
     FROM (
-      -- Join to Time Spine Dataset
+      -- Constrain Output with WHERE
+      -- Select: ['metric_time__day', 'metric_time__month']
       SELECT
-        time_spine_src_28006.ds AS metric_time__day
-        , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
-        , sma_28009_cte.booking_value AS booking_value
-      FROM ***************************.mf_time_spine time_spine_src_28006
-      INNER JOIN
-        sma_28009_cte
-      ON
-        DATE_SUB(CAST(time_spine_src_28006.ds AS DATETIME), INTERVAL 1 week) = sma_28009_cte.metric_time__day
-    ) subq_22
-    WHERE metric_time__day = '2020-01-01'
+        metric_time__day
+        , metric_time__month
+      FROM (
+        -- Read From Time Spine 'mf_time_spine'
+        -- Change Column Aliases
+        -- Select: ['metric_time__day', 'metric_time__month']
+        SELECT
+          ds AS metric_time__day
+          , DATETIME_TRUNC(ds, month) AS metric_time__month
+        FROM ***************************.mf_time_spine time_spine_src_28006
+      ) subq_24
+      WHERE metric_time__day = '2020-01-01'
+    ) subq_26
+    INNER JOIN
+      sma_28009_cte
+    ON
+      DATE_SUB(CAST(subq_26.metric_time__day AS DATETIME), INTERVAL 1 week) = sma_28009_cte.metric_time__day
     GROUP BY
       metric_time__month
-  ) subq_26
+  ) subq_31
   FULL OUTER JOIN (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookers', 'metric_time__month']
+    -- Select: ['__bookers', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
@@ -60,18 +69,19 @@ FROM (
       , COUNT(DISTINCT bookers) AS bookers
     FROM (
       -- Read From CTE For node_id=sma_28009
+      -- Select: ['__bookers', 'metric_time__month', 'metric_time__day']
       SELECT
         metric_time__day
         , metric_time__month
-        , bookers
+        , __bookers AS bookers
       FROM sma_28009_cte
-    ) subq_27
+    ) subq_33
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_31
+  ) subq_37
   ON
-    subq_26.metric_time__month = subq_31.metric_time__month
+    subq_31.metric_time__month = subq_37.metric_time__month
   GROUP BY
     metric_time__month
-) subq_32
+) subq_38

@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 
 import pytest
-from dbt_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
@@ -13,7 +11,7 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
@@ -21,6 +19,8 @@ from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSql
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow_semantic_interfaces.references import SemanticModelReference, TimeDimensionReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +66,8 @@ def test_view_sql_generated_at_a_node(
         aggregation_time_dimension_reference=TimeDimensionReference(element_name="ds"),
     )
 
-    # Show SQL and spec set at a filter node.
-    filter_elements_node = FilterElementsNode.create(
+    # Show SQL and spec set at a selector node.
+    selector_node = SelectorNode.create(
         parent_node=metric_time_node,
         include_specs=InstanceSpecSet(
             time_dimension_specs=(
@@ -81,14 +81,10 @@ def test_view_sql_generated_at_a_node(
     )
     conversion_result = to_sql_plan_converter.convert_to_sql_plan(
         sql_engine_type=sql_client.sql_engine_type,
-        dataflow_plan_node=filter_elements_node,
+        dataflow_plan_node=selector_node,
     )
-    sql_plan_at_filter_elements_node = conversion_result.sql_plan
-    sql_at_filter_elements_node = sql_renderer.render_sql_plan(sql_plan_at_filter_elements_node).sql
-    spec_set_at_filter_elements_node = node_output_resolver.get_output_data_set(
-        filter_elements_node
-    ).instance_set.spec_set
-    logger.debug(LazyFormat(lambda: f"SQL generated at {filter_elements_node} is:\n\n{sql_at_filter_elements_node}"))
-    logger.debug(
-        LazyFormat(lambda: f"Spec set at {filter_elements_node} is:\n\n{mf_pformat(spec_set_at_filter_elements_node)}")
-    )
+    sql_plan_at_selector_node = conversion_result.sql_plan
+    sql_at_selector_node = sql_renderer.render_sql_plan(sql_plan_at_selector_node).sql
+    spec_set_at_selector_node = node_output_resolver.get_output_data_set(selector_node).instance_set.spec_set
+    logger.debug(LazyFormat(lambda: f"SQL generated at {selector_node} is:\n\n{sql_at_selector_node}"))
+    logger.debug(LazyFormat(lambda: f"Spec set at {selector_node} is:\n\n{mf_pformat(spec_set_at_selector_node)}"))

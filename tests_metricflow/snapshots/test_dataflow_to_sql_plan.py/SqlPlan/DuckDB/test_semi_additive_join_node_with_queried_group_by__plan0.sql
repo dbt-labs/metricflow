@@ -44,17 +44,17 @@ SELECT
   , subq_0.account__user AS account__user
   , subq_0.account_type AS account_type
   , subq_0.account__account_type AS account__account_type
-  , subq_0.account_balance AS account_balance
-  , subq_0.total_account_balance_first_day AS total_account_balance_first_day
-  , subq_0.current_account_balance_by_user AS current_account_balance_by_user
-  , subq_0.total_account_balance_first_day_of_month AS total_account_balance_first_day_of_month
+  , subq_0.__account_balance AS __account_balance
+  , subq_0.__total_account_balance_first_day AS __total_account_balance_first_day
+  , subq_0.__current_account_balance_by_user AS __current_account_balance_by_user
+  , subq_0.__total_account_balance_first_day_of_month AS __total_account_balance_first_day_of_month
 FROM (
   -- Read Elements From Semantic Model 'accounts_source'
   SELECT
-    accounts_source_src_28000.account_balance
-    , accounts_source_src_28000.account_balance AS total_account_balance_first_day
-    , accounts_source_src_28000.account_balance AS current_account_balance_by_user
-    , accounts_source_src_28000.account_balance AS total_account_balance_first_day_of_month
+    accounts_source_src_28000.account_balance AS __account_balance
+    , accounts_source_src_28000.account_balance AS __total_account_balance_first_day
+    , accounts_source_src_28000.account_balance AS __current_account_balance_by_user
+    , accounts_source_src_28000.account_balance AS __total_account_balance_first_day_of_month
     , DATE_TRUNC('day', accounts_source_src_28000.ds) AS ds__day
     , DATE_TRUNC('week', accounts_source_src_28000.ds) AS ds__week
     , DATE_TRUNC('month', accounts_source_src_28000.ds) AS ds__month
@@ -103,10 +103,10 @@ INNER JOIN (
   FROM (
     -- Read Elements From Semantic Model 'accounts_source'
     SELECT
-      accounts_source_src_28000.account_balance
-      , accounts_source_src_28000.account_balance AS total_account_balance_first_day
-      , accounts_source_src_28000.account_balance AS current_account_balance_by_user
-      , accounts_source_src_28000.account_balance AS total_account_balance_first_day_of_month
+      accounts_source_src_28000.account_balance AS __account_balance
+      , accounts_source_src_28000.account_balance AS __total_account_balance_first_day
+      , accounts_source_src_28000.account_balance AS __current_account_balance_by_user
+      , accounts_source_src_28000.account_balance AS __total_account_balance_first_day_of_month
       , DATE_TRUNC('day', accounts_source_src_28000.ds) AS ds__day
       , DATE_TRUNC('week', accounts_source_src_28000.ds) AS ds__week
       , DATE_TRUNC('month', accounts_source_src_28000.ds) AS ds__month

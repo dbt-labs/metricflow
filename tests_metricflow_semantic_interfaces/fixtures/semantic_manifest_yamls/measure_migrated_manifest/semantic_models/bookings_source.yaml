@@ -1,0 +1,244 @@
+---
+semantic_model:
+  name: bookings_source
+  defaults:
+    agg_time_dimension: ds
+  description: bookings_source
+  node_relation:
+    alias: fct_bookings
+    schema_name: $source_schema
+  primary_entity: booking
+  entities:
+    - name: listing
+      type: foreign
+      expr: listing_id
+    - name: guest
+      type: foreign
+      expr: guest_id
+    - name: host
+      type: foreign
+      expr: host_id
+  dimensions:
+    - name: is_instant
+      type: categorical
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+    - name: ds_partitioned
+      type: time
+      is_partition: true
+      type_params:
+        time_granularity: day
+    - name: booking_paid_at
+      type: time
+      type_params:
+        time_granularity: day
+
+---
+metric:
+  name: bookings
+  description: bookings metric
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: sum
+  label: Bookings
+
+---
+metric:
+  name: average_booking_value
+  description: average booking value metric
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: average
+  label: Average Bookings Value
+
+---
+metric:
+  name: instant_bookings
+  description: instant bookings
+  type: simple
+  type_params:
+    expr: CASE WHEN is_instant THEN 1 ELSE 0 END
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: sum
+  label: Instant Bookings
+
+---
+metric:
+  name: booking_value
+  description: booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: sum
+
+---
+metric:
+  name: max_booking_value
+  description: max booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: max
+
+---
+metric:
+  name: min_booking_value
+  description: min booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: min
+
+---
+metric:
+  name: instant_booking_value
+  description: booking value of instant bookings
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: sum
+  filter: "{{ Dimension('booking__is_instant') }}"
+
+---
+metric:
+  name: average_instant_booking_value
+  description: average booking value of instant bookings
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: average
+  filter: "{{ Dimension('booking__is_instant') }}"
+
+---
+metric:
+  name: booking_value_for_non_null_listing_id
+  description: booking value of instant bookings
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: sum
+  filter: "{{ Entity('listing') }} IS NOT NULL"
+
+---
+metric:
+  name: bookers
+  description: bookers
+  type: simple
+  type_params:
+    expr: guest_id
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: count_distinct
+
+---
+metric:
+  name: booking_payments
+  description: Booking payments.
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: sum
+      agg_time_dimension: booking_paid_at
+
+---
+metric:
+  name: referred_bookings
+  description: bookings made through a referral
+  type: simple
+  type_params:
+    expr: CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: sum
+
+---
+metric:
+  name: median_booking_value
+  description: median booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: percentile
+      agg_params:
+        percentile: 0.5
+
+---
+metric:
+  name: booking_value_p99
+  description: p99 booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+
+---
+metric:
+  name: discrete_booking_value_p99
+  description: discrete p99 booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_discrete_percentile: true
+
+---
+metric:
+  name: approximate_continuous_booking_value_p99
+  description: approximate continuous p99 booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_approximate_percentile: true
+
+---
+metric:
+  name: approximate_discrete_booking_value_p99
+  description: approximate discrete p99 booking value
+  type: simple
+  type_params:
+    expr: booking_value
+    metric_aggregation_params:
+      semantic_model: bookings_source
+      agg: percentile
+      agg_params:
+        percentile: 0.99
+        use_discrete_percentile: true
+        use_approximate_percentile: true

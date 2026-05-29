@@ -10,57 +10,47 @@ docstring:
         <ComputeMetricsNode>
             <!-- description = 'Compute Metrics via Expressions' -->
             <!-- node_id = NodeId(id_str='cm_1') -->
-            <!-- metric_spec =                                       -->
-            <!--   MetricSpec(                                       -->
-            <!--     element_name='listings',                        -->
-            <!--     filter_spec_set=WhereFilterSpecSet(             -->
-            <!--       query_level_filter_specs=(                    -->
-            <!--         WhereFilterSpec(                            -->
-            <!--           where_sql='listing__bookings > 2',        -->
-            <!--           bind_parameters=SqlBindParameterSet(),    -->
-            <!--           element_set=GroupByItemSet(               -->
-            <!--             annotated_specs=(                       -->
-            <!--               AnnotatedSpec(                        -->
-            <!--                 element_type=METRIC,                -->
-            <!--                 element_name='bookings',            -->
-            <!--                 entity_link_names=(                 -->
-            <!--                   'listing',                        -->
-            <!--                 ),                                  -->
-            <!--                 metric_subquery_entity_link_names=( -->
-            <!--                   'listing',                        -->
-            <!--                 ),                                  -->
-            <!--                 element_properties=(                -->
-            <!--                   JOINED,                           -->
-            <!--                   METRIC,                           -->
-            <!--                 ),                                  -->
-            <!--                 origin_semantic_model_names=(       -->
-            <!--                   '__VIRTUAL__',                    -->
-            <!--                 ),                                  -->
-            <!--                 derived_from_semantic_model_names=( -->
-            <!--                   'listings_latest',                -->
-            <!--                   'bookings_source',                -->
-            <!--                 ),                                  -->
-            <!--               ),                                    -->
-            <!--             ),                                      -->
-            <!--           ),                                        -->
-            <!--         ),                                          -->
-            <!--       ),                                            -->
-            <!--     ),                                              -->
-            <!--   )                                                 -->
+            <!-- metric_spec =                                               -->
+            <!--   MetricSpec(                                               -->
+            <!--     element_name='listings',                                -->
+            <!--     where_filter_specs=(                                    -->
+            <!--       WhereFilterSpec(                                      -->
+            <!--         where_sql='listing__bookings > 2',                  -->
+            <!--         bind_parameters=SqlBindParameterSet(),              -->
+            <!--         element_set=GroupByItemSet(                         -->
+            <!--           annotated_specs=(                                 -->
+            <!--             AnnotatedSpec(                                  -->
+            <!--               element_type=METRIC,                          -->
+            <!--               element_name='bookings',                      -->
+            <!--               entity_link_names=('listing',),               -->
+            <!--               metric_subquery_entity_link_names=(           -->
+            <!--                 'listing',                                  -->
+            <!--               ),                                            -->
+            <!--               element_properties=(JOINED, METRIC),          -->
+            <!--               origin_semantic_model_names=('__VIRTUAL__',), -->
+            <!--               derived_from_semantic_model_names=(           -->
+            <!--                 'listings_latest',                          -->
+            <!--                 'bookings_source',                          -->
+            <!--               ),                                            -->
+            <!--             ),                                              -->
+            <!--           ),                                                -->
+            <!--         ),                                                  -->
+            <!--       ),                                                    -->
+            <!--     ),                                                      -->
+            <!--   )                                                         -->
             <AggregateSimpleMetricInputsNode>
                 <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                 <!-- node_id = NodeId(id_str='am_1') -->
-                <!-- alias_mapping = {} -->
-                <!-- null_fill_value_mapping = {} -->
-                <FilterElementsNode>
-                    <!-- description = "Pass Only Elements: ['listings']" -->
-                    <!-- node_id = NodeId(id_str='pfe_2') -->
+                <!-- null_fill_value_mapping = {'listings': None} -->
+                <SelectorNode>
+                    <!-- description = "Select: ['__listings']" -->
+                    <!-- node_id = NodeId(id_str='pfe_4') -->
                     <!-- include_spec = SimpleMetricInputSpec(element_name='listings') -->
                     <!-- distinct = False -->
-                    <WhereConstraintNode>
-                        <!-- description = 'Constrain Output with WHERE' -->
+                    <WhereFilterNode>
+                        <!-- description = 'Filter Output with WHERE' -->
                         <!-- node_id = NodeId(id_str='wcc_0') -->
-                        <!-- where_condition =                                         -->
+                        <!-- filter_spec =                                             -->
                         <!--   WhereFilterSpec(                                        -->
                         <!--     where_sql='listing__bookings > 2',                    -->
                         <!--     bind_parameters=SqlBindParameterSet(),                -->
@@ -81,69 +71,87 @@ docstring:
                         <!--       ),                                                  -->
                         <!--     ),                                                    -->
                         <!--   )                                                       -->
-                        <JoinOnEntitiesNode>
-                            <!-- description = 'Join Standard Outputs' -->
-                            <!-- node_id = NodeId(id_str='jso_0') -->
-                            <!-- join0_for_node_id_pfe_1 =                                      -->
-                            <!--   JoinDescription(                                             -->
-                            <!--     join_node=FilterElementsNode(node_id=pfe_1),               -->
-                            <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
-                            <!--     join_type=LEFT_OUTER,                                      -->
-                            <!--   )                                                            -->
-                            <MetricTimeDimensionTransformNode>
-                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                <!-- node_id = NodeId(id_str='sma_28014') -->
-                                <!-- aggregation_time_dimension = 'ds' -->
-                                <ReadSqlSourceNode>
-                                    <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
-                                    <!-- node_id = NodeId(id_str='rss_28024') -->
-                                    <!-- data_set = SemanticModelDataSet('listings_latest') -->
-                                </ReadSqlSourceNode>
-                            </MetricTimeDimensionTransformNode>
-                            <FilterElementsNode>
-                                <!-- description = "Pass Only Elements: ['listing', 'listing__bookings']" -->
-                                <!-- node_id = NodeId(id_str='pfe_1') -->
-                                <!-- include_spec = EntitySpec(element_name='listing') -->
-                                <!-- include_spec =                                                               -->
-                                <!--   GroupByMetricSpec(                                                         -->
-                                <!--     element_name='bookings',                                                 -->
-                                <!--     metric_subquery_entity_links=(EntityReference(element_name='listing'),), -->
-                                <!--   )                                                                          -->
-                                <!-- distinct = False -->
-                                <ComputeMetricsNode>
-                                    <!-- description = 'Compute Metrics via Expressions' -->
-                                    <!-- node_id = NodeId(id_str='cm_0') -->
-                                    <!-- metric_spec = MetricSpec(element_name='bookings') -->
-                                    <!-- for_group_by_source_node = True -->
-                                    <AggregateSimpleMetricInputsNode>
-                                        <!-- description = 'Aggregate Inputs for Simple Metrics' -->
-                                        <!-- node_id = NodeId(id_str='am_0') -->
-                                        <!-- alias_mapping = {} -->
-                                        <!-- null_fill_value_mapping = {} -->
-                                        <FilterElementsNode>
-                                            <!-- description = "Pass Only Elements: ['bookings', 'listing']" -->
-                                            <!-- node_id = NodeId(id_str='pfe_0') -->
-                                            <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
-                                            <!-- include_spec = EntitySpec(element_name='listing') -->
-                                            <!-- distinct = False -->
-                                            <MetricTimeDimensionTransformNode>
-                                                <!-- description = "Metric Time Dimension 'ds'" -->
-                                                <!-- node_id = NodeId(id_str='sma_28009') -->
-                                                <!-- aggregation_time_dimension = 'ds' -->
-                                                <ReadSqlSourceNode>
-                                                    <!-- description =                                         -->
-                                                    <!--   "Read From SemanticModelDataSet('bookings_source')" -->
-                                                    <!-- node_id = NodeId(id_str='rss_28020') -->
-                                                    <!-- data_set = SemanticModelDataSet('bookings_source') -->
-                                                </ReadSqlSourceNode>
-                                            </MetricTimeDimensionTransformNode>
-                                        </FilterElementsNode>
-                                    </AggregateSimpleMetricInputsNode>
-                                </ComputeMetricsNode>
-                            </FilterElementsNode>
-                        </JoinOnEntitiesNode>
-                    </WhereConstraintNode>
-                </FilterElementsNode>
+                        <SelectorNode>
+                            <!-- description = "Select: ['__listings', 'listing__bookings']" -->
+                            <!-- node_id = NodeId(id_str='pfe_3') -->
+                            <!-- include_spec = SimpleMetricInputSpec(element_name='listings') -->
+                            <!-- include_spec =                                                               -->
+                            <!--   GroupByMetricSpec(                                                         -->
+                            <!--     element_name='bookings',                                                 -->
+                            <!--     entity_links=(EntityReference(element_name='listing'),),                 -->
+                            <!--     metric_subquery_entity_links=(EntityReference(element_name='listing'),), -->
+                            <!--   )                                                                          -->
+                            <!-- distinct = False -->
+                            <JoinOnEntitiesNode>
+                                <!-- description = 'Join Standard Outputs' -->
+                                <!-- node_id = NodeId(id_str='jso_0') -->
+                                <!-- join0_for_node_id_pfe_2 =                                   -->
+                                <!--   JoinDescription(                                          -->
+                                <!--     join_node=SelectorNode(node_id=pfe_2),                  -->
+                                <!--     join_on_entity=EntityReference(element_name='listing'), -->
+                                <!--     join_type=LEFT_OUTER,                                   -->
+                                <!--   )                                                         -->
+                                <MetricTimeDimensionTransformNode>
+                                    <!-- description = "Metric Time Dimension 'ds'" -->
+                                    <!-- node_id = NodeId(id_str='sma_28014') -->
+                                    <!-- aggregation_time_dimension = 'ds' -->
+                                    <ReadSqlSourceNode>
+                                        <!-- description = "Read From SemanticModelDataSet('listings_latest')" -->
+                                        <!-- node_id = NodeId(id_str='rss_28024') -->
+                                        <!-- data_set = SemanticModelDataSet('listings_latest') -->
+                                    </ReadSqlSourceNode>
+                                </MetricTimeDimensionTransformNode>
+                                <SelectorNode>
+                                    <!-- description = "Select: ['listing', 'listing__bookings']" -->
+                                    <!-- node_id = NodeId(id_str='pfe_2') -->
+                                    <!-- include_spec = EntitySpec(element_name='listing') -->
+                                    <!-- include_spec =                                                               -->
+                                    <!--   GroupByMetricSpec(                                                         -->
+                                    <!--     element_name='bookings',                                                 -->
+                                    <!--     metric_subquery_entity_links=(EntityReference(element_name='listing'),), -->
+                                    <!--   )                                                                          -->
+                                    <!-- distinct = False -->
+                                    <ComputeMetricsNode>
+                                        <!-- description = 'Compute Metrics via Expressions' -->
+                                        <!-- node_id = NodeId(id_str='cm_0') -->
+                                        <!-- metric_spec = MetricSpec(element_name='bookings') -->
+                                        <!-- output_group_by_metric_instances = True -->
+                                        <AggregateSimpleMetricInputsNode>
+                                            <!-- description = 'Aggregate Inputs for Simple Metrics' -->
+                                            <!-- node_id = NodeId(id_str='am_0') -->
+                                            <!-- null_fill_value_mapping = {'bookings': None} -->
+                                            <SelectorNode>
+                                                <!-- description = "Select: ['__bookings', 'listing']" -->
+                                                <!-- node_id = NodeId(id_str='pfe_1') -->
+                                                <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                                                <!-- include_spec = EntitySpec(element_name='listing') -->
+                                                <!-- distinct = False -->
+                                                <SelectorNode>
+                                                    <!-- description = "Select: ['__bookings', 'listing']" -->
+                                                    <!-- node_id = NodeId(id_str='pfe_0') -->
+                                                    <!-- include_spec = SimpleMetricInputSpec(element_name='bookings') -->
+                                                    <!-- include_spec = EntitySpec(element_name='listing') -->
+                                                    <!-- distinct = False -->
+                                                    <MetricTimeDimensionTransformNode>
+                                                        <!-- description = "Metric Time Dimension 'ds'" -->
+                                                        <!-- node_id = NodeId(id_str='sma_28009') -->
+                                                        <!-- aggregation_time_dimension = 'ds' -->
+                                                        <ReadSqlSourceNode>
+                                                            <!-- description =                                         -->
+                                                            <!--   "Read From SemanticModelDataSet('bookings_source')" -->
+                                                            <!-- node_id = NodeId(id_str='rss_28020') -->
+                                                            <!-- data_set = SemanticModelDataSet('bookings_source') -->
+                                                        </ReadSqlSourceNode>
+                                                    </MetricTimeDimensionTransformNode>
+                                                </SelectorNode>
+                                            </SelectorNode>
+                                        </AggregateSimpleMetricInputsNode>
+                                    </ComputeMetricsNode>
+                                </SelectorNode>
+                            </JoinOnEntitiesNode>
+                        </SelectorNode>
+                    </WhereFilterNode>
+                </SelectorNode>
             </AggregateSimpleMetricInputsNode>
         </ComputeMetricsNode>
     </WriteToResultDataTableNode>

@@ -4,8 +4,6 @@ import logging
 from typing import Mapping
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import SemanticModelElementReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.instances import (
     InstanceSet,
@@ -14,7 +12,6 @@ from metricflow_semantics.instances import (
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociation
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
 from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
@@ -32,6 +29,8 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelElementReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)
@@ -108,7 +107,7 @@ def test_joined_node_data_set(
         join_targets=[
             JoinDescription(
                 join_node=users_node,
-                join_on_entity=LinklessEntitySpec.from_element_name("user"),
+                join_on_entity=EntityReference("user"),
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,

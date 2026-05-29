@@ -21,10 +21,10 @@ def create_tables_listed_in_table_snapshot_repository(
     table_snapshot_repository: SqlTableSnapshotRepository,
 ) -> None:
     """Creates all tables in the table snapshot repository in the given schema."""
-    snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client, schema_name=schema_name)
+    snapshot_loader = SqlTableSnapshotLoader(ddl_sql_client=ddl_sql_client)
     for table_snapshot in table_snapshot_repository.table_snapshots:
         logger.debug(LazyFormat(lambda: f"Loading: {table_snapshot.table_name}"))
-        snapshot_loader.load(table_snapshot)
+        snapshot_loader.load(table_snapshot.with_schema_name(schema_name))
 
 
 def get_populate_source_schema_shell_command(engine: SqlEngine) -> str:

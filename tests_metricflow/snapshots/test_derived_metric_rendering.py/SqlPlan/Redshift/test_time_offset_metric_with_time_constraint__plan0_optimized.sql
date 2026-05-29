@@ -12,36 +12,38 @@ FROM (
   -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
   -- Compute Metrics via Expressions
   SELECT
-    subq_19.metric_time__day AS metric_time__day
-    , subq_15.bookings_5_days_ago AS bookings_5_days_ago
+    subq_25.metric_time__day AS metric_time__day
+    , subq_20.__bookings AS bookings_5_days_ago
   FROM (
     -- Read From Time Spine 'mf_time_spine'
     -- Change Column Aliases
+    -- Select: ['metric_time__day']
     -- Constrain Time Range to [2019-12-19T00:00:00, 2020-01-02T00:00:00]
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       ds AS metric_time__day
     FROM ***************************.mf_time_spine time_spine_src_28006
     WHERE ds BETWEEN '2019-12-19' AND '2020-01-02'
-  ) subq_19
+  ) subq_25
   INNER JOIN (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__day
-      , SUM(bookings) AS bookings_5_days_ago
+      , SUM(__bookings) AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_14
+    ) subq_19
     GROUP BY
       metric_time__day
-  ) subq_15
+  ) subq_20
   ON
-    DATEADD(day, -5, subq_19.metric_time__day) = subq_15.metric_time__day
-  WHERE subq_19.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
-) subq_22
+    DATEADD(day, -5, subq_25.metric_time__day) = subq_20.metric_time__day
+  WHERE subq_25.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
+) subq_28

@@ -1,0 +1,16 @@
+---
+metric:
+  name: homonymous_metric_and_dimension
+  description: |
+    Used to test a soon-to-be-deprecated use case where the name of the metric is the same as a dimension.
+  type: simple
+  type_params:
+    measure: booking_value
+---
+metric:
+  name: homonymous_metric_and_entity
+  description: |
+    Used to test a soon-to-be-deprecated use case where the name of the metric is the same as an entity.
+  type: simple
+  type_params:
+    measure: booking_value

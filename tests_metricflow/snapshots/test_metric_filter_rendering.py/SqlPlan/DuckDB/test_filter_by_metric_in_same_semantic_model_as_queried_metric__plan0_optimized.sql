@@ -5,7 +5,7 @@ docstring:
 sql_engine: DuckDB
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['bookers']
+-- Select: ['__bookers']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -14,8 +14,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     guest_id AS guest
-    , booking_value
-    , guest_id AS bookers
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -23,30 +23,32 @@ SELECT
   COUNT(DISTINCT bookers) AS bookers
 FROM (
   -- Join Standard Outputs
+  -- Select: ['__bookers', 'guest__booking_value']
   SELECT
-    subq_21.guest__booking_value AS guest__booking_value
-    , subq_16.bookers AS bookers
+    subq_29.guest__booking_value AS guest__booking_value
+    , subq_23.__bookers AS bookers
   FROM (
     -- Read From CTE For node_id=sma_28009
     SELECT
       guest
-      , bookers
+      , __bookers
     FROM sma_28009_cte
-  ) subq_16
+  ) subq_23
   LEFT OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['booking_value', 'guest']
+    -- Select: ['__booking_value', 'guest']
+    -- Select: ['__booking_value', 'guest']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['guest', 'guest__booking_value']
+    -- Select: ['guest', 'guest__booking_value']
     SELECT
       guest
-      , SUM(booking_value) AS guest__booking_value
+      , SUM(__booking_value) AS guest__booking_value
     FROM sma_28009_cte
     GROUP BY
       guest
-  ) subq_21
+  ) subq_29
   ON
-    subq_16.guest = subq_21.guest
-) subq_22
+    subq_23.guest = subq_29.guest
+) subq_31
 WHERE guest__booking_value > 1.00

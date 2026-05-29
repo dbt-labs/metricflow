@@ -9,44 +9,45 @@ sql_engine: DuckDB
 SELECT
   metric_time__day
   , booking__is_instant
-  , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
+  , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
 FROM (
   -- Constrain Output with WHERE
   SELECT
-    metric_time__day
+    bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
     , booking__is_instant
-    , bookings_fill_nulls_with_0
+    , metric_time__day
   FROM (
     -- Join to Time Spine Dataset
     SELECT
       time_spine_src_28006.ds AS metric_time__day
-      , subq_15.booking__is_instant AS booking__is_instant
-      , subq_15.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+      , subq_18.booking__is_instant AS booking__is_instant
+      , subq_18.__bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
     FROM ***************************.mf_time_spine time_spine_src_28006
     LEFT OUTER JOIN (
       -- Constrain Output with WHERE
-      -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
+      -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
         , booking__is_instant
-        , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+        , SUM(bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
       FROM (
         -- Read Elements From Semantic Model 'bookings_source'
         -- Metric Time Dimension 'ds'
+        -- Select: ['__bookings_fill_nulls_with_0', 'booking__is_instant', 'metric_time__day']
         SELECT
           DATE_TRUNC('day', ds) AS metric_time__day
           , is_instant AS booking__is_instant
           , 1 AS bookings_fill_nulls_with_0
         FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_12
+      ) subq_15
       WHERE booking__is_instant
       GROUP BY
         metric_time__day
         , booking__is_instant
-    ) subq_15
+    ) subq_18
     ON
-      time_spine_src_28006.ds = subq_15.metric_time__day
-  ) subq_19
+      time_spine_src_28006.ds = subq_18.metric_time__day
+  ) subq_23
   WHERE booking__is_instant
-) subq_20
+) subq_24

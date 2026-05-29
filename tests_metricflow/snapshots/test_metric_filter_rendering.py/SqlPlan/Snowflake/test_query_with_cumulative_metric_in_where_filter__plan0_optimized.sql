@@ -3,11 +3,11 @@ test_filename: test_metric_filter_rendering.py
 docstring:
   Tests a query with a cumulative metric in the query-level where filter.
 
-      Note this cumulative metric has no window / grain to date.
+  Note this cumulative metric has no window / grain to date.
 sql_engine: Snowflake
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -15,33 +15,35 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Select: ['__listings', 'user__revenue_all_time']
   SELECT
-    subq_26.user__revenue_all_time AS user__revenue_all_time
-    , subq_19.listings AS listings
+    subq_35.user__revenue_all_time AS user__revenue_all_time
+    , subq_27.__listings AS listings
   FROM (
     -- Read Elements From Semantic Model 'listings_latest'
     -- Metric Time Dimension 'ds'
     SELECT
       user_id AS user
-      , 1 AS listings
+      , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
-  ) subq_19
+  ) subq_27
   LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'revenue'
     -- Metric Time Dimension 'ds'
-    -- Pass Only Elements: ['revenue', 'user']
+    -- Select: ['__revenue', 'user']
+    -- Select: ['__revenue', 'user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['user', 'user__revenue_all_time']
+    -- Select: ['user', 'user__revenue_all_time']
     SELECT
       user_id AS user
       , SUM(revenue) AS user__revenue_all_time
     FROM ***************************.fct_revenue revenue_src_28000
     GROUP BY
       user_id
-  ) subq_26
+  ) subq_35
   ON
-    subq_19.user = subq_26.user
-) subq_27
+    subq_27.user = subq_35.user
+) subq_37
 WHERE user__revenue_all_time > 1

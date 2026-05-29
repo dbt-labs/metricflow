@@ -13,8 +13,8 @@ WITH sma_28009_cte AS (
     DATE_TRUNC('day', ds) AS metric_time__day
     , DATE_TRUNC('month', ds) AS metric_time__month
     , DATE_TRUNC('year', ds) AS metric_time__year
-    , booking_value
-    , guest_id AS bookers
+    , booking_value AS __booking_value
+    , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -26,11 +26,11 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day) AS metric_time__day
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month) AS metric_time__month
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year) AS metric_time__year
-    , MAX(subq_23.booking_value) AS booking_value
-    , MAX(subq_27.bookers) AS bookers
+    COALESCE(subq_28.metric_time__day, subq_33.metric_time__day) AS metric_time__day
+    , COALESCE(subq_28.metric_time__month, subq_33.metric_time__month) AS metric_time__month
+    , COALESCE(subq_28.metric_time__year, subq_33.metric_time__year) AS metric_time__year
+    , MAX(subq_28.booking_value) AS booking_value
+    , MAX(subq_33.bookers) AS bookers
   FROM (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
@@ -38,52 +38,54 @@ FROM (
       time_spine_src_28006.ds AS metric_time__day
       , DATE_TRUNC('month', time_spine_src_28006.ds) AS metric_time__month
       , DATE_TRUNC('year', time_spine_src_28006.ds) AS metric_time__year
-      , subq_18.booking_value AS booking_value
+      , subq_22.__booking_value AS booking_value
     FROM ***************************.mf_time_spine time_spine_src_28006
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Select: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+      -- Select: ['__booking_value', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
         , metric_time__month
         , metric_time__year
-        , SUM(booking_value) AS booking_value
+        , SUM(__booking_value) AS __booking_value
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
         , metric_time__month
         , metric_time__year
-    ) subq_18
+    ) subq_22
     ON
-      time_spine_src_28006.ds - MAKE_INTERVAL(weeks => 1) = subq_18.metric_time__day
-  ) subq_23
+      time_spine_src_28006.ds - MAKE_INTERVAL(weeks => 1) = subq_22.metric_time__day
+  ) subq_28
   FULL OUTER JOIN (
     -- Read From CTE For node_id=sma_28009
-    -- Pass Only Elements: ['bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+    -- Select: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
+    -- Select: ['__bookers', 'metric_time__day', 'metric_time__month', 'metric_time__year']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
       , metric_time__month
       , metric_time__year
-      , COUNT(DISTINCT bookers) AS bookers
+      , COUNT(DISTINCT __bookers) AS bookers
     FROM sma_28009_cte
     GROUP BY
       metric_time__day
       , metric_time__month
       , metric_time__year
-  ) subq_27
+  ) subq_33
   ON
     (
-      subq_23.metric_time__day = subq_27.metric_time__day
+      subq_28.metric_time__day = subq_33.metric_time__day
     ) AND (
-      subq_23.metric_time__month = subq_27.metric_time__month
+      subq_28.metric_time__month = subq_33.metric_time__month
     ) AND (
-      subq_23.metric_time__year = subq_27.metric_time__year
+      subq_28.metric_time__year = subq_33.metric_time__year
     )
   GROUP BY
-    COALESCE(subq_23.metric_time__day, subq_27.metric_time__day)
-    , COALESCE(subq_23.metric_time__month, subq_27.metric_time__month)
-    , COALESCE(subq_23.metric_time__year, subq_27.metric_time__year)
-) subq_28
+    COALESCE(subq_28.metric_time__day, subq_33.metric_time__day)
+    , COALESCE(subq_28.metric_time__month, subq_33.metric_time__month)
+    , COALESCE(subq_28.metric_time__year, subq_33.metric_time__year)
+) subq_34

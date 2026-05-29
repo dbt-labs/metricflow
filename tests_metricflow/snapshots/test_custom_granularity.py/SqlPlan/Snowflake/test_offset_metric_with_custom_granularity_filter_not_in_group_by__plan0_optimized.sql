@@ -11,53 +11,47 @@ FROM (
   -- Join to Time Spine Dataset
   -- Compute Metrics via Expressions
   SELECT
-    subq_22.metric_time__day AS metric_time__day
-    , subq_18.bookings_5_days_ago AS bookings_5_days_ago
+    subq_24.metric_time__day AS metric_time__day
+    , subq_19.__bookings AS bookings_5_days_ago
   FROM (
     -- Constrain Output with WHERE
-    -- Pass Only Elements: ['metric_time__day']
+    -- Select: ['metric_time__day']
     SELECT
       metric_time__day
     FROM (
       -- Read From Time Spine 'mf_time_spine'
       -- Change Column Aliases
+      -- Select: ['metric_time__day', 'metric_time__alien_day']
       SELECT
         ds AS metric_time__day
         , alien_day AS metric_time__alien_day
       FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_20
+    ) subq_22
     WHERE metric_time__alien_day = '2020-01-01'
-  ) subq_22
+  ) subq_24
   INNER JOIN (
-    -- Constrain Output with WHERE
-    -- Pass Only Elements: ['bookings', 'metric_time__day']
+    -- Metric Time Dimension 'ds'
+    -- Join to Custom Granularity Dataset
+    -- Select: ['__bookings', 'metric_time__day']
+    -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      metric_time__day
-      , SUM(bookings) AS bookings_5_days_ago
+      subq_14.ds__day AS metric_time__day
+      , SUM(subq_14.__bookings) AS __bookings
     FROM (
-      -- Metric Time Dimension 'ds'
-      -- Join to Custom Granularity Dataset
+      -- Read Elements From Semantic Model 'bookings_source'
       SELECT
-        subq_13.ds__day AS metric_time__day
-        , subq_13.bookings AS bookings
-        , subq_14.alien_day AS metric_time__alien_day
-      FROM (
-        -- Read Elements From Semantic Model 'bookings_source'
-        SELECT
-          1 AS bookings
-          , DATE_TRUNC('day', ds) AS ds__day
-        FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_13
-      LEFT OUTER JOIN
-        ***************************.mf_time_spine subq_14
-      ON
-        subq_13.ds__day = subq_14.ds
-    ) subq_15
-    WHERE metric_time__alien_day = '2020-01-01'
+        1 AS __bookings
+        , DATE_TRUNC('day', ds) AS ds__day
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    ) subq_14
+    LEFT OUTER JOIN
+      ***************************.mf_time_spine subq_15
+    ON
+      subq_14.ds__day = subq_15.ds
     GROUP BY
-      metric_time__day
-  ) subq_18
+      subq_14.ds__day
+  ) subq_19
   ON
-    DATEADD(day, -5, subq_22.metric_time__day) = subq_18.metric_time__day
-) subq_24
+    DATEADD(day, -5, subq_24.metric_time__day) = subq_19.metric_time__day
+) subq_26

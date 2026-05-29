@@ -12,12 +12,21 @@ SELECT
   , metric_time__extract_day
   , metric_time__extract_dow
   , metric_time__extract_doy
-  , SUM(bookings) AS bookings
+  , SUM(__bookings) AS bookings
 FROM (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
-  -- Pass Only Elements: [
-  --   'bookings',
+  -- Select: [
+  --   '__bookings',
+  --   'metric_time__extract_day',
+  --   'metric_time__extract_dow',
+  --   'metric_time__extract_doy',
+  --   'metric_time__extract_month',
+  --   'metric_time__extract_quarter',
+  --   'metric_time__extract_year',
+  -- ]
+  -- Select: [
+  --   '__bookings',
   --   'metric_time__extract_day',
   --   'metric_time__extract_dow',
   --   'metric_time__extract_doy',
@@ -32,9 +41,9 @@ FROM (
     , EXTRACT(day FROM ds) AS metric_time__extract_day
     , EXTRACT(isodow FROM ds) AS metric_time__extract_dow
     , EXTRACT(doy FROM ds) AS metric_time__extract_doy
-    , 1 AS bookings
+    , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
-) subq_7
+) subq_9
 GROUP BY
   metric_time__extract_year
   , metric_time__extract_quarter

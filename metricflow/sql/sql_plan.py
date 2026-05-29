@@ -131,6 +131,10 @@ class SqlSelectColumn:
             column_name=self.column_alias, table_alias=source_table_alias
         )
 
+    def copy_with_new_alias(self, column_alias: str) -> SqlSelectColumn:
+        """Return a copy with the `column_alias` replaced with the given value."""
+        return SqlSelectColumn(expr=self.expr, column_alias=column_alias)
+
 
 class SqlPlan(MetricFlowDag[SqlPlanNode]):
     """Model for an SQL statement as a DAG."""

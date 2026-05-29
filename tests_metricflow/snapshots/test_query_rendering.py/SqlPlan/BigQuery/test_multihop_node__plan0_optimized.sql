@@ -5,17 +5,18 @@ docstring:
 sql_engine: BigQuery
 ---
 -- Join Standard Outputs
--- Pass Only Elements: ['txn_count', 'account_id__customer_id__customer_name']
+-- Select: ['__txn_count', 'account_id__customer_id__customer_name']
+-- Select: ['__txn_count', 'account_id__customer_id__customer_name']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_24.customer_id__customer_name AS account_id__customer_id__customer_name
+  subq_28.customer_id__customer_name AS account_id__customer_id__customer_name
   , SUM(account_month_txns_src_22000.txn_count) AS txn_count
 FROM ***************************.account_month_txns account_month_txns_src_22000
 LEFT OUTER JOIN (
   -- Join Standard Outputs
-  -- Pass Only Elements: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
+  -- Select: ['customer_id__customer_name', 'ds_partitioned__day', 'account_id']
   SELECT
     DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) AS ds_partitioned__day
     , bridge_table_src_22000.account_id AS account_id
@@ -29,12 +30,12 @@ LEFT OUTER JOIN (
     ) AND (
       DATETIME_TRUNC(bridge_table_src_22000.ds_partitioned, day) = DATETIME_TRUNC(customer_table_src_22000.ds_partitioned, day)
     )
-) subq_24
+) subq_28
 ON
   (
-    account_month_txns_src_22000.account_id = subq_24.account_id
+    account_month_txns_src_22000.account_id = subq_28.account_id
   ) AND (
-    DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_24.ds_partitioned__day
+    DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_28.ds_partitioned__day
   )
 GROUP BY
   account_id__customer_id__customer_name

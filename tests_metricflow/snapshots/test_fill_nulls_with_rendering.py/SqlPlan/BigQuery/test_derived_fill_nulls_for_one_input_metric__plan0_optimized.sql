@@ -9,8 +9,8 @@ WITH sma_28009_cte AS (
   -- Metric Time Dimension 'ds'
   SELECT
     DATETIME_TRUNC(ds, day) AS metric_time__day
-    , 1 AS bookings
-    , 1 AS bookings_fill_nulls_with_0
+    , 1 AS __bookings
+    , 1 AS __bookings_fill_nulls_with_0
   FROM ***************************.fct_bookings bookings_source_src_28000
 )
 
@@ -27,58 +27,60 @@ SELECT
 FROM (
   -- Combine Aggregated Outputs
   SELECT
-    COALESCE(subq_27.metric_time__day, subq_35.metric_time__day) AS metric_time__day
-    , COALESCE(MAX(subq_27.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
-    , MAX(subq_35.bookings_2_weeks_ago) AS bookings_2_weeks_ago
+    COALESCE(subq_33.metric_time__day, subq_43.metric_time__day) AS metric_time__day
+    , COALESCE(MAX(subq_33.bookings_fill_nulls_with_0), 0) AS bookings_fill_nulls_with_0
+    , MAX(subq_43.bookings_2_weeks_ago) AS bookings_2_weeks_ago
   FROM (
     -- Compute Metrics via Expressions
     SELECT
       metric_time__day
-      , COALESCE(bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
+      , COALESCE(__bookings_fill_nulls_with_0, 0) AS bookings_fill_nulls_with_0
     FROM (
       -- Join to Time Spine Dataset
       SELECT
         rss_28018_cte.ds__day AS metric_time__day
-        , subq_22.bookings_fill_nulls_with_0 AS bookings_fill_nulls_with_0
+        , subq_27.__bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
       FROM rss_28018_cte
       LEFT OUTER JOIN (
         -- Read From CTE For node_id=sma_28009
-        -- Pass Only Elements: ['bookings_fill_nulls_with_0', 'metric_time__day']
+        -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
+        -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
         -- Aggregate Inputs for Simple Metrics
         SELECT
           metric_time__day
-          , SUM(bookings_fill_nulls_with_0) AS bookings_fill_nulls_with_0
+          , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM sma_28009_cte
         GROUP BY
           metric_time__day
-      ) subq_22
+      ) subq_27
       ON
-        rss_28018_cte.ds__day = subq_22.metric_time__day
-    ) subq_26
-  ) subq_27
+        rss_28018_cte.ds__day = subq_27.metric_time__day
+    ) subq_32
+  ) subq_33
   FULL OUTER JOIN (
     -- Join to Time Spine Dataset
     -- Compute Metrics via Expressions
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_30.bookings_2_weeks_ago AS bookings_2_weeks_ago
+      , subq_37.__bookings AS bookings_2_weeks_ago
     FROM rss_28018_cte
     INNER JOIN (
       -- Read From CTE For node_id=sma_28009
-      -- Pass Only Elements: ['bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(bookings) AS bookings_2_weeks_ago
+        , SUM(__bookings) AS __bookings
       FROM sma_28009_cte
       GROUP BY
         metric_time__day
-    ) subq_30
+    ) subq_37
     ON
-      DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 14 day) = subq_30.metric_time__day
-  ) subq_35
+      DATE_SUB(CAST(rss_28018_cte.ds__day AS DATETIME), INTERVAL 14 day) = subq_37.metric_time__day
+  ) subq_43
   ON
-    subq_27.metric_time__day = subq_35.metric_time__day
+    subq_33.metric_time__day = subq_43.metric_time__day
   GROUP BY
     metric_time__day
-) subq_36
+) subq_44

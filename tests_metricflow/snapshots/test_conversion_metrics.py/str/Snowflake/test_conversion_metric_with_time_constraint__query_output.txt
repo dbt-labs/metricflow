@@ -3,6 +3,6 @@ test_filename: test_conversion_metrics.py
 docstring:
   Test query against a conversion metric with a time constraint and categorical filter.
 ---
-VISIT__REFERRER_ID      VISIT_BUY_CONVERSION_RATE
+visit__referrer_id      visit_buy_conversion_rate
 --------------------  ---------------------------
 fb_ad_1                                       1.5

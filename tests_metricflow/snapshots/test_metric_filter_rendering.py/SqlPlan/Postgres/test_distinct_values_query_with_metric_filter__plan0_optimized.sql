@@ -5,38 +5,40 @@ docstring:
 sql_engine: Postgres
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listing']
+-- Select: ['listing']
 -- Write to DataTable
 SELECT
   listing
 FROM (
   -- Join Standard Outputs
+  -- Select: ['listing', 'listing__bookings']
   SELECT
-    subq_19.listing__bookings AS listing__bookings
-    , lux_listing_mapping_src_28000.listing_id AS listing
+    lux_listing_mapping_src_28000.listing_id AS listing
+    , subq_27.listing__bookings AS listing__bookings
   FROM ***************************.dim_lux_listing_id_mapping lux_listing_mapping_src_28000
   FULL OUTER JOIN (
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing', 'listing__bookings']
+    -- Select: ['listing', 'listing__bookings']
     SELECT
       listing
-      , SUM(bookings) AS listing__bookings
+      , SUM(__bookings) AS listing__bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Pass Only Elements: ['bookings', 'listing']
+      -- Select: ['__bookings', 'listing']
+      -- Select: ['__bookings', 'listing']
       SELECT
         listing_id AS listing
-        , 1 AS bookings
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
-    ) subq_16
+    ) subq_24
     GROUP BY
       listing
-  ) subq_19
+  ) subq_27
   ON
-    lux_listing_mapping_src_28000.listing_id = subq_19.listing
-) subq_20
+    lux_listing_mapping_src_28000.listing_id = subq_27.listing
+) subq_29
 WHERE listing__bookings > 2
 GROUP BY
   listing

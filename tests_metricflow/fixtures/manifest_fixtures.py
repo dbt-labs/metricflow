@@ -8,11 +8,10 @@ from enum import Enum
 from typing import Dict, Mapping
 
 import pytest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -25,12 +24,18 @@ from metricflow_semantics.test_helpers.semantic_manifest_yamls.cyclic_join_manif
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.data_warehouse_validation_manifest import (
     DW_VALIDATION_MANIFEST_ANCHOR,
 )
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.derived_metrics_manifest import (
+    DERIVED_METRICS_MANIFEST_ANCHOR,
+)
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.extended_date_manifest import (
     EXTENDED_DATE_MANIFEST_ANCHOR,
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.join_types_manifest import JOIN_TYPES_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.multi_hop_join_manifest import (
     MULTI_HOP_JOIN_MANIFEST_ANCHOR,
+)
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.name_edge_case_manifest import (
+    NAME_EDGE_CASE_MANIFEST_ANCHOR,
 )
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.non_sm_manifest import NON_SM_MANIFEST_ANCHOR
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.partitioned_multi_hop_join_manifest import (
@@ -50,9 +55,13 @@ from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataset.convert_semantic_model import SemanticModelToDataSetConverter
 from metricflow.dataset.semantic_model_adapter import SemanticModelDataSet
 from metricflow.engine.metricflow_engine import MetricFlowEngine
+from metricflow.execution.dataflow_to_execution import DataflowToExecutionPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.test_utils import as_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -130,6 +139,16 @@ class SemanticManifestSetup(Enum):
         id_number_space=IdNumberSpace.for_block(10),
         yaml_file_dir=SIMPLE_MULTI_HOP_JOIN_MANIFEST_ANCHOR.directory,
     )
+    NAME_EDGE_CASE_MANIFEST = SemanticManifestSetupPropertySet(
+        semantic_manifest_name="name_edge_case_manifest",
+        id_number_space=IdNumberSpace.for_block(11),
+        yaml_file_dir=NAME_EDGE_CASE_MANIFEST_ANCHOR.directory,
+    )
+    DERIVED_METRICS_MANIFEST = SemanticManifestSetupPropertySet(
+        semantic_manifest_name="derived_metrics_manifest",
+        id_number_space=IdNumberSpace.for_block(12),
+        yaml_file_dir=DERIVED_METRICS_MANIFEST_ANCHOR.directory,
+    )
 
     @property
     def id_number_space(self) -> IdNumberSpace:  # noqa: D102
@@ -149,12 +168,14 @@ class MetricFlowEngineTestFixture:
     """Contains objects for testing the MF engine for a specific semantic manifest."""
 
     semantic_manifest: PydanticSemanticManifest
+    manifest_object_lookup: ManifestObjectLookup
     semantic_manifest_lookup: SemanticManifestLookup
     column_association_resolver: ColumnAssociationResolver
     data_set_mapping: OrderedDict[str, SemanticModelDataSet]
     read_node_mapping: OrderedDict[str, ReadSqlSourceNode]
     source_node_set: SourceNodeSet
     dataflow_to_sql_converter: DataflowToSqlPlanConverter
+    dataflow_to_execution_converter: DataflowToExecutionPlanConverter
     query_parser: MetricFlowQueryParser
     metricflow_engine: MetricFlowEngine
     source_node_builder: SourceNodeBuilder
@@ -167,6 +188,7 @@ class MetricFlowEngineTestFixture:
         semantic_manifest: PydanticSemanticManifest,
     ) -> MetricFlowEngineTestFixture:
         semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
+        manifest_object_lookup = ManifestObjectLookup(semantic_manifest)
         data_set_mapping = MetricFlowEngineTestFixture._create_data_sets(semantic_manifest_lookup)
         read_node_mapping = MetricFlowEngineTestFixture._data_set_to_read_nodes(data_set_mapping)
         column_association_resolver = DunderColumnAssociationResolver()
@@ -178,18 +200,29 @@ class MetricFlowEngineTestFixture:
         )
         node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
         query_parser = MetricFlowQueryParser(semantic_manifest_lookup=semantic_manifest_lookup)
+
+        dataflow_to_sql_converter = DataflowToSqlPlanConverter(
+            column_association_resolver=column_association_resolver,
+            semantic_manifest_lookup=semantic_manifest_lookup,
+        )
+
+        dataflow_to_execution_converter = DataflowToExecutionPlanConverter(
+            sql_plan_converter=dataflow_to_sql_converter,
+            sql_plan_renderer=sql_client.sql_plan_renderer,
+            sql_client=sql_client,
+            sql_optimization_level=SqlOptimizationLevel.default_level(),
+        )
         return MetricFlowEngineTestFixture(
             semantic_manifest=semantic_manifest,
+            manifest_object_lookup=manifest_object_lookup,
             semantic_manifest_lookup=semantic_manifest_lookup,
             column_association_resolver=column_association_resolver,
             data_set_mapping=data_set_mapping,
             read_node_mapping=read_node_mapping,
             source_node_set=source_node_set,
             _node_output_resolver=node_output_resolver,
-            dataflow_to_sql_converter=DataflowToSqlPlanConverter(
-                column_association_resolver=column_association_resolver,
-                semantic_manifest_lookup=semantic_manifest_lookup,
-            ),
+            dataflow_to_sql_converter=dataflow_to_sql_converter,
+            dataflow_to_execution_converter=dataflow_to_execution_converter,
             query_parser=query_parser,
             metricflow_engine=MetricFlowEngine(
                 semantic_manifest_lookup=semantic_manifest_lookup,
@@ -383,3 +416,11 @@ def simple_multi_hop_join_manifest_lookup(
 ) -> SemanticManifestLookup:
     """Manifest used to test ambiguous resolution of group-by-items."""
     return mf_engine_test_fixture_mapping[SemanticManifestSetup.SIMPLE_MULTI_HOP_JOIN_MANIFEST].semantic_manifest_lookup
+
+
+@pytest.fixture(scope="session")
+def name_edge_case_manifest(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture]
+) -> SemanticManifestLookup:
+    """Manifest used to test name-related edge cases."""
+    return mf_engine_test_fixture_mapping[SemanticManifestSetup.NAME_EDGE_CASE_MANIFEST].semantic_manifest_lookup

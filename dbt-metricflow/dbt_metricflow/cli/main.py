@@ -15,12 +15,7 @@ from typing import Callable, List, Optional, Sequence
 
 import click
 import jinja2
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from dbt_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
-from dbt_semantic_interfaces.validations.validator_helpers import SemanticManifestValidationResults
 from halo import Halo
-from metricflow_semantics.dag.dag_visualization import display_dag_as_svg
-from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from update_checker import UpdateChecker
 
 import dbt_metricflow.cli.custom_click_types as click_custom
@@ -28,6 +23,7 @@ from dbt_metricflow.cli import PACKAGE_NAME
 from dbt_metricflow.cli.cli_configuration import CLIConfiguration
 from dbt_metricflow.cli.constants import MAX_LIST_OBJECT_ELEMENTS
 from dbt_metricflow.cli.dbt_connectors.dbt_config_accessor import dbtArtifacts
+from dbt_metricflow.cli.graph_svg_rendering import display_dag_as_svg
 from dbt_metricflow.cli.tutorial import (
     dbtMetricFlowTutorialHelper,
 )
@@ -36,10 +32,16 @@ from dbt_metricflow.cli.utils import (
     query_options,
     start_end_time_options,
 )
+from dbt_metricflow.cli.validation_result_formatter import ValidationResultFormatter
 from metricflow.engine.metricflow_engine import MetricFlowExplainResult, MetricFlowQueryRequest, MetricFlowQueryResult
 from metricflow.telemetry.models import TelemetryLevel
 from metricflow.telemetry.reporter import TelemetryReporter, log_call
 from metricflow.validation.data_warehouse_model_validator import DataWarehouseModelValidator
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
+from metricflow_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from metricflow_semantic_interfaces.validations.validator_helpers import (
+    SemanticManifestValidationResults,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +92,7 @@ def cli(cfg: CLIConfiguration, verbose: bool) -> None:  # noqa: D103
 
         try:
             # Note: we may wish to add support for canceling all queries if zombie queries are a problem
-            logger.debug(LazyFormat(lambda: "Closing client connections"))
+            logger.debug("Closing client connections")
             cfg.sql_client.close()
         finally:
             sys.exit(-1)
@@ -179,7 +181,7 @@ def query(
     cfg: CLIConfiguration,
     metrics: Optional[Sequence[str]] = None,
     group_by: Optional[Sequence[str]] = None,
-    where: Optional[str] = None,
+    where: Sequence[str] = (),
     start_time: Optional[dt.datetime] = None,
     end_time: Optional[dt.datetime] = None,
     order: Optional[List[str]] = None,
@@ -207,14 +209,14 @@ def query(
         spinner = Halo(text="Initiating query…", spinner="dots")
         spinner.start()
 
-    mf_request = MetricFlowQueryRequest.create_with_random_request_id(
+    mf_request = MetricFlowQueryRequest.create(
         saved_query_name=saved_query,
         metric_names=metrics,
         group_by_names=group_by,
         limit=limit,
         time_constraint_start=start_time,
         time_constraint_end=end_time,
-        where_constraints=[where] if where else None,
+        where_constraints=where or None,
         order_by_names=order,
     )
 
@@ -479,15 +481,15 @@ def dimension_values(
 
 
 def _print_issues(
-    issues: SemanticManifestValidationResults, show_non_blocking: bool = False, verbose: bool = False
+    result: SemanticManifestValidationResults, show_non_blocking: bool = False, verbose: bool = False
 ) -> None:
-    for issue in issues.errors:
-        print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
+    for issue in result.errors:
+        print(f"• {ValidationResultFormatter.format_validation_issue(issue, verbose=verbose)}")
     if show_non_blocking:
-        for issue in issues.future_errors:
-            print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
-        for issue in issues.warnings:
-            print(f"• {issue.as_cli_formatted_str(verbose=verbose)}")
+        for issue in result.future_errors:
+            print(f"• {ValidationResultFormatter.format_validation_issue(issue, verbose=verbose)}")
+        for issue in result.warnings:
+            print(f"• {ValidationResultFormatter.format_validation_issue(issue, verbose=verbose)}")
 
 
 def _run_dw_validations(
@@ -502,10 +504,12 @@ def _run_dw_validations(
 
     results = validation_func(manifest, timeout)
     if not results.has_blocking_issues:
-        spinner.succeed(f"🎉 Successfully validated {validation_type} against data warehouse ({results.summary()})")
+        spinner.succeed(
+            f"🎉 Successfully validated {validation_type} against data warehouse ({ValidationResultFormatter.format_summary(results)})"
+        )
     else:
         spinner.fail(
-            f"Breaking issues found when validating {validation_type} against data warehouse ({results.summary()})"
+            f"Breaking issues found when validating {validation_type} against data warehouse ({ValidationResultFormatter.format_summary(results)})"
         )
     return results
 
@@ -592,17 +596,19 @@ def validate_configs(
     # Semantic validation
     semantic_spinner = Halo(text="Validating semantics of built manifest", spinner="dots")
     semantic_spinner.start()
-    model_issues = SemanticManifestValidator[SemanticManifest](
+    validation_result = SemanticManifestValidator[SemanticManifest](
         max_workers=semantic_validation_workers
     ).validate_semantic_manifest(semantic_manifest)
 
-    if not model_issues.has_blocking_issues:
-        semantic_spinner.succeed(f"🎉 Successfully validated the semantics of built manifest ({model_issues.summary()})")
+    if not validation_result.has_blocking_issues:
+        semantic_spinner.succeed(
+            f"🎉 Successfully validated the semantics of built manifest ({ValidationResultFormatter.format_summary(validation_result)})"
+        )
     else:
         semantic_spinner.fail(
-            f"Breaking issues found when checking semantics of built manifest ({model_issues.summary()})"
+            f"Breaking issues found when checking semantics of built manifest ({ValidationResultFormatter.format_summary(validation_result)})"
         )
-        _print_issues(model_issues, show_non_blocking=show_all, verbose=verbose_issues)
+        _print_issues(validation_result, show_non_blocking=show_all, verbose=verbose_issues)
         exit(1)
 
     dw_results = SemanticManifestValidationResults()
@@ -613,7 +619,7 @@ def validate_configs(
             dw_validator=dw_validator, manifest=semantic_manifest, timeout=dw_timeout
         )
 
-    merged_results = SemanticManifestValidationResults.merge([model_issues, dw_results])
+    merged_results = SemanticManifestValidationResults.merge([validation_result, dw_results])
     _print_issues(merged_results, show_non_blocking=show_all, verbose=verbose_issues)
     if merged_results.has_blocking_issues:
         exit(1)

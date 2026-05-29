@@ -1,21 +1,14 @@
 from __future__ import annotations
 
 import datetime as dt
+import logging
 from collections import OrderedDict, defaultdict
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import (
-    MetricModelReference,
-    SemanticModelElementReference,
-    TimeDimensionReference,
-)
-from dbt_semantic_interfaces.type_enums import AggregationType, ConversionCalculationType, MetricType, PeriodAggregation
-from dbt_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
-from metricflow_semantics.errors.error_classes import SemanticManifestConfigurationError
+from metricflow_semantics.errors.error_classes import MetricFlowInternalError, SemanticManifestConfigurationError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.instances import (
     GroupByMetricInstance,
@@ -29,12 +22,14 @@ from metricflow_semantics.instances import (
 )
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.metadata_spec import MetadataSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
@@ -68,6 +63,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
 
@@ -79,7 +75,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -92,7 +88,7 @@ from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGran
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -105,16 +101,15 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     AddGroupByMetric,
     AddMetadata,
     AddMetrics,
-    AliasAggregatedSimpleMetricInputs,
     ChangeAssociatedColumns,
     ChangeSimpleMetricInputAggregationState,
     ConvertToMetadata,
     CreateSelectColumnForCombineOutputNode,
     CreateSqlColumnReferencesForInstances,
-    FilterElements,
     FilterLinkableInstancesWithLeadingLink,
     RemoveMetrics,
     RemoveSimpleMetricInputTransform,
+    SelectElementsTransform,
     UpdateSimpleMetricInputFillNullsWith,
 )
 from metricflow.plan_conversion.instance_set_transforms.select_columns import (
@@ -127,7 +122,9 @@ from metricflow.plan_conversion.spec_transforms import (
     CreateSelectCoalescedColumnsForLinkableSpecs,
     SelectOnlyLinkableSpecs,
 )
+from metricflow.plan_conversion.to_sql_plan.output_column_orderer import OutputColumnOrderer
 from metricflow.plan_conversion.to_sql_plan.sql_join_builder import ColumnEqualityDescription, SqlPlanJoinBuilder
+from metricflow.sql.column_alias_renamer import ColumnAliasRenamer
 from metricflow.sql.sql_ctas_node import SqlCreateTableAsNode
 from metricflow.sql.sql_cte_node import SqlCteNode
 from metricflow.sql.sql_plan import (
@@ -135,6 +132,22 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
+from metricflow_semantic_interfaces.references import (
+    MetricModelReference,
+    SemanticModelElementReference,
+    TimeDimensionReference,
+)
+from metricflow_semantic_interfaces.type_enums import (
+    AggregationType,
+    ConversionCalculationType,
+    MetricType,
+    PeriodAggregation,
+)
+from metricflow_semantic_interfaces.validations.unique_valid_name import MetricFlowReservedKeywords
+
+logger = logging.getLogger(__name__)
 
 
 class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
@@ -147,7 +160,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         self,
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
-        spec_output_order: Sequence[InstanceSpec] = (),
+        output_column_orderer: Optional[OutputColumnOrderer] = None,
         _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
         """Initializer.
@@ -169,7 +182,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             tuple(self._time_spine_sources.values())
         )
         self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
-        self._spec_output_order = spec_output_order
+        self._output_column_orderer = output_column_orderer
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
@@ -202,6 +215,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         return DataflowNodeToSqlSubqueryVisitor(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
+            output_column_orderer=self._output_column_orderer,
             _node_to_output_data_set=dict(self._node_to_output_data_set),
         )
 
@@ -324,17 +338,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Build outer query to apply where constraints.
         inner_query_alias = self._next_unique_table_alias()
-        where_constraint_exprs = [
-            self._render_where_constraint_expr(constraint) for constraint in time_spine_where_constraints
-        ]
-        complete_outer_where_filter: Optional[SqlExpressionNode] = None
-        if len(where_constraint_exprs) > 1:
-            complete_outer_where_filter = SqlLogicalExpression.create(
-                operator=SqlLogicalOperator.AND, args=where_constraint_exprs
-            )
-        elif len(where_constraint_exprs) == 1:
-            complete_outer_where_filter = where_constraint_exprs[0]
-
+        complete_outer_where_filter = self._render_where_constraint_expr(time_spine_where_constraints)
         outer_query_output_instance_set = InstanceSet(time_dimension_instances=agg_time_dimension_instances)
         outer_query_select_columns = create_simple_select_columns_for_instance_sets(
             column_resolver=self._column_association_resolver,
@@ -390,7 +394,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # Build select columns, replacing agg_time_dimensions from the parent node with columns from the time spine.
         table_alias_to_instance_set[time_spine_data_set_alias] = time_spine_data_set.instance_set
         table_alias_to_instance_set[parent_data_set_alias] = parent_data_set.instance_set.transform(
-            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=node.queried_agg_time_dimension_specs))
+            SelectElementsTransform(
+                exclude_specs=InstanceSpecSet(time_dimension_specs=node.queried_agg_time_dimension_specs)
+            )
         )
         select_columns = create_simple_select_columns_for_instance_sets(
             column_resolver=self._column_association_resolver, table_alias_to_instance_set=table_alias_to_instance_set
@@ -417,7 +423,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # multiple rows, so we'll need to re-aggregate.
         from_data_set_output_instance_set = from_data_set.instance_set.transform(
             # TODO: is this filter doing anything? seems like no?
-            FilterElements(include_specs=from_data_set.instance_set.spec_set)
+            SelectElementsTransform(include_specs=from_data_set.instance_set.spec_set)
         ).transform(
             ChangeSimpleMetricInputAggregationState(
                 {
@@ -452,9 +458,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             if join_on_entity:
                 # Remove any instances that already have the join_on_entity as the leading link. This will prevent a duplicate
                 # entity link when we add it in the next step.
-                right_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(
-                    join_on_entity.reference
-                ).transform(right_data_set.instance_set)
+                right_instance_set_filtered = FilterLinkableInstancesWithLeadingLink(join_on_entity).transform(
+                    right_data_set.instance_set
+                )
 
                 # After the right data set is joined, update the entity links to indicate that joining on the entity was
                 # required to reach the spec. If the "country" dimension was joined and "user_id" is the join_on_entity,
@@ -462,7 +468,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 new_instances: Tuple[MdoInstance, ...] = ()
                 for original_instance in right_instance_set_filtered.linkable_instances:
                     new_instance = original_instance.with_entity_prefix(
-                        join_on_entity.reference, column_association_resolver=self._column_association_resolver
+                        join_on_entity, column_association_resolver=self._column_association_resolver
                     )
                     # Build new select column using the old column name as the expr and the new column name as the alias.
                     select_column = SqlSelectColumn(
@@ -542,21 +548,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 table_alias=from_data_set_alias,
                 column_resolver=self._column_association_resolver,
                 manifest_object_lookup=self._manifest_object_lookup,
-                alias_mapping=node.alias_mapping,
             )
         )
-
-        if len(node.alias_mapping.element_name_to_alias) > 0:
-            # This is a little silly, but we need to update the column instance set with the new aliases
-            # There are a number of refactoring options - simplest is to consolidate this with
-            # `ChangeSimpleMetricInputAggregationState`, assuming there are no ordering dependencies up above
-            aggregated_instance_set = aggregated_instance_set.transform(
-                AliasAggregatedSimpleMetricInputs(node.alias_mapping)
-            )
-            # and make sure we follow the resolver format for any newly aliased simple-metric inputs....
-            aggregated_instance_set = aggregated_instance_set.transform(
-                ChangeAssociatedColumns(self._column_association_resolver)
-            )
 
         return SqlDataSet(
             instance_set=aggregated_instance_set,
@@ -582,9 +575,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Also, the output columns should always follow the resolver format.
         output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
-        output_instance_set = output_instance_set.transform(RemoveMetrics())
+        output_instance_set = output_instance_set.transform(
+            RemoveMetrics(retained_metric_specs=node.passthrough_metric_specs)
+        )
 
-        if node.for_group_by_source_node:
+        if node.output_group_by_metric_instances:
             assert (
                 len(node.metric_specs) == 1 and len(output_instance_set.entity_instances) == 1
             ), "Group by metrics currently only support exactly one metric grouped by exactly one entity."
@@ -600,7 +595,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         metric_select_columns = []
         metric_instances = []
         group_by_metric_instance: Optional[GroupByMetricInstance] = None
-        for metric_spec in node.metric_specs:
+        simple_metric_input_element_name_to_instance = {
+            instance.spec.element_name: instance
+            for instance in from_data_set.instance_set.simple_metric_input_instances
+        }
+        for metric_spec in node.computed_metric_specs:
             metric = self._metric_lookup.get_metric(metric_spec.reference)
 
             metric_expr: Optional[SqlExpressionNode] = None
@@ -632,8 +631,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     ),
                 )
             elif metric.type is MetricType.SIMPLE:
+                metric_name = metric_spec.element_name
+                simple_metric_input_instance = simple_metric_input_element_name_to_instance.get(metric_name)
+                if simple_metric_input_instance is None:
+                    raise MetricFlowInternalError(
+                        LazyFormat(
+                            "Expected a simple metric instance with a element name matching the metric name to be"
+                            " present in the input",
+                            metric_name=metric_name,
+                            input_instance_spec_set=from_data_set.instance_set.spec_set,
+                        )
+                    )
                 metric_expr = self.__make_col_reference_or_coalesce_expr(
-                    column_name=self._column_association_resolver.resolve_spec(metric_spec).column_name,
+                    column_name=simple_metric_input_instance.associated_column.column_name,
                     null_fill_value=metric.type_params.fill_nulls_with,
                     from_data_set_alias=from_data_set_alias,
                 )
@@ -662,24 +672,34 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 assert input_base_metric is not None, "A conversion metric must have a base metric."
                 input_conversion_metric = conversion_type_params.conversion_metric
                 assert input_conversion_metric is not None, "A conversion metric must have a conversion metric."
-                input_base_metric_column = self._column_association_resolver.resolve_spec(
-                    MetricSpec(element_name=input_base_metric.post_aggregation_reference.element_name)
-                ).column_name
-                input_conversion_metric_column = self._column_association_resolver.resolve_spec(
-                    MetricSpec(element_name=input_conversion_metric.post_aggregation_reference.element_name)
-                ).column_name
+
+                base_input_metric_instance = simple_metric_input_element_name_to_instance.get(input_base_metric.name)
+                conversion_input_metric_instance = simple_metric_input_element_name_to_instance.get(
+                    input_conversion_metric.name
+                )
+                if base_input_metric_instance is None or conversion_input_metric_instance is None:
+                    raise MetricFlowInternalError(
+                        LazyFormat(
+                            "Expected a simple metric instances with an element name matching the"
+                            " input metrics for the conversion metric name to be"
+                            " present in the input",
+                            base_input_metric_instance=base_input_metric_instance,
+                            conversion_input_metric_instance=conversion_input_metric_instance,
+                            input_instance_spec_set=from_data_set.instance_set.spec_set,
+                        )
+                    )
 
                 calculation_type = conversion_type_params.calculation
                 conversion_column_reference = SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=input_conversion_metric_column,
+                        column_name=conversion_input_metric_instance.associated_column.column_name,
                     )
                 )
                 base_column_reference = SqlColumnReferenceExpression.create(
                     SqlColumnReference(
                         table_alias=from_data_set_alias,
-                        column_name=input_base_metric_column,
+                        column_name=base_input_metric_instance.associated_column.column_name,
                     )
                 )
                 if calculation_type == ConversionCalculationType.CONVERSION_RATE:
@@ -696,7 +716,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
             defined_from = MetricModelReference(metric_name=metric_spec.element_name)
 
-            if node.for_group_by_source_node:
+            if node.output_group_by_metric_instances:
                 entity_spec = output_instance_set.entity_instances[0].spec
                 group_by_metric_spec = GroupByMetricSpec(
                     element_name=metric_spec.element_name,
@@ -812,7 +832,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             instance_set=input_data_set.instance_set,
             sql_select_node=SqlSelectStatementNode.create(
                 description=node.description,
-                select_columns=transform_result.get_columns(self._spec_output_order),
+                select_columns=transform_result.get_columns(self._output_column_orderer),
                 from_source=input_data_set.checked_sql_select_node,
                 from_source_alias=input_data_set_alias,
             ),
@@ -835,17 +855,17 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 sql_table=node.output_sql_table,
                 parent_node=SqlSelectStatementNode.create(
                     description=node.description,
-                    select_columns=transform_result.get_columns(self._spec_output_order),
+                    select_columns=transform_result.get_columns(self._output_column_orderer),
                     from_source=input_data_set.checked_sql_select_node,
                     from_source_alias=input_data_set_alias,
                 ),
             ),
         )
 
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> SqlDataSet:
-        """Generates the query that realizes the behavior of FilterElementsNode."""
+    def visit_selector_node(self, node: SelectorNode) -> SqlDataSet:
+        """Generates the query that realizes the behavior of SelectorNode."""
         from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
-        output_instance_set = from_data_set.instance_set.transform(FilterElements(node.include_specs))
+        output_instance_set = from_data_set.instance_set.transform(SelectElementsTransform(node.include_specs))
         from_data_set_alias = self._next_unique_table_alias()
 
         # Also, the output columns should always follow the resolver format.
@@ -869,42 +889,145 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             ),
         )
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> SqlDataSet:
-        """Adds where clause to SQL statement from parent node."""
-        parent_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
-        # Since we're copying the instance set from the parent to conveniently generate the output instance set for this
-        # node, we'll need to change the column names.
-        output_instance_set = parent_data_set.instance_set.transform(
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> SqlDataSet:
+        """Adds a `WHERE` clause to the SQL statement from parent / input node."""
+        input_dataset: SqlDataSet = self.get_output_data_set(node.parent_node)
+
+        # For the migration, render simple-metric-inputs without the dunder.
+        modified_resolver = self._column_association_resolver.with_options(
+            dunder_prefix_simple_metric_inputs=False,
+        )
+
+        # The input dataset has different column aliases, so create a mapping to an intermediate alias.
+        # In this case, the intermediate aliases are the simple-metric-input names without the dunder.
+        # e.g. for SimpleMetricInputInstance("bookings") -> "__bookings"
+        # input_column_alias_to_intermediate_column_alias = {"__bookings": "bookings"}
+        column_alias_renamer = ColumnAliasRenamer()
+        input_column_alias_to_intermediate_column_alias = {}
+        intermediate_column_alias_to_instance = {}
+
+        for instance in input_dataset.instance_set.as_tuple:
+            next_column_alias = modified_resolver.resolve_spec(instance.spec).column_name
+            input_column_alias_to_intermediate_column_alias[
+                instance.associated_column.column_name
+            ] = modified_resolver.resolve_spec(instance.spec).column_name
+            intermediate_column_alias_to_instance[next_column_alias] = instance
+
+        inner_query_alias = self._next_unique_table_alias()
+
+        # Generate SQL that uses a subquery to change column aliases to the intermediate aliases.
+        # See `rename_via_subquery` for why a subquery is needed.
+        #
+        # e.g.
+        #   From the parent SQL:
+        #
+        #   SELECT
+        #       col as __bookings
+        #       ...
+        #
+        #   ->
+        #   -- Outer query
+        #   SELECT
+        #       subq.bookings AS bookings
+        #       ...
+        #   FROM (
+        #       -- Inner query
+        #       SELECT col AS bookings
+        #       ...
+        #   ) subq
+
+        outer_select_node = column_alias_renamer.rename_via_subquery(
+            select_statement_node=input_dataset.checked_sql_select_node,
+            previous_column_name_to_next_column_name=input_column_alias_to_intermediate_column_alias,
+            description="Constrain Output with WHERE",
+            inner_query_alias=inner_query_alias,
+        )
+
+        # Add the `WHERE` clause now that the column identifier without the dunder is valid.
+        # e.g.
+        #   SELECT
+        #       subq.bookings AS bookings
+        #       ...
+        #   FROM (
+        #       SELECT col AS bookings
+        #       ...
+        #   ) subq
+        #   WHERE bookings IS NOT NULL
+
+        outer_select_node = outer_select_node.with_where_clause(self._render_where_constraint_expr(node.filter_specs))
+
+        # Since the outer query sets the column aliases to the intermediate values, change them to the
+        # ones generated by the default resolver with the dunder prefix.
+        #
+        # e.g.
+        #
+        #   SELECT
+        #       subq.bookings AS __bookings
+        #       ...
+        #   FROM (
+        #       SELECT col AS bookings
+        #       ...
+        #   ) subq
+        #   WHERE bookings IS NOT NULL
+        intermediate_column_alias_to_output_column_alias = {}
+        for intermediate_column_alias, instance in intermediate_column_alias_to_instance.items():
+            intermediate_column_alias_to_output_column_alias[
+                intermediate_column_alias
+            ] = self._column_association_resolver.resolve_spec(instance.spec).column_name
+
+        outer_select_node = column_alias_renamer.rename(
+            select_statement_node=outer_select_node,
+            previous_column_alias_to_next_column_alias=intermediate_column_alias_to_output_column_alias,
+        )
+
+        # Create the output instance set by copying the input instance set since this does not add or remove
+        # instances.
+        #
+        # Since the input instances could have mapped them to different column aliases, use `ChangeAssociatedColumns`
+        # to change them to the ones generated above.
+        #
+        # e.g. while the input instances usually map SimpleMetricInputSpec("bookings") -> "__bookings",
+        # SimpleMetricInputInstance("bookings") -> "some_other_col" would have been a valid input too.
+        output_instance_set = input_dataset.instance_set.transform(
             ChangeAssociatedColumns(self._column_association_resolver)
         )
-        from_data_set_alias = self._next_unique_table_alias()
 
         return SqlDataSet(
             instance_set=output_instance_set,
-            sql_select_node=SqlSelectStatementNode.create(
-                description=node.description,
-                # This creates select expressions for all columns referenced in the instance set.
-                select_columns=output_instance_set.transform(
-                    CreateSelectColumnsForInstances(from_data_set_alias, self._column_association_resolver)
-                ).get_columns(),
-                from_source=parent_data_set.checked_sql_select_node,
-                from_source_alias=from_data_set_alias,
-                where=self._render_where_constraint_expr(node.where),
-            ),
+            sql_select_node=outer_select_node,
         )
 
-    def _render_where_constraint_expr(self, where_filter: WhereFilterSpec) -> SqlStringExpression:
+    def _render_where_constraint_expr(self, filter_specs: Sequence[WhereFilterSpec]) -> Optional[SqlExpressionNode]:
         """Build SqlStringExpression from WhereFilterSpec."""
-        column_associations_in_where_sql = CreateColumnAssociations(
-            column_association_resolver=self._column_association_resolver
-        ).transform(spec_set=InstanceSpecSet.create_from_specs(where_filter.linkable_specs))
-        return SqlStringExpression.create(
-            sql_expr=where_filter.where_sql,
-            used_columns=tuple(
-                column_association.column_name for column_association in column_associations_in_where_sql
-            ),
-            bind_parameter_set=where_filter.bind_parameters,
-        )
+        filter_key_to_string_expression: dict[tuple[str, SqlBindParameterSet], SqlStringExpression] = {}
+        for filter_spec in filter_specs:
+            filter_key = (filter_spec.where_sql, filter_spec.bind_parameters)
+
+            if filter_key in filter_key_to_string_expression:
+                continue
+
+            instance_spec_set = filter_spec.instance_spec_set
+            column_associations_in_where_sql = CreateColumnAssociations(
+                column_association_resolver=self._column_association_resolver
+            ).transform(instance_spec_set)
+            filter_key_to_string_expression[filter_key] = SqlStringExpression.create(
+                sql_expr=filter_spec.where_sql,
+                used_columns=tuple(
+                    column_association.column_name for column_association in column_associations_in_where_sql
+                ),
+                bind_parameter_set=filter_spec.bind_parameters,
+            )
+
+        # Odd type-check inspection with just `tuple(filter_key_to_string_expression.values())`
+        string_expressions = tuple(string_expression for string_expression in filter_key_to_string_expression.values())
+        expression_count = len(string_expressions)
+
+        if expression_count == 0:
+            return None
+        elif expression_count == 1:
+            return string_expressions[0]
+        else:
+            return SqlLogicalExpression.create(operator=SqlLogicalOperator.AND, args=string_expressions)
 
     def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> SqlDataSet:
         """Join aggregated output datasets together to return a single dataset containing all metrics/simple-metric inputs.
@@ -958,13 +1081,19 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Sanity check that all parents have the same linkable specs before building the join descriptions.
         linkable_specs = from_data_set.data_set.instance_set.spec_set.linkable_specs
-        assert all(
+        if not all(
             [set(x.data_set.instance_set.spec_set.linkable_specs) == set(linkable_specs) for x in join_data_sets]
-        ), (
-            "All join data sets should have the same set of linkable instances as the from dataset since all values are coalesced.\n"
-            f"From dataset instance set: {from_data_set.data_set.instance_set}\n"
-            f"Join dataset instance sets: {[join_data_set.data_set.instance_set for join_data_set in join_data_sets]}"
-        )
+        ):
+            raise MetricFlowInternalError(
+                LazyFormat(
+                    "All join data sets should have the same set of linkable instances as the `from` dataset since all values"
+                    " are coalesced.",
+                    from_data_set_instance_set=from_data_set.data_set.instance_set,
+                    join_data_set_instance_sets=[
+                        join_data_set.data_set.instance_set for join_data_set in join_data_sets
+                    ],
+                )
+            )
 
         linkable_spec_set = from_data_set.data_set.instance_set.spec_set.transform(SelectOnlyLinkableSpecs())
         join_type = SqlJoinType.CROSS_JOIN if len(linkable_spec_set.all_specs) == 0 else SqlJoinType.FULL_OUTER
@@ -1039,20 +1168,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         from_data_set: SqlDataSet = self.get_output_data_set(node.parent_node)
         from_data_set_alias = self._next_unique_table_alias()
 
-        time_dimension_instances_for_metric_time = sorted(
-            [
-                instance
-                for instance in from_data_set.metric_time_dimension_instances
-                if not instance.spec.has_custom_grain and not instance.spec.date_part
-            ],
-            key=lambda x: x.spec.base_granularity_sort_key,
-        )
-
-        assert (
-            len(time_dimension_instances_for_metric_time) > 0
-        ), "No metric time dimensions with standard granularities found in the input data set for this node"
-
-        time_dimension_instance_for_metric_time = time_dimension_instances_for_metric_time[0]
+        time_dimension_instance_for_metric_time = from_data_set.metric_time_instance_for_time_constraint
 
         # Build an expression like "ds >= CAST('2020-01-01' AS TIMESTAMP) AND ds <= CAST('2020-01-02' AS TIMESTAMP)"
         constrain_metric_time_column_condition = DataflowNodeToSqlSubqueryVisitor._make_time_range_comparison_expr(
@@ -1211,7 +1327,8 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Build optional window grouping SqlSelectColumn
         entity_select_columns: List[SqlSelectColumn] = []
-        for entity_spec in node.entity_specs:
+        for entity_reference in node.entity_references:
+            entity_spec = EntitySpec.create_from_reference(entity_reference)
             entity_column_name = self._column_association_resolver.resolve_spec(entity_spec).column_name
             entity_select_columns.append(
                 SqlSelectColumn(
@@ -1301,10 +1418,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         time_spine_data_set = self.get_output_data_set(node.time_spine_node)
         time_spine_alias = self._next_unique_table_alias()
 
-        required_agg_time_dimension_specs = tuple(node.requested_agg_time_dimension_specs)
-        join_spec_was_requested = node.join_on_time_dimension_spec in node.requested_agg_time_dimension_specs
-        if not join_spec_was_requested:
-            required_agg_time_dimension_specs += (node.join_on_time_dimension_spec,)
+        requested_agg_time_dimension_specs = FrozenOrderedSet(node.requested_agg_time_dimension_specs)
+        time_dimension_specs_to_pass_from_time_spine = requested_agg_time_dimension_specs.union(
+            (node.join_on_time_dimension_spec,)
+        )
 
         # Build join expression.
         parent_join_column_name = self._column_association_resolver.resolve_spec(
@@ -1324,13 +1441,12 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         # Build new instances and columns.
-        time_spine_required_spec_set = InstanceSpecSet(time_dimension_specs=required_agg_time_dimension_specs)
         output_parent_instance_set = parent_data_set.instance_set.transform(
-            FilterElements(
+            SelectElementsTransform(
                 exclude_specs=InstanceSpecSet.create_from_specs(
                     tuple(
                         spec
-                        for spec in time_spine_required_spec_set.time_dimension_specs
+                        for spec in time_dimension_specs_to_pass_from_time_spine
                         if spec in parent_data_set.instance_set.spec_set.time_dimension_specs
                     )
                 )
@@ -1340,8 +1456,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         output_time_spine_columns: Tuple[SqlSelectColumn, ...] = ()
         for old_instance in time_spine_data_set.instance_set.time_dimension_instances:
             new_spec = old_instance.spec.with_window_functions(())
-            if new_spec not in required_agg_time_dimension_specs:
+
+            if new_spec not in time_dimension_specs_to_pass_from_time_spine:
                 continue
+
             if old_instance.spec.window_functions:
                 new_instance = old_instance.with_new_spec(
                     new_spec=new_spec, column_association_resolver=self._column_association_resolver
@@ -1371,7 +1489,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         # If offset_to_grain is used, will need to filter down to rows that match selected granularities.
         # Does not apply if one of the granularities selected matches the time spine column granularity.
         where_filter: Optional[SqlExpressionNode] = None
-        need_where_filter = node.offset_to_grain and not join_spec_was_requested
+        need_where_filter = (
+            node.offset_to_grain and node.join_on_time_dimension_spec not in requested_agg_time_dimension_specs
+        )
 
         # Filter down to one row per granularity period requested in the group by. Any other granularities
         # included here will be filtered out before aggregation and so should not be included in where filter.
@@ -1415,6 +1535,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def _get_custom_granularity_column_name(self, custom_granularity_name: str) -> str:
         time_spine_source = self._get_time_spine_for_custom_granularity(custom_granularity_name)
+        custom_granularity: Optional[PydanticTimeSpineCustomGranularityColumn] = None
         for custom_granularity in time_spine_source.custom_granularities:
             if custom_granularity.name == custom_granularity_name:
                 return custom_granularity.parsed_column_name
@@ -1736,7 +1857,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
 
         conversion_data_set_output_instance_set = conversion_data_set.instance_set.transform(
-            FilterElements(
+            SelectElementsTransform(
                 include_specs=InstanceSpecSet(simple_metric_input_specs=(node.conversion_input_metric_spec,))
             )
         )
@@ -1846,12 +1967,12 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         # Order by instance should not be included in the output dataset because it was not requested in the query.
         output_instance_set = parent_instance_set.transform(
-            FilterElements(exclude_specs=InstanceSpecSet(time_dimension_specs=(order_by_instance.spec,)))
+            SelectElementsTransform(exclude_specs=InstanceSpecSet(time_dimension_specs=(order_by_instance.spec,)))
         )
 
         # Can't include window function in a group by, so we use a subquery and apply group by in the outer query.
         subquery_select_columns = output_instance_set.transform(
-            FilterElements(exclude_specs=InstanceSpecSet(metric_specs=(metric_instance.spec,)))
+            SelectElementsTransform(exclude_specs=InstanceSpecSet(metric_specs=(metric_instance.spec,)))
         ).transform(
             CreateSelectColumnsForInstances(parent_data_set_alias, self._column_association_resolver)
         ).get_columns() + (

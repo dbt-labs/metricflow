@@ -3,15 +3,10 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
-from dbt_semantic_interfaces.type_enums import MetricType
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.instances import (
     DimensionInstance,
@@ -29,6 +24,7 @@ from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
+from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAggregateFunctionExpression,
@@ -50,6 +46,12 @@ from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
 )
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.references import EntityReference, MetricReference, SemanticModelReference
+from metricflow_semantic_interfaces.type_enums import MetricType
+from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -212,8 +214,8 @@ class FilterLinkableInstancesWithLeadingLink(InstanceSetTransform[InstanceSet]):
         return output
 
 
-class FilterElements(InstanceSetTransform[InstanceSet]):
-    """Return an instance set with the elements that don't match any of the pass specs removed."""
+class SelectElementsTransform(InstanceSetTransform[InstanceSet]):
+    """Return an instance set that only contains instances that match the given criteria."""
 
     def __init__(
         self,
@@ -471,7 +473,10 @@ class RemoveSimpleMetricInputTransform(InstanceSetTransform[InstanceSet]):
 
 
 class RemoveMetrics(InstanceSetTransform[InstanceSet]):
-    """Remove metrics from the instance set."""
+    """Remove metrics from the instance set except for the ones marked for retention."""
+
+    def __init__(self, retained_metric_specs: Iterable[MetricSpec]) -> None:  # noqa: D107
+        self._retained_metric_specs = set(retained_metric_specs)
 
     def transform(self, instance_set: InstanceSet) -> InstanceSet:  # noqa: D102
         return InstanceSet(
@@ -480,7 +485,11 @@ class RemoveMetrics(InstanceSetTransform[InstanceSet]):
             time_dimension_instances=instance_set.time_dimension_instances,
             entity_instances=instance_set.entity_instances,
             group_by_metric_instances=instance_set.group_by_metric_instances,
-            metric_instances=(),
+            metric_instances=tuple(
+                metric_instance
+                for metric_instance in instance_set.metric_instances
+                if metric_instance.spec in self._retained_metric_specs
+            ),
             metadata_instances=instance_set.metadata_instances,
         )
 

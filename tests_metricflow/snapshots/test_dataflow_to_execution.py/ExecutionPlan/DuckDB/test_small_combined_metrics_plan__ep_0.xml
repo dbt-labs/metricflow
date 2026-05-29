@@ -13,42 +13,44 @@ test_filename: test_dataflow_to_execution.py
         <!--    "  -- Metric Time Dimension 'ds'\n"                                           -->
         <!--    '  SELECT\n'                                                                  -->
         <!--    '    is_instant\n'                                                            -->
-        <!--    '    , 1 AS bookings\n'                                                       -->
-        <!--    '    , booking_value\n'                                                       -->
+        <!--    '    , 1 AS __bookings\n'                                                     -->
+        <!--    '    , booking_value AS __booking_value\n'                                    -->
         <!--    '  FROM ***************************.fct_bookings bookings_source_src_28000\n' -->
         <!--    ')\n'                                                                         -->
         <!--    '\n'                                                                          -->
         <!--    'SELECT\n'                                                                    -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_8.is_instant) AS is_instant\n'            -->
-        <!--    '  , MAX(subq_4.bookings) AS bookings\n'                                      -->
-        <!--    '  , MAX(subq_8.booking_value) AS booking_value\n'                            -->
+        <!--    '  COALESCE(subq_5.is_instant, subq_10.is_instant) AS is_instant\n'           -->
+        <!--    '  , MAX(subq_5.bookings) AS bookings\n'                                      -->
+        <!--    '  , MAX(subq_10.booking_value) AS booking_value\n'                           -->
         <!--    'FROM (\n'                                                                    -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                  -->
-        <!--    "  -- Pass Only Elements: ['bookings', 'is_instant']\n"                       -->
+        <!--    "  -- Select: ['__bookings', 'is_instant']\n"                                 -->
+        <!--    "  -- Select: ['__bookings', 'is_instant']\n"                                 -->
         <!--    '  -- Aggregate Inputs for Simple Metrics\n'                                  -->
         <!--    '  -- Compute Metrics via Expressions\n'                                      -->
         <!--    '  SELECT\n'                                                                  -->
         <!--    '    is_instant\n'                                                            -->
-        <!--    '    , SUM(bookings) AS bookings\n'                                           -->
+        <!--    '    , SUM(__bookings) AS bookings\n'                                         -->
         <!--    '  FROM sma_28009_cte\n'                                                      -->
         <!--    '  GROUP BY\n'                                                                -->
         <!--    '    is_instant\n'                                                            -->
-        <!--    ') subq_4\n'                                                                  -->
+        <!--    ') subq_5\n'                                                                  -->
         <!--    'FULL OUTER JOIN (\n'                                                         -->
         <!--    '  -- Read From CTE For node_id=sma_28009\n'                                  -->
-        <!--    "  -- Pass Only Elements: ['booking_value', 'is_instant']\n"                  -->
+        <!--    "  -- Select: ['__booking_value', 'is_instant']\n"                            -->
+        <!--    "  -- Select: ['__booking_value', 'is_instant']\n"                            -->
         <!--    '  -- Aggregate Inputs for Simple Metrics\n'                                  -->
         <!--    '  -- Compute Metrics via Expressions\n'                                      -->
         <!--    '  SELECT\n'                                                                  -->
         <!--    '    is_instant\n'                                                            -->
-        <!--    '    , SUM(booking_value) AS booking_value\n'                                 -->
+        <!--    '    , SUM(__booking_value) AS booking_value\n'                               -->
         <!--    '  FROM sma_28009_cte\n'                                                      -->
         <!--    '  GROUP BY\n'                                                                -->
         <!--    '    is_instant\n'                                                            -->
-        <!--    ') subq_8\n'                                                                  -->
+        <!--    ') subq_10\n'                                                                 -->
         <!--    'ON\n'                                                                        -->
-        <!--    '  subq_4.is_instant = subq_8.is_instant\n'                                   -->
+        <!--    '  subq_5.is_instant = subq_10.is_instant\n'                                  -->
         <!--    'GROUP BY\n'                                                                  -->
-        <!--    '  COALESCE(subq_4.is_instant, subq_8.is_instant)')                           -->
+        <!--    '  COALESCE(subq_5.is_instant, subq_10.is_instant)')                          -->
     </SelectSqlQueryToDataTableTask>
 </ExecutionPlan>

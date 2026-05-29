@@ -2,22 +2,21 @@ from __future__ import annotations
 
 import dataclasses
 import logging
+from collections.abc import Iterable
 from enum import Enum
 from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 from metricflow_semantics.errors.error_classes import FeatureNotSupportedError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import MAX_JOIN_HOPS
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.spec_set_transforms import ToElementNameSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 
@@ -26,12 +25,14 @@ from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
 )
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.validation.dataflow_join_validator import JoinDataflowOutputValidator
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.references import EntityReference, SemanticModelReference, TimeDimensionReference
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ class MultiHopJoinCandidateLineage:
 
     first_node_to_join: DataflowPlanNode
     second_node_to_join: DataflowPlanNode
-    join_second_node_by_entity: LinklessEntitySpec
+    join_second_node_by_entity: EntityReference
 
 
 @dataclasses.dataclass(frozen=True)
@@ -97,7 +98,7 @@ class PredicatePushdownState:
     added to the query filters.
     The second may be updated based on query configuration, like if a cumulative metric is added to the plan
     there may be changes to what sort of predicate pushdown operations are supported.
-    The last will be updated as filters are applied via pushdown or by the original WhereConstraintNode.
+    The last will be updated as filters are applied via pushdown or by the original WhereFilterNode.
 
     Finally, the time_range_constraint property holds the time window for setting up a time range filter expression.
     """
@@ -105,10 +106,24 @@ class PredicatePushdownState:
     time_range_constraint: Optional[TimeRangeConstraint]
     # TODO: Deduplicate where_filter_specs
     where_filter_specs: Tuple[WhereFilterSpec, ...]
-    applied_where_filter_specs: FrozenSet[WhereFilterSpec] = frozenset()
-    pushdown_enabled_types: FrozenSet[PredicateInputType] = frozenset(
-        [PredicateInputType.TIME_RANGE_CONSTRAINT, PredicateInputType.CATEGORICAL_DIMENSION]
-    )
+    applied_where_filter_specs: FrozenOrderedSet[WhereFilterSpec]
+    pushdown_enabled_types: FrozenOrderedSet[PredicateInputType]
+
+    @staticmethod
+    def create(  # noqa: D102
+        time_range_constraint: Optional[TimeRangeConstraint] = None,
+        where_filter_specs: Iterable[WhereFilterSpec] = (),
+        applied_where_filter_specs: Iterable[WhereFilterSpec] = FrozenOrderedSet(),
+        pushdown_enabled_types: Iterable[PredicateInputType] = FrozenOrderedSet(
+            (PredicateInputType.TIME_RANGE_CONSTRAINT, PredicateInputType.CATEGORICAL_DIMENSION),
+        ),
+    ) -> PredicatePushdownState:
+        return PredicatePushdownState(
+            time_range_constraint=time_range_constraint,
+            where_filter_specs=tuple(where_filter_specs),
+            applied_where_filter_specs=FrozenOrderedSet.from_iterable(applied_where_filter_specs),
+            pushdown_enabled_types=FrozenOrderedSet.from_iterable(pushdown_enabled_types),
+        )
 
     def __post_init__(self) -> None:
         """Validation to ensure pushdown states are configured correctly.
@@ -217,9 +232,9 @@ class PredicatePushdownState:
         range constraint filter if one becomes available mid-stream during dataflow plan construction.
         """
         pushdown_enabled_types = original_pushdown_state.pushdown_enabled_types.union(
-            {PredicateInputType.TIME_RANGE_CONSTRAINT}
+            (PredicateInputType.TIME_RANGE_CONSTRAINT,)
         )
-        return PredicatePushdownState(
+        return PredicatePushdownState.create(
             time_range_constraint=time_range_constraint,
             pushdown_enabled_types=pushdown_enabled_types,
             where_filter_specs=original_pushdown_state.where_filter_specs,
@@ -239,9 +254,9 @@ class PredicatePushdownState:
         TODO: replace or rename this method.
         """
         pushdown_enabled_types = original_pushdown_state.pushdown_enabled_types.difference(
-            {PredicateInputType.TIME_RANGE_CONSTRAINT}
+            (PredicateInputType.TIME_RANGE_CONSTRAINT,)
         )
-        return PredicatePushdownState(
+        return PredicatePushdownState.create(
             time_range_constraint=None,
             pushdown_enabled_types=pushdown_enabled_types,
             where_filter_specs=original_pushdown_state.where_filter_specs,
@@ -279,14 +294,14 @@ class PredicatePushdownState:
 
     @staticmethod
     def with_pushdown_applied_where_filter_specs(
-        original_pushdown_state: PredicatePushdownState, pushdown_applied_where_filter_specs: FrozenSet[WhereFilterSpec]
+        original_pushdown_state: PredicatePushdownState, pushdown_applied_where_filter_specs: Set[WhereFilterSpec]
     ) -> PredicatePushdownState:
         """Factory method for replacing pushdown applied where filter specs in pushdown operations.
 
         This is useful for managing propagation - both forwards and backwards - of where filter specs that have been
         applied via a pushdown operation.
         """
-        return PredicatePushdownState(
+        return PredicatePushdownState.create(
             time_range_constraint=original_pushdown_state.time_range_constraint,
             pushdown_enabled_types=original_pushdown_state.pushdown_enabled_types,
             where_filter_specs=original_pushdown_state.where_filter_specs,
@@ -302,10 +317,8 @@ class PredicatePushdownState:
         configuration might send a disabled copy of the pushdown parameters down that path while retaining the potential
         for using another path.
         """
-        return PredicatePushdownState(
-            time_range_constraint=None,
-            pushdown_enabled_types=frozenset(),
-            where_filter_specs=tuple(),
+        return PredicatePushdownState.create(
+            pushdown_enabled_types=(),
         )
 
 
@@ -434,7 +447,7 @@ class PreJoinNodeProcessor:
                     filtered_nodes.append(source_node)
                 else:
                     filtered_nodes.append(
-                        WhereConstraintNode.create(parent_node=source_node, where_specs=matching_filter_specs)
+                        WhereFilterNode.create(parent_node=source_node, filter_specs=matching_filter_specs)
                     )
             else:
                 filtered_nodes.append(source_node)
@@ -544,7 +557,7 @@ class PreJoinNodeProcessor:
 
                 # Remove simple-metric inputs from the joined node.
                 specs = data_set_of_second_node_that_can_be_joined.instance_set.spec_set
-                filtered_joinable_node = FilterElementsNode.create(
+                selector_node_for_joinable = SelectorNode.create(
                     parent_node=second_node_that_could_be_joined,
                     include_specs=group_specs_by_type(
                         specs.dimension_specs
@@ -569,10 +582,8 @@ class PreJoinNodeProcessor:
                             left_node=first_node_that_could_be_joined,
                             join_targets=[
                                 JoinDescription(
-                                    join_node=filtered_joinable_node,
-                                    join_on_entity=LinklessEntitySpec.from_reference(
-                                        desired_linkable_spec.entity_links[1]
-                                    ),
+                                    join_node=selector_node_for_joinable,
+                                    join_on_entity=desired_linkable_spec.entity_links[1],
                                     join_on_partition_dimensions=join_on_partition_dimensions,
                                     join_on_partition_time_dimensions=join_on_partition_time_dimensions,
                                     join_type=join_type,
@@ -582,11 +593,7 @@ class PreJoinNodeProcessor:
                         lineage=MultiHopJoinCandidateLineage(
                             first_node_to_join=first_node_that_could_be_joined,
                             second_node_to_join=second_node_that_could_be_joined,
-                            # entity_spec_in_first_node should already not have entity links since we checked
-                            # for that, but using this method for type checking.
-                            join_second_node_by_entity=LinklessEntitySpec.from_reference(
-                                desired_linkable_spec.entity_links[1]
-                            ),
+                            join_second_node_by_entity=desired_linkable_spec.entity_links[1],
                         ),
                     )
                 )

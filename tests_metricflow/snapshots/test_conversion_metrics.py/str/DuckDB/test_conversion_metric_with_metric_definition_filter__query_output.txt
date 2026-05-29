@@ -1,0 +1,10 @@
+test_name: test_conversion_metric_with_metric_definition_filter
+test_filename: test_conversion_metrics.py
+docstring:
+  Test query against a conversion metric that has a filter defined in the YAML metric definition.
+---
+metric_time__day       visit_buy_conversion_rate_with_filter
+-------------------  ---------------------------------------
+2020-01-01T00:00:00                                        2
+2020-01-02T00:00:00                                        1
+2020-01-03T00:00:00                                        1

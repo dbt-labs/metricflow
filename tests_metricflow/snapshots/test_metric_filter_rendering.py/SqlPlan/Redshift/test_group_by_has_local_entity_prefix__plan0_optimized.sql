@@ -3,7 +3,7 @@ test_filename: test_metric_filter_rendering.py
 sql_engine: Redshift
 ---
 -- Constrain Output with WHERE
--- Pass Only Elements: ['listings']
+-- Select: ['__listings']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Write to DataTable
@@ -13,7 +13,7 @@ WITH sma_28014_cte AS (
   SELECT
     listing_id AS listing
     , user_id AS user
-    , 1 AS listings
+    , 1 AS __listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
 )
 
@@ -21,16 +21,18 @@ SELECT
   SUM(listings) AS listings
 FROM (
   -- Join Standard Outputs
+  -- Select: ['__listings', 'user__listing__user__average_booking_value']
   SELECT
-    subq_32.listing__user__average_booking_value AS user__listing__user__average_booking_value
-    , sma_28014_cte.listings AS listings
+    subq_43.listing__user__average_booking_value AS user__listing__user__average_booking_value
+    , sma_28014_cte.__listings AS listings
   FROM sma_28014_cte
   LEFT OUTER JOIN (
     -- Join Standard Outputs
-    -- Pass Only Elements: ['average_booking_value', 'listing__user']
+    -- Select: ['__average_booking_value', 'listing__user']
+    -- Select: ['__average_booking_value', 'listing__user']
     -- Aggregate Inputs for Simple Metrics
     -- Compute Metrics via Expressions
-    -- Pass Only Elements: ['listing__user', 'listing__user__average_booking_value']
+    -- Select: ['listing__user', 'listing__user__average_booking_value']
     SELECT
       sma_28014_cte.user AS listing__user
       , AVG(bookings_source_src_28000.booking_value) AS listing__user__average_booking_value
@@ -41,8 +43,8 @@ FROM (
       bookings_source_src_28000.listing_id = sma_28014_cte.listing
     GROUP BY
       sma_28014_cte.user
-  ) subq_32
+  ) subq_43
   ON
-    sma_28014_cte.user = subq_32.listing__user
-) subq_33
+    sma_28014_cte.user = subq_43.listing__user
+) subq_45
 WHERE user__listing__user__average_booking_value > 1

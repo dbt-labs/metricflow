@@ -3,13 +3,13 @@ test_filename: test_convert_semantic_model.py
 docstring:
   Complete test of table semantic model conversion. This includes the full set of simple-metric inputs/entities/dimensions.
 
-      Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
-      dimension types, which should cover most, if not all, of the table source branches in the target class.
+  Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
+  dimension types, which should cover most, if not all, of the table source branches in the target class.
 sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'id_verifications'
 SELECT
-  1 AS identity_verifications
+  1 AS __identity_verifications
   , DATE_TRUNC('day', id_verifications_src_28000.ds) AS ds__day
   , DATE_TRUNC('week', id_verifications_src_28000.ds) AS ds__week
   , DATE_TRUNC('month', id_verifications_src_28000.ds) AS ds__month

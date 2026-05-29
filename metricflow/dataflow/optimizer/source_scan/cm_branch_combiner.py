@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import itertools
 import logging
 from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
-from metricflow_semantics.specs.metric_spec import MetricSpec
+from metricflow_semantics.toolkit.cache.result_cache import ResultCache
+from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from typing_extensions import override
 
 from metricflow.dataflow.dataflow_plan import (
     DataflowPlanNode,
@@ -17,7 +20,7 @@ from metricflow.dataflow.nodes.alias_specs import AliasSpecsNode
 from metricflow.dataflow.nodes.combine_aggregated_outputs import CombineAggregatedOutputsNode
 from metricflow.dataflow.nodes.compute_metrics import ComputeMetricsNode
 from metricflow.dataflow.nodes.constrain_time import ConstrainTimeRangeNode
-from metricflow.dataflow.nodes.filter_elements import FilterElementsNode
+from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
@@ -30,7 +33,7 @@ from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGran
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -69,7 +72,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     left_branch:
         <ComputeMetricsNode metrics=["bookings"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["bookings"]>
+                <SelectorNode include_specs=["bookings"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
@@ -77,7 +80,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     right_branch:
         <ComputeMetricsNode metrics=["booking_value"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["booking_value"]>
+                <SelectorNode include_specs=["booking_value"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
@@ -87,7 +90,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
     <ComputeMetricsNode metrics=["bookings", "booking_value"]
         <AggregateSimpleMetricInputsNode>
-            <FilterElementsNode include_specs=["bookings", "booking_value"]>
+            <SelectorNode include_specs=["bookings", "booking_value"]>
                 <ReadSqlSourceNode semantic_model="bookings_source"/>
             </>
         </>
@@ -98,7 +101,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     left_branch:
         <ComputeMetricsNode metrics=["bookings"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["bookings", "is_instant"]>
+                <SelectorNode include_specs=["bookings", "is_instant"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
@@ -106,13 +109,13 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     right_branch:
         <ComputeMetricsNode metrics=["booking_value"]
             <AggregateSimpleMetricInputsNode>
-                <FilterElementsNode include_specs=["booking_value"]>
+                <SelectorNode include_specs=["booking_value"]>
                     <ReadSqlSourceNode semantic_model="bookings_source"/>
                 </>
             </>
         </>
 
-    can't be superpositioned / combined because the different set of linkable specs in the FilterElementsNode will cause
+    can't be superpositioned / combined because the different set of linkable specs in the SelectorNode will cause
     the AggregatedMeasuresNode to produce values for the simple-metric input that is different from the original branches. The logic
     to determine whether this is possible for each node type is encapsulated into the handler for each node type.
 
@@ -131,8 +134,15 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
     is propagated up to the result at the root node.
     """
 
-    def __init__(self, left_branch_node: DataflowPlanNode) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self,
+        left_branch_node: DataflowPlanNode,
+        branch_combiner_cache: ResultCache[
+            tuple[DataflowPlanNode, DataflowPlanNode], ComputeMetricsBranchCombinerResult
+        ],
+    ) -> None:
         self._current_left_node: DataflowPlanNode = left_branch_node
+        self._branch_combiner_cache = branch_combiner_cache
 
     def _log_visit_node_type(self, node: DataflowPlanNode) -> None:
         logger.debug(LazyFormat(lambda: f"Visiting {node.node_id}"))
@@ -198,6 +208,13 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         return combined_parents
 
     def _default_handler(self, current_right_node: DataflowPlanNode) -> ComputeMetricsBranchCombinerResult:
+        cache_key = (self._current_left_node, current_right_node)
+        cache_entry = self._branch_combiner_cache.get(cache_key)
+        if cache_entry:
+            return cache_entry.value
+        return self._branch_combiner_cache.set_and_get(cache_key, self._default_handler_inner(current_right_node))
+
+    def _default_handler_inner(self, current_right_node: DataflowPlanNode) -> ComputeMetricsBranchCombinerResult:
         combined_parent_nodes = self._combine_parent_branches(current_right_node)
         if combined_parent_nodes is None:
             return ComputeMetricsBranchCombinerResult()
@@ -206,6 +223,13 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         # If the parent nodes were combined, and the left node is the same as the right node, then the left and right
         # nodes can be combined.
+        if self._current_left_node == current_right_node:
+            combined_node = self._current_left_node
+            self._log_combine_success(
+                left_node=self._current_left_node, right_node=current_right_node, combined_node=combined_node
+            )
+            return ComputeMetricsBranchCombinerResult(combined_node)
+
         if self._current_left_node.functionally_identical(current_right_node):
             combined_node = current_right_node.with_new_parents(new_parent_nodes)
             self._log_combine_success(
@@ -220,19 +244,66 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult()
 
-    def visit_source_node(self, node: ReadSqlSourceNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    @override
+    def visit_source_node(self, node: ReadSqlSourceNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_on_entities_node(  # noqa: D102
-        self, node: JoinOnEntitiesNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    @override
+    def visit_join_on_entities_node(self, node: JoinOnEntitiesNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_aggregate_simple_metric_inputs_node(  # noqa: D102
+    @override
+    def visit_aggregate_simple_metric_inputs_node(
         self, node: AggregateSimpleMetricInputsNode
-    ) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    ) -> ComputeMetricsBranchCombinerResult:
+        cache_key = (self._current_left_node, node)
+        cache_entry = self._branch_combiner_cache.get(cache_key)
+        if cache_entry:
+            return cache_entry.value
+        return self._branch_combiner_cache.set_and_get(cache_key, self._visit_aggregate_simple_metric_inputs_node(node))
+
+    def _visit_aggregate_simple_metric_inputs_node(
+        self, node: AggregateSimpleMetricInputsNode
+    ) -> ComputeMetricsBranchCombinerResult:
+        """Combine two branches where the leaf node is an `AggregateSimpleMetricInputsNode`.
+
+        The `AggregateSimpleMetricInputsNode` outputs aggregated forms of its simple-metric inputs. It
+        also produces output instances with the `fill_nulls_with` context.
+
+        If the parent branches of the left and right nodes can be combined, it means that the left and right
+        branches have similar structure (e.g. select from the same semantic model / have the same joins) but aggregate
+        different simple-metric inputs. The cases to consider are:
+
+        * Both the left and right `AggregateSimpleMetricInputsNodes` specify the same null-fill value mapping. Then the
+        left and right branches can be combined as the default case.
+
+        * The left and right branches have a null-fill value mapping that contains no common simple-metric inputs.
+
+        e.g.
+            left:
+                null_fill_value_mapping = {"bookings": 0}
+            right:
+                null_fill_value_mapping = {"booking_value": 0}
+
+        Since different instances are represented with different columns, there are no issues using different null-fill
+        values and the branches can be combined.
+
+        * The left and right branches have a conflicting null-fill value for the same simple-metric input. After the
+        measure -> simple-metric migration, this case should not be possible as each simple metric is only allowed a
+        single `fill_nulls_with` value in the configuration. However, if allowed:
+
+        e.g.
+            left:
+                null_fill_value_mapping = {"bookings": 0, "booking_value": None}
+            right:
+                null_fill_value_mapping = {"bookings": 0, "booking_value": 1}
+
+        The output of the combined branch would need to represent `booking_value` with no null-fill and a null-fill
+        value of 1. This would require the output to contain different columns for each case, so we can't combine the
+        branches.
+        """
         self._log_visit_node_type(node)
         current_right_node = node
 
@@ -251,18 +322,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         assert len(combined_parent_nodes) == 1
         combined_parent_node = combined_parent_nodes[0]
 
-        # Avoid combining branches if the AggregateSimpleMetricInputsNode specifies conflicting aliases.
-        # e.g. two metrics use the same alias for two different simple-metric inputs. This is not always the case,
-        # so this could be improved later.
-        if self._current_left_node.alias_mapping.has_conflict(current_right_node.alias_mapping):
-            self._log_combine_failure(
-                left_node=self._current_left_node,
-                right_node=current_right_node,
-                combine_failure_reason=f"Conflicting alias mapping - left: {self._current_left_node.alias_mapping} right: {current_right_node.alias_mapping}",
-            )
-            return ComputeMetricsBranchCombinerResult()
-
-        if self._current_left_node.null_fill_value_mapping != current_right_node.null_fill_value_mapping:
+        if self._current_left_node.null_fill_value_mapping.has_conflict(current_right_node.null_fill_value_mapping):
             self._log_combine_failure(
                 left_node=self._current_left_node,
                 right_node=current_right_node,
@@ -272,9 +332,11 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         combined_node = AggregateSimpleMetricInputsNode.create(
             parent_node=combined_parent_node,
-            alias_mapping=self._current_left_node.alias_mapping,
-            null_fill_value_mapping=self._current_left_node.null_fill_value_mapping,
+            null_fill_value_mapping=self._current_left_node.null_fill_value_mapping.merge(
+                current_right_node.null_fill_value_mapping
+            ),
         )
+
         self._log_combine_success(
             left_node=self._current_left_node,
             right_node=current_right_node,
@@ -282,7 +344,15 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    @override
+    def visit_compute_metrics_node(self, node: ComputeMetricsNode) -> ComputeMetricsBranchCombinerResult:
+        cache_key = (self._current_left_node, node)
+        cache_entry = self._branch_combiner_cache.get(cache_key)
+        if cache_entry:
+            return cache_entry.value
+        return self._branch_combiner_cache.set_and_get(cache_key, self._visit_compute_metrics_node(node))
+
+    def _visit_compute_metrics_node(self, node: ComputeMetricsNode) -> ComputeMetricsBranchCombinerResult:
         current_right_node = node
         self._log_visit_node_type(current_right_node)
         combined_parent_nodes = self._combine_parent_branches(current_right_node)
@@ -310,18 +380,20 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_parent_node = combined_parent_nodes[0]
         assert combined_parent_node is not None
 
-        # Dedupe (preserving order for output consistency) as it's possible for multiple derived metrics to use the same
-        # metric.
-        unique_metric_specs: List[MetricSpec] = []
-        for metric_spec in tuple(self._current_left_node.metric_specs) + tuple(current_right_node.metric_specs):
-            if metric_spec not in unique_metric_specs:
-                unique_metric_specs.append(metric_spec)
-
         combined_node = ComputeMetricsNode.create(
             parent_node=combined_parent_node,
-            metric_specs=unique_metric_specs,
+            # Dedupe (preserving order for output consistency) as it's possible for multiple derived metrics to use the same
+            # metric.
+            computed_metric_specs=FrozenOrderedSet(
+                itertools.chain(self._current_left_node.computed_metric_specs, current_right_node.computed_metric_specs)
+            ),
+            passthrough_metric_specs=FrozenOrderedSet(
+                itertools.chain(
+                    self._current_left_node.passthrough_metric_specs, current_right_node.passthrough_metric_specs
+                )
+            ),
             aggregated_to_elements=current_right_node.aggregated_to_elements,
-            for_group_by_source_node=current_right_node.for_group_by_source_node,
+            output_group_by_metric_instances=current_right_node.output_group_by_metric_instances,
         )
         self._log_combine_success(
             left_node=self._current_left_node,
@@ -340,35 +412,42 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult()
 
-    def visit_window_reaggregation_node(  # noqa: D102
-        self, node: WindowReaggregationNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_window_reaggregation_node(self, node: WindowReaggregationNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    @override
+    def visit_order_by_limit_node(self, node: OrderByLimitNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_where_constraint_node(  # noqa: D102
-        self, node: WhereConstraintNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_write_to_result_data_table_node(  # noqa: D102
+    @override
+    def visit_write_to_result_data_table_node(
         self, node: WriteToResultDataTableNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_write_to_result_table_node(  # noqa: D102
-        self, node: WriteToResultTableNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_write_to_result_table_node(self, node: WriteToResultTableNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_filter_elements_node(self, node: FilterElementsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    @override
+    def visit_selector_node(self, node: SelectorNode) -> ComputeMetricsBranchCombinerResult:
+        cache_key = (self._current_left_node, node)
+        cache_entry = self._branch_combiner_cache.get(cache_key)
+        if cache_entry:
+            return cache_entry.value
+        return self._branch_combiner_cache.set_and_get(cache_key, self._visit_selector_node(node))
+
+    def _visit_selector_node(self, node: SelectorNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
 
         current_right_node = node
@@ -388,7 +467,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         combined_parent_node = results_of_visiting_parent_nodes[0]
         assert combined_parent_node is not None
 
-        # For the FilterElementsNode to be combined, the linkable specs have to be the same for the left and right.
+        # For the SelectorNode to be combined, the linkable specs have to be the same for the left and right.
         if not MatchingLinkableSpecsTransform(self._current_left_node.include_specs).transform(
             current_right_node.include_specs
         ):
@@ -401,7 +480,7 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
 
         # De-dupe so that we don't see the same spec twice in include specs. For example, this can happen with dimension
         # specs since any branch that is merged together needs to output the same set of dimensions.
-        combined_node = FilterElementsNode.create(
+        combined_node = SelectorNode.create(
             parent_node=combined_parent_node,
             include_specs=self._current_left_node.include_specs.merge(current_right_node.include_specs).dedupe(),
         )
@@ -412,75 +491,78 @@ class ComputeMetricsBranchCombiner(DataflowPlanNodeVisitor[ComputeMetricsBranchC
         )
         return ComputeMetricsBranchCombinerResult(combined_node)
 
-    def visit_combine_aggregated_outputs_node(  # noqa: D102
+    @override
+    def visit_combine_aggregated_outputs_node(
         self, node: CombineAggregatedOutputsNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._handle_unsupported_node(node)
 
-    def visit_constrain_time_range_node(  # noqa: D102
-        self, node: ConstrainTimeRangeNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_over_time_range_node(  # noqa: D102
-        self, node: JoinOverTimeRangeNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_join_over_time_range_node(self, node: JoinOverTimeRangeNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_semi_additive_join_node(  # noqa: D102
-        self, node: SemiAdditiveJoinNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_semi_additive_join_node(self, node: SemiAdditiveJoinNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_metric_time_dimension_transform_node(  # noqa: D102
+    @override
+    def visit_metric_time_dimension_transform_node(
         self, node: MetricTimeDimensionTransformNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_to_time_spine_node(  # noqa: D102
-        self, node: JoinToTimeSpineNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_join_to_time_spine_node(self, node: JoinToTimeSpineNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_add_generated_uuid_column_node(  # noqa: D102
+    @override
+    def visit_add_generated_uuid_column_node(
         self, node: AddGeneratedUuidColumnNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_conversion_events_node(  # noqa: D102
-        self, node: JoinConversionEventsNode
-    ) -> ComputeMetricsBranchCombinerResult:
+    @override
+    def visit_join_conversion_events_node(self, node: JoinConversionEventsNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_join_to_custom_granularity_node(  # noqa: D102
+    @override
+    def visit_join_to_custom_granularity_node(
         self, node: JoinToCustomGranularityNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_min_max_node(self, node: MinMaxNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    @override
+    def visit_min_max_node(self, node: MinMaxNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_alias_specs_node(self, node: AliasSpecsNode) -> ComputeMetricsBranchCombinerResult:  # noqa: D102
+    @override
+    def visit_alias_specs_node(self, node: AliasSpecsNode) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_offset_base_grain_by_custom_grain_node(  # noqa: D102
+    @override
+    def visit_offset_base_grain_by_custom_grain_node(
         self, node: OffsetBaseGrainByCustomGrainNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)
         return self._default_handler(node)
 
-    def visit_offset_custom_granularity_node(  # noqa: D102
+    @override
+    def visit_offset_custom_granularity_node(
         self, node: OffsetCustomGranularityNode
     ) -> ComputeMetricsBranchCombinerResult:
         self._log_visit_node_type(node)

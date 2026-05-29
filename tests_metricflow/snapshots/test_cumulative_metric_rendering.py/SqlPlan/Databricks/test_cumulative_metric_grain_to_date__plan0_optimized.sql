@@ -6,7 +6,8 @@ sql_engine: Databricks
 ---
 -- Read Elements From Semantic Model 'revenue'
 -- Metric Time Dimension 'ds'
--- Pass Only Elements: ['revenue', 'ds__month']
+-- Select: ['__revenue', 'ds__month']
+-- Select: ['__revenue', 'ds__month']
 -- Aggregate Inputs for Simple Metrics
 -- Compute Metrics via Expressions
 -- Compute Metrics via Expressions
