@@ -799,3 +799,29 @@ def test_saved_query_override_order_by_and_limit(  # noqa: D103
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
+@pytest.mark.skip
+def test_column_order(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+) -> None:
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_fill_nulls_with_0_without_time_spine", "instant_bookings_fill_nulls_with_0_without_time_spine"),
+        group_by_names=("listing__country_latest", "listing__capacity_latest", "metric_time__day"),
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+    )

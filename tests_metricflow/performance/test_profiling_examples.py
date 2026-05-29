@@ -87,6 +87,7 @@ def mf_explain_saved_query(
             )
             try:
                 explain_result = mf_engine.explain(MetricFlowQueryRequest.create(saved_query_name=saved_query.name))
+                logger.info(LazyFormat("Explain SQL", sql=explain_result.sql_statement.sql))
             except Exception:
                 logger.exception("Ignoring exception for the test")
 
@@ -175,6 +176,6 @@ def test_profile_performance_using_json_manifest(
         )
     )
     # saved_query_names = tuple(saved_query.name for saved_query in semantic_manifest.saved_queries)[:100]
-    saved_query_names = ["sq_act_trigger_dashboard_export_ytd_subregion_metrics_wo_sales_batch_2"]
-    mf_explain_saved_query(semantic_manifest, sql_client, saved_query_names=saved_query_names, profile=True)
+    saved_query_names = ["sq_flashmod_weekly_bld_headcount"]
+    mf_explain_saved_query(semantic_manifest, sql_client, saved_query_names=saved_query_names, profile=False)
     # mf_simulate_validation(semantic_manifest, sql_client, profile=True)

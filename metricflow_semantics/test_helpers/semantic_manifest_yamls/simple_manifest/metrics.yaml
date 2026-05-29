@@ -691,6 +691,15 @@ metric:
     measure:
       name: bookings
       fill_nulls_with: 0
+#---
+#metric:
+#  name: instant_bookings_fill_nulls_with_0_without_time_spine
+#  description: Simple metric filling 0 without time spine. Not a commonly expected scenario.
+#  type: simple
+#  type_params:
+#    measure:
+#      name: instant_bookings
+#      fill_nulls_with: 0
 ---
 metric:
   name: bookings_fill_nulls_with_0
