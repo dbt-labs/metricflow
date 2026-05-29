@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID"
 AWS_DEFAULT_REGION = "AWS_DEFAULT_REGION"
 AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
+AWS_SECURITY_TOKEN = "AWS_SECURITY_TOKEN"
+AWS_SESSION_TOKEN = "AWS_SESSION_TOKEN"
 DBT_PROFILE_PORT = "DBT_PROFILE_PORT"
 DBT_ENV_SECRET_AWS_PROFILE_NAME = "DBT_ENV_SECRET_AWS_PROFILE_NAME"
 DBT_ENV_SECRET_DATABASE = "DBT_ENV_SECRET_DATABASE"
@@ -54,6 +56,18 @@ DBT_ENV_SECRET_TOKEN_URI = "DBT_ENV_SECRET_TOKEN_URI"
 
 # Trino is special, so it gets its own set of env vars. Keeping them split out here for consistency.
 DBT_ENV_SECRET_CATALOG = "DBT_ENV_SECRET_CATALOG"
+
+
+def __clear_athena_aws_auth_env() -> None:
+    """Clear Athena auth env vars so each run starts from a clean credential state."""
+    for env_var in (
+        AWS_ACCESS_KEY_ID,
+        AWS_SECRET_ACCESS_KEY,
+        AWS_SESSION_TOKEN,
+        AWS_SECURITY_TOKEN,
+        DBT_ENV_SECRET_AWS_PROFILE_NAME,
+    ):
+        os.environ.pop(env_var, None)
 
 
 def __configure_test_env_from_url(url: str, password: str, schema: str) -> SqlEngineConnectionParameterSet:
@@ -86,6 +100,7 @@ def __configure_test_env_from_url(url: str, password: str, schema: str) -> SqlEn
 
 def __configure_athena_env_from_url(url: str, password: str, schema: str) -> SqlEngineConnectionParameterSet:
     """Populate Athena-specific dbt and AWS environment variables from a connection URL."""
+    __clear_athena_aws_auth_env()
     connection_parameters = SqlEngineConnectionParameterSet.create_from_url(url)
     aws_profile_names = connection_parameters.get_query_field_values("aws_profile_name")
     assert (

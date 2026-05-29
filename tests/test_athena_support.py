@@ -4,12 +4,8 @@ import os
 from unittest.mock import Mock
 
 import pytest
-
-from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient, SupportedAdapterTypes
 from dbt_semantic_interfaces.type_enums.date_part import DatePart
 from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from metricflow.protocols.sql_client import SqlEngine
-from metricflow.sql.render.athena import AthenaSqlExpressionRenderer, AthenaSqlPlanRenderer
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlBetweenExpression,
@@ -21,8 +17,13 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
     SqlStringLiteralExpression,
+    SqlStringExpression,
     SqlSubtractTimeIntervalExpression,
 )
+
+from dbt_metricflow.cli.dbt_connectors.adapter_backed_client import AdapterBackedSqlClient, SupportedAdapterTypes
+from metricflow.protocols.sql_client import SqlEngine
+from metricflow.sql.render.athena import AthenaSqlExpressionRenderer, AthenaSqlPlanRenderer
 from tests_metricflow.fixtures import sql_client_fixtures
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 from tests_metricflow.fixtures.sql_client_fixtures import make_test_sql_client
@@ -102,10 +103,26 @@ def test_athena_expression_renderer_supports_expected_operations() -> None:
 
     between_expr = SqlBetweenExpression.create(
         column_arg=SqlColumnReferenceExpression.create(SqlColumnReference("alias", "event_time")),
-        start_expr=SqlStringLiteralExpression.create("'2023-01-01'"),
-        end_expr=SqlStringLiteralExpression.create("'2023-12-31'"),
+        start_expr=SqlStringLiteralExpression.create("2023-01-01"),
+        end_expr=SqlStringLiteralExpression.create("2023-12-31"),
     )
-    assert "alias.event_time BETWEEN" in renderer.visit_between_expr(between_expr).sql
+    assert renderer.visit_between_expr(between_expr).sql == (
+        "alias.event_time BETWEEN timestamp '2023-01-01' AND timestamp '2023-12-31'"
+    )
+
+
+def test_athena_between_expr_does_not_wrap_arbitrary_sql_fragments() -> None:
+    """Athena should not treat rendered SQL fragments as timestamp literals."""
+    renderer = AthenaSqlExpressionRenderer()
+    between_expr = SqlBetweenExpression.create(
+        column_arg=SqlColumnReferenceExpression.create(SqlColumnReference("alias", "event_time")),
+        start_expr=SqlStringExpression.create("DATE '2023-01-01'", requires_parenthesis=False),
+        end_expr=SqlStringExpression.create("DATE '2023-01-10'", requires_parenthesis=False),
+    )
+
+    assert renderer.visit_between_expr(between_expr).sql == (
+        "alias.event_time BETWEEN DATE '2023-01-01' AND DATE '2023-01-10'"
+    )
 
 
 def test_athena_plan_renderer_uses_athena_expression_renderer() -> None:
@@ -127,12 +144,16 @@ def test_make_test_sql_client_supports_athena(monkeypatch: pytest.MonkeyPatch) -
         "AWS_ACCESS_KEY_ID",
         "AWS_DEFAULT_REGION",
         "AWS_SECRET_ACCESS_KEY",
+        "AWS_SECURITY_TOKEN",
+        "AWS_SESSION_TOKEN",
+        "DBT_ENV_SECRET_AWS_PROFILE_NAME",
         "DBT_ENV_SECRET_DATABASE",
         "DBT_ENV_SECRET_REGION_NAME",
         "DBT_ENV_SECRET_S3_STAGING_DIR",
         "DBT_ENV_SECRET_SCHEMA",
     ):
         monkeypatch.delenv(env_var, raising=False)
+    monkeypatch.setenv("DBT_ENV_SECRET_AWS_PROFILE_NAME", "stale-profile")
 
     sql_client = make_test_sql_client(
         url="athena://access_key_id@/awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/",
@@ -141,6 +162,7 @@ def test_make_test_sql_client_supports_athena(monkeypatch: pytest.MonkeyPatch) -
     )
 
     assert sql_client.sql_engine_type is SqlEngine.ATHENA
+    assert "DBT_ENV_SECRET_AWS_PROFILE_NAME" not in os.environ
     assert os.environ["AWS_ACCESS_KEY_ID"] == "access_key_id"
     assert os.environ["AWS_DEFAULT_REGION"] == "eu-central-1"
     assert os.environ["AWS_SECRET_ACCESS_KEY"] == "secret"
@@ -162,6 +184,8 @@ def test_make_test_sql_client_supports_athena_profile_auth(monkeypatch: pytest.M
         "AWS_ACCESS_KEY_ID",
         "AWS_DEFAULT_REGION",
         "AWS_SECRET_ACCESS_KEY",
+        "AWS_SECURITY_TOKEN",
+        "AWS_SESSION_TOKEN",
         "DBT_ENV_SECRET_AWS_PROFILE_NAME",
         "DBT_ENV_SECRET_DATABASE",
         "DBT_ENV_SECRET_REGION_NAME",
@@ -169,6 +193,11 @@ def test_make_test_sql_client_supports_athena_profile_auth(monkeypatch: pytest.M
         "DBT_ENV_SECRET_SCHEMA",
     ):
         monkeypatch.delenv(env_var, raising=False)
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "stale-access")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "stale-secret")
+    monkeypatch.setenv("AWS_SESSION_TOKEN", "stale-session")
+    monkeypatch.setenv("AWS_SECURITY_TOKEN", "stale-security")
+    monkeypatch.setenv("DBT_ENV_SECRET_AWS_PROFILE_NAME", "stale-profile")
 
     sql_client = make_test_sql_client(
         url="athena:///awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/&aws_profile_name=my-profile",
@@ -177,6 +206,10 @@ def test_make_test_sql_client_supports_athena_profile_auth(monkeypatch: pytest.M
     )
 
     assert sql_client.sql_engine_type is SqlEngine.ATHENA
+    assert "AWS_ACCESS_KEY_ID" not in os.environ
+    assert "AWS_SECRET_ACCESS_KEY" not in os.environ
+    assert "AWS_SESSION_TOKEN" not in os.environ
+    assert "AWS_SECURITY_TOKEN" not in os.environ
     assert os.environ["DBT_ENV_SECRET_AWS_PROFILE_NAME"] == "my-profile"
     assert os.environ["DBT_ENV_SECRET_REGION_NAME"] == "eu-central-1"
     assert os.environ["DBT_ENV_SECRET_S3_STAGING_DIR"] == "s3://bucket/dbt/"
