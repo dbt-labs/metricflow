@@ -32,6 +32,10 @@ export MF_TEST_ENGINE_CREDENTIALS=$(cat <<EOF
         "engine_url": trino://...",
         "engine_password": "..."
     },
+    "athena": {
+        "engine_url": "athena://...",
+        "engine_password": "..."
+    },
 }
 EOF
 )
@@ -71,6 +75,7 @@ class MetricFlowEngineConfiguration:  # noqa: D101
 
 class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
     duck_db: MetricFlowTestCredentialSet
+    athena: MetricFlowTestCredentialSet
     redshift: MetricFlowTestCredentialSet
     snowflake: MetricFlowTestCredentialSet
     big_query: MetricFlowTestCredentialSet
@@ -84,6 +89,10 @@ class MetricFlowTestCredentialSetForAllEngines(FrozenBaseModel):  # noqa: D101
             MetricFlowEngineConfiguration(
                 engine=SqlEngine.DUCKDB,
                 credential_set=self.duck_db,
+            ),
+            MetricFlowEngineConfiguration(
+                engine=SqlEngine.ATHENA,
+                credential_set=self.athena,
             ),
             MetricFlowEngineConfiguration(
                 engine=SqlEngine.REDSHIFT,
@@ -148,7 +157,8 @@ def run_tests(test_configuration: MetricFlowEngineConfiguration) -> None:  # noq
         # these are not dialect specific, so only need to run once
         run_command(f"pytest -x -vv -n 4 --overwrite-snapshots {MF_SEMANTICS_TEST_DIRECTORY}")
     elif (
-        test_configuration.engine is SqlEngine.REDSHIFT
+        test_configuration.engine is SqlEngine.ATHENA
+        or test_configuration.engine is SqlEngine.REDSHIFT
         or test_configuration.engine is SqlEngine.SNOWFLAKE
         or test_configuration.engine is SqlEngine.BIGQUERY
         or test_configuration.engine is SqlEngine.DATABRICKS

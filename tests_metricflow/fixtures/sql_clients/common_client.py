@@ -8,6 +8,7 @@ class SqlDialect(Enum):
     """All SQL dialects that MQL currently supports. Value of enum is used in URLs as the dialect."""
 
     DUCKDB = "duckdb"
+    ATHENA = "athena"
     REDSHIFT = "redshift"
     POSTGRESQL = "postgresql"
     SNOWFLAKE = "snowflake"

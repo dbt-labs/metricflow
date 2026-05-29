@@ -25,7 +25,8 @@ def populate_schemas(test_configuration: MetricFlowEngineConfiguration) -> None:
         # DuckDB & Postgres don't use persistent source schema
         return None
     elif (
-        test_configuration.engine is SqlEngine.SNOWFLAKE
+        test_configuration.engine is SqlEngine.ATHENA
+        or test_configuration.engine is SqlEngine.SNOWFLAKE
         or test_configuration.engine is SqlEngine.BIGQUERY
         or test_configuration.engine is SqlEngine.DATABRICKS
         or test_configuration.engine is SqlEngine.REDSHIFT

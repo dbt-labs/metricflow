@@ -25,10 +25,16 @@ logger = logging.getLogger(__name__)
 
 # Env vars for dbt profile configuration. We use DBT_ENV_SECRET to avoid leaking secrets in CI logs.
 # Note port cannot use the secret obfuscation because it must be type-cast to int
+AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID"
+AWS_DEFAULT_REGION = "AWS_DEFAULT_REGION"
+AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
 DBT_PROFILE_PORT = "DBT_PROFILE_PORT"
+DBT_ENV_SECRET_AWS_PROFILE_NAME = "DBT_ENV_SECRET_AWS_PROFILE_NAME"
 DBT_ENV_SECRET_DATABASE = "DBT_ENV_SECRET_DATABASE"
 DBT_ENV_SECRET_HOST = "DBT_ENV_SECRET_HOST"
 DBT_ENV_SECRET_HTTP_PATH = "DBT_ENV_SECRET_HTTP_PATH"
+DBT_ENV_SECRET_REGION_NAME = "DBT_ENV_SECRET_REGION_NAME"
+DBT_ENV_SECRET_S3_STAGING_DIR = "DBT_ENV_SECRET_S3_STAGING_DIR"
 DBT_ENV_SECRET_PASSWORD = "DBT_ENV_SECRET_PASSWORD"
 DBT_ENV_SECRET_SCHEMA = "DBT_ENV_SECRET_SCHEMA"
 DBT_ENV_SECRET_USER = "DBT_ENV_SECRET_USER"
@@ -73,6 +79,42 @@ def __configure_test_env_from_url(url: str, password: str, schema: str) -> SqlEn
         os.environ[DBT_PROFILE_PORT] = str(connection_parameters.port)
 
     os.environ[DBT_ENV_SECRET_PASSWORD] = password
+    os.environ[DBT_ENV_SECRET_SCHEMA] = schema
+
+    return connection_parameters
+
+
+def __configure_athena_env_from_url(url: str, password: str, schema: str) -> SqlEngineConnectionParameterSet:
+    """Populate Athena-specific dbt and AWS environment variables from a connection URL."""
+    connection_parameters = SqlEngineConnectionParameterSet.create_from_url(url)
+    aws_profile_names = connection_parameters.get_query_field_values("aws_profile_name")
+    assert (
+        len(aws_profile_names) <= 1
+    ), f"SQL engine URL specified multiple Athena aws_profile_name values: {aws_profile_names}"
+
+    if aws_profile_names:
+        os.environ[DBT_ENV_SECRET_AWS_PROFILE_NAME] = aws_profile_names[0]
+    else:
+        if connection_parameters.username:
+            os.environ[AWS_ACCESS_KEY_ID] = connection_parameters.username
+
+        if password:
+            os.environ[AWS_SECRET_ACCESS_KEY] = password
+
+    region_names = connection_parameters.get_query_field_values("region_name")
+    assert len(region_names) == 1, f"SQL engine URL did not specify exactly 1 Athena region_name! Got {region_names}"
+    os.environ[DBT_ENV_SECRET_REGION_NAME] = region_names[0]
+    os.environ[AWS_DEFAULT_REGION] = region_names[0]
+
+    s3_staging_dirs = connection_parameters.get_query_field_values("s3_staging_dir")
+    assert (
+        len(s3_staging_dirs) == 1
+    ), f"SQL engine URL did not specify exactly 1 Athena s3_staging_dir! Got {s3_staging_dirs}"
+    os.environ[DBT_ENV_SECRET_S3_STAGING_DIR] = s3_staging_dirs[0]
+
+    if connection_parameters.database:
+        os.environ[DBT_ENV_SECRET_DATABASE] = connection_parameters.database
+
     os.environ[DBT_ENV_SECRET_SCHEMA] = schema
 
     return connection_parameters
@@ -141,6 +183,10 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     # TODO: Switch on an enum of adapter type when all engines are cut over
     dialect = SqlDialect(SqlEngineConnectionParameterSet.create_from_url(url).dialect)
 
+    if dialect is SqlDialect.ATHENA:
+        __configure_athena_env_from_url(url, password=password, schema=schema)
+        __initialize_dbt()
+        return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("athena"))
     if dialect is SqlDialect.REDSHIFT:
         __configure_test_env_from_url(url, password=password, schema=schema)
         __initialize_dbt()

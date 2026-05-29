@@ -17,6 +17,19 @@ bigquery:
         token_uri: "{{ env_var('DBT_ENV_SECRET_TOKEN_URI') }}"
         auth_provider_x509_cert_url: "{{ env_var('DBT_ENV_SECRET_AUTH_PROVIDER_CERT_URL') }}"
         client_x509_cert_url: "{{ env_var('DBT_ENV_SECRET_CLIENT_CERT_URL') }}"
+athena:
+  target: dev
+  outputs:
+    dev:
+      type: athena
+      database: "{{ env_var('DBT_ENV_SECRET_DATABASE') }}"
+      region_name: "{{ env_var('DBT_ENV_SECRET_REGION_NAME') }}"
+      s3_staging_dir: "{{ env_var('DBT_ENV_SECRET_S3_STAGING_DIR') }}"
+      schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
+{% if env_var('DBT_ENV_SECRET_AWS_PROFILE_NAME', '') != '' %}
+      aws_profile_name: "{{ env_var('DBT_ENV_SECRET_AWS_PROFILE_NAME') }}"
+{% endif %}
+      work_group: primary
 databricks:
   target: dev
   outputs:
