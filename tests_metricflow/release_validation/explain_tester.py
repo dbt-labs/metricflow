@@ -13,7 +13,7 @@ from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSe
 from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
-from metricflow.engine.metricflow_engine import MetricFlowRequestId
+from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from tests_metricflow.release_validation.explain_runner import (
@@ -143,14 +143,36 @@ class DuckDbExplainTester:
         manifest_path.write_text(semantic_manifest.json(indent=2))
         return manifest_path
 
+    @staticmethod
+    def _generate_request_hash(request: MetricFlowQueryRequest) -> str:
+        """Generates a hash of the request, excluding the request ID and optimizations."""
+        return mf_sha1_iterables(
+            [
+                str(request.saved_query_name),
+                str(request.metric_names),
+                str(request.metrics),
+                str(request.group_by_names),
+                str(request.group_by),
+                str(request.limit),
+                str(request.time_constraint_start),
+                str(request.time_constraint_end),
+                str(request.where_constraints),
+                str(request.order_by_names),
+                str(request.order_by),
+                str(request.min_max_only),
+                str(request.apply_group_by),
+                str(request.query_type),
+                str(request.order_output_columns_by_input_order),
+            ]
+        )
+
     def _generate_and_submit_requests_for_one_manifest(
         self, executor: ProcessPoolExecutor, manifest_setup: ManifestSetup
     ) -> Mapping[Future, MetricFlowExplainTask]:
         future_to_task: dict[Future, MetricFlowExplainTask] = {}
-        empty_request_id = MetricFlowRequestId("")
 
         for request in self._request_generator.generate_requests(manifest_setup.semantic_manifest):
-            request_name = "query_" + mf_sha1_iterables([str(request.with_request_id(empty_request_id))])[:8]
+            request_name = "query_" + self._generate_request_hash(request)[:8]
             task = MetricFlowExplainTask(
                 manifest_setup=manifest_setup,
                 request_name=request_name,
