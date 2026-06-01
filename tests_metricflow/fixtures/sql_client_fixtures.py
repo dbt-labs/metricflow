@@ -46,26 +46,31 @@ DBT_ENV_SECRET_S3_STAGING_DIR = "DBT_ENV_SECRET_S3_STAGING_DIR"
 DBT_ENV_SECRET_SCHEMA = "DBT_ENV_SECRET_SCHEMA"
 
 
-def __clear_athena_aws_auth_env() -> None:
-    """Clear Athena auth env vars so each run starts from a clean credential state."""
+def __clear_athena_env() -> None:
+    """Clear Athena-specific env vars so each run starts from a clean configuration state."""
     for env_var in (
         AWS_ACCESS_KEY_ID,
+        AWS_DEFAULT_REGION,
         AWS_SECRET_ACCESS_KEY,
         AWS_SESSION_TOKEN,
         AWS_SECURITY_TOKEN,
         DBT_ENV_SECRET_AWS_PROFILE_NAME,
+        DBT_ENV_SECRET_DATABASE,
+        DBT_ENV_SECRET_REGION_NAME,
+        DBT_ENV_SECRET_S3_STAGING_DIR,
+        DBT_ENV_SECRET_SCHEMA,
     ):
         os.environ.pop(env_var, None)
 
 
-def __configure_athena_env_from_url(url: str, password: str, schema: str) -> SqlEngineConnectionParameterSet:
-    """Populate Athena-specific dbt and AWS environment variables from a connection URL."""
-    __clear_athena_aws_auth_env()
-    connection_parameters = SqlEngineConnectionParameterSet.create_from_url(url)
+def __configure_athena_env_from_connection_parameters(
+    connection_parameters: SqlEngineConnectionParameterSet, password: str, schema: str
+) -> None:
+    """Populate Athena-specific dbt and AWS environment variables from parsed connection parameters."""
+    __clear_athena_env()
     aws_profile_names = connection_parameters.get_query_field_values("aws_profile_name")
-    assert (
-        len(aws_profile_names) <= 1
-    ), f"SQL engine URL specified multiple Athena aws_profile_name values: {aws_profile_names}"
+    if len(aws_profile_names) > 1:
+        raise ValueError(f"SQL engine URL specified multiple Athena aws_profile_name values: {aws_profile_names}")
 
     if aws_profile_names:
         os.environ[DBT_ENV_SECRET_AWS_PROFILE_NAME] = aws_profile_names[0]
@@ -77,14 +82,14 @@ def __configure_athena_env_from_url(url: str, password: str, schema: str) -> Sql
             os.environ[AWS_SECRET_ACCESS_KEY] = password
 
     region_names = connection_parameters.get_query_field_values("region_name")
-    assert len(region_names) == 1, f"SQL engine URL did not specify exactly 1 Athena region_name! Got {region_names}"
+    if len(region_names) != 1:
+        raise ValueError(f"SQL engine URL did not specify exactly 1 Athena region_name! Got {region_names}")
     os.environ[DBT_ENV_SECRET_REGION_NAME] = region_names[0]
     os.environ[AWS_DEFAULT_REGION] = region_names[0]
 
     s3_staging_dirs = connection_parameters.get_query_field_values("s3_staging_dir")
-    assert (
-        len(s3_staging_dirs) == 1
-    ), f"SQL engine URL did not specify exactly 1 Athena s3_staging_dir! Got {s3_staging_dirs}"
+    if len(s3_staging_dirs) != 1:
+        raise ValueError(f"SQL engine URL did not specify exactly 1 Athena s3_staging_dir! Got {s3_staging_dirs}")
     os.environ[DBT_ENV_SECRET_S3_STAGING_DIR] = s3_staging_dirs[0]
 
     if connection_parameters.database:
@@ -92,12 +97,10 @@ def __configure_athena_env_from_url(url: str, password: str, schema: str) -> Sql
 
     os.environ[DBT_ENV_SECRET_SCHEMA] = schema
 
-    return connection_parameters
-
 
 def __initialize_dbt() -> None:
     """Invoke the dbt runner from the appropriate directory so we can fetch the relevant adapter."""
-    dbtRunner().invoke(["debug"], project_dir=dbt_project_dir(), PROFILES_DIR=dbt_project_dir())
+    dbtRunner().invoke(["debug"], project_dir=dbt_project_dir(), profiles_dir=dbt_project_dir())
 
 
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
@@ -106,7 +109,9 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     dialect = SqlDialect(connection_params.dialect)
 
     if dialect is SqlDialect.ATHENA:
-        __configure_athena_env_from_url(url, password=password, schema=schema)
+        __configure_athena_env_from_connection_parameters(
+            connection_params, password=password, schema=schema
+        )
         __initialize_dbt()
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("athena"))
 
