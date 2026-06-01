@@ -27,7 +27,7 @@ from metricflow.sql.render.athena import AthenaSqlExpressionRenderer, AthenaSqlP
 from scripts.generate_snapshots import ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
 from tests_metricflow.fixtures import sql_client_fixtures
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
-from tests_metricflow.fixtures.sql_client_fixtures import make_test_sql_client
+from tests_metricflow.fixtures.sql_client_fixtures import cleanup_athena_env, make_test_sql_client
 
 
 def test_create_from_url_supports_athena() -> None:
@@ -129,9 +129,11 @@ def test_athena_plan_renderer_uses_athena_expression_renderer() -> None:
     assert isinstance(plan_renderer.expr_renderer, AthenaSqlExpressionRenderer)
 
 
-def test_make_test_sql_client_supports_athena(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_make_test_sql_client_supports_athena(
+    monkeypatch: pytest.MonkeyPatch, cleanup_athena_env: None
+) -> None:
     """Athena clients should be routable through the dbt test harness."""
-    monkeypatch.setattr(sql_client_fixtures, "__initialize_dbt", lambda: None)
+    monkeypatch.setattr(sql_client_fixtures, "_initialize_dbt", lambda project_dir, profiles_dir: None)
 
     mock_adapter = Mock()
     mock_adapter.type.return_value = "athena"
@@ -169,9 +171,11 @@ def test_make_test_sql_client_supports_athena(monkeypatch: pytest.MonkeyPatch) -
     assert os.environ["DBT_ENV_SECRET_SCHEMA"] == "analytics"
 
 
-def test_make_test_sql_client_supports_athena_profile_auth(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_make_test_sql_client_supports_athena_profile_auth(
+    monkeypatch: pytest.MonkeyPatch, cleanup_athena_env: None
+) -> None:
     """Athena clients should support AWS profile-based auth without explicit key pairs."""
-    monkeypatch.setattr(sql_client_fixtures, "__initialize_dbt", lambda: None)
+    monkeypatch.setattr(sql_client_fixtures, "_initialize_dbt", lambda project_dir, profiles_dir: None)
 
     mock_adapter = Mock()
     mock_adapter.type.return_value = "athena"

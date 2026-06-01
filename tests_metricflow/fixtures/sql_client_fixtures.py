@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import warnings
+from functools import lru_cache
 from typing import Generator
 
 import pytest
@@ -46,7 +47,7 @@ DBT_ENV_SECRET_S3_STAGING_DIR = "DBT_ENV_SECRET_S3_STAGING_DIR"
 DBT_ENV_SECRET_SCHEMA = "DBT_ENV_SECRET_SCHEMA"
 
 
-def __clear_athena_env() -> None:
+def _clear_athena_env() -> None:
     """Clear Athena-specific env vars so each run starts from a clean configuration state."""
     for env_var in (
         AWS_ACCESS_KEY_ID,
@@ -63,11 +64,11 @@ def __clear_athena_env() -> None:
         os.environ.pop(env_var, None)
 
 
-def __configure_athena_env_from_connection_parameters(
+def _configure_athena_env_from_connection_parameters(
     connection_parameters: SqlEngineConnectionParameterSet, password: str, schema: str
 ) -> None:
     """Populate Athena-specific dbt and AWS environment variables from parsed connection parameters."""
-    __clear_athena_env()
+    _clear_athena_env()
     aws_profile_names = connection_parameters.get_query_field_values("aws_profile_name")
     if len(aws_profile_names) > 1:
         raise ValueError(f"SQL engine URL specified multiple Athena aws_profile_name values: {aws_profile_names}")
@@ -92,15 +93,25 @@ def __configure_athena_env_from_connection_parameters(
         raise ValueError(f"SQL engine URL did not specify exactly 1 Athena s3_staging_dir! Got {s3_staging_dirs}")
     os.environ[DBT_ENV_SECRET_S3_STAGING_DIR] = s3_staging_dirs[0]
 
-    if connection_parameters.database:
-        os.environ[DBT_ENV_SECRET_DATABASE] = connection_parameters.database
+    if not connection_parameters.database:
+        raise ValueError("SQL engine URL did not specify an Athena database/catalog in the URL path.")
+    os.environ[DBT_ENV_SECRET_DATABASE] = connection_parameters.database
 
     os.environ[DBT_ENV_SECRET_SCHEMA] = schema
 
 
-def __initialize_dbt() -> None:
+@lru_cache(maxsize=None)
+def _initialize_dbt(project_dir: str, profiles_dir: str) -> None:
     """Invoke the dbt runner from the appropriate directory so we can fetch the relevant adapter."""
-    dbtRunner().invoke(["debug"], project_dir=dbt_project_dir(), profiles_dir=dbt_project_dir())
+    dbtRunner().invoke(["debug"], project_dir=project_dir, profiles_dir=profiles_dir)
+
+
+@pytest.fixture(autouse=True)
+def cleanup_athena_env() -> Generator[None, None, None]:
+    """Clear Athena-specific env vars around each test to avoid configuration leakage."""
+    _clear_athena_env()
+    yield
+    _clear_athena_env()
 
 
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
@@ -109,10 +120,11 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     dialect = SqlDialect(connection_params.dialect)
 
     if dialect is SqlDialect.ATHENA:
-        __configure_athena_env_from_connection_parameters(
+        _configure_athena_env_from_connection_parameters(
             connection_params, password=password, schema=schema
         )
-        __initialize_dbt()
+        project_dir = dbt_project_dir()
+        _initialize_dbt(project_dir=project_dir, profiles_dir=project_dir)
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("athena"))
 
     # Build SqlAlchemy URL
@@ -196,6 +208,8 @@ def ddl_sql_client(
         sql_client.drop_schema(mf_test_configuration.mf_source_schema, cascade=True)
 
     sql_client.close()
+    if sql_client.sql_engine_type is SqlEngine.ATHENA:
+        _clear_athena_env()
     return None
 
 
