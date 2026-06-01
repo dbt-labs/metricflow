@@ -1,1 +1,2 @@
-dbt-athena-community>=1.8.0, <1.10.0
+# Athena SQLAlchemy connector
+PyAthena[SQLAlchemy]>=3.10.0, <4.0.0

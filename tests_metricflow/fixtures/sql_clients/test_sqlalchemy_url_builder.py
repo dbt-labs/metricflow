@@ -103,6 +103,26 @@ def test_redshift_url() -> None:
     assert url.database == "dev"
 
 
+def test_athena_url() -> None:
+    """Test Athena URL conversion."""
+    params = SqlEngineConnectionParameterSet.create_from_url(
+        "athena://access_key_id@/awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/"
+        "&aws_profile_name=analytics-profile"
+    )
+    url = SqlAlchemyUrlBuilder.build_url(params, password="secret", schema="analytics")
+
+    assert url.drivername == "awsathena+rest"
+    assert url.username == "access_key_id"
+    assert url.password == "secret"
+    assert url.host == "athena.eu-central-1.amazonaws.com"
+    assert url.port == 443
+    assert url.database == "awsdatacatalog"
+    assert url.query["region_name"] == "eu-central-1"
+    assert url.query["s3_staging_dir"] == "s3://bucket/dbt/"
+    assert url.query["schema_name"] == "analytics"
+    assert url.query["profile_name"] == "analytics-profile"
+
+
 def test_bigquery_url() -> None:
     """Test BigQuery URL with JSON credentials."""
     credentials_json = '{"type": "service_account", "project_id": "my-project", "client_email": "test@test.com"}'
