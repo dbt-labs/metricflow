@@ -5,6 +5,7 @@ import logging
 import os
 import warnings
 from functools import lru_cache
+from pathlib import Path
 from typing import Generator
 
 import pytest
@@ -24,7 +25,6 @@ from metricflow.sql.render.redshift import RedshiftSqlPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
-from tests_metricflow.fixtures.setup_fixtures import dbt_project_dir
 from tests_metricflow.fixtures.sql_clients.adapter_backed_ddl_client import AdapterBackedDDLSqlClient
 from tests_metricflow.fixtures.sql_clients.common_client import SqlDialect
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
@@ -47,14 +47,27 @@ DBT_ENV_SECRET_S3_STAGING_DIR = "DBT_ENV_SECRET_S3_STAGING_DIR"
 DBT_ENV_SECRET_SCHEMA = "DBT_ENV_SECRET_SCHEMA"
 
 
-def _clear_athena_env() -> None:
-    """Clear Athena-specific env vars so each run starts from a clean configuration state."""
+def _athena_dbt_project_dir() -> str:
+    """Return the dbt project dir used for Athena adapter initialization in tests."""
+    return os.path.join(os.path.dirname(__file__), Path("dbt_projects", "metricflow_testing"))
+
+
+def _clear_athena_auth_env() -> None:
+    """Clear Athena AWS auth env vars managed by this module."""
     for env_var in (
         AWS_ACCESS_KEY_ID,
-        AWS_DEFAULT_REGION,
         AWS_SECRET_ACCESS_KEY,
         AWS_SESSION_TOKEN,
         AWS_SECURITY_TOKEN,
+    ):
+        os.environ.pop(env_var, None)
+
+
+def _clear_athena_env() -> None:
+    """Clear Athena-specific env vars so each run starts from a clean configuration state."""
+    _clear_athena_auth_env()
+    for env_var in (
+        AWS_DEFAULT_REGION,
         DBT_ENV_SECRET_AWS_PROFILE_NAME,
         DBT_ENV_SECRET_DATABASE,
         DBT_ENV_SECRET_REGION_NAME,
@@ -68,10 +81,21 @@ def _configure_athena_env_from_connection_parameters(
     connection_parameters: SqlEngineConnectionParameterSet, password: str, schema: str
 ) -> None:
     """Populate Athena-specific dbt and AWS environment variables from parsed connection parameters."""
-    _clear_athena_env()
+    for env_var in (
+        AWS_DEFAULT_REGION,
+        DBT_ENV_SECRET_AWS_PROFILE_NAME,
+        DBT_ENV_SECRET_DATABASE,
+        DBT_ENV_SECRET_REGION_NAME,
+        DBT_ENV_SECRET_S3_STAGING_DIR,
+        DBT_ENV_SECRET_SCHEMA,
+    ):
+        os.environ.pop(env_var, None)
     aws_profile_names = connection_parameters.get_query_field_values("aws_profile_name")
     if len(aws_profile_names) > 1:
         raise ValueError(f"SQL engine URL specified multiple Athena aws_profile_name values: {aws_profile_names}")
+
+    if aws_profile_names or connection_parameters.username or password:
+        _clear_athena_auth_env()
 
     if aws_profile_names:
         os.environ[DBT_ENV_SECRET_AWS_PROFILE_NAME] = aws_profile_names[0]
@@ -106,9 +130,9 @@ def _initialize_dbt(project_dir: str, profiles_dir: str) -> None:
     dbtRunner().invoke(["debug"], project_dir=project_dir, profiles_dir=profiles_dir)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def cleanup_athena_env() -> Generator[None, None, None]:
-    """Clear Athena-specific env vars around each test to avoid configuration leakage."""
+    """Clear Athena-specific env vars around tests that exercise Athena setup."""
     _clear_athena_env()
     yield
     _clear_athena_env()
@@ -123,7 +147,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         _configure_athena_env_from_connection_parameters(
             connection_params, password=password, schema=schema
         )
-        project_dir = dbt_project_dir()
+        project_dir = _athena_dbt_project_dir()
         _initialize_dbt(project_dir=project_dir, profiles_dir=project_dir)
         return AdapterBackedDDLSqlClient(adapter=get_adapter_by_type("athena"))
 

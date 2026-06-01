@@ -216,6 +216,35 @@ def test_make_test_sql_client_supports_athena_profile_auth(
     assert os.environ["DBT_ENV_SECRET_S3_STAGING_DIR"] == "s3://bucket/dbt/"
 
 
+def test_make_test_sql_client_preserves_ambient_aws_env_credentials(
+    monkeypatch: pytest.MonkeyPatch, cleanup_athena_env: None
+) -> None:
+    """Athena clients should preserve ambient AWS env credentials when the URL does not replace them."""
+    monkeypatch.setattr(sql_client_fixtures, "_initialize_dbt", lambda project_dir, profiles_dir: None)
+
+    mock_adapter = Mock()
+    mock_adapter.type.return_value = "athena"
+    monkeypatch.setattr(sql_client_fixtures, "get_adapter_by_type", lambda adapter_type: mock_adapter)
+
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "ambient-access")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "ambient-secret")
+    monkeypatch.setenv("AWS_SESSION_TOKEN", "ambient-session")
+    monkeypatch.setenv("AWS_SECURITY_TOKEN", "ambient-security")
+
+    sql_client = make_test_sql_client(
+        url="athena:///awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/",
+        password="",
+        schema="analytics",
+    )
+
+    assert sql_client.sql_engine_type is SqlEngine.ATHENA
+    assert os.environ["AWS_ACCESS_KEY_ID"] == "ambient-access"
+    assert os.environ["AWS_SECRET_ACCESS_KEY"] == "ambient-secret"
+    assert os.environ["AWS_SESSION_TOKEN"] == "ambient-session"
+    assert os.environ["AWS_SECURITY_TOKEN"] == "ambient-security"
+    assert "DBT_ENV_SECRET_AWS_PROFILE_NAME" not in os.environ
+
+
 def test_snapshot_engine_configurations_include_athena() -> None:
     """Snapshot generation should include Athena in the engine registry."""
     assert "athena" in ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
