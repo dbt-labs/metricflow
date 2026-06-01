@@ -1,92 +1,26 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Collection
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
-    SqlAddTimeExpression,
-    SqlArithmeticExpression,
-    SqlArithmeticOperator,
     SqlBetweenExpression,
-    SqlGenerateUuidExpression,
-    SqlIntegerExpression,
     SqlPercentileExpression,
     SqlPercentileFunctionType,
     SqlStringLiteralExpression,
-    SqlSubtractTimeIntervalExpression,
 )
 from typing_extensions import override
 
 from metricflow.protocols.sql_client import SqlEngine
-from metricflow.sql.render.expr_renderer import (
-    DefaultSqlExpressionRenderer,
-    SqlExpressionRenderer,
-    SqlExpressionRenderResult,
-)
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
+from metricflow.sql.render.expr_renderer import SqlExpressionRenderResult
+from metricflow.sql.render.trino import TrinoSqlExpressionRenderer, TrinoSqlPlanRenderer
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 
 
-class AthenaSqlExpressionRenderer(DefaultSqlExpressionRenderer):
+class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
     """Expression renderer for the Amazon Athena engine."""
 
     sql_engine = SqlEngine.ATHENA
-
-    @property
-    @override
-    def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
-        return {
-            SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
-        }
-
-    @override
-    def visit_generate_uuid_expr(self, node: SqlGenerateUuidExpression) -> SqlExpressionRenderResult:
-        return SqlExpressionRenderResult(
-            sql="uuid()",
-            bind_parameter_set=SqlBindParameterSet(),
-        )
-
-    @override
-    def visit_subtract_time_interval_expr(self, node: SqlSubtractTimeIntervalExpression) -> SqlExpressionRenderResult:
-        """Render time delta for Athena, require granularity in quotes and function name change."""
-        arg_rendered = node.arg.accept(self)
-
-        count = node.count
-        granularity = node.granularity
-        if granularity is TimeGranularity.QUARTER:
-            granularity = TimeGranularity.MONTH
-            count *= 3
-        return SqlExpressionRenderResult(
-            sql=f"DATE_ADD('{granularity.value}', -{count}, {arg_rendered.sql})",
-            bind_parameter_set=arg_rendered.bind_parameter_set,
-        )
-
-    @override
-    def visit_add_time_expr(self, node: SqlAddTimeExpression) -> SqlExpressionRenderResult:
-        """Render time delta for Athena, require granularity in quotes and function name change."""
-        granularity = node.granularity
-        count_expr = node.count_expr
-        if granularity is TimeGranularity.QUARTER:
-            granularity = TimeGranularity.MONTH
-            count_expr = SqlArithmeticExpression.create(
-                left_expr=node.count_expr,
-                operator=SqlArithmeticOperator.MULTIPLY,
-                right_expr=SqlIntegerExpression.create(3),
-            )
-
-        arg_rendered = node.arg.accept(self)
-        count_rendered = count_expr.accept(self)
-        count_sql = f"({count_rendered.sql})" if count_expr.requires_parenthesis else count_rendered.sql
-
-        return SqlExpressionRenderResult(
-            sql=f"DATE_ADD('{granularity.value}', {count_sql}, {arg_rendered.sql})",
-            bind_parameter_set=SqlBindParameterSet.merge_iterable(
-                (arg_rendered.bind_parameter_set, count_rendered.bind_parameter_set)
-            ),
-        )
 
     @override
     def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
@@ -165,24 +99,8 @@ class AthenaSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         return self.__is_iso_timestamp_literal(node.start_expr) and self.__is_iso_timestamp_literal(node.end_expr)
 
-    @override
-    def render_date_part(self, date_part: DatePart) -> str:
-        """Render DATE PART for an EXTRACT expression.
 
-        Override DAY_OF_WEEK in Athena to ISO date part to ensure all engines return consistent results.
-        """
-        if date_part is DatePart.DOW:
-            return "DAY_OF_WEEK"
-
-        return date_part.value
-
-
-class AthenaSqlPlanRenderer(DefaultSqlPlanRenderer):
+class AthenaSqlPlanRenderer(TrinoSqlPlanRenderer):
     """Plan renderer for the Amazon Athena engine."""
 
     EXPR_RENDERER = AthenaSqlExpressionRenderer()
-
-    @property
-    @override
-    def expr_renderer(self) -> SqlExpressionRenderer:
-        return self.EXPR_RENDERER
