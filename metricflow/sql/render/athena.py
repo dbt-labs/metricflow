@@ -5,8 +5,6 @@ from datetime import date, datetime
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlBetweenExpression,
-    SqlPercentileExpression,
-    SqlPercentileFunctionType,
     SqlStringLiteralExpression,
 )
 from typing_extensions import override
@@ -14,37 +12,12 @@ from typing_extensions import override
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.expr_renderer import SqlExpressionRenderResult
 from metricflow.sql.render.trino import TrinoSqlExpressionRenderer, TrinoSqlPlanRenderer
-from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 
 
 class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
     """Expression renderer for the Amazon Athena engine."""
 
     sql_engine = SqlEngine.ATHENA
-
-    @override
-    def visit_percentile_expr(self, node: SqlPercentileExpression) -> SqlExpressionRenderResult:
-        """Render a percentile expression for Athena."""
-        arg_rendered = self.render_sql_expr(node.order_by_arg)
-        params = arg_rendered.bind_parameter_set
-        percentile = node.percentile_args.percentile
-
-        if node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
-            return SqlExpressionRenderResult(
-                sql=f"approx_percentile({arg_rendered.sql}, {percentile})",
-                bind_parameter_set=params,
-            )
-        elif (
-            node.percentile_args.function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE
-            or node.percentile_args.function_type is SqlPercentileFunctionType.DISCRETE
-            or node.percentile_args.function_type is SqlPercentileFunctionType.CONTINUOUS
-        ):
-            raise RuntimeError(
-                "Discrete, Continuous and Approximate discrete percentile aggregates are not supported for Athena. Set "
-                + "use_approximate_percentile and disable use_discrete_percentile in all percentile simple-metrics."
-            )
-        else:
-            assert_values_exhausted(node.percentile_args.function_type)
 
     @override
     def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:
@@ -91,12 +64,12 @@ class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
 
     def __should_wrap_between_bounds_with_timestamp(self, node: SqlBetweenExpression) -> bool:
         """Check whether both between bounds are safe to render as Athena timestamp literals."""
-        if not isinstance(node.start_expr, SqlStringLiteralExpression) or not isinstance(
-            node.end_expr, SqlStringLiteralExpression
-        ):
+        start_expr = node.start_expr.as_string_literal_expression
+        end_expr = node.end_expr.as_string_literal_expression
+        if start_expr is None or end_expr is None:
             return False
 
-        return self.__is_iso_timestamp_literal(node.start_expr) and self.__is_iso_timestamp_literal(node.end_expr)
+        return self.__is_iso_timestamp_literal(start_expr) and self.__is_iso_timestamp_literal(end_expr)
 
 
 class AthenaSqlPlanRenderer(TrinoSqlPlanRenderer):

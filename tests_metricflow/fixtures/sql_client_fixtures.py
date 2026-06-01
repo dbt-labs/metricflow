@@ -10,8 +10,6 @@ from typing import Generator
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt.adapters.factory import get_adapter_by_type
-from dbt.cli.main import dbtRunner
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from sqlalchemy import create_engine, make_url
@@ -136,6 +134,8 @@ def _configure_athena_env_from_connection_parameters(
 @lru_cache(maxsize=None)
 def _initialize_dbt(project_dir: str, profiles_dir: str) -> None:
     """Invoke the dbt runner from the appropriate directory so we can fetch the relevant adapter."""
+    from dbt.cli.main import dbtRunner
+
     invocation_result = dbtRunner().invoke(["debug"], project_dir=project_dir, profiles_dir=profiles_dir)
     if invocation_result.success:
         return
@@ -160,6 +160,8 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     dialect = SqlDialect(connection_params.dialect)
 
     if dialect is SqlDialect.ATHENA:
+        from dbt.adapters.factory import get_adapter_by_type
+
         _configure_athena_env_from_connection_parameters(
             connection_params, password=password, schema=schema
         )
