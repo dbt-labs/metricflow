@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
@@ -119,6 +120,20 @@ def test_athena_between_expr_does_not_wrap_arbitrary_sql_fragments() -> None:
 
     assert renderer.visit_between_expr(between_expr).sql == (
         "alias.event_time BETWEEN DATE '2023-01-01' AND DATE '2023-01-10'"
+    )
+
+
+def test_athena_between_expr_does_not_wrap_timezone_aware_literals() -> None:
+    """Athena should not wrap timezone-aware ISO datetime literals with TIMESTAMP syntax."""
+    renderer = AthenaSqlExpressionRenderer()
+    between_expr = SqlBetweenExpression.create(
+        column_arg=SqlColumnReferenceExpression.create(SqlColumnReference("alias", "event_time")),
+        start_expr=SqlStringLiteralExpression.create("2023-01-01T00:00:00+00:00"),
+        end_expr=SqlStringLiteralExpression.create("2023-01-10T00:00:00Z"),
+    )
+
+    assert renderer.visit_between_expr(between_expr).sql == (
+        "alias.event_time BETWEEN '2023-01-01T00:00:00+00:00' AND '2023-01-10T00:00:00Z'"
     )
 
 
@@ -243,6 +258,91 @@ def test_make_test_sql_client_preserves_ambient_aws_env_credentials(
     assert os.environ["AWS_SESSION_TOKEN"] == "ambient-session"
     assert os.environ["AWS_SECURITY_TOKEN"] == "ambient-security"
     assert "DBT_ENV_SECRET_AWS_PROFILE_NAME" not in os.environ
+
+
+def test_initialize_dbt_raises_clear_error_on_failed_debug(monkeypatch: pytest.MonkeyPatch) -> None:
+    """dbt initialization should fail fast when dbt debug does not succeed."""
+    sql_client_fixtures._initialize_dbt.cache_clear()
+
+    class FailingRunner:
+        """Stub runner returning a failed debug result."""
+
+        def invoke(self, args: list[str], project_dir: str, profiles_dir: str) -> SimpleNamespace:
+            del args, project_dir, profiles_dir
+            return SimpleNamespace(success=False, result="debug failed", exception=None)
+
+    monkeypatch.setattr(sql_client_fixtures, "dbtRunner", lambda: FailingRunner())
+
+    with pytest.raises(RuntimeError, match="Failed to initialize dbt for Athena test setup"):
+        sql_client_fixtures._initialize_dbt(project_dir="/tmp/project", profiles_dir="/tmp/profiles")
+
+    sql_client_fixtures._initialize_dbt.cache_clear()
+
+
+def test_configure_athena_env_rejects_multiple_profile_names(cleanup_athena_env: None) -> None:
+    """Athena env setup should reject URLs with multiple aws_profile_name values."""
+    connection_parameters = SqlEngineConnectionParameterSet.create_from_url(
+        "athena:///awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/"
+        "&aws_profile_name=first&aws_profile_name=second"
+    )
+
+    with pytest.raises(ValueError, match="multiple Athena aws_profile_name values"):
+        sql_client_fixtures._configure_athena_env_from_connection_parameters(
+            connection_parameters, password="", schema="analytics"
+        )
+
+
+def test_configure_athena_env_requires_exactly_one_region_name(cleanup_athena_env: None) -> None:
+    """Athena env setup should require exactly one region_name."""
+    missing_region_parameters = SqlEngineConnectionParameterSet.create_from_url(
+        "athena:///awsdatacatalog?s3_staging_dir=s3://bucket/dbt/"
+    )
+    multiple_region_parameters = SqlEngineConnectionParameterSet.create_from_url(
+        "athena:///awsdatacatalog?region_name=eu-central-1&region_name=us-east-1&s3_staging_dir=s3://bucket/dbt/"
+    )
+
+    with pytest.raises(ValueError, match="exactly 1 Athena region_name"):
+        sql_client_fixtures._configure_athena_env_from_connection_parameters(
+            missing_region_parameters, password="", schema="analytics"
+        )
+
+    with pytest.raises(ValueError, match="exactly 1 Athena region_name"):
+        sql_client_fixtures._configure_athena_env_from_connection_parameters(
+            multiple_region_parameters, password="", schema="analytics"
+        )
+
+
+def test_configure_athena_env_requires_exactly_one_s3_staging_dir(cleanup_athena_env: None) -> None:
+    """Athena env setup should require exactly one s3_staging_dir."""
+    missing_staging_dir_parameters = SqlEngineConnectionParameterSet.create_from_url(
+        "athena:///awsdatacatalog?region_name=eu-central-1"
+    )
+    multiple_staging_dir_parameters = SqlEngineConnectionParameterSet.create_from_url(
+        "athena:///awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/one/"
+        "&s3_staging_dir=s3://bucket/two/"
+    )
+
+    with pytest.raises(ValueError, match="exactly 1 Athena s3_staging_dir"):
+        sql_client_fixtures._configure_athena_env_from_connection_parameters(
+            missing_staging_dir_parameters, password="", schema="analytics"
+        )
+
+    with pytest.raises(ValueError, match="exactly 1 Athena s3_staging_dir"):
+        sql_client_fixtures._configure_athena_env_from_connection_parameters(
+            multiple_staging_dir_parameters, password="", schema="analytics"
+        )
+
+
+def test_configure_athena_env_requires_database_path(cleanup_athena_env: None) -> None:
+    """Athena env setup should require a database/catalog in the URL path."""
+    connection_parameters = SqlEngineConnectionParameterSet.create_from_url(
+        "athena://?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/"
+    )
+
+    with pytest.raises(ValueError, match="did not specify an Athena database/catalog"):
+        sql_client_fixtures._configure_athena_env_from_connection_parameters(
+            connection_parameters, password="", schema="analytics"
+        )
 
 
 def test_snapshot_engine_configurations_include_athena() -> None:

@@ -78,11 +78,10 @@ class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
 
     @staticmethod
     def __is_iso_timestamp_literal(node: SqlStringLiteralExpression) -> bool:
-        """Return True when a string literal is a strict ISO date or datetime literal."""
+        """Return True when a string literal is a strict ISO date or timezone-naive datetime literal."""
         literal_value = node.literal_value
         try:
-            datetime.fromisoformat(literal_value.replace("Z", "+00:00"))
-            return True
+            return datetime.fromisoformat(literal_value).tzinfo is None
         except ValueError:
             try:
                 date.fromisoformat(literal_value)

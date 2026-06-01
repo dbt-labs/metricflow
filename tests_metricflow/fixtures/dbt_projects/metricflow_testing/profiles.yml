@@ -26,7 +26,10 @@ athena:
       region_name: "{{ env_var('DBT_ENV_SECRET_REGION_NAME') }}"
       s3_staging_dir: "{{ env_var('DBT_ENV_SECRET_S3_STAGING_DIR') }}"
       schema: "{{ env_var('DBT_ENV_SECRET_SCHEMA') }}"
-      aws_profile_name: "{{ env_var('DBT_ENV_SECRET_AWS_PROFILE_NAME', '') }}"
+      {% set aws_profile_name = env_var('DBT_ENV_SECRET_AWS_PROFILE_NAME', none) %}
+      {% if aws_profile_name is not none %}
+      aws_profile_name: "{{ aws_profile_name }}"
+      {% endif %}
       work_group: primary
 databricks:
   target: dev

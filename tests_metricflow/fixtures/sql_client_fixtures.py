@@ -63,6 +63,13 @@ def _clear_athena_auth_env() -> None:
         os.environ.pop(env_var, None)
 
 
+def _clear_initialize_dbt_cache() -> None:
+    """Clear cached dbt initialization state when Athena configuration changes."""
+    cache_clear = getattr(_initialize_dbt, "cache_clear", None)
+    if cache_clear is not None:
+        cache_clear()
+
+
 def _clear_athena_env() -> None:
     """Clear Athena-specific env vars so each run starts from a clean configuration state."""
     _clear_athena_auth_env()
@@ -75,6 +82,7 @@ def _clear_athena_env() -> None:
         DBT_ENV_SECRET_SCHEMA,
     ):
         os.environ.pop(env_var, None)
+    _clear_initialize_dbt_cache()
 
 
 def _configure_athena_env_from_connection_parameters(
@@ -90,6 +98,7 @@ def _configure_athena_env_from_connection_parameters(
         DBT_ENV_SECRET_SCHEMA,
     ):
         os.environ.pop(env_var, None)
+    _clear_initialize_dbt_cache()
     aws_profile_names = connection_parameters.get_query_field_values("aws_profile_name")
     if len(aws_profile_names) > 1:
         raise ValueError(f"SQL engine URL specified multiple Athena aws_profile_name values: {aws_profile_names}")
@@ -127,7 +136,14 @@ def _configure_athena_env_from_connection_parameters(
 @lru_cache(maxsize=None)
 def _initialize_dbt(project_dir: str, profiles_dir: str) -> None:
     """Invoke the dbt runner from the appropriate directory so we can fetch the relevant adapter."""
-    dbtRunner().invoke(["debug"], project_dir=project_dir, profiles_dir=profiles_dir)
+    invocation_result = dbtRunner().invoke(["debug"], project_dir=project_dir, profiles_dir=profiles_dir)
+    if invocation_result.success:
+        return
+
+    if invocation_result.exception is not None:
+        raise RuntimeError("Failed to initialize dbt for Athena test setup.") from invocation_result.exception
+
+    raise RuntimeError(f"Failed to initialize dbt for Athena test setup: {invocation_result.result}")
 
 
 @pytest.fixture
