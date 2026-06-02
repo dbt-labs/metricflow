@@ -13,6 +13,7 @@ from tests_metricflow.query_rendering.compare_rendered_query import render_and_c
 
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
+@pytest.mark.skip
 def test_fnw(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,

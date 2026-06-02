@@ -37,13 +37,13 @@ class DataflowPlanOptimization(Enum):
 
         Predicate pushdown optimizer is currently disabled.
         """
-        # return frozenset((DataflowPlanOptimization.SOURCE_SCAN,))
-        return frozenset(
-            (
-                DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION,
-                DataflowPlanOptimization.SOURCE_SCAN,
-            )
-        )
+        return frozenset((DataflowPlanOptimization.SOURCE_SCAN,))
+        # return frozenset(
+        #     (
+        #         DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION,
+        #         DataflowPlanOptimization.SOURCE_SCAN,
+        #     )
+        # )
 
 
 class DataflowPlanOptimizerFactory:

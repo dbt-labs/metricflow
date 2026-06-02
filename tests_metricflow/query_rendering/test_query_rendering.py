@@ -813,7 +813,10 @@ def test_column_order(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = query_parser.parse_and_validate_query(
-        metric_names=("bookings_fill_nulls_with_0_without_time_spine", "instant_bookings_fill_nulls_with_0_without_time_spine"),
+        metric_names=(
+            "bookings_fill_nulls_with_0_without_time_spine",
+            "instant_bookings_fill_nulls_with_0_without_time_spine",
+        ),
         group_by_names=("listing__country_latest", "listing__capacity_latest", "metric_time__day"),
     ).query_spec
 
