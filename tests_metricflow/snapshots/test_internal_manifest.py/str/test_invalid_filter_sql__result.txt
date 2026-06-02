@@ -3,7 +3,7 @@ test_filename: test_internal_manifest.py
 docstring:
   Test that invalid SQL in a filter is detected.
 ---
-query_56a97413:
+query_742bc81c:
   status: SQL_EXCEPTION
   explain_sql:
     -- Constrain Output with WHERE
