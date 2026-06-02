@@ -145,6 +145,7 @@ class MetricFlowQueryRequest:
     order_output_columns_by_input_order: The columns in the output are arranged in groups as described in
     `CreateSelectColumnsForInstances`. If this is set to True, the order of the columns in each group follows the order
     as described by inputs (e.g. `metric_names`).
+    legacy_output_column_order_default: Whether the legacy output column ordering should be used by default.
     """
 
     request_id: MetricFlowRequestId
@@ -165,6 +166,7 @@ class MetricFlowQueryRequest:
     dataflow_plan_optimizations: frozenset[DataflowPlanOptimization]
     query_type: MetricFlowQueryType
     order_output_columns_by_input_order: bool
+    legacy_output_column_order_default: bool
 
     @staticmethod
     def create(  # noqa: D102
@@ -186,6 +188,7 @@ class MetricFlowQueryRequest:
         min_max_only: bool = False,
         apply_group_by: bool = True,
         order_output_columns_by_input_order: bool = False,
+        legacy_output_column_order_default: bool = True,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}") if request_id is None else request_id,
@@ -210,6 +213,7 @@ class MetricFlowQueryRequest:
             min_max_only=min_max_only,
             apply_group_by=apply_group_by,
             order_output_columns_by_input_order=order_output_columns_by_input_order,
+            legacy_output_column_order_default=legacy_output_column_order_default,
         )
 
     def with_request_id(self, request_id: MetricFlowRequestId) -> MetricFlowQueryRequest:  # noqa: D102
@@ -232,6 +236,7 @@ class MetricFlowQueryRequest:
             dataflow_plan_optimizations=self.dataflow_plan_optimizations,
             query_type=self.query_type,
             order_output_columns_by_input_order=self.order_output_columns_by_input_order,
+            legacy_output_column_order_default=self.legacy_output_column_order_default,
         )
 
 
@@ -639,8 +644,10 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         # `TypeGroupedOrderer` during the rollout.
         elif DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in mf_query_request.dataflow_plan_optimizations:
             output_column_orderer = TypeGroupedOrderer(query_spec.input_spec_order)
-        else:
+        elif mf_query_request.legacy_output_column_order_default:
             output_column_orderer = LegacyTypeGroupedOrderer()
+        else:
+            output_column_orderer = TypeGroupedOrderer(query_spec.input_spec_order)
 
         convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(
             dataflow_plan=dataflow_plan,
