@@ -7,11 +7,13 @@ sql_engine: DuckDB
 -- Constrain Output with WHERE
 SELECT
   subq_1.bookings AS __bookings
+  , subq_1.is_instant
   , subq_1.ds__day
 FROM (
-  -- Select: ['__bookings', 'ds__day']
+  -- Select: ['__bookings', 'is_instant', 'ds__day']
   SELECT
     subq_0.ds__day
+    , subq_0.is_instant
     , subq_0.__bookings AS bookings
   FROM (
     -- Read Elements From Semantic Model 'bookings_source'
@@ -116,4 +118,8 @@ FROM (
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_0
 ) subq_1
-WHERE booking__ds__day = '2020-01-01'
+WHERE (
+  booking__ds__day = '2020-01-01' OR booking__ds__day = '2020-01-02'
+) AND (
+  booking__is_instant
+)
