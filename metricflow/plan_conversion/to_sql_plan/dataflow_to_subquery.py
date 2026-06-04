@@ -1016,6 +1016,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     column_association.column_name for column_association in column_associations_in_where_sql
                 ),
                 bind_parameter_set=filter_spec.bind_parameters,
+                # Where-filter SQL is raw text, so require parenthesis to avoid operator precedence issues when combined
+                # with other expressions.
+                # e.g. `(booking__ds__day = '2020-01-01' OR booking__ds__day = '2020-01-02) AND ...`
+                requires_parenthesis=True,
             )
 
         # Odd type-check inspection with just `tuple(filter_key_to_string_expression.values())`
