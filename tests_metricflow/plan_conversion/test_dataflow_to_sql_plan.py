@@ -191,18 +191,21 @@ def test_filter_with_where_constraint_node(
         entity_links=(),
         time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
+    is_instant_spec = DimensionSpec(element_name="is_instant", entity_links=())
     selector_node = SelectorNode.create(
         parent_node=source_node,
         include_specs=InstanceSpecSet(
-            simple_metric_input_specs=(simple_metric_input_spec,), time_dimension_specs=(ds_spec,)
+            simple_metric_input_specs=(simple_metric_input_spec,),
+            dimension_specs=(is_instant_spec,),
+            time_dimension_specs=(ds_spec,),
         ),
-    )  # need to include ds_spec because where constraint operates on ds
+    )
     time_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY)
     where_constraint_node = WhereFilterNode.create(
         parent_node=selector_node,
         filter_specs=(
             WhereFilterSpec(
-                where_sql="booking__ds__day = '2020-01-01'",
+                where_sql="booking__ds__day = '2020-01-01' OR booking__ds__day = '2020-01-02'",
                 bind_parameters=SqlBindParameterSet(),
                 element_set=GroupByItemSet(
                     annotated_specs=(
@@ -211,6 +214,25 @@ def test_filter_with_where_constraint_node(
                             element_name="ds",
                             entity_links=(EntityReference(element_name="booking"),),
                             time_grain=time_grain,
+                            date_part=None,
+                            metric_subquery_entity_links=None,
+                            properties=(),
+                            origin_model_ids=(),
+                            derived_from_semantic_models=(),
+                        ),
+                    ),
+                ),
+            ),
+            WhereFilterSpec(
+                where_sql="booking__is_instant",
+                bind_parameters=SqlBindParameterSet(),
+                element_set=GroupByItemSet(
+                    annotated_specs=(
+                        AnnotatedSpec.create(
+                            element_type=LinkableElementType.DIMENSION,
+                            element_name="is_instant",
+                            entity_links=(EntityReference(element_name="booking"),),
+                            time_grain=None,
                             date_part=None,
                             metric_subquery_entity_links=None,
                             properties=(),
