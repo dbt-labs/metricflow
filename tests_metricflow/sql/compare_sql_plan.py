@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from typing import Optional
 
@@ -21,6 +22,8 @@ from tests_metricflow.snapshot_utils import (
     _EXCLUDE_TABLE_ALIAS_REGEX,
     SQL_ENGINE_HEADER_NAME,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def assert_default_rendered_sql_equal(
@@ -88,7 +91,7 @@ def assert_rendered_sql_from_plan_equal(
             sql_query_plan=sql_query_plan,
             rendered_sql=rendered_sql,
         )
-        snapshot_text = "" if snapshot_text_if_different is None else snapshot_text_if_different
+        snapshot_text = "Matches DuckDB snapshot." if snapshot_text_if_different is None else snapshot_text_if_different
 
     assert_snapshot_text_equal(
         request=request,
@@ -133,12 +136,8 @@ def _rendered_sql_if_different_from_duckdb_snapshot(
         system_schema=mf_test_configuration.mf_system_schema,
         source_schema=mf_test_configuration.mf_source_schema,
     )
-    duckdb_snapshot_body = _normalize_rendered_sql_for_duckdb_comparison(
-        schema_replacement_function(_remove_snapshot_header(duckdb_snapshot_text))
-    )
-    rendered_sql_for_comparison = _normalize_rendered_sql_for_duckdb_comparison(
-        schema_replacement_function(rendered_sql)
-    )
+    duckdb_snapshot_body = _remove_snapshot_header(duckdb_snapshot_text).rstrip("\n")
+    rendered_sql_for_comparison = schema_replacement_function(rendered_sql)
 
     if rendered_sql_for_comparison == duckdb_snapshot_body:
         return None
