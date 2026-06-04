@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import difflib
+import os
 from typing import Optional
 
 from _pytest.fixtures import FixtureRequest
@@ -9,9 +11,10 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_plan_snapshot_text_equal,
     assert_snapshot_text_equal,
     make_schema_replacement_function,
+    snapshot_path_prefix,
 )
 
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
 from metricflow.sql.sql_plan import SqlPlan, SqlPlanNode
 from tests_metricflow.fixtures.setup_fixtures import check_sql_engine_snapshot_marker
@@ -76,14 +79,25 @@ def assert_rendered_sql_from_plan_equal(
     check_sql_engine_snapshot_marker(request)
 
     rendered_sql = sql_client.sql_plan_renderer.render_sql_plan(sql_query_plan).sql
-
     sql_engine = sql_client.sql_engine_type
+    if sql_engine is SqlEngine.DUCKDB:
+        snapshot_text = rendered_sql
+    else:
+        diff_from_duckdb_snapshot = _diff_from_duckdb_snapshot_text(
+            request=request,
+            mf_test_configuration=mf_test_configuration,
+            sql_query_plan=sql_query_plan,
+            sql_engine=sql_engine,
+            rendered_sql=rendered_sql,
+        )
+        snapshot_text = "" if diff_from_duckdb_snapshot is None else diff_from_duckdb_snapshot
+
     assert_snapshot_text_equal(
         request=request,
         snapshot_configuration=mf_test_configuration,
         group_id=sql_query_plan.__class__.__name__,
         snapshot_id=sql_query_plan.dag_id.id_str,
-        snapshot_text=rendered_sql,
+        snapshot_text=snapshot_text,
         snapshot_file_extension=".sql",
         incomparable_strings_replacement_function=make_schema_replacement_function(
             system_schema=mf_test_configuration.mf_system_schema, source_schema=mf_test_configuration.mf_source_schema
@@ -93,6 +107,85 @@ def assert_rendered_sql_from_plan_equal(
         additional_header_fields={SQL_ENGINE_HEADER_NAME: sql_engine.value},
         expectation_description=expectation_description,
     )
+
+
+def _diff_from_duckdb_snapshot_text(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_query_plan: SqlPlan,
+    sql_engine: SqlEngine,
+    rendered_sql: str,
+) -> Optional[str]:
+    """Return diff text for rendered SQL compared to the DuckDB snapshot."""
+    duckdb_snapshot_file = _sql_snapshot_file_path(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_query_plan=sql_query_plan,
+        sql_engine=SqlEngine.DUCKDB,
+    )
+    if not os.path.exists(duckdb_snapshot_file):
+        raise FileNotFoundError(
+            f"Could not find DuckDB snapshot file at path {duckdb_snapshot_file}. "
+            "Generate the DuckDB snapshot first using --overwrite-snapshots with DuckDB."
+        )
+
+    with open(duckdb_snapshot_file, "r") as duckdb_snapshot:
+        duckdb_snapshot_text = duckdb_snapshot.read()
+
+    schema_replacement_function = make_schema_replacement_function(
+        system_schema=mf_test_configuration.mf_system_schema,
+        source_schema=mf_test_configuration.mf_source_schema,
+    )
+    duckdb_snapshot_body = _normalize_rendered_sql_for_duckdb_comparison(
+        schema_replacement_function(_remove_snapshot_header(duckdb_snapshot_text))
+    )
+    rendered_sql_for_comparison = _normalize_rendered_sql_for_duckdb_comparison(
+        schema_replacement_function(rendered_sql)
+    )
+
+    if rendered_sql_for_comparison == duckdb_snapshot_body:
+        return None
+
+    diff = difflib.unified_diff(
+        a=duckdb_snapshot_body.splitlines(keepends=True),
+        b=rendered_sql_for_comparison.splitlines(keepends=True),
+        fromfile="DuckDB snapshot",
+        tofile=f"{sql_engine.value} generated SQL",
+    )
+    return "Diff from DuckDB snapshot:\n\n" + "".join(diff)
+
+
+def _sql_snapshot_file_path(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_query_plan: SqlPlan,
+    sql_engine: SqlEngine,
+) -> str:
+    """Return the snapshot file path for a rendered SQL plan."""
+    return str(
+        snapshot_path_prefix(
+            request=request,
+            snapshot_configuration=mf_test_configuration,
+            snapshot_group=sql_query_plan.__class__.__name__,
+            snapshot_id=sql_query_plan.dag_id.id_str,
+            additional_sub_directories=(sql_engine.value,),
+        ).with_suffix(".sql")
+    )
+
+
+def _remove_snapshot_header(snapshot_text: str) -> str:
+    """Remove the generated snapshot header if there is one."""
+    lines = snapshot_text.splitlines(keepends=True)
+    for index, line in enumerate(lines):
+        if line.rstrip("\n") == "---":
+            return "".join(lines[index + 1 :])
+    return snapshot_text
+
+
+def _normalize_rendered_sql_for_duckdb_comparison(snapshot_text: str) -> str:
+    """Normalize rendered SQL snapshot text before comparing it to DuckDB."""
+    lines = snapshot_text.split("\n")
+    return "\n".join(line for line in lines if "_src" not in line)
 
 
 def assert_sql_plan_text_equal(  # noqa: D103
