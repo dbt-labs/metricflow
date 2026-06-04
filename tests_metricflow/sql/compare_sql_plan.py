@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import difflib
 import os
 from typing import Optional
 
@@ -83,14 +82,13 @@ def assert_rendered_sql_from_plan_equal(
     if sql_engine is SqlEngine.DUCKDB:
         snapshot_text = rendered_sql
     else:
-        diff_from_duckdb_snapshot = _diff_from_duckdb_snapshot_text(
+        snapshot_text_if_different = _rendered_sql_if_different_from_duckdb_snapshot(
             request=request,
             mf_test_configuration=mf_test_configuration,
             sql_query_plan=sql_query_plan,
-            sql_engine=sql_engine,
             rendered_sql=rendered_sql,
         )
-        snapshot_text = "" if diff_from_duckdb_snapshot is None else diff_from_duckdb_snapshot
+        snapshot_text = "" if snapshot_text_if_different is None else snapshot_text_if_different
 
     assert_snapshot_text_equal(
         request=request,
@@ -109,14 +107,13 @@ def assert_rendered_sql_from_plan_equal(
     )
 
 
-def _diff_from_duckdb_snapshot_text(
+def _rendered_sql_if_different_from_duckdb_snapshot(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
     sql_query_plan: SqlPlan,
-    sql_engine: SqlEngine,
     rendered_sql: str,
 ) -> Optional[str]:
-    """Return diff text for rendered SQL compared to the DuckDB snapshot."""
+    """Return rendered SQL if it differs from the DuckDB snapshot."""
     duckdb_snapshot_file = _sql_snapshot_file_path(
         request=request,
         mf_test_configuration=mf_test_configuration,
@@ -146,13 +143,7 @@ def _diff_from_duckdb_snapshot_text(
     if rendered_sql_for_comparison == duckdb_snapshot_body:
         return None
 
-    diff = difflib.unified_diff(
-        a=duckdb_snapshot_body.splitlines(keepends=True),
-        b=rendered_sql_for_comparison.splitlines(keepends=True),
-        fromfile="DuckDB snapshot",
-        tofile=f"{sql_engine.value} generated SQL",
-    )
-    return "Diff from DuckDB snapshot:\n\n" + "".join(diff)
+    return rendered_sql
 
 
 def _sql_snapshot_file_path(
