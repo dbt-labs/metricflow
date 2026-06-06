@@ -8,14 +8,18 @@ SELECT
   listing__ds__day
 FROM (
   SELECT
-    subq_5.alien_day AS listing__ds__alien_day
-    , toStartOfDay(listings_latest_src_28000.created_at) AS listing__ds__day
-  FROM ***************************.dim_listings_latest listings_latest_src_28000
-  LEFT OUTER JOIN
-    ***************************.mf_time_spine subq_5
-  ON
-    toStartOfDay(listings_latest_src_28000.created_at) = subq_5.ds
-) subq_7
-WHERE listing__ds__alien_day = '2020-01-01'
+    listing__ds__day
+  FROM (
+    SELECT
+      subq_5.alien_day AS listing__ds__alien_day
+      , toStartOfDay(listings_latest_src_28000.created_at) AS listing__ds__day
+    FROM ***************************.dim_listings_latest listings_latest_src_28000
+    LEFT OUTER JOIN
+      ***************************.mf_time_spine subq_5
+    ON
+      toStartOfDay(listings_latest_src_28000.created_at) = subq_5.ds
+  ) subq_7
+  WHERE listing__ds__alien_day = '2020-01-01'
+) subq_8
 GROUP BY
   listing__ds__day

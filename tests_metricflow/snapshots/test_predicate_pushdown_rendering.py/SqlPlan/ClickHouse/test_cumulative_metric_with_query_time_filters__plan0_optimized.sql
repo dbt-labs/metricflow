@@ -12,9 +12,9 @@ SELECT
   , COUNT(DISTINCT __bookers) AS every_two_days_bookers
 FROM (
   SELECT
-    metric_time__day
+    bookers AS __bookers
     , listing__country_latest
-    , bookers AS __bookers
+    , metric_time__day
   FROM (
     SELECT
       subq_19.metric_time__day AS metric_time__day
@@ -43,7 +43,7 @@ FROM (
       subq_19.listing = listings_latest_src_28000.listing_id
   ) subq_24
   WHERE booking__is_instant
-) subq_26
+) subq_25
 GROUP BY
   metric_time__day
   , listing__country_latest

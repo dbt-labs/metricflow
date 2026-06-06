@@ -39,9 +39,9 @@ FROM (
       , SUM(__bookings) AS bookings
     FROM (
       SELECT
-        metric_time__day
+        bookings AS __bookings
         , listing__country_latest
-        , bookings AS __bookings
+        , metric_time__day
       FROM (
         SELECT
           sma_28009_cte.metric_time__day AS metric_time__day
@@ -55,7 +55,7 @@ FROM (
           sma_28009_cte.listing = sma_28014_cte.listing
       ) subq_33
       WHERE booking__is_instant
-    ) subq_35
+    ) subq_34
     GROUP BY
       metric_time__day
       , listing__country_latest
@@ -73,9 +73,9 @@ FROM (
         , SUM(__bookings) AS __bookings
       FROM (
         SELECT
-          metric_time__day
+          bookings AS __bookings
           , listing__country_latest
-          , bookings AS __bookings
+          , metric_time__day
         FROM (
           SELECT
             sma_28009_cte.metric_time__day AS metric_time__day
@@ -89,7 +89,7 @@ FROM (
             sma_28009_cte.listing = sma_28014_cte.listing
         ) subq_42
         WHERE booking__is_instant
-      ) subq_44
+      ) subq_43
       GROUP BY
         metric_time__day
         , listing__country_latest

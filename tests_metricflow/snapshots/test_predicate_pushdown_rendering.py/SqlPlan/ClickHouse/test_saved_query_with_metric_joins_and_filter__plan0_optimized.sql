@@ -20,8 +20,8 @@ WITH sma_28014_cte AS (
     , SUM(__bookings) AS bookings
   FROM (
     SELECT
-      listing__capacity_latest
-      , bookings AS __bookings
+      bookings AS __bookings
+      , listing__capacity_latest
     FROM (
       SELECT
         subq_27.metric_time__day AS metric_time__day
@@ -41,7 +41,7 @@ WITH sma_28014_cte AS (
         subq_27.listing = sma_28014_cte.listing
     ) subq_32
     WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
-  ) subq_34
+  ) subq_33
   GROUP BY
     listing__capacity_latest
 )
@@ -52,8 +52,8 @@ WITH sma_28014_cte AS (
     , SUM(__views) AS views
   FROM (
     SELECT
-      listing__capacity_latest
-      , views AS __views
+      views AS __views
+      , listing__capacity_latest
     FROM (
       SELECT
         subq_38.metric_time__day AS metric_time__day
@@ -73,7 +73,7 @@ WITH sma_28014_cte AS (
         subq_38.listing = sma_28014_cte.listing
     ) subq_42
     WHERE (listing__is_lux_latest) AND (metric_time__day >= '2020-01-02')
-  ) subq_44
+  ) subq_43
   GROUP BY
     listing__capacity_latest
 )

@@ -36,4 +36,4 @@ FROM (
       subq_24.listing = subq_31.listing
   ) subq_33
   WHERE listing__bookings > 2
-) subq_35
+) subq_34

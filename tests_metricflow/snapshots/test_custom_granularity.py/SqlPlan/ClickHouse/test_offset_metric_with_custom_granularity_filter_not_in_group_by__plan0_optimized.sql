@@ -7,7 +7,7 @@ SELECT
   , bookings_5_days_ago AS bookings_5_day_lag
 FROM (
   SELECT
-    subq_26.metric_time__day AS metric_time__day
+    subq_25.metric_time__day AS metric_time__day
     , subq_21.__bookings AS bookings_5_days_ago
   FROM (
     SELECT
@@ -19,15 +19,15 @@ FROM (
       FROM ***************************.mf_time_spine time_spine_src_28006
     ) subq_24
     WHERE metric_time__alien_day = '2020-01-01'
-  ) subq_26
+  ) subq_25
   INNER JOIN (
     SELECT
       metric_time__day
       , SUM(__bookings) AS __bookings
     FROM (
       SELECT
-        metric_time__day
-        , bookings AS __bookings
+        bookings AS __bookings
+        , metric_time__day
       FROM (
         SELECT
           subq_16.alien_day AS metric_time__alien_day
@@ -45,10 +45,10 @@ FROM (
           subq_15.ds__day = subq_16.ds
       ) subq_18
       WHERE metric_time__alien_day = '2020-01-01'
-    ) subq_20
+    ) subq_19
     GROUP BY
       metric_time__day
   ) subq_21
   ON
-    addDays(subq_26.metric_time__day, -5) = subq_21.metric_time__day
+    addDays(subq_25.metric_time__day, -5) = subq_21.metric_time__day
 ) subq_28

@@ -24,8 +24,8 @@ FROM (
       , SUM(__booking_value) AS booking_value_with_is_instant_constraint
     FROM (
       SELECT
-        metric_time__day
-        , booking_value AS __booking_value
+        booking_value AS __booking_value
+        , metric_time__day
       FROM (
         SELECT
           metric_time__day
@@ -34,7 +34,7 @@ FROM (
         FROM sma_28009_cte
       ) subq_16
       WHERE booking__is_instant
-    ) subq_18
+    ) subq_17
     GROUP BY
       metric_time__day
   ) subq_20

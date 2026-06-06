@@ -7,8 +7,8 @@ SELECT
   , SUM(__archived_users) AS archived_users
 FROM (
   SELECT
-    metric_time__extract_year
-    , archived_users AS __archived_users
+    archived_users AS __archived_users
+    , metric_time__extract_year
   FROM (
     SELECT
       toYear(archived_at) AS metric_time__extract_year
@@ -17,6 +17,6 @@ FROM (
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_9
   WHERE metric_time__extract_day = '2020-01-01'
-) subq_11
+) subq_10
 GROUP BY
   metric_time__extract_year

@@ -27,8 +27,8 @@ FROM (
       , SUM(__booking_value) AS booking_value
     FROM (
       SELECT
-        metric_time__month
-        , booking_value AS __booking_value
+        booking_value AS __booking_value
+        , metric_time__month
       FROM (
         SELECT
           time_spine_src_28006.ds AS metric_time__day
@@ -41,7 +41,7 @@ FROM (
           addDays(time_spine_src_28006.ds, -7) = sma_28009_cte.metric_time__day
       ) subq_27
       WHERE metric_time__day = '2020-01-01'
-    ) subq_29
+    ) subq_28
     GROUP BY
       metric_time__month
   ) subq_31
@@ -51,8 +51,8 @@ FROM (
       , COUNT(DISTINCT __bookers) AS bookers
     FROM (
       SELECT
-        metric_time__month
-        , bookers AS __bookers
+        bookers AS __bookers
+        , metric_time__month
       FROM (
         SELECT
           metric_time__day
@@ -61,7 +61,7 @@ FROM (
         FROM sma_28009_cte
       ) subq_33
       WHERE metric_time__day = '2020-01-01'
-    ) subq_35
+    ) subq_34
     GROUP BY
       metric_time__month
   ) subq_37

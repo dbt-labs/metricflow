@@ -9,8 +9,8 @@ SELECT
   , SUM(__revenue) AS trailing_2_months_revenue_with_filter
 FROM (
   SELECT
-    metric_time__day
-    , revenue AS __revenue
+    revenue AS __revenue
+    , metric_time__day
   FROM (
     SELECT
       subq_18.metric_time__day AS metric_time__day
@@ -37,6 +37,6 @@ FROM (
       subq_18.user = users_latest_src_28000.user_id
   ) subq_22
   WHERE user__home_state_latest = 'CA'
-) subq_24
+) subq_23
 GROUP BY
   metric_time__day

@@ -39,4 +39,4 @@ FROM (
       subq_23.guest = subq_29.guest
   ) subq_31
   WHERE guest__booking_value > 1.00
-) subq_33
+) subq_32

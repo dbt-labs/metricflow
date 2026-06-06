@@ -18,8 +18,8 @@ FROM (
       , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
     FROM (
       SELECT
-        metric_time__day
-        , bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+        bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+        , metric_time__day
       FROM (
         SELECT
           toStartOfDay(ds) AS metric_time__day
@@ -28,7 +28,7 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_14
       WHERE booking__is_instant
-    ) subq_16
+    ) subq_15
     GROUP BY
       metric_time__day
   ) subq_17

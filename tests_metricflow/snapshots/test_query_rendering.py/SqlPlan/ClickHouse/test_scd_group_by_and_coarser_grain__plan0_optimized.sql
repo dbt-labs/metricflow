@@ -8,9 +8,9 @@ SELECT
   , SUM(__family_bookings) AS family_bookings
 FROM (
   SELECT
-    metric_time__month
+    family_bookings AS __family_bookings
     , listing__capacity
-    , family_bookings AS __family_bookings
+    , metric_time__month
   FROM (
     SELECT
       subq_11.metric_time__month AS metric_time__month
@@ -42,7 +42,7 @@ FROM (
       )
   ) subq_15
   WHERE listing__capacity > 2
-) subq_17
+) subq_16
 GROUP BY
   metric_time__month
   , listing__capacity

@@ -38,4 +38,4 @@ FROM (
       subq_45.listing = subq_51.listing
   ) subq_55
   WHERE listing__bookings_per_booker > 1
-) subq_57
+) subq_56

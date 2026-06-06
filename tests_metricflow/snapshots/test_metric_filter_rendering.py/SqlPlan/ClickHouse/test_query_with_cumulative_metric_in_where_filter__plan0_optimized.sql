@@ -33,4 +33,4 @@ FROM (
       subq_27.user = subq_35.user
   ) subq_37
   WHERE user__revenue_all_time > 1
-) subq_39
+) subq_38

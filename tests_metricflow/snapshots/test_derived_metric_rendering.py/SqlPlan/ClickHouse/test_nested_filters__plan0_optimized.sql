@@ -45,7 +45,7 @@ FROM (
             sma_28009_cte.listing = listings_latest_src_28000.listing_id
         ) subq_35
         WHERE (listing__is_lux_latest) AND (booking__is_instant)
-      ) subq_37
+      ) subq_36
     ) subq_39
     CROSS JOIN (
       SELECT
@@ -60,7 +60,7 @@ FROM (
           FROM sma_28009_cte
         ) subq_41
         WHERE booking__is_instant
-      ) subq_43
+      ) subq_42
     ) subq_45
   ) subq_46
 ) subq_47

@@ -3,7 +3,7 @@ test_filename: test_fill_nulls_with_rendering.py
 sql_engine: ClickHouse
 ---
 SELECT
-  subq_23.metric_time__day AS metric_time__day
+  subq_22.metric_time__day AS metric_time__day
   , subq_18.__bookings_join_to_time_spine_with_tiered_filters AS bookings_join_to_time_spine_with_tiered_filters
 FROM (
   SELECT
@@ -21,15 +21,15 @@ FROM (
   ) AND (
     metric_time__month > '2020-01-01'
   )
-) subq_23
+) subq_22
 LEFT OUTER JOIN (
   SELECT
     metric_time__day
     , SUM(__bookings_join_to_time_spine_with_tiered_filters) AS __bookings_join_to_time_spine_with_tiered_filters
   FROM (
     SELECT
-      metric_time__day
-      , bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
+      bookings_join_to_time_spine_with_tiered_filters AS __bookings_join_to_time_spine_with_tiered_filters
+      , metric_time__day
     FROM (
       SELECT
         toStartOfDay(ds) AS metric_time__day
@@ -44,9 +44,9 @@ LEFT OUTER JOIN (
     ) AND (
       metric_time__month > '2020-01-01'
     )
-  ) subq_17
+  ) subq_16
   GROUP BY
     metric_time__day
 ) subq_18
 ON
-  subq_23.metric_time__day = subq_18.metric_time__day
+  subq_22.metric_time__day = subq_18.metric_time__day

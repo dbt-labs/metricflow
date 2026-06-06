@@ -7,8 +7,8 @@ SELECT
   , SUM(__family_bookings) AS family_bookings
 FROM (
   SELECT
-    listing__capacity
-    , family_bookings AS __family_bookings
+    family_bookings AS __family_bookings
+    , listing__capacity
   FROM (
     SELECT
       listings_src_26000.capacity AS listing__capacity
@@ -38,6 +38,6 @@ FROM (
       )
   ) subq_15
   WHERE listing__capacity > 2
-) subq_17
+) subq_16
 GROUP BY
   listing__capacity

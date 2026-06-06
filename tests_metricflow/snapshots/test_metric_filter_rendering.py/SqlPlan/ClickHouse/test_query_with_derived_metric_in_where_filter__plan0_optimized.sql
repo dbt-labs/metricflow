@@ -59,4 +59,4 @@ FROM (
       subq_46.listing = subq_61.listing
   ) subq_63
   WHERE listing__views_times_booking_value > 1
-) subq_65
+) subq_64

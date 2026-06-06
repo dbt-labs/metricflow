@@ -28,21 +28,16 @@ FROM (
   ) subq_23
   FULL OUTER JOIN (
     SELECT
-      metric_time__week
-      , SUM(__bookings) AS bookings_at_start_of_month
-    FROM (
-      SELECT
-        toStartOfWeek(time_spine_src_28006.ds, 1) AS metric_time__week
-        , sma_28009_cte.__bookings AS __bookings
-      FROM ***************************.mf_time_spine time_spine_src_28006
-      INNER JOIN
-        sma_28009_cte
-      ON
-        toStartOfMonth(time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
-      WHERE toStartOfWeek(time_spine_src_28006.ds, 1) = time_spine_src_28006.ds
-    ) subq_31
+      toStartOfWeek(time_spine_src_28006.ds, 1) AS metric_time__week
+      , SUM(sma_28009_cte.__bookings) AS bookings_at_start_of_month
+    FROM ***************************.mf_time_spine time_spine_src_28006
+    INNER JOIN
+      sma_28009_cte
+    ON
+      toStartOfMonth(time_spine_src_28006.ds) = sma_28009_cte.metric_time__day
+    WHERE toStartOfWeek(time_spine_src_28006.ds, 1) = time_spine_src_28006.ds
     GROUP BY
-      metric_time__week
+      toStartOfWeek(time_spine_src_28006.ds, 1)
   ) subq_33
   ON
     subq_23.metric_time__week = subq_33.metric_time__week

@@ -37,9 +37,9 @@ FROM (
       , SUM(__visits) AS __visits
     FROM (
       SELECT
-        metric_time__day
+        visits AS __visits
         , user__home_state_latest
-        , visits AS __visits
+        , metric_time__day
       FROM (
         SELECT
           sma_28019_cte.metric_time__day AS metric_time__day
@@ -53,7 +53,7 @@ FROM (
           sma_28019_cte.user = rss_28028_cte.user
       ) subq_31
       WHERE visit__referrer_id = '123456'
-    ) subq_33
+    ) subq_32
     GROUP BY
       metric_time__day
       , user__home_state_latest
@@ -65,55 +65,55 @@ FROM (
       , SUM(__buys) AS __buys
     FROM (
       SELECT DISTINCT
-        FIRST_VALUE(subq_41.__visits) OVER (
+        FIRST_VALUE(subq_40.__visits) OVER (
           PARTITION BY
             subq_44.user
             , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.metric_time__day DESC
+          ORDER BY subq_40.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS __visits
-        , FIRST_VALUE(subq_41.visit__referrer_id) OVER (
+        , FIRST_VALUE(subq_40.visit__referrer_id) OVER (
           PARTITION BY
             subq_44.user
             , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.metric_time__day DESC
+          ORDER BY subq_40.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
-        , FIRST_VALUE(subq_41.user__home_state_latest) OVER (
+        , FIRST_VALUE(subq_40.user__home_state_latest) OVER (
           PARTITION BY
             subq_44.user
             , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.metric_time__day DESC
+          ORDER BY subq_40.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user__home_state_latest
-        , FIRST_VALUE(subq_41.metric_time__day) OVER (
+        , FIRST_VALUE(subq_40.metric_time__day) OVER (
           PARTITION BY
             subq_44.user
             , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.metric_time__day DESC
+          ORDER BY subq_40.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_41.user) OVER (
+        , FIRST_VALUE(subq_40.user) OVER (
           PARTITION BY
             subq_44.user
             , subq_44.metric_time__day
             , subq_44.mf_internal_uuid
-          ORDER BY subq_41.metric_time__day DESC
+          ORDER BY subq_40.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_44.mf_internal_uuid AS mf_internal_uuid
         , subq_44.__buys AS __buys
       FROM (
         SELECT
-          metric_time__day
-          , subq_39.user
+          visits AS __visits
           , visit__referrer_id
           , user__home_state_latest
-          , visits AS __visits
+          , metric_time__day
+          , subq_39.user
         FROM (
           SELECT
             sma_28019_cte.metric_time__day AS metric_time__day
@@ -128,7 +128,7 @@ FROM (
             sma_28019_cte.user = rss_28028_cte.user
         ) subq_39
         WHERE visit__referrer_id = '123456'
-      ) subq_41
+      ) subq_40
       INNER JOIN (
         SELECT
           toStartOfDay(ds) AS metric_time__day
@@ -139,12 +139,12 @@ FROM (
       ) subq_44
       ON
         (
-          subq_41.user = subq_44.user
+          subq_40.user = subq_44.user
         ) AND (
           (
-            subq_41.metric_time__day <= subq_44.metric_time__day
+            subq_40.metric_time__day <= subq_44.metric_time__day
           ) AND (
-            subq_41.metric_time__day > addDays(subq_44.metric_time__day, -7)
+            subq_40.metric_time__day > addDays(subq_44.metric_time__day, -7)
           )
         )
     ) subq_45

@@ -9,10 +9,10 @@ SELECT
   , SUM(__instant_bookings) AS instant_bookings
 FROM (
   SELECT
-    metric_time__day
-    , listing__capacity_latest
-    , bookings AS __bookings
+    bookings AS __bookings
     , instant_bookings AS __instant_bookings
+    , listing__capacity_latest
+    , metric_time__day
   FROM (
     SELECT
       subq_1.metric_time__day AS metric_time__day
@@ -33,7 +33,7 @@ FROM (
       subq_1.listing = listings_latest_src_10000.listing_id
   ) subq_6
   WHERE listing__capacity_latest > 3
-) subq_8
+) subq_7
 GROUP BY
   metric_time__day
   , listing__capacity_latest

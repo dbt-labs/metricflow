@@ -38,4 +38,4 @@ FROM (
       subq_23.listing = subq_29.listing
   ) subq_31
   WHERE listing__bookers > 1.00
-) subq_33
+) subq_32

@@ -10,15 +10,19 @@ FROM (
     metric_time__day
   FROM (
     SELECT
-      ts AS metric_time__hour
-      , toStartOfDay(ts) AS metric_time__day
-    FROM ***************************.mf_time_spine_hour time_spine_src_28005
-  ) subq_21
-  WHERE (
-    metric_time__hour > '2020-01-01 00:09:00'
-  ) AND (
-    metric_time__day = '2020-01-01'
-  )
+      metric_time__day
+    FROM (
+      SELECT
+        ts AS metric_time__hour
+        , toStartOfDay(ts) AS metric_time__day
+      FROM ***************************.mf_time_spine_hour time_spine_src_28005
+    ) subq_21
+    WHERE (
+      metric_time__hour > '2020-01-01 00:09:00'
+    ) AND (
+      metric_time__day = '2020-01-01'
+    )
+  ) subq_22
   GROUP BY
     metric_time__day
 ) subq_23
@@ -28,8 +32,8 @@ LEFT OUTER JOIN (
     , SUM(__archived_users_join_to_time_spine) AS __archived_users_join_to_time_spine
   FROM (
     SELECT
-      metric_time__day
-      , archived_users_join_to_time_spine AS __archived_users_join_to_time_spine
+      archived_users_join_to_time_spine AS __archived_users_join_to_time_spine
+      , metric_time__day
     FROM (
       SELECT
         toStartOfHour(archived_at) AS metric_time__hour
@@ -42,7 +46,7 @@ LEFT OUTER JOIN (
     ) AND (
       metric_time__day = '2020-01-01'
     )
-  ) subq_17
+  ) subq_16
   GROUP BY
     metric_time__day
 ) subq_18

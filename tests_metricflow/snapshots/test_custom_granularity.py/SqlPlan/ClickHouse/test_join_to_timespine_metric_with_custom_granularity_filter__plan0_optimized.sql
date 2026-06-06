@@ -10,10 +10,14 @@ FROM (
     metric_time__alien_day
   FROM (
     SELECT
-      alien_day AS metric_time__alien_day
-    FROM ***************************.mf_time_spine time_spine_src_28006
-  ) subq_23
-  WHERE metric_time__alien_day = '2020-01-01'
+      metric_time__alien_day
+    FROM (
+      SELECT
+        alien_day AS metric_time__alien_day
+      FROM ***************************.mf_time_spine time_spine_src_28006
+    ) subq_23
+    WHERE metric_time__alien_day = '2020-01-01'
+  ) subq_24
   GROUP BY
     metric_time__alien_day
 ) subq_25
@@ -23,8 +27,8 @@ LEFT OUTER JOIN (
     , SUM(__bookings_join_to_time_spine) AS __bookings_join_to_time_spine
   FROM (
     SELECT
-      metric_time__alien_day
-      , bookings_join_to_time_spine AS __bookings_join_to_time_spine
+      bookings_join_to_time_spine AS __bookings_join_to_time_spine
+      , metric_time__alien_day
     FROM (
       SELECT
         subq_15.alien_day AS metric_time__alien_day
@@ -41,7 +45,7 @@ LEFT OUTER JOIN (
         subq_14.ds__day = subq_15.ds
     ) subq_17
     WHERE metric_time__alien_day = '2020-01-01'
-  ) subq_19
+  ) subq_18
   GROUP BY
     metric_time__alien_day
 ) subq_20

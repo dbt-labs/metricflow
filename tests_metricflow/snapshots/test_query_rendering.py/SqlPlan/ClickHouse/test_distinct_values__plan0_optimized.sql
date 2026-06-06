@@ -8,10 +8,14 @@ SELECT
   listing__country_latest
 FROM (
   SELECT
-    country AS listing__country_latest
-  FROM ***************************.dim_listings_latest listings_latest_src_28000
-) subq_6
-WHERE listing__country_latest = 'us'
+    listing__country_latest
+  FROM (
+    SELECT
+      country AS listing__country_latest
+    FROM ***************************.dim_listings_latest listings_latest_src_28000
+  ) subq_6
+  WHERE listing__country_latest = 'us'
+) subq_7
 GROUP BY
   listing__country_latest
 ORDER BY listing__country_latest DESC
