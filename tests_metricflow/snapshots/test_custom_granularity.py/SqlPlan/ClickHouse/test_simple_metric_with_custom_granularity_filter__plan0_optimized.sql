@@ -25,4 +25,4 @@ FROM (
       subq_8.ds__day = subq_9.ds
   ) subq_11
   WHERE metric_time__alien_day = '2020-01-01'
-) subq_13
+) subq_12

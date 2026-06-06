@@ -24,8 +24,8 @@ FROM (
       , SUM(__visits) AS __visits
     FROM (
       SELECT
-        metric_time__alien_day
-        , visits AS __visits
+        visits AS __visits
+        , metric_time__alien_day
       FROM (
         SELECT
           subq_23.alien_day AS metric_time__alien_day
@@ -37,7 +37,7 @@ FROM (
           sma_28019_cte.metric_time__day = subq_23.ds
       ) subq_25
       WHERE metric_time__alien_day = '2020-01-01'
-    ) subq_27
+    ) subq_26
     GROUP BY
       metric_time__alien_day
   ) subq_28
@@ -47,46 +47,46 @@ FROM (
       , SUM(__buys) AS __buys
     FROM (
       SELECT DISTINCT
-        FIRST_VALUE(subq_33.__visits) OVER (
+        FIRST_VALUE(subq_32.__visits) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS __visits
-        , FIRST_VALUE(subq_33.metric_time__alien_day) OVER (
+        , FIRST_VALUE(subq_32.metric_time__alien_day) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__alien_day
-        , FIRST_VALUE(subq_33.metric_time__day) OVER (
+        , FIRST_VALUE(subq_32.metric_time__day) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_33.user) OVER (
+        , FIRST_VALUE(subq_32.user) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_36.mf_internal_uuid AS mf_internal_uuid
         , subq_36.__buys AS __buys
       FROM (
         SELECT
-          metric_time__alien_day
+          visits AS __visits
+          , metric_time__alien_day
           , metric_time__day
           , subq_31.user
-          , visits AS __visits
         FROM (
           SELECT
             subq_29.alien_day AS metric_time__alien_day
@@ -100,7 +100,7 @@ FROM (
             sma_28019_cte.metric_time__day = subq_29.ds
         ) subq_31
         WHERE metric_time__alien_day = '2020-01-01'
-      ) subq_33
+      ) subq_32
       INNER JOIN (
         SELECT
           toStartOfDay(ds) AS metric_time__day
@@ -111,12 +111,12 @@ FROM (
       ) subq_36
       ON
         (
-          subq_33.user = subq_36.user
+          subq_32.user = subq_36.user
         ) AND (
           (
-            subq_33.metric_time__day <= subq_36.metric_time__day
+            subq_32.metric_time__day <= subq_36.metric_time__day
           ) AND (
-            subq_33.metric_time__day > addDays(subq_36.metric_time__day, -7)
+            subq_32.metric_time__day > addDays(subq_36.metric_time__day, -7)
           )
         )
     ) subq_37

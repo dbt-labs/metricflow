@@ -98,4 +98,4 @@ FROM (
       subq_58.user = subq_75.user
   ) subq_79
   WHERE user__visit_buy_conversion_rate > 2
-) subq_81
+) subq_80

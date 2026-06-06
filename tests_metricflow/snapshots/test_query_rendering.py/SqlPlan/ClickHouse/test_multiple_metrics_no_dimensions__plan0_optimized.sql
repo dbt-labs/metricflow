@@ -7,21 +7,13 @@ SELECT
   , MAX(subq_32.listings) AS listings
 FROM (
   SELECT
-    SUM(__bookings) AS bookings
-  FROM (
-    SELECT
-      1 AS __bookings
-    FROM ***************************.fct_bookings bookings_source_src_28000
-    WHERE toStartOfDay(ds) BETWEEN '2020-01-01' AND '2020-01-01'
-  ) subq_23
+    SUM(1) AS bookings
+  FROM ***************************.fct_bookings bookings_source_src_28000
+  WHERE toStartOfDay(ds) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_25
 CROSS JOIN (
   SELECT
-    SUM(__listings) AS listings
-  FROM (
-    SELECT
-      1 AS __listings
-    FROM ***************************.dim_listings_latest listings_latest_src_28000
-    WHERE toStartOfDay(created_at) BETWEEN '2020-01-01' AND '2020-01-01'
-  ) subq_30
+    SUM(1) AS listings
+  FROM ***************************.dim_listings_latest listings_latest_src_28000
+  WHERE toStartOfDay(created_at) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_32

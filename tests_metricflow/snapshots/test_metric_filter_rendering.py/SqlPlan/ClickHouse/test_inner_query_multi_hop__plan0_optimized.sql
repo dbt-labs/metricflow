@@ -43,4 +43,4 @@ FROM (
       third_hop_table_src_22000.customer_third_hop_id = subq_59.account_id__customer_id__customer_third_hop_id
   ) subq_61
   WHERE customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2
-) subq_63
+) subq_62

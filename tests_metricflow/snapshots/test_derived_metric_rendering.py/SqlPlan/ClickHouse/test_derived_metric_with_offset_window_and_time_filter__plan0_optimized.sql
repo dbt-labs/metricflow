@@ -23,8 +23,8 @@ FROM (
       , SUM(__bookings) AS bookings
     FROM (
       SELECT
-        metric_time__day
-        , bookings AS __bookings
+        bookings AS __bookings
+        , metric_time__day
       FROM (
         SELECT
           metric_time__day
@@ -32,13 +32,13 @@ FROM (
         FROM sma_28009_cte
       ) subq_23
       WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
-    ) subq_25
+    ) subq_24
     GROUP BY
       metric_time__day
   ) subq_27
   FULL OUTER JOIN (
     SELECT
-      subq_37.metric_time__day AS metric_time__day
+      subq_36.metric_time__day AS metric_time__day
       , subq_32.__bookings AS bookings_2_weeks_ago
     FROM (
       SELECT
@@ -49,15 +49,15 @@ FROM (
         FROM ***************************.mf_time_spine time_spine_src_28006
       ) subq_35
       WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
-    ) subq_37
+    ) subq_36
     INNER JOIN (
       SELECT
         metric_time__day
         , SUM(__bookings) AS __bookings
       FROM (
         SELECT
-          metric_time__day
-          , bookings AS __bookings
+          bookings AS __bookings
+          , metric_time__day
         FROM (
           SELECT
             metric_time__day
@@ -65,12 +65,12 @@ FROM (
           FROM sma_28009_cte
         ) subq_29
         WHERE metric_time__day = '2020-01-01' or metric_time__day = '2020-01-14'
-      ) subq_31
+      ) subq_30
       GROUP BY
         metric_time__day
     ) subq_32
     ON
-      addDays(subq_37.metric_time__day, -14) = subq_32.metric_time__day
+      addDays(subq_36.metric_time__day, -14) = subq_32.metric_time__day
   ) subq_39
   ON
     subq_27.metric_time__day = subq_39.metric_time__day

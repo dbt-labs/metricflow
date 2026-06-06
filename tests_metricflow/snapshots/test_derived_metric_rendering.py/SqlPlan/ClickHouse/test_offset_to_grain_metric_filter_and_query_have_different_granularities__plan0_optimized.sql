@@ -16,11 +16,15 @@ FROM (
       metric_time__month
     FROM (
       SELECT
-        ds AS metric_time__day
-        , toStartOfMonth(ds) AS metric_time__month
-      FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_22
-    WHERE metric_time__day = '2020-01-01'
+        metric_time__month
+      FROM (
+        SELECT
+          ds AS metric_time__day
+          , toStartOfMonth(ds) AS metric_time__month
+        FROM ***************************.mf_time_spine time_spine_src_28006
+      ) subq_22
+      WHERE metric_time__day = '2020-01-01'
+    ) subq_23
     GROUP BY
       metric_time__month
   ) subq_24
@@ -30,8 +34,8 @@ FROM (
       , SUM(__bookings) AS __bookings
     FROM (
       SELECT
-        metric_time__month
-        , bookings AS __bookings
+        bookings AS __bookings
+        , metric_time__month
       FROM (
         SELECT
           toStartOfDay(ds) AS metric_time__day
@@ -40,7 +44,7 @@ FROM (
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_16
       WHERE metric_time__day = '2020-01-01'
-    ) subq_18
+    ) subq_17
     GROUP BY
       metric_time__month
   ) subq_19

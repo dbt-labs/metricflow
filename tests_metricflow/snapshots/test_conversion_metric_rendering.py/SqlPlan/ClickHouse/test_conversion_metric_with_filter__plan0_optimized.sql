@@ -27,44 +27,44 @@ FROM (
       FROM sma_28019_cte
     ) subq_22
     WHERE metric_time__day = '2020-01-01'
-  ) subq_24
+  ) subq_23
 ) subq_25
 CROSS JOIN (
   SELECT
     SUM(__buys) AS __buys
   FROM (
     SELECT DISTINCT
-      FIRST_VALUE(subq_29.__visits) OVER (
+      FIRST_VALUE(subq_28.__visits) OVER (
         PARTITION BY
           subq_32.user
           , subq_32.metric_time__day
           , subq_32.mf_internal_uuid
-        ORDER BY subq_29.metric_time__day DESC
+        ORDER BY subq_28.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS __visits
-      , FIRST_VALUE(subq_29.metric_time__day) OVER (
+      , FIRST_VALUE(subq_28.metric_time__day) OVER (
         PARTITION BY
           subq_32.user
           , subq_32.metric_time__day
           , subq_32.mf_internal_uuid
-        ORDER BY subq_29.metric_time__day DESC
+        ORDER BY subq_28.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS metric_time__day
-      , FIRST_VALUE(subq_29.user) OVER (
+      , FIRST_VALUE(subq_28.user) OVER (
         PARTITION BY
           subq_32.user
           , subq_32.metric_time__day
           , subq_32.mf_internal_uuid
-        ORDER BY subq_29.metric_time__day DESC
+        ORDER BY subq_28.metric_time__day DESC
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
       , subq_32.mf_internal_uuid AS mf_internal_uuid
       , subq_32.__buys AS __buys
     FROM (
       SELECT
-        metric_time__day
+        visits AS __visits
+        , metric_time__day
         , subq_27.user
-        , visits AS __visits
       FROM (
         SELECT
           metric_time__day
@@ -73,7 +73,7 @@ CROSS JOIN (
         FROM sma_28019_cte
       ) subq_27
       WHERE metric_time__day = '2020-01-01'
-    ) subq_29
+    ) subq_28
     INNER JOIN (
       SELECT
         toStartOfDay(ds) AS metric_time__day
@@ -84,9 +84,9 @@ CROSS JOIN (
     ) subq_32
     ON
       (
-        subq_29.user = subq_32.user
+        subq_28.user = subq_32.user
       ) AND (
-        (subq_29.metric_time__day <= subq_32.metric_time__day)
+        (subq_28.metric_time__day <= subq_32.metric_time__day)
       )
   ) subq_33
 ) subq_37

@@ -28,9 +28,9 @@ FROM (
       , SUM(__bookings) AS bookings
     FROM (
       SELECT
-        metric_time__day
-        , bookings AS __bookings
+        bookings AS __bookings
         , average_booking_value AS __average_booking_value
+        , metric_time__day
       FROM (
         SELECT
           sma_28009_cte.metric_time__day AS metric_time__day
@@ -44,7 +44,7 @@ FROM (
           sma_28009_cte.listing = listings_latest_src_28000.listing_id
       ) subq_33
       WHERE listing__is_lux_latest
-    ) subq_35
+    ) subq_34
     GROUP BY
       metric_time__day
   ) subq_37

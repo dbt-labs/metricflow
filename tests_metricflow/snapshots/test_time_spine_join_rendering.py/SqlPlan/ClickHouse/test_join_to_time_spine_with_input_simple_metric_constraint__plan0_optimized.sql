@@ -7,7 +7,7 @@ docstring:
 sql_engine: ClickHouse
 ---
 SELECT
-  subq_23.metric_time__day AS metric_time__day
+  subq_22.metric_time__day AS metric_time__day
   , subq_18.booking__is_instant AS booking__is_instant
   , subq_18.__instant_bookings_with_measure_filter AS instant_bookings_with_measure_filter
 FROM (
@@ -19,7 +19,7 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_21
   WHERE metric_time__day > '2020-01-01'
-) subq_23
+) subq_22
 LEFT OUTER JOIN (
   SELECT
     metric_time__day
@@ -27,9 +27,9 @@ LEFT OUTER JOIN (
     , SUM(__instant_bookings_with_measure_filter) AS __instant_bookings_with_measure_filter
   FROM (
     SELECT
-      metric_time__day
+      instant_bookings_with_measure_filter AS __instant_bookings_with_measure_filter
       , booking__is_instant
-      , instant_bookings_with_measure_filter AS __instant_bookings_with_measure_filter
+      , metric_time__day
     FROM (
       SELECT
         toStartOfDay(ds) AS metric_time__day
@@ -45,10 +45,10 @@ LEFT OUTER JOIN (
     ) AND (
       metric_time__day > '2020-01-01'
     )
-  ) subq_17
+  ) subq_16
   GROUP BY
     metric_time__day
     , booking__is_instant
 ) subq_18
 ON
-  subq_23.metric_time__day = subq_18.metric_time__day
+  subq_22.metric_time__day = subq_18.metric_time__day

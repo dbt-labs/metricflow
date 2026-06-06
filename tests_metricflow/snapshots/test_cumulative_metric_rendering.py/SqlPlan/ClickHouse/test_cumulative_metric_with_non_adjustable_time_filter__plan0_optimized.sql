@@ -13,8 +13,8 @@ SELECT
   , COUNT(DISTINCT __bookers) AS every_two_days_bookers
 FROM (
   SELECT
-    metric_time__day
-    , bookers AS __bookers
+    bookers AS __bookers
+    , metric_time__day
   FROM (
     SELECT
       subq_14.ds AS metric_time__day
@@ -30,6 +30,6 @@ FROM (
       )
   ) subq_16
   WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'
-) subq_18
+) subq_17
 GROUP BY
   metric_time__day

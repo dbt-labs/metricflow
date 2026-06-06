@@ -3,7 +3,7 @@ test_filename: test_custom_granularity.py
 sql_engine: ClickHouse
 ---
 SELECT
-  subq_25.metric_time__day AS metric_time__day
+  subq_24.metric_time__day AS metric_time__day
   , subq_20.__bookings_join_to_time_spine AS bookings_join_to_time_spine
 FROM (
   SELECT
@@ -15,15 +15,15 @@ FROM (
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_23
   WHERE metric_time__alien_day = '2020-01-02'
-) subq_25
+) subq_24
 LEFT OUTER JOIN (
   SELECT
     metric_time__day
     , SUM(__bookings_join_to_time_spine) AS __bookings_join_to_time_spine
   FROM (
     SELECT
-      metric_time__day
-      , bookings_join_to_time_spine AS __bookings_join_to_time_spine
+      bookings_join_to_time_spine AS __bookings_join_to_time_spine
+      , metric_time__day
     FROM (
       SELECT
         subq_15.alien_day AS metric_time__alien_day
@@ -41,9 +41,9 @@ LEFT OUTER JOIN (
         subq_14.ds__day = subq_15.ds
     ) subq_17
     WHERE metric_time__alien_day = '2020-01-02'
-  ) subq_19
+  ) subq_18
   GROUP BY
     metric_time__day
 ) subq_20
 ON
-  subq_25.metric_time__day = subq_20.metric_time__day
+  subq_24.metric_time__day = subq_20.metric_time__day

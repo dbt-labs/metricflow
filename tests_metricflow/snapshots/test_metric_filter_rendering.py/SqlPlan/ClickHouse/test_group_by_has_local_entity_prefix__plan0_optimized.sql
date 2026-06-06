@@ -36,4 +36,4 @@ FROM (
       sma_28014_cte.user = subq_43.listing__user
   ) subq_45
   WHERE user__listing__user__average_booking_value > 1
-) subq_47
+) subq_46

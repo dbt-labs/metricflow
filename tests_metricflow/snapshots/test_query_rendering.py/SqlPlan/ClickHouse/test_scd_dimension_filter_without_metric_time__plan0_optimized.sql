@@ -36,4 +36,4 @@ FROM (
       )
   ) subq_15
   WHERE listing__capacity > 2
-) subq_17
+) subq_16

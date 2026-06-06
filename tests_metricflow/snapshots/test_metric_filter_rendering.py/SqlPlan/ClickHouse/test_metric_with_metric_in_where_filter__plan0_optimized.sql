@@ -9,8 +9,8 @@ SELECT
   , SUM(__active_listings) AS active_listings
 FROM (
   SELECT
-    metric_time__day
-    , active_listings AS __active_listings
+    active_listings AS __active_listings
+    , metric_time__day
   FROM (
     SELECT
       subq_24.metric_time__day AS metric_time__day
@@ -40,6 +40,6 @@ FROM (
       subq_24.listing = subq_31.listing
   ) subq_33
   WHERE listing__bookings > 2
-) subq_35
+) subq_34
 GROUP BY
   metric_time__day

@@ -17,25 +17,20 @@ FROM (
   ) subq_40
   INNER JOIN (
     SELECT
-      metric_time__day
-      , COUNT(DISTINCT __bookers) AS __bookers
-    FROM (
-      SELECT
-        subq_30.ds AS metric_time__day
-        , bookings_source_src_28000.guest_id AS __bookers
-      FROM ***************************.mf_time_spine subq_30
-      INNER JOIN
-        ***************************.fct_bookings bookings_source_src_28000
-      ON
-        (
-          toStartOfDay(bookings_source_src_28000.ds) <= subq_30.ds
-        ) AND (
-          toStartOfDay(bookings_source_src_28000.ds) > addDays(subq_30.ds, -2)
-        )
-      WHERE subq_30.ds BETWEEN '2019-12-19' AND '2020-01-02'
-    ) subq_34
+      subq_30.ds AS metric_time__day
+      , COUNT(DISTINCT bookings_source_src_28000.guest_id) AS __bookers
+    FROM ***************************.mf_time_spine subq_30
+    INNER JOIN
+      ***************************.fct_bookings bookings_source_src_28000
+    ON
+      (
+        toStartOfDay(bookings_source_src_28000.ds) <= subq_30.ds
+      ) AND (
+        toStartOfDay(bookings_source_src_28000.ds) > addDays(subq_30.ds, -2)
+      )
+    WHERE subq_30.ds BETWEEN '2019-12-19' AND '2020-01-02'
     GROUP BY
-      metric_time__day
+      subq_30.ds
   ) subq_35
   ON
     addDays(subq_40.metric_time__day, -2) = subq_35.metric_time__day

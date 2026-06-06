@@ -5,17 +5,11 @@ docstring:
 sql_engine: ClickHouse
 ---
 SELECT
-  SUM(src2.bookings) AS bookings
-  , src2.ds
-FROM (
-  SELECT
-    src0.bookings
-    , src0.ds
-  FROM demo.fct_bookings src0
-  WHERE src0.ds >= '2020-01-01'
-  LIMIT 1
-) src2
-WHERE src2.ds <= '2020-01-05'
+  SUM(src0.bookings) AS bookings
+  , src0.ds
+FROM demo.fct_bookings src0
+WHERE (src2.ds <= '2020-01-05') AND (src0.ds >= '2020-01-01')
 GROUP BY
-  src2.ds
-ORDER BY src2.ds
+  src0.ds
+ORDER BY ds
+LIMIT 1

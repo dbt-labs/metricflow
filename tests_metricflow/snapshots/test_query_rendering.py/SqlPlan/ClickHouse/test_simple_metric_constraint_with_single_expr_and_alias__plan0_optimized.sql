@@ -11,8 +11,8 @@ FROM (
     , SUM(__bookings) AS delayed_bookings
   FROM (
     SELECT
-      metric_time__day
-      , bookings AS __bookings
+      bookings AS __bookings
+      , metric_time__day
     FROM (
       SELECT
         toStartOfDay(ds) AS metric_time__day
@@ -21,7 +21,7 @@ FROM (
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_10
     WHERE NOT booking__is_instant
-  ) subq_12
+  ) subq_11
   GROUP BY
     metric_time__day
 ) subq_14

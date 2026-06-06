@@ -28,8 +28,8 @@ FROM (
       , SUM(__visits) AS __visits
     FROM (
       SELECT
-        visit__referrer_id
-        , visits AS __visits
+        visits AS __visits
+        , visit__referrer_id
       FROM (
         SELECT
           visit__referrer_id
@@ -37,7 +37,7 @@ FROM (
         FROM ctr_1_cte
       ) subq_26
       WHERE visit__referrer_id = 'ref_id_01'
-    ) subq_28
+    ) subq_27
     GROUP BY
       visit__referrer_id
   ) subq_29
@@ -47,46 +47,46 @@ FROM (
       , SUM(__buys) AS __buys
     FROM (
       SELECT DISTINCT
-        FIRST_VALUE(subq_33.__visits) OVER (
+        FIRST_VALUE(subq_32.__visits) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS __visits
-        , FIRST_VALUE(subq_33.visit__referrer_id) OVER (
+        , FIRST_VALUE(subq_32.visit__referrer_id) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS visit__referrer_id
-        , FIRST_VALUE(subq_33.metric_time__day) OVER (
+        , FIRST_VALUE(subq_32.metric_time__day) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS metric_time__day
-        , FIRST_VALUE(subq_33.user) OVER (
+        , FIRST_VALUE(subq_32.user) OVER (
           PARTITION BY
             subq_36.user
             , subq_36.metric_time__day
             , subq_36.mf_internal_uuid
-          ORDER BY subq_33.metric_time__day DESC
+          ORDER BY subq_32.metric_time__day DESC
           ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
         ) AS user
         , subq_36.mf_internal_uuid AS mf_internal_uuid
         , subq_36.__buys AS __buys
       FROM (
         SELECT
-          metric_time__day
-          , subq_31.user
+          visits AS __visits
           , visit__referrer_id
-          , visits AS __visits
+          , metric_time__day
+          , subq_31.user
         FROM (
           SELECT
             metric_time__day
@@ -96,7 +96,7 @@ FROM (
           FROM ctr_1_cte
         ) subq_31
         WHERE visit__referrer_id = 'ref_id_01'
-      ) subq_33
+      ) subq_32
       INNER JOIN (
         SELECT
           toStartOfDay(ds) AS metric_time__day
@@ -107,9 +107,9 @@ FROM (
       ) subq_36
       ON
         (
-          subq_33.user = subq_36.user
+          subq_32.user = subq_36.user
         ) AND (
-          (subq_33.metric_time__day <= subq_36.metric_time__day)
+          (subq_32.metric_time__day <= subq_36.metric_time__day)
         )
     ) subq_37
     GROUP BY

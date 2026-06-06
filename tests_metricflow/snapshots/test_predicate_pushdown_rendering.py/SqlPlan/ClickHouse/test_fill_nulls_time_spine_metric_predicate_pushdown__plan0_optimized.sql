@@ -56,9 +56,9 @@ FROM (
           , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           SELECT
-            metric_time__day
+            bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
             , listing__country_latest
-            , bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+            , metric_time__day
           FROM (
             SELECT
               sma_28009_cte.metric_time__day AS metric_time__day
@@ -72,7 +72,7 @@ FROM (
               sma_28009_cte.listing = sma_28014_cte.listing
           ) subq_38
           WHERE booking__is_instant
-        ) subq_40
+        ) subq_39
         GROUP BY
           metric_time__day
           , listing__country_latest
@@ -99,9 +99,9 @@ FROM (
           , SUM(__bookings_fill_nulls_with_0) AS __bookings_fill_nulls_with_0
         FROM (
           SELECT
-            metric_time__day
+            bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
             , listing__country_latest
-            , bookings_fill_nulls_with_0 AS __bookings_fill_nulls_with_0
+            , metric_time__day
           FROM (
             SELECT
               sma_28009_cte.metric_time__day AS metric_time__day
@@ -115,7 +115,7 @@ FROM (
               sma_28009_cte.listing = sma_28014_cte.listing
           ) subq_52
           WHERE booking__is_instant
-        ) subq_54
+        ) subq_53
         GROUP BY
           metric_time__day
           , listing__country_latest

@@ -9,8 +9,8 @@ SELECT
   , SUM(__listings) AS listings
 FROM (
   SELECT
-    user__home_state_latest
-    , listings AS __listings
+    listings AS __listings
+    , user__home_state_latest
   FROM (
     SELECT
       subq_11.listing__is_lux_latest AS listing__is_lux_latest
@@ -31,6 +31,6 @@ FROM (
       subq_11.user = users_latest_src_28000.user_id
   ) subq_15
   WHERE listing__is_lux_latest OR listing__capacity_latest > 4
-) subq_17
+) subq_16
 GROUP BY
   user__home_state_latest

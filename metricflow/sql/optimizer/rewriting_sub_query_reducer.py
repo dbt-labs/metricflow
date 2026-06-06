@@ -89,8 +89,8 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     Unlike SqlSubQueryReducerVisitor, this will re-write expressions to realize more reductions.
     """
 
-    def __init__(self, prevent_where_hoist_with_aggregates: bool = False) -> None:  # noqa: D107
-        self._prevent_where_hoist_with_aggregates = prevent_where_hoist_with_aggregates
+    def __init__(self, has_ambiguous_alias_resolution_in_where: bool = False) -> None:  # noqa: D107
+        self._has_ambiguous_alias_resolution_in_where = has_ambiguous_alias_resolution_in_where
 
     def _reduce_parents(
         self,
@@ -303,17 +303,22 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         if len(from_source_node_as_select_node.group_bys) > 0 and node.where:
             return False
 
-        # ClickHouse-specific guard: if the inner (FROM) subquery has a WHERE and this SELECT has aggregate functions,
-        # hoisting the WHERE would place it alongside GROUP BY + aggregation in the merged node. ClickHouse's new query
-        # analyzer (enable_analyzer=1) resolves the WHERE column reference to the SELECT aggregate alias instead of the
-        # source column when the names match, causing Code 184 ILLEGAL_AGGREGATION. This guard is opt-in and only
-        # enabled for ClickHouse via the prevent_where_hoist_with_aggregates flag.
-        if (
-            self._prevent_where_hoist_with_aggregates
-            and from_source_node_as_select_node.where is not None
-            and any(col.expr.lineage.contains_aggregate_exprs for col in node.select_columns)
-        ):
-            return False
+        # Guard for engines with early alias resolution in WHERE (e.g. ClickHouse):
+        #
+        # ClickHouse's query analyzer resolves unqualified column names in WHERE to SELECT aliases when names match.
+        # This violates standard SQL evaluation order (WHERE is evaluated before SELECT aliases are assigned).
+        #
+        # SqlColumnReferenceExpression always includes a table alias (e.g. subq.col), making it unambiguous after
+        # hoisting. SqlStringExpression is raw SQL text that may contain unqualified column names — the only vector
+        # for alias collisions after reduction.
+        #
+        # If the FROM source's WHERE contains SqlStringExpression, the hoisted unqualified reference could be
+        # misresolved to a SELECT alias (causing ILLEGAL_AGGREGATION for aggregates, or silent wrong results for
+        # non-aggregate expressions like COALESCE).
+        if self._has_ambiguous_alias_resolution_in_where:
+            from_where = from_source_node_as_select_node.where
+            if from_where is not None and from_where.lineage.contains_string_exprs:
+                return False
 
         # If the parent has a GROUP BY, the case where it's easiest to merge this with the parent is if all select
         # columns are column references.
@@ -888,15 +893,15 @@ class SqlRewritingSubQueryReducer(SqlPlanOptimizer):
     def __init__(
         self,
         use_column_alias_in_group_bys: bool = False,
-        prevent_where_hoist_with_aggregates: bool = False,
+        has_ambiguous_alias_resolution_in_where: bool = False,
     ) -> None:  # noqa: D107
         self._use_column_alias_in_group_bys = use_column_alias_in_group_bys
-        self._prevent_where_hoist_with_aggregates = prevent_where_hoist_with_aggregates
+        self._has_ambiguous_alias_resolution_in_where = has_ambiguous_alias_resolution_in_where
 
     def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
         result = node.accept(
             SqlRewritingSubQueryReducerVisitor(
-                prevent_where_hoist_with_aggregates=self._prevent_where_hoist_with_aggregates,
+                has_ambiguous_alias_resolution_in_where=self._has_ambiguous_alias_resolution_in_where,
             )
         )
         if self._use_column_alias_in_group_bys:

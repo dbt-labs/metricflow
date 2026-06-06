@@ -20,8 +20,8 @@ FROM (
         , SUM(__paraguayan_customers) AS customer_id__customer_third_hop_id__paraguayan_customers
       FROM (
         SELECT
-          customer_id__customer_third_hop_id
-          , paraguayan_customers AS __paraguayan_customers
+          paraguayan_customers AS __paraguayan_customers
+          , customer_id__customer_third_hop_id
         FROM (
           SELECT
             customer_third_hop_id AS customer_id__customer_third_hop_id
@@ -30,7 +30,7 @@ FROM (
           FROM ***************************.customer_other_data customer_other_data_src_22000
         ) subq_30
         WHERE customer_id__country = 'paraguay'
-      ) subq_32
+      ) subq_31
       GROUP BY
         customer_id__customer_third_hop_id
     ) subq_35
@@ -38,4 +38,4 @@ FROM (
       third_hop_table_src_22000.customer_third_hop_id = subq_35.customer_id__customer_third_hop_id
   ) subq_37
   WHERE customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers > 0
-) subq_39
+) subq_38

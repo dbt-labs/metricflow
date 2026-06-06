@@ -9,8 +9,8 @@ SELECT
   , SUM(__bookings) AS bookings
 FROM (
   SELECT
-    booking__is_instant
-    , bookings AS __bookings
+    bookings AS __bookings
+    , booking__is_instant
   FROM (
     SELECT
       subq_12.booking__is_instant AS booking__is_instant
@@ -29,6 +29,6 @@ FROM (
       subq_12.listing = listings_latest_src_28000.listing_id
   ) subq_17
   WHERE listing__country_latest = 'us'
-) subq_19
+) subq_18
 GROUP BY
   booking__is_instant

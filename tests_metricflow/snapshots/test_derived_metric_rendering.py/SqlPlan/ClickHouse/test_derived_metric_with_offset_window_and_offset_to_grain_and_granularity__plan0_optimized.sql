@@ -26,21 +26,16 @@ FROM (
     , MAX(subq_43.bookings_1_month_ago) AS bookings_1_month_ago
   FROM (
     SELECT
-      metric_time__year
-      , SUM(__bookings) AS month_start_bookings
-    FROM (
-      SELECT
-        rss_28018_cte.ds__year AS metric_time__year
-        , sma_28009_cte.__bookings AS __bookings
-      FROM rss_28018_cte
-      INNER JOIN
-        sma_28009_cte
-      ON
-        toStartOfMonth(rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
-      WHERE rss_28018_cte.ds__year = rss_28018_cte.ds__day
-    ) subq_31
+      rss_28018_cte.ds__year AS metric_time__year
+      , SUM(sma_28009_cte.__bookings) AS month_start_bookings
+    FROM rss_28018_cte
+    INNER JOIN
+      sma_28009_cte
+    ON
+      toStartOfMonth(rss_28018_cte.ds__day) = sma_28009_cte.metric_time__day
+    WHERE rss_28018_cte.ds__year = rss_28018_cte.ds__day
     GROUP BY
-      metric_time__year
+      rss_28018_cte.ds__year
   ) subq_33
   FULL OUTER JOIN (
     SELECT

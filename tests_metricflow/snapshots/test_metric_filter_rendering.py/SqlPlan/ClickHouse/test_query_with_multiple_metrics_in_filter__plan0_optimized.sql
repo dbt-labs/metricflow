@@ -50,4 +50,4 @@ FROM (
       subq_38.listing = subq_51.listing
   ) subq_53
   WHERE listing__bookings > 2 AND listing__bookers > 1
-) subq_55
+) subq_54
