@@ -66,7 +66,7 @@ from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSql
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
 from metricflow.plan_conversion.to_sql_plan.output_column_orderer import (
     InputOrderPreservingOrderer,
-    InputOrderPreservingTypeGroupedOrderer,
+    LegacyTypeGroupedOrderer,
     OutputColumnOrderer,
     TypeGroupedOrderer,
 )
@@ -636,11 +636,11 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         if mf_query_request.order_output_columns_by_input_order:
             output_column_orderer = InputOrderPreservingOrderer(query_spec.input_spec_order)
         # Since the passthrough optimization can change the output column order, use
-        # `InputOrderPreservingTypeGroupedOrderer` so that it's somewhat sensible.
+        # `TypeGroupedOrderer` during the rollout.
         elif DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in mf_query_request.dataflow_plan_optimizations:
-            output_column_orderer = InputOrderPreservingTypeGroupedOrderer(query_spec.input_spec_order)
+            output_column_orderer = TypeGroupedOrderer(query_spec.input_spec_order)
         else:
-            output_column_orderer = TypeGroupedOrderer()
+            output_column_orderer = LegacyTypeGroupedOrderer()
 
         convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(
             dataflow_plan=dataflow_plan,
