@@ -66,14 +66,18 @@ class TypeGroupedOrderer(OutputColumnOrderer):
     def order_columns(
         self, spec_to_columns_mapping: Mapping[InstanceSpec, Sequence[SqlSelectColumn]]
     ) -> Sequence[SqlSelectColumn]:
-        specs_in_order = TypeGroupedOrderer._OrderByTypeTransform(self._input_spec_order).transform(
-            InstanceSpecSet.create_from_specs(spec_to_columns_mapping)
-        )
-        select_columns: list[SqlSelectColumn] = []
-        for spec in specs_in_order:
-            select_columns.extend(spec_to_columns_mapping[spec])
+        try:
+            specs_in_order = TypeGroupedOrderer._OrderByTypeTransform(self._input_spec_order).transform(
+                InstanceSpecSet.create_from_specs(spec_to_columns_mapping)
+            )
+            select_columns: list[SqlSelectColumn] = []
+            for spec in specs_in_order:
+                select_columns.extend(spec_to_columns_mapping[spec])
 
-        return select_columns
+            return select_columns
+        except Exception:
+            logger.exception("Error resolving output column order falling back to legacy order")
+            return LegacyTypeGroupedOrderer().order_columns(spec_to_columns_mapping)
 
     class _OrderByTypeTransform(InstanceSpecSetTransform):
         def __init__(self, input_spec_order: InputSpecOrder) -> None:  # noqa: D107
@@ -128,14 +132,15 @@ class InputOrderPreservingOrderer(OutputColumnOrderer):
         for spec in self._input_spec_order.group_by_item_specs + self._input_spec_order.metric_specs:
             select_columns = spec_to_columns_mapping.get(spec)
             if select_columns is None:
-                raise RuntimeError(
+                logger.error(
                     LazyFormat(
                         "Spec missing from select column mapping. Check generation of `input_spec_order`"
-                        " and `spec_to_columns_mapping`.",
+                        " and `spec_to_columns_mapping`. Falling back to legacy column order.",
                         missing_spec=spec,
                         input_spec_order=self._input_spec_order,
                     )
                 )
+                return LegacyTypeGroupedOrderer().order_columns(spec_to_columns_mapping)
             results.extend(select_columns)
 
         return results
