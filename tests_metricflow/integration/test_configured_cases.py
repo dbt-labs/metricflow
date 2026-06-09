@@ -31,7 +31,7 @@ from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
-from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
+from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, OutputColumnOrderMode
 from metricflow.protocols.sql_client import SqlClient
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
@@ -374,7 +374,7 @@ def _test_case(
             order_by_names=case.order_bys,
             min_max_only=case.min_max_only,
             apply_group_by=case.apply_group_by,
-            order_output_columns_by_input_order=True,
+            output_column_order_mode=OutputColumnOrderMode.INPUT_ORDER,
             dataflow_plan_optimizations=dataflow_optimizers,
         )
     )
