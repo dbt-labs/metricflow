@@ -3,7 +3,7 @@ test_filename: test_internal_manifest.py
 docstring:
   Test that an invalid metric is detected.
 ---
-query_8f3ebb7d:
+query_e0e62a72:
   status: MF_EXCEPTION
   mf_exception:
     Got error(s) during query resolution.
