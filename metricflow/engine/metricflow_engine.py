@@ -123,6 +123,22 @@ class MetricFlowQueryType(Enum):
     DIMENSION_VALUES = "dimension_values"
 
 
+class OutputColumnOrderMode(Enum):
+    """Describes the ordering of the columns in the output SQL.
+
+    See associated `OutputColumnOrderer` classes.
+    """
+
+    # Columns are grouped by the spec type, but columns in each group are in an arbitrary order that depends on
+    # how MF generates the SQL.
+    LEGACY_TYPE_GROUPED = "legacy"
+    # Columns are grouped by the spec type (e.g. time dimensions, entities, ...), but columns in each group are in
+    # the same order as the inputs.
+    TYPE_GROUPED = "type_grouped"
+    # Columns are in the order of the inputs.
+    INPUT_ORDER = "input_order"
+
+
 @dataclass(frozen=True)
 class MetricFlowQueryRequest:
     """Encapsulates the parameters for a metric query.
@@ -142,9 +158,7 @@ class MetricFlowQueryRequest:
     output_table: If specified, output the result data to this table instead of a result data_table.
     sql_optimization_level: The level of optimization for the generated SQL.
     query_type: Type of MetricFlow query.
-    order_output_columns_by_input_order: The columns in the output are arranged in groups as described in
-    `CreateSelectColumnsForInstances`. If this is set to True, the order of the columns in each group follows the order
-    as described by inputs (e.g. `metric_names`).
+    output_column_order_mode: The ordering mode to use for columns in the output SQL.
     """
 
     request_id: MetricFlowRequestId
@@ -164,7 +178,7 @@ class MetricFlowQueryRequest:
     sql_optimization_level: SqlOptimizationLevel
     dataflow_plan_optimizations: frozenset[DataflowPlanOptimization]
     query_type: MetricFlowQueryType
-    order_output_columns_by_input_order: bool
+    output_column_order_mode: OutputColumnOrderMode
 
     @staticmethod
     def create(  # noqa: D102
@@ -185,7 +199,7 @@ class MetricFlowQueryRequest:
         query_type: MetricFlowQueryType = MetricFlowQueryType.METRIC,
         min_max_only: bool = False,
         apply_group_by: bool = True,
-        order_output_columns_by_input_order: bool = False,
+        output_column_order_mode: Optional[OutputColumnOrderMode] = None,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}") if request_id is None else request_id,
@@ -209,7 +223,9 @@ class MetricFlowQueryRequest:
             query_type=query_type,
             min_max_only=min_max_only,
             apply_group_by=apply_group_by,
-            order_output_columns_by_input_order=order_output_columns_by_input_order,
+            output_column_order_mode=output_column_order_mode
+            if output_column_order_mode is not None
+            else OutputColumnOrderMode.LEGACY_TYPE_GROUPED,
         )
 
     def with_request_id(self, request_id: MetricFlowRequestId) -> MetricFlowQueryRequest:  # noqa: D102
@@ -231,7 +247,7 @@ class MetricFlowQueryRequest:
             sql_optimization_level=self.sql_optimization_level,
             dataflow_plan_optimizations=self.dataflow_plan_optimizations,
             query_type=self.query_type,
-            order_output_columns_by_input_order=self.order_output_columns_by_input_order,
+            output_column_order_mode=self.output_column_order_mode,
         )
 
 
@@ -632,15 +648,15 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             sql_optimization_level=mf_query_request.sql_optimization_level,
         )
 
-        output_column_orderer: OutputColumnOrderer
-        if mf_query_request.order_output_columns_by_input_order:
-            output_column_orderer = InputOrderPreservingOrderer(query_spec.input_spec_order)
-        # Since the passthrough optimization can change the output column order, use
-        # `TypeGroupedOrderer` during the rollout.
-        elif DataflowPlanOptimization.PASSTHROUGH_METRIC_EVALUATION in mf_query_request.dataflow_plan_optimizations:
+        output_column_order_mode = mf_query_request.output_column_order_mode
+        if output_column_order_mode is OutputColumnOrderMode.INPUT_ORDER:
+            output_column_orderer: OutputColumnOrderer = InputOrderPreservingOrderer(query_spec.input_spec_order)
+        elif output_column_order_mode is OutputColumnOrderMode.TYPE_GROUPED:
             output_column_orderer = TypeGroupedOrderer(query_spec.input_spec_order)
-        else:
+        elif output_column_order_mode is OutputColumnOrderMode.LEGACY_TYPE_GROUPED:
             output_column_orderer = LegacyTypeGroupedOrderer()
+        else:
+            assert_values_exhausted(output_column_order_mode)
 
         convert_to_execution_plan_result = _to_execution_plan_converter.convert_to_execution_plan(
             dataflow_plan=dataflow_plan,
