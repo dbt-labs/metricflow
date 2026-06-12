@@ -14,11 +14,12 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlStringLiteralExpression,
     SqlSubtractTimeIntervalExpression,
 )
+
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.athena import AthenaSqlExpressionRenderer, AthenaSqlPlanRenderer
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from scripts.generate_snapshots import ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
+from scripts.snapshot_engine_config import ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 
 
@@ -108,11 +109,25 @@ def test_athena_between_expr_does_not_wrap_timezone_aware_literals() -> None:
     )
 
 
+def test_athena_between_expr_wraps_timezone_naive_datetime_literals() -> None:
+    """Athena should wrap timezone-naive ISO datetime literals with TIMESTAMP syntax."""
+    renderer = AthenaSqlExpressionRenderer()
+    between_expr = SqlBetweenExpression.create(
+        column_arg=SqlColumnReferenceExpression.create(SqlColumnReference("alias", "event_time")),
+        start_expr=SqlStringLiteralExpression.create("2023-01-01T12:34:56"),
+        end_expr=SqlStringLiteralExpression.create("2023-01-10T23:45:01"),
+    )
+
+    assert renderer.visit_between_expr(between_expr).sql == (
+        "alias.event_time BETWEEN timestamp '2023-01-01T12:34:56' AND timestamp '2023-01-10T23:45:01'"
+    )
+
+
 def test_athena_plan_renderer_uses_athena_expression_renderer() -> None:
     """The plan renderer should be backed by the Athena expression renderer."""
     plan_renderer = AthenaSqlPlanRenderer()
 
-    assert type(plan_renderer.expr_renderer) is AthenaSqlExpressionRenderer
+    assert isinstance(plan_renderer.expr_renderer, AthenaSqlExpressionRenderer)
 
 
 def test_snapshot_engine_configurations_include_athena() -> None:

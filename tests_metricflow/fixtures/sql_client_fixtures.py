@@ -31,7 +31,13 @@ logger = logging.getLogger(__name__)
 
 
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
-    """Build test SQL client based on url, password, and schema defined in test environment."""
+    """Build the SQL client used by engine-backed MetricFlow tests.
+
+    Most engines can be exercised through a single SqlAlchemy engine and the matching MetricFlow renderer. BigQuery
+    needs a separate dry-run engine because BigQuery dry runs are enabled through URL query parameters rather than
+    per-query flags. Keeping that branch here makes the fixture boundary explicit and keeps engine-specific behavior
+    out of individual tests.
+    """
     connection_params = SqlEngineConnectionParameterSet.create_from_url(url)
     dialect = SqlDialect(connection_params.dialect)
 
@@ -93,7 +99,12 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
 def ddl_sql_client(
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> Generator[SqlClientWithDDLMethods, None, None]:
-    """Provides a SqlClient with the necessary DDL and data loading methods for test configuration."""
+    """Provide a DDL-capable SQL client for the configured test engine.
+
+    Tests use this fixture for schema setup, data loading, and teardown because those operations require capabilities
+    beyond the regular `SqlClient` protocol. Persistent source-schema runs intentionally keep the source schema after
+    the session so expensive fixture data can be reused by later engine-specific snapshot runs.
+    """
     sql_client = make_test_sql_client(
         url=mf_test_configuration.sql_engine_url,
         password=mf_test_configuration.sql_engine_password,
@@ -122,7 +133,7 @@ def ddl_sql_client(
 
 @pytest.fixture(scope="session")
 def sql_client(ddl_sql_client: SqlClientWithDDLMethods) -> SqlClient:
-    """Provides a standard SqlClient instance for running MetricFlow tests."""
+    """Expose the DDL-capable fixture as the standard SqlClient used by query tests."""
     return ddl_sql_client
 
 

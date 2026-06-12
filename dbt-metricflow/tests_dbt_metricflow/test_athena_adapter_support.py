@@ -13,7 +13,7 @@ def test_supported_adapter_types_include_athena() -> None:
 
     assert "athena" in adapter_values
     assert SupportedAdapterTypes.ATHENA.sql_engine_type is SqlEngine.ATHENA
-    assert type(SupportedAdapterTypes.ATHENA.sql_plan_renderer) is AthenaSqlPlanRenderer
+    assert isinstance(SupportedAdapterTypes.ATHENA.sql_plan_renderer, AthenaSqlPlanRenderer)
 
 
 def test_adapter_backed_sql_client_supports_athena_adapter() -> None:
@@ -24,4 +24,4 @@ def test_adapter_backed_sql_client_supports_athena_adapter() -> None:
     sql_client = AdapterBackedSqlClient(mock_adapter)
 
     assert sql_client.sql_engine_type is SqlEngine.ATHENA
-    assert type(sql_client.sql_plan_renderer) is AthenaSqlPlanRenderer
+    assert isinstance(sql_client.sql_plan_renderer, AthenaSqlPlanRenderer)
