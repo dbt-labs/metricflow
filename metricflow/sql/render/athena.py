@@ -23,9 +23,9 @@ class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
     def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:
         """Render a between expression for Athena.
 
-        Only wrap bounds with Athena's TIMESTAMP literal syntax when both bounds are string literals that strictly
-        parse as ISO date or datetime values. This avoids misclassifying arbitrary rendered SQL fragments as
-        timestamp literals.
+        Only wrap bounds with Athena's TIMESTAMP literal syntax when both bounds are string literals that parse as
+        Python fromisoformat-compatible dates or timezone-naive datetimes. This avoids misclassifying arbitrary
+        rendered SQL fragments as timestamp literals.
         """
         rendered_column_arg = self.render_sql_expr(node.column_arg)
         rendered_start_expr = self.render_sql_expr(node.start_expr)
@@ -51,7 +51,7 @@ class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
 
     @staticmethod
     def __is_iso_date_or_timestamp_literal(node: SqlStringLiteralExpression) -> bool:
-        """Return True when a string literal is a strict ISO date or timezone-naive datetime literal."""
+        """Return True for Python fromisoformat-compatible dates or timezone-naive datetimes."""
         literal_value = node.literal_value
         try:
             return datetime.fromisoformat(literal_value).tzinfo is None

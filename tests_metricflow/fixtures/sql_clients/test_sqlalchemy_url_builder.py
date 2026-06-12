@@ -116,10 +116,10 @@ def test_athena_url() -> None:
     assert url.password == "secret"
     assert url.host == "athena.eu-central-1.amazonaws.com"
     assert url.port == 443
-    assert url.database == "awsdatacatalog"
+    assert url.database == "analytics"
+    assert url.query["catalog_name"] == "awsdatacatalog"
     assert url.query["region_name"] == "eu-central-1"
     assert url.query["s3_staging_dir"] == "s3://bucket/dbt/"
-    assert url.query["schema_name"] == "analytics"
     assert url.query["profile_name"] == "analytics-profile"
 
 

@@ -258,9 +258,8 @@ class SqlAlchemyUrlBuilder:
             "region_name": region_name_values[0],
             "s3_staging_dir": s3_staging_dir_values[0],
         }
-
-        if schema:
-            query_params["schema_name"] = schema
+        if connection_params.database:
+            query_params["catalog_name"] = connection_params.database
 
         aws_profile_name_values = connection_params.get_query_field_values("aws_profile_name")
         if len(aws_profile_name_values) > 1:
@@ -276,6 +275,6 @@ class SqlAlchemyUrlBuilder:
             password=password or None,
             host=f"athena.{region_name_values[0]}.amazonaws.com",
             port=connection_params.port or 443,
-            database=connection_params.database,
+            database=schema,
             query=query_params,
         )
