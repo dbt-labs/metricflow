@@ -123,6 +123,20 @@ def test_athena_between_expr_wraps_timezone_naive_datetime_literals() -> None:
     )
 
 
+def test_athena_between_expr_does_not_wrap_non_iso_string_literals() -> None:
+    """Athena should not wrap arbitrary non-ISO string literals with TIMESTAMP syntax."""
+    renderer = AthenaSqlExpressionRenderer()
+    between_expr = SqlBetweenExpression.create(
+        column_arg=SqlColumnReferenceExpression.create(SqlColumnReference("alias", "event_time")),
+        start_expr=SqlStringLiteralExpression.create("not-a-date"),
+        end_expr=SqlStringLiteralExpression.create("also-not-a-date"),
+    )
+
+    assert renderer.visit_between_expr(between_expr).sql == (
+        "alias.event_time BETWEEN 'not-a-date' AND 'also-not-a-date'"
+    )
+
+
 def test_athena_plan_renderer_uses_athena_expression_renderer() -> None:
     """The plan renderer should be backed by the Athena expression renderer."""
     plan_renderer = AthenaSqlPlanRenderer()
