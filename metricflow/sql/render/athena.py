@@ -50,7 +50,7 @@ class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
         )
 
     @staticmethod
-    def __is_iso_timestamp_literal(node: SqlStringLiteralExpression) -> bool:
+    def __is_iso_date_or_timestamp_literal(node: SqlStringLiteralExpression) -> bool:
         """Return True when a string literal is a strict ISO date or timezone-naive datetime literal."""
         literal_value = node.literal_value
         try:
@@ -69,7 +69,7 @@ class AthenaSqlExpressionRenderer(TrinoSqlExpressionRenderer):
         if start_expr is None or end_expr is None:
             return False
 
-        return self.__is_iso_timestamp_literal(start_expr) and self.__is_iso_timestamp_literal(end_expr)
+        return self.__is_iso_date_or_timestamp_literal(start_expr) and self.__is_iso_date_or_timestamp_literal(end_expr)
 
 
 class AthenaSqlPlanRenderer(TrinoSqlPlanRenderer):
