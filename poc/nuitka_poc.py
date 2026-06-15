@@ -11,7 +11,7 @@ Usage (run via hatch to get the full dev dependency set):
 
 Validation workflow:
   python poc/nuitka_poc.py --manifest-dir $MANIFEST > poc/reference.sql
-  poc/nuitka_poc.dist/nuitka_poc --manifest-dir $MANIFEST > poc/nuitka.sql
+  poc/nuitka_poc.dist/nuitka_poc.bin --manifest-dir $MANIFEST > poc/nuitka.sql
   diff poc/reference.sql poc/nuitka.sql   # must be empty
 """
 from __future__ import annotations

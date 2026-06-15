@@ -157,7 +157,7 @@ compile = [
 ]
 validate = [
   "python poc/nuitka_poc.py --manifest-dir metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_00_minimal_manifest > poc/reference.sql",
-  "poc/nuitka_poc.dist/nuitka_poc --manifest-dir metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_00_minimal_manifest > poc/nuitka.sql",
+  "poc/nuitka_poc.dist/nuitka_poc.bin --manifest-dir metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_00_minimal_manifest > poc/nuitka.sql",
   "diff poc/reference.sql poc/nuitka.sql",
 ]
 
