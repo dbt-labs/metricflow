@@ -153,7 +153,7 @@ extra-dependencies = ["nuitka"]
 
 [tool.hatch.envs.nuitka-build.scripts]
 compile = [
-  "python -m nuitka --standalone --follow-imports --include-package=metricflow --include-package=metricflow_semantics --include-package=metricflow_semantic_interfaces --include-package=dbt_semantic_interfaces --output-dir=poc/ poc/nuitka_poc.py",
+  "python -m nuitka --standalone --follow-imports --include-package=metricflow --include-package=metricflow_semantics --include-package=metricflow_semantic_interfaces --output-dir=poc/ poc/nuitka_poc.py",
 ]
 validate = [
   "python poc/nuitka_poc.py --manifest-dir metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_00_minimal_manifest > poc/reference.sql",
