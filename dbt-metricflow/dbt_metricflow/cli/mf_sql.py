@@ -187,8 +187,9 @@ def _build_fast_path_engine(manifest_source: str, dialect: str) -> MetricFlowEng
 @click.option(
     "--where",
     type=str,
-    default=None,
-    help=("SQL-like where statement string. Example: \"{{ Dimension('order_id__revenue') }} > 100\""),
+    multiple=True,
+    default=(),
+    help=("SQL-like where statement string. Repeat for multiple conditions (ANDed together). Example: \"{{ Dimension('order_id__revenue') }} > 100\""),
 )
 @click.option(
     "--start-time",
@@ -231,7 +232,7 @@ def cli(  # noqa: D103
     dialect: str,
     metrics: str,
     group_by: str,
-    where: Optional[str],
+    where: Sequence[str],
     start_time: Optional[str],
     end_time: Optional[str],
     order: str,
@@ -249,7 +250,7 @@ def cli(  # noqa: D103
         limit=limit,
         time_constraint_start=_parse_optional_datetime(start_time),
         time_constraint_end=_parse_optional_datetime(end_time),
-        where_constraints=[where] if where else None,
+        where_constraints=list(where) if where else None,
         order_by_names=_parse_csv(order),
     )
 
