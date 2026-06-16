@@ -4,8 +4,6 @@ from dataclasses import dataclass
 from typing import Mapping
 
 import pytest
-from dbt_semantic_interfaces.test_utils import as_datetime
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -14,6 +12,8 @@ from metricflow_semantics.time.time_spine_source import TimeSpineSource
 
 from metricflow.engine.metricflow_engine import MetricFlowEngine
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 @dataclass(frozen=True)

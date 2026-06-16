@@ -3,7 +3,7 @@ test_filename: test_time_spine_join_rendering.py
 docstring:
   Check filter hierarchy.
 
-      Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+  Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
 sql_engine: Postgres
 ---
 -- Write to DataTable
@@ -312,7 +312,13 @@ FROM (
               ) subq_0
             ) subq_1
           ) subq_2
-          WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
+          WHERE (
+            booking__is_instant
+          ) AND (
+            listing IS NOT NULL
+          ) AND (
+            metric_time__day > '2020-01-01'
+          )
         ) subq_3
       ) subq_4
       GROUP BY

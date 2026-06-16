@@ -8,6 +8,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_plan_snapshot_text_equal,
 )
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.dataflow.dataflow_plan import DataflowPlan, DataflowPlanNode
@@ -31,7 +32,7 @@ from metricflow.dataflow.nodes.offset_custom_granularity import OffsetCustomGran
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -65,7 +66,16 @@ def check_source_scan_optimization(  # noqa: D103
     )
 
     source_counter = _ReadSqlSourceNodeCounter()
-    assert source_counter.count_source_nodes(dataflow_plan) == expected_num_sources_in_unoptimized
+    source_node_count_in_unoptimized_plan = source_counter.count_source_nodes(dataflow_plan)
+
+    if source_node_count_in_unoptimized_plan != expected_num_sources_in_unoptimized:
+        raise AssertionError(
+            LazyFormat(
+                "Unexpected source node count in unoptimized dataflow plan",
+                source_node_count_in_unoptimized_plan=source_node_count_in_unoptimized_plan,
+                expected_num_sources_in_unoptimized=expected_num_sources_in_unoptimized,
+            )
+        )
 
     optimizer = SourceScanOptimizer()
     optimized_dataflow_plan = optimizer.optimize(dataflow_plan)
@@ -82,7 +92,15 @@ def check_source_scan_optimization(  # noqa: D103
         mf_test_configuration=mf_test_configuration,
         dag_graph=optimized_dataflow_plan,
     )
-    assert source_counter.count_source_nodes(optimized_dataflow_plan) == expected_num_sources_in_optimized
+    source_node_count_in_optimized_dataflow_plan = source_counter.count_source_nodes(optimized_dataflow_plan)
+    if source_node_count_in_optimized_dataflow_plan != expected_num_sources_in_optimized:
+        raise AssertionError(
+            LazyFormat(
+                "Unexpected source node count in optimized dataflow plan",
+                source_node_count_in_optimized_dataflow_plan=source_node_count_in_optimized_dataflow_plan,
+                expected_num_sources_in_optimized=expected_num_sources_in_optimized,
+            )
+        )
 
 
 class _ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
@@ -109,7 +127,7 @@ class _ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
     def visit_order_by_limit_node(self, node: OrderByLimitNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> int:  # noqa: D102
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def visit_write_to_result_data_table_node(self, node: WriteToResultDataTableNode) -> int:  # noqa: D102

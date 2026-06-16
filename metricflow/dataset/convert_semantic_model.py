@@ -5,15 +5,6 @@ import re
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple
 
-from dbt_semantic_interfaces.protocols.dimension import Dimension, DimensionType
-from dbt_semantic_interfaces.protocols.entity import Entity
-from dbt_semantic_interfaces.references import (
-    EntityReference,
-    SemanticModelElementReference,
-    SemanticModelReference,
-)
-from dbt_semantic_interfaces.type_enums.date_part import DatePart
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.aggregation_properties import AggregationState
 from metricflow_semantics.dag.id_prefix import DynamicIdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
@@ -53,6 +44,15 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_select_node import SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
+from metricflow_semantic_interfaces.protocols.dimension import Dimension, DimensionType
+from metricflow_semantic_interfaces.protocols.entity import Entity
+from metricflow_semantic_interfaces.references import (
+    EntityReference,
+    SemanticModelElementReference,
+    SemanticModelReference,
+)
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
 

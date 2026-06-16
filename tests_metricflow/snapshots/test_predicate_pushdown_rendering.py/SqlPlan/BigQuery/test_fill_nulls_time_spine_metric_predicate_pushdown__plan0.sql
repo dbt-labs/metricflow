@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with enabled.
 
-      TODO: support metric time filters
+  TODO: support metric time filters
 sql_engine: BigQuery
 ---
 -- Write to DataTable

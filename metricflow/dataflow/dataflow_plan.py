@@ -16,10 +16,10 @@ from metricflow_semantics.toolkit.comparison_helpers import ComparisonOtherType
 from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
 
 if typing.TYPE_CHECKING:
-    from dbt_semantic_interfaces.references import SemanticModelReference
     from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 
     from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
+    from metricflow_semantic_interfaces.references import SemanticModelReference
 
 logger = logging.getLogger(__name__)
 

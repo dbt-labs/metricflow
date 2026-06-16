@@ -3,13 +3,13 @@ test_filename: test_cli.py
 docstring:
   Tests the message output of the tutorial.
 
-      The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
-      so from an end user perspective it's little more than the output with -m.
+  The tutorial now essentially compiles a semantic manifest and then asks the user to run dbt seed,
+  so from an end user perspective it's little more than the output with -m.
 
-      The tutorial currently requires execution from a dbt project path. Rather than go all the way on testing the
-      tutorial given the path and dbt project requirements, we simply check the message output. When we allow for
-      project path overrides it might warrant a more complete test of the semantic manifest building steps in the
-      tutorial flow.
+  The tutorial currently requires execution from a dbt project path. Rather than go all the way on testing the
+  tutorial given the path and dbt project requirements, we simply check the message output. When we allow for
+  project path overrides it might warrant a more complete test of the semantic manifest building steps in the
+  tutorial flow.
 ---
 🤓 Please run the following steps:
 
@@ -37,7 +37,7 @@ docstring:
         --start-time 2022-03-20 --end-time 2022-04-01
 12. Before integrating metrics into your project, read up on adding a time spine.
     (<Control>+<Left Click> may work in your terminal to follow the link)
-       https://docs.getdbt.com/docs/build/metricflow-time-spine?version=1.10
+       https://docs.getdbt.com/docs/build/metricflow-time-spine?version=1.11
 
 If you found MetricFlow to be helpful, consider adding a Github star to promote the project:
        https://github.com/dbt-labs/metricflow

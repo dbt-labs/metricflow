@@ -122,12 +122,12 @@ test_filename: test_dataflow_plan_builder.py
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec =                                                            -->
-                    <!--   MetricSpec(                                                            -->
-                    <!--     element_name='bookings_fill_nulls_with_0',                           -->
-                    <!--     alias='bookings_2_weeks_ago',                                        -->
-                    <!--     offset_window=PydanticMetricTimeWindow(count=14, granularity='day'), -->
-                    <!--   )                                                                      -->
+                    <!-- metric_spec =                                              -->
+                    <!--   MetricSpec(                                              -->
+                    <!--     element_name='bookings_fill_nulls_with_0',             -->
+                    <!--     alias='bookings_2_weeks_ago',                          -->
+                    <!--     offset_window=TimeWindow(count=14, granularity='day'), -->
+                    <!--   )                                                        -->
                     <JoinToTimeSpineNode>
                         <!-- description = 'Join to Time Spine Dataset' -->
                         <!-- node_id = NodeId(id_str='jts_1') -->
@@ -144,7 +144,7 @@ test_filename: test_dataflow_plan_builder.py
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- join_type = LEFT_OUTER -->
-                        <!-- standard_offset_window = PydanticMetricTimeWindow(count=14, granularity='day') -->
+                        <!-- standard_offset_window = TimeWindow(count=14, granularity='day') -->
                         <AggregateSimpleMetricInputsNode>
                             <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                             <!-- node_id = NodeId(id_str='am_1') -->

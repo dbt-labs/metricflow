@@ -1,0 +1,106 @@
+---
+semantic_model:
+  name: listings_latest
+  defaults:
+    agg_time_dimension: ds
+  description: listings_latest
+  node_relation:
+    alias: dim_listings_latest
+    schema_name: $source_schema
+  entities:
+    - name: listing
+      type: primary
+      expr: listing_id
+    - name: user
+      type: foreign
+      expr: user_id
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: day
+      expr: created_at
+    - name: created_at
+      type: time
+      type_params:
+        time_granularity: day
+    - name: country_latest
+      type: categorical
+      expr: country
+    - name: is_lux_latest
+      type: categorical
+      expr: is_lux
+    - name: capacity_latest
+      type: categorical
+      expr: capacity
+
+---
+metric:
+  name: listings
+  description: listings
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: listings_latest
+      agg: sum
+
+---
+metric:
+  name: lux_listings
+  description: lux_listings
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: listings_latest
+      agg: sum
+  filter: "{{ Dimension('listing__is_lux_latest') }}"
+
+---
+metric:
+  name: smallest_listing
+  description: smallest listing
+  type: simple
+  type_params:
+    expr: capacity
+    metric_aggregation_params:
+      semantic_model: listings_latest
+      agg: min
+
+---
+metric:
+  name: largest_listing
+  description: largest listing
+  type: simple
+  type_params:
+    expr: capacity
+    metric_aggregation_params:
+      semantic_model: listings_latest
+      agg: max
+
+---
+metric:
+  name: ever_active_listings
+  description: |
+    number of listings that have had at least 2 bookings ever
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: listings_latest
+      agg: sum
+  filter: "{{ Metric('bookings', group_by=['listing']) }} > 2"
+
+---
+metric:
+  name: active_listings
+  description: |
+    number of listings that had at least 2 bookings on given date
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: listings_latest
+      agg: sum
+  filter: "{{ Metric('bookings', group_by=['listing', 'metric_time']) }} > 2"

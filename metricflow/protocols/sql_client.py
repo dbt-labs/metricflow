@@ -4,12 +4,12 @@ from abc import abstractmethod
 from enum import Enum
 from typing import Protocol, Set
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 
 class SqlEngine(Enum):

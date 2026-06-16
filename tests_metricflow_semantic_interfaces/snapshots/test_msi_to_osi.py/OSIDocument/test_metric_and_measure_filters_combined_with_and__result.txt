@@ -1,0 +1,45 @@
+test_name: test_metric_and_measure_filters_combined_with_and
+test_filename: test_msi_to_osi.py
+---
+OSIDocument(
+  version='0.1.1',
+  dialects=[ANSI_SQL],
+  semantic_model=[
+    OSISemanticModel(
+      name='semantic_model',
+      datasets=[
+        OSIDataset(
+          name='orders',
+          source='schema.table',
+          fields=[
+            OSIField(
+              name='revenue',
+              expression=OSIExpression(
+                dialects=[
+                  OSIDialectExpression(
+                    dialect=ANSI_SQL,
+                    expression='amount',
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+      metrics=[
+        OSIMetric(
+          name='paid_intl_revenue',
+          expression=OSIExpression(
+            dialects=[
+              OSIDialectExpression(
+                dialect=ANSI_SQL,
+                expression=("SUM(CASE WHEN (status = 'paid') AND (region = "
+                 "'intl') THEN orders.amount END)"),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ],
+)

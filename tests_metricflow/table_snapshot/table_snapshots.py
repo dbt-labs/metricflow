@@ -10,13 +10,13 @@ from typing import Iterable, List, Optional, Sequence, Tuple
 
 import dateutil.parser
 import yaml
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.base import FrozenBaseModel
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 
 from metricflow.data_table.column_types import CellValue
 from metricflow.data_table.mf_table import MetricFlowDataTable
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.base import FrozenBaseModel
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 
 logger = logging.getLogger(__name__)

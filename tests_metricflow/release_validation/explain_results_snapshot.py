@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Iterable
 
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from tests_metricflow.release_validation.explain_runner import ExplainQueryStatus, ExplainTaskResult
 from tests_metricflow.snapshot_utils import assert_str_snapshot_equal
 

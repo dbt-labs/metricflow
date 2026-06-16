@@ -4,7 +4,6 @@ from typing import Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import TimeDimensionReference
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
@@ -14,6 +13,7 @@ from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilde
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.references import TimeDimensionReference
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.plan_conversion.test_dataflow_to_sql_plan import convert_and_check
 
@@ -80,8 +80,8 @@ def test_simple_query_with_metric_time_dimension(
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_payments"),
+                MetricSpec.create(element_name="bookings"),
+                MetricSpec.create(element_name="booking_payments"),
             ),
             dimension_specs=(),
             time_dimension_specs=(MTD_SPEC_DAY,),

@@ -3,10 +3,10 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we expect to skip predicate pushdown because it is unsafe.
 
-      This is the query rendering test for the scenarios where the push down evaluation indicates that we should
-      skip pushdown, typically due to a lack of certainty over whether or not the query will return the same results.
+  This is the query rendering test for the scenarios where the push down evaluation indicates that we should
+  skip pushdown, typically due to a lack of certainty over whether or not the query will return the same results.
 
-      The specific scenario is less important here than that it match one that should not be pushed down.
+  The specific scenario is less important here than that it match one that should not be pushed down.
 sql_engine: Postgres
 ---
 -- Constrain Output with WHERE

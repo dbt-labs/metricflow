@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
@@ -32,8 +33,8 @@ class AliasSpecsNode(DataflowPlanNode, ABC):
         assert len(self.change_specs) > 0, "Must have at least one value in change_specs for AliasSpecsNode."
 
     @staticmethod
-    def create(parent_node: DataflowPlanNode, change_specs: Tuple[SpecToAlias, ...]) -> AliasSpecsNode:  # noqa: D102
-        return AliasSpecsNode(parent_nodes=(parent_node,), change_specs=change_specs)
+    def create(parent_node: DataflowPlanNode, change_specs: Iterable[SpecToAlias]) -> AliasSpecsNode:  # noqa: D102
+        return AliasSpecsNode(parent_nodes=(parent_node,), change_specs=tuple(change_specs))
 
     @classmethod
     def id_prefix(cls) -> IdPrefix:  # noqa: D102

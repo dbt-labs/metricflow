@@ -15,7 +15,7 @@ FROM (
   -- Join Standard Outputs
   -- Select: ['__third_hop_count', 'customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count']
   SELECT
-    subq_49.account_id__customer_id__customer_third_hop_id__txn_count AS customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
+    subq_59.account_id__customer_id__customer_third_hop_id__txn_count AS customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count
     , third_hop_table_src_22000.customer_third_hop_id AS third_hop_count
   FROM ***************************.third_hop_table third_hop_table_src_22000
   LEFT OUTER JOIN (
@@ -26,7 +26,7 @@ FROM (
     -- Compute Metrics via Expressions
     -- Select: ['account_id__customer_id__customer_third_hop_id', 'account_id__customer_id__customer_third_hop_id__txn_count']
     SELECT
-      subq_43.customer_id__customer_third_hop_id AS account_id__customer_id__customer_third_hop_id
+      subq_53.customer_id__customer_third_hop_id AS account_id__customer_id__customer_third_hop_id
       , SUM(account_month_txns_src_22000.txn_count) AS account_id__customer_id__customer_third_hop_id__txn_count
     FROM ***************************.account_month_txns account_month_txns_src_22000
     LEFT OUTER JOIN (
@@ -41,17 +41,17 @@ FROM (
         ***************************.customer_other_data customer_other_data_src_22000
       ON
         bridge_table_src_22000.customer_id = customer_other_data_src_22000.customer_id
-    ) subq_43
+    ) subq_53
     ON
       (
-        account_month_txns_src_22000.account_id = subq_43.account_id
+        account_month_txns_src_22000.account_id = subq_53.account_id
       ) AND (
-        DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_43.ds_partitioned__day
+        DATETIME_TRUNC(account_month_txns_src_22000.ds_partitioned, day) = subq_53.ds_partitioned__day
       )
     GROUP BY
       account_id__customer_id__customer_third_hop_id
-  ) subq_49
+  ) subq_59
   ON
-    third_hop_table_src_22000.customer_third_hop_id = subq_49.account_id__customer_id__customer_third_hop_id
-) subq_51
+    third_hop_table_src_22000.customer_third_hop_id = subq_59.account_id__customer_id__customer_third_hop_id
+) subq_61
 WHERE customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2

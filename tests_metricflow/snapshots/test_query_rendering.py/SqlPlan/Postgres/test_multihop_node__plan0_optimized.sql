@@ -11,7 +11,7 @@ sql_engine: Postgres
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_25.customer_id__customer_name AS account_id__customer_id__customer_name
+  subq_28.customer_id__customer_name AS account_id__customer_id__customer_name
   , SUM(account_month_txns_src_22000.txn_count) AS txn_count
 FROM ***************************.account_month_txns account_month_txns_src_22000
 LEFT OUTER JOIN (
@@ -30,12 +30,12 @@ LEFT OUTER JOIN (
     ) AND (
       DATE_TRUNC('day', bridge_table_src_22000.ds_partitioned) = DATE_TRUNC('day', customer_table_src_22000.ds_partitioned)
     )
-) subq_25
+) subq_28
 ON
   (
-    account_month_txns_src_22000.account_id = subq_25.account_id
+    account_month_txns_src_22000.account_id = subq_28.account_id
   ) AND (
-    DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) = subq_25.ds_partitioned__day
+    DATE_TRUNC('day', account_month_txns_src_22000.ds_partitioned) = subq_28.ds_partitioned__day
   )
 GROUP BY
-  subq_25.customer_id__customer_name
+  subq_28.customer_id__customer_name

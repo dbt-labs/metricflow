@@ -5,7 +5,6 @@ from typing import Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -13,6 +12,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow_semantics.test_helpers.snapshot_helpers import assert_plan_snapshot_text_equal
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
+from metricflow_semantic_interfaces.references import EntityReference
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.fixtures.sql_client_fixtures import sql_client  # noqa: F401, F403
@@ -35,7 +35,7 @@ def test_cyclic_join(
     """Tests that sources with the same joinable keys don't cause cycle issues."""
     dataflow_plan = cyclic_join_manifest_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="listings"),),
+            metric_specs=(MetricSpec.create(element_name="listings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="capacity_latest",

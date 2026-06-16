@@ -6,7 +6,7 @@ import pytest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 
-from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowQueryResult
+from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, MetricFlowQueryResult, OutputColumnOrderMode
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from tests_metricflow.integration.conftest import IntegrationTestHelpers
@@ -20,14 +20,14 @@ def test_output_column_order(
     sql_client: SqlClient,
     it_helpers: IntegrationTestHelpers,
 ) -> None:
-    """Test the order of output columns when `order_output_columns_by_input_order=True`."""
+    """Test output columns when `OutputColumnOrderMode.INPUT_ORDER` is used."""
     metric_names: AnyLengthTuple[str] = ("bookings", "listings")
     group_by_names: AnyLengthTuple[str] = ("metric_time__day", "listing", "listing__country_latest")
     query_result: MetricFlowQueryResult = it_helpers.mf_engine.query(
-        MetricFlowQueryRequest.create_with_random_request_id(
+        MetricFlowQueryRequest.create(
             metric_names=metric_names,
             group_by_names=group_by_names,
-            order_output_columns_by_input_order=True,
+            output_column_order_mode=OutputColumnOrderMode.INPUT_ORDER,
         )
     )
     assert query_result.result_df is not None
@@ -53,10 +53,10 @@ def test_output_column_order(
 
     for optimization_level in SqlOptimizationLevel:
         query_result = it_helpers.mf_engine.query(
-            MetricFlowQueryRequest.create_with_random_request_id(
+            MetricFlowQueryRequest.create(
                 metric_names=reversed_metric_names,
                 group_by_names=reversed_group_by_names,
-                order_output_columns_by_input_order=True,
+                output_column_order_mode=OutputColumnOrderMode.INPUT_ORDER,
                 sql_optimization_level=optimization_level,
             )
         )

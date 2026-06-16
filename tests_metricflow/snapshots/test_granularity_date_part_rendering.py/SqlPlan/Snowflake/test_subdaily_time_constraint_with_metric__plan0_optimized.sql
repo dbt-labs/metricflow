@@ -7,8 +7,8 @@ sql_engine: Snowflake
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  subq_27.metric_time__hour AS metric_time__hour
-  , subq_22.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
+  subq_28.metric_time__hour AS metric_time__hour
+  , subq_23.__subdaily_join_to_time_spine_metric AS subdaily_join_to_time_spine_metric
 FROM (
   -- Read From Time Spine 'mf_time_spine_hour'
   -- Change Column Aliases
@@ -19,7 +19,7 @@ FROM (
     ts AS metric_time__hour
   FROM ***************************.mf_time_spine_hour time_spine_src_28005
   WHERE ts BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-) subq_27
+) subq_28
 LEFT OUTER JOIN (
   -- Aggregate Inputs for Simple Metrics
   SELECT
@@ -36,10 +36,10 @@ LEFT OUTER JOIN (
       , 1 AS __subdaily_join_to_time_spine_metric
     FROM ***************************.dim_users users_ds_source_src_28000
     WHERE DATE_TRUNC('hour', archived_at) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
-  ) subq_21
+  ) subq_22
   GROUP BY
     metric_time__hour
-) subq_22
+) subq_23
 ON
-  subq_27.metric_time__hour = subq_22.metric_time__hour
-WHERE subq_27.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+  subq_28.metric_time__hour = subq_23.metric_time__hour
+WHERE subq_28.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'

@@ -3,7 +3,7 @@ test_filename: test_offset_metrics.py
 docstring:
   Test offset window metric queried with grain larger than offset grain.
 
-      Not a very useful query, but still demonstrates that we can handle these params.
+  Not a very useful query, but still demonstrates that we can handle these params.
 ---
 metric_time__year      bookings    bookings_1_month_ago    bookings_mom
 -------------------  ----------  ----------------------  --------------

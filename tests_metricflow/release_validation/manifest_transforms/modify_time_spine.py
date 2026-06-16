@@ -4,11 +4,12 @@ import copy
 import logging
 from typing import Optional
 
-from dbt_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 from metricflow_semantics.sql.sql_table import SqlTable
 from typing_extensions import override
+
+from metricflow_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.transformations.transform_rule import SemanticManifestTransformRule
 
 logger = logging.getLogger(__name__)
 

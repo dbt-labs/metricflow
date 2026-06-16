@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative grain to date metric queried with non-default grains.
 
-      Uses agg time dimension instead of metric_time. Excludes default grain.
+  Uses agg time dimension instead of metric_time. Excludes default grain.
 sql_engine: Trino
 ---
 -- Re-aggregate Metric via Group By

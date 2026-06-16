@@ -4,11 +4,11 @@ import logging
 from pathlib import Path
 
 import pytest
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from varname import nameof
 
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from tests_metricflow.fixtures.sql_clients.ddl_sql_client import SqlClientWithDDLMethods
 from tests_metricflow.release_validation.explain_runner import ExplainQueryStatus
 from tests_metricflow.release_validation.explain_tester import DuckDbExplainTester

@@ -1,0 +1,7 @@
+from __future__ import annotations
+
+from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
+
+from metricflow_semantic_interfaces.references import MetricReference
+
+EXAMPLE_FILTER_LOCATION = WhereFilterLocation.for_metric(MetricReference("example_metric"))

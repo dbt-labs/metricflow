@@ -3,8 +3,8 @@ test_filename: test_source_scan_optimizer.py
 docstring:
   Tests that 2 metrics from the same semantic model but where 1 is constrained results in 2 scans.
 
-      If there is a constraint for a metric, it needs to be handled in a separate query because the constraint applies to
-      all rows.
+  If there is a constraint for a metric, it needs to be handled in a separate query because the constraint applies to
+  all rows.
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>
@@ -73,10 +73,10 @@ docstring:
                         <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                         <!--   )                                                                             -->
                         <!-- distinct = False -->
-                        <WhereConstraintNode>
-                            <!-- description = 'Constrain Output with WHERE' -->
+                        <WhereFilterNode>
+                            <!-- description = 'Filter Output with WHERE' -->
                             <!-- node_id = NodeId(id_str='wcc_0') -->
-                            <!-- where_condition =                                           -->
+                            <!-- filter_spec =                                               -->
                             <!--   WhereFilterSpec(                                          -->
                             <!--     where_sql='booking__is_instant',                        -->
                             <!--     bind_parameters=SqlBindParameterSet(),                  -->
@@ -122,7 +122,7 @@ docstring:
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
                             </SelectorNode>
-                        </WhereConstraintNode>
+                        </WhereFilterNode>
                     </SelectorNode>
                 </AggregateSimpleMetricInputsNode>
             </ComputeMetricsNode>

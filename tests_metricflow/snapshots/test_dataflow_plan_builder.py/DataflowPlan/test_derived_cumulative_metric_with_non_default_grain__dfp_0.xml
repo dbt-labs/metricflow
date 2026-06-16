@@ -92,7 +92,7 @@ docstring:
                                         <!--       ),                                        -->
                                         <!--     ),                                          -->
                                         <!--   )                                             -->
-                                        <!-- window = PydanticMetricTimeWindow(count=2, granularity='month') -->
+                                        <!-- window = TimeWindow(count=2, granularity='month') -->
                                         <MetricTimeDimensionTransformNode>
                                             <!-- description = "Metric Time Dimension 'ds'" -->
                                             <!-- node_id = NodeId(id_str='sma_28015') -->

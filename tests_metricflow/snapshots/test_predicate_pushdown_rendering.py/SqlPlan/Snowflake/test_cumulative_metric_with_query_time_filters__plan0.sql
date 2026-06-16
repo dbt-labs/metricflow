@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests pushdown optimizer behavior for a query against a cumulative metric.
 
-      TODO: support metric time filters
+  TODO: support metric time filters
 sql_engine: Snowflake
 ---
 -- Write to DataTable

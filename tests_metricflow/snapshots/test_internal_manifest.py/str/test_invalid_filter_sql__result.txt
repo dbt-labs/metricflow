@@ -3,7 +3,7 @@ test_filename: test_internal_manifest.py
 docstring:
   Test that invalid SQL in a filter is detected.
 ---
-query_56a97413:
+query_7415c13c:
   status: SQL_EXCEPTION
   explain_sql:
     -- Constrain Output with WHERE
@@ -27,7 +27,7 @@ query_56a97413:
     GROUP BY
       metric_time__day
   sql_exception:
-    (duckdb.duckdb.BinderException) Binder Error: Referenced column "invalid_column" not found in FROM clause!
+    (_duckdb.BinderException) Binder Error: Referenced column "invalid_column" not found in FROM clause!
     Candidate bindings: "metric_time__day"
 
     LINE 18: WHERE invalid_column > 1

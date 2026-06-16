@@ -2,9 +2,27 @@
 sqlalchemy>=2.0.0, <2.1.0
 # DuckDB engine for DuckDB-backed, SqlAlchemy-based client
 duckdb-engine>=0.13.0, <0.14.0
-# Excluding duckdb 1.2.1 due to window functions returning incorrect results:
-# https://github.com/duckdb/duckdb/issues/16617
-# Version 1.4.0 seems to have issues as well, so pinning to <1.4.0 until those are resolved.
-duckdb !=1.2.1, <1.4.0
+duckdb >=1.5, <1.6
+graphviz>=0.18.2, <0.21
 tomli >=2.3.0, <3
 varname >=0.15.1, < 1
+# Developer tools
+mypy>=1.7.0, <1.8.0
+pre-commit>=3.2.2, <3.3.0
+Pympler >=1.1, <=2.0
+pytest-mock>=3.14.0, <3.15.0
+pytest-xdist>=3.6.0, <3.7.0
+pytest>=8.0.0, < 9.0.0
+termcolor>=3.0, <4.0
+types-PyYAML
+types-python-dateutil
+types-tabulate
+httpx>=0.24,<0.25
+hypothesis>=6.87,<7
+isort>=5.12,<6
+black>=23.3,<24
+types-Jinja2>=2.11,<3
+types-jsonschema>=4.17,<5
+# For release tools.
+dulwich>=1.2, <2.0
+PyGithub>=2.9, <3.0

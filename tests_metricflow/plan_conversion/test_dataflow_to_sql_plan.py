@@ -4,11 +4,6 @@ from typing import List, Mapping
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
-from dbt_semantic_interfaces.references import EntityReference, TimeDimensionReference
-from dbt_semantic_interfaces.test_utils import as_datetime
-from dbt_semantic_interfaces.type_enums.aggregation_type import AggregationType
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -19,7 +14,7 @@ from metricflow_semantics.semantic_graph.attribute_resolution.group_by_item_set 
 )
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
-from metricflow_semantics.specs.entity_spec import LinklessEntitySpec
+from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveDimensionSpec
 from metricflow_semantics.specs.order_by_spec import OrderBySpec
@@ -49,12 +44,17 @@ from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntiti
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
 from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
 from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+from metricflow.dataflow.nodes.where_filter import WhereFilterNode
 from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
+from metricflow_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from metricflow_semantic_interfaces.references import EntityReference, TimeDimensionReference
+from metricflow_semantic_interfaces.test_utils import as_datetime
+from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal, assert_sql_plan_text_equal
@@ -191,18 +191,21 @@ def test_filter_with_where_constraint_node(
         entity_links=(),
         time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
+    is_instant_spec = DimensionSpec(element_name="is_instant", entity_links=())
     selector_node = SelectorNode.create(
         parent_node=source_node,
         include_specs=InstanceSpecSet(
-            simple_metric_input_specs=(simple_metric_input_spec,), time_dimension_specs=(ds_spec,)
+            simple_metric_input_specs=(simple_metric_input_spec,),
+            dimension_specs=(is_instant_spec,),
+            time_dimension_specs=(ds_spec,),
         ),
-    )  # need to include ds_spec because where constraint operates on ds
+    )
     time_grain = ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY)
-    where_constraint_node = WhereConstraintNode.create(
+    where_constraint_node = WhereFilterNode.create(
         parent_node=selector_node,
-        where_specs=(
+        filter_specs=(
             WhereFilterSpec(
-                where_sql="booking__ds__day = '2020-01-01'",
+                where_sql="booking__ds__day = '2020-01-01' OR booking__ds__day = '2020-01-02'",
                 bind_parameters=SqlBindParameterSet(),
                 element_set=GroupByItemSet(
                     annotated_specs=(
@@ -211,6 +214,25 @@ def test_filter_with_where_constraint_node(
                             element_name="ds",
                             entity_links=(EntityReference(element_name="booking"),),
                             time_grain=time_grain,
+                            date_part=None,
+                            metric_subquery_entity_links=None,
+                            properties=(),
+                            origin_model_ids=(),
+                            derived_from_semantic_models=(),
+                        ),
+                    ),
+                ),
+            ),
+            WhereFilterSpec(
+                where_sql="booking__is_instant",
+                bind_parameters=SqlBindParameterSet(),
+                element_set=GroupByItemSet(
+                    annotated_specs=(
+                        AnnotatedSpec.create(
+                            element_type=LinkableElementType.DIMENSION,
+                            element_name="is_instant",
+                            entity_links=(EntityReference(element_name="booking"),),
+                            time_grain=None,
                             date_part=None,
                             metric_subquery_entity_links=None,
                             properties=(),
@@ -293,7 +315,8 @@ def test_single_join_node(
     simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
+    entity_reference = EntityReference(element_name="listing")
+    entity_spec = EntitySpec.create_from_reference(entity_reference)
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
@@ -325,7 +348,7 @@ def test_single_join_node(
         join_targets=[
             JoinDescription(
                 join_node=selector_node_for_dimension,
-                join_on_entity=entity_spec,
+                join_on_entity=entity_reference,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -355,7 +378,8 @@ def test_multi_join_node(
     simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
+    entity_reference = EntityReference(element_name="listing")
+    entity_spec = EntitySpec.create_from_reference(entity_reference)
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
@@ -386,14 +410,14 @@ def test_multi_join_node(
         join_targets=[
             JoinDescription(
                 join_node=selector_node_for_dimension,
-                join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
+                join_on_entity=entity_reference,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
             ),
             JoinDescription(
                 join_node=selector_node_for_dimension,
-                join_on_entity=LinklessEntitySpec.from_element_name(element_name="listing"),
+                join_on_entity=entity_reference,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -423,7 +447,8 @@ def test_compute_metrics_node(
     simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="bookings",
     )
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
+    entity_reference = EntityReference(element_name="listing")
+    entity_spec = EntitySpec.create_from_reference(entity_reference)
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
@@ -455,7 +480,7 @@ def test_compute_metrics_node(
         join_targets=[
             JoinDescription(
                 join_node=selector_node_for_dimension,
-                join_on_entity=entity_spec,
+                join_on_entity=entity_reference,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -468,7 +493,7 @@ def test_compute_metrics_node(
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
-    metric_spec = MetricSpec(element_name="bookings")
+    metric_spec = MetricSpec.create(element_name="bookings")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         computed_metric_specs=[metric_spec],
@@ -498,7 +523,8 @@ def test_compute_metrics_node_simple_expr(
     simple_metric_input_spec = SimpleMetricInputSpec(
         element_name="booking_value",
     )
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
+    entity_reference = EntityReference(element_name="listing")
+    entity_spec = EntitySpec.create_from_reference(entity_reference)
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
@@ -529,7 +555,7 @@ def test_compute_metrics_node_simple_expr(
         join_targets=[
             JoinDescription(
                 join_node=selector_node_for_dimension,
-                join_on_entity=entity_spec,
+                join_on_entity=entity_reference,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -541,7 +567,7 @@ def test_compute_metrics_node_simple_expr(
         parent_node=join_node,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
-    metric_spec = MetricSpec(element_name="booking_fees")
+    metric_spec = MetricSpec.create(element_name="booking_fees")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         computed_metric_specs=[metric_spec],
@@ -590,7 +616,8 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
     denominator_spec = SimpleMetricInputSpec(
         element_name="bookers",
     )
-    entity_spec = LinklessEntitySpec.from_element_name(element_name="listing")
+    entity_reference = EntityReference(element_name="listing")
+    entity_spec = EntitySpec.create_from_reference(entity_reference)
     simple_metric_input_source_node = mf_engine_test_fixture_mapping[
         SemanticManifestSetup.SIMPLE_MANIFEST
     ].read_node_mapping["bookings_source"]
@@ -621,7 +648,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         join_targets=[
             JoinDescription(
                 join_node=selector_node_for_dimension,
-                join_on_entity=entity_spec,
+                join_on_entity=entity_reference,
                 join_on_partition_dimensions=(),
                 join_on_partition_time_dimensions=(),
                 join_type=SqlJoinType.LEFT_OUTER,
@@ -633,7 +660,7 @@ def test_compute_metrics_node_ratio_from_single_semantic_model(
         parent_node=join_node,
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
-    metric_spec = MetricSpec(element_name="bookings_per_booker")
+    metric_spec = MetricSpec.create(element_name="bookings_per_booker")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measures_node,
         computed_metric_specs=[metric_spec],
@@ -692,7 +719,7 @@ def test_order_by_node(
         null_fill_value_mapping=NullFillValueMapping.create(),
     )
 
-    metric_spec = MetricSpec(element_name="bookings")
+    metric_spec = MetricSpec.create(element_name="bookings")
     compute_metrics_node = ComputeMetricsNode.create(
         parent_node=aggregated_measure_node,
         computed_metric_specs=[metric_spec],
@@ -801,7 +828,7 @@ def test_semi_additive_join_node(
     ].read_node_mapping["accounts_source"]
     semi_additive_join_node = SemiAdditiveJoinNode.create(
         parent_node=simple_metric_input_source_node,
-        entity_specs=tuple(),
+        entity_references=tuple(),
         time_dimension_spec=time_dimension_spec,
         agg_by_function=non_additive_dimension_spec.window_choice,
     )
@@ -842,7 +869,7 @@ def test_semi_additive_join_node_with_queried_group_by(
     ].read_node_mapping["accounts_source"]
     semi_additive_join_node = SemiAdditiveJoinNode.create(
         parent_node=simple_metric_input_source_node,
-        entity_specs=tuple(),
+        entity_references=tuple(),
         time_dimension_spec=time_dimension_spec,
         agg_by_function=non_additive_dimension_spec.window_choice,
         queried_time_dimension_spec=queried_time_dimension_spec,
@@ -871,7 +898,7 @@ def test_semi_additive_join_node_with_grouping(
         window_choice=AggregationType.MAX,
         window_groupings=("user",),
     )
-    entity_spec = LinklessEntitySpec(element_name="user", entity_links=())
+    entity_reference = EntityReference(element_name="user")
     time_dimension_spec = TimeDimensionSpec(
         element_name="ds",
         entity_links=(),
@@ -883,7 +910,7 @@ def test_semi_additive_join_node_with_grouping(
     ].read_node_mapping["accounts_source"]
     semi_additive_join_node = SemiAdditiveJoinNode.create(
         parent_node=simple_metric_input_source_node,
-        entity_specs=(entity_spec,),
+        entity_references=(entity_reference,),
         time_dimension_spec=time_dimension_spec,
         agg_by_function=non_additive_dimension_spec.window_choice,
     )
@@ -967,7 +994,7 @@ def test_compute_metrics_node_ratio_from_multiple_semantic_models(
         entity_links=(),
         time_granularity=ExpandedTimeGranularity.from_time_granularity(TimeGranularity.DAY),
     )
-    metric_spec = MetricSpec(element_name="bookings_per_view")
+    metric_spec = MetricSpec.create(element_name="bookings_per_view")
 
     dataflow_plan = dataflow_plan_builder.build_plan(
         query_spec=MetricFlowQuerySpec(
@@ -1135,15 +1162,15 @@ def test_compute_metrics_node_with_passthrough(
 
     compute_metrics_node_0 = ComputeMetricsNode.create(
         parent_node=aggregation_node,
-        computed_metric_specs=(MetricSpec(element_name="booking_value"),),
+        computed_metric_specs=(MetricSpec.create(element_name="booking_value"),),
         passthrough_metric_specs=(),
         aggregated_to_elements=set(),
     )
 
     compute_metrics_node_1 = ComputeMetricsNode.create(
         parent_node=compute_metrics_node_0,
-        computed_metric_specs=(MetricSpec(element_name="booking_fees"),),
-        passthrough_metric_specs=(MetricSpec(element_name="booking_value"),),
+        computed_metric_specs=(MetricSpec.create(element_name="booking_fees"),),
+        passthrough_metric_specs=(MetricSpec.create(element_name="booking_value"),),
         aggregated_to_elements=set(),
     )
 

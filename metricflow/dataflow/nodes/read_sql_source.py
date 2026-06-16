@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from typing import Optional, Sequence
 
 import jinja2
-from dbt_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
@@ -14,6 +13,7 @@ from typing_extensions import override
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow.dataset.sql_dataset import SqlDataSet
+from metricflow_semantic_interfaces.references import SemanticModelReference
 
 
 @dataclass(frozen=True, eq=False)

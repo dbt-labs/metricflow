@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Restore `dbt-metricflow` dependency changes in release flow
+time: 2026-05-26T16:25:28.839476-07:00
+custom:
+    Author: plypaul
+    Issue: "2055"
