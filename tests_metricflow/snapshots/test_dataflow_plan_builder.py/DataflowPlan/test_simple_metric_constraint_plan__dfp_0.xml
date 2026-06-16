@@ -17,39 +17,33 @@ docstring:
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_0') -->
-                    <!-- metric_spec =                                       -->
-                    <!--   MetricSpec(                                       -->
-                    <!--     element_name='average_booking_value',           -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(             -->
-                    <!--       metric_level_filter_specs=(                   -->
-                    <!--         WhereFilterSpec(                            -->
-                    <!--           where_sql='listing__is_lux_latest',       -->
-                    <!--           bind_parameters=SqlBindParameterSet(),    -->
-                    <!--           element_set=GroupByItemSet(               -->
-                    <!--             annotated_specs=(                       -->
-                    <!--               AnnotatedSpec(                        -->
-                    <!--                 element_type=DIMENSION,             -->
-                    <!--                 element_name='is_lux_latest',       -->
-                    <!--                 entity_link_names=(                 -->
-                    <!--                   'listing',                        -->
-                    <!--                 ),                                  -->
-                    <!--                 element_properties=(                -->
-                    <!--                   JOINED,                           -->
-                    <!--                 ),                                  -->
-                    <!--                 origin_semantic_model_names=(       -->
-                    <!--                   'listings_latest',                -->
-                    <!--                 ),                                  -->
-                    <!--                 derived_from_semantic_model_names=( -->
-                    <!--                   'bookings_source',                -->
-                    <!--                   'listings_latest',                -->
-                    <!--                 ),                                  -->
-                    <!--               ),                                    -->
-                    <!--             ),                                      -->
-                    <!--           ),                                        -->
-                    <!--         ),                                          -->
-                    <!--       ),                                            -->
-                    <!--     ),                                              -->
-                    <!--   )                                                 -->
+                    <!-- metric_spec =                                     -->
+                    <!--   MetricSpec(                                     -->
+                    <!--     element_name='average_booking_value',         -->
+                    <!--     where_filter_specs=(                          -->
+                    <!--       WhereFilterSpec(                            -->
+                    <!--         where_sql='listing__is_lux_latest',       -->
+                    <!--         bind_parameters=SqlBindParameterSet(),    -->
+                    <!--         element_set=GroupByItemSet(               -->
+                    <!--           annotated_specs=(                       -->
+                    <!--             AnnotatedSpec(                        -->
+                    <!--               element_type=DIMENSION,             -->
+                    <!--               element_name='is_lux_latest',       -->
+                    <!--               entity_link_names=('listing',),     -->
+                    <!--               element_properties=(JOINED,),       -->
+                    <!--               origin_semantic_model_names=(       -->
+                    <!--                 'listings_latest',                -->
+                    <!--               ),                                  -->
+                    <!--               derived_from_semantic_model_names=( -->
+                    <!--                 'bookings_source',                -->
+                    <!--                 'listings_latest',                -->
+                    <!--               ),                                  -->
+                    <!--             ),                                    -->
+                    <!--           ),                                      -->
+                    <!--         ),                                        -->
+                    <!--       ),                                          -->
+                    <!--     ),                                            -->
+                    <!--   )                                               -->
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_0') -->
@@ -64,10 +58,10 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- distinct = False -->
-                            <WhereConstraintNode>
-                                <!-- description = 'Constrain Output with WHERE' -->
+                            <WhereFilterNode>
+                                <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_0') -->
-                                <!-- where_condition =                             -->
+                                <!-- filter_spec =                                 -->
                                 <!--   WhereFilterSpec(                            -->
                                 <!--     where_sql='listing__is_lux_latest',       -->
                                 <!--     bind_parameters=SqlBindParameterSet(),    -->
@@ -109,12 +103,12 @@ docstring:
                                     <JoinOnEntitiesNode>
                                         <!-- description = 'Join Standard Outputs' -->
                                         <!-- node_id = NodeId(id_str='jso_0') -->
-                                        <!-- join0_for_node_id_pfe_0 =                                      -->
-                                        <!--   JoinDescription(                                             -->
-                                        <!--     join_node=SelectorNode(node_id=pfe_0),                     -->
-                                        <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
-                                        <!--     join_type=LEFT_OUTER,                                      -->
-                                        <!--   )                                                            -->
+                                        <!-- join0_for_node_id_pfe_0 =                                   -->
+                                        <!--   JoinDescription(                                          -->
+                                        <!--     join_node=SelectorNode(node_id=pfe_0),                  -->
+                                        <!--     join_on_entity=EntityReference(element_name='listing'), -->
+                                        <!--     join_type=LEFT_OUTER,                                   -->
+                                        <!--   )                                                         -->
                                         <MetricTimeDimensionTransformNode>
                                             <!-- description = "Metric Time Dimension 'ds'" -->
                                             <!-- node_id = NodeId(id_str='sma_28009') -->
@@ -129,7 +123,7 @@ docstring:
                                             <!-- description = "Select: ['is_lux_latest', 'listing']" -->
                                             <!-- node_id = NodeId(id_str='pfe_0') -->
                                             <!-- include_spec = DimensionSpec(element_name='is_lux_latest') -->
-                                            <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                            <!-- include_spec = EntitySpec(element_name='listing') -->
                                             <!-- distinct = False -->
                                             <MetricTimeDimensionTransformNode>
                                                 <!-- description = "Metric Time Dimension 'ds'" -->
@@ -145,46 +139,40 @@ docstring:
                                         </SelectorNode>
                                     </JoinOnEntitiesNode>
                                 </SelectorNode>
-                            </WhereConstraintNode>
+                            </WhereFilterNode>
                         </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>
                 <ComputeMetricsNode>
                     <!-- description = 'Compute Metrics via Expressions' -->
                     <!-- node_id = NodeId(id_str='cm_1') -->
-                    <!-- metric_spec =                                       -->
-                    <!--   MetricSpec(                                       -->
-                    <!--     element_name='bookings',                        -->
-                    <!--     filter_spec_set=WhereFilterSpecSet(             -->
-                    <!--       metric_level_filter_specs=(                   -->
-                    <!--         WhereFilterSpec(                            -->
-                    <!--           where_sql='listing__is_lux_latest',       -->
-                    <!--           bind_parameters=SqlBindParameterSet(),    -->
-                    <!--           element_set=GroupByItemSet(               -->
-                    <!--             annotated_specs=(                       -->
-                    <!--               AnnotatedSpec(                        -->
-                    <!--                 element_type=DIMENSION,             -->
-                    <!--                 element_name='is_lux_latest',       -->
-                    <!--                 entity_link_names=(                 -->
-                    <!--                   'listing',                        -->
-                    <!--                 ),                                  -->
-                    <!--                 element_properties=(                -->
-                    <!--                   JOINED,                           -->
-                    <!--                 ),                                  -->
-                    <!--                 origin_semantic_model_names=(       -->
-                    <!--                   'listings_latest',                -->
-                    <!--                 ),                                  -->
-                    <!--                 derived_from_semantic_model_names=( -->
-                    <!--                   'bookings_source',                -->
-                    <!--                   'listings_latest',                -->
-                    <!--                 ),                                  -->
-                    <!--               ),                                    -->
-                    <!--             ),                                      -->
-                    <!--           ),                                        -->
-                    <!--         ),                                          -->
-                    <!--       ),                                            -->
-                    <!--     ),                                              -->
-                    <!--   )                                                 -->
+                    <!-- metric_spec =                                     -->
+                    <!--   MetricSpec(                                     -->
+                    <!--     element_name='bookings',                      -->
+                    <!--     where_filter_specs=(                          -->
+                    <!--       WhereFilterSpec(                            -->
+                    <!--         where_sql='listing__is_lux_latest',       -->
+                    <!--         bind_parameters=SqlBindParameterSet(),    -->
+                    <!--         element_set=GroupByItemSet(               -->
+                    <!--           annotated_specs=(                       -->
+                    <!--             AnnotatedSpec(                        -->
+                    <!--               element_type=DIMENSION,             -->
+                    <!--               element_name='is_lux_latest',       -->
+                    <!--               entity_link_names=('listing',),     -->
+                    <!--               element_properties=(JOINED,),       -->
+                    <!--               origin_semantic_model_names=(       -->
+                    <!--                 'listings_latest',                -->
+                    <!--               ),                                  -->
+                    <!--               derived_from_semantic_model_names=( -->
+                    <!--                 'bookings_source',                -->
+                    <!--                 'listings_latest',                -->
+                    <!--               ),                                  -->
+                    <!--             ),                                    -->
+                    <!--           ),                                      -->
+                    <!--         ),                                        -->
+                    <!--       ),                                          -->
+                    <!--     ),                                            -->
+                    <!--   )                                               -->
                     <AggregateSimpleMetricInputsNode>
                         <!-- description = 'Aggregate Inputs for Simple Metrics' -->
                         <!-- node_id = NodeId(id_str='am_1') -->
@@ -199,10 +187,10 @@ docstring:
                             <!--     time_granularity=ExpandedTimeGranularity(name='day', base_granularity=DAY), -->
                             <!--   )                                                                             -->
                             <!-- distinct = False -->
-                            <WhereConstraintNode>
-                                <!-- description = 'Constrain Output with WHERE' -->
+                            <WhereFilterNode>
+                                <!-- description = 'Filter Output with WHERE' -->
                                 <!-- node_id = NodeId(id_str='wcc_1') -->
-                                <!-- where_condition =                             -->
+                                <!-- filter_spec =                                 -->
                                 <!--   WhereFilterSpec(                            -->
                                 <!--     where_sql='listing__is_lux_latest',       -->
                                 <!--     bind_parameters=SqlBindParameterSet(),    -->
@@ -243,12 +231,12 @@ docstring:
                                     <JoinOnEntitiesNode>
                                         <!-- description = 'Join Standard Outputs' -->
                                         <!-- node_id = NodeId(id_str='jso_1') -->
-                                        <!-- join0_for_node_id_pfe_3 =                                      -->
-                                        <!--   JoinDescription(                                             -->
-                                        <!--     join_node=SelectorNode(node_id=pfe_3),                     -->
-                                        <!--     join_on_entity=LinklessEntitySpec(element_name='listing'), -->
-                                        <!--     join_type=LEFT_OUTER,                                      -->
-                                        <!--   )                                                            -->
+                                        <!-- join0_for_node_id_pfe_3 =                                   -->
+                                        <!--   JoinDescription(                                          -->
+                                        <!--     join_node=SelectorNode(node_id=pfe_3),                  -->
+                                        <!--     join_on_entity=EntityReference(element_name='listing'), -->
+                                        <!--     join_type=LEFT_OUTER,                                   -->
+                                        <!--   )                                                         -->
                                         <MetricTimeDimensionTransformNode>
                                             <!-- description = "Metric Time Dimension 'ds'" -->
                                             <!-- node_id = NodeId(id_str='sma_28009') -->
@@ -263,7 +251,7 @@ docstring:
                                             <!-- description = "Select: ['is_lux_latest', 'listing']" -->
                                             <!-- node_id = NodeId(id_str='pfe_3') -->
                                             <!-- include_spec = DimensionSpec(element_name='is_lux_latest') -->
-                                            <!-- include_spec = LinklessEntitySpec(element_name='listing') -->
+                                            <!-- include_spec = EntitySpec(element_name='listing') -->
                                             <!-- distinct = False -->
                                             <MetricTimeDimensionTransformNode>
                                                 <!-- description = "Metric Time Dimension 'ds'" -->
@@ -279,7 +267,7 @@ docstring:
                                         </SelectorNode>
                                     </JoinOnEntitiesNode>
                                 </SelectorNode>
-                            </WhereConstraintNode>
+                            </WhereFilterNode>
                         </SelectorNode>
                     </AggregateSimpleMetricInputsNode>
                 </ComputeMetricsNode>

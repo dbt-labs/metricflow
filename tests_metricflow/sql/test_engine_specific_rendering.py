@@ -4,7 +4,6 @@ from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlCastToTimestampExpression,
@@ -26,6 +25,7 @@ from metricflow.sql.sql_plan import (
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
 
 

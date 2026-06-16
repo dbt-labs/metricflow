@@ -1,0 +1,174 @@
+test_name: test_cases_with_passthrough_planner[08__time_nested_offset_metric_with_non_queried_element_in_filter]
+test_filename: test_passthrough_planner.py
+docstring:
+  Test enumerated cases using the `PassThroughMetricEvaluationPlanner`.
+expectation_description:
+  The query for `bookings` should contain the filter and only have `metric_time`
+  in the group-by items. The current snapshot does not reflect the correct result.
+---
+Query for a nested time offset metric with a `metric_time` filter
+
+  Metric Names: ['bookings_offset_twice']
+  Group-By Names: ['metric_time']
+  Metric Evaluation Overview:
+    ┌───────┬───────────┬───────────────────────┬───────────────────────┬───────────────────────┬──────────────────┐
+    │ id    │ src_ids   │ computed_outputs      │ passthrough_outputs   │ source_metrics        │ semantic_model   │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ smp_0 │           │ bookings              │                       │                       │ bookings_source  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ drv_0 │ smp_0     │ bookings_offset_once  │                       │ bookings              │                  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ drv_1 │ drv_0     │ bookings_offset_twice │                       │ bookings_offset_once  │                  │
+    ├───────┼───────────┼───────────────────────┼───────────────────────┼───────────────────────┼──────────────────┤
+    │ tpl_0 │ drv_1     │                       │ bookings_offset_twice │ bookings_offset_twice │                  │
+    └───────┴───────────┴───────────────────────┴───────────────────────┴───────────────────────┴──────────────────┘
+  Metric Query Output:
+    ┌───────┬─────────────────────────────────────────────────────────┬────────────────────────────────────────────────────────┐
+    │ id    │ output_specs                                            │ output_properties                                      │
+    ├───────┼─────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────┤
+    │ smp_0 │ MetricSpec(                                             │ MetricQueryPropertySet(                                │
+    │       │   element_name='bookings',                              │   group_by_item_specs=['metric_time__day', 'listing'], │
+    │       │   offset_window=TimeWindow(count=5, granularity='day'), │ )                                                      │
+    │       │ )                                                       │                                                        │
+    ├───────┼─────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────┤
+    │ drv_0 │ MetricSpec(                                             │ MetricQueryPropertySet(                                │
+    │       │   element_name='bookings_offset_once',                  │   group_by_item_specs=['metric_time__day'],            │
+    │       │   where_filter_specs=(                                  │   pushdown_enabled_types={                             │
+    │       │     WhereFilterSpec(                                    │     TIME_RANGE_CONSTRAINT,                             │
+    │       │       where_sql="listing = '1'",                        │     CATEGORICAL_DIMENSION,                             │
+    │       │       bind_parameters=SqlBindParameterSet(),            │   },                                                   │
+    │       │       element_set=GroupByItemSet(                       │ )                                                      │
+    │       │         annotated_specs=(                               │                                                        │
+    │       │           AnnotatedSpec(                                │                                                        │
+    │       │             element_type=ENTITY,                        │                                                        │
+    │       │             element_name='listing',                     │                                                        │
+    │       │             element_properties=(                        │                                                        │
+    │       │               ENTITY,                                   │                                                        │
+    │       │               LOCAL,                                    │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │             origin_semantic_model_names=(               │                                                        │
+    │       │               'bookings_source',                        │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │             derived_from_semantic_model_names=(         │                                                        │
+    │       │               'bookings_source',                        │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │           ),                                            │                                                        │
+    │       │         ),                                              │                                                        │
+    │       │       ),                                                │                                                        │
+    │       │     ),                                                  │                                                        │
+    │       │   ),                                                    │                                                        │
+    │       │   offset_window=TimeWindow(count=2, granularity='day'), │                                                        │
+    │       │ )                                                       │                                                        │
+    ├───────┼─────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────┤
+    │ drv_1 │ MetricSpec(                                             │ MetricQueryPropertySet(                                │
+    │       │   element_name='bookings_offset_twice',                 │   group_by_item_specs=['metric_time__day'],            │
+    │       │   where_filter_specs=(                                  │   pushdown_enabled_types={                             │
+    │       │     WhereFilterSpec(                                    │     TIME_RANGE_CONSTRAINT,                             │
+    │       │       where_sql="listing = '1'",                        │     CATEGORICAL_DIMENSION,                             │
+    │       │       bind_parameters=SqlBindParameterSet(),            │   },                                                   │
+    │       │       element_set=GroupByItemSet(                       │ )                                                      │
+    │       │         annotated_specs=(                               │                                                        │
+    │       │           AnnotatedSpec(                                │                                                        │
+    │       │             element_type=ENTITY,                        │                                                        │
+    │       │             element_name='listing',                     │                                                        │
+    │       │             element_properties=(                        │                                                        │
+    │       │               ENTITY,                                   │                                                        │
+    │       │               LOCAL,                                    │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │             origin_semantic_model_names=(               │                                                        │
+    │       │               'bookings_source',                        │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │             derived_from_semantic_model_names=(         │                                                        │
+    │       │               'bookings_source',                        │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │           ),                                            │                                                        │
+    │       │         ),                                              │                                                        │
+    │       │       ),                                                │                                                        │
+    │       │     ),                                                  │                                                        │
+    │       │   ),                                                    │                                                        │
+    │       │ )                                                       │                                                        │
+    ├───────┼─────────────────────────────────────────────────────────┼────────────────────────────────────────────────────────┤
+    │ tpl_0 │ MetricSpec(                                             │ MetricQueryPropertySet(                                │
+    │       │   element_name='bookings_offset_twice',                 │   group_by_item_specs=['metric_time__day'],            │
+    │       │   where_filter_specs=(                                  │   pushdown_enabled_types={                             │
+    │       │     WhereFilterSpec(                                    │     TIME_RANGE_CONSTRAINT,                             │
+    │       │       where_sql="listing = '1'",                        │     CATEGORICAL_DIMENSION,                             │
+    │       │       bind_parameters=SqlBindParameterSet(),            │   },                                                   │
+    │       │       element_set=GroupByItemSet(                       │ )                                                      │
+    │       │         annotated_specs=(                               │                                                        │
+    │       │           AnnotatedSpec(                                │                                                        │
+    │       │             element_type=ENTITY,                        │                                                        │
+    │       │             element_name='listing',                     │                                                        │
+    │       │             element_properties=(                        │                                                        │
+    │       │               ENTITY,                                   │                                                        │
+    │       │               LOCAL,                                    │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │             origin_semantic_model_names=(               │                                                        │
+    │       │               'bookings_source',                        │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │             derived_from_semantic_model_names=(         │                                                        │
+    │       │               'bookings_source',                        │                                                        │
+    │       │             ),                                          │                                                        │
+    │       │           ),                                            │                                                        │
+    │       │         ),                                              │                                                        │
+    │       │       ),                                                │                                                        │
+    │       │     ),                                                  │                                                        │
+    │       │   ),                                                    │                                                        │
+    │       │ )                                                       │                                                        │
+    └───────┴─────────────────────────────────────────────────────────┴────────────────────────────────────────────────────────┘
+  SQL:
+    WITH rss_28018_cte AS (
+      SELECT
+        ds AS ds__day
+      FROM ***************************.mf_time_spine time_spine_src_28006
+    )
+
+    SELECT
+      metric_time__day AS metric_time__day
+      , 2 * bookings_offset_once AS bookings_offset_twice
+    FROM (
+      SELECT
+        metric_time__day
+        , bookings_offset_once
+      FROM (
+        SELECT
+          rss_28018_cte.ds__day AS metric_time__day
+          , subq_11.listing AS listing
+          , subq_11.bookings_offset_once AS bookings_offset_once
+        FROM rss_28018_cte
+        INNER JOIN (
+          SELECT
+            metric_time__day
+            , listing
+            , 2 * bookings AS bookings_offset_once
+          FROM (
+            SELECT
+              rss_28018_cte.ds__day AS metric_time__day
+              , subq_4.listing AS listing
+              , subq_4.__bookings AS bookings
+            FROM rss_28018_cte
+            INNER JOIN (
+              SELECT
+                metric_time__day
+                , listing
+                , SUM(__bookings) AS __bookings
+              FROM (
+                SELECT
+                  DATE_TRUNC('day', ds) AS metric_time__day
+                  , listing_id AS listing
+                  , 1 AS __bookings
+                FROM ***************************.fct_bookings bookings_source_src_28000
+              ) subq_3
+              GROUP BY
+                metric_time__day
+                , listing
+            ) subq_4
+            ON
+              rss_28018_cte.ds__day - INTERVAL 5 day = subq_4.metric_time__day
+          ) subq_10
+        ) subq_11
+        ON
+          rss_28018_cte.ds__day - INTERVAL 2 day = subq_11.metric_time__day
+      ) subq_16
+      WHERE listing = '1'
+    ) subq_18

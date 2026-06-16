@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-from metricflow_semantics.test_helpers.config_helpers import DirectoryPathAnchor
+from metricflow_semantics.toolkit.directory_anchor import DirectoryAnchor
 
-TESTS_METRICFLOW_DIRECTORY_ANCHOR = DirectoryPathAnchor()
+TESTS_METRICFLOW_DIRECTORY_ANCHOR = DirectoryAnchor()

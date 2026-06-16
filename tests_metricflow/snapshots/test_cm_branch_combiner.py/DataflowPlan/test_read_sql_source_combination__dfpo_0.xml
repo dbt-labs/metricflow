@@ -9,7 +9,7 @@ docstring:
         <!-- node_id = NodeId(id_str='wrd_0') -->
         <ReadSqlSourceNode>
             <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-            <!-- node_id = NodeId(id_str='rss_0') -->
+            <!-- node_id = NodeId(id_str='rss_28001') -->
             <!-- data_set = SemanticModelDataSet('bookings_source') -->
         </ReadSqlSourceNode>
     </WriteToResultDataTableNode>

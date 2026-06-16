@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dbt_semantic_interfaces.references import EntityReference
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -9,6 +8,7 @@ from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfi
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.references import EntityReference
 from tests_metricflow.performance.conftest import MeasureFixture
 
 
@@ -21,7 +21,7 @@ def test_simple_query(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="identity_verifications"),),
+        metric_specs=(MetricSpec.create(element_name="identity_verifications"),),
         dimension_specs=(
             DimensionSpec(
                 element_name="home_state",
@@ -47,7 +47,7 @@ def test_simple_query_2(
 ) -> None:
     """Tests converting a dataflow plan to a SQL query plan where there is a join between 1 measure and 2 dimensions."""
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="identity_verifications"),),
+        metric_specs=(MetricSpec.create(element_name="identity_verifications"),),
         dimension_specs=(
             DimensionSpec(
                 element_name="home_state",

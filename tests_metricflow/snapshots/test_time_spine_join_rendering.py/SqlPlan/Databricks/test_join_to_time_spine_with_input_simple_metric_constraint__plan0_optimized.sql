@@ -3,7 +3,7 @@ test_filename: test_time_spine_join_rendering.py
 docstring:
   Check filter hierarchy.
 
-      Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+  Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
 sql_engine: Databricks
 ---
 -- Join to Time Spine Dataset
@@ -47,7 +47,13 @@ LEFT OUTER JOIN (
       , 1 AS instant_bookings_with_measure_filter
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_15
-  WHERE ((booking__is_instant) AND (listing IS NOT NULL)) AND (metric_time__day > '2020-01-01')
+  WHERE (
+    booking__is_instant
+  ) AND (
+    listing IS NOT NULL
+  ) AND (
+    metric_time__day > '2020-01-01'
+  )
   GROUP BY
     metric_time__day
     , booking__is_instant

@@ -6,16 +6,21 @@ import sys
 import textwrap
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 import click
 from dateutil.parser import parse as parse_datetime
-from dbt_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
-from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
-from metricflow.protocols.sql_client import SqlEngine
-from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
+
+from metricflow.data_table.mf_table import MetricFlowDataTable
+from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExplainResult, MetricFlowQueryRequest
+from metricflow.protocols.sql_client import SqlEngine
+from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +38,7 @@ class _DialectOnlySqlClient:
         aliases: Dict[str, SqlEngine] = {
             "bigquery": SqlEngine.BIGQUERY,
             "big_query": SqlEngine.BIGQUERY,
+            "duckdb": SqlEngine.DUCKDB,
             "postgres": SqlEngine.POSTGRES,
             "postgresql": SqlEngine.POSTGRES,
             "redshift": SqlEngine.REDSHIFT,
@@ -49,7 +55,9 @@ class _DialectOnlySqlClient:
         if sql_engine is SqlEngine.BIGQUERY:
             from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
 
-            renderer = BigQuerySqlPlanRenderer()
+            renderer: SqlPlanRenderer = BigQuerySqlPlanRenderer()
+        elif sql_engine is SqlEngine.DUCKDB:
+            renderer = DuckDbSqlPlanRenderer()
         elif sql_engine is SqlEngine.POSTGRES:
             from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
 
@@ -73,6 +81,46 @@ class _DialectOnlySqlClient:
     @property
     def sql_plan_renderer(self) -> SqlPlanRenderer:
         return self._sql_plan_renderer
+
+    def query(
+        self,
+        stmt: str,
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
+    ) -> MetricFlowDataTable:
+        """Reject query execution; this client is only intended for rendering SQL."""
+        raise SqlBindParametersNotSupportedError(
+            "_DialectOnlySqlClient cannot execute queries; use it only with MetricFlowEngine.explain()."
+        )
+
+    def execute(
+        self,
+        stmt: str,
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
+    ) -> None:
+        """Reject statement execution; this client is only intended for rendering SQL."""
+        raise SqlBindParametersNotSupportedError(
+            "_DialectOnlySqlClient cannot execute statements; use it only with MetricFlowEngine.explain()."
+        )
+
+    def dry_run(
+        self,
+        stmt: str,
+        sql_bind_parameter_set: SqlBindParameterSet = SqlBindParameterSet(),
+    ) -> None:
+        """Reject dry runs; this client is only intended for rendering SQL."""
+        raise SqlBindParametersNotSupportedError(
+            "_DialectOnlySqlClient cannot dry run statements; use it only with MetricFlowEngine.explain()."
+        )
+
+    def close(self) -> None:
+        """No-op close method to satisfy the SqlClient protocol."""
+        return None
+
+    def render_bind_parameter_key(self, bind_parameter_key: str) -> str:
+        """Reject bind parameter rendering; this client has no warehouse execution context."""
+        raise SqlBindParametersNotSupportedError(
+            "_DialectOnlySqlClient cannot render bind parameters; use it only with MetricFlowEngine.explain()."
+        )
 
 
 def _parse_optional_datetime(value: Optional[str]) -> Optional[dt.datetime]:
@@ -104,7 +152,7 @@ def _load_semantic_manifest_from_source(manifest_source: str) -> SemanticManifes
 
 
 def _build_fast_path_engine(manifest_source: str, dialect: str) -> MetricFlowEngine:
-    logging.getLogger("dbt_semantic_interfaces.transformations.fix_proxy_metrics").setLevel(logging.ERROR)
+    logging.getLogger("metricflow_semantic_interfaces.transformations.fix_proxy_metrics").setLevel(logging.ERROR)
     semantic_manifest = _load_semantic_manifest_from_source(manifest_source)
     semantic_manifest_lookup = SemanticManifestLookup(semantic_manifest)
     sql_client = _DialectOnlySqlClient.from_dialect_name(dialect)
@@ -122,7 +170,7 @@ def _build_fast_path_engine(manifest_source: str, dialect: str) -> MetricFlowEng
     "--dialect",
     required=True,
     type=str,
-    help="SQL dialect (redshift, snowflake, bigquery, postgres).",
+    help="SQL dialect (redshift, snowflake, bigquery, postgres, duckdb).",
 )
 @click.option(
     "--metrics",
@@ -140,9 +188,7 @@ def _build_fast_path_engine(manifest_source: str, dialect: str) -> MetricFlowEng
     "--where",
     type=str,
     default=None,
-    help=(
-        "SQL-like where statement string. Example: \"{{ Dimension('order_id__revenue') }} > 100\""
-    ),
+    help=("SQL-like where statement string. Example: \"{{ Dimension('order_id__revenue') }} > 100\""),
 )
 @click.option(
     "--start-time",
@@ -197,7 +243,7 @@ def cli(  # noqa: D103
     click.echo("mf-sql: query start")
     mf_engine = _build_fast_path_engine(manifest_source=semantic_manifest, dialect=dialect)
 
-    mf_request = MetricFlowQueryRequest.create_with_random_request_id(
+    mf_request = MetricFlowQueryRequest.create(
         metric_names=_parse_csv(metrics),
         group_by_names=_parse_csv(group_by),
         limit=limit,

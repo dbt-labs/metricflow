@@ -3,7 +3,7 @@ test_filename: test_source_scan_optimizer.py
 docstring:
   Tests optimization of a query that use a derived metrics with simple-metric inputs coming from a single semantic model.
 
-      non_referred_bookings_pct is a derived metric that uses simple metrics `[bookings, referred_bookings]`
+  non_referred_bookings_pct is a derived metric that uses simple metrics `[bookings, referred_bookings]`
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>

@@ -9,13 +9,13 @@ from collections.abc import Mapping, Sequence
 from concurrent.futures import Future, ProcessPoolExecutor
 from pathlib import Path
 
-from dbt_semantic_interfaces.enum_extension import assert_values_exhausted
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.id_helpers import mf_sha1_iterables
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.engine.metricflow_engine import MetricFlowRequestId
+from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
 from tests_metricflow.release_validation.explain_runner import (
     DuckDbExplainTaskRunner,
     ExplainQueryStatus,

@@ -1,0 +1,37 @@
+---
+semantic_model:
+  name: bookings_monthly
+  defaults:
+    agg_time_dimension: ds
+  description: bookings_monthly
+  node_relation:
+    alias: fct_bookings
+    schema_name: $source_schema
+  primary_entity: monthly_booking
+  entities:
+    - name: listing
+      type: foreign
+      expr: listing_id
+    - name: guest
+      type: foreign
+      expr: guest_id
+    - name: host
+      type: foreign
+      expr: host_id
+  dimensions:
+    - name: ds
+      type: time
+      type_params:
+        time_granularity: month
+
+---
+metric:
+  name: monthly_bookings
+  description: bookings by month
+  type: simple
+  type_params:
+    expr: "1"
+    metric_aggregation_params:
+      semantic_model: bookings_monthly
+      agg: sum
+  label: bookings by month

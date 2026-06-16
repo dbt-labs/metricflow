@@ -28,7 +28,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.order_by_limit import OrderByLimitNode
     from metricflow.dataflow.nodes.read_sql_source import ReadSqlSourceNode
     from metricflow.dataflow.nodes.semi_additive_join import SemiAdditiveJoinNode
-    from metricflow.dataflow.nodes.where_filter import WhereConstraintNode
+    from metricflow.dataflow.nodes.where_filter import WhereFilterNode
     from metricflow.dataflow.nodes.window_reaggregation_node import WindowReaggregationNode
     from metricflow.dataflow.nodes.write_to_data_table import WriteToResultDataTableNode
     from metricflow.dataflow.nodes.write_to_table import WriteToResultTableNode
@@ -69,7 +69,7 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> VisitorOutputT:  # noqa: D102
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> VisitorOutputT:  # noqa: D102
         raise NotImplementedError
 
     @abstractmethod
@@ -178,7 +178,7 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
         return self._default_handler(node)
 
     @override
-    def visit_where_constraint_node(self, node: WhereConstraintNode) -> VisitorOutputT:  # noqa: D102
+    def visit_where_constraint_node(self, node: WhereFilterNode) -> VisitorOutputT:  # noqa: D102
         return self._default_handler(node)
 
     @override

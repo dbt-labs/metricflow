@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
@@ -19,6 +17,8 @@ from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSql
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.snapshot_utils import assert_execution_plan_text_equal
 
 
@@ -48,7 +48,7 @@ def test_joined_plan(  # noqa: D103
 ) -> None:
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="bookings"),),
+            metric_specs=(MetricSpec.create(element_name="bookings"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="is_instant",
@@ -89,8 +89,8 @@ def test_small_combined_metrics_plan(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="booking_value"),
+                MetricSpec.create(element_name="bookings"),
+                MetricSpec.create(element_name="booking_value"),
             ),
             dimension_specs=(
                 DimensionSpec(
@@ -127,9 +127,9 @@ def test_combined_metrics_plan(  # noqa: D103
     dataflow_plan = dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
             metric_specs=(
-                MetricSpec(element_name="bookings"),
-                MetricSpec(element_name="instant_bookings"),
-                MetricSpec(element_name="booking_value"),
+                MetricSpec.create(element_name="bookings"),
+                MetricSpec.create(element_name="instant_bookings"),
+                MetricSpec.create(element_name="booking_value"),
             ),
             dimension_specs=(
                 DimensionSpec(
@@ -173,7 +173,7 @@ def test_multihop_joined_plan(
     """Tests a plan getting a measure and a joined dimension."""
     dataflow_plan = multihop_dataflow_plan_builder.build_plan(
         MetricFlowQuerySpec(
-            metric_specs=(MetricSpec(element_name="txn_count"),),
+            metric_specs=(MetricSpec.create(element_name="txn_count"),),
             dimension_specs=(
                 DimensionSpec(
                     element_name="customer_name",

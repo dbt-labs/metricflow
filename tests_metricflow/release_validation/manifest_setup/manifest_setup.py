@@ -4,14 +4,16 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
-from dbt_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
-from dbt_semantic_interfaces.transformations.pydantic_rule_set import PydanticSemanticManifestTransformRuleSet
-from dbt_semantic_interfaces.transformations.semantic_manifest_transformer import PydanticSemanticManifestTransformer
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from typing_extensions import override
 
+from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.transformations.pydantic_rule_set import PydanticSemanticManifestTransformRuleSet
+from metricflow_semantic_interfaces.transformations.semantic_manifest_transformer import (
+    PydanticSemanticManifestTransformer,
+)
 from tests_metricflow.release_validation.manifest_transforms.modify_model_node_relation import (
     ModifyModelNodeRelationRule,
 )

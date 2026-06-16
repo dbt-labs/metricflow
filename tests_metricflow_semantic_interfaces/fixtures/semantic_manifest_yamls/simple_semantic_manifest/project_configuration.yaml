@@ -1,0 +1,21 @@
+---
+project_configuration:
+  time_spine_table_configurations:
+    - location: example_schema.example_table
+      column_name: ds
+      grain: day
+  time_spines:
+    - node_relation:
+        schema_name: stuff
+        alias: day_time_spine
+      primary_column:
+        name: ds_day
+        time_granularity: day
+    - node_relation:
+        alias: mf_time_spine
+        schema_name: stufffs
+      primary_column:
+        name: ds
+        time_granularity: day
+      custom_granularities:
+        - name: martian_day

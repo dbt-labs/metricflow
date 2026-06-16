@@ -13,8 +13,8 @@ FROM (
   -- Join to Time Spine Dataset
   -- Compute Metrics via Expressions
   SELECT
-    subq_24.metric_time__month AS metric_time__month
-    , subq_19.__bookings AS bookings_start_of_month
+    subq_22.metric_time__month AS metric_time__month
+    , subq_17.__bookings AS bookings_start_of_month
   FROM (
     -- Constrain Output with WHERE
     -- Select: ['metric_time__month']
@@ -28,32 +28,29 @@ FROM (
         ds AS metric_time__day
         , DATETIME_TRUNC(ds, month) AS metric_time__month
       FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_22
+    ) subq_20
     WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_24
+  ) subq_22
   INNER JOIN (
-    -- Constrain Output with WHERE
-    -- Select: ['__bookings', 'metric_time__month']
     -- Aggregate Inputs for Simple Metrics
     SELECT
       metric_time__month
-      , SUM(bookings) AS __bookings
+      , SUM(__bookings) AS __bookings
     FROM (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
-      -- Select: ['__bookings', 'metric_time__month', 'metric_time__day']
+      -- Select: ['__bookings', 'metric_time__month']
+      -- Select: ['__bookings', 'metric_time__month']
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
-        , DATETIME_TRUNC(ds, month) AS metric_time__month
-        , 1 AS bookings
+        DATETIME_TRUNC(ds, month) AS metric_time__month
+        , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_16
-    WHERE metric_time__day = '2020-01-01'
     GROUP BY
       metric_time__month
-  ) subq_19
+  ) subq_17
   ON
-    DATETIME_TRUNC(subq_24.metric_time__month, month) = subq_19.metric_time__month
-) subq_26
+    DATETIME_TRUNC(subq_22.metric_time__month, month) = subq_17.metric_time__month
+) subq_24

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import FrozenSet, Optional, Sequence, Set
+from collections.abc import Sequence, Set
+from typing import FrozenSet, Optional
 
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
-from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.string_helpers import mf_indent
@@ -19,6 +19,7 @@ from metricflow.dataset.sql_dataset import SqlDataSet
 from metricflow.plan_conversion.convert_to_sql_plan import ConvertToSqlPlanResult
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_cte import DataflowNodeToSqlCteVisitor
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow.plan_conversion.to_sql_plan.output_column_orderer import OutputColumnOrderer
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.optimizer.optimization_levels import (
     SqlGenerationOptionSet,
@@ -70,7 +71,7 @@ class DataflowToSqlPlanConverter:
         dataflow_plan_node: DataflowPlanNode,
         optimization_level: SqlOptimizationLevel = SqlOptimizationLevel.default_level(),
         sql_query_plan_id: Optional[DagId] = None,
-        spec_output_order: Sequence[InstanceSpec] = (),
+        output_column_orderer: Optional[OutputColumnOrderer] = None,
     ) -> ConvertToSqlPlanResult:
         """Create an SQL query plan that represents the computation up to the given dataflow plan node."""
         # In case there are bugs that raise exceptions at higher optimization levels, retry generation at a lower
@@ -119,7 +120,7 @@ class DataflowToSqlPlanConverter:
                     sql_query_plan_id=sql_query_plan_id,
                     nodes_to_convert_to_cte=nodes_to_convert_to_cte,
                     optimizers=option_set.optimizers,
-                    spec_output_order=spec_output_order,
+                    output_column_orderer=output_column_orderer,
                 )
 
                 if retried_at_lower_optimization_level:
@@ -160,7 +161,7 @@ class DataflowToSqlPlanConverter:
         sql_query_plan_id: Optional[DagId],
         nodes_to_convert_to_cte: FrozenSet[DataflowPlanNode],
         optimizers: Sequence[SqlPlanOptimizer],
-        spec_output_order: Sequence[InstanceSpec],
+        output_column_orderer: Optional[OutputColumnOrderer] = None,
     ) -> ConvertToSqlPlanResult:
         """Helper method to convert using specific options. Main use case are tests."""
         logger.debug(
@@ -174,7 +175,7 @@ class DataflowToSqlPlanConverter:
             to_sql_subquery_visitor = DataflowNodeToSqlSubqueryVisitor(
                 column_association_resolver=self.column_association_resolver,
                 semantic_manifest_lookup=self._semantic_manifest_lookup,
-                spec_output_order=spec_output_order,
+                output_column_orderer=output_column_orderer,
             )
             data_set = to_sql_subquery_visitor.get_output_data_set(dataflow_plan_node)
         else:
@@ -182,7 +183,7 @@ class DataflowToSqlPlanConverter:
                 column_association_resolver=self.column_association_resolver,
                 semantic_manifest_lookup=self._semantic_manifest_lookup,
                 nodes_to_convert_to_cte=nodes_to_convert_to_cte,
-                spec_output_order=spec_output_order,
+                output_column_orderer=output_column_orderer,
             )
             data_set = dataflow_plan_node.accept(to_sql_cte_visitor)
             select_statement = data_set.checked_sql_select_node
@@ -226,7 +227,7 @@ class DataflowToSqlPlanConverter:
     ) -> FrozenSet[DataflowPlanNode]:
         """Handles logic for selecting which nodes to convert to CTEs based on the request."""
         dataflow_plan = dataflow_plan_node.as_plan()
-        nodes_to_convert_to_cte: Set[DataflowPlanNode] = set(DataflowPlanAnalyzer.find_common_branches(dataflow_plan))
+        nodes_to_convert_to_cte: Set[DataflowPlanNode] = DataflowPlanAnalyzer.find_common_branches(dataflow_plan)
         # Additional nodes will be added later.
 
         return frozenset(nodes_to_convert_to_cte)

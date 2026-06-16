@@ -1,1 +1,1 @@
-metricflow==0.209.0
+metricflow @ {root:parent:uri}

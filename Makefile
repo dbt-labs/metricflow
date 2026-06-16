@@ -18,6 +18,7 @@ USE_PERSISTENT_SOURCE_SCHEMA = --use-persistent-source-schema
 TESTS_DBT_METRICFLOW = tests_dbt_metricflow
 TESTS_METRICFLOW = tests_metricflow
 TESTS_METRICFLOW_SEMANTICS = tests_metricflow_semantics
+TESTS_METRICFLOW_SEMANTIC_INTERFACES = tests_metricflow_semantic_interfaces
 POPULATE_PERSISTENT_SOURCE_SCHEMA = $(TESTS_METRICFLOW)/source_schema_tools.py::populate_source_schema
 
 # Install Hatch package / project manager
@@ -36,14 +37,22 @@ perf-compare:
 # Testing and linting
 .PHONY: test
 test:
-	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTIC_INTERFACES)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) -m "not slow" $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
-.PHONY: test-include-slow
-test-include-slow:
-	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_DBT_METRICFLOW)/
-	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
+.PHONY: test-include-slow-metricflow
+test-include-slow-metricflow:
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW_SEMANTIC_INTERFACES)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
+.PHONY: test-include-slow-dbt-metricflow
+test-include-slow-dbt-metricflow:
+	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_DBT_METRICFLOW)/
+
+.PHONY: test-include-slow
+test-include-slow: test-include-slow-metricflow test-include-slow-dbt-metricflow
 
 .PHONY: test-postgresql
 test-postgresql:
@@ -90,8 +99,7 @@ test-trino:
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
-	@echo "\n\nTypechecking dbt-metricflow separately due to dbt-core dependency...\n\n"
-	cd dbt-metricflow && hatch -v run dev-env:mypy --config-file ../mypy.ini dbt_metricflow
+	cd dbt-metricflow && hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
 
 # Running data warehouses locally
 .PHONY: postgresql postgres
@@ -105,12 +113,12 @@ trino:
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
-	hatch -v run dev-env:python tests_metricflow/generate_snapshots.py
+	python3 -m scripts.generate_snapshots
 
 # Populate persistent source schemas for all relevant SQL engines.
 .PHONY: populate-persistent-source-schemas
 populate-persistent-source-schemas:
-	hatch -v run dev-env:python $(TESTS_METRICFLOW)/populate_persistent_source_schemas.py
+	python3 -m scripts.populate_persistent_source_schemas
 
 # Sync dbt-semantic-interfaces files to metricflow-semantic-interfaces folder
 .PHONY: sync-dsi
@@ -133,9 +141,17 @@ testx-snap:
 .PHONY: test-snap-slow
 test-snap-slow:
 	cd dbt-metricflow && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_DBT_METRICFLOW)/
-	cd metricflow-semantics && hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTICS)/
+	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW_SEMANTIC_INTERFACES)/
 	hatch -v run dev-env:pytest -vv -n $(PARALLELISM) --overwrite-snapshots $(TESTS_METRICFLOW)/
 
+.PHONY: test-build-packages-metricflow
+test-build-packages-metricflow:
+	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=. --package metricflow
+
+.PHONY: test-build-packages-dbt-metricflow
+test-build-packages-dbt-metricflow:
+	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=. --package dbt-metricflow
+
 .PHONY: test-build-packages
-test-build-packages:
-	PYTHONPATH=. python scripts/ci_tests/run_package_build_tests.py --metricflow-repo-directory=.
+test-build-packages: test-build-packages-metricflow test-build-packages-dbt-metricflow

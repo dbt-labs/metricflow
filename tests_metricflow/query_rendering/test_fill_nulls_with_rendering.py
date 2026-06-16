@@ -6,11 +6,6 @@ import datetime
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from dbt_semantic_interfaces.implementations.filters.where_filter import (
-    PydanticWhereFilter,
-)
-from dbt_semantic_interfaces.references import EntityReference
-from dbt_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -23,6 +18,11 @@ from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.implementations.filters.where_filter import (
+    PydanticWhereFilter,
+)
+from metricflow_semantic_interfaces.references import EntityReference
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
 
@@ -35,7 +35,7 @@ def test_simple_fill_nulls_with_0_metric_time(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -58,7 +58,7 @@ def test_simple_fill_nulls_with_0_month(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         time_dimension_specs=(MTD_SPEC_MONTH,),
     )
 
@@ -81,7 +81,7 @@ def test_simple_fill_nulls_with_0_with_non_metric_time(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         time_dimension_specs=(
             TimeDimensionSpec(
                 element_name="paid_at",
@@ -110,7 +110,7 @@ def test_simple_fill_nulls_with_0_with_categorical_dimension(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0"),),
         dimension_specs=(DimensionSpec(element_name="is_instant", entity_links=(EntityReference("booking"),)),),
     )
 
@@ -133,7 +133,7 @@ def test_simple_fill_nulls_without_time_spine(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_fill_nulls_with_0_without_time_spine"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_fill_nulls_with_0_without_time_spine"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -156,7 +156,7 @@ def test_cumulative_fill_nulls(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="every_two_days_bookers_fill_nulls_with_0"),),
+        metric_specs=(MetricSpec.create(element_name="every_two_days_bookers_fill_nulls_with_0"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 
@@ -179,7 +179,7 @@ def test_derived_fill_nulls_for_one_input_metric(  # noqa: D103
     sql_client: SqlClient,
 ) -> None:
     query_spec = MetricFlowQuerySpec(
-        metric_specs=(MetricSpec(element_name="bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset"),),
+        metric_specs=(MetricSpec.create(element_name="bookings_growth_2_weeks_fill_nulls_with_0_for_non_offset"),),
         time_dimension_specs=(MTD_SPEC_DAY,),
     )
 

@@ -4,10 +4,10 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Sequence
 
-from dbt_semantic_interfaces.protocols.metric import MetricTimeWindow
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
+from metricflow_semantics.specs.time_window import TimeWindow
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
@@ -24,7 +24,7 @@ class OffsetCustomGranularityNode(DataflowPlanNode, ABC):
     non-offset column for the base grain. The base grain is needed to join to the source node.
     """
 
-    offset_window: MetricTimeWindow
+    offset_window: TimeWindow
     required_time_spine_specs: Sequence[TimeDimensionSpec]
     time_spine_node: DataflowPlanNode
 
@@ -41,7 +41,7 @@ class OffsetCustomGranularityNode(DataflowPlanNode, ABC):
     @staticmethod
     def create(  # noqa: D102
         time_spine_node: DataflowPlanNode,
-        offset_window: MetricTimeWindow,
+        offset_window: TimeWindow,
         required_time_spine_specs: Sequence[TimeDimensionSpec],
     ) -> OffsetCustomGranularityNode:
         return OffsetCustomGranularityNode(

@@ -3,9 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Sequence
 
-from dbt_semantic_interfaces.protocols import SemanticManifest
-
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest
+from metricflow_semantic_interfaces.protocols import SemanticManifest
 
 
 class MetricFlowRequestGenerator(ABC):

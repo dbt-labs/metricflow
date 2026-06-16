@@ -7,6 +7,16 @@ Welcome to the MetricFlow developer community, we're thrilled to have you aboard
 1. Familiarize yourself with our [Code of Conduct](https://www.getdbt.com/community/code-of-conduct/#:~:text=We%20want%20everyone%20to%20have,don't%20be%20a%20jerk.). In summary - be kind to each other. We're all here trying to make the data world a better place to work.
 2. Make sure you can sign our [Contributor License Agreement](https://docs.getdbt.com/community/resources/contributor-license-agreements). Unfortunately, we cannot accept PRs unless you have signed. If you are not able to sign the agreement you may still participate in our Slack community or interact with Issues. To sign the agreement simply put up a PR, and you will receive instructions there.
 
+## Before you write any code
+
+**For interface changes, open an issue first.**
+
+If your contribution would add, remove, or modify any public interface — including query APIs, semantic manifest schemas, metric/dimension/entity definitions, CLI commands, or any other surface that downstream tools or users depend on — please [open a GitHub issue](https://github.com/dbt-labs/metricflow/issues/new) for discussion *before* writing code.
+
+Interface changes have broad impact across dbt Labs tools and the wider ecosystem, and the Semantic Layer engineering team needs to be part of that conversation early. PRs that introduce interface changes without prior discussion are very likely to be declined or sent back for significant rework, regardless of implementation quality. We want your time to be well-spent, and a brief issue thread upfront saves everyone effort.
+
+If you're not sure whether your change qualifies, err on the side of opening an issue. We're happy to help you figure out the right approach.
+
 ## Environment setup
 
 1. Ensure you have a relevant version of Python.
@@ -58,10 +68,12 @@ When running any one of the hatch commands, the environment is automatically set
         - `export MF_SQL_ENGINE_PASSWORD=<YOUR_WAREHOUSE_PASSWORD>`
     - Run `make test-<engine>` to execute the entire test suite against the target engine. This will pull in and configure the necessary dependencies for query execution. For example, to run tests against BigQuery, run `make test-bigquery`
     - By default, without `MF_SQL_ENGINE_URL` and `MF_SQL_ENGINE_PASSWORD` set, your tests will run against DuckDB.
-4. Run the linters with `make lint` at any time, but especially before submitting a PR. We use:
+4. Run the linters with `make lint`. We use:
     - `Black` for formatting
     - `Ruff` for general Python linting
     - `MyPy` for typechecking
+
+    Linting **must pass before you open a PR** — CI will enforce this, and PRs with lint failures won't be reviewed until they're clean. Running it locally before pushing saves you a round trip.
 5. To see how your changes work with more interactive queries, use your repo-local CLI.
     - Run `hatch run dev-env:mf --help`
     - Follow the CLI help from there, just remember your local CLI is always `hatch run dev-env:run mf <COMMAND>`!
@@ -75,7 +87,7 @@ We use [changie](https://changie.dev) to generate `CHANGELOG` entries. **Note:**
 In order to use it, you can:
 
 1. Follow the steps to [install `changie`](https://changie.dev/guide/installation/) for your system.
-2. Once changie is installed and your PR is created for a new feature, run the following command and changie will walk you through the process of creating a changelog entry. `changie new`.
+2. Once changie is installed, run `changie new` **before opening your PR** and changie will walk you through the process of creating a changelog entry.
 3. Commit the file that's created and your changelog entry is complete!
 4. (Optional if contributing to a feature in progress) Modify the changie yaml file in `metricflow/.changes/unreleased/` related to your change. If you need help finding this file, please ask within the discussion for the pull request!
 
@@ -83,16 +95,20 @@ You don't need to worry about which `metricflow` version your change will go int
 
 ## Submit your contribution!
 
-1. Merge your changes into your fork of the MetricFlow repository
+1. Rebase your branch onto the latest `main` before opening your PR: `git fetch upstream && git rebase upstream/main`. Keep your branch up to date with `main` throughout the review process as well — we prefer rebase over merge commits to keep history clean.
 2. Make a well-formed Pull Request (PR) from your fork into the main MetricFlow repository. If you're not clear on what a well-formed PR looks like, fear not! We will help you here and throughout the review process.
-    - Well-formed PRs are composed of one or more well-formed commits, and include clear indications of how they were tested and verified prior to submission.
+
+    **A PR should do one thing.** This is the single most important rule for getting a timely, high-quality review. A PR that mixes a bug fix, a refactor, and a new feature is much harder to review carefully — and mistakes are more likely to slip through. If you find yourself writing "also" or "while I was in here..." in your PR description, that's a signal to split.
+
+    - Well-formed PRs are composed of one or more well-formed commits, and include clear indications of how they were tested and verified prior to submission. **PRs that add new behavior or fix bugs must include tests.** We will ask you to add them if they're missing, so save yourself the round trip.
+    - **Use commits to tell the story of your PR.** When a PR involves multiple logical steps — for example, first refactoring an internal structure, then adding new behavior on top — break those into separate commits. A reviewer should be able to read through your commits in order and understand how you arrived at the final state. Squashing everything into a single commit is fine for trivial changes, but obscures the reasoning for anything non-trivial.
     - Well-formed commits are focused (loosely speaking they do one conceptual thing) and well-described.
-    - A good commit message - like a good PR message - will have three components:
+    - A good commit message — like a good PR message — will have three components:
         1. A succinct title explaining what the commit does
         2. A separate body describing WHY the change is being made
         3. Additional detail on what the commit does, if needed
     - We want this because we believe the hardest part of a collaborative software project is not getting the computer to do what it's supposed to do. It's communicating to a human reader what you meant for the computer to do (and why!), and also getting the computer to do that thing.
-    - This helps you too - well-formed PRs get reviewed a lot faster and a lot more productively. We want your contribution experience to be as smooth as possible and this helps immensely!
+    - This helps you too — well-formed PRs get reviewed a lot faster and a lot more productively. We want your contribution experience to be as smooth as possible and this helps immensely!
 3. One of our core contributors will review your PR and either approve it or send it back with requests for updates
 4. Once the PR has been approved, our core contributors will merge it into the main project.
 5. You will get a shoutout in our changelog/release notes. Thank you for your contribution!

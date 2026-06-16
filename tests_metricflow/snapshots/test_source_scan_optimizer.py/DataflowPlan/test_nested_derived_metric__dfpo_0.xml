@@ -3,8 +3,8 @@ test_filename: test_source_scan_optimizer.py
 docstring:
   Tests optimization of a query that use a nested derived metric from a single semantic model.
 
-      The optimal solution would reduce this to 1 source scan, but there are challenges with derived metrics e.g. aliases,
-      so that is left as a future improvement.
+  The optimal solution would reduce this to 1 source scan, but there are challenges with derived metrics e.g. aliases,
+  so that is left as a future improvement.
 ---
 <DataflowPlan>
     <WriteToResultDataTableNode>
@@ -55,11 +55,11 @@ docstring:
                                     <!-- distinct = False -->
                                     <MetricTimeDimensionTransformNode>
                                         <!-- description = "Metric Time Dimension 'ds'" -->
-                                        <!-- node_id = NodeId(id_str='sma_0') -->
+                                        <!-- node_id = NodeId(id_str='sma_28009') -->
                                         <!-- aggregation_time_dimension = 'ds' -->
                                         <ReadSqlSourceNode>
                                             <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                            <!-- node_id = NodeId(id_str='rss_0') -->
+                                            <!-- node_id = NodeId(id_str='rss_28020') -->
                                             <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                         </ReadSqlSourceNode>
                                     </MetricTimeDimensionTransformNode>
@@ -101,11 +101,11 @@ docstring:
                                 <!-- distinct = False -->
                                 <MetricTimeDimensionTransformNode>
                                     <!-- description = "Metric Time Dimension 'ds'" -->
-                                    <!-- node_id = NodeId(id_str='sma_1') -->
+                                    <!-- node_id = NodeId(id_str='sma_28009') -->
                                     <!-- aggregation_time_dimension = 'ds' -->
                                     <ReadSqlSourceNode>
                                         <!-- description = "Read From SemanticModelDataSet('bookings_source')" -->
-                                        <!-- node_id = NodeId(id_str='rss_1') -->
+                                        <!-- node_id = NodeId(id_str='rss_28020') -->
                                         <!-- data_set = SemanticModelDataSet('bookings_source') -->
                                     </ReadSqlSourceNode>
                                 </MetricTimeDimensionTransformNode>
