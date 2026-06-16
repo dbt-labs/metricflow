@@ -10,7 +10,6 @@ from typing import Dict, Optional, Sequence
 
 import click
 from dateutil.parser import parse as parse_datetime
-from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
 from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -21,6 +20,7 @@ from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowExpl
 from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
+from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
 
 logger = logging.getLogger(__name__)
 
