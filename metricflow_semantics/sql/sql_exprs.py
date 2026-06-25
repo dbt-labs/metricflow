@@ -6,11 +6,10 @@ import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Generic, List, Mapping, Optional, Sequence, Tuple
+from typing import ClassVar, Dict, Generic, List, Literal, Mapping, Optional, Sequence, Tuple
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagNode, DisplayedProperty
-from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInputAggregation
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.toolkit.merger import Mergeable
 from metricflow_semantics.toolkit.mf_logging.pretty_formatter import PrettyFormatContext
@@ -18,7 +17,6 @@ from metricflow_semantics.toolkit.visitor import Visitable, VisitorOutputT
 from typing_extensions import override
 
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow_semantic_interfaces.protocols.measure import MeasureAggregationParameters
 from metricflow_semantic_interfaces.type_enums.aggregation_type import AggregationType
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.period_agg import PeriodAggregation
@@ -792,6 +790,18 @@ class SqlFunction(Enum):
             assert_values_exhausted(aggregation_type)
 
 
+NonPercentileAggregationType = Literal[
+    AggregationType.SUM,
+    AggregationType.MIN,
+    AggregationType.MAX,
+    AggregationType.COUNT_DISTINCT,
+    AggregationType.SUM_BOOLEAN,
+    AggregationType.AVERAGE,
+    AggregationType.MEDIAN,
+    AggregationType.COUNT,
+]
+
+
 @dataclass(frozen=True, eq=False)
 class SqlFunctionExpression(SqlExpressionNode):
     """Denotes a function expression in SQL."""
@@ -803,19 +813,20 @@ class SqlFunctionExpression(SqlExpressionNode):
         pass
 
     @staticmethod
-    def build_expression_from_aggregation_type(
-        aggregation_type: AggregationType,
+    def build_expression_for_non_percentile_aggregation(
+        aggregation_type: NonPercentileAggregationType,
         sql_column_expression: SqlColumnReferenceExpression,
-        agg_params: Optional[SimpleMetricInputAggregation] = None,
     ) -> SqlFunctionExpression:
-        """Returns sql function expression depending on aggregation type."""
-        if aggregation_type is AggregationType.PERCENTILE:
-            assert agg_params is not None, "Agg_params is none, which should have been caught in validation"
-            return SqlPercentileExpression.create(
-                sql_column_expression, SqlPercentileExpressionArgument.from_aggregation_parameters(agg_params)
-            )
-        else:
-            return SqlAggregateFunctionExpression.from_aggregation_type(aggregation_type, sql_column_expression)
+        """Build a SQL expression for an aggregation that does not require percentile-specific syntax."""
+        return SqlAggregateFunctionExpression.from_aggregation_type(aggregation_type, sql_column_expression)
+
+    @staticmethod
+    def build_expression_for_percentile_aggregation(
+        percentile_args: SqlPercentileExpressionArgument,
+        sql_column_expression: SqlColumnReferenceExpression,
+    ) -> SqlFunctionExpression:
+        """Build a SQL expression for a percentile aggregation."""
+        return SqlPercentileExpression.create(sql_column_expression, percentile_args)
 
 
 @dataclass(frozen=True, eq=False)
@@ -926,28 +937,21 @@ class SqlPercentileExpressionArgument:
     percentile: float
     function_type: SqlPercentileFunctionType
 
+    _PERCENTILE_FLAGS_TO_FUNCTION_TYPE: ClassVar[
+        Mapping[Tuple[UseDiscretePercentile, UseApproximatePercentile], SqlPercentileFunctionType]
+    ] = {
+        (False, False): SqlPercentileFunctionType.CONTINUOUS,
+        (True, False): SqlPercentileFunctionType.DISCRETE,
+        (False, True): SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
+        (True, True): SqlPercentileFunctionType.APPROXIMATE_DISCRETE,
+    }
+
     @staticmethod
-    def from_aggregation_parameters(agg_params: MeasureAggregationParameters) -> SqlPercentileExpressionArgument:
-        """Given the simple-metric input parameters, returns a SqlPercentileExpressionArgument with the corresponding percentile args."""
-        if not agg_params.percentile:
-            raise RuntimeError("Percentile value is none - this should have been caught during model parsing.")
-
-        flags_to_function_type: Mapping[
-            Tuple[UseDiscretePercentile, UseApproximatePercentile], SqlPercentileFunctionType
-        ] = {
-            (False, False): SqlPercentileFunctionType.CONTINUOUS,
-            (True, False): SqlPercentileFunctionType.DISCRETE,
-            (False, True): SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
-            (True, True): SqlPercentileFunctionType.APPROXIMATE_DISCRETE,
-        }
-
-        percentile_function_type = flags_to_function_type[
-            (agg_params.use_discrete_percentile, agg_params.use_approximate_percentile)
-        ]
-
+    def create(percentile: float, discrete: bool, approximate: bool) -> SqlPercentileExpressionArgument:
+        """Create a SQL percentile argument from percentile settings."""
         return SqlPercentileExpressionArgument(
-            agg_params.percentile,
-            percentile_function_type,
+            percentile,
+            SqlPercentileExpressionArgument._PERCENTILE_FLAGS_TO_FUNCTION_TYPE[(discrete, approximate)],
         )
 
 

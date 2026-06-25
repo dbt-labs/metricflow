@@ -5,13 +5,13 @@ from typing import Optional, Sequence
 
 from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DisplayedProperty
+from metricflow_semantics.specs.non_additive_dimension_spec import NonAdditiveWindowChoiceType
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.toolkit.visitor import VisitorOutputT
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
 from metricflow_semantic_interfaces.references import EntityReference
-from metricflow_semantic_interfaces.type_enums import AggregationType
 
 
 @dataclass(frozen=True, eq=False)
@@ -72,7 +72,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
 
     entity_references: Sequence[EntityReference]
     time_dimension_spec: TimeDimensionSpec
-    agg_by_function: AggregationType
+    agg_by_function: NonAdditiveWindowChoiceType
     queried_time_dimension_spec: Optional[TimeDimensionSpec]
 
     def __post_init__(self) -> None:  # noqa: D105
@@ -84,7 +84,7 @@ class SemiAdditiveJoinNode(DataflowPlanNode):
         parent_node: DataflowPlanNode,
         entity_references: Sequence[EntityReference],
         time_dimension_spec: TimeDimensionSpec,
-        agg_by_function: AggregationType,
+        agg_by_function: NonAdditiveWindowChoiceType,
         queried_time_dimension_spec: Optional[TimeDimensionSpec] = None,
     ) -> SemiAdditiveJoinNode:
         return SemiAdditiveJoinNode(
