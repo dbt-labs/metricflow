@@ -31,6 +31,7 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
+    NonPercentileAggregationType,
     SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
     SqlArithmeticExpression,
@@ -1311,7 +1312,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             node.time_dimension_spec.with_aggregation_state(AggregationState.COMPLETE),
         ).column_name
         time_dimension_select_column = SqlSelectColumn(
-            expr=SqlFunctionExpression.build_expression_from_aggregation_type(
+            expr=SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
                 aggregation_type=node.agg_by_function,
                 sql_column_expression=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
@@ -1681,12 +1682,13 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         select_columns: List[SqlSelectColumn] = []
         metadata_instances: List[MetadataInstance] = []
-        for agg_type in (AggregationType.MIN, AggregationType.MAX):
+        agg_types: Tuple[NonPercentileAggregationType, ...] = (AggregationType.MIN, AggregationType.MAX)
+        for agg_type in agg_types:
             metadata_spec = MetadataSpec(element_name=parent_column_alias, agg_type=agg_type)
             output_column_association = self._column_association_resolver.resolve_spec(metadata_spec)
             select_columns.append(
                 SqlSelectColumn(
-                    expr=SqlFunctionExpression.build_expression_from_aggregation_type(
+                    expr=SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
                         aggregation_type=agg_type,
                         sql_column_expression=SqlColumnReferenceExpression.create(
                             SqlColumnReference(table_alias=parent_table_alias, column_name=parent_column_alias)
