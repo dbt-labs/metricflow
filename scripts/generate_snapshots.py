@@ -8,6 +8,10 @@ export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
         "engine_url": null,
         "engine_password": null
     },
+    "athena": {
+        "engine_url": "athena://...",
+        "engine_password": "..."
+    },
     "redshift": {
         "engine_url": "redshift://...",
         "engine_password": "..."
@@ -45,7 +49,13 @@ import os
 import shlex
 import subprocess
 from dataclasses import dataclass
-from typing import Final, Optional, Sequence, cast
+from typing import Optional, Sequence, cast
+
+from scripts.snapshot_engine_config import (
+    DUCKDB_ENGINE_NAME,
+    ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME,
+    ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,23 +65,6 @@ MF_SEMANTICS_TEST_DIRECTORY = "tests_metricflow_semantics"
 
 # Tests that generate SQL engine snapshots have this `pytest` marker set.
 SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
-
-DUCKDB_ENGINE_NAME = "duck_db"
-
-# Maps the engine name in the credentials JSON to the `hatch` environment name.
-ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
-    DUCKDB_ENGINE_NAME: "dev-env",
-    "redshift": "redshift-env",
-    "snowflake": "snowflake-env",
-    "big_query": "bigquery-env",
-    "databricks": "databricks-env",
-    "postgres": "postgres-env",
-    "trino": "trino-env",
-}
-
-ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(
-    ("redshift", "snowflake", "big_query", "databricks")
-)
 
 
 @dataclass(frozen=True)

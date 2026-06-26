@@ -54,6 +54,9 @@ dbt-databricks = [
 dbt-duckdb = [
   "requirements-files/requirements-dbt-duckdb.txt"
 ]
+dbt-athena = [
+  "requirements-files/requirements-dbt-athena.txt"
+]
 dbt-postgres = [
   "requirements-files/requirements-dbt-postgres.txt"
 ]
