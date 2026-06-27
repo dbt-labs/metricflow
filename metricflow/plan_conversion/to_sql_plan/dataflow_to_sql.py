@@ -98,9 +98,16 @@ class DataflowToSqlPlanConverter:
                 # TODO: Make this a more generally accessible attribute instead of checking against the
                 # BigQuery-ness of the engine
                 use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
+                # ClickHouse's query analyzer resolves unqualified column names in WHERE to SELECT aliases when
+                # names match. This violates standard SQL evaluation order and can cause ILLEGAL_AGGREGATION errors
+                # or silent wrong results. Enable the guard that prevents reducing when the FROM source's WHERE
+                # contains SqlStringExpression (the only source of unqualified column references).
+                has_ambiguous_alias_resolution_in_where = sql_engine_type is SqlEngine.CLICKHOUSE
 
                 option_set = SqlGenerationOptionSet.options_for_level(
-                    attempted_optimization_level, use_column_alias_in_group_by=use_column_alias_in_group_by
+                    attempted_optimization_level,
+                    use_column_alias_in_group_by=use_column_alias_in_group_by,
+                    has_ambiguous_alias_resolution_in_where=has_ambiguous_alias_resolution_in_where,
                 )
 
                 logger.info(

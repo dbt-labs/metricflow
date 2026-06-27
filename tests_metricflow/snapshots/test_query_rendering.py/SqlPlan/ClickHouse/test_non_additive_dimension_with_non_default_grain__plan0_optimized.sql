@@ -1,0 +1,21 @@
+test_name: test_non_additive_dimension_with_non_default_grain
+test_filename: test_query_rendering.py
+docstring:
+  Tests querying a metric with a non-additive agg_time_dimension that has non-default granularity.
+sql_engine: ClickHouse
+---
+SELECT
+  SUM(subq_11.__total_account_balance_first_day_of_month) AS total_account_balance_first_day_of_month
+FROM (
+  SELECT
+    toStartOfMonth(ds_month) AS ds_month__month
+    , account_balance AS __total_account_balance_first_day_of_month
+  FROM ***************************.fct_accounts accounts_source_src_28000
+) subq_11
+INNER JOIN (
+  SELECT
+    MIN(toStartOfMonth(ds_month)) AS ds_month__month__complete
+  FROM ***************************.fct_accounts accounts_source_src_28000
+) subq_13
+ON
+  subq_11.ds_month__month = subq_13.ds_month__month__complete

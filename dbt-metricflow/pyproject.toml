@@ -63,6 +63,9 @@ dbt-redshift = [
 dbt-snowflake = [
   "requirements-files/requirements-dbt-snowflake.txt"
 ]
+dbt-clickhouse = [
+    "requirements-files/requirements-dbt-clickhouse.txt"
+]
 dbt-trino = [
   "requirements-files/requirements-dbt-trino.txt"
 ]
