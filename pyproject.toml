@@ -158,6 +158,10 @@ compile = [
 validate = [
   "python sidecar/validate_mf_entry.py",
 ]
+build-and-validate = [
+  "hatch run nuitka-build:compile",
+  "hatch run nuitka-build:validate",
+]
 
 
 [tool.black]

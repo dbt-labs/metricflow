@@ -34,29 +34,26 @@ printf '{"id":"1","method":"explain","v":1,"params":{"manifest_path":"%s","metri
   | hatch run dev-env:python sidecar/mf_entry.py
 ```
 
-## Building
+## Building and local validation
 
-Compile `mf_entry.py` to a standalone binary:
+To compile and validate in one step:
 
 ```bash
-hatch run nuitka-build:compile
+hatch run nuitka-build:build-and-validate
 ```
 
 Output lands in `sidecar/mf_entry.dist/`. The binary is named `mf_entry.bin`
-on macOS/Linux and `mf_entry.exe` on Windows.
+on macOS/Linux and `mf_entry.exe` on Windows. The validation step sends the
+same `explain` request to both the Python interpreter and the compiled binary
+and diffs the `sql` field — a mismatch means the Nuitka build is diverging
+from the interpreter.
 
-## Validation
-
-After building, confirm the binary produces identical SQL to the Python
-interpreter:
+The two steps can also be run separately:
 
 ```bash
-hatch run nuitka-build:validate
+hatch run nuitka-build:compile    # build only
+hatch run nuitka-build:validate   # validate only (binary must already exist)
 ```
-
-This sends the same `explain` request to both and diffs the `sql` field of
-each response. A mismatch means something in the Nuitka build is diverging
-from the interpreter.
 
 ## mf-ipc v1 protocol
 
