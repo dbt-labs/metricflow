@@ -1,6 +1,6 @@
 """Script to help generate test snapshots for all supported engines.
 
-Credentials are stored as a JSON string in an environment variable set via a shell command like:
+Credentials are stored as a JSON string in an environment variable set via a shell command like this.
 
 export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
 {
@@ -31,6 +31,10 @@ export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
     "trino": {
         "engine_url": trino://...",
         "engine_password": "..."
+    },
+    "starrocks": {
+        "engine_url": "starrocks://root@localhost:9030/test",
+        "engine_password": ""
     },
 }
 EOF
@@ -67,6 +71,7 @@ ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
     "databricks": "databricks-env",
     "postgres": "postgres-env",
     "trino": "trino-env",
+    "starrocks": "starrocks-env",
 }
 
 ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(

@@ -134,6 +134,36 @@ jobs:
               ]
             }
 
+  starrocks-tests:
+    # StarRocks tests run on a local service container, similar to Trino.
+    name: StarRocks Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
+    runs-on: ubuntu-latest
+    services:
+      starrocks:
+        image: starrocks/allin1-ubuntu:3.5-latest
+        ports:
+          - 9030:9030
+        options: >-
+          --health-cmd "mysql -h 127.0.0.1 -P 9030 -u root -e 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+          --health-start-period 60s
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          make-target: "test-starrocks"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "starrocks-env"}
+              ]
+            }
+
   remove-label:
     name: Remove Label After Running Tests
     runs-on: ubuntu-latest

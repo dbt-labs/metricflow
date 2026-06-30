@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
@@ -15,8 +16,15 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPla
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
 from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
+from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.dataflow_plan_to_svg import display_graph_if_requested
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_from_plan_equal
+
+
+def skip_if_time_granularity_not_supported(sql_client: SqlClient, time_granularity: TimeGranularity) -> None:
+    """Skip a test that explicitly requires a time granularity unsupported by the SQL engine."""
+    if time_granularity in sql_client.sql_engine_type.unsupported_granularities:
+        pytest.skip(f"{sql_client.sql_engine_type.value} does not support {time_granularity.name} granularity.")
 
 
 def render_and_check(

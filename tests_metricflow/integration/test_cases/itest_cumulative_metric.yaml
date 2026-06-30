@@ -437,7 +437,7 @@ integration_test:
       FROM (
         SELECT
           t.ds AS metric_time__day
-          , {{ render_date_trunc("T.ds", TimeGranularity.WEEK) }} AS metric_time__week
+          , {{ render_date_trunc("t.ds", TimeGranularity.WEEK) }} AS metric_time__week
           , {{ render_date_trunc("t.ds", TimeGranularity.QUARTER) }} AS metric_time__quarter
           , SUM(r.revenue) AS revenue_all_time
         FROM {{ source_schema }}.mf_time_spine t

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import Final, List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -9,24 +9,35 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlCastToTimestampExpression,
     SqlColumnReference,
     SqlColumnReferenceExpression,
+    SqlExtractExpression,
     SqlGenerateUuidExpression,
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlPercentileFunctionType,
     SqlStringExpression,
     SqlStringLiteralExpression,
+    SqlSubtractTimeIntervalExpression,
 )
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.sql_plan import (
     SqlSelectColumn,
 )
 from metricflow.sql.sql_select_node import SqlJoinDescription, SqlOrderByDescription, SqlSelectStatementNode
 from metricflow.sql.sql_table_node import SqlTableNode
+from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.sql.compare_sql_plan import assert_rendered_sql_equal
+
+ENGINES_WITH_NEW_TIME_EXPR_SNAPSHOTS: Final[frozenset[SqlEngine]] = frozenset((SqlEngine.DUCKDB, SqlEngine.STARROCKS))
+
+
+def _skip_unless_new_time_expr_snapshot_is_available(sql_client: SqlClient) -> None:
+    """Limit new time-expression snapshots to engines covered by this change."""
+    if sql_client.sql_engine_type not in ENGINES_WITH_NEW_TIME_EXPR_SNAPSHOTS:
+        pytest.skip(f"No snapshot has been added for {sql_client.sql_engine_type.value}.")
 
 
 @pytest.mark.sql_engine_snapshot
@@ -328,6 +339,81 @@ def test_add_time_expr(
         mf_test_configuration=mf_test_configuration,
         sql_plan_node=SqlSelectStatementNode.create(
             description="Test Add Time Expression",
+            select_columns=tuple(select_columns),
+            from_source=from_source,
+            from_source_alias=from_source_alias,
+        ),
+        plan_id="plan0",
+        sql_client=sql_client,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_subtract_time_expr(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering of the SqlSubtractTimeIntervalExpression in a query."""
+    _skip_unless_new_time_expr_snapshot_is_available(sql_client)
+
+    select_columns = [
+        SqlSelectColumn(
+            expr=SqlSubtractTimeIntervalExpression.create(
+                arg=SqlStringLiteralExpression.create(
+                    "2020-01-01",
+                ),
+                count=1,
+                granularity=TimeGranularity.QUARTER,
+            ),
+            column_alias="subtract_time",
+        ),
+    ]
+
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source_alias = "a"
+
+    assert_rendered_sql_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_plan_node=SqlSelectStatementNode.create(
+            description="Test Subtract Time Expression",
+            select_columns=tuple(select_columns),
+            from_source=from_source,
+            from_source_alias=from_source_alias,
+        ),
+        plan_id="plan0",
+        sql_client=sql_client,
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_extract_dow_expr(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+) -> None:
+    """Tests rendering of EXTRACT with day-of-week date part, which requires normalization on some engines."""
+    _skip_unless_new_time_expr_snapshot_is_available(sql_client)
+
+    select_columns = [
+        SqlSelectColumn(
+            expr=SqlExtractExpression.create(
+                date_part=DatePart.DOW,
+                arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "ds")),
+            ),
+            column_alias="dow",
+        ),
+    ]
+
+    from_source = SqlTableNode.create(sql_table=SqlTable(schema_name="foo", table_name="bar"))
+    from_source_alias = "a"
+
+    assert_rendered_sql_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_plan_node=SqlSelectStatementNode.create(
+            description="Test Extract DOW Expression",
             select_columns=tuple(select_columns),
             from_source=from_source,
             from_source_alias=from_source_alias,

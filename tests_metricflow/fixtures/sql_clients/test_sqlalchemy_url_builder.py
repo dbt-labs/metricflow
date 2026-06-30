@@ -103,6 +103,23 @@ def test_redshift_url() -> None:
     assert url.database == "dev"
 
 
+def test_starrocks_url() -> None:
+    """Test StarRocks URL with default MySQL-protocol port.
+
+    StarRocks does not support a 'schema' connection parameter (pymysql raises TypeError),
+    so no default database is set in the URL. All queries use fully-qualified schema.table names.
+    """
+    params = SqlEngineConnectionParameterSet.create_from_url("starrocks://root@localhost:9030/test")
+    url = SqlAlchemyUrlBuilder.build_url(params, password="", schema="analytics")
+
+    assert url.drivername == "starrocks"
+    assert url.username == "root"
+    assert url.host == "localhost"
+    assert url.port == 9030
+    assert url.database is None
+    assert "schema" not in url.query
+
+
 def test_bigquery_url() -> None:
     """Test BigQuery URL with JSON credentials."""
     credentials_json = '{"type": "service_account", "project_id": "my-project", "client_email": "test@test.com"}'

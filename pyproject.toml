@@ -67,6 +67,10 @@ trino-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-trino.txt",
 ]
+starrocks-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-starrocks.txt",
+]
 
 
 [project.urls]
@@ -144,6 +148,16 @@ MF_SQL_ENGINE_PASSWORD=""
 description = "Dev environment for working with Trino"
 template = "dev-env"
 features = ["trino-env-requirements"]
+
+
+[tool.hatch.envs.starrocks-env.env-vars]
+MF_SQL_ENGINE_URL = "starrocks://root@localhost:9030/test"
+MF_SQL_ENGINE_PASSWORD = ""
+
+[tool.hatch.envs.starrocks-env]
+description = "Dev environment for working with StarRocks"
+template = "dev-env"
+features = ["starrocks-env-requirements"]
 
 
 [tool.black]

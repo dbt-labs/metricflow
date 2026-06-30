@@ -14,6 +14,7 @@ class SqlDialect(Enum):
     BIGQUERY = "bigquery"
     DATABRICKS = "databricks"
     TRINO = "trino"
+    STARROCKS = "starrocks"
 
 
 T = TypeVar("T")
