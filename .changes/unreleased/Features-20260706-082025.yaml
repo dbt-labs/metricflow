@@ -1,0 +1,6 @@
+kind: Features
+body: Add Athena adapter and SQL rendering support
+time: 2026-07-06T08:20:25.174126+02:00
+custom:
+    Author: faaabi963
+    Issue: 1925 979
