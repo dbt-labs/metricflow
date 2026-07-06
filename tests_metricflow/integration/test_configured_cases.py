@@ -34,7 +34,6 @@ from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPla
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, OutputColumnOrderMode
 from metricflow.protocols.sql_client import SqlClient
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasureAggregationParameters
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
@@ -145,12 +144,10 @@ class CheckQueryHelpers:
         self, expr: str, percentile: float, use_discrete_percentile: bool, use_approximate_percentile: bool
     ) -> str:
         """Return the percentile call that can be used for computing a percentile aggregation."""
-        percentile_args = SqlPercentileExpressionArgument.from_aggregation_parameters(
-            PydanticMeasureAggregationParameters(
-                percentile=percentile,
-                use_discrete_percentile=use_discrete_percentile,
-                use_approximate_percentile=use_approximate_percentile,
-            )
+        percentile_args = SqlPercentileExpressionArgument.create(
+            percentile=percentile,
+            discrete=use_discrete_percentile,
+            approximate=use_approximate_percentile,
         )
 
         renderable_expr = SqlPercentileExpression.create(
