@@ -5,15 +5,13 @@ from __future__ import annotations
 import logging
 
 from scripts.generate_snapshots import (
+    ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME,
+    ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS,
     MetricFlowEngineConfiguration,
     load_credential_sets,
     run_hatch_command,
     set_engine_env_variables,
     setup_logging,
-)
-from scripts.snapshot_engine_config import (
-    ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME,
-    ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS,
 )
 
 logger = logging.getLogger(__name__)

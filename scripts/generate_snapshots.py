@@ -49,19 +49,31 @@ import os
 import shlex
 import subprocess
 from dataclasses import dataclass
-from typing import Optional, Sequence, cast
-
-from scripts.snapshot_engine_config import (
-    DUCKDB_ENGINE_NAME,
-    ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME,
-    ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS,
-)
+from typing import Final, Optional, Sequence, cast
 
 logger = logging.getLogger(__name__)
 
 
 MF_TEST_DIRECTORY = "tests_metricflow"
 MF_SEMANTICS_TEST_DIRECTORY = "tests_metricflow_semantics"
+
+DUCKDB_ENGINE_NAME: Final[str] = "duck_db"
+
+# Maps the engine name in the credentials JSON to the `hatch` environment name.
+ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
+    DUCKDB_ENGINE_NAME: "dev-env",
+    "athena": "athena-env",
+    "redshift": "redshift-env",
+    "snowflake": "snowflake-env",
+    "big_query": "bigquery-env",
+    "databricks": "databricks-env",
+    "postgres": "postgres-env",
+    "trino": "trino-env",
+}
+
+ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(
+    ("athena", "redshift", "snowflake", "big_query", "databricks")
+)
 
 # Tests that generate SQL engine snapshots have this `pytest` marker set.
 SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"

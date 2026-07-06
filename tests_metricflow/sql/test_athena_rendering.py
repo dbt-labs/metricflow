@@ -19,7 +19,7 @@ from metricflow.protocols.sql_client import SqlEngine
 from metricflow.sql.render.athena import AthenaSqlExpressionRenderer, AthenaSqlPlanRenderer
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from scripts.snapshot_engine_config import ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
+from scripts.generate_snapshots import ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME
 from tests_metricflow.fixtures.connection_url import SqlEngineConnectionParameterSet
 
 
