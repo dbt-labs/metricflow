@@ -123,7 +123,14 @@ class BigQuerySqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
     @override
     def visit_date_trunc_expr(self, node: SqlDateTruncExpression) -> SqlExpressionRenderResult:
-        """Render DATE_TRUNC for BigQuery, which takes the opposite argument order from Snowflake and Redshift."""
+        """Render the DATE_TRUNC analog (TIMESTAMP_TRUNC) for BigQuery.
+
+        In BigQuery, both DATETIME_TRUNC and TIMESTAMP_TRUNC are overloaded to accept DATETIME and TIMESTAMP types
+        and return the same type. Both default to UTC for TIMESTAMP inputs if the argument is a TIMESTAMP and no
+        timezone is provided.
+
+        However, TIMESTAMP_TRUNC is used as it allows for partition pruning when used with partition columns.
+        """
         self._validate_granularity_for_engine(node.time_granularity)
 
         arg_rendered = self.render_sql_expr(node.arg)
