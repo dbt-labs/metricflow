@@ -32,8 +32,8 @@ FROM (
     -- Compute Metrics via Expressions
     -- Compute Metrics via Expressions
     SELECT
-      DATETIME_TRUNC(subq_15.ds, quarter) AS revenue_instance__ds__quarter
-      , DATETIME_TRUNC(subq_15.ds, year) AS revenue_instance__ds__year
+      TIMESTAMP_TRUNC(subq_15.ds, quarter) AS revenue_instance__ds__quarter
+      , TIMESTAMP_TRUNC(subq_15.ds, year) AS revenue_instance__ds__year
       , subq_15.ds AS metric_time__day
       , SUM(revenue_src_28000.revenue) AS revenue_mtd
     FROM ***************************.mf_time_spine subq_15
@@ -41,9 +41,9 @@ FROM (
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) >= DATETIME_TRUNC(subq_15.ds, month)
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) >= TIMESTAMP_TRUNC(subq_15.ds, month)
       )
     GROUP BY
       revenue_instance__ds__quarter

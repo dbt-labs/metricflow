@@ -10,8 +10,8 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
-    , DATETIME_TRUNC(ds, month) AS metric_time__month
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+    , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
     , booking_value AS __booking_value
     , guest_id AS __bookers
   FROM ***************************.fct_bookings bookings_source_src_28000
@@ -47,7 +47,7 @@ FROM (
         -- Select: ['metric_time__day', 'metric_time__month']
         SELECT
           ds AS metric_time__day
-          , DATETIME_TRUNC(ds, month) AS metric_time__month
+          , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
         FROM ***************************.mf_time_spine time_spine_src_28006
       ) subq_24
       WHERE metric_time__day = '2020-01-01'

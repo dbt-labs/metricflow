@@ -21,7 +21,7 @@ FROM (
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_20
   ON
-    DATETIME_TRUNC(time_spine_src_28005.ts, day) = subq_20.ds
+    TIMESTAMP_TRUNC(time_spine_src_28005.ts, day) = subq_20.ds
 ) subq_23
 LEFT OUTER JOIN (
   -- Metric Time Dimension 'archived_at'
@@ -37,8 +37,8 @@ LEFT OUTER JOIN (
     -- Read Elements From Semantic Model 'users_ds_source'
     SELECT
       1 AS __subdaily_join_to_time_spine_metric
-      , DATETIME_TRUNC(archived_at, hour) AS archived_at__hour
-      , DATETIME_TRUNC(archived_at, day) AS archived_at__day
+      , TIMESTAMP_TRUNC(archived_at, hour) AS archived_at__hour
+      , TIMESTAMP_TRUNC(archived_at, day) AS archived_at__day
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_13
   LEFT OUTER JOIN

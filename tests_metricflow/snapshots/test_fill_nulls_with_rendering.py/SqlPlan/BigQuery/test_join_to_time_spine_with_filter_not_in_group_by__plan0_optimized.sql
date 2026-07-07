@@ -19,7 +19,7 @@ FROM (
     -- Select: ['metric_time__day', 'metric_time__month']
     SELECT
       ds AS metric_time__day
-      , DATETIME_TRUNC(ds, month) AS metric_time__month
+      , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
     FROM ***************************.mf_time_spine time_spine_src_28006
   ) subq_21
   WHERE (
@@ -42,8 +42,8 @@ LEFT OUTER JOIN (
     -- Metric Time Dimension 'ds'
     -- Select: ['__bookings_join_to_time_spine_with_tiered_filters', 'metric_time__day', 'metric_time__month']
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
-      , DATETIME_TRUNC(ds, month) AS metric_time__month
+      TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+      , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
       , 1 AS bookings_join_to_time_spine_with_tiered_filters
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_15

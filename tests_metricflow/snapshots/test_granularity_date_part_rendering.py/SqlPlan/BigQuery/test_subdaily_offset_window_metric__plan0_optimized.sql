@@ -25,7 +25,7 @@ FROM (
       -- Select: ['__archived_users', 'metric_time__hour']
       -- Select: ['__archived_users', 'metric_time__hour']
       SELECT
-        DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
+        TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
         , 1 AS __archived_users
       FROM ***************************.dim_users users_ds_source_src_28000
     ) subq_15

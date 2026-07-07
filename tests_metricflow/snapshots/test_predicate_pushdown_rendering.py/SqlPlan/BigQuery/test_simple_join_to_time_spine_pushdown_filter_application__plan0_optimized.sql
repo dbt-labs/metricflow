@@ -33,7 +33,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Select: ['__bookings_join_to_time_spine', 'booking__is_instant', 'metric_time__day']
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
+        TIMESTAMP_TRUNC(ds, day) AS metric_time__day
         , is_instant AS booking__is_instant
         , 1 AS bookings_join_to_time_spine
       FROM ***************************.fct_bookings bookings_source_src_28000

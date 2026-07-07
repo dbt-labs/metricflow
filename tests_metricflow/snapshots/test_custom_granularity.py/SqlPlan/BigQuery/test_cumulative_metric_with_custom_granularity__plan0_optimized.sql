@@ -29,9 +29,9 @@ FROM (
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_16.ds
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) <= subq_16.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_16.ds AS DATETIME), INTERVAL 2 month)
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_16.ds AS DATETIME), INTERVAL 2 month)
       )
     LEFT OUTER JOIN
       ***************************.mf_time_spine subq_17

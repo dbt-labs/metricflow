@@ -16,7 +16,7 @@ FROM (
   -- Metric Time Dimension 'ds_month'
   -- Select: ['__total_account_balance_first_day_of_month', 'ds_month__month']
   SELECT
-    DATETIME_TRUNC(ds_month, month) AS ds_month__month
+    TIMESTAMP_TRUNC(ds_month, month) AS ds_month__month
     , account_balance AS __total_account_balance_first_day_of_month
   FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_11
@@ -26,7 +26,7 @@ INNER JOIN (
   -- Select: ['__total_account_balance_first_day_of_month', 'ds_month__month']
   -- Filter row on MIN(ds_month__month)
   SELECT
-    MIN(DATETIME_TRUNC(ds_month, month)) AS ds_month__month__complete
+    MIN(TIMESTAMP_TRUNC(ds_month, month)) AS ds_month__month__complete
   FROM ***************************.fct_accounts accounts_source_src_28000
 ) subq_13
 ON
