@@ -48,6 +48,8 @@ class SqlAlchemyUrlBuilder:
             return SqlAlchemyUrlBuilder._build_bigquery_url(password, schema)
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
+        elif dialect is SqlDialect.CLICKHOUSE:
+            return SqlAlchemyUrlBuilder._build_clickhouse_url(connection_params, password, schema)
         else:
             raise ValueError(f"Unsupported dialect: {dialect}")
 
@@ -231,6 +233,27 @@ class SqlAlchemyUrlBuilder:
             password=password,
             host=connection_params.hostname,
             port=connection_params.port or 8080,
+            database=connection_params.database,
+            query=query_params,
+        )
+
+    @staticmethod
+    def _build_clickhouse_url(
+        connection_params: SqlEngineConnectionParameterSet,
+        password: str,
+        schema: Optional[str] = None,
+    ) -> SqlAlchemyURL:
+        """Build a ClickHouse URL for the ClickHouse Connect SQLAlchemy dialect."""
+        query_params = {}
+        for field in connection_params.query_fields:
+            query_params[field.field_name] = field.values[0]
+
+        return SqlAlchemyURL.create(
+            drivername="clickhousedb",
+            username=connection_params.username,
+            password=password,
+            host=connection_params.hostname,
+            port=connection_params.port or 8123,
             database=connection_params.database,
             query=query_params,
         )

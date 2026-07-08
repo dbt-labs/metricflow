@@ -1,0 +1,2 @@
+# ClickHouse Connect ships with a SQLAlchemy dialect for test clients.
+clickhouse-connect>=0.10.0, <0.11.0

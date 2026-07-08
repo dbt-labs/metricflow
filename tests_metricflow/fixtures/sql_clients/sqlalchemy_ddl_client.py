@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import logging
 import time
-from typing import Optional
+from typing import Optional, Sequence
 
 from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
@@ -15,6 +15,15 @@ from metricflow.protocols.sql_client import SqlEngine
 from tests_metricflow.fixtures.sql_clients.sqlalchemy_client import SqlAlchemyBasedSqlClient
 
 logger = logging.getLogger(__name__)
+
+
+def make_create_table_statement(sql_engine_type: SqlEngine, sql_table: SqlTable, column_defs: Sequence[str]) -> str:
+    """Build the engine-specific CREATE TABLE statement for test fixture tables."""
+    create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)})"
+    if sql_engine_type is SqlEngine.CLICKHOUSE:
+        return f"{create_stmt} ENGINE = MergeTree ORDER BY tuple()"
+
+    return create_stmt
 
 
 class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
@@ -41,7 +50,11 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
             sql_type = self._get_sql_type(col_desc)
             column_defs.append(f"{col_desc.column_name} {sql_type}")
 
-        create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)})"
+        create_stmt = make_create_table_statement(
+            sql_engine_type=self.sql_engine_type,
+            sql_table=sql_table,
+            column_defs=column_defs,
+        )
 
         # Execute CREATE TABLE
         self.execute(create_stmt)
@@ -106,16 +119,26 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
         if column_type is str:
             if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY):
                 return "string"
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "Nullable(String)"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
             return "text"
         elif column_type is bool:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "Nullable(Bool)"
             return "boolean"
         elif column_type is int:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "Nullable(Int64)"
             return "bigint"
         elif column_type is float:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return f"Nullable({self._sql_plan_renderer.expr_renderer.double_data_type})"
             return self._sql_plan_renderer.expr_renderer.double_data_type
         elif column_type is datetime.datetime:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return f"Nullable({self._sql_plan_renderer.expr_renderer.timestamp_data_type})"
             return self._sql_plan_renderer.expr_renderer.timestamp_data_type
         else:
             raise ValueError(f"Unexpected column type: {column_type}")
@@ -128,9 +151,17 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
     def create_schema(self, schema_name: str) -> None:
         """Create schema if it doesn't exist."""
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            self.execute(f"CREATE DATABASE IF NOT EXISTS {schema_name}")
+            return
+
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
         """Drop schema if it exists."""
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            self.execute(f"DROP DATABASE IF EXISTS {schema_name}")
+            return
+
         cascade_clause = " CASCADE" if cascade else ""
         self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")

@@ -90,6 +90,20 @@ def test_trino_url_with_database_as_catalog() -> None:
     assert url.query["schema"] == "default"
 
 
+def test_clickhouse_url() -> None:
+    """Test ClickHouse URL conversion."""
+    params = SqlEngineConnectionParameterSet.create_from_url("clickhouse://user@localhost:8123/default?secure=1")
+    url = SqlAlchemyUrlBuilder.build_url(params, password="secret", schema="analytics")
+
+    assert url.drivername == "clickhousedb"
+    assert url.username == "user"
+    assert url.password == "secret"
+    assert url.host == "localhost"
+    assert url.port == 8123
+    assert url.database == "default"
+    assert url.query["secure"] == "1"
+
+
 def test_redshift_url() -> None:
     """Test Redshift URL conversion."""
     params = SqlEngineConnectionParameterSet.create_from_url("redshift://user@host.redshift.amazonaws.com:5439/dev")

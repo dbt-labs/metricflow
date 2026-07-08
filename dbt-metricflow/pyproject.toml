@@ -66,6 +66,9 @@ dbt-snowflake = [
 dbt-trino = [
   "requirements-files/requirements-dbt-trino.txt"
 ]
+dbt-clickhouse = [
+  "requirements-files/requirements-dbt-clickhouse.txt"
+]
 dev-env-requirements = [
   "../requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt"
@@ -83,6 +86,17 @@ features = ["dev-env-requirements"]
 # If we do not do this, then the tests will break on broken imports whenever someone moves things around in
 # metricflow or metricflow-semantics between the latest dbt-metricflow release and test runtime.
 # TODO: switch to workspaces if removal of mf (e.g., after integration with dbt-core) will not happen in a timely fashion.
+post-install-commands = [
+  "pip install -e ../",
+]
+
+
+[tool.hatch.envs.clickhouse-env]
+description = "Environment for package + CLI development and testing against ClickHouse."
+run = "run-coverage --no-cov"
+
+features = ["dev-env-requirements", "dbt-clickhouse"]
+
 post-install-commands = [
   "pip install -e ../",
 ]
