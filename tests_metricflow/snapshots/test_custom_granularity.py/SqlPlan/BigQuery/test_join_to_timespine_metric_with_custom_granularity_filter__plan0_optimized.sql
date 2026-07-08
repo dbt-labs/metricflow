@@ -43,7 +43,7 @@ LEFT OUTER JOIN (
       -- Read Elements From Semantic Model 'bookings_source'
       SELECT
         1 AS __bookings_join_to_time_spine
-        , DATETIME_TRUNC(ds, day) AS ds__day
+        , TIMESTAMP_TRUNC(ds, day) AS ds__day
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_14
     LEFT OUTER JOIN

@@ -23,16 +23,16 @@ FROM (
     -- Aggregate Inputs for Simple Metrics
     SELECT
       subq_15.ds AS metric_time__day
-      , DATETIME_TRUNC(subq_15.ds, year) AS metric_time__year
+      , TIMESTAMP_TRUNC(subq_15.ds, year) AS metric_time__year
       , SUM(revenue_src_28000.revenue) AS __revenue
     FROM ***************************.mf_time_spine subq_15
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
       ) AND (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_15.ds AS DATETIME), INTERVAL 2 month)
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_15.ds AS DATETIME), INTERVAL 2 month)
       )
     GROUP BY
       metric_time__day

@@ -18,7 +18,7 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     subq_33.alien_day AS metric_time__alien_day
-    , DATETIME_TRUNC(subq_29.ds__day__lead, month) AS booking__ds__month
+    , TIMESTAMP_TRUNC(subq_29.ds__day__lead, month) AS booking__ds__month
     , EXTRACT(year FROM subq_29.ds__day__lead) AS metric_time__extract_year
     , SUM(subq_25.__bookings) AS bookings
   FROM (
@@ -80,7 +80,7 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     -- Metric Time Dimension 'ds'
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
+      TIMESTAMP_TRUNC(ds, day) AS metric_time__day
       , 1 AS __bookings
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_25

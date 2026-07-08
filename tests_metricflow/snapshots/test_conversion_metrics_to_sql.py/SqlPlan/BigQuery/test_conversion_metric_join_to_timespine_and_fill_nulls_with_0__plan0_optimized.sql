@@ -10,7 +10,7 @@ WITH sma_28019_cte AS (
   -- Read Elements From Semantic Model 'visits_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
     , user_id AS user
     , 1 AS __visits_fill_nulls_with_0_join_to_timespine
   FROM ***************************.fct_visits visits_source_src_28000
@@ -102,7 +102,7 @@ FROM (
           -- Metric Time Dimension 'ds'
           -- Add column with generated UUID
           SELECT
-            DATETIME_TRUNC(ds, day) AS metric_time__day
+            TIMESTAMP_TRUNC(ds, day) AS metric_time__day
             , user_id AS user
             , 1 AS __buys_fill_nulls_with_0_join_to_timespine
             , GENERATE_UUID() AS mf_internal_uuid

@@ -23,7 +23,7 @@ FROM (
     -- Read Elements From Semantic Model 'bookings_source'
     SELECT
       1 AS __bookings
-      , DATETIME_TRUNC(ds, day) AS ds__day
+      , TIMESTAMP_TRUNC(ds, day) AS ds__day
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_8
   LEFT OUTER JOIN

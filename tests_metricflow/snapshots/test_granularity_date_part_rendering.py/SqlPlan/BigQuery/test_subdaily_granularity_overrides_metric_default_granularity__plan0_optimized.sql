@@ -20,7 +20,7 @@ LEFT OUTER JOIN (
     -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
     -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
     SELECT
-      DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
+      TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
       , 1 AS __subdaily_join_to_time_spine_metric
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_14

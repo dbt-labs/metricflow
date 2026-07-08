@@ -15,12 +15,12 @@ FROM (
   -- Select: ['listing__ds__day', 'listing__ds__alien_day']
   SELECT
     subq_5.alien_day AS listing__ds__alien_day
-    , DATETIME_TRUNC(listings_latest_src_28000.created_at, day) AS listing__ds__day
+    , TIMESTAMP_TRUNC(listings_latest_src_28000.created_at, day) AS listing__ds__day
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   LEFT OUTER JOIN
     ***************************.mf_time_spine subq_5
   ON
-    DATETIME_TRUNC(listings_latest_src_28000.created_at, day) = subq_5.ds
+    TIMESTAMP_TRUNC(listings_latest_src_28000.created_at, day) = subq_5.ds
 ) subq_7
 WHERE listing__ds__alien_day = '2020-01-01'
 GROUP BY
