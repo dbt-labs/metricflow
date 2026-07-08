@@ -149,7 +149,7 @@ features = ["trino-env-requirements"]
 [tool.hatch.envs.nuitka-build]
 description = "Nuitka compilation environment for building a standalone MetricFlow binary."
 template = "dev-env"
-extra-dependencies = ["nuitka"]
+extra-dependencies = ["nuitka==4.1.2"]
 
 [tool.hatch.envs.nuitka-build.scripts]
 compile = [
