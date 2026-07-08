@@ -1,7 +1,5 @@
 # Compiles sidecar/mf_entry.py into standalone Nuitka binaries for every platform
-# Fusion needs to embed via rust-embed (DI-4631). Windows x64 is intentionally not
-# included yet — see ci-sidecar-windows-nuitka-spike.yaml, which is de-risking that
-# leg in isolation before it's added here.
+# Fusion needs to embed via rust-embed (DI-4631).
 name: Build Sidecar Binaries
 
 on:
@@ -25,6 +23,8 @@ jobs:
             target-triple: x86_64-apple-darwin
           - runner: ubuntu-22.04
             target-triple: x86_64-unknown-linux-gnu
+          - runner: windows-latest
+            target-triple: x86_64-pc-windows-msvc
     steps:
       - name: Check-out the repo
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
