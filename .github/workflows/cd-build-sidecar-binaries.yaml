@@ -52,3 +52,42 @@ jobs:
           name: mf_entry-${{ matrix.target-triple }}
           path: sidecar/mf_entry.dist/
           if-no-files-found: error
+
+  publish:
+    name: Publish release assets
+    needs: build
+    # Only publish on an actual release tag. workflow_dispatch and pull_request runs exist
+    # to validate the build matrix on real runners and have no tag to attach assets to.
+    # `needs: build` already means this only runs if every matrix leg succeeded.
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # actions/download-artifact@v4
+        with:
+          pattern: mf_entry-*
+          path: dist
+
+      - name: Package archives and generate checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist
+          for dir in mf_entry-*/; do
+            dir="${dir%/}"
+            triple="${dir#mf_entry-}"
+            if [[ "$triple" == *windows* ]]; then
+              (cd "$dir" && zip -r "../mf_entry-${{ github.ref_name }}-${triple}.zip" .)
+            else
+              tar -czf "mf_entry-${{ github.ref_name }}-${triple}.tar.gz" -C "$dir" .
+            fi
+            rm -rf "$dir"
+          done
+          sha256sum mf_entry-* > SHA256SUMS.txt
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # softprops/action-gh-release@v2
+        with:
+          files: dist/*
