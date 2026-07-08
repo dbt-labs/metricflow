@@ -1,0 +1,54 @@
+# Compiles sidecar/mf_entry.py into standalone Nuitka binaries for every platform
+# Fusion needs to embed via rust-embed (DI-4631). Windows x64 is intentionally not
+# included yet — see ci-sidecar-windows-nuitka-spike.yaml, which is de-risking that
+# leg in isolation before it's added here.
+name: Build Sidecar Binaries
+
+on:
+  push:
+    # Mirrors the MetricFlow release tag pattern in cd-push-metricflow-to-pypi.yaml.
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Compile & Validate mf_entry (${{ matrix.target-triple }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            target-triple: aarch64-apple-darwin
+          - runner: macos-13
+            target-triple: x86_64-apple-darwin
+          - runner: ubuntu-22.04
+            target-triple: x86_64-unknown-linux-gnu
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - uses: ./.github/actions/setup-python-env
+        with:
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "nuitka-build"}
+              ]
+            }
+
+      - name: Compile mf_entry with Nuitka
+        shell: bash
+        run: hatch run nuitka-build:compile
+
+      - name: Validate compiled binary against Python interpreter
+        shell: bash
+        run: hatch run nuitka-build:validate
+
+      - name: Upload mf_entry.dist for ${{ matrix.target-triple }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # actions/upload-artifact@v4
+        with:
+          name: mf_entry-${{ matrix.target-triple }}
+          path: sidecar/mf_entry.dist/
+          if-no-files-found: error
