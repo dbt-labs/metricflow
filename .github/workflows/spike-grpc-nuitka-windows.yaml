@@ -49,4 +49,11 @@ jobs:
 
       - name: Run compiled grpc probe
         shell: bash
-        run: ./spike-grpc-nuitka/grpc_probe.dist/grpc_probe.bin
+        # Nuitka names the binary grpc_probe.exe on Windows, grpc_probe.bin elsewhere
+        # (same distinction sidecar/validate_mf_entry.py already handles for mf_entry).
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            ./spike-grpc-nuitka/grpc_probe.dist/grpc_probe.exe
+          else
+            ./spike-grpc-nuitka/grpc_probe.dist/grpc_probe.bin
+          fi
