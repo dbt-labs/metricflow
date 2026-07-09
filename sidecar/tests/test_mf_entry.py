@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
-_MF_ENTRY = _REPO_ROOT / "poc" / "mf_entry.py"
+_MF_ENTRY = _REPO_ROOT / "sidecar" / "mf_entry.py"
 _MANIFEST_DIR = (
     _REPO_ROOT / "metricflow_semantics" / "test_helpers" / "semantic_manifest_yamls" / "sg_00_minimal_manifest"
 )
