@@ -1,0 +1,52 @@
+# Throwaway spike: does grpc survive Nuitka standalone freezing on Windows?
+# Investigating the suggestion on PR #2072 to use gRPC for the mf-ipc protocol.
+# Already validated on macOS arm64 locally (isolated, combined with real MetricFlow
+# deps, and with real protobuf message serialization) — this checks the one
+# remaining platform where grpc's C-core does platform-conditional DNS/socket
+# handling that could behave differently. Delete this workflow and
+# spike-grpc-nuitka/ once the signal lands.
+#
+# The pull_request trigger exists only because workflow_dispatch cannot be invoked
+# via API/CLI until a workflow file exists on the default branch.
+name: "[Spike] grpc + Nuitka on Windows"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "spike-grpc-nuitka/**"
+      - ".github/workflows/spike-grpc-nuitka-windows.yaml"
+
+jobs:
+  windows-grpc-spike:
+    name: Compile & run grpc probe (Windows x64)
+    runs-on: windows-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - uses: ./.github/actions/setup-python-env
+        with:
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "nuitka-build"}
+              ]
+            }
+
+      - name: Install grpcio into the nuitka-build env
+        shell: bash
+        run: hatch run nuitka-build:pip install grpcio
+
+      - name: Compile grpc probe with Nuitka
+        shell: bash
+        run: >-
+          hatch run nuitka-build:python -m nuitka
+          --standalone --follow-imports --assume-yes-for-downloads
+          --include-package=grpc
+          --output-dir=spike-grpc-nuitka/
+          spike-grpc-nuitka/grpc_probe.py
+
+      - name: Run compiled grpc probe
+        shell: bash
+        run: ./spike-grpc-nuitka/grpc_probe.dist/grpc_probe.bin
