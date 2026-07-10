@@ -38,6 +38,18 @@ from metricflow_semantics.test_helpers.manifest_helpers import (
     mf_load_manifest_from_json_file,
     mf_load_manifest_from_yaml_directory,
 )
+from mf_ipc_protocol import (
+    ErrorDetail,
+    ErrorResponse,
+    ExplainParams,
+    ExplainResponse,
+    OkResponse,
+    ReadyMessage,
+    RequestEnvelope,
+    RequestId,
+    StartupErrorMessage,
+)
+from pydantic import BaseModel, ValidationError
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.engine.metricflow_engine import MetricFlowEngine, MetricFlowQueryRequest
@@ -139,64 +151,65 @@ def _get_engine(manifest_path: str, sql_engine: SqlEngine) -> MetricFlowEngine:
     return engine
 
 
-def _write(obj: dict) -> None:
+def _write(msg: BaseModel) -> None:
     try:
-        _ipc.write(json.dumps(obj) + "\n")
+        _ipc.write(msg.model_dump_json() + "\n")
         _ipc.flush()
     except BrokenPipeError:
         logging.warning("IPC pipe broken; exiting")
         sys.exit(0)
 
 
-def _err(req_id: str | int | None, exc: Exception) -> dict:
-    error: dict[str, str] = {"type": type(exc).__name__, "message": str(exc)}
+def _err(req_id: RequestId, exc: Exception) -> ErrorResponse:
+    error = ErrorDetail(type=type(exc).__name__, message=str(exc))
     if _debug:
-        error["traceback"] = _traceback.format_exc()
-    return {"id": req_id, "ok": False, "error": error}
+        error.traceback = _traceback.format_exc()
+    return ErrorResponse(id=req_id, error=error)
 
 
-def _handle_explain(req_id: str | int | None, params: dict) -> dict:
+def _handle_explain(req_id: RequestId, raw_params: dict) -> ExplainResponse | ErrorResponse:
     try:
-        manifest_path = params["manifest_path"]
-        sql_engine = SqlEngine[params.get("sql_engine", "DUCKDB")]
-        engine = _get_engine(manifest_path, sql_engine)
+        params = ExplainParams.model_validate(raw_params)
+        sql_engine = SqlEngine[params.sql_engine]
+        engine = _get_engine(params.manifest_path, sql_engine)
         request = MetricFlowQueryRequest.create(
-            metric_names=params.get("metric_names"),
-            group_by_names=params.get("group_by_names"),
-            where_constraints=params.get("where_constraints"),
-            order_by_names=params.get("order_by_names"),
-            limit=params.get("limit"),
+            metric_names=params.metric_names,
+            group_by_names=params.group_by_names,
+            where_constraints=params.where_constraints,
+            order_by_names=params.order_by_names,
+            limit=params.limit,
         )
         result = engine.explain(request)
-        return {"id": req_id, "ok": True, "sql": result.sql_statement.sql}
+        return ExplainResponse(id=req_id, sql=result.sql_statement.sql)
     except Exception as e:
         return _err(req_id, e)
 
 
-def _dispatch(req: dict) -> dict:
-    req_id = req.get("id")
-    method = req.get("method")
-    v = req.get("v", 1)
-    if v != 1:
-        return {
-            "id": req_id,
-            "ok": False,
-            "error": {"type": "ProtocolVersionError", "message": f"Expected v=1, got v={v!r}"},
-        }
-    if method == "ping":
-        return {"id": req_id, "ok": True}
-    if method == "shutdown":
-        return {"id": req_id, "ok": True}
-    if method == "explain":
-        return _handle_explain(req_id, req.get("params") or {})
-    return {
-        "id": req_id,
-        "ok": False,
-        "error": {
-            "type": "UnknownMethod",
-            "message": f"Unknown method: {method!r}. Supported: explain, ping, shutdown",
-        },
-    }
+def _dispatch(req: object) -> ExplainResponse | OkResponse | ErrorResponse:
+    try:
+        envelope = RequestEnvelope.model_validate(req)
+    except ValidationError as e:
+        fallback_id = req.get("id") if isinstance(req, dict) else None
+        return _err(fallback_id, e)
+
+    if envelope.v != 1:
+        return ErrorResponse(
+            id=envelope.id,
+            error=ErrorDetail(type="ProtocolVersionError", message=f"Expected v=1, got v={envelope.v!r}"),
+        )
+    if envelope.method == "ping":
+        return OkResponse(id=envelope.id)
+    if envelope.method == "shutdown":
+        return OkResponse(id=envelope.id)
+    if envelope.method == "explain":
+        return _handle_explain(envelope.id, envelope.params or {})
+    return ErrorResponse(
+        id=envelope.id,
+        error=ErrorDetail(
+            type="UnknownMethod",
+            message=f"Unknown method: {envelope.method!r}. Supported: explain, ping, shutdown",
+        ),
+    )
 
 
 def main(argv: list[str]) -> int:  # noqa: D103
@@ -238,17 +251,14 @@ def main(argv: list[str]) -> int:  # noqa: D103
         try:
             _get_engine(args.manifest_path, SqlEngine[args.sql_engine])
         except Exception as e:
-            _ipc.write(json.dumps({"status": "error", "type": type(e).__name__, "message": str(e)}) + "\n")
-            _ipc.flush()
+            _write(StartupErrorMessage(type=type(e).__name__, message=str(e)))
             return 1
 
     _write(
-        {
-            "status": "ready",
-            "metricflow_version": _MF_VERSION,
-            "python_version": sys.version.split()[0],
-            "protocol_version": 1,
-        }
+        ReadyMessage(
+            metricflow_version=_MF_VERSION,
+            python_version=sys.version.split()[0],
+        )
     )
 
     try:
@@ -259,11 +269,11 @@ def main(argv: list[str]) -> int:  # noqa: D103
             try:
                 req = json.loads(line)
             except json.JSONDecodeError as e:
-                _write({"id": None, "ok": False, "error": {"type": "JSONDecodeError", "message": str(e)}})
+                _write(ErrorResponse(id=None, error=ErrorDetail(type="JSONDecodeError", message=str(e))))
                 continue
             resp = _dispatch(req)
             _write(resp)
-            if req.get("method") == "shutdown":
+            if isinstance(req, dict) and req.get("method") == "shutdown":
                 break
     except Exception:
         logging.exception("Uncaught error in IPC loop")
