@@ -30,7 +30,7 @@ import sys
 import traceback as _traceback
 import types
 from pathlib import Path
-from typing import IO
+from typing import IO, Literal
 
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
@@ -212,7 +212,7 @@ def _dispatch(req: object) -> ExplainResponse | OkResponse | ErrorResponse:
     )
 
 
-def main(argv: list[str]) -> int:  # noqa: D103
+def main(argv: list[str]) -> Literal[0, 1]:  # noqa: D103
     global _ipc, _debug
 
     parser = argparse.ArgumentParser(description="MetricFlow IPC entry point (mf-ipc v1)")
