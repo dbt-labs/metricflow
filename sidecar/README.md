@@ -13,9 +13,11 @@ them. It wraps `MetricFlowEngine.explain()`.
 ```
 sidecar/
   mf_entry.py            IPC server (the file Nuitka compiles)
+  mf_ipc_protocol.py     pydantic models for every message shape below
   validate_mf_entry.py   validation helper: compares Python vs binary SQL output
   tests/
-    test_mf_entry.py     subprocess integration tests (mf-ipc v1)
+    test_mf_entry.py         subprocess integration tests (mf-ipc v1)
+    test_mf_ipc_protocol.py  direct unit tests for the pydantic models
 ```
 
 ## Development
@@ -60,6 +62,13 @@ hatch run nuitka-build:validate   # validate only (binary must already exist)
 All messages are newline-delimited JSON (NDJSON). The protocol is strictly
 sequential: the caller sends one request and waits for one response before
 sending the next.
+
+Every message shape documented below has a corresponding pydantic model in
+`mf_ipc_protocol.py`, which `mf_entry.py` validates requests against and
+builds responses from. This is a minimal, MetricFlow-internal typing layer —
+there's no shared schema artifact or codegen for the Rust side yet. Adopting
+a structured cross-repo contract (gRPC/protobuf, or a JSON Schema shared with
+Fusion) is tracked separately in DI-4709.
 
 ### Startup
 
