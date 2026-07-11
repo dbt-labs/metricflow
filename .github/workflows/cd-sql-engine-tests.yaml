@@ -134,6 +134,43 @@ jobs:
               ]
             }
 
+  vertica-tests:
+    # Vertica tests run on a local container, which obviates the need for separate Environment hosting.
+    # The container is started with docker compose instead of a service container because the single-node
+    # bootstrap requires an init script from the repo, which is not available before checkout.
+    name: Vertica Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - name: Start Vertica
+        shell: bash
+        run: docker compose -f local-data-warehouses/vertica/docker-compose.yaml up -d
+
+      - name: Wait for Vertica to be ready
+        shell: bash
+        run: |
+          for i in $(seq 1 60); do
+            if docker logs vertica 2>&1 | grep -q "is ready on port 5433"; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker logs vertica
+          exit 1
+
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          make-target: "test-vertica"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "vertica-env"}
+              ]
+            }
+
   remove-label:
     name: Remove Label After Running Tests
     runs-on: ubuntu-latest

@@ -66,6 +66,9 @@ dbt-snowflake = [
 dbt-trino = [
   "requirements-files/requirements-dbt-trino.txt"
 ]
+dbt-vertica = [
+  "requirements-files/requirements-dbt-vertica.txt"
+]
 dev-env-requirements = [
   "../requirements-files/dev-env-requirements.txt",
   "requirements-files/dev-env-requirements.txt"
