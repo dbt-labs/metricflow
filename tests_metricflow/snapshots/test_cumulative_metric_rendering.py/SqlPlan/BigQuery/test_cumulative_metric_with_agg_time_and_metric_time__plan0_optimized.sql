@@ -12,7 +12,7 @@ sql_engine: BigQuery
 -- Compute Metrics via Expressions
 -- Write to DataTable
 SELECT
-  DATETIME_TRUNC(subq_13.ds, month) AS revenue_instance__ds__month
+  TIMESTAMP_TRUNC(subq_13.ds, month) AS revenue_instance__ds__month
   , subq_13.ds AS metric_time__day
   , SUM(revenue_src_28000.revenue) AS trailing_2_months_revenue
 FROM ***************************.mf_time_spine subq_13
@@ -20,9 +20,9 @@ INNER JOIN
   ***************************.fct_revenue revenue_src_28000
 ON
   (
-    DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_13.ds
+    TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) <= subq_13.ds
   ) AND (
-    DATETIME_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_13.ds AS DATETIME), INTERVAL 2 month)
+    TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) > DATE_SUB(CAST(subq_13.ds AS DATETIME), INTERVAL 2 month)
   )
 GROUP BY
   revenue_instance__ds__month

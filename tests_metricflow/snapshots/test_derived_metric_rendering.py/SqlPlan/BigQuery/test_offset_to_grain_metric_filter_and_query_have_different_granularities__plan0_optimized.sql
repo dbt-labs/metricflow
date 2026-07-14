@@ -26,7 +26,7 @@ FROM (
       -- Select: ['metric_time__month', 'metric_time__day']
       SELECT
         ds AS metric_time__day
-        , DATETIME_TRUNC(ds, month) AS metric_time__month
+        , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
       FROM ***************************.mf_time_spine time_spine_src_28006
     ) subq_20
     WHERE metric_time__day = '2020-01-01'
@@ -44,7 +44,7 @@ FROM (
       -- Select: ['__bookings', 'metric_time__month']
       -- Select: ['__bookings', 'metric_time__month']
       SELECT
-        DATETIME_TRUNC(ds, month) AS metric_time__month
+        TIMESTAMP_TRUNC(ds, month) AS metric_time__month
         , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_16
@@ -52,5 +52,5 @@ FROM (
       metric_time__month
   ) subq_17
   ON
-    DATETIME_TRUNC(subq_22.metric_time__month, month) = subq_17.metric_time__month
+    TIMESTAMP_TRUNC(subq_22.metric_time__month, month) = subq_17.metric_time__month
 ) subq_24

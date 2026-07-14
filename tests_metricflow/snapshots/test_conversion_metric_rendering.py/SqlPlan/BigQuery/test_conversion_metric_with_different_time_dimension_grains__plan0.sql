@@ -77,11 +77,11 @@ FROM (
               SELECT
                 1 AS __visits
                 , 1 AS __visits_fill_nulls_with_0_join_to_timespine
-                , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
-                , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
-                , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
-                , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
-                , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS ds__year
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, day) AS ds__day
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, month) AS ds__month
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, year) AS ds__year
                 , EXTRACT(year FROM visits_source_src_28000.ds) AS ds__extract_year
                 , EXTRACT(quarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
                 , EXTRACT(month FROM visits_source_src_28000.ds) AS ds__extract_month
@@ -89,11 +89,11 @@ FROM (
                 , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS ds__extract_dow
                 , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS ds__extract_doy
                 , visits_source_src_28000.referrer_id
-                , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
-                , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
-                , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
-                , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
-                , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
+                , TIMESTAMP_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
                 , EXTRACT(year FROM visits_source_src_28000.ds) AS visit__ds__extract_year
                 , EXTRACT(quarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
                 , EXTRACT(month FROM visits_source_src_28000.ds) AS visit__ds__extract_month
@@ -220,11 +220,11 @@ FROM (
                       SELECT
                         1 AS __visits
                         , 1 AS __visits_fill_nulls_with_0_join_to_timespine
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS ds__day
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS ds__month
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS ds__year
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, day) AS ds__day
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, isoweek) AS ds__week
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, month) AS ds__month
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, quarter) AS ds__quarter
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, year) AS ds__year
                         , EXTRACT(year FROM visits_source_src_28000.ds) AS ds__extract_year
                         , EXTRACT(quarter FROM visits_source_src_28000.ds) AS ds__extract_quarter
                         , EXTRACT(month FROM visits_source_src_28000.ds) AS ds__extract_month
@@ -232,11 +232,11 @@ FROM (
                         , IF(EXTRACT(dayofweek FROM visits_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM visits_source_src_28000.ds) - 1) AS ds__extract_dow
                         , EXTRACT(dayofyear FROM visits_source_src_28000.ds) AS ds__extract_doy
                         , visits_source_src_28000.referrer_id
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
-                        , DATETIME_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, day) AS visit__ds__day
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, isoweek) AS visit__ds__week
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, month) AS visit__ds__month
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, quarter) AS visit__ds__quarter
+                        , TIMESTAMP_TRUNC(visits_source_src_28000.ds, year) AS visit__ds__year
                         , EXTRACT(year FROM visits_source_src_28000.ds) AS visit__ds__extract_year
                         , EXTRACT(quarter FROM visits_source_src_28000.ds) AS visit__ds__extract_quarter
                         , EXTRACT(month FROM visits_source_src_28000.ds) AS visit__ds__extract_month
@@ -357,37 +357,37 @@ FROM (
                       , 1 AS __buys_fill_nulls_with_0
                       , 1 AS __buys_fill_nulls_with_0_join_to_timespine
                       , 1 AS __buys_month
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS ds__day
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS ds__week
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS ds__month
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, quarter) AS ds__quarter
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, year) AS ds__year
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, day) AS ds__day
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, isoweek) AS ds__week
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, month) AS ds__month
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, quarter) AS ds__quarter
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, year) AS ds__year
                       , EXTRACT(year FROM buys_source_src_28000.ds) AS ds__extract_year
                       , EXTRACT(quarter FROM buys_source_src_28000.ds) AS ds__extract_quarter
                       , EXTRACT(month FROM buys_source_src_28000.ds) AS ds__extract_month
                       , EXTRACT(day FROM buys_source_src_28000.ds) AS ds__extract_day
                       , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS ds__extract_dow
                       , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS ds__extract_doy
-                      , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS ds_month__month
-                      , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS ds_month__quarter
-                      , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS ds_month__year
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds_month, month) AS ds_month__month
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds_month, quarter) AS ds_month__quarter
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds_month, year) AS ds_month__year
                       , EXTRACT(year FROM buys_source_src_28000.ds_month) AS ds_month__extract_year
                       , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS ds_month__extract_quarter
                       , EXTRACT(month FROM buys_source_src_28000.ds_month) AS ds_month__extract_month
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, day) AS buy__ds__day
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, isoweek) AS buy__ds__week
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, month) AS buy__ds__month
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, quarter) AS buy__ds__quarter
-                      , DATETIME_TRUNC(buys_source_src_28000.ds, year) AS buy__ds__year
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, day) AS buy__ds__day
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, isoweek) AS buy__ds__week
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, month) AS buy__ds__month
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, quarter) AS buy__ds__quarter
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds, year) AS buy__ds__year
                       , EXTRACT(year FROM buys_source_src_28000.ds) AS buy__ds__extract_year
                       , EXTRACT(quarter FROM buys_source_src_28000.ds) AS buy__ds__extract_quarter
                       , EXTRACT(month FROM buys_source_src_28000.ds) AS buy__ds__extract_month
                       , EXTRACT(day FROM buys_source_src_28000.ds) AS buy__ds__extract_day
                       , IF(EXTRACT(dayofweek FROM buys_source_src_28000.ds) = 1, 7, EXTRACT(dayofweek FROM buys_source_src_28000.ds) - 1) AS buy__ds__extract_dow
                       , EXTRACT(dayofyear FROM buys_source_src_28000.ds) AS buy__ds__extract_doy
-                      , DATETIME_TRUNC(buys_source_src_28000.ds_month, month) AS buy__ds_month__month
-                      , DATETIME_TRUNC(buys_source_src_28000.ds_month, quarter) AS buy__ds_month__quarter
-                      , DATETIME_TRUNC(buys_source_src_28000.ds_month, year) AS buy__ds_month__year
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds_month, month) AS buy__ds_month__month
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds_month, quarter) AS buy__ds_month__quarter
+                      , TIMESTAMP_TRUNC(buys_source_src_28000.ds_month, year) AS buy__ds_month__year
                       , EXTRACT(year FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_year
                       , EXTRACT(quarter FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_quarter
                       , EXTRACT(month FROM buys_source_src_28000.ds_month) AS buy__ds_month__extract_month

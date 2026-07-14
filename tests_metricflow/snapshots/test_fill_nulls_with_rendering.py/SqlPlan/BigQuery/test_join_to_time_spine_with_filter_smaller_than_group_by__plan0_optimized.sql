@@ -19,7 +19,7 @@ FROM (
     -- Select: ['metric_time__day', 'metric_time__hour']
     SELECT
       ts AS metric_time__hour
-      , DATETIME_TRUNC(ts, day) AS metric_time__day
+      , TIMESTAMP_TRUNC(ts, day) AS metric_time__day
     FROM ***************************.mf_time_spine_hour time_spine_src_28005
   ) subq_21
   WHERE (
@@ -42,8 +42,8 @@ LEFT OUTER JOIN (
     -- Metric Time Dimension 'archived_at'
     -- Select: ['__archived_users_join_to_time_spine', 'metric_time__day', 'metric_time__hour']
     SELECT
-      DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
-      , DATETIME_TRUNC(archived_at, day) AS metric_time__day
+      TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
+      , TIMESTAMP_TRUNC(archived_at, day) AS metric_time__day
       , 1 AS archived_users_join_to_time_spine
     FROM ***************************.dim_users users_ds_source_src_28000
   ) subq_15
