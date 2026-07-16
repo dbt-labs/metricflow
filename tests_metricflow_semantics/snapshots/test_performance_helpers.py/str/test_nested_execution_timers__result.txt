@@ -1,0 +1,9 @@
+test_name: test_nested_execution_timers
+test_filename: test_performance_helpers.py
+docstring:
+  Snapshot the log lines emitted by nested `ExecutionTimer` contexts.
+---
+[START D0] Outer timer
+[START D1] Inner timer
+[END D1] Inner timer [duration=0.00 s]
+[END D0] Outer timer [duration=0.00 s]

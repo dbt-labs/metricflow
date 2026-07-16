@@ -142,7 +142,7 @@ def mf_simulate_validation(
         )
 
 
-@pytest.mark.skip("Example only.")
+# @pytest.mark.skip("Example only.")
 def test_profile_explain(
     mf_test_configuration: MetricFlowTestConfiguration,
     manifest_with_50_models_25_metrics: SemanticManifest,
