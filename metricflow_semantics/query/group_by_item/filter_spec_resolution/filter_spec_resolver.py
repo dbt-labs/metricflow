@@ -80,14 +80,9 @@ class WhereFilterSpecResolver:
         self._resolution_dag = resolution_dag
         self.spec_pattern_factory = spec_pattern_factory
 
+    @mf_log_duration()
     def resolve_lookup(self) -> FilterSpecResolutionLookUp:
         """Find all where filters and return a lookup that provides the specs for the included group-by-items."""
-        # Workaround for a Pycharm type inspection issue with decorators.
-        # noinspection PyArgumentList
-        return self._resolve_lookup()
-
-    @mf_log_duration()
-    def _resolve_lookup(self) -> FilterSpecResolutionLookUp:
         visitor = _ResolveWhereFilterSpecVisitor(
             manifest_lookup=self._manifest_lookup,
             spec_pattern_factory=self.spec_pattern_factory,

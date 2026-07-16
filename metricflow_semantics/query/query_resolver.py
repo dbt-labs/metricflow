@@ -448,14 +448,9 @@ class MetricFlowQueryResolver:
 
         return where_filter_spec_resolver.resolve_lookup()
 
+    @mf_log_duration()
     def resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         """Resolve the query into specs that can be passed into the next stage in query processing."""
-        # Workaround for a Pycharm type inspection issue with decorators.
-        # noinspection PyArgumentList
-        return self._resolve_query(resolver_input_for_query=resolver_input_for_query)
-
-    @mf_log_duration()
-    def _resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         metric_inputs = resolver_input_for_query.metric_inputs
         group_by_item_inputs = resolver_input_for_query.group_by_item_inputs
         order_by_item_inputs = resolver_input_for_query.order_by_item_inputs

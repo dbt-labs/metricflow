@@ -120,7 +120,7 @@ class MetricFlowQueryParser:
         if limit is None:
             limit = saved_query.query_params.limit
 
-        return self._parse_and_validate_query(
+        return self.parse_and_validate_query(
             metric_names=saved_query.query_params.metrics,
             metrics=None,
             group_by_names=saved_query.query_params.group_by,
@@ -385,6 +385,7 @@ class MetricFlowQueryParser:
 
         raise InvalidQueryException(self.generate_error_message(input_to_issue_set=input_to_issue_set))
 
+    @mf_log_duration()
     def parse_and_validate_query(
         self,
         metric_names: Optional[Sequence[str]] = None,
@@ -405,41 +406,6 @@ class MetricFlowQueryParser:
 
         e.g. make sure that the given metric is a valid metric name.
         """
-        # Workaround for a Pycharm type inspection issue with decorators.
-        # noinspection PyArgumentList
-        return self._parse_and_validate_query(
-            metric_names=metric_names,
-            metrics=metrics,
-            group_by_names=group_by_names,
-            group_by=group_by,
-            limit=limit,
-            time_constraint_start=time_constraint_start,
-            time_constraint_end=time_constraint_end,
-            where_constraints=where_constraints,
-            where_constraint_strs=where_constraint_strs,
-            order_by_names=order_by_names,
-            order_by=order_by,
-            min_max_only=min_max_only,
-            apply_group_by=apply_group_by,
-        )
-
-    @mf_log_duration()
-    def _parse_and_validate_query(
-        self,
-        metric_names: Optional[Sequence[str]],
-        metrics: Optional[Sequence[MetricQueryParameter]],
-        group_by_names: Optional[Sequence[str]],
-        group_by: Optional[Tuple[GroupByQueryParameter, ...]],
-        limit: Optional[int],
-        time_constraint_start: Optional[datetime.datetime],
-        time_constraint_end: Optional[datetime.datetime],
-        where_constraints: Optional[Sequence[WhereFilter]],
-        where_constraint_strs: Optional[Sequence[str]],
-        order_by_names: Optional[Sequence[str]],
-        order_by: Optional[Sequence[OrderByQueryParameter]],
-        min_max_only: bool,
-        apply_group_by: bool,
-    ) -> ParseQueryResult:
         if min_max_only and (metric_names or metrics):
             raise InvalidQueryException("Cannot use min_max_only param for queries with metrics.")
         assert_at_most_one_arg_set(metric_names=metric_names, metrics=metrics)

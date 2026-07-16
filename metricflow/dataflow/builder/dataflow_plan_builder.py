@@ -836,6 +836,7 @@ class DataflowPlanBuilder:
 
         return output_node
 
+    @mf_log_duration()
     def build_plan_for_distinct_values(
         self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization] = frozenset()
     ) -> DataflowPlan:
@@ -847,14 +848,7 @@ class DataflowPlanBuilder:
             optimizations=frozenset(optimizations),
             output_group_by_metric_instances=False,
         )
-        # Workaround for a Pycharm type inspection issue with decorators.
-        # noinspection PyArgumentList
-        return self._build_plan_for_no_metrics_query(query_spec=query_spec, option_set=option_set)
 
-    @mf_log_duration()
-    def _build_plan_for_no_metrics_query(
-        self, query_spec: MetricFlowQuerySpec, option_set: DataflowPlanOptionSet
-    ) -> DataflowPlan:
         assert not query_spec.metric_specs, "Can't build distinct values plan with metrics."
 
         # Remove aliases for easier spec-matching. Will be added back in sink node.
