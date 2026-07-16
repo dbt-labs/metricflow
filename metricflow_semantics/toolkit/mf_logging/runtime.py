@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import functools
 import logging
-import time
-from typing import Callable, TypeVar
+from typing import Callable, Optional, TypeVar
 
-from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
+from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
 from typing_extensions import ParamSpec
 
 logger = logging.getLogger(__name__)
@@ -15,11 +14,12 @@ ParametersType = ParamSpec("ParametersType")
 
 
 def log_runtime(
-    runtime_warning_threshold: float = 5.0,
+    log_level: int = logging.INFO,
+    duration_warning_threshold: Optional[float] = 30.0,
 ) -> Callable[[Callable[ParametersType, ReturnType]], Callable[ParametersType, ReturnType]]:
     """Logs how long a function took to run.
 
-    If the runtime exceeds runtime_warning_threshold, then a warning is logged.
+    If the runtime exceeds duration_warning_threshold, then a warning is logged.
     """
 
     def decorator(wrapped_function: Callable[ParametersType, ReturnType]) -> Callable[ParametersType, ReturnType]:
@@ -28,18 +28,12 @@ def log_runtime(
         def _inner(*args: ParametersType.args, **kwargs: ParametersType.kwargs) -> ReturnType:
             # __qualname__ includes the path like MyClass.my_function
             function_name = f"{wrapped_function.__qualname__}()"
-            start_time = time.perf_counter()
-            logger.info(LazyFormat(lambda: f"Starting {function_name}"))
-
-            try:
-                result = wrapped_function(*args, **kwargs)
-            finally:
-                runtime = time.perf_counter() - start_time
-                logger.info(LazyFormat(lambda: f"Finished {function_name} in {runtime:.1f}s"))
-                if runtime > runtime_warning_threshold:
-                    logger.warning(LazyFormat(lambda: f"{function_name} is slow with a runtime of {runtime:.1f}s"))
-
-            return result
+            with ExecutionTimer(
+                function_name,
+                log_level=log_level,
+                duration_warning_threshold=duration_warning_threshold,
+            ):
+                return wrapped_function(*args, **kwargs)
 
         return _inner
 
