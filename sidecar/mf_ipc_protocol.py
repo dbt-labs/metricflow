@@ -13,14 +13,34 @@ tracked separately in DI-4709.
 """
 from __future__ import annotations
 
+from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 RequestId = str | int | None
 
 
-class ReadyMessage(BaseModel):
+class Method(str, Enum):
+    """Method names recognized by _dispatch.
+
+    RequestEnvelope.method stays a plain `str | None` (not this enum): an
+    unrecognized method is a valid, expected input that must reach
+    _dispatch's own UnknownMethod handling, not fail at parse time.
+    """
+
+    EXPLAIN = "explain"
+    PING = "ping"
+    SHUTDOWN = "shutdown"
+
+
+class _FrozenModel(BaseModel):
+    """Base for all mf-ipc messages: parsed or built once, then only read."""
+
+    model_config = ConfigDict(frozen=True)
+
+
+class ReadyMessage(_FrozenModel):
     """Startup handshake, written once before any request is read from stdin."""
 
     status: Literal["ready"] = "ready"
@@ -29,7 +49,7 @@ class ReadyMessage(BaseModel):
     protocol_version: Literal[1] = 1
 
 
-class StartupErrorMessage(BaseModel):
+class StartupErrorMessage(_FrozenModel):
     """Written instead of ReadyMessage if --manifest-path pre-loading fails."""
 
     status: Literal["error"] = "error"
@@ -37,22 +57,28 @@ class StartupErrorMessage(BaseModel):
     message: str
 
 
-class RequestEnvelope(BaseModel):
+class RequestEnvelope(_FrozenModel):
     """Generic shape every request must have, validated before method dispatch.
 
-    `method` and `v` are intentionally left unconstrained (not Literal) here:
-    an unknown method or a protocol version other than 1 is a valid, expected
-    input that must reach _dispatch's own UnknownMethod / ProtocolVersionError
-    handling, not fail at the envelope-parsing stage.
+    `id` is required: the IPC loop writes exactly one response per request
+    line, so there is no fire-and-forget "notification" case that would
+    justify defaulting it. A request missing `id` fails validation here and
+    surfaces to the caller as a structured error (itself with id=None, since
+    there's no id to echo back) rather than silently proceeding.
+
+    `method` and `protocol_version` are intentionally left unconstrained (not
+    Literal) here: an unknown method or a protocol version other than 1 is a
+    valid, expected input that must reach _dispatch's own UnknownMethod /
+    ProtocolVersionError handling, not fail at the envelope-parsing stage.
     """
 
-    id: RequestId = None
+    id: RequestId
     method: str | None = None
-    v: int = 1
+    protocol_version: int = 1
     params: dict | None = None
 
 
-class ExplainParams(BaseModel):
+class ExplainParams(_FrozenModel):
     """Params for the `explain` method.
 
     sql_engine is intentionally a plain string, not the SqlEngine enum:
@@ -63,15 +89,15 @@ class ExplainParams(BaseModel):
     """
 
     manifest_path: str
-    metric_names: list[str] | None = None
-    group_by_names: list[str] | None = None
-    where_constraints: list[str] | None = None
-    order_by_names: list[str] | None = None
+    metric_names: tuple[str, ...] | None = None
+    group_by_names: tuple[str, ...] | None = None
+    where_constraints: tuple[str, ...] | None = None
+    order_by_names: tuple[str, ...] | None = None
     limit: int | None = None
     sql_engine: str = "DUCKDB"
 
 
-class ErrorDetail(BaseModel):
+class ErrorDetail(_FrozenModel):
     """The `error` payload of an ErrorResponse."""
 
     type: str
@@ -79,7 +105,7 @@ class ErrorDetail(BaseModel):
     traceback: str | None = None
 
 
-class ErrorResponse(BaseModel):
+class ErrorResponse(_FrozenModel):
     """Response shape for any request that fails, regardless of method."""
 
     id: RequestId
@@ -87,14 +113,14 @@ class ErrorResponse(BaseModel):
     error: ErrorDetail
 
 
-class OkResponse(BaseModel):
+class OkResponse(_FrozenModel):
     """Response for `ping` / `shutdown` — ok:true with no extra payload."""
 
     id: RequestId
     ok: Literal[True] = True
 
 
-class ExplainResponse(BaseModel):
+class ExplainResponse(_FrozenModel):
     """Successful response for the `explain` method."""
 
     id: RequestId

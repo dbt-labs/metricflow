@@ -6,12 +6,12 @@ as a subprocess. Communicates via NDJSON over stdin/stdout (mf-ipc v1).
 
 Protocol v1:
   ready:    {"status":"ready","metricflow_version":"X","python_version":"X","protocol_version":1}
-  explain:  {"id":"...","method":"explain","v":1,"params":{
+  explain:  {"id":"...","method":"explain","protocol_version":1,"params":{
                 "manifest_path":"...","metric_names":[...],"group_by_names":[...],
                 "where_constraints":null,"order_by_names":null,"limit":null,"sql_engine":"DUCKDB"
             }} → {"id":"...","ok":true,"sql":"..."}
-  ping:     {"id":"...","method":"ping","v":1} → {"id":"...","ok":true}
-  shutdown: {"id":"...","method":"shutdown","v":1} → {"id":"...","ok":true}
+  ping:     {"id":"...","method":"ping","protocol_version":1} → {"id":"...","ok":true}
+  shutdown: {"id":"...","method":"shutdown","protocol_version":1} → {"id":"...","ok":true}
   error:    {"id":"...","ok":false,"error":{"type":"ExceptionClass","message":"..."}}
 
 manifest_path may be a YAML directory (dev/testing) or a manifest.json file (production).
@@ -43,6 +43,7 @@ from mf_ipc_protocol import (
     ErrorResponse,
     ExplainParams,
     ExplainResponse,
+    Method,
     OkResponse,
     ReadyMessage,
     RequestEnvelope,
@@ -161,9 +162,11 @@ def _write(msg: BaseModel) -> None:
 
 
 def _err(req_id: RequestId, exc: Exception) -> ErrorResponse:
-    error = ErrorDetail(type=type(exc).__name__, message=str(exc))
-    if _debug:
-        error.traceback = _traceback.format_exc()
+    error = ErrorDetail(
+        type=type(exc).__name__,
+        message=str(exc),
+        traceback=_traceback.format_exc() if _debug else None,
+    )
     return ErrorResponse(id=req_id, error=error)
 
 
@@ -185,29 +188,39 @@ def _handle_explain(req_id: RequestId, raw_params: dict) -> ExplainResponse | Er
         return _err(req_id, e)
 
 
-def _dispatch(req: object) -> ExplainResponse | OkResponse | ErrorResponse:
+def _parse_envelope(req: object) -> RequestEnvelope | ErrorResponse:
+    """Validate a decoded JSON value into a RequestEnvelope, or a structured error."""
     try:
-        envelope = RequestEnvelope.model_validate(req)
+        return RequestEnvelope.model_validate(req)
     except ValidationError as e:
         fallback_id = req.get("id") if isinstance(req, dict) else None
         return _err(fallback_id, e)
 
-    if envelope.v != 1:
+
+def _dispatch(envelope: RequestEnvelope) -> ExplainResponse | OkResponse | ErrorResponse:
+    """Route a validated envelope to its method handler.
+
+    `shutdown` is handled by the caller (main's IPC loop), not here: it needs
+    to break the read loop, which is a loop-control concern rather than a
+    per-method response to compute.
+    """
+    if envelope.protocol_version != 1:
         return ErrorResponse(
             id=envelope.id,
-            error=ErrorDetail(type="ProtocolVersionError", message=f"Expected v=1, got v={envelope.v!r}"),
+            error=ErrorDetail(
+                type="ProtocolVersionError",
+                message=f"Expected protocol_version=1, got protocol_version={envelope.protocol_version!r}",
+            ),
         )
-    if envelope.method == "ping":
+    if envelope.method == Method.PING:
         return OkResponse(id=envelope.id)
-    if envelope.method == "shutdown":
-        return OkResponse(id=envelope.id)
-    if envelope.method == "explain":
+    if envelope.method == Method.EXPLAIN:
         return _handle_explain(envelope.id, envelope.params or {})
     return ErrorResponse(
         id=envelope.id,
         error=ErrorDetail(
             type="UnknownMethod",
-            message=f"Unknown method: {envelope.method!r}. Supported: explain, ping, shutdown",
+            message=f"Unknown method: {envelope.method!r}. Supported: {', '.join(m.value for m in Method)}",
         ),
     )
 
@@ -267,14 +280,21 @@ def main(argv: list[str]) -> Literal[0, 1]:  # noqa: D103
             if not line:
                 continue
             try:
+                # Parsed as raw JSON, then separately validated into a RequestEnvelope,
+                # so malformed JSON (JSONDecodeError) and schema-invalid JSON
+                # (ValidationError) remain distinguishable error types for the caller.
                 req = json.loads(line)
             except json.JSONDecodeError as e:
                 _write(ErrorResponse(id=None, error=ErrorDetail(type="JSONDecodeError", message=str(e))))
                 continue
-            resp = _dispatch(req)
-            _write(resp)
-            if isinstance(req, dict) and req.get("method") == "shutdown":
+            envelope = _parse_envelope(req)
+            if isinstance(envelope, ErrorResponse):
+                _write(envelope)
+                continue
+            if envelope.method == Method.SHUTDOWN:
+                _write(OkResponse(id=envelope.id))
                 break
+            _write(_dispatch(envelope))
     except Exception:
         logging.exception("Uncaught error in IPC loop")
         return 1

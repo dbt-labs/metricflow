@@ -32,7 +32,7 @@ Quick smoke test from the repo root:
 
 ```bash
 MANIFEST=metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_00_minimal_manifest
-printf '{"id":"1","method":"explain","v":1,"params":{"manifest_path":"%s","metric_names":["bookings"],"group_by_names":["metric_time"],"sql_engine":"DUCKDB"}}\n{"id":"2","method":"shutdown","v":1}\n' "$MANIFEST" \
+printf '{"id":"1","method":"explain","protocol_version":1,"params":{"manifest_path":"%s","metric_names":["bookings"],"group_by_names":["metric_time"],"sql_engine":"DUCKDB"}}\n{"id":"2","method":"shutdown","protocol_version":1}\n' "$MANIFEST" \
   | hatch run dev-env:python sidecar/mf_entry.py
 ```
 
@@ -88,10 +88,10 @@ an error message and exits 1:
 ### Request format
 
 ```json
-{"id": "<string or int>", "method": "<method>", "v": 1, "params": {...}}
+{"id": "<string or int>", "method": "<method>", "protocol_version": 1, "params": {...}}
 ```
 
-`id` is echoed back in the response. `v` must be `1`.
+`id` is echoed back in the response. `protocol_version` must be `1`.
 
 ### Methods
 
@@ -103,7 +103,7 @@ Compiles a metric query to SQL without executing it.
 {
   "id": "1",
   "method": "explain",
-  "v": 1,
+  "protocol_version": 1,
   "params": {
     "manifest_path": "/path/to/manifest.json",
     "metric_names": ["bookings"],
@@ -137,7 +137,7 @@ Response:
 Health check. Responds immediately without touching the manifest or engine.
 
 ```json
-{"id": "2", "method": "ping", "v": 1}
+{"id": "2", "method": "ping", "protocol_version": 1}
 ```
 
 Response:
@@ -151,7 +151,7 @@ Response:
 Graceful shutdown. The sidecar responds, flushes stdout, then exits 0.
 
 ```json
-{"id": "3", "method": "shutdown", "v": 1}
+{"id": "3", "method": "shutdown", "protocol_version": 1}
 ```
 
 Response:

@@ -17,7 +17,7 @@ _INPUT = (
         {
             "id": "1",
             "method": "explain",
-            "v": 1,
+            "protocol_version": 1,
             "params": {
                 "manifest_path": _MANIFEST,
                 "metric_names": ["bookings"],
@@ -27,7 +27,7 @@ _INPUT = (
         }
     )
     + "\n"
-    + json.dumps({"id": "2", "method": "shutdown", "v": 1})
+    + json.dumps({"id": "2", "method": "shutdown", "protocol_version": 1})
     + "\n"
 )
 

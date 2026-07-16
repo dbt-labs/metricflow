@@ -36,20 +36,26 @@ def test_explain_params_defaults() -> None:
     assert params.limit is None
 
 
+def test_request_envelope_requires_id() -> None:
+    """The id field has no default; omitting it must raise a field-level ValidationError."""
+    with pytest.raises(ValidationError, match="id"):
+        RequestEnvelope.model_validate({})
+
+
 def test_request_envelope_defaults() -> None:
-    """An empty request body still parses, with id/method/params defaulting to None and v to 1."""
-    envelope = RequestEnvelope.model_validate({})
-    assert envelope.id is None
+    """Given only id, method/params default to None and protocol_version defaults to 1."""
+    envelope = RequestEnvelope.model_validate({"id": "1"})
+    assert envelope.id == "1"
     assert envelope.method is None
-    assert envelope.v == 1
+    assert envelope.protocol_version == 1
     assert envelope.params is None
 
 
 def test_request_envelope_accepts_unknown_method_and_version() -> None:
     """Unconstrained so _dispatch's own UnknownMethod/ProtocolVersionError logic can run."""
-    envelope = RequestEnvelope.model_validate({"method": "does_not_exist", "v": 99})
+    envelope = RequestEnvelope.model_validate({"id": "1", "method": "does_not_exist", "protocol_version": 99})
     assert envelope.method == "does_not_exist"
-    assert envelope.v == 99
+    assert envelope.protocol_version == 99
 
 
 def test_request_envelope_rejects_non_mapping_input() -> None:
@@ -61,7 +67,7 @@ def test_request_envelope_rejects_non_mapping_input() -> None:
 @pytest.mark.parametrize("model_cls", [RequestEnvelope, ExplainParams])
 def test_extra_fields_are_ignored_not_rejected(model_cls: type[BaseModel]) -> None:
     """An older MetricFlow shouldn't reject a newer Fusion's request over an unknown field."""
-    payload = {"manifest_path": "/some/path", "some_future_field": "value"}
+    payload = {"id": "1", "manifest_path": "/some/path", "some_future_field": "value"}
     model_cls.model_validate(payload)  # must not raise
 
 
