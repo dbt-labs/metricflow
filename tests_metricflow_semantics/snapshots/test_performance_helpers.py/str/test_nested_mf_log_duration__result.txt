@@ -1,0 +1,9 @@
+test_name: test_nested_mf_log_duration
+test_filename: test_performance_helpers.py
+docstring:
+  Snapshot the log lines emitted by nested functions decorated with `mf_log_duration`.
+---
+[START D0] _outer_function()
+[START D1] _inner_function()
+[END D1] _inner_function() [duration=0.00 s]
+[END D0] _outer_function() [duration=0.00 s]
