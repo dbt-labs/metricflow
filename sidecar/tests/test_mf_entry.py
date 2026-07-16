@@ -11,18 +11,24 @@ import sys
 from collections.abc import Iterator
 from pathlib import Path
 
+import mf_entry
 import pytest
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_00_minimal_manifest import SG_00_MINIMAL_MANIFEST
+from mf_ipc_protocol import ExplainParams, Method, RequestEnvelope
 
-_REPO_ROOT = Path(__file__).parent.parent.parent
-_MF_ENTRY = _REPO_ROOT / "sidecar" / "mf_entry.py"
-_MANIFEST_DIR = (
-    _REPO_ROOT / "metricflow_semantics" / "test_helpers" / "semantic_manifest_yamls" / "sg_00_minimal_manifest"
-)
+_MF_ENTRY = Path(mf_entry.__file__)
+_MANIFEST_DIR = SG_00_MINIMAL_MANIFEST.directory
 
 
-def _send(proc: subprocess.Popen, req: dict) -> dict:  # type: ignore[type-arg]
+def _send(proc: subprocess.Popen, req: RequestEnvelope | dict) -> dict:  # type: ignore[type-arg]
+    """Send a request and return the decoded response.
+
+    Accepts a raw dict (in addition to RequestEnvelope) so tests can send
+    envelopes that wouldn't validate, e.g. one missing the now-required id.
+    """
     assert proc.stdin is not None and proc.stdout is not None
-    proc.stdin.write(json.dumps(req) + "\n")
+    body = req.model_dump_json() if isinstance(req, RequestEnvelope) else json.dumps(req)
+    proc.stdin.write(body + "\n")
     proc.stdin.flush()
     return json.loads(proc.stdout.readline())
 
@@ -41,8 +47,7 @@ def sidecar() -> Iterator[subprocess.Popen[str]]:
     assert ready["status"] == "ready", f"Expected ready, got: {ready}"
     yield proc
     try:
-        proc.stdin.write(json.dumps({"id": "teardown", "method": "shutdown", "v": 1}) + "\n")  # type: ignore[union-attr]
-        proc.stdin.flush()  # type: ignore[union-attr]
+        _send(proc, RequestEnvelope(id="teardown", method=Method.SHUTDOWN.value))
         proc.wait(timeout=10)
     except Exception:
         proc.kill()
@@ -55,26 +60,19 @@ def test_ready_message_fields(sidecar: subprocess.Popen) -> None:  # type: ignor
 
 def test_ping(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
     """Ping returns ok:true with the matching request id."""
-    resp = _send(sidecar, {"id": "ping-1", "method": "ping", "v": 1})
+    resp = _send(sidecar, RequestEnvelope(id="ping-1", method=Method.PING.value))
     assert resp == {"id": "ping-1", "ok": True}
 
 
 def test_explain_returns_sql(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
     """Explain returns ok:true with a non-empty SQL string containing the metric name."""
-    resp = _send(
-        sidecar,
-        {
-            "id": "explain-1",
-            "method": "explain",
-            "v": 1,
-            "params": {
-                "manifest_path": str(_MANIFEST_DIR),
-                "metric_names": ["bookings"],
-                "group_by_names": ["metric_time"],
-                "sql_engine": "DUCKDB",
-            },
-        },
+    params = ExplainParams(
+        manifest_path=str(_MANIFEST_DIR),
+        metric_names=["bookings"],
+        group_by_names=["metric_time"],
+        sql_engine="DUCKDB",
     )
+    resp = _send(sidecar, RequestEnvelope(id="explain-1", method=Method.EXPLAIN.value, params=params.model_dump()))
     assert resp["id"] == "explain-1"
     assert resp["ok"] is True
     assert "SELECT" in resp["sql"]
@@ -83,19 +81,8 @@ def test_explain_returns_sql(sidecar: subprocess.Popen) -> None:  # type: ignore
 
 def test_explain_invalid_metric_returns_structured_error(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
     """Explain with an unknown metric name returns ok:false with InvalidQueryException."""
-    resp = _send(
-        sidecar,
-        {
-            "id": "explain-2",
-            "method": "explain",
-            "v": 1,
-            "params": {
-                "manifest_path": str(_MANIFEST_DIR),
-                "metric_names": ["nonexistent_metric"],
-                "sql_engine": "DUCKDB",
-            },
-        },
-    )
+    params = ExplainParams(manifest_path=str(_MANIFEST_DIR), metric_names=["nonexistent_metric"], sql_engine="DUCKDB")
+    resp = _send(sidecar, RequestEnvelope(id="explain-2", method=Method.EXPLAIN.value, params=params.model_dump()))
     assert resp["id"] == "explain-2"
     assert resp["ok"] is False
     assert resp["error"]["type"] == "InvalidQueryException"
@@ -104,7 +91,7 @@ def test_explain_invalid_metric_returns_structured_error(sidecar: subprocess.Pop
 
 def test_unknown_method(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
     """An unrecognised method name returns ok:false with UnknownMethod."""
-    resp = _send(sidecar, {"id": "unk-1", "method": "does_not_exist", "v": 1})
+    resp = _send(sidecar, RequestEnvelope(id="unk-1", method="does_not_exist"))
     assert resp["id"] == "unk-1"
     assert resp["ok"] is False
     assert resp["error"]["type"] == "UnknownMethod"
@@ -112,11 +99,19 @@ def test_unknown_method(sidecar: subprocess.Popen) -> None:  # type: ignore[type
 
 
 def test_wrong_protocol_version(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
-    """A request with v!=1 returns ok:false with ProtocolVersionError."""
-    resp = _send(sidecar, {"id": "ver-1", "method": "ping", "v": 99})
+    """A request with protocol_version!=1 returns ok:false with ProtocolVersionError."""
+    resp = _send(sidecar, RequestEnvelope(id="ver-1", method=Method.PING.value, protocol_version=99))
     assert resp["id"] == "ver-1"
     assert resp["ok"] is False
     assert resp["error"]["type"] == "ProtocolVersionError"
+
+
+def test_missing_id_returns_structured_error(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
+    """A request without an id fails RequestEnvelope validation; the error id falls back to None."""
+    resp = _send(sidecar, {"method": Method.PING.value, "protocol_version": 1})
+    assert resp["id"] is None
+    assert resp["ok"] is False
+    assert "id" in resp["error"]["message"]
 
 
 def test_malformed_json(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
@@ -140,7 +135,7 @@ def test_shutdown_exits_zero() -> None:
     )
     assert proc.stdout is not None and proc.stdin is not None
     json.loads(proc.stdout.readline())  # consume ready
-    resp = _send(proc, {"id": "shut-1", "method": "shutdown", "v": 1})
+    resp = _send(proc, RequestEnvelope(id="shut-1", method=Method.SHUTDOWN.value))
     assert resp == {"id": "shut-1", "ok": True}
     proc.wait(timeout=5)
     assert proc.returncode == 0
