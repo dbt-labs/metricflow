@@ -41,7 +41,7 @@ from metricflow_semantics.time.time_source import TimeSource
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.id_helpers import mf_random_id
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
+from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 from typing_extensions import TypeVar
 
@@ -670,7 +670,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D102
-        with log_block_runtime("explain"):
+        with ExecutionTimer("explain", duration_warning_threshold=5.0):
             return self._create_execution_plan(mf_request)
 
     def _build_metric_time_dimension(self, time_grain: Optional[ExpandedTimeGranularity]) -> Dimension:
