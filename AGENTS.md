@@ -27,6 +27,10 @@ This project uses **hatch** for dependency management and testing:
 - For prompts that are made from the CLI and the response includes a table, 
   use a formatting style that aligns columns vertically.
 - Avoid variable names that would shadow a name from an outer scope.
+- Avoid hard-coded strings for module names. Instead, derive them from 
+  imports to improve refactoring safety.
+- When adding compact logic such as regexes, parsers, or normalization rules,
+  include a concise comment with the intent and a representative example.
 
 ## Python Code Standards
 
@@ -43,3 +47,4 @@ This project uses **hatch** for dependency management and testing:
 - Code comments should capture non-obvious behavior.
 - Include appropriate comments that describe fields in dataclass-like classes.
 - Avoid the use of mocks unless another approach is not reasonable.
+- Default to the Google Python Style Guide.
