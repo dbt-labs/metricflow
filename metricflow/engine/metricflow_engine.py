@@ -670,7 +670,7 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
 
     @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
     def explain(self, mf_request: MetricFlowQueryRequest) -> MetricFlowExplainResult:  # noqa: D102
-        with ExecutionTimer("explain", duration_warning_threshold=5.0):
+        with ExecutionTimer("Explain Request", duration_warning_threshold=5.0):
             return self._create_execution_plan(mf_request)
 
     def _build_metric_time_dimension(self, time_grain: Optional[ExpandedTimeGranularity]) -> Dimension:
