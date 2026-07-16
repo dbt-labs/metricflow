@@ -53,7 +53,7 @@ from metricflow_semantics.time.dateutil_adjuster import DateutilTimePeriodAdjust
 from metricflow_semantics.toolkit.assert_one_arg import assert_at_most_one_arg_set
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
+from metricflow_semantics.toolkit.performance_helpers import mf_log_duration
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 
 from metricflow_semantic_interfaces.implementations.filters.where_filter import (
@@ -423,7 +423,7 @@ class MetricFlowQueryParser:
             apply_group_by=apply_group_by,
         )
 
-    @log_runtime()
+    @mf_log_duration()
     def _parse_and_validate_query(
         self,
         metric_names: Optional[Sequence[str]],

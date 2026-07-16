@@ -46,7 +46,7 @@ from metricflow_semantics.query.issues.issues_base import (
     MetricFlowQueryResolutionIssueSet,
 )
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
+from metricflow_semantics.toolkit.performance_helpers import mf_log_duration
 from typing_extensions import override
 
 from metricflow_semantic_interfaces.call_parameter_sets import JinjaCallParameterSets, MetricCallParameterSet
@@ -86,7 +86,7 @@ class WhereFilterSpecResolver:
         # noinspection PyArgumentList
         return self._resolve_lookup()
 
-    @log_runtime()
+    @mf_log_duration()
     def _resolve_lookup(self) -> FilterSpecResolutionLookUp:
         visitor = _ResolveWhereFilterSpecVisitor(
             manifest_lookup=self._manifest_lookup,

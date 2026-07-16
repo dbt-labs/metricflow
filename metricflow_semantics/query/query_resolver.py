@@ -72,7 +72,7 @@ from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
+from metricflow_semantics.toolkit.performance_helpers import mf_log_duration
 from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 
 from metricflow_semantic_interfaces.references import MetricReference, SemanticModelReference
@@ -454,7 +454,7 @@ class MetricFlowQueryResolver:
         # noinspection PyArgumentList
         return self._resolve_query(resolver_input_for_query=resolver_input_for_query)
 
-    @log_runtime()
+    @mf_log_duration()
     def _resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         metric_inputs = resolver_input_for_query.metric_inputs
         group_by_item_inputs = resolver_input_for_query.group_by_item_inputs

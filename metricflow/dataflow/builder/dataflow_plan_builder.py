@@ -53,8 +53,7 @@ from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import Metric
 from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import EdgeCountWeightFunction
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
-from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
+from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer, mf_log_duration
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 from typing_extensions import override
 
@@ -852,7 +851,7 @@ class DataflowPlanBuilder:
         # noinspection PyArgumentList
         return self._build_plan_for_no_metrics_query(query_spec=query_spec, option_set=option_set)
 
-    @log_runtime()
+    @mf_log_duration()
     def _build_plan_for_no_metrics_query(
         self, query_spec: MetricFlowQuerySpec, option_set: DataflowPlanOptionSet
     ) -> DataflowPlan:
