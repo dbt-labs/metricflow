@@ -731,7 +731,7 @@ integration_test:
         GROUP BY
           ds
       ) d
-      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
+      ON {{ render_date_sub("c", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
     ) b
     ON a.metric_time__day = b.metric_time__day
 ---
@@ -1836,7 +1836,7 @@ integration_test:
         GROUP BY
           ds
       ) d
-      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
+      ON {{ render_date_sub("c", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
     ) b
     ON a.booking__ds__day = b.booking__ds__day
 ---
@@ -2252,6 +2252,7 @@ integration_test:
   model: SIMPLE_MODEL
   metrics: ["new_users"]
   group_bys: ["user__last_profile_edit_ts__millisecond"]
+  required_features: ["MILLISECOND_TIME_GRANULARITY"]
   check_query: |
     SELECT
       {{ render_date_trunc("last_profile_edit_ts", TimeGranularity.MILLISECOND) }} AS user__last_profile_edit_ts__millisecond

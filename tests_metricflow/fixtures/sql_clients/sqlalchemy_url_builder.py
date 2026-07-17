@@ -48,6 +48,8 @@ class SqlAlchemyUrlBuilder:
             return SqlAlchemyUrlBuilder._build_bigquery_url(password, schema)
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
+        elif dialect is SqlDialect.STARROCKS:
+            return SqlAlchemyUrlBuilder._build_starrocks_url(connection_params, password, schema)
         else:
             raise ValueError(f"Unsupported dialect: {dialect}")
 
@@ -233,4 +235,28 @@ class SqlAlchemyUrlBuilder:
             port=connection_params.port or 8080,
             database=connection_params.database,
             query=query_params,
+        )
+
+    @staticmethod
+    def _build_starrocks_url(
+        connection_params: SqlEngineConnectionParameterSet,
+        password: str,
+        schema: Optional[str] = None,
+    ) -> SqlAlchemyURL:
+        """Build StarRocks URL.
+
+        StarRocks uses MySQL protocol on port 9030. Schema selection is handled
+        via database-qualified table names rather than a connection-level parameter,
+        because the underlying pymysql driver does not accept a 'schema' keyword argument.
+        """
+        return SqlAlchemyURL.create(
+            drivername="starrocks",
+            username=connection_params.username,
+            password=password,
+            host=connection_params.hostname,
+            port=connection_params.port or 9030,
+            # No default database — StarRocks raises "Unknown database" if the database
+            # doesn't exist at connect time. All MetricFlow queries use fully-qualified
+            # schema.table names, so no default database is required.
+            database=None,
         )

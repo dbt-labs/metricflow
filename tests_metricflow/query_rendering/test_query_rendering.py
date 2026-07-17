@@ -32,7 +32,10 @@ from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_N
 from metricflow_semantic_interfaces.references import EntityReference
 from metricflow_semantic_interfaces.test_utils import as_datetime
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
-from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
+from tests_metricflow.query_rendering.compare_rendered_query import (
+    render_and_check,
+    skip_if_time_granularity_not_supported,
+)
 
 
 @pytest.mark.sql_engine_snapshot
@@ -106,6 +109,8 @@ def test_partitioned_join(
     sql_client: SqlClient,
 ) -> None:
     """Tests converting a dataflow plan where there's a join on a partitioned dimension."""
+    skip_if_time_granularity_not_supported(sql_client, TimeGranularity.MILLISECOND)
+
     query_spec = MetricFlowQuerySpec(
         metric_specs=(MetricSpec.create(element_name="identity_verifications"),),
         dimension_specs=(

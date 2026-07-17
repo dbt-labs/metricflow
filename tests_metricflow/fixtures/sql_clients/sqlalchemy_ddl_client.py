@@ -104,7 +104,7 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
         column_type = column_description.column_type
 
         if column_type is str:
-            if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY):
+            if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY, SqlEngine.STARROCKS):
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
@@ -128,9 +128,19 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
     def create_schema(self, schema_name: str) -> None:
         """Create schema if it doesn't exist."""
-        self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
+        if self.sql_engine_type is SqlEngine.STARROCKS:
+            # StarRocks uses MySQL-style databases; CREATE SCHEMA is a synonym for CREATE DATABASE,
+            # but DATABASE is more broadly supported across StarRocks versions.
+            self.execute(f"CREATE DATABASE IF NOT EXISTS {schema_name}")
+        else:
+            self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
         """Drop schema if it exists."""
-        cascade_clause = " CASCADE" if cascade else ""
-        self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")
+        if self.sql_engine_type is SqlEngine.STARROCKS:
+            # StarRocks (MySQL-style) does not support the CASCADE clause in DROP DATABASE/SCHEMA.
+            # Dropping the database implicitly removes all contained tables.
+            self.execute(f"DROP DATABASE IF EXISTS {schema_name}")
+        else:
+            cascade_clause = " CASCADE" if cascade else ""
+            self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")
