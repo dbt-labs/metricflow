@@ -49,6 +49,7 @@ from pathlib import Path
 from typing import cast
 
 import click
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from packaging.version import InvalidVersion, Version
 
 from msi_pydantic_shim import BaseModel
@@ -340,7 +341,12 @@ def _load_release_tool_state(state_file_path: Path) -> ReleaseToolState:
     """Load and return the release-tool state, raising if the file is missing."""
     if not state_file_path.exists():
         raise click.ClickException(f"Release tool state file not found at {state_file_path}.")
-    return ReleaseToolState.parse_raw(state_file_path.read_text())
+    try:
+        return ReleaseToolState.parse_raw(state_file_path.read_text())
+    except Exception as e:
+        raise LoadStateFileException(
+            LazyFormat("Unable to load release tool state", state_file_path=state_file_path)
+        ) from e
 
 
 def _warn_if_step_previously_run(step_name: str, step_state: object | None, console: ReleaseHelperConsole) -> None:
@@ -701,8 +707,17 @@ def clean(ctx: click.Context) -> None:
     git_manager = context.git_manager_factory(context.current_directory)
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
 
-    if state_file_path.exists():
+    release_tool_state: ReleaseToolState | None = None
+    try:
         release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+    except LoadStateFileException:
+        click.echo(
+            LazyFormat(
+                "Unable to load state file so not deleting branches used in release", state_file_path=state_file_path
+            )
+        )
+
+    if release_tool_state:
         branch_names: list[str] = []
         if release_tool_state.step_1 is not None:
             branch_names.append(release_tool_state.step_1.branch_name)
@@ -726,6 +741,12 @@ def clean(ctx: click.Context) -> None:
         state_file_path.unlink()
     else:
         console.echo(f"State file {state_file_path} does not exist, nothing to delete")
+
+
+class LoadStateFileException(Exception):
+    """Exception raised when there's an error loading the state file."""
+
+    pass
 
 
 if __name__ == "__main__":
