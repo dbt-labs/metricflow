@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import argparse
 import importlib.metadata
-import json
 import logging
 import os
 import signal
@@ -188,15 +187,6 @@ def _handle_explain(req_id: RequestId, raw_params: dict) -> ExplainResponse | Er
         return _err(req_id, e)
 
 
-def _parse_envelope(req: object) -> RequestEnvelope | ErrorResponse:
-    """Validate a decoded JSON value into a RequestEnvelope, or a structured error."""
-    try:
-        return RequestEnvelope.model_validate(req)
-    except ValidationError as e:
-        fallback_id = req.get("id") if isinstance(req, dict) else None
-        return _err(fallback_id, e)
-
-
 def _dispatch(envelope: RequestEnvelope) -> ExplainResponse | OkResponse | ErrorResponse:
     """Route a validated envelope to its method handler.
 
@@ -280,16 +270,9 @@ def main(argv: list[str]) -> Literal[0, 1]:  # noqa: D103
             if not line:
                 continue
             try:
-                # Parsed as raw JSON, then separately validated into a RequestEnvelope,
-                # so malformed JSON (JSONDecodeError) and schema-invalid JSON
-                # (ValidationError) remain distinguishable error types for the caller.
-                req = json.loads(line)
-            except json.JSONDecodeError as e:
-                _write(ErrorResponse(id=None, error=ErrorDetail(type="JSONDecodeError", message=str(e))))
-                continue
-            envelope = _parse_envelope(req)
-            if isinstance(envelope, ErrorResponse):
-                _write(envelope)
+                envelope = RequestEnvelope.model_validate_json(line)
+            except ValidationError as e:
+                _write(_err(None, e))
                 continue
             if envelope.method == Method.SHUTDOWN:
                 _write(OkResponse(id=envelope.id))

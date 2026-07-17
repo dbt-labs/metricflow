@@ -123,14 +123,14 @@ def test_null_id_returns_structured_error(sidecar: subprocess.Popen) -> None:  #
 
 
 def test_malformed_json(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
-    """A non-JSON line returns ok:false with id:null and JSONDecodeError."""
+    """A non-JSON line returns ok:false with id:null and ValidationError."""
     assert sidecar.stdin is not None and sidecar.stdout is not None
     sidecar.stdin.write("not valid json\n")
     sidecar.stdin.flush()
     resp = json.loads(sidecar.stdout.readline())
     assert resp["id"] is None
     assert resp["ok"] is False
-    assert resp["error"]["type"] == "JSONDecodeError"
+    assert resp["error"]["type"] == "ValidationError"
 
 
 def test_shutdown_exits_zero() -> None:

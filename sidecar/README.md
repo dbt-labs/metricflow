@@ -168,15 +168,15 @@ All errors share a single shape:
 {"id": "<id or null>", "ok": false, "error": {"type": "ExceptionClass", "message": "..."}}
 ```
 
-`id` is `null` when the request itself could not be parsed (e.g. malformed
-JSON). Common `type` values:
+`id` is `null` when the request itself could not be parsed or validated
+(e.g. malformed JSON, or a missing/invalid field). Common `type` values:
 
 | type | cause |
 |---|---|
 | `InvalidQueryException` | invalid query parameters |
 | `UnknownMetricError` | metric name not found in manifest |
-| `JSONDecodeError` | request line was not valid JSON |
-| `ProtocolVersionError` | `v` field was not `1` |
+| `ValidationError` | request line was not valid JSON, or didn't match the expected shape |
+| `ProtocolVersionError` | `protocol_version` field was not `1` |
 | `UnknownMethod` | unrecognised method name |
 
 With `--debug`, error responses also include a `"traceback"` field.
