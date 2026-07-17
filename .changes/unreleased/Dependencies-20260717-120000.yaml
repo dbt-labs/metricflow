@@ -1,0 +1,6 @@
+kind: Dependencies
+body: Allow `dbt-core` 1.12.x in the `dbt-metricflow` CLI and dev environment
+time: 2026-07-17T12:00:00.000000+03:00
+custom:
+    Author: beratli
+    Issue: ""
