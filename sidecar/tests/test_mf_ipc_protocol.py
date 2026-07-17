@@ -42,6 +42,12 @@ def test_request_envelope_requires_id() -> None:
         RequestEnvelope.model_validate({})
 
 
+def test_request_envelope_rejects_null_id() -> None:
+    """The id field is typed str | int (not RequestId): an explicit null must be rejected, not just an absent key."""
+    with pytest.raises(ValidationError, match="id"):
+        RequestEnvelope.model_validate({"id": None})
+
+
 def test_request_envelope_defaults() -> None:
     """Given only id, method/params default to None and protocol_version defaults to 1."""
     envelope = RequestEnvelope.model_validate({"id": "1"})

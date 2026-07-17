@@ -114,6 +114,14 @@ def test_missing_id_returns_structured_error(sidecar: subprocess.Popen) -> None:
     assert "id" in resp["error"]["message"]
 
 
+def test_null_id_returns_structured_error(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
+    """A request with an explicit null id fails RequestEnvelope validation the same as a missing one."""
+    resp = _send(sidecar, {"id": None, "method": Method.PING.value, "protocol_version": 1})
+    assert resp["id"] is None
+    assert resp["ok"] is False
+    assert "id" in resp["error"]["message"]
+
+
 def test_malformed_json(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
     """A non-JSON line returns ok:false with id:null and JSONDecodeError."""
     assert sidecar.stdin is not None and sidecar.stdout is not None

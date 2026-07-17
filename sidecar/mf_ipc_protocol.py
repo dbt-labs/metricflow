@@ -19,6 +19,14 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict
 
 RequestId = str | int | None
+"""The `id` carried on a response, or a fallback used while building one.
+
+None specifically means "no request to attribute this response to": either
+the incoming line wasn't valid JSON at all, or it failed RequestEnvelope
+validation (including a missing `id`). It is never produced by echoing a
+validated request's own id, because RequestEnvelope.id itself excludes None
+— see RequestEnvelope's docstring.
+"""
 
 
 class Method(str, Enum):
@@ -60,9 +68,11 @@ class StartupErrorMessage(_FrozenModel):
 class RequestEnvelope(_FrozenModel):
     """Generic shape every request must have, validated before method dispatch.
 
-    `id` is required: the IPC loop writes exactly one response per request
-    line, so there is no fire-and-forget "notification" case that would
-    justify defaulting it. A request missing `id` fails validation here and
+    `id` is required and typed `str | int` (not RequestId): the IPC loop
+    writes exactly one response per request line, so there is no
+    fire-and-forget "notification" case that would justify a default, and
+    excluding None means an explicit `"id": null` is rejected the same way
+    as an absent `id` key. Either way, the request fails validation here and
     surfaces to the caller as a structured error (itself with id=None, since
     there's no id to echo back) rather than silently proceeding.
 
@@ -72,7 +82,7 @@ class RequestEnvelope(_FrozenModel):
     ProtocolVersionError handling, not fail at the envelope-parsing stage.
     """
 
-    id: RequestId
+    id: str | int
     method: str | None = None
     protocol_version: int = 1
     params: dict | None = None
