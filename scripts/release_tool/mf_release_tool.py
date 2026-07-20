@@ -708,14 +708,13 @@ def clean(ctx: click.Context) -> None:
     state_file_path = _release_tool_state_file_path(current_directory=context.current_directory)
 
     release_tool_state: ReleaseToolState | None = None
-    try:
-        release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
-    except LoadStateFileException:
-        click.echo(
-            LazyFormat(
-                "Unable to load state file so not deleting branches used in release", state_file_path=state_file_path
-            )
-        )
+    if state_file_path.exists():
+        try:
+            release_tool_state = _load_release_tool_state(state_file_path=state_file_path)
+        except LoadStateFileException as e:
+            raise click.ClickException(
+                f"Unable to load release tool state at {state_file_path}. Please fix the file or remove it."
+            ) from e
 
     if release_tool_state:
         branch_names: list[str] = []
