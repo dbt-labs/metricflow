@@ -100,8 +100,8 @@ class ExecutionTimer(ContextManager["ExecutionTimer"]):
                 if self._duration_warning_threshold is not None and total_duration > self._duration_warning_threshold:
                     logger.warning(
                         LazyFormat(
-                            lambda: f"{self._render_execution_timer_description(description)!r} is slow with a duration "
-                            f"of {pretty_total_duration}"
+                            lambda: f"{str(self._render_execution_timer_description(description))!r}"
+                            f" is slow with a duration of {pretty_total_duration}"
                         ),
                         extra=self._context_state.extra,
                     )

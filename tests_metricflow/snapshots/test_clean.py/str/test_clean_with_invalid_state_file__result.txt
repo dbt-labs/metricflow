@@ -1,0 +1,9 @@
+test_name: test_clean_with_invalid_state_file
+test_filename: test_clean.py
+docstring:
+  Check running `clean` with an invalid state file.
+expectation_description:
+  Includes a message for an invalid state file.
+---
+MetricFlow repo directory: <TMP>/metricflow
+Error: Unable to load release tool state at <TMP>/metricflow/git_ignored/mf_release_tool_state.json. Please fix the file or remove it.
