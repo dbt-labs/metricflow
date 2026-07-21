@@ -74,6 +74,18 @@ Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
 "Source Code" = "https://github.com/dbt-labs/metricflow"
 
 
+# test_helpers is only used by tests_metricflow/, which isn't published (see
+# addopts below and the sdist/wheel packages list) -- nothing importable from
+# the published package touches it. Excluding it shrinks the distribution and
+# avoids shipping the symlinked fixtures under semantic_manifest_yamls/, which
+# break building this sdist on Windows (hatchling's os.stat() on the
+# tar-extracted symlinks raises WinError 123).
+[tool.hatch.build]
+exclude = [
+  "metricflow_semantics/test_helpers",
+  "metricflow_semantic_interfaces/test_helpers",
+]
+
 # There are files that hatch will always include as well (e.g. the LICENSE file).
 # See hatch build docs for more details.
 [tool.hatch.build.targets.sdist]
