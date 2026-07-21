@@ -69,6 +69,7 @@ results as assets on that tag's GitHub Release:
 | `aarch64-apple-darwin` | macos-14 | `mf_entry-<tag>-aarch64-apple-darwin.tar.gz` |
 | `x86_64-apple-darwin` | macos-13 | `mf_entry-<tag>-x86_64-apple-darwin.tar.gz` |
 | `x86_64-unknown-linux-gnu` | ubuntu-22.04 | `mf_entry-<tag>-x86_64-unknown-linux-gnu.tar.gz` |
+| `aarch64-unknown-linux-gnu` | ubuntu-24.04-arm | `mf_entry-<tag>-aarch64-unknown-linux-gnu.tar.gz` |
 | `x86_64-pc-windows-msvc` | windows-latest | `mf_entry-<tag>-x86_64-pc-windows-msvc.zip` |
 
 A `SHA256SUMS.txt` asset is published alongside the archives for integrity

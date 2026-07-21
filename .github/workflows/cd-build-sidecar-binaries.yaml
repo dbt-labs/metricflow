@@ -23,6 +23,8 @@ jobs:
             target-triple: x86_64-apple-darwin
           - runner: ubuntu-22.04
             target-triple: x86_64-unknown-linux-gnu
+          - runner: ubuntu-24.04-arm
+            target-triple: aarch64-unknown-linux-gnu
           - runner: windows-latest
             target-triple: x86_64-pc-windows-msvc
     steps:
