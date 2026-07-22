@@ -72,6 +72,11 @@ class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
         return None
 
     @property
+    def as_string_literal_expression(self) -> Optional[SqlStringLiteralExpression]:
+        """If this is a string literal expression, return self."""
+        return None
+
+    @property
     def as_window_function_expression(self) -> Optional[SqlWindowFunctionExpression]:
         """If this is a window function expression, return self."""
         return None
@@ -379,6 +384,10 @@ class SqlStringLiteralExpression(SqlExpressionNode):
     @property
     def bind_parameter_set(self) -> SqlBindParameterSet:  # noqa: D102
         return SqlBindParameterSet()
+
+    @property
+    def as_string_literal_expression(self) -> Optional[SqlStringLiteralExpression]:  # noqa: D102
+        return self
 
     def __repr__(self) -> str:  # noqa: D105
         return f"{self.__class__.__name__}(node_id={self.node_id}, literal_value={self.literal_value})"

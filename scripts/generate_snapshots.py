@@ -8,6 +8,10 @@ export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
         "engine_url": null,
         "engine_password": null
     },
+    "athena": {
+        "engine_url": "athena://...",
+        "engine_password": "..."
+    },
     "redshift": {
         "engine_url": "redshift://...",
         "engine_password": "..."
@@ -53,14 +57,12 @@ logger = logging.getLogger(__name__)
 MF_TEST_DIRECTORY = "tests_metricflow"
 MF_SEMANTICS_TEST_DIRECTORY = "tests_metricflow_semantics"
 
-# Tests that generate SQL engine snapshots have this `pytest` marker set.
-SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
-
-DUCKDB_ENGINE_NAME = "duck_db"
+DUCKDB_ENGINE_NAME: Final[str] = "duck_db"
 
 # Maps the engine name in the credentials JSON to the `hatch` environment name.
 ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
     DUCKDB_ENGINE_NAME: "dev-env",
+    "athena": "athena-env",
     "redshift": "redshift-env",
     "snowflake": "snowflake-env",
     "big_query": "bigquery-env",
@@ -70,8 +72,11 @@ ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
 }
 
 ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(
-    ("redshift", "snowflake", "big_query", "databricks")
+    ("athena", "redshift", "snowflake", "big_query", "databricks")
 )
+
+# Tests that generate SQL engine snapshots have this `pytest` marker set.
+SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
 
 
 @dataclass(frozen=True)
