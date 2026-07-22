@@ -19,8 +19,14 @@ jobs:
         include:
           - runner: macos-14
             target-triple: aarch64-apple-darwin
-          - runner: macos-13
-            target-triple: x86_64-apple-darwin
+          # macos-13 (x86_64-apple-darwin) is disabled: GitHub's hosted Intel Mac runner
+          # pool is scarce/deprecating, and this leg has sat in `queued` with no runner
+          # assigned for 2+ hours in testing. Since `publish` below needs the whole `build`
+          # matrix to complete, a hung leg here blocks release artifacts for every other
+          # (working) platform. Re-enable once DI-4819 (Depot access for metricflow) lands
+          # and this leg is switched to a Depot-hosted runner, as fs/dbt-core v2 already do.
+          # - runner: macos-13
+          #   target-triple: x86_64-apple-darwin
           - runner: ubuntu-22.04
             target-triple: x86_64-unknown-linux-gnu
           - runner: ubuntu-24.04-arm
