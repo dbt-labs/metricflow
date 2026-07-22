@@ -141,3 +141,9 @@ performance-comparison.md
 
 # Directory to consolidate files ignored by git.
 **/git_ignored
+
+# Nuitka sidecar build artifacts
+sidecar/mf_entry.dist/
+sidecar/mf_entry.build/
+sidecar/nuitka_poc.dist/
+sidecar/nuitka_poc.build/

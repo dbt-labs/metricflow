@@ -66,7 +66,7 @@ from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
+from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
@@ -207,7 +207,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def cache_output_data_sets(self, nodes: Sequence[DataflowPlanNode]) -> None:
         """Cache the output of the given nodes for consistent retrieval with `get_output_data_set`."""
-        with log_block_runtime(f"cache_output_data_sets for {len(nodes)} nodes"):
+        with ExecutionTimer(f"cache_output_data_sets for {len(nodes)} nodes", duration_warning_threshold=5.0):
             for node in nodes:
                 self.get_output_data_set(node)
 
