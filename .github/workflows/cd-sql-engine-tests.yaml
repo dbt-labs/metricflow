@@ -152,7 +152,7 @@ jobs:
       - name: Wait for Vertica to be ready
         shell: bash
         run: |
-          for i in $(seq 1 60); do
+          for _ in $(seq 1 60); do
             if docker logs vertica 2>&1 | grep -q "is ready on port 5433"; then
               exit 0
             fi
