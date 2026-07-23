@@ -15,6 +15,7 @@ from scripts.release_tool.mf_release_tool import (
     ReleaseToolContext,
     cli,
 )
+from scripts.release_tool.release_step_1 import ReleaseStep1Runner
 from tests_metricflow.release_tools.release_tool_test_helpers import (
     RELEASE_TOOL_TEST_ENVIRONMENT,
     FakeCliCommandRunner,
@@ -51,10 +52,14 @@ def test_step_1_all_operations_match_snapshot(
         operation_log=operation_log,
     )
     cli_command_runner = FakeCliCommandRunner(operation_log=operation_log)
-    cli_command_runner.captured_outputs[("fossa", "report", "attribution", "--format", "markdown")] = b"# Attribution\n"
     github_client = FakeGitHubClient(operation_log=operation_log)
     github_client_factory = FakeGitHubClientFactory(github_client=github_client, operation_log=operation_log)
     repo_path = _make_metricflow_repo(tmp_path)
+    notice_report_path = (
+        repo_path / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY / ReleaseStep1Runner.ORT_NOTICE_REPORT_FILE_PATH
+    )
+    notice_report_path.parent.mkdir(parents=True)
+    notice_report_path.write_text("# Attribution\n")
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager, operation_log=operation_log)
     release_tool_context = ReleaseToolContext(
         environment=RELEASE_TOOL_TEST_ENVIRONMENT,
@@ -62,7 +67,7 @@ def test_step_1_all_operations_match_snapshot(
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=github_client_factory.create_client,
-        is_cli_command_available=("fossa", "changie").__contains__,
+        is_cli_command_available=("docker", "changie").__contains__,
         cli_command_runner=cli_command_runner,
         sleep=FakeSleep().sleep,
     )

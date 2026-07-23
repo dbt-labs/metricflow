@@ -38,7 +38,7 @@ def _release_tool_context(repo_path: Path, git_manager: FakeGitManager) -> Relea
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=FakeGitHubClientFactory(github_client=FakeGitHubClient()).create_client,
-        is_cli_command_available=("fossa", "changie").__contains__,
+        is_cli_command_available=("docker", "changie").__contains__,
         cli_command_runner=FakeCliCommandRunner(),
         sleep=FakeSleep().sleep,
     )
