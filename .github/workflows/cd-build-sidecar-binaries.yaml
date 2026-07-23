@@ -1,5 +1,10 @@
 # Compiles sidecar/mf_entry.py into standalone Nuitka binaries for every platform
 # Fusion needs to embed via rust-embed (DI-4631).
+#
+# The pull_request trigger is temporary validation scaffolding for DI-4819: workflow_dispatch
+# can't be invoked via API/CLI until this file exists on the default branch, so a draft PR is
+# the only way to prove the new MACOS_RUNNER_INTEL leg actually compiles and validates before
+# merging. Remove it once that leg is proven (or once it's clear it needs more org-side work).
 name: Build Sidecar Binaries
 
 on:
@@ -8,6 +13,11 @@ on:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+*"
   workflow_dispatch:
+  pull_request:
+    paths:
+      - "sidecar/**"
+      - "pyproject.toml"
+      - ".github/workflows/cd-build-sidecar-binaries.yaml"
 
 jobs:
   build:
@@ -19,14 +29,21 @@ jobs:
         include:
           - runner: macos-14
             target-triple: aarch64-apple-darwin
-          # macos-13 (x86_64-apple-darwin) is disabled: GitHub's hosted Intel Mac runner
-          # pool is scarce/deprecating, and this leg has sat in `queued` with no runner
-          # assigned for 2+ hours in testing. Since `publish` below needs the whole `build`
-          # matrix to complete, a hung leg here blocks release artifacts for every other
-          # (working) platform. Re-enable once DI-4819 (Depot access for metricflow) lands
-          # and this leg is switched to a Depot-hosted runner, as fs/dbt-core v2 already do.
-          # - runner: macos-13
-          #   target-triple: x86_64-apple-darwin
+          # DI-4819: was macos-13 (GitHub's free-tier Intel Mac pool), which sat in
+          # `queued` with no runner assigned for 2+ hours in testing -- a hung leg here
+          # would block `publish` (needs: build) for every other platform. Depot -- fs's
+          # and dbt-core v2's route for aarch64-apple-darwin -- turned out not to be a fix:
+          # Depot's macOS runners are Apple Silicon only (confirmed via Depot's docs), and
+          # Nuitka can't cross-compile the way fs/dbt-core's Rust CLI builds do, since it
+          # embeds native CPython plus precompiled per-arch wheels (pydantic-core, duckdb).
+          # `vars.MACOS_RUNNER_INTEL` is fs's actual genuine-Intel-hardware path (used for
+          # its ADBC/DuckDB driver native builds, which have the same can't-cross-compile
+          # constraint) -- a GitHub-hosted paid "larger runner" (macos-15-intel), not Depot.
+          # Untested whether this variable is visible to metricflow yet (it may be scoped
+          # to fs's repo only); if this leg hangs the same way macos-13 did, that's the
+          # signal it isn't, and getting it added is an org-admin ask, not a YAML fix.
+          - runner: ${{ vars.MACOS_RUNNER_INTEL }}
+            target-triple: x86_64-apple-darwin
           - runner: ubuntu-22.04
             target-triple: x86_64-unknown-linux-gnu
           - runner: ubuntu-24.04-arm
