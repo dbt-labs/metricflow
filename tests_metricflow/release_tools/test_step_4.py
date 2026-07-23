@@ -69,7 +69,7 @@ def test_step_4_all_operations_match_snapshot(
     repo_path = _make_metricflow_repo(tmp_path)
     _make_dbt_metricflow_requirements_file(repo_path)
     _write_step_1_step_2_and_step_3_state(repo_path)
-    step_4_cli_commands = ("fossa", "changie", "hatch")
+    step_4_cli_commands = ("docker", "changie", "hatch")
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager, operation_log=operation_log)
     release_tool_context = ReleaseToolContext(
         environment=RELEASE_TOOL_TEST_ENVIRONMENT,

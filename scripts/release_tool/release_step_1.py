@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import ClassVar
 
 import click
 
 from msi_pydantic_shim import BaseModel
+from scripts.release_tool import RELEASE_TOOL_DIRECTORY_ANCHOR
 from scripts.release_tool.github_client import GitHubClient
 from scripts.release_tool.package_version import PackageVersionUpdate
 from scripts.release_tool.release_helper import ReleaseHelper
@@ -42,7 +44,7 @@ class ReleaseStep1Runner:
 
     * Creating or recreating the local step-1 branch from `main`
     * Generating the changelog updates
-    * Generating the FOSSA attribution update
+    * Generating the ORT attribution update
     * Updating the package version
     * Linting and validating the resulting file changes
     * Committing the changelog, attribution, and version updates
@@ -51,19 +53,31 @@ class ReleaseStep1Runner:
     """
 
     # CLI commands that must be available on PATH for step 1.
-    REQUIRED_CLI_COMMANDS: ClassVar[tuple[str, ...]] = ("fossa", "changie")
+    REQUIRED_CLI_COMMANDS: ClassVar[tuple[str, ...]] = ("docker", "changie")
     # Commit message used for the changelog update commit.
     CHANGELOG_COMMIT_MESSAGE: ClassVar[str] = "Update change log"
-    # Commit message used for the FOSSA attribution update commit.
-    ATTRIBUTION_COMMIT_MESSAGE: ClassVar[str] = "Update attribution from FOSSA"
+    # Commit message used for the ORT attribution update commit.
+    ATTRIBUTION_COMMIT_MESSAGE: ClassVar[str] = "Update attribution from ORT"
     # File path that changelog generation is allowed to modify.
     ALLOWED_CHANGELOG_FILE_PATH: ClassVar[str] = "CHANGELOG.md"
     # Directory that changelog generation is allowed to modify.
     ALLOWED_CHANGE_DIRECTORY: ClassVar[str] = ".changes/"
-    # File path that FOSSA attribution is allowed to modify.
+    # File path that ORT attribution is allowed to modify.
     ALLOWED_ATTRIBUTION_FILE_PATH: ClassVar[str] = "ATTRIBUTION.md"
-    # Command used to generate the FOSSA attribution report.
-    FOSSA_REPORT_COMMAND: ClassVar[tuple[str, ...]] = ("fossa", "report", "attribution", "--format", "markdown")
+    # Docker image used to run ORT.
+    ORT_IMAGE: ClassVar[str] = "ghcr.io/oss-review-toolkit/ort"
+    # Python version available in the ORT container for python-inspector.
+    ORT_PYTHON_VERSION: ClassVar[str] = "3.13"
+    # Release-tool ORT configuration directory.
+    ORT_CONFIG_DIRECTORY_PATH: ClassVar[Path] = RELEASE_TOOL_DIRECTORY_ANCHOR.directory / "ort"
+    # ORT configuration file path inside the Docker container.
+    ORT_CONFIG_CONTAINER_FILE_PATH: ClassVar[Path] = Path("/ort-config/config.yml")
+    # Repository-relative requirements file used as the ORT analyzer input.
+    ORT_REQUIREMENTS_FILE_PATH: ClassVar[Path] = Path("requirements-files/requirements.txt")
+    # Repository-relative output directory for ORT intermediate files.
+    ORT_OUTPUT_DIRECTORY: ClassVar[Path] = Path("git_ignored/ort-attribution/release-step-1")
+    # ORT notice report path relative to ``ORT_OUTPUT_DIRECTORY``.
+    ORT_NOTICE_REPORT_FILE_PATH: ClassVar[Path] = Path("reporter/NOTICE_DEFAULT")
     # File path that the version update is allowed to modify.
     ALLOWED_ABOUT_FILE_PATH: ClassVar[str] = "metricflow/__about__.py"
     # Commit message used for the package version update commit.
@@ -114,7 +128,7 @@ class ReleaseStep1Runner:
                 commit_message=ReleaseStep1Runner.CHANGELOG_COMMIT_MESSAGE,
             ),
             ReleasePrCommitTask(
-                action=self._generate_fossa_attribution,
+                action=self._generate_ort_attribution,
                 validate=self._check_only_attribution_changed,
                 commit_message=ReleaseStep1Runner.ATTRIBUTION_COMMIT_MESSAGE,
             ),
@@ -128,10 +142,13 @@ class ReleaseStep1Runner:
         self.release_helper.run_cli_command(command=("changie", "batch", self.version))
         self.release_helper.run_cli_command(command=("changie", "merge"))
 
-    def _generate_fossa_attribution(self) -> None:
-        """Generate FOSSA attribution changes for the release."""
-        self.release_helper.run_cli_command(command=("fossa", "analyze"))
-        self._run_fossa_report()
+    def _generate_ort_attribution(self) -> None:
+        """Generate ORT attribution changes for the release."""
+        self._prepare_ort_output_directory()
+        self._run_ort_analyze()
+        self._run_ort_scan()
+        self._run_ort_report()
+        self._copy_ort_report_to_attribution()
 
     def _check_only_changelog_changed(self) -> None:
         """Raise if step 1 changed files outside the changelog inputs or output."""
@@ -148,23 +165,100 @@ class ReleaseStep1Runner:
                 f"Unexpected changed paths: {', '.join(unexpected_file_paths)}"
             )
 
-    def _run_fossa_report(self) -> None:
-        """Run ``fossa report attribution`` and write the output to ATTRIBUTION.md."""
-        description = (
-            f"Run {' '.join(ReleaseStep1Runner.FOSSA_REPORT_COMMAND)} > "
-            f"{ReleaseStep1Runner.ALLOWED_ATTRIBUTION_FILE_PATH}"
+    def _run_ort_command(self, command: Sequence[str]) -> None:
+        """Run an ORT Docker command from the release repository root."""
+        self.release_helper.run_cli_command(command=tuple(command))
+
+    def _prepare_ort_output_directory(self) -> None:
+        """Create the ignored ORT output directory before Docker bind-mounts it."""
+        (self.release_helper.current_directory / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY).mkdir(
+            parents=True, exist_ok=True
         )
-        with self.release_helper.console.spinner(description):
-            result = self.release_helper.cli_command_runner.run(
-                ReleaseStep1Runner.FOSSA_REPORT_COMMAND,
-                self.release_helper.current_directory,
-                capture_output=True,
+
+    def _ort_docker_command(self, ort_args: Sequence[str]) -> tuple[str, ...]:
+        """Return a Docker command that runs ORT with the shared release config."""
+        project_mount = f"{self.release_helper.current_directory}:/project"
+        output_mount = f"{self.release_helper.current_directory / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY}:/ort-out"
+        config_mount = f"{ReleaseStep1Runner.ORT_CONFIG_DIRECTORY_PATH}:/ort-config:ro"
+        return (
+            "docker",
+            "run",
+            "--rm",
+            "-e",
+            f"PYENV_VERSION={ReleaseStep1Runner.ORT_PYTHON_VERSION}",
+            "-v",
+            project_mount,
+            "-v",
+            output_mount,
+            "-v",
+            config_mount,
+            ReleaseStep1Runner.ORT_IMAGE,
+            "--info",
+            "-c",
+            str(ReleaseStep1Runner.ORT_CONFIG_CONTAINER_FILE_PATH),
+            *ort_args,
+        )
+
+    def _run_ort_analyze(self) -> None:
+        """Run ORT analysis for the release requirements file."""
+        self._run_ort_command(
+            command=self._ort_docker_command(
+                (
+                    "analyze",
+                    "-i",
+                    f"/project/{ReleaseStep1Runner.ORT_REQUIREMENTS_FILE_PATH}",
+                    "-o",
+                    "/ort-out/analyzer",
+                )
             )
+        )
+
+    def _run_ort_scan(self) -> None:
+        """Run ORT package scanning from the analyzer result."""
+        self._run_ort_command(
+            command=self._ort_docker_command(
+                (
+                    "scan",
+                    "-i",
+                    "/ort-out/analyzer/analyzer-result.yml",
+                    "--package-types",
+                    "PACKAGE",
+                    "-o",
+                    "/ort-out/scanner",
+                )
+            )
+        )
+
+    def _run_ort_report(self) -> None:
+        """Run ORT notice report generation from the scanner result."""
+        self._run_ort_command(
+            command=self._ort_docker_command(
+                (
+                    "report",
+                    "--report-formats",
+                    "PlainTextTemplate",
+                    "-i",
+                    "/ort-out/scanner/scan-result.yml",
+                    "-o",
+                    "/ort-out/reporter",
+                    "-O",
+                    "PlainTextTemplate=template.id=NOTICE_DEFAULT",
+                )
+            )
+        )
+
+    def _copy_ort_report_to_attribution(self) -> None:
+        """Copy the generated ORT notice report to ATTRIBUTION.md."""
         attribution_path = self.release_helper.current_directory / ReleaseStep1Runner.ALLOWED_ATTRIBUTION_FILE_PATH
-        attribution_path.write_bytes(result.stdout)
+        notice_report_path = (
+            self.release_helper.current_directory
+            / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY
+            / ReleaseStep1Runner.ORT_NOTICE_REPORT_FILE_PATH
+        )
+        attribution_path.write_bytes(notice_report_path.read_bytes())
 
     def _check_only_attribution_changed(self) -> None:
-        """Raise if FOSSA attribution changed files outside ATTRIBUTION.md."""
+        """Raise if ORT attribution changed files outside ATTRIBUTION.md."""
         changed_file_paths = self.release_helper.git_manager.changed_file_paths()
         unexpected_file_paths = [
             file_path
@@ -173,7 +267,7 @@ class ReleaseStep1Runner:
         ]
         if unexpected_file_paths:
             raise click.ClickException(
-                f"FOSSA attribution may only change {ReleaseStep1Runner.ALLOWED_ATTRIBUTION_FILE_PATH}. "
+                f"ORT attribution may only change {ReleaseStep1Runner.ALLOWED_ATTRIBUTION_FILE_PATH}. "
                 f"Unexpected changed paths: {', '.join(unexpected_file_paths)}"
             )
 

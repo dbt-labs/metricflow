@@ -4,7 +4,6 @@ Before running the tool, set the following environment variables:
 
     export GITHUB_USERNAME=<GitHub username>
     export GITHUB_API_TOKEN=<GitHub API token>
-    export FOSSA_API_KEY=<FOSSA API key>
 
 The GitHub API token should have the following permissions:
 
@@ -16,9 +15,9 @@ Also, checkout a clean version of the MF repo where the tool will create
 branches and make commits for the release. A separate checkout make it easier
 to make changes to the release tool independent of the release changes.
 
-Ensure `fossa` and `changie` CLI commands are installed. e.g.
+Ensure `docker` and `changie` CLI commands are installed. e.g.
 
-    brew install --cask fossa
+    brew install --cask docker
     brew install changie
 
 Start the process with:
@@ -70,7 +69,7 @@ logger = logging.getLogger(__name__)
 GITHUB_REPOSITORY_NAME = "dbt-labs/metricflow"
 GITHUB_REPOSITORY_GIT_NAME = f"{GITHUB_REPOSITORY_NAME}.git"
 GITHUB_REPOSITORY_HTML_BASE_URL = f"https://github.com/{GITHUB_REPOSITORY_NAME}"
-REQUIRED_ENVIRONMENT_VARIABLES = ("GITHUB_USERNAME", "GITHUB_API_TOKEN", "FOSSA_API_KEY")
+REQUIRED_ENVIRONMENT_VARIABLES = ("GITHUB_USERNAME", "GITHUB_API_TOKEN")
 RELEASE_TOOL_STATE_FILE_PATH = Path("git_ignored/mf_release_tool_state.json")
 
 CLI_COMMAND_STEP_1 = "step-1"

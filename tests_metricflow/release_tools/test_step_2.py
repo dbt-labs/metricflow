@@ -74,7 +74,7 @@ def test_step_2_all_operations_match_snapshot(
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=github_client_factory.create_client,
-        is_cli_command_available=("fossa", "changie").__contains__,
+        is_cli_command_available=("docker", "changie").__contains__,
         cli_command_runner=cli_command_runner,
         sleep=FakeSleep().sleep,
     )
