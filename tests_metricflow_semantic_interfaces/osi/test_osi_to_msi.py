@@ -250,8 +250,8 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         assert ratio.name == "arpu"
         assert ratio.type_params.numerator is not None
         assert ratio.type_params.denominator is not None
-        assert ratio.type_params.numerator.name == "arpu__numerator"
-        assert ratio.type_params.denominator.name == "arpu__denominator"
+        assert ratio.type_params.numerator.name == "arpu_numerator"
+        assert ratio.type_params.denominator.name == "arpu_denominator"
 
     def test_ratio_sub_metrics_are_simple(self) -> None:  # noqa: D102
         doc = _osi_doc(
@@ -263,7 +263,7 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         simple_metrics = [m for m in result.metrics if m.type == MetricType.SIMPLE]
         assert len(simple_metrics) == 2
         names = {m.name for m in simple_metrics}
-        assert names == {"ratio__numerator", "ratio__denominator"}
+        assert names == {"ratio_numerator", "ratio_denominator"}
 
     def test_complex_expression_falls_back_to_simple_with_raw_expr(self) -> None:  # noqa: D102
         doc = _osi_doc(
