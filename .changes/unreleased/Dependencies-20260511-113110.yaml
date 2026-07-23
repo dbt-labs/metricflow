@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Update DuckDB dev dependency to `>= 1.5`
-time: 2026-05-11T11:31:10.601663-07:00
-custom:
-    Author: plypaul
-    Issue: "2051"

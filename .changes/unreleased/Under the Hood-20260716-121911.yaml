@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Update emitted messages in `ExecutionTimer`
-time: 2026-07-16T12:19:11.968929-07:00
-custom:
-    Author: plypaul
-    Issue: "2084"
