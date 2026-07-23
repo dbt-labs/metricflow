@@ -1,0 +1,20 @@
+# Throwaway check for DI-4819: confirms MACOS_RUNNER_INTEL actually schedules a job for
+# this repo before re-running the full sidecar build matrix (cd-build-sidecar-binaries.yaml)
+# on it. Delete once proven -- either this check succeeds and cd-build-sidecar-binaries.yaml
+# is exercised directly, or it hangs/fails and DI-4819 needs more org-side work.
+name: Check MACOS_RUNNER_INTEL runner assignment
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/ci-sidecar-macos-intel-runner-check.yaml"
+
+jobs:
+  check:
+    name: Confirm runner assignment (${{ vars.MACOS_RUNNER_INTEL }})
+    runs-on: ${{ vars.MACOS_RUNNER_INTEL }}
+    steps:
+      - name: Report runner identity
+        run: |
+          uname -a
+          sw_vers
