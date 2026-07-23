@@ -1,0 +1,8 @@
+self-hosted-runner:
+  # ubuntu-24.04-arm is a GitHub-hosted (not self-hosted) runner label for
+  # GitHub's native Linux ARM64 runners. It's missing from actionlint
+  # v1.7.6's bundled hosted-runner-label list (pinned in .pre-commit-config.yaml);
+  # listing it here is actionlint's documented workaround for a hosted label
+  # it doesn't recognize yet.
+  labels:
+    - ubuntu-24.04-arm
