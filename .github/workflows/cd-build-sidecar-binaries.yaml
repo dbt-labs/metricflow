@@ -119,3 +119,7 @@ jobs:
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # softprops/action-gh-release@v2
         with:
           files: dist/*
+          # DI-4871: default is `true`, which silently overwrites assets on a re-push of
+          # an existing tag. An accidental re-push (mistyped/reused ad hoc counter, or a
+          # force-moved tag) should fail loudly instead of clobbering a published release.
+          overwrite_files: false
