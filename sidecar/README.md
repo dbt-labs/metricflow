@@ -59,28 +59,63 @@ hatch run nuitka-build:validate   # validate only (binary must already exist)
 
 ## CI builds and release artifacts
 
-On every MetricFlow release tag (`v<major>.<minor>.<patch>...`),
+Sidecar binaries have their own release versioning, decoupled from MetricFlow's (DI-4871).
+Every sidecar release is tagged `sidecar/v<mf_version>+<counter>` — e.g. `sidecar/v0.208.0+1`
+— where `<mf_version>` is the MetricFlow version embedded in the binary and `<counter>`
+distinguishes multiple sidecar builds off that same MetricFlow version. This is a **separate
+GitHub Release from MetricFlow's own `v<mf_version>` tag** (the one used for the PyPI
+publish) — Fusion pins the sidecar tag specifically, not the MetricFlow tag.
+
+**The `+1` baseline.** Every MetricFlow release always gets a matching sidecar build with no
+separate manual step:
+[`scripts/release_tool/release_step_3.py`](../scripts/release_tool/release_step_3.py)
+automatically pushes `sidecar/v<mf_version>+1` alongside MetricFlow's own release tag.
+
+**Ad hoc releases (`+2`, `+3`, ...).** For a sidecar-only change — e.g. a new `mf_entry.py`
+entry point — that doesn't correspond to a new MetricFlow version, run
+[`Cut Ad Hoc Sidecar Release`](../.github/workflows/cd-cut-adhoc-sidecar-release.yaml) from
+the Actions tab (`workflow_dispatch`, dispatchable only from `main`). It resolves the
+MetricFlow version reachable from the current commit, computes the next counter for that
+version, pushes the tag, and triggers the build.
+
 [`cd-build-sidecar-binaries.yaml`](../.github/workflows/cd-build-sidecar-binaries.yaml)
-compiles `mf_entry.py` for every platform Fusion needs and publishes the
-results as assets on that tag's GitHub Release:
+compiles `mf_entry.py` for every platform Fusion needs and publishes the results as assets
+on that sidecar tag's GitHub Release:
 
 | target triple | runner | archive |
 |---|---|---|
-| `aarch64-apple-darwin` | macos-14 | `mf_entry-<tag>-aarch64-apple-darwin.tar.gz` |
-| `x86_64-apple-darwin` | macos-13 | `mf_entry-<tag>-x86_64-apple-darwin.tar.gz` |
-| `x86_64-unknown-linux-gnu` | ubuntu-22.04 | `mf_entry-<tag>-x86_64-unknown-linux-gnu.tar.gz` |
-| `aarch64-unknown-linux-gnu` | ubuntu-24.04-arm | `mf_entry-<tag>-aarch64-unknown-linux-gnu.tar.gz` |
-| `x86_64-pc-windows-msvc` | windows-latest | `mf_entry-<tag>-x86_64-pc-windows-msvc.zip` |
+| `aarch64-apple-darwin` | macos-14 | `mf_entry-<version>-aarch64-apple-darwin.tar.gz` |
+| `x86_64-apple-darwin` | `vars.MACOS_RUNNER_INTEL` (macos-15-intel) | `mf_entry-<version>-x86_64-apple-darwin.tar.gz` |
+| `x86_64-unknown-linux-gnu` | ubuntu-22.04 | `mf_entry-<version>-x86_64-unknown-linux-gnu.tar.gz` |
+| `aarch64-unknown-linux-gnu` | ubuntu-24.04-arm | `mf_entry-<version>-aarch64-unknown-linux-gnu.tar.gz` |
+| `x86_64-pc-windows-msvc` | windows-latest | `mf_entry-<version>-x86_64-pc-windows-msvc.zip` |
 
-A `SHA256SUMS.txt` asset is published alongside the archives for integrity
-verification. Consumers fetch a specific version at
-`https://github.com/dbt-labs/metricflow/releases/download/<tag>/<archive>` —
-no authentication required, since the repo is public. Each archive extracts
-to the same layout as a local `sidecar/mf_entry.dist/` build.
+`<version>` in the archive name is the sidecar tag with its `sidecar/` namespace prefix
+stripped — e.g. tag `sidecar/v0.208.0+1` produces `mf_entry-v0.208.0+1-<triple>.tar.gz`. The
+namespace's only job is keeping the *tag* from also matching
+`cd-push-metricflow-to-pypi.yaml`'s `v[0-9]+.[0-9]+.[0-9]+*` trigger glob, so restating it in
+every filename would be redundant.
 
-This is the contract Fusion's build tooling depends on — changing the target
-triple list, archive naming, or checksum file name is a breaking change from
+A `SHA256SUMS.txt` and a `build-info.json` are published alongside the archives.
+`build-info.json` records the embedded MetricFlow version, the source commit, and the
+Nuitka/Python versions actually measured at build time — the thing to check if a specific
+binary's exact provenance is ever in question, since ad hoc releases intentionally don't
+guard against `metricflow`/`metricflow_semantics`/`metricflow_semantic_interfaces` having
+changed since the last MetricFlow release they're tagged against.
+
+Consumers fetch a specific version at
+`https://github.com/dbt-labs/metricflow/releases/download/<sidecar-tag>/<archive>` — no
+authentication required, since the repo is public. Each archive extracts to the same layout
+as a local `sidecar/mf_entry.dist/` build.
+
+This is the contract Fusion's build tooling depends on — changing the target triple list,
+archive naming, tag format, or the checksum/build-info file names is a breaking change from
 Fusion's perspective, not just a MetricFlow-internal refactor.
+
+**Re-publishing an existing tag fails loudly; it doesn't overwrite.** The release-asset
+publish step sets `overwrite_files: false`, so an accidental re-push of an existing sidecar
+tag (a mistyped or reused ad hoc counter, or a force-moved tag) fails CI instead of silently
+clobbering already-published binaries.
 
 **Version pins:** binaries are compiled with Nuitka `4.1.2` (pinned in
 `pyproject.toml`) against Python 3.10, per `setup-python-env`'s default. Both
