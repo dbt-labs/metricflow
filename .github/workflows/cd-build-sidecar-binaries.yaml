@@ -5,12 +5,14 @@ name: Build Sidecar Binaries
 on:
   push:
     tags:
-      # Mirrors the MetricFlow release tag pattern in cd-push-metricflow-to-pypi.yaml.
-      - "v[0-9]+.[0-9]+.[0-9]+*"
-      # DI-4871: sidecar-only releases (no corresponding MetricFlow version bump), e.g.
-      # sidecar/v0.208.0+2. Pushed either by release_step_3.py's automated `+1` baseline
-      # (a real user token, so this push trigger fires normally) or by hand for an `+n`
-      # tag created outside the ad hoc-release Action's re-dispatch path.
+      # DI-4871: every sidecar binary release -- including the baseline build for a new
+      # MetricFlow version -- goes through the sidecar/v<mf_version>+<counter> namespace.
+      # release_step_3.py automatically pushes a `+1` tag alongside MetricFlow's own
+      # `v<version>` tag on every release, so this is the sole trigger for this workflow;
+      # the bare `v*` tag's only remaining job is triggering
+      # cd-push-metricflow-to-pypi.yaml. (Triggering on both `v*` and `sidecar/v*` would
+      # double-build and double-publish for every release, once per tag.) `+2`, `+3`,
+      # etc. are pushed by hand or via the ad hoc-release Action's re-dispatch.
       - "sidecar/v[0-9]+.[0-9]+.[0-9]+*"
   workflow_dispatch:
 

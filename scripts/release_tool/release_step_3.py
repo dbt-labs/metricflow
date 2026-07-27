@@ -20,6 +20,8 @@ class ReleaseStep3State(BaseModel):
 
     # Tag created for the MetricFlow release.
     metricflow_release_tag_name: str | None = None
+    # Sidecar baseline tag created alongside the MetricFlow release (DI-4871).
+    sidecar_release_tag_name: str | None = None
     # Merge commit SHA for the step 1 PR that creates the release.
     metricflow_release_merge_commit_sha: str
     # Merge commit SHA for the step 2 PR that changes the metricflow package version to a dev one.
@@ -46,6 +48,10 @@ class ReleaseStep3Runner:
     * Polling until the step-2 PR is ready to merge, then merging it
     * Creating or updating a lightweight ``v$VERSION`` tag pointing to
       the step-1 merge commit and force-pushing it
+    * Creating or updating the sidecar baseline tag
+      (``sidecar/v$VERSION+1``, DI-4871) at the same commit and
+      force-pushing it, so every MetricFlow release always has a
+      matching sidecar binary build with no separate manual step
     * Triggering the publish workflow using the new tag
     """
 
@@ -71,6 +77,10 @@ class ReleaseStep3Runner:
         helper = self.release_helper
         git = helper.git_manager
         tag_name = f"{ReleaseHelper.METRICFLOW_RELEASE_TAG_PREFIX}{self.step_1_state.metricflow_package_version}"
+        sidecar_tag_name = (
+            f"{ReleaseHelper.SIDECAR_RELEASE_TAG_PREFIX}{self.step_1_state.metricflow_package_version}"
+            f"{ReleaseHelper.SIDECAR_BASELINE_COUNTER_SUFFIX}"
+        )
 
         self._wait_for_prs(step_1_pr=step_1_pr, step_2_pr=step_2_pr)
 
@@ -120,8 +130,17 @@ class ReleaseStep3Runner:
                 force=True,
             ),
         )
+        helper.run_confirmed_remote_action(
+            description=f"Create and force push sidecar baseline tag {sidecar_tag_name} at {step_1_merge_sha}",
+            action=lambda: git.push_tag(
+                tag_name=sidecar_tag_name,
+                objectish=step_1_merge_sha,
+                force=True,
+            ),
+        )
         return ReleaseStep3State(
             metricflow_release_tag_name=tag_name,
+            sidecar_release_tag_name=sidecar_tag_name,
             metricflow_release_merge_commit_sha=step_1_merge_sha,
             metricflow_dev_version_commit_sha=step_2_merge_sha,
         )
