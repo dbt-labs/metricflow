@@ -149,11 +149,11 @@ features = ["trino-env-requirements"]
 [tool.hatch.envs.nuitka-build]
 description = "Nuitka compilation environment for building a standalone MetricFlow binary."
 template = "dev-env"
-extra-dependencies = ["nuitka"]
+extra-dependencies = ["nuitka==4.1.2"]
 
 [tool.hatch.envs.nuitka-build.scripts]
 compile = [
-  "python -m nuitka --standalone --follow-imports --include-package=metricflow --include-package=metricflow_semantics --include-package=metricflow_semantic_interfaces --output-dir=sidecar/ sidecar/mf_entry.py",
+  "python -m nuitka --standalone --follow-imports --assume-yes-for-downloads --include-package=metricflow --include-package=metricflow_semantics --include-package=metricflow_semantic_interfaces --output-dir=sidecar/ sidecar/mf_entry.py",
 ]
 validate = [
   "python sidecar/validate_mf_entry.py",
