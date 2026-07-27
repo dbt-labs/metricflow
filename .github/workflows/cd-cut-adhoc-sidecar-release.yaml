@@ -1,0 +1,75 @@
+# Cuts an ad hoc sidecar-only release (DI-4871): a new sidecar/v<mf_version>+<counter>
+# tag for a change to sidecar/mf_entry.py or mf_ipc_protocol.py that doesn't correspond to
+# a new MetricFlow version. The `+1` baseline for each MetricFlow version is cut
+# automatically by scripts/release_tool/release_step_3.py instead -- this workflow is only
+# for `+2`, `+3`, etc.
+name: Cut Ad Hoc Sidecar Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  cut-release:
+    name: Tag and build an ad hoc sidecar release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restrict to main
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "::error::This workflow can only be dispatched from main (got ${{ github.ref }}). An ad hoc sidecar release must not embed unmerged/unreviewed code." >&2
+            exit 1
+          fi
+
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Resolve MetricFlow version, compute next counter, and push the tag
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The nearest real MetricFlow release tag reachable from this commit -- not
+          # metricflow/__about__.py's __version__, which is a `.devN` string between
+          # releases. `--tags` is required since release tags are lightweight, not
+          # annotated. DI-4871 explicitly does not guard against metricflow/,
+          # metricflow_semantics/, or metricflow_semantic_interfaces/ having changed
+          # since that release -- build-info.json's recorded commit is the source of
+          # truth if that's ever in question.
+          mf_version="$(git describe --tags --abbrev=0 --match 'v[0-9]*.[0-9]*.[0-9]*' HEAD)"
+          mf_version="${mf_version#v}"
+
+          highest_counter=0
+          for existing_tag in $(git tag -l "sidecar/v${mf_version}+*"); do
+            counter="${existing_tag##*+}"
+            if [[ "$counter" =~ ^[0-9]+$ ]] && (( counter > highest_counter )); then
+              highest_counter="$counter"
+            fi
+          done
+          new_tag="sidecar/v${mf_version}+$((highest_counter + 1))"
+
+          echo "Cutting ${new_tag} at $(git rev-parse HEAD)"
+          git tag "$new_tag"
+          git push origin "refs/tags/${new_tag}"
+
+          echo "tag=${new_tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger the sidecar build+publish workflow for the new tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # A tag pushed with this workflow's own GITHUB_TOKEN does not trigger another
+          # workflow's `on: push: tags:` (GitHub's built-in same-token recursion guard),
+          # so cd-build-sidecar-binaries.yaml must be dispatched explicitly rather than
+          # relying on the push trigger it uses for the automated `+1` baseline tag.
+          gh workflow run cd-build-sidecar-binaries.yaml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ steps.tag.outputs.tag }}"
