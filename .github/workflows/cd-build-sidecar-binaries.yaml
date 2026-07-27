@@ -73,6 +73,28 @@ jobs:
           path: sidecar/mf_entry.dist/
           if-no-files-found: error
 
+      # DI-4871: build-info.json records the Nuitka/Python versions actually used, rather
+      # than re-stating pyproject.toml's pin (which could drift from what really ran).
+      # These values don't vary by platform (single pinned Nuitka version, and
+      # setup-python-env's python-version input is the same for every matrix leg), so
+      # they only need capturing once -- arbitrarily, on this leg -- rather than on all 5.
+      - name: Record build tool versions for build-info.json
+        if: matrix.target-triple == 'x86_64-unknown-linux-gnu'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build-metadata
+          hatch run nuitka-build:python -m nuitka --version | head -n1 > build-metadata/nuitka-version.txt
+          hatch run nuitka-build:python --version > build-metadata/python-version.txt
+
+      - name: Upload build tool version metadata
+        if: matrix.target-triple == 'x86_64-unknown-linux-gnu'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # actions/upload-artifact@v4
+        with:
+          name: build-metadata
+          path: build-metadata/
+          if-no-files-found: error
+
   publish:
     name: Publish release assets
     needs: build
@@ -90,6 +112,12 @@ jobs:
         with:
           pattern: mf_entry-*
           path: dist
+
+      - name: Download build tool version metadata
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # actions/download-artifact@v4
+        with:
+          name: build-metadata
+          path: build-metadata
 
       - name: Package archives and generate checksums
         shell: bash
@@ -114,6 +142,41 @@ jobs:
             rm -rf "$dir"
           done
           sha256sum mf_entry-* > SHA256SUMS.txt
+
+      - name: Generate build-info.json
+        shell: bash
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          tag="${{ github.ref_name }}"
+          tag="${tag#sidecar/}"
+          # Everything from the first `+` on is the ad hoc counter, not part of the
+          # embedded MetricFlow version (a baseline `+1`/real-release tag has no `+` at
+          # all, so this is a harmless no-op in that case).
+          mf_version="${tag%%+*}"
+          mf_version="${mf_version#v}"
+          NUITKA_VERSION="$(cat build-metadata/nuitka-version.txt)" \
+          PYTHON_VERSION="$(cat build-metadata/python-version.txt)" \
+          SIDECAR_TAG="$tag" \
+          METRICFLOW_VERSION="$mf_version" \
+          python3 - <<'PY' > dist/build-info.json
+          import json
+          import os
+
+          print(
+              json.dumps(
+                  {
+                      "sidecar_tag": os.environ["SIDECAR_TAG"],
+                      "metricflow_version": os.environ["METRICFLOW_VERSION"],
+                      "commit": os.environ["COMMIT_SHA"],
+                      "nuitka_version": os.environ["NUITKA_VERSION"].strip(),
+                      "python_version": os.environ["PYTHON_VERSION"].strip(),
+                  },
+                  indent=2,
+              )
+          )
+          PY
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # softprops/action-gh-release@v2
