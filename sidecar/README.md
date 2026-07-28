@@ -57,6 +57,43 @@ hatch run nuitka-build:compile    # build only
 hatch run nuitka-build:validate   # validate only (binary must already exist)
 ```
 
+## CI builds and release artifacts
+
+On every MetricFlow release tag (`v<major>.<minor>.<patch>...`),
+[`cd-build-sidecar-binaries.yaml`](../.github/workflows/cd-build-sidecar-binaries.yaml)
+compiles `mf_entry.py` for every platform Fusion needs and publishes the
+results as assets on that tag's GitHub Release:
+
+| target triple | runner | archive |
+|---|---|---|
+| `aarch64-apple-darwin` | macos-14 | `mf_entry-<tag>-aarch64-apple-darwin.tar.gz` |
+| `x86_64-apple-darwin` | macos-13 | `mf_entry-<tag>-x86_64-apple-darwin.tar.gz` |
+| `x86_64-unknown-linux-gnu` | ubuntu-22.04 | `mf_entry-<tag>-x86_64-unknown-linux-gnu.tar.gz` |
+| `aarch64-unknown-linux-gnu` | ubuntu-24.04-arm | `mf_entry-<tag>-aarch64-unknown-linux-gnu.tar.gz` |
+| `x86_64-pc-windows-msvc` | windows-latest | `mf_entry-<tag>-x86_64-pc-windows-msvc.zip` |
+
+A `SHA256SUMS.txt` asset is published alongside the archives for integrity
+verification. Consumers fetch a specific version at
+`https://github.com/dbt-labs/metricflow/releases/download/<tag>/<archive>` —
+no authentication required, since the repo is public. Each archive extracts
+to the same layout as a local `sidecar/mf_entry.dist/` build.
+
+This is the contract Fusion's build tooling depends on — changing the target
+triple list, archive naming, or checksum file name is a breaking change from
+Fusion's perspective, not just a MetricFlow-internal refactor.
+
+**Version pins:** binaries are compiled with Nuitka `4.1.2` (pinned in
+`pyproject.toml`) against Python 3.10, per `setup-python-env`'s default. Both
+are chosen for parity with the Nuitka PoC that was manually validated against
+`sg_00_minimal_manifest`, not for any Python-3.10-specific behavior.
+
+**Not covered by this pipeline** (tracked separately — see the parent
+epic's other tickets): code signing and notarization for the macOS and
+Windows binaries, a musl/Alpine Linux build, and full snapshot-suite
+validation across every SQL dialect and metric type. The `validate`
+step above only diffs one fixture (`sg_00_minimal_manifest`) against
+`DUCKDB` — it's a build-sanity smoke check, not a correctness gate.
+
 ## mf-ipc v1 protocol
 
 All messages are newline-delimited JSON (NDJSON). The protocol is strictly
