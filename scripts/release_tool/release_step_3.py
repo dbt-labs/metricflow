@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from typing import ClassVar
 
 from msi_pydantic_shim import BaseModel
@@ -11,6 +12,7 @@ from scripts.release_tool.github_client import GitHubClient, GitHubMergeMethod
 from scripts.release_tool.release_helper import ReleaseHelper
 from scripts.release_tool.release_step_1 import ReleaseStep1State
 from scripts.release_tool.release_step_2 import ReleaseStep2State
+from scripts.sidecar_release.tag import build_sidecar_release_tag
 
 logger = logging.getLogger(__name__)
 
@@ -48,10 +50,11 @@ class ReleaseStep3Runner:
     * Polling until the step-2 PR is ready to merge, then merging it
     * Creating or updating a lightweight ``v$VERSION`` tag pointing to
       the step-1 merge commit and force-pushing it
-    * Creating or updating the sidecar baseline tag
-      (``sidecar/v$VERSION+1``, DI-4871) at the same commit and
-      force-pushing it, so every MetricFlow release always has a
-      matching sidecar binary build with no separate manual step
+    * Creating or updating a matching sidecar release tag
+      (``mf-entry-bin/v$VERSION+<timestamp>.<sha8>``, DI-4871) at the
+      same commit and force-pushing it, so every MetricFlow release
+      always has a matching sidecar binary build with no separate
+      manual step
     * Triggering the publish workflow using the new tag
     """
 
@@ -67,6 +70,8 @@ class ReleaseStep3Runner:
     release_helper: ReleaseHelper
     # Function used to sleep between poll iterations.
     sleep: Callable[[float], None]
+    # Function used to get the current UTC time for the sidecar release tag (DI-4871).
+    now: Callable[[], datetime]
 
     def run(self) -> ReleaseStep3State:
         """Run step 3 and return state to save."""
@@ -77,10 +82,6 @@ class ReleaseStep3Runner:
         helper = self.release_helper
         git = helper.git_manager
         tag_name = f"{ReleaseHelper.METRICFLOW_RELEASE_TAG_PREFIX}{self.step_1_state.metricflow_package_version}"
-        sidecar_tag_name = (
-            f"{ReleaseHelper.SIDECAR_RELEASE_TAG_PREFIX}{self.step_1_state.metricflow_package_version}"
-            f"{ReleaseHelper.SIDECAR_BASELINE_COUNTER_SUFFIX}"
-        )
 
         self._wait_for_prs(step_1_pr=step_1_pr, step_2_pr=step_2_pr)
 
@@ -122,6 +123,12 @@ class ReleaseStep3Runner:
 
         step_2_merge_sha = self._merge_pr_if_needed(step_2_pr)
 
+        sidecar_tag_name = build_sidecar_release_tag(
+            metricflow_version=self.step_1_state.metricflow_package_version,
+            commit_sha=step_1_merge_sha,
+            timestamp=self.now(),
+        )
+
         helper.run_confirmed_remote_action(
             description=f"Create and force push tag {tag_name} at {step_1_merge_sha}",
             action=lambda: git.push_tag(
@@ -131,7 +138,7 @@ class ReleaseStep3Runner:
             ),
         )
         helper.run_confirmed_remote_action(
-            description=f"Create and force push sidecar baseline tag {sidecar_tag_name} at {step_1_merge_sha}",
+            description=f"Create and force push sidecar release tag {sidecar_tag_name} at {step_1_merge_sha}",
             action=lambda: git.push_tag(
                 tag_name=sidecar_tag_name,
                 objectish=step_1_merge_sha,

@@ -44,6 +44,7 @@ import time
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from itertools import cycle
 from pathlib import Path
 from typing import cast
@@ -210,6 +211,8 @@ class ReleaseToolContext:
     cli_command_runner: CliCommandRunner
     # Function used to sleep between poll iterations.
     sleep: Callable[[float], None]
+    # Function used to get the current UTC time (DI-4871 sidecar release tag timestamps).
+    now: Callable[[], datetime]
 
     def copy(
         self,
@@ -222,6 +225,7 @@ class ReleaseToolContext:
         is_cli_command_available: Callable[[str], bool] | None = None,
         cli_command_runner: CliCommandRunner | None = None,
         sleep: Callable[[float], None] | None = None,
+        now: Callable[[], datetime] | None = None,
     ) -> ReleaseToolContext:
         """Return a copy with any provided fields replaced; pass ``None`` to leave a field unchanged."""
         return ReleaseToolContext(
@@ -237,6 +241,7 @@ class ReleaseToolContext:
             ),
             cli_command_runner=self.cli_command_runner if cli_command_runner is None else cli_command_runner,
             sleep=self.sleep if sleep is None else sleep,
+            now=self.now if now is None else now,
         )
 
 
@@ -261,6 +266,7 @@ def _default_release_tool_context(current_directory: Path) -> ReleaseToolContext
         is_cli_command_available=_is_cli_command_available,
         cli_command_runner=MetricFlowCliCommandRunner(),
         sleep=time.sleep,
+        now=lambda: datetime.now(timezone.utc),
     )
 
 
@@ -510,6 +516,7 @@ def step_3(ctx: click.Context) -> None:
         github_client=github_client,
         release_helper=release_helper,
         sleep=context.sleep,
+        now=context.now,
     )
     step_3_state = step_3_runner.run()
 

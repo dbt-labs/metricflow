@@ -59,14 +59,6 @@ class ReleaseHelper:
     METRICFLOW_RELEASE_TAG_PREFIX: ClassVar[str] = "v"
     # Prefix for dbt-metricflow release version tags.
     DBT_METRICFLOW_RELEASE_TAG_PREFIX: ClassVar[str] = "dbt-metricflow/v"
-    # Prefix for sidecar binary release tags (DI-4871). Slash-namespaced, rather than a
-    # suffix on the bare `v<version>` tag, so it can't also match
-    # cd-push-metricflow-to-pypi.yaml's `v[0-9]+.[0-9]+.[0-9]+*` trigger glob.
-    SIDECAR_RELEASE_TAG_PREFIX: ClassVar[str] = "sidecar/v"
-    # Counter suffix for the sidecar tag automatically cut alongside every MetricFlow
-    # release. Ad hoc sidecar-only releases between MetricFlow versions use `+2`, `+3`,
-    # etc., cut by hand or via the ad hoc-release GitHub Action, not by this tool.
-    SIDECAR_BASELINE_COUNTER_SUFFIX: ClassVar[str] = "+1"
     # GitHub Actions workflow file that publishes MetricFlow to PyPI after a release tag.
     CD_PUSH_METRICFLOW_TO_PYPI_WORKFLOW_FILE_NAME: ClassVar[str] = "cd-push-metricflow-to-pypi.yaml"
     # GitHub Actions workflow file that publishes dbt-metricflow to PyPI after a release tag.

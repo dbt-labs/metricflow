@@ -3,25 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
-from scripts.sidecar_release.generate_build_info import (
-    generate_build_info,
-    metricflow_version_from_tag,
-)
-
-
-@pytest.mark.parametrize(
-    ("tag", "expected_version"),
-    [
-        ("sidecar/v0.208.0+1", "0.208.0"),
-        ("mf-entry-bin/v0.208.0+2607281534.a1b2c3d4", "0.208.0"),
-        ("v0.208.0", "0.208.0"),
-    ],
-)
-def test_metricflow_version_from_tag(tag: str, expected_version: str) -> None:
-    """The embedded MetricFlow version should parse out regardless of prefix or suffix shape."""
-    assert metricflow_version_from_tag(tag) == expected_version
+from scripts.sidecar_release.generate_build_info import generate_build_info
 
 
 def test_generate_build_info_contents() -> None:

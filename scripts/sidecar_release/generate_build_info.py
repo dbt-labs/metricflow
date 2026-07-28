@@ -5,9 +5,9 @@ Replaces the inline python3 heredoc in cd-build-sidecar-binaries.yaml's `publish
 versions actually measured at build time -- the thing to check if a specific binary's exact
 provenance is ever in question, since the tag/archive names alone don't encode the commit.
 
-Deliberately prefix-agnostic (works the same regardless of the tag's namespace prefix, e.g.
-`sidecar/` or `mf-entry-bin/`): the embedded MetricFlow version is parsed as everything after
-the tag's last `/`, before its first `+`, with a leading `v` stripped.
+The embedded MetricFlow version is parsed via `tag.py` -- the single source of truth for
+the sidecar release tag format -- so this stays correct automatically if that format ever
+changes again.
 """
 
 from __future__ import annotations
@@ -16,10 +16,7 @@ import argparse
 import json
 from pathlib import Path
 
-
-def metricflow_version_from_tag(tag: str) -> str:
-    """Return the embedded MetricFlow version encoded in a sidecar release tag."""
-    return tag.rsplit("/", 1)[-1].split("+", 1)[0].removeprefix("v")
+from scripts.sidecar_release.tag import metricflow_version_from_tag
 
 
 def generate_build_info(

@@ -4,6 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
@@ -713,3 +714,19 @@ class FakeSleep:
     def sleep(self, seconds: float) -> None:
         """Record the sleep duration."""
         self.durations.append(seconds)
+
+
+class FakeNow:
+    """Returns a fixed UTC time; pass ``now`` to match ``Callable[[], datetime]``.
+
+    Used so DI-4871 sidecar release tags (which embed the current time) are deterministic
+    in snapshot tests instead of embedding the real wall-clock time the test happened to run at.
+    """
+
+    def __init__(self, fixed_now: datetime | None = None) -> None:
+        """Initialize with a fixed UTC time, defaulting to an arbitrary stable value."""
+        self.fixed_now = fixed_now or datetime(2026, 1, 1, tzinfo=timezone.utc)
+
+    def now(self) -> datetime:
+        """Return the fixed time."""
+        return self.fixed_now

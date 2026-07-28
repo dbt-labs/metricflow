@@ -1,8 +1,9 @@
-# Cuts an ad hoc sidecar-only release (DI-4871): a new sidecar/v<mf_version>+<counter>
-# tag for a change to sidecar/mf_entry.py or mf_ipc_protocol.py that doesn't correspond to
-# a new MetricFlow version. The `+1` baseline for each MetricFlow version is cut
-# automatically by scripts/release_tool/release_step_3.py instead -- this workflow is only
-# for `+2`, `+3`, etc.
+# Cuts an ad hoc sidecar-only release (DI-4871): a new
+# mf-entry-bin/v<mf_version>+<timestamp>.<sha8> tag for a change to sidecar/mf_entry.py or
+# mf_ipc_protocol.py that doesn't correspond to a new MetricFlow version. The tag cut
+# alongside each MetricFlow release is instead pushed automatically by
+# scripts/release_tool/release_step_3.py -- this workflow is only for sidecar-only changes
+# in between releases.
 name: Cut Ad Hoc Sidecar Release
 
 on:
@@ -31,35 +32,16 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Resolve MetricFlow version, compute next counter, and push the tag
+      - name: Cut the local release tag
         id: tag
         shell: bash
-        run: |
-          set -euo pipefail
-          # The nearest real MetricFlow release tag reachable from this commit -- not
-          # metricflow/__about__.py's __version__, which is a `.devN` string between
-          # releases. `--tags` is required since release tags are lightweight, not
-          # annotated. DI-4871 explicitly does not guard against metricflow/,
-          # metricflow_semantics/, or metricflow_semantic_interfaces/ having changed
-          # since that release -- build-info.json's recorded commit is the source of
-          # truth if that's ever in question.
-          mf_version="$(git describe --tags --abbrev=0 --match 'v[0-9]*.[0-9]*.[0-9]*' HEAD)"
-          mf_version="${mf_version#v}"
+        # DI-4871: stdlib-only script (scripts/sidecar_release/), no hatch env needed --
+        # run it locally with --dry-run to preview the tag a real dispatch would cut.
+        run: python3 -m scripts.sidecar_release.cut_adhoc_release
 
-          highest_counter=0
-          for existing_tag in $(git tag -l "sidecar/v${mf_version}+*"); do
-            counter="${existing_tag##*+}"
-            if [[ "$counter" =~ ^[0-9]+$ ]] && (( counter > highest_counter )); then
-              highest_counter="$counter"
-            fi
-          done
-          new_tag="sidecar/v${mf_version}+$((highest_counter + 1))"
-
-          echo "Cutting ${new_tag} at $(git rev-parse HEAD)"
-          git tag "$new_tag"
-          git push origin "refs/tags/${new_tag}"
-
-          echo "tag=${new_tag}" >> "$GITHUB_OUTPUT"
+      - name: Push the release tag
+        shell: bash
+        run: git push origin "refs/tags/${{ steps.tag.outputs.tag }}"
 
       - name: Trigger the sidecar build+publish workflow for the new tag
         env:
@@ -69,7 +51,7 @@ jobs:
           # A tag pushed with this workflow's own GITHUB_TOKEN does not trigger another
           # workflow's `on: push: tags:` (GitHub's built-in same-token recursion guard),
           # so cd-build-sidecar-binaries.yaml must be dispatched explicitly rather than
-          # relying on the push trigger it uses for the automated `+1` baseline tag.
+          # relying on the push trigger it uses for the automated release_step_3.py tag.
           gh workflow run cd-build-sidecar-binaries.yaml \
             --repo "${{ github.repository }}" \
             --ref "${{ steps.tag.outputs.tag }}"
