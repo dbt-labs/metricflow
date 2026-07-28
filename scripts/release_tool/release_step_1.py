@@ -119,7 +119,7 @@ class ReleaseStep1Runner:
         package_version_update = PackageVersionUpdate(
             version=self.version,
             release_helper=self.release_helper,
-            hatch_project_directory=self.release_helper.current_directory,
+            hatch_project_directory=self.release_helper.metricflow_repo_directory,
         )
         return (
             ReleasePrCommitTask(
@@ -171,14 +171,16 @@ class ReleaseStep1Runner:
 
     def _prepare_ort_output_directory(self) -> None:
         """Create the ignored ORT output directory before Docker bind-mounts it."""
-        (self.release_helper.current_directory / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY).mkdir(
+        (self.release_helper.metricflow_repo_directory / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY).mkdir(
             parents=True, exist_ok=True
         )
 
     def _ort_docker_command(self, ort_args: Sequence[str]) -> tuple[str, ...]:
         """Return a Docker command that runs ORT with the shared release config."""
-        project_mount = f"{self.release_helper.current_directory}:/project"
-        output_mount = f"{self.release_helper.current_directory / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY}:/ort-out"
+        project_mount = f"{self.release_helper.metricflow_repo_directory}:/project"
+        output_mount = (
+            f"{self.release_helper.metricflow_repo_directory / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY}:/ort-out"
+        )
         config_mount = f"{ReleaseStep1Runner.ORT_CONFIG_DIRECTORY_PATH}:/ort-config:ro"
         return (
             "docker",
@@ -249,9 +251,11 @@ class ReleaseStep1Runner:
 
     def _copy_ort_report_to_attribution(self) -> None:
         """Copy the generated ORT notice report to ATTRIBUTION.md."""
-        attribution_path = self.release_helper.current_directory / ReleaseStep1Runner.ALLOWED_ATTRIBUTION_FILE_PATH
+        attribution_path = (
+            self.release_helper.metricflow_repo_directory / ReleaseStep1Runner.ALLOWED_ATTRIBUTION_FILE_PATH
+        )
         notice_report_path = (
-            self.release_helper.current_directory
+            self.release_helper.metricflow_repo_directory
             / ReleaseStep1Runner.ORT_OUTPUT_DIRECTORY
             / ReleaseStep1Runner.ORT_NOTICE_REPORT_FILE_PATH
         )

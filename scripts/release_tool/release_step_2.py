@@ -85,7 +85,7 @@ class ReleaseStep2Runner:
         package_version_update = PackageVersionUpdate(
             version=new_version,
             release_helper=self.release_helper,
-            hatch_project_directory=self.release_helper.current_directory,
+            hatch_project_directory=self.release_helper.metricflow_repo_directory,
         )
         pr_title = self._development_version_pr_title(version=new_version)
         pr_result = ReleasePrRunner(

@@ -79,7 +79,7 @@ def test_step_3_all_operations_match_snapshot(
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager, operation_log=operation_log)
     release_tool_context = ReleaseToolContext(
         environment=RELEASE_TOOL_TEST_ENVIRONMENT,
-        current_directory=repo_path,
+        metricflow_repo_directory=repo_path,
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=github_client_factory.create_client,
