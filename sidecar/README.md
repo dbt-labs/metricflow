@@ -82,8 +82,12 @@ version and commit it already knows — no git lookups needed.
 **Ad hoc releases.** For a sidecar-only change — e.g. a new `mf_entry.py` entry point — that
 doesn't correspond to a new MetricFlow version, run
 [`Cut Ad Hoc Sidecar Release`](../.github/workflows/cd-cut-adhoc-sidecar-release.yaml) from
-the Actions tab (`workflow_dispatch`, dispatchable only from `main`). It resolves the
-MetricFlow version reachable from the current commit, builds the tag, pushes it, and
+the Actions tab (`workflow_dispatch`, dispatchable only from `main`). It reads MetricFlow's
+current version straight from `metricflow/__about__.py` (often a `.devN` pre-release version
+between MetricFlow releases — deliberately so, since an ad hoc release doesn't guard against
+`metricflow`/`metricflow_semantics`/`metricflow_semantic_interfaces` having changed since the
+last real release, and `.devN` says "unreleased, in development" honestly rather than
+implying an exact match to a release that may not hold), builds the tag, pushes it, and
 triggers the build. The tag-resolution logic is a real script,
 [`scripts/sidecar_release/cut_adhoc_release.py`](../scripts/sidecar_release/cut_adhoc_release.py)
 — run it locally to preview the exact tag a real dispatch would cut, no CI required:

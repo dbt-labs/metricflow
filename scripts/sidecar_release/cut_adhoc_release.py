@@ -2,17 +2,25 @@
 
 Replaces the inline bash tag-resolution step in cd-cut-adhoc-sidecar-release.yaml. For a
 change to sidecar/mf_entry.py or mf_ipc_protocol.py that doesn't correspond to a new
-MetricFlow version -- the `+1` baseline for each MetricFlow version is instead cut
+MetricFlow version -- the tag cut alongside each MetricFlow release is instead pushed
 automatically by scripts/release_tool/release_step_3.py, which already knows the version
 and commit it's releasing and calls `build_sidecar_release_tag` directly, with no need to
-resolve either from git the way this script does.
+resolve either the way this script does.
 
-Resolves the nearest MetricFlow release tag reachable from HEAD (not
-metricflow/__about__.py's `__version__`, which is a `.devN` string between releases and not
-a valid tag component) and HEAD's own commit SHA, then creates the tag locally. Does not
-push it -- that, and re-dispatching cd-build-sidecar-binaries.yaml for the new tag, are
-genuinely CI/remote actions and stay as separate, explicit steps in the workflow, matching
-the "the workflow becomes mostly orchestrating these scripts" framing this was written for.
+Resolves MetricFlow's current version from metricflow/__about__.py and HEAD's own commit
+SHA, then creates the tag locally. Does not push it -- that, and re-dispatching
+cd-build-sidecar-binaries.yaml for the new tag, are genuinely CI/remote actions and stay as
+separate, explicit steps in the workflow, matching the "the workflow becomes mostly
+orchestrating these scripts" framing this was written for.
+
+Deliberately reads __about__.py rather than resolving the nearest real release tag via
+`git describe`: between releases, __about__.py holds a `.devN` pre-release version (e.g.
+`0.212.0.dev0`), and an ad hoc release doesn't guard against metricflow/,
+metricflow_semantics/, or metricflow_semantic_interfaces/ having changed since the last real
+release (see the acceptance criteria in DI-4871) -- so labeling it with the last released
+version number would overstate how closely it actually matches that release. `.devN`
+honestly signals "unreleased, in-development state" whether or not real changes happened,
+rather than implying an exact match to a specific release that may not hold.
 
 Run with `--dry-run` to preview the tag that would be cut without creating anything --
 runnable locally against a real clone, no CI required.
@@ -22,20 +30,22 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 from pathlib import Path
 
 from scripts.mf_script_helper import MetricFlowScriptHelper
 from scripts.sidecar_release.tag import build_sidecar_release_tag
 
+_VERSION_ASSIGNMENT_PATTERN = re.compile(r'__version__\s*=\s*"([^"]+)"')
 
-def resolve_nearest_release_tag(repository_directory: Path) -> str:
-    """Return the nearest MetricFlow release tag (bare `v<version>`) reachable from HEAD."""
-    result = MetricFlowScriptHelper.run_command(
-        ["git", "describe", "--tags", "--abbrev=0", "--match", "v[0-9]*.[0-9]*.[0-9]*", "HEAD"],
-        working_directory=repository_directory,
-        capture_output=True,
-    )
-    return result.stdout.decode().strip()
+
+def resolve_metricflow_version(repository_directory: Path) -> str:
+    """Return MetricFlow's current version, as declared in metricflow/__about__.py."""
+    about_file_path = repository_directory / "metricflow" / "__about__.py"
+    match = _VERSION_ASSIGNMENT_PATTERN.search(about_file_path.read_text())
+    if match is None:
+        raise RuntimeError(f'Could not find a `__version__ = "..."` assignment in {about_file_path}')
+    return match.group(1)
 
 
 def resolve_head_commit_sha(repository_directory: Path) -> str:
@@ -55,8 +65,7 @@ def create_local_tag(tag: str, repository_directory: Path) -> None:
 
 def cut_adhoc_release(repository_directory: Path, dry_run: bool) -> str:
     """Resolve the next ad hoc sidecar release tag and, unless `dry_run`, create it locally."""
-    nearest_release_tag = resolve_nearest_release_tag(repository_directory)
-    metricflow_version = nearest_release_tag.removeprefix("v")
+    metricflow_version = resolve_metricflow_version(repository_directory)
     commit_sha = resolve_head_commit_sha(repository_directory)
 
     tag = build_sidecar_release_tag(metricflow_version=metricflow_version, commit_sha=commit_sha)
