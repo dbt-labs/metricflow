@@ -38,7 +38,7 @@ class PackageVersionUpdate:
 
         return (
             self.hatch_project_directory.joinpath(hatch_version_path)
-            .relative_to(self.release_helper.current_directory)
+            .relative_to(self.release_helper.metricflow_repo_directory)
             .as_posix()
         )
 

@@ -150,12 +150,12 @@ class ReleaseStep4Runner:
 
     def _write_requirements_file(self, requirement_line: str) -> None:
         """Write the pinned `metricflow` requirement to the dbt-metricflow requirements file."""
-        requirements_path = self.release_helper.current_directory / ReleaseStep4Runner.REQUIREMENTS_FILE_PATH
+        requirements_path = self.release_helper.metricflow_repo_directory / ReleaseStep4Runner.REQUIREMENTS_FILE_PATH
         requirements_path.write_text(f"{requirement_line}\n")
 
     def _dbt_metricflow_root(self) -> Path:
         """Return the dbt-metricflow hatch project directory."""
-        return self.release_helper.current_directory / ReleaseStep4Runner.DBT_METRICFLOW_SUBDIRECTORY
+        return self.release_helper.metricflow_repo_directory / ReleaseStep4Runner.DBT_METRICFLOW_SUBDIRECTORY
 
     def _check_requirements_only_changes(self) -> None:
         """Raise if the requirements update changed files outside the pin file."""

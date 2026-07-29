@@ -83,11 +83,11 @@ def test_step_5_all_operations_match_snapshot(
     github_client_factory = FakeGitHubClientFactory(github_client=github_client, operation_log=operation_log)
     repo_path = _make_metricflow_repo(tmp_path)
     _write_step_1_and_step_4_state(repo_path)
-    step_5_cli_commands = ("fossa", "changie", "hatch")
+    step_5_cli_commands = ("docker", "changie", "hatch")
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager, operation_log=operation_log)
     release_tool_context = ReleaseToolContext(
         environment=RELEASE_TOOL_TEST_ENVIRONMENT,
-        current_directory=repo_path,
+        metricflow_repo_directory=repo_path,
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=github_client_factory.create_client,

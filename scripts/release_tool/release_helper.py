@@ -68,8 +68,8 @@ class ReleaseHelper:
 
     # GitHub repository name, such as ``dbt-labs/metricflow``.
     repository_name: str
-    # Repository directory.
-    current_directory: Path
+    # MetricFlow repository directory used to create release branches and commits.
+    metricflow_repo_directory: Path
     # Whether to skip confirmation prompts for remote actions.
     confirm_all: bool
     # Git manager for the repository.
@@ -101,7 +101,7 @@ class ReleaseHelper:
         """Run a CLI command from the release repository root."""
 
         def _action() -> None:
-            self.cli_command_runner.run(command, self.current_directory)
+            self.cli_command_runner.run(command, self.metricflow_repo_directory)
 
         self.run(description=f"Run {' '.join(command)}", action=_action)
 
