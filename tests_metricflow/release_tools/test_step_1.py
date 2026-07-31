@@ -23,6 +23,7 @@ from tests_metricflow.release_tools.release_tool_test_helpers import (
     FakeGitHubClientFactory,
     FakeGitManager,
     FakeGitManagerFactory,
+    FakeNow,
     FakeOperations,
     FakeReleaseStateFile,
     FakeSleep,
@@ -70,6 +71,7 @@ def test_step_1_all_operations_match_snapshot(
         is_cli_command_available=("docker", "changie").__contains__,
         cli_command_runner=cli_command_runner,
         sleep=FakeSleep().sleep,
+        now=FakeNow().now,
     )
 
     result = CliRunner().invoke(

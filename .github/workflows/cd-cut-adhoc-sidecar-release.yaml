@@ -1,0 +1,54 @@
+# Cuts an ad hoc sidecar-only release (DI-4871): a new
+# mf-stdio-sidecar/v<mf_version>+<timestamp>.<sha8> tag for a change to sidecar/mf_entry.py or
+# mf_ipc_protocol.py that doesn't correspond to a new MetricFlow version. The tag cut
+# alongside each MetricFlow release is instead pushed automatically by
+# scripts/release_tool/release_step_3.py -- this workflow is only for sidecar-only changes
+# in between releases.
+name: Cut Ad Hoc Sidecar Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  cut-release:
+    name: Tag and build an ad hoc sidecar release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restrict to main
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "::error::This workflow can only be dispatched from main (got ${{ github.ref }}). An ad hoc sidecar release must not embed unmerged/unreviewed code." >&2
+            exit 1
+          fi
+
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - name: Cut the local release tag
+        id: tag
+        shell: bash
+        # DI-4871: stdlib-only script (scripts/sidecar_release/), no hatch env needed --
+        # run it locally with --dry-run to preview the tag a real dispatch would cut.
+        run: python3 -m scripts.sidecar_release.cut_adhoc_release
+
+      - name: Push the release tag
+        shell: bash
+        run: git push origin "refs/tags/${{ steps.tag.outputs.tag }}"
+
+      - name: Trigger the sidecar build+publish workflow for the new tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # A tag pushed with this workflow's own GITHUB_TOKEN does not trigger another
+          # workflow's `on: push: tags:` (GitHub's built-in same-token recursion guard),
+          # so cd-build-sidecar-binaries.yaml must be dispatched explicitly rather than
+          # relying on the push trigger it uses for the automated release_step_3.py tag.
+          gh workflow run cd-build-sidecar-binaries.yaml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ steps.tag.outputs.tag }}"
