@@ -9,14 +9,14 @@ from scripts.sidecar_release.generate_build_info import generate_build_info
 def test_generate_build_info_contents() -> None:
     """The assembled dict should carry all five fields with the parsed MetricFlow version."""
     build_info = generate_build_info(
-        tag="mf-entry-bin/v0.208.0+2607281534.a1b2c3d4",
+        tag="mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4",
         commit_sha="deadbeefcafe",
         nuitka_version="4.1.2\n",
         python_version="Python 3.10.19\n",
     )
 
     assert build_info == {
-        "tag": "mf-entry-bin/v0.208.0+2607281534.a1b2c3d4",
+        "tag": "mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4",
         "metricflow_version": "0.208.0",
         "commit": "deadbeefcafe",
         "nuitka_version": "4.1.2",
@@ -37,7 +37,7 @@ def test_main_writes_valid_json(tmp_path: Path) -> None:
     main(
         [
             "--tag",
-            "mf-entry-bin/v0.208.0+2607281534.a1b2c3d4",
+            "mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4",
             "--commit",
             "deadbeefcafe",
             "--nuitka-version-file",

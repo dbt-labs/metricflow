@@ -10,7 +10,7 @@ renamed to that shape). Produces `mf_entry-<version>-<target-triple>.tar.gz` (`.
 Windows triples) for each, plus a `SHA256SUMS.txt` covering all of them.
 
 `--tag` is the raw git tag (or ref name) this release was cut from, e.g.
-`mf-entry-bin/v0.208.0+2607281534.a1b2c3d4`. Deliberately prefix-agnostic: the archive
+`mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4`. Deliberately prefix-agnostic: the archive
 version is just everything after the tag's last `/`, so this script doesn't need to change
 if the tag namespace is ever renamed again -- only the workflow's trigger/publish-gate
 patterns would.

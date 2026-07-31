@@ -77,7 +77,7 @@ def test_resolve_head_commit_sha_matches_git_rev_parse(git_repo: Path) -> None:
 def test_cut_adhoc_release_dry_run_does_not_create_a_tag(git_repo: Path) -> None:
     """--dry-run should compute the tag without creating it in the repository."""
     tag = cut_adhoc_release(git_repo, dry_run=True)
-    assert tag.startswith("mf-entry-bin/v0.212.0.dev0+")
+    assert tag.startswith("mf-stdio-sidecar/v0.212.0.dev0+")
 
     existing_tags = subprocess.run(["git", "tag", "-l"], cwd=git_repo, check=True, capture_output=True).stdout.decode()
     assert tag not in existing_tags

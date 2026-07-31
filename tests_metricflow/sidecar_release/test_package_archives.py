@@ -16,7 +16,7 @@ from scripts.sidecar_release.package_archives import (
     ("tag", "expected_version"),
     [
         ("sidecar/v0.208.0+2", "v0.208.0+2"),
-        ("mf-entry-bin/v0.208.0+2607281534.a1b2c3d4", "v0.208.0+2607281534.a1b2c3d4"),
+        ("mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4", "v0.208.0+2607281534.a1b2c3d4"),
         ("v0.208.0", "v0.208.0"),
     ],
 )
@@ -38,7 +38,7 @@ def test_package_release_archives_produces_tar_gz_for_non_windows(tmp_path: Path
     dist_dir = tmp_path / "dist"
     _make_platform_dir(dist_dir, "x86_64-unknown-linux-gnu")
 
-    archive_paths = package_release_archives(dist_dir, tag="mf-entry-bin/v0.208.0+2")
+    archive_paths = package_release_archives(dist_dir, tag="mf-stdio-sidecar/v0.208.0+2")
 
     assert len(archive_paths) == 1
     archive_path = archive_paths[0]
@@ -55,7 +55,7 @@ def test_package_release_archives_produces_zip_for_windows(tmp_path: Path) -> No
     dist_dir = tmp_path / "dist"
     _make_platform_dir(dist_dir, "x86_64-pc-windows-msvc")
 
-    archive_paths = package_release_archives(dist_dir, tag="mf-entry-bin/v0.208.0+2")
+    archive_paths = package_release_archives(dist_dir, tag="mf-stdio-sidecar/v0.208.0+2")
 
     assert len(archive_paths) == 1
     archive_path = archive_paths[0]
@@ -72,7 +72,7 @@ def test_package_release_archives_writes_checksums_for_every_archive(tmp_path: P
     _make_platform_dir(dist_dir, "aarch64-apple-darwin")
     _make_platform_dir(dist_dir, "x86_64-pc-windows-msvc")
 
-    package_release_archives(dist_dir, tag="mf-entry-bin/v0.208.0+2")
+    package_release_archives(dist_dir, tag="mf-stdio-sidecar/v0.208.0+2")
 
     checksums = (dist_dir / "SHA256SUMS.txt").read_text()
     assert "mf_entry-v0.208.0+2-aarch64-apple-darwin.tar.gz" in checksums
@@ -85,7 +85,7 @@ def test_package_release_archives_removes_source_directories(tmp_path: Path) -> 
     dist_dir = tmp_path / "dist"
     platform_dir = _make_platform_dir(dist_dir, "x86_64-unknown-linux-gnu")
 
-    package_release_archives(dist_dir, tag="mf-entry-bin/v0.208.0+2")
+    package_release_archives(dist_dir, tag="mf-stdio-sidecar/v0.208.0+2")
 
     assert not platform_dir.exists()
 
@@ -96,4 +96,4 @@ def test_package_release_archives_raises_when_nothing_to_package(tmp_path: Path)
     dist_dir.mkdir()
 
     with pytest.raises(RuntimeError, match="No mf_entry-<triple>/ directories found"):
-        package_release_archives(dist_dir, tag="mf-entry-bin/v0.208.0+2")
+        package_release_archives(dist_dir, tag="mf-stdio-sidecar/v0.208.0+2")

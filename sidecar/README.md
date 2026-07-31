@@ -60,8 +60,8 @@ hatch run nuitka-build:validate   # validate only (binary must already exist)
 ## CI builds and release artifacts
 
 Sidecar binaries have their own release versioning, decoupled from MetricFlow's (DI-4871).
-Every sidecar release is tagged `mf-entry-bin/v<mf_version>+<YYMMDDHHmm>.<sha8>` — e.g.
-`mf-entry-bin/v0.208.0+2607281534.a1b2c3d4` — where `<mf_version>` is the MetricFlow version
+Every sidecar release is tagged `mf-stdio-sidecar/v<mf_version>+<YYMMDDHHmm>.<sha8>` — e.g.
+`mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4` — where `<mf_version>` is the MetricFlow version
 embedded in the binary, and the UTC timestamp plus short commit SHA disambiguate multiple
 sidecar builds off that same MetricFlow version with no counter to keep track of. This is a
 **separate GitHub Release from MetricFlow's own `v<mf_version>` tag** (the one used for the
@@ -108,8 +108,8 @@ on that sidecar tag's GitHub Release:
 | `aarch64-unknown-linux-gnu` | ubuntu-24.04-arm | `mf_entry-<version>-aarch64-unknown-linux-gnu.tar.gz` |
 | `x86_64-pc-windows-msvc` | windows-latest | `mf_entry-<version>-x86_64-pc-windows-msvc.zip` |
 
-`<version>` in the archive name is the sidecar tag with its `mf-entry-bin/` namespace prefix
-stripped — e.g. tag `mf-entry-bin/v0.208.0+2607281534.a1b2c3d4` produces
+`<version>` in the archive name is the sidecar tag with its `mf-stdio-sidecar/` namespace prefix
+stripped — e.g. tag `mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4` produces
 `mf_entry-v0.208.0+2607281534.a1b2c3d4-<triple>.tar.gz`. The namespace's only job is keeping
 the *tag* from also matching `cd-push-metricflow-to-pypi.yaml`'s `v[0-9]+.[0-9]+.[0-9]+*`
 trigger glob, so restating it in every filename would be redundant. Packaging is done by
@@ -121,7 +121,7 @@ layout the script (and CI's `actions/download-artifact`) expect:
 hatch run nuitka-build:build-and-validate
 mkdir -p dist/mf_entry-aarch64-apple-darwin  # use your own platform's target triple
 cp -r sidecar/mf_entry.dist/. dist/mf_entry-aarch64-apple-darwin/
-python3 -m scripts.sidecar_release.package_archives --dist-dir dist --tag mf-entry-bin/v0.0.0+test.0000000
+python3 -m scripts.sidecar_release.package_archives --dist-dir dist --tag mf-stdio-sidecar/v0.0.0+test.0000000
 ```
 
 A `SHA256SUMS.txt` and a `build-info.json` are published alongside the archives.

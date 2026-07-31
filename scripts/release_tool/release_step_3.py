@@ -51,7 +51,7 @@ class ReleaseStep3Runner:
     * Creating or updating a lightweight ``v$VERSION`` tag pointing to
       the step-1 merge commit and force-pushing it
     * Creating or updating a matching sidecar release tag
-      (``mf-entry-bin/v$VERSION+<timestamp>.<sha8>``, DI-4871) at the
+      (``mf-stdio-sidecar/v$VERSION+<timestamp>.<sha8>``, DI-4871) at the
       same commit and force-pushing it, so every MetricFlow release
       always has a matching sidecar binary build with no separate
       manual step

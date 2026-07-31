@@ -15,7 +15,7 @@ def test_build_sidecar_release_tag_with_explicit_timestamp() -> None:
         commit_sha="a1b2c3d4e5f6789",
         timestamp=datetime(2026, 7, 28, 15, 34, tzinfo=timezone.utc),
     )
-    assert tag == "mf-entry-bin/v0.208.0+2607281534.a1b2c3d4"
+    assert tag == "mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4"
 
 
 def test_build_sidecar_release_tag_truncates_full_length_sha() -> None:
@@ -32,13 +32,13 @@ def test_build_sidecar_release_tag_truncates_full_length_sha() -> None:
 def test_build_sidecar_release_tag_defaults_to_now_when_timestamp_omitted() -> None:
     """Omitting the timestamp should still produce a validly-shaped tag using the current time."""
     tag = build_sidecar_release_tag(metricflow_version="0.208.0", commit_sha="a1b2c3d4e5f6")
-    assert re.fullmatch(r"mf-entry-bin/v0\.208\.0\+\d{10}\.a1b2c3d4", tag)
+    assert re.fullmatch(r"mf-stdio-sidecar/v0\.208\.0\+\d{10}\.a1b2c3d4", tag)
 
 
 @pytest.mark.parametrize(
     ("tag", "expected_version"),
     [
-        ("mf-entry-bin/v0.208.0+2607281534.a1b2c3d4", "0.208.0"),
+        ("mf-stdio-sidecar/v0.208.0+2607281534.a1b2c3d4", "0.208.0"),
         ("sidecar/v0.208.0+1", "0.208.0"),
         ("v0.208.0", "0.208.0"),
     ],

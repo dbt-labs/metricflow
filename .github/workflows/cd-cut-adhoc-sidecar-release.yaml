@@ -1,5 +1,5 @@
 # Cuts an ad hoc sidecar-only release (DI-4871): a new
-# mf-entry-bin/v<mf_version>+<timestamp>.<sha8> tag for a change to sidecar/mf_entry.py or
+# mf-stdio-sidecar/v<mf_version>+<timestamp>.<sha8> tag for a change to sidecar/mf_entry.py or
 # mf_ipc_protocol.py that doesn't correspond to a new MetricFlow version. The tag cut
 # alongside each MetricFlow release is instead pushed automatically by
 # scripts/release_tool/release_step_3.py -- this workflow is only for sidecar-only changes
