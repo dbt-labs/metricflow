@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 
 from metricflow_semantics.errors.error_classes import SqlBindParametersNotSupportedError
@@ -10,6 +11,8 @@ from sqlalchemy import Engine
 from sqlalchemy import text as sa_text
 from sqlalchemy.dialects import registry
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
+from sqlalchemy.engine import URL
+from sqlalchemy.engine.default import DefaultDialect
 from sqlalchemy.exc import SQLAlchemyError
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
@@ -48,6 +51,45 @@ class MetricFlowRedshiftDialect(PGDialect_psycopg2):
 
 # Make our custom redshift dialect available to SqlAlchemy.
 registry.register("mf_redshift_psycopg2", __name__, "MetricFlowRedshiftDialect")
+
+
+class MetricFlowVerticaDialect(DefaultDialect):
+    """Custom dialect for Vertica.
+
+    The vertica-sqlalchemy-dialect package does not support SqlAlchemy 2.x natively, so we include this simple
+    custom dialect that wraps the vertica-python DBAPI driver and allows for connection via SqlAlchemy's
+    create_engine API. Note this will not support all SqlAlchemy features, but since we only use the engine
+    connection and direct execution of sql text statements this is sufficient for our purposes.
+
+    Note - none of the upstream base classes are typed, so we skip type checking where they are involved.
+    """
+
+    # These properties are set at class level in the built in dialect classes, so we follow that standard here.
+    name = "mf_vertica_python"
+    driver = "vertica_python"
+    supports_statement_cache = False
+
+    @classmethod
+    def import_dbapi(cls):  # type: ignore
+        """Import the DBAPI module used by this dialect."""
+        import vertica_python
+
+        return vertica_python
+
+    def create_connect_args(self, url: URL):  # type: ignore
+        """Map the SqlAlchemy URL to vertica_python.connect() keyword arguments."""
+        connect_args = url.translate_connect_args(username="user")
+        connect_args["port"] = int(connect_args.get("port", 5433))
+        return [], connect_args
+
+
+# Make our custom vertica dialect available to SqlAlchemy.
+registry.register("mf_vertica_python", __name__, "MetricFlowVerticaDialect")
+
+# Vertica's EXPLAIN supports SELECT and DML statements but not DDL, so dry runs of CREATE TABLE ... AS
+# statements validate the inner query instead. The table name is a single token, so this substitution
+# can't collide with AS keywords used elsewhere in the query.
+VERTICA_CREATE_TABLE_AS_PREFIX = re.compile(r"^\s*CREATE\s+TABLE\s+\S+\s+AS\s+", re.IGNORECASE)
 
 
 class SqlAlchemyBasedSqlClient:
@@ -217,6 +259,10 @@ class SqlAlchemyBasedSqlClient:
                         or "org.apache.spark.sql.AnalysisException" in plan_output
                     ):
                         raise RuntimeError(f"Databricks dry run failed: {plan_output}")
+
+                elif self.sql_engine_type is SqlEngine.VERTICA:
+                    # Vertica: EXPLAIN does not support DDL, so validate the query part of CTAS statements
+                    conn.execute(sa_text(f"EXPLAIN {VERTICA_CREATE_TABLE_AS_PREFIX.sub('', stmt, count=1)}"))
 
                 else:
                     # Default: Use EXPLAIN for other engines

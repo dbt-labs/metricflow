@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import enum
 import logging
+import re
 import time
 
 from dbt.adapters.base import BaseAdapter
@@ -21,6 +22,7 @@ from metricflow.sql.render.redshift import RedshiftSqlPlanRenderer
 from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlPlanRenderer
+from metricflow.sql.render.vertica import VerticaSqlPlanRenderer
 from metricflow.sql_request.sql_request_attributes import SqlRequestId
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 
@@ -30,6 +32,11 @@ logger = logging.getLogger(__name__)
 # Discovered via trial and error from the original, and now defunct DatabricksSqlClient implementation
 DATABRICKS_SQL_WAREHOUSE_EXPLAIN_PLAN_ERROR_KEY = "Error occurred during query planning"
 DATABRICKS_CLUSTER_EXPLAIN_PLAN_ERROR_KEY = "org.apache.spark.sql.AnalysisException"
+
+# Vertica's EXPLAIN supports SELECT and DML statements but not DDL, so dry runs of CREATE TABLE ... AS
+# statements validate the inner query instead. The table name is a single token, so this substitution
+# can't collide with AS keywords used elsewhere in the query.
+VERTICA_CREATE_TABLE_AS_PREFIX = re.compile(r"^\s*CREATE\s+TABLE\s+\S+\s+AS\s+", re.IGNORECASE)
 
 
 class SupportedAdapterTypes(enum.Enum):
@@ -42,6 +49,7 @@ class SupportedAdapterTypes(enum.Enum):
     BIGQUERY = "bigquery"
     DUCKDB = "duckdb"
     TRINO = "trino"
+    VERTICA = "vertica"
 
     @property
     def sql_engine_type(self) -> SqlEngine:
@@ -60,6 +68,8 @@ class SupportedAdapterTypes(enum.Enum):
             return SqlEngine.DUCKDB
         elif self is SupportedAdapterTypes.TRINO:
             return SqlEngine.TRINO
+        elif self is SupportedAdapterTypes.VERTICA:
+            return SqlEngine.VERTICA
         else:
             assert_values_exhausted(self)
 
@@ -80,6 +90,8 @@ class SupportedAdapterTypes(enum.Enum):
             return DuckDbSqlPlanRenderer()
         elif self is SupportedAdapterTypes.TRINO:
             return TrinoSqlPlanRenderer()
+        elif self is SupportedAdapterTypes.VERTICA:
+            return VerticaSqlPlanRenderer()
         else:
             assert_values_exhausted(self)
 
@@ -231,6 +243,12 @@ class AdapterBackedSqlClient:
         elif self.sql_engine_type is SqlEngine.BIGQUERY:
             with self._adapter.connection_named(connection_name):
                 self._adapter.validate_sql(stmt)
+        elif self.sql_engine_type is SqlEngine.VERTICA:
+            # Vertica's EXPLAIN does not support DDL, so validate the query part of CTAS statements.
+            with self._adapter.connection_named(connection_name):
+                self._adapter.execute(
+                    f"EXPLAIN {VERTICA_CREATE_TABLE_AS_PREFIX.sub('', stmt, count=1)}", auto_begin=True, fetch=False
+                )
         else:
             is_databricks = self.sql_engine_type is SqlEngine.DATABRICKS
             with self._adapter.connection_named(connection_name):

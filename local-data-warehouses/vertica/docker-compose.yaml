@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  vertica:
+    container_name: vertica
+    # The dedicated Vertica Community Edition image (vertica-ce) was removed from Docker Hub in 2025.
+    # The vertica-k8s server image is still published, and the init script bootstraps a single-node
+    # database in it. 25.3.x is the last release series that accepts the bundled CE license (26.1+
+    # rejects it).
+    image: opentext/vertica-k8s:25.3.0-8-multiarch
+    user: root
+    entrypoint: ["/bin/bash", "/docker-entrypoint/initialize-single-node.sh"]
+    expose:
+      - "5433"
+    ports:
+      - "5433:5433"
+    environment:
+      VERTICA_DB_NAME: "metricflow"
+      APP_DB_USER: "metricflow"
+      APP_DB_PASSWORD: "metricflowing"
+    volumes:
+      - ./initialize-single-node.sh:/docker-entrypoint/initialize-single-node.sh:ro

@@ -48,6 +48,8 @@ class SqlAlchemyUrlBuilder:
             return SqlAlchemyUrlBuilder._build_bigquery_url(password, schema)
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
+        elif dialect is SqlDialect.VERTICA:
+            return SqlAlchemyUrlBuilder._build_vertica_url(connection_params, password)
         else:
             raise ValueError(f"Unsupported dialect: {dialect}")
 
@@ -205,6 +207,28 @@ class SqlAlchemyUrlBuilder:
             drivername="bigquery",
             host=project_id,
             database=database_value,
+        )
+
+    @staticmethod
+    def _build_vertica_url(
+        connection_params: SqlEngineConnectionParameterSet,
+        password: str,
+    ) -> SqlAlchemyURL:
+        """Build Vertica URL.
+
+        Uses the custom MetricFlow Vertica dialect wrapping the vertica-python driver, since there is no
+        Vertica dialect for SqlAlchemy 2.x.
+
+        Like Redshift, Vertica does not support setting a default schema at connection time, so all queries
+        have to use schema-qualified relation names.
+        """
+        return SqlAlchemyURL.create(
+            drivername="mf_vertica_python",
+            username=connection_params.username,
+            password=password,
+            host=connection_params.hostname,
+            port=connection_params.port or 5433,
+            database=connection_params.database,
         )
 
     @staticmethod

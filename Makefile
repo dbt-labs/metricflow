@@ -96,6 +96,10 @@ populate-persistent-source-schema-snowflake:
 test-trino:
 	hatch -v run trino-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
+.PHONY: test-vertica
+test-vertica:
+	hatch -v run vertica-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
@@ -109,6 +113,10 @@ postgresql postgres:
 .PHONY: trino
 trino:
 	make -C local-data-warehouses trino
+
+.PHONY: vertica
+vertica:
+	make -C local-data-warehouses vertica
 
 # Re-generate test snapshots using all supported SQL engines.
 .PHONY: regenerate-test-snapshots
