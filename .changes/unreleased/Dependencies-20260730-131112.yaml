@@ -1,6 +1,0 @@
-kind: Dependencies
-body: Support Python 3.14 in `dbt-metricflow`
-time: 2026-07-30T13:11:12.543413-07:00
-custom:
-    Author: "2108"
-    Issue: plypaul
