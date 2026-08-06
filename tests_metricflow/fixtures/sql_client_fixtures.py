@@ -13,6 +13,7 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from sqlalchemy import create_engine, make_url
 
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.sql.render.athena import AthenaSqlPlanRenderer
 from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlPlanRenderer
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
@@ -30,16 +31,16 @@ logger = logging.getLogger(__name__)
 
 
 def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithDDLMethods:
-    """Build test SQL client based on url, password, and schema defined in test environment.
+    """Build the SQL client used by engine-backed MetricFlow tests.
 
-    Apart from BigQuery, these all have the same basic API, differing only in how the URL object is constructed.
-    BigQuery is in its own branch here because of the way it handles credentials and engine configuration properties.
-
-    This is the standard implementation for our test runners, and all engines should use this unless there is no
-    way to use SqlAlchemy with that engine type.
+    Most engines can be exercised through a single SqlAlchemy engine and the matching MetricFlow renderer. BigQuery
+    needs a separate dry-run engine because BigQuery dry runs are enabled through URL query parameters rather than
+    per-query flags. Keeping that branch here makes the fixture boundary explicit and keeps engine-specific behavior
+    out of individual tests.
     """
     connection_params = SqlEngineConnectionParameterSet.create_from_url(url)
     dialect = SqlDialect(connection_params.dialect)
+
     # Build SqlAlchemy URL
     sqlalchemy_url = SqlAlchemyUrlBuilder.build_url(connection_params, password, schema)
 
@@ -72,6 +73,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
     # Map dialect to engine type and renderer
     dialect_mapping = {
         SqlDialect.DUCKDB: (SqlEngine.DUCKDB, DuckDbSqlPlanRenderer()),
+        SqlDialect.ATHENA: (SqlEngine.ATHENA, AthenaSqlPlanRenderer()),
         SqlDialect.DATABRICKS: (SqlEngine.DATABRICKS, DatabricksSqlPlanRenderer()),
         SqlDialect.POSTGRESQL: (SqlEngine.POSTGRES, PostgresSQLSqlPlanRenderer()),
         SqlDialect.SNOWFLAKE: (SqlEngine.SNOWFLAKE, SnowflakeSqlPlanRenderer()),
@@ -97,10 +99,11 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
 def ddl_sql_client(
     mf_test_configuration: MetricFlowTestConfiguration,
 ) -> Generator[SqlClientWithDDLMethods, None, None]:
-    """Provides a SqlClient with the necessary DDL and data loading methods for test configuration.
+    """Provide a DDL-capable SQL client for the configured test engine.
 
-    This allows us to provide the operations necessary for executing the test suite without exposing those methods in
-    MetricFlow's core SqlClient protocol.
+    Tests use this fixture for schema setup, data loading, and teardown because those operations require capabilities
+    beyond the regular `SqlClient` protocol. Persistent source-schema runs intentionally keep the source schema after
+    the session so expensive fixture data can be reused by later engine-specific snapshot runs.
     """
     sql_client = make_test_sql_client(
         url=mf_test_configuration.sql_engine_url,
@@ -130,10 +133,7 @@ def ddl_sql_client(
 
 @pytest.fixture(scope="session")
 def sql_client(ddl_sql_client: SqlClientWithDDLMethods) -> SqlClient:
-    """Provides a standard SqlClient instance for running MetricFlow tests.
-
-    Unless the test case itself requires the DDL methods, this is the fixture we should use.
-    """
+    """Expose the DDL-capable fixture as the standard SqlClient used by query tests."""
     return ddl_sql_client
 
 
@@ -154,12 +154,9 @@ def warn_user_about_slow_tests_without_parallelism(  # noqa: D103
     num_items = len(request.session.items)
     dialect = SqlDialect(SqlEngineConnectionParameterSet.create_from_url(mf_test_configuration.sql_engine_url).dialect)
 
-    # If already running in parallel or if there's not many test items, no need to print the warning. Picking 10/30 as
-    # the thresholds, but not much thought has been put into it.
     if num_workers > 1 or num_items < 10:
         return
 
-    # Since DuckDB / Postgres is fast, use 30 as the threshold.
     if (dialect is SqlDialect.DUCKDB or dialect is SqlDialect.POSTGRESQL) and num_items < 30:
         return
 

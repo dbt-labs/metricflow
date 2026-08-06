@@ -46,6 +46,8 @@ class SqlAlchemyUrlBuilder:
                 connection_params.url_str == "bigquery://"
             ), "All BigQuery URL properties should be in the credentials JSON string."
             return SqlAlchemyUrlBuilder._build_bigquery_url(password, schema)
+        elif dialect is SqlDialect.ATHENA:
+            return SqlAlchemyUrlBuilder._build_athena_url(connection_params, password, schema)
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
         else:
@@ -232,5 +234,47 @@ class SqlAlchemyUrlBuilder:
             host=connection_params.hostname,
             port=connection_params.port or 8080,
             database=connection_params.database,
+            query=query_params,
+        )
+
+    @staticmethod
+    def _build_athena_url(
+        connection_params: SqlEngineConnectionParameterSet,
+        password: str,
+        schema: Optional[str] = None,
+    ) -> SqlAlchemyURL:
+        """Build Athena URL."""
+        region_name_values = connection_params.get_query_field_values("region_name")
+        if len(region_name_values) != 1:
+            raise ValueError(f"SQL engine URL did not specify exactly 1 Athena region_name! Got {region_name_values}")
+
+        s3_staging_dir_values = connection_params.get_query_field_values("s3_staging_dir")
+        if len(s3_staging_dir_values) != 1:
+            raise ValueError(
+                f"SQL engine URL did not specify exactly 1 Athena s3_staging_dir! Got {s3_staging_dir_values}"
+            )
+
+        query_params = {
+            "region_name": region_name_values[0],
+            "s3_staging_dir": s3_staging_dir_values[0],
+        }
+        if connection_params.database:
+            query_params["catalog_name"] = connection_params.database
+
+        aws_profile_name_values = connection_params.get_query_field_values("aws_profile_name")
+        if len(aws_profile_name_values) > 1:
+            raise ValueError(
+                f"SQL engine URL specified multiple Athena aws_profile_name values: {aws_profile_name_values}"
+            )
+        if aws_profile_name_values:
+            query_params["profile_name"] = aws_profile_name_values[0]
+
+        return SqlAlchemyURL.create(
+            drivername="awsathena+rest",
+            username=connection_params.username,
+            password=password or None,
+            host=f"athena.{region_name_values[0]}.amazonaws.com",
+            port=connection_params.port or 443,
+            database=schema,
             query=query_params,
         )

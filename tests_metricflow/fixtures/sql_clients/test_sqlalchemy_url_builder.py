@@ -103,6 +103,62 @@ def test_redshift_url() -> None:
     assert url.database == "dev"
 
 
+def test_athena_url() -> None:
+    """Test Athena URL conversion."""
+    params = SqlEngineConnectionParameterSet.create_from_url(
+        "athena://access_key_id@/awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/"
+        "&aws_profile_name=analytics-profile"
+    )
+    url = SqlAlchemyUrlBuilder.build_url(params, password="secret", schema="analytics")
+
+    assert url.drivername == "awsathena+rest"
+    assert url.username == "access_key_id"
+    assert url.password == "secret"
+    assert url.host == "athena.eu-central-1.amazonaws.com"
+    assert url.port == 443
+    assert url.database == "analytics"
+    assert url.query["catalog_name"] == "awsdatacatalog"
+    assert url.query["region_name"] == "eu-central-1"
+    assert url.query["s3_staging_dir"] == "s3://bucket/dbt/"
+    assert url.query["profile_name"] == "analytics-profile"
+
+
+@pytest.mark.parametrize(
+    ("url", "message"),
+    (
+        (
+            "athena://access_key_id@/awsdatacatalog?s3_staging_dir=s3://bucket/dbt/",
+            "SQL engine URL did not specify exactly 1 Athena region_name!",
+        ),
+        (
+            "athena://access_key_id@/awsdatacatalog?region_name=eu-central-1&region_name=us-east-1"
+            "&s3_staging_dir=s3://bucket/dbt/",
+            "SQL engine URL did not specify exactly 1 Athena region_name!",
+        ),
+        (
+            "athena://access_key_id@/awsdatacatalog?region_name=eu-central-1",
+            "SQL engine URL did not specify exactly 1 Athena s3_staging_dir!",
+        ),
+        (
+            "athena://access_key_id@/awsdatacatalog?region_name=eu-central-1"
+            "&s3_staging_dir=s3://bucket/dbt/&s3_staging_dir=s3://other/dbt/",
+            "SQL engine URL did not specify exactly 1 Athena s3_staging_dir!",
+        ),
+        (
+            "athena://access_key_id@/awsdatacatalog?region_name=eu-central-1&s3_staging_dir=s3://bucket/dbt/"
+            "&aws_profile_name=analytics-profile&aws_profile_name=other-profile",
+            "SQL engine URL specified multiple Athena aws_profile_name values:",
+        ),
+    ),
+)
+def test_athena_url_rejects_invalid_required_query_parameters(url: str, message: str) -> None:
+    """Athena URL validation should fail deterministically for invalid connection parameters."""
+    params = SqlEngineConnectionParameterSet.create_from_url(url)
+
+    with pytest.raises(ValueError, match=message):
+        SqlAlchemyUrlBuilder.build_url(params, password="secret", schema="analytics")
+
+
 def test_bigquery_url() -> None:
     """Test BigQuery URL with JSON credentials."""
     credentials_json = '{"type": "service_account", "project_id": "my-project", "client_email": "test@test.com"}'
