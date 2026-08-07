@@ -1,0 +1,9 @@
+kind: Fixes
+body: Validate that ratio (`numerator` / `denominator`) and cumulative (`cumulative_type_params.metric`)
+    metrics reference input metrics that exist in the manifest. Previously only derived metrics were
+    checked, so undefined references on these metric types passed validation and failed later during
+    semantic-graph construction.
+time: 2026-06-18T00:01:00.000000-07:00
+custom:
+    Author: WilliamDee
+    Issue: "2073"
