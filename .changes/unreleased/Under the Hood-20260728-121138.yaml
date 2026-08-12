@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Update release tool to use `ort` instead of `fossa`
-time: 2026-07-28T12:11:38.275231-07:00
-custom:
-    Author: plypaul
-    Issue: "2102"
