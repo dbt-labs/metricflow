@@ -1,8 +1,0 @@
-kind: Under the Hood
-body: Add CI pipeline to compile MetricFlow into standalone Nuitka binaries for macOS,
-  Linux, and Windows, and publish them as versioned GitHub Release artifacts for embedding
-  in dbt-core v2 (Fusion)
-time: 2026-07-30T16:44:20.063502-05:00
-custom:
-  Author: QMalcolm
-  Issue: "2106"
