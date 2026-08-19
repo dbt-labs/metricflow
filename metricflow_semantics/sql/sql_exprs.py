@@ -109,6 +109,17 @@ class SqlExpressionNode(DagNode["SqlExpressionNode"], Visitable, ABC):
         """Returns all nodes in the paths from this node to the root nodes."""
         pass
 
+    @property
+    def is_deterministic(self) -> bool:
+        """Whether this expression produces the same value each time it is evaluated.
+
+        A non-deterministic expression (e.g. one that generates a random UUID) must be
+        evaluated exactly once at the place where it is selected. Substituting it for a
+        reference to its alias re-evaluates it at every reference site, which changes
+        the meaning of the query.
+        """
+        return all(parent_node.is_deterministic for parent_node in self.parent_nodes)
+
     def _parents_match(self, other: SqlExpressionNode) -> bool:
         return all(x == y for x, y in itertools.zip_longest(self.parent_nodes, other.parent_nodes))
 
@@ -1796,6 +1807,10 @@ class SqlBetweenExpression(SqlExpressionNode):
 @dataclass(frozen=True, eq=False)
 class SqlGenerateUuidExpression(SqlExpressionNode):
     """Renders a SQL to generate a random UUID, which is non-deterministic."""
+
+    @property
+    def is_deterministic(self) -> bool:  # noqa: D102
+        return False
 
     @staticmethod
     def create() -> SqlGenerateUuidExpression:  # noqa: D102

@@ -1,0 +1,14 @@
+test_name: test_conversion_metric_queried_with_its_conversion_input_metric
+test_filename: test_conversion_metrics.py
+docstring:
+  The conversion rate must not change when the conversion-side input metric is added.
+
+  Regression test for a conversion overcount: the combined plan wrapped the
+  conversion de-duplication sub-query in a shape the sub-query reducer collapsed,
+  which inlined the generated-UUID de-duplication key into the window PARTITION BY
+  and made every row its own partition. The window then kept fan-out duplicates and
+  the conversion rate read high (0.75 where the standalone query reads 0.5).
+---
+  visit_buy_conversion_rate_7days    buys_fill_nulls_with_0
+---------------------------------  ------------------------
+                              0.5                         8

@@ -1046,3 +1046,13 @@ metric:
       window: 7 days
       entity: user
       calculation: conversion_rate
+---
+metric:
+  name: buys_fill_nulls_with_0
+  description: Buy count with nulls filled, the conversion-side input metric.
+  type: simple
+  type_params:
+    measure:
+      name: buys
+      fill_nulls_with: 0
+      join_to_timespine: true

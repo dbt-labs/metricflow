@@ -251,6 +251,13 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         if any(col.expr.is_verbose for col in from_source_node_as_select_node.select_columns):
             return False
 
+        # Reducing substitutes the parent's select expressions into the places that
+        # reference them. A non-deterministic expression (e.g. GEN_RANDOM_UUID() selected
+        # as a de-duplication key) would then be re-evaluated at every reference site
+        # instead of once, which changes the meaning of the query.
+        if any(not col.expr.is_deterministic for col in from_source_node_as_select_node.select_columns):
+            return False
+
         # If there is a column in the parent group by that is not used in the current select statement, don't reduce or it
         # would leave an unselected column in the group by and change the meaning of the query. For example, in the SQL
         # below, reducing would remove the `is_instant` from the select statement.
@@ -523,6 +530,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
                 not join_select_node
                 or not SqlRewritingSubQueryReducerVisitor._is_simple_source(join_select_node)
                 or any(col.expr.is_verbose for col in join_select_node.select_columns)
+                # Same reasoning as in _current_node_can_be_reduced: substituting a
+                # non-deterministic expression past its alias changes query semantics.
+                or any(not col.expr.is_deterministic for col in join_select_node.select_columns)
             ):
                 new_join_descs.append(join_desc)
                 continue
@@ -643,9 +653,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
 
         from_source_node = node_with_reduced_parents.from_source
         from_source_select_node = from_source_node.as_select_node
-        assert (
-            from_source_select_node is not None
-        ), f"{from_source_select_node=} should be set as `_current_node_can_be_reduced()` returned True"
+        assert from_source_select_node is not None, (
+            f"{from_source_select_node=} should be set as `_current_node_can_be_reduced()` returned True"
+        )
 
         # At this point, the query should look similar to
         #

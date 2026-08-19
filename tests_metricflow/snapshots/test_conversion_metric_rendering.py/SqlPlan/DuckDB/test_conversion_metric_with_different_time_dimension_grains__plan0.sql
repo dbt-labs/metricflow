@@ -353,9 +353,9 @@ FROM (
                   FROM (
                     -- Read Elements From Semantic Model 'buys_source'
                     SELECT
-                      1 AS __buys
-                      , 1 AS __buys_fill_nulls_with_0
-                      , 1 AS __buys_fill_nulls_with_0_join_to_timespine
+                      1 AS __buys_fill_nulls_with_0
+                      , 1 AS __buys
+                      , 1 AS __buys_fill_nulls_with_0_1
                       , 1 AS __buys_month
                       , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                       , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week

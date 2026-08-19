@@ -1373,18 +1373,18 @@ docstring:
                                         <!-- col49 =                                                -->
                                         <!--   SqlSelectColumn(                                     -->
                                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_114), -->
-                                        <!--     column_alias='__buys',                             -->
+                                        <!--     column_alias='__buys_fill_nulls_with_0',           -->
                                         <!--   )                                                    -->
                                         <!-- col50 =                                                -->
                                         <!--   SqlSelectColumn(                                     -->
                                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_115), -->
-                                        <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                                        <!--     column_alias='__buys',                             -->
                                         <!--   )                                                    -->
-                                        <!-- col51 =                                                        -->
-                                        <!--   SqlSelectColumn(                                             -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_116),         -->
-                                        <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                        <!--   )                                                            -->
+                                        <!-- col51 =                                                -->
+                                        <!--   SqlSelectColumn(                                     -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_116), -->
+                                        <!--     column_alias='__buys_fill_nulls_with_0_1',         -->
+                                        <!--   )                                                    -->
                                         <!-- col52 =                                             -->
                                         <!--   SqlSelectColumn(                                  -->
                                         <!--     expr=SqlGenerateUuidExpression(node_id=uuid_0), -->
@@ -1644,18 +1644,18 @@ docstring:
                                             <!-- col49 =                                               -->
                                             <!--   SqlSelectColumn(                                    -->
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_62), -->
-                                            <!--     column_alias='__buys',                            -->
+                                            <!--     column_alias='__buys_fill_nulls_with_0',          -->
                                             <!--   )                                                   -->
                                             <!-- col50 =                                               -->
                                             <!--   SqlSelectColumn(                                    -->
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_63), -->
-                                            <!--     column_alias='__buys_fill_nulls_with_0',          -->
+                                            <!--     column_alias='__buys',                            -->
                                             <!--   )                                                   -->
-                                            <!-- col51 =                                                        -->
-                                            <!--   SqlSelectColumn(                                             -->
-                                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_64),          -->
-                                            <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                            <!--   )                                                            -->
+                                            <!-- col51 =                                               -->
+                                            <!--   SqlSelectColumn(                                    -->
+                                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_64), -->
+                                            <!--     column_alias='__buys_fill_nulls_with_0_1',        -->
+                                            <!--   )                                                   -->
                                             <!-- from_source = SqlSelectStatementNode(node_id=ss_209) -->
                                             <!-- where = None -->
                                             <!-- distinct = False -->
@@ -1665,18 +1665,18 @@ docstring:
                                                 <!-- col0 =                                                      -->
                                                 <!--   SqlSelectColumn(                                          -->
                                                 <!--     expr=SqlStringExpression(node_id=str_28008 sql_expr=1), -->
-                                                <!--     column_alias='__buys',                                  -->
+                                                <!--     column_alias='__buys_fill_nulls_with_0',                -->
                                                 <!--   )                                                         -->
                                                 <!-- col1 =                                                      -->
                                                 <!--   SqlSelectColumn(                                          -->
                                                 <!--     expr=SqlStringExpression(node_id=str_28009 sql_expr=1), -->
-                                                <!--     column_alias='__buys_fill_nulls_with_0',                -->
+                                                <!--     column_alias='__buys',                                  -->
                                                 <!--   )                                                         -->
-                                                <!-- col2 =                                                         -->
-                                                <!--   SqlSelectColumn(                                             -->
-                                                <!--     expr=SqlStringExpression(node_id=str_28010 sql_expr=1),    -->
-                                                <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                                <!--   )                                                            -->
+                                                <!-- col2 =                                                      -->
+                                                <!--   SqlSelectColumn(                                          -->
+                                                <!--     expr=SqlStringExpression(node_id=str_28010 sql_expr=1), -->
+                                                <!--     column_alias='__buys_fill_nulls_with_0_1',              -->
+                                                <!--   )                                                         -->
                                                 <!-- col3 =                                                      -->
                                                 <!--   SqlSelectColumn(                                          -->
                                                 <!--     expr=SqlStringExpression(node_id=str_28011 sql_expr=1), -->

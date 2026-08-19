@@ -45,7 +45,7 @@ docstring:
                 <!-- col2 =                                                                         -->
                 <!--   SqlSelectColumn(                                                             -->
                 <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_5, sql_function=COALESCE), -->
-                <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine',                 -->
+                <!--     column_alias='__buys_fill_nulls_with_0',                                   -->
                 <!--   )                                                                            -->
                 <!-- from_source = SqlSelectStatementNode(node_id=ss_203) -->
                 <!-- join_0 =                                                 -->
@@ -689,11 +689,11 @@ docstring:
                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_227), -->
                     <!--     column_alias='metric_time__day',                   -->
                     <!--   )                                                    -->
-                    <!-- col1 =                                                         -->
-                    <!--   SqlSelectColumn(                                             -->
-                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_228),         -->
-                    <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                    <!--   )                                                            -->
+                    <!-- col1 =                                                 -->
+                    <!--   SqlSelectColumn(                                     -->
+                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_228), -->
+                    <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                    <!--   )                                                    -->
                     <!-- from_source = SqlSelectStatementNode(node_id=ss_219) -->
                     <!-- join_0 =                                                 -->
                     <!--   SqlJoinDescription(                                    -->
@@ -878,7 +878,7 @@ docstring:
                         <!-- col1 =                                                                    -->
                         <!--   SqlSelectColumn(                                                        -->
                         <!--     expr=SqlAggregateFunctionExpression(node_id=fnc_1, sql_function=SUM), -->
-                        <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine',            -->
+                        <!--     column_alias='__buys_fill_nulls_with_0',                              -->
                         <!--   )                                                                       -->
                         <!-- from_source = SqlSelectStatementNode(node_id=ss_214) -->
                         <!-- group_by0 =                                            -->
@@ -889,36 +889,34 @@ docstring:
                         <!-- where = None -->
                         <!-- distinct = False -->
                         <SqlSelectStatementNode>
-                            <!-- description =                                                                  -->
-                            <!--   "Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']" -->
+                            <!-- description = "Select: ['__buys_fill_nulls_with_0', 'metric_time__day']" -->
                             <!-- node_id = NodeId(id_str='ss_214') -->
                             <!-- col0 =                                                 -->
                             <!--   SqlSelectColumn(                                     -->
                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_207), -->
                             <!--     column_alias='metric_time__day',                   -->
                             <!--   )                                                    -->
-                            <!-- col1 =                                                         -->
-                            <!--   SqlSelectColumn(                                             -->
-                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_206),         -->
-                            <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                            <!--   )                                                            -->
+                            <!-- col1 =                                                 -->
+                            <!--   SqlSelectColumn(                                     -->
+                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_206), -->
+                            <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                            <!--   )                                                    -->
                             <!-- from_source = SqlSelectStatementNode(node_id=ss_213) -->
                             <!-- where = None -->
                             <!-- distinct = False -->
                             <SqlSelectStatementNode>
-                                <!-- description =                                                                  -->
-                                <!--   "Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']" -->
+                                <!-- description = "Select: ['__buys_fill_nulls_with_0', 'metric_time__day']" -->
                                 <!-- node_id = NodeId(id_str='ss_213') -->
                                 <!-- col0 =                                                 -->
                                 <!--   SqlSelectColumn(                                     -->
                                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_205), -->
                                 <!--     column_alias='metric_time__day',                   -->
                                 <!--   )                                                    -->
-                                <!-- col1 =                                                         -->
-                                <!--   SqlSelectColumn(                                             -->
-                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_204),         -->
-                                <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                <!--   )                                                            -->
+                                <!-- col1 =                                                 -->
+                                <!--   SqlSelectColumn(                                     -->
+                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_204), -->
+                                <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                                <!--   )                                                    -->
                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_212) -->
                                 <!-- where = None -->
                                 <!-- distinct = False -->
@@ -935,11 +933,11 @@ docstring:
                                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_203), -->
                                     <!--     column_alias='user',                               -->
                                     <!--   )                                                    -->
-                                    <!-- col2 =                                                         -->
-                                    <!--   SqlSelectColumn(                                             -->
-                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_200),         -->
-                                    <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                    <!--   )                                                            -->
+                                    <!-- col2 =                                                 -->
+                                    <!--   SqlSelectColumn(                                     -->
+                                    <!--     expr=SqlColumnReferenceExpression(node_id=cr_200), -->
+                                    <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                                    <!--   )                                                    -->
                                     <!-- col3 =                                                           -->
                                     <!--   SqlSelectColumn(                                               -->
                                     <!--     expr=SqlColumnReferenceExpression(node_id=cr_201),           -->
@@ -972,11 +970,11 @@ docstring:
                                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_198), -->
                                         <!--     column_alias='mf_internal_uuid',                   -->
                                         <!--   )                                                    -->
-                                        <!-- col4 =                                                         -->
-                                        <!--   SqlSelectColumn(                                             -->
-                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_199),         -->
-                                        <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                        <!--   )                                                            -->
+                                        <!-- col4 =                                                 -->
+                                        <!--   SqlSelectColumn(                                     -->
+                                        <!--     expr=SqlColumnReferenceExpression(node_id=cr_199), -->
+                                        <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                                        <!--   )                                                    -->
                                         <!-- from_source = SqlSelectStatementNode(node_id=ss_207) -->
                                         <!-- join_0 =                                                 -->
                                         <!--   SqlJoinDescription(                                    -->
@@ -1662,18 +1660,18 @@ docstring:
                                             <!-- col49 =                                                -->
                                             <!--   SqlSelectColumn(                                     -->
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_124), -->
-                                            <!--     column_alias='__buys',                             -->
+                                            <!--     column_alias='__buys_fill_nulls_with_0',           -->
                                             <!--   )                                                    -->
                                             <!-- col50 =                                                -->
                                             <!--   SqlSelectColumn(                                     -->
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_125), -->
-                                            <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                                            <!--     column_alias='__buys',                             -->
                                             <!--   )                                                    -->
-                                            <!-- col51 =                                                        -->
-                                            <!--   SqlSelectColumn(                                             -->
-                                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_126),         -->
-                                            <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                            <!--   )                                                            -->
+                                            <!-- col51 =                                                -->
+                                            <!--   SqlSelectColumn(                                     -->
+                                            <!--     expr=SqlColumnReferenceExpression(node_id=cr_126), -->
+                                            <!--     column_alias='__buys_fill_nulls_with_0_1',         -->
+                                            <!--   )                                                    -->
                                             <!-- col52 =                                             -->
                                             <!--   SqlSelectColumn(                                  -->
                                             <!--     expr=SqlGenerateUuidExpression(node_id=uuid_0), -->
@@ -1933,18 +1931,18 @@ docstring:
                                                 <!-- col49 =                                               -->
                                                 <!--   SqlSelectColumn(                                    -->
                                                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_72), -->
-                                                <!--     column_alias='__buys',                            -->
+                                                <!--     column_alias='__buys_fill_nulls_with_0',          -->
                                                 <!--   )                                                   -->
                                                 <!-- col50 =                                               -->
                                                 <!--   SqlSelectColumn(                                    -->
                                                 <!--     expr=SqlColumnReferenceExpression(node_id=cr_73), -->
-                                                <!--     column_alias='__buys_fill_nulls_with_0',          -->
+                                                <!--     column_alias='__buys',                            -->
                                                 <!--   )                                                   -->
-                                                <!-- col51 =                                                        -->
-                                                <!--   SqlSelectColumn(                                             -->
-                                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_74),          -->
-                                                <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                                <!--   )                                                            -->
+                                                <!-- col51 =                                               -->
+                                                <!--   SqlSelectColumn(                                    -->
+                                                <!--     expr=SqlColumnReferenceExpression(node_id=cr_74), -->
+                                                <!--     column_alias='__buys_fill_nulls_with_0_1',        -->
+                                                <!--   )                                                   -->
                                                 <!-- from_source = SqlSelectStatementNode(node_id=ss_208) -->
                                                 <!-- where = None -->
                                                 <!-- distinct = False -->
@@ -1954,18 +1952,18 @@ docstring:
                                                     <!-- col0 =                                                      -->
                                                     <!--   SqlSelectColumn(                                          -->
                                                     <!--     expr=SqlStringExpression(node_id=str_28008 sql_expr=1), -->
-                                                    <!--     column_alias='__buys',                                  -->
+                                                    <!--     column_alias='__buys_fill_nulls_with_0',                -->
                                                     <!--   )                                                         -->
                                                     <!-- col1 =                                                      -->
                                                     <!--   SqlSelectColumn(                                          -->
                                                     <!--     expr=SqlStringExpression(node_id=str_28009 sql_expr=1), -->
-                                                    <!--     column_alias='__buys_fill_nulls_with_0',                -->
+                                                    <!--     column_alias='__buys',                                  -->
                                                     <!--   )                                                         -->
-                                                    <!-- col2 =                                                         -->
-                                                    <!--   SqlSelectColumn(                                             -->
-                                                    <!--     expr=SqlStringExpression(node_id=str_28010 sql_expr=1),    -->
-                                                    <!--     column_alias='__buys_fill_nulls_with_0_join_to_timespine', -->
-                                                    <!--   )                                                            -->
+                                                    <!-- col2 =                                                      -->
+                                                    <!--   SqlSelectColumn(                                          -->
+                                                    <!--     expr=SqlStringExpression(node_id=str_28010 sql_expr=1), -->
+                                                    <!--     column_alias='__buys_fill_nulls_with_0_1',              -->
+                                                    <!--   )                                                         -->
                                                     <!-- col3 =                                                      -->
                                                     <!--   SqlSelectColumn(                                          -->
                                                     <!--     expr=SqlStringExpression(node_id=str_28011 sql_expr=1), -->
