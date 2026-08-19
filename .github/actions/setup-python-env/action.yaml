@@ -44,7 +44,6 @@ runs:
       # Save the package cache for Hatch.
       # Save pre-commit environments.
       path: |
-        ${{ env.pythonLocation }}
         ~/.cache/pip
         ~/.local/share/hatch
         ~/.cache/hatch
@@ -65,14 +64,13 @@ runs:
         }}" AND
         linux_release: "${{ env.LINUX_RELEASE }}" AND
         cache-pre-commit-environment: "${{ inputs.cache-pre-commit-environment }}" AND
-        manual_update_key: 2
+        manual_update_key: 3
 
   - name: Install Hatch
     shell: bash
-    # Pin `virtualenv` to avoid `module 'virtualenv.discovery.builtin' has no attribute 'propose_interpreters'` error.
     run: |
-      pip3 install "virtualenv<20.40"
-      pip3 install hatch
+      pip install virtualenv
+      pip install hatch
 
   # Running any command will install the dependencies for the project. Add this step so that the `hatch` environment is
   # cached.
