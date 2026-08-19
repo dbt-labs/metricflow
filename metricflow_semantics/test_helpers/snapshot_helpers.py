@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
 
 import _pytest.fixtures
+import pytest
 import tabulate
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
@@ -151,7 +152,10 @@ def assert_snapshot_text_equal(
                 fromfile=f"Expected Result in {file_path}",
                 tofile="Actual Result",
             )
-            assert False, "Result does not match the stored snapshot. Diff from expected to actual:\n\n" + "".join(diff)
+            pytest.fail(
+                "Generated output does not match the stored snapshot. If this change is expected, rerun the test with "
+                f"`--{OVERWRITE_SNAPSHOTS_CLI_FLAG}` to update the snapshot. Diff:\n\n" + "".join(diff)
+            )
 
 
 def snapshot_path_prefix(
