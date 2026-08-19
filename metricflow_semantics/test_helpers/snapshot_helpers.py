@@ -74,11 +74,11 @@ def assert_snapshot_text_equal(
 
     logger.debug(
         LazyFormat(
-            "Generated snapshot text",
-            snapshot_text=snapshot_text if log_snapshot_text else "<hidden in log output>",
+            "Generated snapshot",
+            snapshot_text=snapshot_text if log_snapshot_text else "<snapshot text hidden>",
             file_path=file_path,
             open_link=mf_path_hyperlink(file_path),
-            iterm_hint="Link may be opened with <Command> + <Left Click>",
+            iterm_hint="Open the link with Command-click",
         )
     )
 
@@ -117,18 +117,16 @@ def assert_snapshot_text_equal(
     # Throw an exception if the plan is not there.
     if not os.path.exists(file_path):
         raise FileNotFoundError(
-            f"Could not find snapshot file at path {file_path}. Re-run with --overwrite-snapshots and check git status "
-            f"to see what's new."
+            f"Snapshot not found: {file_path}. Rerun the test with `{OVERWRITE_SNAPSHOTS_CLI_FLAG}` to create it, "
+            "then review the new file."
         )
 
     if snapshot_configuration.display_snapshots:
         if not snapshot_configuration.overwrite_snapshots:
-            logger.warning(
-                LazyFormat(lambda: f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
-            )
+            logger.warning(LazyFormat(lambda: f"Displaying the stored snapshot without updating it: {file_path}"))
 
         if len(request.session.items) > 1:
-            raise ValueError("Displaying snapshots is only supported when there's a single item in a testing session.")
+            raise ValueError(f"`{DISPLAY_SNAPSHOTS_CLI_FLAG}` requires exactly one selected test.")
         webbrowser.open(file_path.resolve().as_uri())
 
     # Read the existing plan from the file and compare with the actual plan
@@ -149,8 +147,8 @@ def assert_snapshot_text_equal(
             diff = difflib.unified_diff(
                 a=expected_snapshot_text.splitlines(keepends=True),
                 b=snapshot_text.splitlines(keepends=True),
-                fromfile=f"Expected Result in {file_path}",
-                tofile="Actual Result",
+                fromfile=f"Stored snapshot: {file_path}",
+                tofile="Generated output",
             )
             pytest.fail(
                 "Generated output does not match the stored snapshot. If this change is expected, rerun the test with "
@@ -212,14 +210,18 @@ OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
 
 
 def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
-    parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
+    parser.addoption(
+        DISPLAY_SNAPSHOTS_CLI_FLAG,
+        action="store_true",
+        help="Open the selected test's snapshot in a browser",
+    )
 
 
 def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
     parser.addoption(
         OVERWRITE_SNAPSHOTS_CLI_FLAG,
         action="store_true",
-        help="Overwrites existing snapshots by ones generated during this testing session",
+        help="Create or update snapshots with generated output",
     )
 
 
@@ -319,7 +321,7 @@ def _convert_linkable_element_set_to_rows(
                 entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links
             )
         else:
-            raise RuntimeError(LazyFormat("There should have been at most 1 group-by-metric spec", spec_set=spec_set))
+            raise RuntimeError(LazyFormat("Expected at most one group-by-metric spec", spec_set=spec_set))
         row_dict["Type"] = annotated_spec.element_type.name.ljust(14)
 
         row_dict["Properties"] = ",".join(
