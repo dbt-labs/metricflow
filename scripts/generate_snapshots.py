@@ -4,20 +4,8 @@ Credentials are stored as a JSON string in an environment variable set via a she
 
 export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
 {
-    "duckdb": {
-        "engine_url": null,
-        "engine_password": null
-    },
     "athena": {
         "engine_url": "athena://...",
-        "engine_password": "..."
-    },
-    "redshift": {
-        "engine_url": "redshift://...",
-        "engine_password": "..."
-    },
-    "snowflake": {
-        "engine_url": "snowflake://...",
         "engine_password": "..."
     },
     "bigquery": {
@@ -28,8 +16,20 @@ export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
         "engine_url": "databricks://...",
         "engine_password": "..."
     },
+    "duckdb": {
+        "engine_url": null,
+        "engine_password": null
+    },
     "postgres": {
         "engine_url": postgres://...",
+        "engine_password": "..."
+    },
+    "redshift": {
+        "engine_url": "redshift://...",
+        "engine_password": "..."
+    },
+    "snowflake": {
+        "engine_url": "snowflake://...",
         "engine_password": "..."
     },
     "trino": {
