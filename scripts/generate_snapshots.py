@@ -222,7 +222,7 @@ def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format=dev_format)
 
 
-def load_credential_sets() -> Sequence[MetricFlowEngineConfiguration]:
+def load_engine_configs() -> Sequence[MetricFlowEngineConfiguration]:
     """Load test credential sets from the environment."""
     credential_sets_json_str = os.environ.get("MF_TEST_ENGINE_CREDENTIAL_SETS")
     if credential_sets_json_str is None:
@@ -238,7 +238,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     """Generate snapshots for all engines, or for the requested engine."""
     args = _parse_args(argv)
     setup_logging()
-    engine_configs = load_credential_sets()
+    engine_configs = load_engine_configs()
     if args.engine is not None:
         engine_configs = tuple(engine_config for engine_config in engine_configs if engine_config.engine == args.engine)
     logger.info(f"Running tests in {MF_TEST_DIRECTORY} with the marker {SQL_ENGINE_SNAPSHOT_MARKER_NAME}")

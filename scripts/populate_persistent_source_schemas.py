@@ -11,7 +11,7 @@ from scripts.generate_snapshots import (
     ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME,
     ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS,
     MetricFlowEngineConfiguration,
-    load_credential_sets,
+    load_engine_configs,
     run_hatch_command,
     set_engine_env_variables,
     setup_logging,
@@ -66,7 +66,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     """Populate persistent source schemas for all relevant engines, or for the requested engine."""
     config = _parse_args(argv)
     setup_logging()
-    engine_configs = load_credential_sets()
+    engine_configs = load_engine_configs()
     if config.engine is not None:
         engine_configs = tuple(
             engine_config for engine_config in engine_configs if engine_config.engine == config.engine
