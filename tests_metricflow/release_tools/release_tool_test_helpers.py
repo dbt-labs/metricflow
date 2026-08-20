@@ -4,9 +4,11 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
+from scripts.release_tool import RELEASE_TOOL_DIRECTORY_ANCHOR
 from scripts.release_tool.cli_command_runner import CliCommandResult, CliCommandRunner
 from scripts.release_tool.git_manager import GitManager
 from scripts.release_tool.github_client import GitHubClient, GitHubMergeMethod, GitHubReleaseMakeLatest
@@ -21,12 +23,13 @@ from scripts.release_tool.mf_release_tool import (
 
 logger = logging.getLogger(__name__)
 
+_RELEASE_TOOL_DIRECTORY_PATH = RELEASE_TOOL_DIRECTORY_ANCHOR.directory
 
-_github_username_var, _github_api_token_var, _fossa_api_key_var = REQUIRED_ENVIRONMENT_VARIABLES
+
+_github_username_var, _github_api_token_var = REQUIRED_ENVIRONMENT_VARIABLES
 RELEASE_TOOL_TEST_ENVIRONMENT = {
     _github_username_var: "metricflow-user",
     _github_api_token_var: "github-token",
-    _fossa_api_key_var: "fossa-token",
 }
 
 
@@ -115,7 +118,7 @@ class FakeCli(FakeLogEntry):
     def snapshot_entry(self, tmp_path: Path) -> FakeSnapshotEntry:
         """Return a ``FakeCliCommand`` with ``current_directory`` normalized to ``<TMP>``."""
         return FakeCliCommand(
-            command=self.command,
+            command=tuple(_tmp_replacement_text(command_part, tmp_path) for command_part in self.command),
             current_directory=_tmp_replacement_path(self.current_directory, tmp_path),
         )
 
@@ -290,7 +293,11 @@ class FakeRunSnapshot:
 
 
 def _tmp_replacement_path(path: Path, tmp_path: Path) -> str:
-    return str(path).replace(str(tmp_path), "<TMP>")
+    return _tmp_replacement_text(str(path), tmp_path)
+
+
+def _tmp_replacement_text(text: str, tmp_path: Path) -> str:
+    return text.replace(str(tmp_path), "<TMP>").replace(str(_RELEASE_TOOL_DIRECTORY_PATH), "<RELEASE_TOOL>")
 
 
 def _normalize_workflow_inputs(inputs: Mapping[str, str] | None) -> tuple[tuple[str, str], ...] | None:
@@ -713,3 +720,19 @@ class FakeSleep:
     def sleep(self, seconds: float) -> None:
         """Record the sleep duration."""
         self.durations.append(seconds)
+
+
+class FakeNow:
+    """Returns a fixed UTC time; pass ``now`` to match ``Callable[[], datetime]``.
+
+    Used so DI-4871 sidecar release tags (which embed the current time) are deterministic
+    in snapshot tests instead of embedding the real wall-clock time the test happened to run at.
+    """
+
+    def __init__(self, fixed_now: datetime | None = None) -> None:
+        """Initialize with a fixed UTC time, defaulting to an arbitrary stable value."""
+        self.fixed_now = fixed_now or datetime(2026, 1, 1, tzinfo=timezone.utc)
+
+    def now(self) -> datetime:
+        """Return the fixed time."""
+        return self.fixed_now

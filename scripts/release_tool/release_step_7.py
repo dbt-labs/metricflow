@@ -91,7 +91,7 @@ class ReleaseStep7Runner:
 
     def _read_change_log_body(self, change_log_file_path: Path) -> str:
         """Return the changelog body for the released version."""
-        full_change_log_file_path = self.release_helper.current_directory / change_log_file_path
+        full_change_log_file_path = self.release_helper.metricflow_repo_directory / change_log_file_path
         if not full_change_log_file_path.exists():
             raise click.ClickException(f"Release changelog file not found at {full_change_log_file_path}.")
         return full_change_log_file_path.read_text()

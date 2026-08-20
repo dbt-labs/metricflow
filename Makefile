@@ -100,6 +100,14 @@ test-trino:
 test-vertica:
 	hatch -v run vertica-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
+.PHONY: test-athena
+test-athena:
+	hatch -v run athena-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
+
+.PHONY: populate-persistent-source-schema-athena
+populate-persistent-source-schema-athena:
+	hatch -v run athena-env:pytest -vv $(ADDITIONAL_PYTEST_OPTIONS) $(USE_PERSISTENT_SOURCE_SCHEMA) $(POPULATE_PERSISTENT_SOURCE_SCHEMA)
+
 .PHONY: lint
 lint:
 	hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)

@@ -148,7 +148,7 @@ class ReleaseStep5Runner:
 
     def _write_requirements_file(self, requirement_line: str) -> None:
         """Write the `metricflow` requirement to the dbt-metricflow requirements file."""
-        requirements_path = self.release_helper.current_directory / ReleaseStep5Runner.REQUIREMENTS_FILE_PATH
+        requirements_path = self.release_helper.metricflow_repo_directory / ReleaseStep5Runner.REQUIREMENTS_FILE_PATH
         requirements_path.write_text(f"{requirement_line}\n")
 
     def _check_requirements_only_changes(self) -> None:
@@ -165,7 +165,7 @@ class ReleaseStep5Runner:
 
     def _dbt_metricflow_root(self) -> Path:
         """Return the dbt-metricflow hatch project directory."""
-        return self.release_helper.current_directory / ReleaseStep4Runner.DBT_METRICFLOW_SUBDIRECTORY
+        return self.release_helper.metricflow_repo_directory / ReleaseStep4Runner.DBT_METRICFLOW_SUBDIRECTORY
 
     def _development_version_pr_title(self, version: str) -> str:
         """Return the development-version PR title."""

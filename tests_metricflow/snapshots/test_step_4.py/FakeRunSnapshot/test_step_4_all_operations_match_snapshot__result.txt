@@ -59,6 +59,7 @@ FakeRunSnapshot(
        '    },\n'
        '    "step_3": {\n'
        '        "metricflow_release_tag_name": "v1.2.3",\n'
+       '        "sidecar_release_tag_name": null,\n'
        '        "metricflow_release_merge_commit_sha": "abc123",\n'
        '        "metricflow_dev_version_commit_sha": "def456"\n'
        '    },\n'

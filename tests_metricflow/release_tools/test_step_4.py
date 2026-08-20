@@ -25,6 +25,7 @@ from tests_metricflow.release_tools.release_tool_test_helpers import (
     FakeGitHubClientFactory,
     FakeGitManager,
     FakeGitManagerFactory,
+    FakeNow,
     FakeOperations,
     FakeReleaseStateFile,
     FakeSleep,
@@ -69,17 +70,18 @@ def test_step_4_all_operations_match_snapshot(
     repo_path = _make_metricflow_repo(tmp_path)
     _make_dbt_metricflow_requirements_file(repo_path)
     _write_step_1_step_2_and_step_3_state(repo_path)
-    step_4_cli_commands = ("fossa", "changie", "hatch")
+    step_4_cli_commands = ("docker", "changie", "hatch")
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager, operation_log=operation_log)
     release_tool_context = ReleaseToolContext(
         environment=RELEASE_TOOL_TEST_ENVIRONMENT,
-        current_directory=repo_path,
+        metricflow_repo_directory=repo_path,
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=github_client_factory.create_client,
         is_cli_command_available=step_4_cli_commands.__contains__,
         cli_command_runner=cli_command_runner,
         sleep=FakeSleep().sleep,
+        now=FakeNow().now,
     )
 
     result = CliRunner().invoke(

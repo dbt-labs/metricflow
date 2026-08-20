@@ -103,7 +103,7 @@ class ReleasePrRunner:
             description="Commit all changes", action=self.release_helper.git_manager.add_all_changes
         )
         run_release_lint(
-            current_directory=self.release_helper.current_directory,
+            current_directory=self.release_helper.metricflow_repo_directory,
             cli_command_runner=self.release_helper.cli_command_runner,
             echo=self.release_helper.console.echo,
         )

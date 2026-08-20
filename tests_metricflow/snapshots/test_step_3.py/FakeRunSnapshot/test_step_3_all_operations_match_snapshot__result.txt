@@ -29,6 +29,11 @@ FakeRunSnapshot(
     FakeGitHubIsMerged(pr_number=200, result=False),
     FakeGitHubMerge(pr_number=200, merge_method='squash'),
     FakeGitOperation(name='push_tag', branch_name='v1.2.3', commit_sha='abc123'),
+    FakeGitOperation(
+      name='push_tag',
+      branch_name='mf-stdio-sidecar/v1.2.3+2601010000.abc123',
+      commit_sha='abc123',
+    ),
     FakeReleaseStateFileSnapshot(
       file_path='<TMP>/metricflow/git_ignored/mf_release_tool_state.json',
       file_text=('{\n'
@@ -47,6 +52,7 @@ FakeRunSnapshot(
        '    },\n'
        '    "step_3": {\n'
        '        "metricflow_release_tag_name": "v1.2.3",\n'
+       '        "sidecar_release_tag_name": "mf-stdio-sidecar/v1.2.3+2601010000.abc123",\n'
        '        "metricflow_release_merge_commit_sha": "abc123",\n'
        '        "metricflow_dev_version_commit_sha": "def456"\n'
        '    },\n'

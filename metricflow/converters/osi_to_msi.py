@@ -294,8 +294,8 @@ class OSIToMSIConverter:
         ratio_result = _try_parse_ratio(expr_str)
         if ratio_result is not None:
             num_expr, den_expr = ratio_result
-            num_name = f"{name}__numerator"
-            den_name = f"{name}__denominator"
+            num_name = f"{name}_numerator"
+            den_name = f"{name}_denominator"
             num_metrics = self._convert_metric(num_name, num_expr, None, datasets)
             den_metrics = self._convert_metric(den_name, den_expr, None, datasets)
             ratio_metric = PydanticMetric(

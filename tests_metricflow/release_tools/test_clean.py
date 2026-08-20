@@ -21,6 +21,7 @@ from tests_metricflow.release_tools.release_tool_test_helpers import (
     FakeGitHubClientFactory,
     FakeGitManager,
     FakeGitManagerFactory,
+    FakeNow,
     FakeSleep,
     _make_metricflow_repo,
     _release_tool_command,
@@ -34,13 +35,14 @@ def _release_tool_context(repo_path: Path, git_manager: FakeGitManager) -> Relea
     fake_git_manager_factory = FakeGitManagerFactory(git_manager=git_manager)
     return ReleaseToolContext(
         environment=RELEASE_TOOL_TEST_ENVIRONMENT,
-        current_directory=repo_path,
+        metricflow_repo_directory=repo_path,
         confirm_all=False,
         git_manager_factory=fake_git_manager_factory.create_manager,
         github_client_factory=FakeGitHubClientFactory(github_client=FakeGitHubClient()).create_client,
-        is_cli_command_available=("fossa", "changie").__contains__,
+        is_cli_command_available=("docker", "changie").__contains__,
         cli_command_runner=FakeCliCommandRunner(),
         sleep=FakeSleep().sleep,
+        now=FakeNow().now,
     )
 
 

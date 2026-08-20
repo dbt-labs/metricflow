@@ -72,6 +72,11 @@ vertica-env-requirements = [
   "requirements-files/requirements-vertica.txt",
 ]
 
+athena-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-athena.txt",
+]
+
 
 [project.urls]
 Documentation = "https://docs.getdbt.com/docs/build/about-metricflow"
@@ -148,6 +153,11 @@ MF_SQL_ENGINE_PASSWORD=""
 description = "Dev environment for working with Trino"
 template = "dev-env"
 features = ["trino-env-requirements"]
+
+[tool.hatch.envs.athena-env]
+description = "Dev environment for working with the Athena adapter"
+template = "dev-env"
+features = ["athena-env-requirements"]
 
 
 [tool.hatch.envs.vertica-env.env-vars]

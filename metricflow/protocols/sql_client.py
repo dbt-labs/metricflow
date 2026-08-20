@@ -26,6 +26,7 @@ class SqlEngine(Enum):
     DATABRICKS = "Databricks"
     TRINO = "Trino"
     VERTICA = "Vertica"
+    ATHENA = "Athena"
 
     @property
     def unsupported_granularities(self) -> Set[TimeGranularity]:
@@ -53,6 +54,8 @@ class SqlEngine(Enum):
         elif self is SqlEngine.VERTICA:
             # Vertica's TIMESTAMP type and DATE_TRUNC function support microsecond precision.
             return {TimeGranularity.NANOSECOND}
+        elif self is SqlEngine.ATHENA:
+            return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
         else:
             assert_values_exhausted(self)
 
