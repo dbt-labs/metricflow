@@ -118,10 +118,10 @@ postgresql postgres:
 trino:
 	make -C local-data-warehouses trino
 
-# Re-generate test snapshots using all supported SQL engines.
+# Re-generate test snapshots using all supported SQL engines, or one engine when ENGINE is set.
 .PHONY: regenerate-test-snapshots
 regenerate-test-snapshots:
-	python3 -m scripts.generate_snapshots
+	python3 -m scripts.generate_snapshots $(if $(ENGINE),--engine=$(ENGINE))
 
 # Populate persistent source schemas for all relevant SQL engines.
 .PHONY: populate-persistent-source-schemas

@@ -43,6 +43,7 @@ EOF
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
 import os
@@ -90,6 +91,22 @@ class MetricFlowEngineConfiguration:  # noqa: D101
     engine: str
     hatch_environment: str
     credential_set: MetricFlowTestCredentialSet
+
+
+@dataclass(frozen=True)
+class GenerateSnapshotsConfig:  # noqa: D101
+    engine: Optional[str]
+
+
+def _parse_args(argv: Optional[Sequence[str]] = None) -> GenerateSnapshotsConfig:
+    parser = argparse.ArgumentParser(description="Generate test snapshots for supported SQL engines.")
+    parser.add_argument(
+        "--engine",
+        choices=tuple(ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME),
+        help="Generate snapshots for only the specified engine.",
+    )
+    args = parser.parse_args(argv)
+    return GenerateSnapshotsConfig(engine=args.engine)
 
 
 def _credential_set_from_json(credential_set_json: dict[str, object]) -> MetricFlowTestCredentialSet:
@@ -217,12 +234,18 @@ def load_credential_sets() -> Sequence[MetricFlowEngineConfiguration]:
     return parse_credential_sets(credential_sets_json_str)
 
 
-if __name__ == "__main__":
+def main(argv: Optional[Sequence[str]] = None) -> None:
+    """Generate snapshots for all engines, or for the requested engine."""
+    args = _parse_args(argv)
     setup_logging()
-    credential_sets = load_credential_sets()
+    engine_configs = load_credential_sets()
+    if args.engine is not None:
+        engine_configs = tuple(engine_config for engine_config in engine_configs if engine_config.engine == args.engine)
     logger.info(f"Running tests in {MF_TEST_DIRECTORY} with the marker {SQL_ENGINE_SNAPSHOT_MARKER_NAME}")
-    for test_configuration in credential_sets:
-        logger.info(
-            f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
-        )
-        run_tests(test_configuration)
+    for engine_config in engine_configs:
+        logger.info(f"Running tests for {engine_config.engine} with URL: {engine_config.credential_set.engine_url}")
+        run_tests(engine_config)
+
+
+if __name__ == "__main__":
+    main()
