@@ -123,10 +123,10 @@ trino:
 regenerate-test-snapshots:
 	python3 -m scripts.generate_snapshots $(if $(ENGINE),--engine=$(ENGINE))
 
-# Populate persistent source schemas for all relevant SQL engines.
+# Populate persistent source schemas for all relevant SQL engines, or one engine when ENGINE is set.
 .PHONY: populate-persistent-source-schemas
 populate-persistent-source-schemas:
-	python3 -m scripts.populate_persistent_source_schemas
+	python3 -m scripts.populate_persistent_source_schemas $(if $(ENGINE),--engine=$(ENGINE))
 
 # Sync dbt-semantic-interfaces files to metricflow-semantic-interfaces folder
 .PHONY: sync-dsi
