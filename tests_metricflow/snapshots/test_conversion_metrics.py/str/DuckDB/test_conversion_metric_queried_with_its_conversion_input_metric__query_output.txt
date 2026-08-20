@@ -9,6 +9,6 @@ docstring:
   and made every row its own partition. The window then kept fan-out duplicates and
   the conversion rate read high (0.75 where the standalone query reads 0.5).
 ---
-  visit_buy_conversion_rate_7days    buys_fill_nulls_with_0
----------------------------------  ------------------------
-                              0.5                         8
+  visit_buy_conversion_rate_7days    buys_null_filled
+---------------------------------  ------------------
+                              0.5                   8

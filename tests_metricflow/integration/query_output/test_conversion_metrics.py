@@ -246,7 +246,7 @@ def test_conversion_metric_queried_with_its_conversion_input_metric(
     """
     query_result = it_helpers.mf_engine.query(
         MetricFlowQueryRequest.create(
-            metric_names=("visit_buy_conversion_rate_7days", "buys_fill_nulls_with_0"),
+            metric_names=("visit_buy_conversion_rate_7days", "buys_null_filled"),
         )
     )
     assert query_result.result_df is not None, "Unexpected empty result."

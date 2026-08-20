@@ -1221,7 +1221,7 @@ docstring:
                                         <!-- col49 =                                                -->
                                         <!--   SqlSelectColumn(                                     -->
                                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_102), -->
-                                        <!--     column_alias='__buys_fill_nulls_with_0',           -->
+                                        <!--     column_alias='__buys_null_filled',                 -->
                                         <!--   )                                                    -->
                                         <!-- col50 =                                                -->
                                         <!--   SqlSelectColumn(                                     -->
@@ -1231,7 +1231,7 @@ docstring:
                                         <!-- col51 =                                                -->
                                         <!--   SqlSelectColumn(                                     -->
                                         <!--     expr=SqlColumnReferenceExpression(node_id=cr_104), -->
-                                        <!--     column_alias='__buys_fill_nulls_with_0_1',         -->
+                                        <!--     column_alias='__buys_fill_nulls_with_0',           -->
                                         <!--   )                                                    -->
                                         <!-- col52 =                                             -->
                                         <!--   SqlSelectColumn(                                  -->
@@ -1492,7 +1492,7 @@ docstring:
                                             <!-- col49 =                                               -->
                                             <!--   SqlSelectColumn(                                    -->
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_50), -->
-                                            <!--     column_alias='__buys_fill_nulls_with_0',          -->
+                                            <!--     column_alias='__buys_null_filled',                -->
                                             <!--   )                                                   -->
                                             <!-- col50 =                                               -->
                                             <!--   SqlSelectColumn(                                    -->
@@ -1502,7 +1502,7 @@ docstring:
                                             <!-- col51 =                                               -->
                                             <!--   SqlSelectColumn(                                    -->
                                             <!--     expr=SqlColumnReferenceExpression(node_id=cr_52), -->
-                                            <!--     column_alias='__buys_fill_nulls_with_0_1',        -->
+                                            <!--     column_alias='__buys_fill_nulls_with_0',          -->
                                             <!--   )                                                   -->
                                             <!-- from_source = SqlSelectStatementNode(node_id=ss_201) -->
                                             <!-- where = None -->
@@ -1513,7 +1513,7 @@ docstring:
                                                 <!-- col0 =                                                      -->
                                                 <!--   SqlSelectColumn(                                          -->
                                                 <!--     expr=SqlStringExpression(node_id=str_28008 sql_expr=1), -->
-                                                <!--     column_alias='__buys_fill_nulls_with_0',                -->
+                                                <!--     column_alias='__buys_null_filled',                      -->
                                                 <!--   )                                                         -->
                                                 <!-- col1 =                                                      -->
                                                 <!--   SqlSelectColumn(                                          -->
@@ -1523,7 +1523,7 @@ docstring:
                                                 <!-- col2 =                                                      -->
                                                 <!--   SqlSelectColumn(                                          -->
                                                 <!--     expr=SqlStringExpression(node_id=str_28010 sql_expr=1), -->
-                                                <!--     column_alias='__buys_fill_nulls_with_0_1',              -->
+                                                <!--     column_alias='__buys_fill_nulls_with_0',                -->
                                                 <!--   )                                                         -->
                                                 <!-- col3 =                                                      -->
                                                 <!--   SqlSelectColumn(                                          -->

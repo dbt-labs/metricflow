@@ -1048,7 +1048,7 @@ metric:
       calculation: conversion_rate
 ---
 metric:
-  name: buys_fill_nulls_with_0
+  name: buys_null_filled
   description: Buy count with nulls filled, the conversion-side input metric.
   type: simple
   type_params:

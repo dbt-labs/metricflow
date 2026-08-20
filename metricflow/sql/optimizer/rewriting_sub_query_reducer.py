@@ -653,9 +653,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
 
         from_source_node = node_with_reduced_parents.from_source
         from_source_select_node = from_source_node.as_select_node
-        assert from_source_select_node is not None, (
-            f"{from_source_select_node=} should be set as `_current_node_can_be_reduced()` returned True"
-        )
+        assert (
+            from_source_select_node is not None
+        ), f"{from_source_select_node=} should be set as `_current_node_can_be_reduced()` returned True"
 
         # At this point, the query should look similar to
         #

@@ -19,7 +19,7 @@ WITH sma_28019_cte AS (
 )
 
 SELECT
-  COALESCE(MAX(subq_37.__buys_fill_nulls_with_0_1), 0) AS visit_buy_conversions
+  COALESCE(MAX(subq_37.__buys_fill_nulls_with_0), 0) AS visit_buy_conversions
 FROM (
   -- Constrain Output with WHERE
   -- Select: ['__visits']
@@ -38,11 +38,11 @@ FROM (
 ) subq_25
 CROSS JOIN (
   -- Find conversions for user within the range of 7 day
-  -- Select: ['__buys_fill_nulls_with_0_1']
-  -- Select: ['__buys_fill_nulls_with_0_1']
+  -- Select: ['__buys_fill_nulls_with_0']
+  -- Select: ['__buys_fill_nulls_with_0']
   -- Aggregate Inputs for Simple Metrics
   SELECT
-    SUM(__buys_fill_nulls_with_0_1) AS __buys_fill_nulls_with_0_1
+    SUM(__buys_fill_nulls_with_0) AS __buys_fill_nulls_with_0
   FROM (
     -- Dedupe the fanout with mf_internal_uuid in the conversion data set
     SELECT DISTINCT
@@ -79,7 +79,7 @@ CROSS JOIN (
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
       ) AS user
       , subq_32.mf_internal_uuid AS mf_internal_uuid
-      , subq_32.__buys_fill_nulls_with_0_1 AS __buys_fill_nulls_with_0_1
+      , subq_32.__buys_fill_nulls_with_0 AS __buys_fill_nulls_with_0
     FROM (
       -- Constrain Output with WHERE
       -- Select: ['__visits', 'visit__referrer_id', 'metric_time__day', 'user']
@@ -107,7 +107,7 @@ CROSS JOIN (
       SELECT
         DATE_TRUNC('day', ds) AS metric_time__day
         , user_id AS user
-        , 1 AS __buys_fill_nulls_with_0_1
+        , 1 AS __buys_fill_nulls_with_0
         , GEN_RANDOM_UUID() AS mf_internal_uuid
       FROM ***************************.fct_buys buys_source_src_28000
     ) subq_32
