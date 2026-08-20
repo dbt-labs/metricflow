@@ -4,7 +4,7 @@ Credentials are stored as a JSON string in an environment variable set via a she
 
 export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
 {
-    "duck_db": {
+    "duckdb": {
         "engine_url": null,
         "engine_password": null
     },
@@ -20,7 +20,7 @@ export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
         "engine_url": "snowflake://...",
         "engine_password": "..."
     },
-    "big_query": {
+    "bigquery": {
         "engine_url": "bigquery://",
         "engine_password": "..."
     },
@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 MF_TEST_DIRECTORY = "tests_metricflow"
 MF_SEMANTICS_TEST_DIRECTORY = "tests_metricflow_semantics"
 
-DUCKDB_ENGINE_NAME: Final[str] = "duck_db"
+DUCKDB_ENGINE_NAME: Final[str] = "duckdb"
 
 # Maps the engine name in the credentials JSON to the `hatch` environment name.
 ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
@@ -66,14 +66,14 @@ ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
     "athena": "athena-env",
     "redshift": "redshift-env",
     "snowflake": "snowflake-env",
-    "big_query": "bigquery-env",
+    "bigquery": "bigquery-env",
     "databricks": "databricks-env",
     "postgres": "postgres-env",
     "trino": "trino-env",
 }
 
 ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(
-    ("athena", "redshift", "snowflake", "big_query", "databricks")
+    ("athena", "redshift", "snowflake", "bigquery", "databricks")
 )
 
 # Tests that generate SQL engine snapshots have this `pytest` marker set.
