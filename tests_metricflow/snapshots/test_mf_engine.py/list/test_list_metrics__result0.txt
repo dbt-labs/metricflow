@@ -115,6 +115,7 @@ docstring:
   'visit_buy_conversion_rate_7days',
   'visit_buy_conversion_rate_7days_fill_nulls_with_0',
   'visit_buy_conversion_rate_by_session',
+  'visit_buy_conversion_rate_with_base_measure_filter',
   'visit_buy_conversion_rate_with_filter',
   'visit_buy_conversion_rate_with_monthly_conversion',
   'visit_buy_conversions',

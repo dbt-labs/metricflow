@@ -1361,6 +1361,16 @@ class DataflowPlanBuilder:
             conversion_type_params.conversion_metric is not None
         ), "A conversion metric must have a conversion metric."
 
+        # The filter attached to the base metric at the point where it's referenced as a conversion input (e.g.
+        # `base_metric: {name: ..., filter: ...}`) is distinct from that metric's own definition-level filter, and
+        # is otherwise never converted into WhereFilterSpecs, so it has to be resolved here.
+        base_metric_input_filter_specs = filter_spec_factory.create_from_where_filter_intersection(
+            filter_location=WhereFilterLocation.for_input_metric(
+                input_metric_reference=conversion_type_params.base_metric.as_reference
+            ),
+            filter_intersection=conversion_type_params.base_metric.filter,
+        )
+
         base_simple_metric_recipe, conversion_simple_metric_recipe = [
             self._build_simple_metric_recipe(
                 filter_spec_factory=filter_spec_factory,
@@ -1369,11 +1379,14 @@ class DataflowPlanBuilder:
                 queried_linkable_specs=queried_linkable_specs,
                 child_metric_offset_window=None,
                 child_metric_offset_to_grain=None,
-                additional_filter_specs=descendant_filter_specs,
+                additional_filter_specs=additional_filter_specs,
             )
             # Filters should only be applied to base metrics.
-            for input_metric, descendant_filter_specs in [
-                (conversion_type_params.base_metric, descendant_filter_specs),
+            for input_metric, additional_filter_specs in [
+                (
+                    conversion_type_params.base_metric,
+                    tuple(descendant_filter_specs) + tuple(base_metric_input_filter_specs),
+                ),
                 (conversion_type_params.conversion_metric, ()),
             ]
         ]
