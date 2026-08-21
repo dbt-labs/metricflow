@@ -54,8 +54,8 @@ test-include-slow-dbt-metricflow:
 .PHONY: test-include-slow
 test-include-slow: test-include-slow-metricflow test-include-slow-dbt-metricflow
 
-.PHONY: test-postgresql
-test-postgresql:
+.PHONY: test-postgres
+test-postgres:
 	hatch -v run postgres-env:pytest -vv -n $(PARALLELISM) $(ADDITIONAL_PYTEST_OPTIONS) $(TESTS_METRICFLOW)/
 
 # Engine-specific test environments.
@@ -110,13 +110,13 @@ lint:
 	cd dbt-metricflow && hatch -v run dev-env:pre-commit run --verbose --all-files $(ADDITIONAL_PRECOMMIT_OPTIONS)
 
 # Running data warehouses locally
-.PHONY: postgresql postgres
-postgresql postgres:
-	make -C local-data-warehouses postgresql
+.PHONY: postgres
+postgres:
+	$(MAKE) -C local-data-warehouses postgres
 
 .PHONY: trino
 trino:
-	make -C local-data-warehouses trino
+	$(MAKE) -C local-data-warehouses trino
 
 # Re-generate test snapshots using all supported SQL engines, or one engine when ENGINE is set.
 .PHONY: regenerate-test-snapshots
@@ -136,15 +136,15 @@ sync-dsi:
 # Re-generate snapshots for the default SQL engine.
 .PHONY: test-snap
 test-snap:
-	make test ADDITIONAL_PYTEST_OPTIONS=--overwrite-snapshots
+	$(MAKE) test ADDITIONAL_PYTEST_OPTIONS=--overwrite-snapshots
 
 .PHONY: testx
 testx:
-	make test ADDITIONAL_PYTEST_OPTIONS=-x
+	$(MAKE) test ADDITIONAL_PYTEST_OPTIONS=-x
 
 .PHONY: testx-snap
 testx-snap:
-	make test ADDITIONAL_PYTEST_OPTIONS='-x --overwrite-snapshots'
+	$(MAKE) test ADDITIONAL_PYTEST_OPTIONS='-x --overwrite-snapshots'
 
 .PHONY: test-snap-slow
 test-snap-slow:

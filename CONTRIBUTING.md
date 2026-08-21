@@ -38,7 +38,7 @@ If you're not sure whether your change qualifies, err on the side of opening an 
 You're ready to start! Note all `make` and `hatch` commands should be run from your repository root unless otherwise indicated.
 
 `pyproject.yaml` includes a definition for a Hatch environment named `dev-env` that is similar to a virtual environment
-and allows packages to be installed in isolation. The `Makefile` includes a number of other useful commands as well, such as `make test`, which handle the environment switching. For engine-specific testing refer to the `<engine>-env` environments defined in `pyproject.yaml` and the `test-<engine>` commands in the `Makefile` - for example, postgres tests are most easily run through the `postgres-env` instead of `dev-env`, or via `make test-postgresql`.
+and allows packages to be installed in isolation. The `Makefile` includes a number of other useful commands as well, such as `make test`, which handle the environment switching. For engine-specific testing refer to the `<engine>-env` environments defined in `pyproject.yaml` and the `test-<engine>` commands in the `Makefile` - for example, postgres tests are most easily run through the `postgres-env` instead of `dev-env`, or via `make test-postgres`.
 
 When running any one of the hatch commands, the environment is automatically set up for you.
 
