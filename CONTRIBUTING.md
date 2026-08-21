@@ -38,7 +38,7 @@ If you're not sure whether your change qualifies, err on the side of opening an 
 You're ready to start! Note all `make` and `hatch` commands should be run from your repository root unless otherwise indicated.
 
 `pyproject.yaml` includes a definition for a Hatch environment named `dev-env` that is similar to a virtual environment
-and allows packages to be installed in isolation. The `Makefile` includes a number of other useful commands as well, such as `make test`, which handle the environment switching. For engine-specific testing refer to the `<engine>-env` environments defined in `pyproject.yaml` and the `test-<engine>` commands in the `Makefile` - for example, postgres tests are most easily run through the `postgres-env` instead of `dev-env`, or via `make test-postgresql`.
+and allows packages to be installed in isolation. The `Makefile` includes a number of other useful commands as well, such as `make test`, which handle the environment switching. For engine-specific testing refer to the `<engine>-env` environments defined in `pyproject.yaml` and the `test-<engine>` commands in the `Makefile` - for example, postgres tests are most easily run through the `postgres-env` instead of `dev-env`, or via `make test-postgres`.
 
 When running any one of the hatch commands, the environment is automatically set up for you.
 
@@ -78,7 +78,14 @@ When running any one of the hatch commands, the environment is automatically set
     - Run `hatch run dev-env:mf --help`
     - Follow the CLI help from there, just remember your local CLI is always `hatch run dev-env:run mf <COMMAND>`!
     - Note this will only work if you invoke the command from within a properly configured dbt project, so it may be simpler to clone the [jaffle-sl-template repo](https://github.com/dbt-labs/jaffle-sl-template) and do an editable install (via `pip install -e /path/to/metricflow/repo`) in a separate Python virtual environment.
-6. Some tests generate snapshots in the test directory. Separate snapshots may be generated for each SQL engine. You can regenerate these snapshots by running `make regenerate-test-snapshots`.
+6. Some tests generate snapshots in the test directory. To update the
+   snapshots for tests in a pytest session, rerun the pytest command with
+   `--overwrite-snapshots`, such as
+   `hatch run dev-env:pytest --overwrite-snapshots <path-to-test>`. Do not edit
+   snapshot files directly. Separate snapshots may be generated for each SQL
+   engine. To regenerate snapshots for all engines, run
+   `make regenerate-test-snapshots`. To run for a single engine, run
+   `make regenerate-test-snapshots ENGINE=<engine>`.
 
 ## Adding or modifying a CHANGELOG Entry!
 

@@ -2,8 +2,8 @@
 # Local Data Warehouse Setup
 #
 
-.PHONY: postgresql
-postgresql:
+.PHONY: postgres
+postgres:
 	docker-compose -f postgresql/docker-compose.yaml up
 
 .PHONY: trino

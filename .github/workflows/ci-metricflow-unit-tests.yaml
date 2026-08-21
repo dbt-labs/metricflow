@@ -48,7 +48,7 @@ jobs:
 
       - uses: ./.github/actions/run-mf-tests
         with:
-          make-target: "test-postgresql"
+          make-target: "test-postgres"
           hatch-environment-cache-config-json: >-
             {
               "configs": [
