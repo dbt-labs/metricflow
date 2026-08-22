@@ -327,9 +327,9 @@ FROM (
                   , subq_9.session_id
                   , subq_9.buy__user
                   , subq_9.buy__session_id
+                  , subq_9.__buys_null_filled
                   , subq_9.__buys
                   , subq_9.__buys_fill_nulls_with_0
-                  , subq_9.__buys_fill_nulls_with_0_join_to_timespine
                   , GEN_RANDOM_UUID() AS mf_internal_uuid
                 FROM (
                   -- Metric Time Dimension 'ds'
@@ -383,15 +383,15 @@ FROM (
                     , subq_8.session_id
                     , subq_8.buy__user
                     , subq_8.buy__session_id
+                    , subq_8.__buys_null_filled
                     , subq_8.__buys
                     , subq_8.__buys_fill_nulls_with_0
-                    , subq_8.__buys_fill_nulls_with_0_join_to_timespine
                   FROM (
                     -- Read Elements From Semantic Model 'buys_source'
                     SELECT
-                      1 AS __buys
+                      1 AS __buys_null_filled
+                      , 1 AS __buys
                       , 1 AS __buys_fill_nulls_with_0
-                      , 1 AS __buys_fill_nulls_with_0_join_to_timespine
                       , 1 AS __buys_month
                       , DATE_TRUNC('day', buys_source_src_28000.ds) AS ds__day
                       , DATE_TRUNC('week', buys_source_src_28000.ds) AS ds__week

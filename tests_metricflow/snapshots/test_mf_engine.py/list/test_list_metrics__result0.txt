@@ -55,6 +55,7 @@ docstring:
   'bookings_since_start_of_month',
   'bookings_since_start_of_year',
   'bookings_yoy',
+  'buys_null_filled',
   'current_account_balance_by_user',
   'derived_bookings_0',
   'derived_bookings_1',
