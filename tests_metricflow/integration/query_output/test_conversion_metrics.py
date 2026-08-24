@@ -227,3 +227,34 @@ def test_conversion_metric_with_metric_definition_filter(
         snapshot_str=query_result.result_df.text_format(),
         sql_engine=sql_client.sql_engine_type,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_queried_with_its_conversion_input_metric(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+    it_helpers: IntegrationTestHelpers,
+) -> None:
+    """The conversion rate must not change when the conversion-side input metric is added.
+
+    Regression test for a conversion overcount: the combined plan wrapped the
+    conversion de-duplication sub-query in a shape the sub-query reducer collapsed,
+    which inlined the generated-UUID de-duplication key into the window PARTITION BY
+    and made every row its own partition. The window then kept fan-out duplicates and
+    the conversion rate read high (0.75 where the standalone query reads 0.5).
+    """
+    query_result = it_helpers.mf_engine.query(
+        MetricFlowQueryRequest.create(
+            metric_names=("visit_buy_conversion_rate_7days", "buys_null_filled"),
+        )
+    )
+    assert query_result.result_df is not None, "Unexpected empty result."
+
+    assert_str_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        snapshot_id="query_output",
+        snapshot_str=query_result.result_df.text_format(),
+        sql_engine=sql_client.sql_engine_type,
+    )
