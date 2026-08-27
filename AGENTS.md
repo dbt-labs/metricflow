@@ -40,6 +40,7 @@ This project uses **hatch** for dependency management and testing:
 - Include `logger = logging.getLogger(__name__)` in Python files.
 - Avoid the use of `isinstance()`.
 - Avoid dynamic field access with `getattr`.
+- Avoid plural class names.
 - Prefer to use immutable data types.
 - Prioritize code clarity and readability.
 - Docstrings should be concise, capture behavior, capture assumptions, and

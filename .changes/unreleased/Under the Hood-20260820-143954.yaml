@@ -1,0 +1,6 @@
+kind: Under the Hood
+body: Remove Python 3.13 in CI
+time: 2026-08-20T14:39:54.624428-07:00
+custom:
+    Author: plypaul
+    Issue: "2116"

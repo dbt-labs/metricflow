@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.13", "3.14"]
+        python-version: ["3.10", "3.14"]
     steps:
       - name: Check-out the repo
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
@@ -48,7 +48,7 @@ jobs:
 
       - uses: ./.github/actions/run-mf-tests
         with:
-          make-target: "test-postgresql"
+          make-target: "test-postgres"
           hatch-environment-cache-config-json: >-
             {
               "configs": [
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.10", "3.13", "3.14" ]
+        python-version: [ "3.10", "3.14" ]
     steps:
 
       - name: Check-out the repo
@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.13"]
+        python-version: ["3.10", "3.14"]
     steps:
       - name: Check-out the repo
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
@@ -114,7 +114,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.10", "3.13" ]
+        python-version: [ "3.10", "3.14" ]
     steps:
 
       - name: Check-out the repo
