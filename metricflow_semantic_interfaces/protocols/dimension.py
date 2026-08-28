@@ -9,7 +9,7 @@ from metricflow_semantic_interfaces.references import (
     DimensionReference,
     TimeDimensionReference,
 )
-from metricflow_semantic_interfaces.type_enums import DimensionType, TimeGranularity
+from metricflow_semantic_interfaces.type_enums import DataType, DimensionType, TimeGranularity
 
 
 class DimensionValidityParams(Protocol):
@@ -63,6 +63,16 @@ class Dimension(Protocol):
     @property
     @abstractmethod
     def type(self) -> DimensionType:  # noqa: D102
+        pass
+
+    @property
+    @abstractmethod
+    def datatype(self) -> Optional[DataType]:
+        """Specific logical data type of the dimension, if known.
+
+        Unused by MetricFlow's own validation or query logic. Purely a passthrough annotation for downstream
+        consumers (e.g. round-tripping Ossie's `Field.datatype` through a semantic manifest).
+        """
         pass
 
     @property

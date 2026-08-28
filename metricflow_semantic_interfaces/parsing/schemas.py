@@ -54,6 +54,20 @@ time_granularity_values += [x.lower() for x in time_granularity_values]
 dimension_type_values = ["CATEGORICAL", "TIME"]
 dimension_type_values += [x.lower() for x in dimension_type_values]
 
+data_type_values = [
+    "STRING",
+    "INTEGER",
+    "DECIMAL",
+    "FLOAT",
+    "BOOLEAN",
+    "DATE",
+    "TIME",
+    "DATETIME",
+    "DATETIME_TZ",
+    "OPAQUE",
+]
+data_type_values += [x.lower() for x in data_type_values]
+
 time_dimension_type_values = ["TIME", "time"]
 
 export_destination_type_values = ["TABLE", "VIEW"]
@@ -325,6 +339,7 @@ dimension_schema = {
         },
         "description": {"type": "string"},
         "type": {"enum": dimension_type_values},
+        "datatype": {"enum": data_type_values},
         "is_partition": {"type": "boolean"},
         "expr": {"type": ["string", "boolean"]},
         "type_params": {"$ref": "dimension_type_params_schema"},
