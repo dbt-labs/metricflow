@@ -18,6 +18,7 @@ from metricflow_semantic_interfaces.parsing.dir_to_model import (
 from metricflow_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow_semantic_interfaces.type_enums import (
     ConversionCalculationType,
+    DataType,
     MetricType,
     TimeGranularity,
 )
@@ -110,6 +111,47 @@ def test_base_metric_parsing() -> None:
     assert metric.type == metric_type
     assert metric.description == description
     assert metric.label == label
+
+
+def test_metric_datatype_parsing() -> None:
+    """Test for parsing a metric's optional datatype out of a metric specification."""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: base_test
+          type: simple
+          datatype: decimal
+          type_params:
+            measure:
+              name: metadata_test_measure
+        """
+    )
+    file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+    assert len(build_result.semantic_manifest.metrics) == 1
+    metric = build_result.semantic_manifest.metrics[0]
+    assert metric.datatype is DataType.DECIMAL
+
+
+def test_metric_without_datatype_parsing() -> None:
+    """Test that a metric's datatype defaults to None when not specified, for backward compatibility."""
+    yaml_contents = textwrap.dedent(
+        """\
+        metric:
+          name: base_test
+          type: simple
+          type_params:
+            measure:
+              name: metadata_test_measure
+        """
+    )
+    file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+    assert len(build_result.semantic_manifest.metrics) == 1
+    metric = build_result.semantic_manifest.metrics[0]
+    assert metric.datatype is None
 
 
 def test_metric_metadata_parsing() -> None:

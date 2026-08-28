@@ -377,6 +377,7 @@ metric_schema = {
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
         "type": {"enum": metric_types_enum_values},
+        "datatype": {"enum": data_type_values},
         "type_params": {"$ref": "metric_type_params"},
         "filter": {"$ref": "filter_schema"},
         "description": {"type": "string"},

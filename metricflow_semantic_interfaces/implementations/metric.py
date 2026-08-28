@@ -31,6 +31,7 @@ from metricflow_semantic_interfaces.references import MeasureReference, MetricRe
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
     ConversionCalculationType,
+    DataType,
     MetricType,
     PeriodAggregation,
     TimeGranularity,
@@ -239,6 +240,7 @@ class PydanticMetric(HashableBaseModel, ModelWithMetadataParsing, ProtocolHint[M
     name: str
     description: Optional[str]
     type: MetricType
+    datatype: Optional[DataType] = None
     type_params: PydanticMetricTypeParams
     filter: Optional[PydanticWhereFilterIntersection]
     metadata: Optional[PydanticMetadata]
