@@ -890,11 +890,11 @@ class SqlRewritingSubQueryReducer(SqlPlanOptimizer):
     GROUP BY foo
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         use_column_alias_in_group_bys: bool = False,
         has_ambiguous_alias_resolution_in_where: bool = False,
-    ) -> None:  # noqa: D107
+    ) -> None:
         self._use_column_alias_in_group_bys = use_column_alias_in_group_bys
         self._has_ambiguous_alias_resolution_in_where = has_ambiguous_alias_resolution_in_where
 
