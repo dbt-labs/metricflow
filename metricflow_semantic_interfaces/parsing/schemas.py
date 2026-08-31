@@ -54,19 +54,20 @@ time_granularity_values += [x.lower() for x in time_granularity_values]
 dimension_type_values = ["CATEGORICAL", "TIME"]
 dimension_type_values += [x.lower() for x in dimension_type_values]
 
+# DataType is a plain Enum (not ExtendedEnum), so parsing is case-sensitive; only its canonical
+# lowercase values are accepted here.
 data_type_values = [
-    "STRING",
-    "INTEGER",
-    "DECIMAL",
-    "FLOAT",
-    "BOOLEAN",
-    "DATE",
-    "TIME",
-    "DATETIME",
-    "DATETIME_TZ",
-    "OPAQUE",
+    "string",
+    "integer",
+    "decimal",
+    "float",
+    "boolean",
+    "date",
+    "time",
+    "datetime",
+    "datetime_tz",
+    "opaque",
 ]
-data_type_values += [x.lower() for x in data_type_values]
 
 time_dimension_type_values = ["TIME", "time"]
 

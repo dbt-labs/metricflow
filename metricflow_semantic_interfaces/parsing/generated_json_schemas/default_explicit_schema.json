@@ -153,16 +153,6 @@
                 },
                 "datatype": {
                     "enum": [
-                        "STRING",
-                        "INTEGER",
-                        "DECIMAL",
-                        "FLOAT",
-                        "BOOLEAN",
-                        "DATE",
-                        "TIME",
-                        "DATETIME",
-                        "DATETIME_TZ",
-                        "OPAQUE",
                         "string",
                         "integer",
                         "decimal",
@@ -591,16 +581,6 @@
                 },
                 "datatype": {
                     "enum": [
-                        "STRING",
-                        "INTEGER",
-                        "DECIMAL",
-                        "FLOAT",
-                        "BOOLEAN",
-                        "DATE",
-                        "TIME",
-                        "DATETIME",
-                        "DATETIME_TZ",
-                        "OPAQUE",
                         "string",
                         "integer",
                         "decimal",

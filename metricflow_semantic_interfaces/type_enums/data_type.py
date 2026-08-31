@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from metricflow_semantic_interfaces.enum_extension import ExtendedEnum
+from enum import Enum
 
 
-class DataType(ExtendedEnum):
+class DataType(Enum):
     """Logical data type of a dimension or metric value, independent of physical representation.
 
     This is a passthrough annotation, not used by MetricFlow's own validation or query logic. It exists so
