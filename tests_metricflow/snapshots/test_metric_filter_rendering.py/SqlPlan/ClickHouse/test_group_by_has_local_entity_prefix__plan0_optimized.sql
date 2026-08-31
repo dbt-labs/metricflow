@@ -37,3 +37,4 @@ FROM (
   ) subq_45
   WHERE user__listing__user__average_booking_value > 1
 ) subq_46
+SETTINGS join_use_nulls = 1

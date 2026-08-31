@@ -109,3 +109,4 @@ FROM (
   GROUP BY
     COALESCE(subq_25.metric_time__alien_day, subq_37.metric_time__alien_day)
 ) subq_38
+SETTINGS join_use_nulls = 1

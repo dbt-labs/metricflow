@@ -44,3 +44,4 @@ ON
 GROUP BY
   subq_25.metric_time__day
   , subq_30.user__home_state_latest
+SETTINGS join_use_nulls = 1

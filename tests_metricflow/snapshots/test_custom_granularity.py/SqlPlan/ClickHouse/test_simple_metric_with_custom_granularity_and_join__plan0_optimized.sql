@@ -21,3 +21,4 @@ ON
   toStartOfDay(listings_latest_src_28000.created_at) = subq_16.ds
 GROUP BY
   subq_16.alien_day
+SETTINGS join_use_nulls = 1

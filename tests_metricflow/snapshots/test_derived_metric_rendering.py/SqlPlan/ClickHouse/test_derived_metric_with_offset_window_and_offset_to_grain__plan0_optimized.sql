@@ -60,3 +60,4 @@ FROM (
   GROUP BY
     COALESCE(subq_33.metric_time__day, subq_43.metric_time__day)
 ) subq_44
+SETTINGS join_use_nulls = 1

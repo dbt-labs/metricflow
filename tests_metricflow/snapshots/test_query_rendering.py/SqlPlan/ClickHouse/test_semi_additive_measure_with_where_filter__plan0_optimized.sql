@@ -50,3 +50,4 @@ ON
   )
 GROUP BY
   subq_13.user
+SETTINGS join_use_nulls = 1

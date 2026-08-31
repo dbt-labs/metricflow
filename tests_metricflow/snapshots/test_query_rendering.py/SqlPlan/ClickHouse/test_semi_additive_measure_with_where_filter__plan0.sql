@@ -106,7 +106,7 @@ FROM (
                   , toQuarter(accounts_source_src_28000.ds) AS ds__extract_quarter
                   , toMonth(accounts_source_src_28000.ds) AS ds__extract_month
                   , toDayOfMonth(accounts_source_src_28000.ds) AS ds__extract_day
-                  , toDayOfWeek(accounts_source_src_28000.ds) AS ds__extract_dow
+                  , toDayOfWeek(accounts_source_src_28000.ds, 0) AS ds__extract_dow
                   , toDayOfYear(accounts_source_src_28000.ds) AS ds__extract_doy
                   , toStartOfMonth(accounts_source_src_28000.ds_month) AS ds_month__month
                   , toStartOfQuarter(accounts_source_src_28000.ds_month) AS ds_month__quarter
@@ -124,7 +124,7 @@ FROM (
                   , toQuarter(accounts_source_src_28000.ds) AS account__ds__extract_quarter
                   , toMonth(accounts_source_src_28000.ds) AS account__ds__extract_month
                   , toDayOfMonth(accounts_source_src_28000.ds) AS account__ds__extract_day
-                  , toDayOfWeek(accounts_source_src_28000.ds) AS account__ds__extract_dow
+                  , toDayOfWeek(accounts_source_src_28000.ds, 0) AS account__ds__extract_dow
                   , toDayOfYear(accounts_source_src_28000.ds) AS account__ds__extract_doy
                   , toStartOfMonth(accounts_source_src_28000.ds_month) AS account__ds_month__month
                   , toStartOfQuarter(accounts_source_src_28000.ds_month) AS account__ds_month__quarter
@@ -226,7 +226,7 @@ FROM (
                     , toQuarter(accounts_source_src_28000.ds) AS ds__extract_quarter
                     , toMonth(accounts_source_src_28000.ds) AS ds__extract_month
                     , toDayOfMonth(accounts_source_src_28000.ds) AS ds__extract_day
-                    , toDayOfWeek(accounts_source_src_28000.ds) AS ds__extract_dow
+                    , toDayOfWeek(accounts_source_src_28000.ds, 0) AS ds__extract_dow
                     , toDayOfYear(accounts_source_src_28000.ds) AS ds__extract_doy
                     , toStartOfMonth(accounts_source_src_28000.ds_month) AS ds_month__month
                     , toStartOfQuarter(accounts_source_src_28000.ds_month) AS ds_month__quarter
@@ -244,7 +244,7 @@ FROM (
                     , toQuarter(accounts_source_src_28000.ds) AS account__ds__extract_quarter
                     , toMonth(accounts_source_src_28000.ds) AS account__ds__extract_month
                     , toDayOfMonth(accounts_source_src_28000.ds) AS account__ds__extract_day
-                    , toDayOfWeek(accounts_source_src_28000.ds) AS account__ds__extract_dow
+                    , toDayOfWeek(accounts_source_src_28000.ds, 0) AS account__ds__extract_dow
                     , toDayOfYear(accounts_source_src_28000.ds) AS account__ds__extract_doy
                     , toStartOfMonth(accounts_source_src_28000.ds_month) AS account__ds_month__month
                     , toStartOfQuarter(accounts_source_src_28000.ds_month) AS account__ds_month__quarter
@@ -276,3 +276,4 @@ FROM (
       subq_7.user
   ) subq_8
 ) subq_9
+SETTINGS join_use_nulls = 1

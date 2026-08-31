@@ -7,3 +7,4 @@ sql_engine: ClickHouse
 SELECT
   quantileExact(0.5)(a.col0) AS col0_percentile
 FROM foo.bar a
+SETTINGS join_use_nulls = 1

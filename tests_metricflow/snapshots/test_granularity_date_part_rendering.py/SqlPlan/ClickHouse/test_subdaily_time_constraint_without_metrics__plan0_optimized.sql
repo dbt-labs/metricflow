@@ -8,3 +8,4 @@ FROM ***************************.mf_time_spine_second time_spine_src_28003
 WHERE ts BETWEEN '2020-01-01 00:00:02' AND '2020-01-01 00:00:08'
 GROUP BY
   ts
+SETTINGS join_use_nulls = 1

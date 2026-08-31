@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative all-time metric queried with non-default grains.
 
-      Uses only metric_time. Excludes default grain.
+  Uses only metric_time. Excludes default grain.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -151,7 +151,7 @@ FROM (
                       , toQuarter(revenue_src_28000.created_at) AS ds__extract_quarter
                       , toMonth(revenue_src_28000.created_at) AS ds__extract_month
                       , toDayOfMonth(revenue_src_28000.created_at) AS ds__extract_day
-                      , toDayOfWeek(revenue_src_28000.created_at) AS ds__extract_dow
+                      , toDayOfWeek(revenue_src_28000.created_at, 0) AS ds__extract_dow
                       , toDayOfYear(revenue_src_28000.created_at) AS ds__extract_doy
                       , toStartOfDay(revenue_src_28000.created_at) AS revenue_instance__ds__day
                       , toStartOfWeek(revenue_src_28000.created_at, 1) AS revenue_instance__ds__week
@@ -162,7 +162,7 @@ FROM (
                       , toQuarter(revenue_src_28000.created_at) AS revenue_instance__ds__extract_quarter
                       , toMonth(revenue_src_28000.created_at) AS revenue_instance__ds__extract_month
                       , toDayOfMonth(revenue_src_28000.created_at) AS revenue_instance__ds__extract_day
-                      , toDayOfWeek(revenue_src_28000.created_at) AS revenue_instance__ds__extract_dow
+                      , toDayOfWeek(revenue_src_28000.created_at, 0) AS revenue_instance__ds__extract_dow
                       , toDayOfYear(revenue_src_28000.created_at) AS revenue_instance__ds__extract_doy
                       , revenue_src_28000.user_id AS user
                       , revenue_src_28000.user_id AS revenue_instance__user
@@ -187,3 +187,4 @@ FROM (
     , subq_10.metric_time__quarter
     , subq_10.revenue_all_time
 ) subq_11
+SETTINGS join_use_nulls = 1

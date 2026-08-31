@@ -32,3 +32,4 @@ FROM (
   ON
     subq_19.metric_time__month = subq_15.metric_time__month
 ) subq_20
+SETTINGS join_use_nulls = 1

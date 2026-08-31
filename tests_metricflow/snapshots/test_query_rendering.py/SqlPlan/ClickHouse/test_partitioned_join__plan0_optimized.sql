@@ -24,3 +24,4 @@ ON
   )
 GROUP BY
   users_ds_source_src_28000.home_state
+SETTINGS join_use_nulls = 1

@@ -23,27 +23,26 @@ FROM (
     , MAX(subq_37.bookers) AS bookers
   FROM (
     SELECT
-      metric_time__month
-      , SUM(__booking_value) AS booking_value
+      subq_25.metric_time__month AS metric_time__month
+      , SUM(sma_28009_cte.__booking_value) AS booking_value
     FROM (
       SELECT
-        booking_value AS __booking_value
+        metric_time__day
         , metric_time__month
       FROM (
         SELECT
-          time_spine_src_28006.ds AS metric_time__day
-          , toStartOfMonth(time_spine_src_28006.ds) AS metric_time__month
-          , sma_28009_cte.__booking_value AS booking_value
+          ds AS metric_time__day
+          , toStartOfMonth(ds) AS metric_time__month
         FROM ***************************.mf_time_spine time_spine_src_28006
-        INNER JOIN
-          sma_28009_cte
-        ON
-          addDays(time_spine_src_28006.ds, -7) = sma_28009_cte.metric_time__day
-      ) subq_27
+      ) subq_24
       WHERE metric_time__day = '2020-01-01'
-    ) subq_28
+    ) subq_25
+    INNER JOIN
+      sma_28009_cte
+    ON
+      addDays(subq_25.metric_time__day, -7) = sma_28009_cte.metric_time__day
     GROUP BY
-      metric_time__month
+      subq_25.metric_time__month
   ) subq_31
   FULL OUTER JOIN (
     SELECT
@@ -70,3 +69,4 @@ FROM (
   GROUP BY
     COALESCE(subq_31.metric_time__month, subq_37.metric_time__month)
 ) subq_38
+SETTINGS join_use_nulls = 1

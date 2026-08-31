@@ -7,3 +7,4 @@ SELECT
   , a.bookings
 FROM demo.fct_bookings a
 ORDER BY a.booking_value, a.bookings DESC
+SETTINGS join_use_nulls = 1

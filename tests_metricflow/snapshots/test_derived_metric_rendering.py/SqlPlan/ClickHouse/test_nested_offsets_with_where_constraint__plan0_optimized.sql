@@ -51,3 +51,4 @@ FROM (
   ) subq_35
   WHERE metric_time__day = '2020-01-12' or metric_time__day = '2020-01-13'
 ) subq_36
+SETTINGS join_use_nulls = 1

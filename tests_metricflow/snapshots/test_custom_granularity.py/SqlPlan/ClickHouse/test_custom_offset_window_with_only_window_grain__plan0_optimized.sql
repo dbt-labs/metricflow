@@ -47,3 +47,4 @@ FROM (
     subq_17.metric_time__alien_day
     , subq_17.booking__ds__alien_day
 ) subq_24
+SETTINGS join_use_nulls = 1

@@ -7,3 +7,4 @@ sql_engine: ClickHouse
 SELECT
   SUM(1) AS bookings
 FROM demo.fct_bookings a
+SETTINGS join_use_nulls = 1

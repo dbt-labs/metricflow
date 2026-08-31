@@ -7,3 +7,4 @@ SELECT
 FROM ***************************.dim_users users_ds_source_src_28000
 GROUP BY
   toStartOfSecond(bio_added_ts)
+SETTINGS join_use_nulls = 1

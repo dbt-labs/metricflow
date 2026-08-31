@@ -13,3 +13,4 @@ GROUP BY
   src0.ds
 ORDER BY ds
 LIMIT 1
+SETTINGS join_use_nulls = 1

@@ -19,3 +19,4 @@ INNER JOIN (
 ) subq_13
 ON
   subq_11.ds_month__month = subq_13.ds_month__month__complete
+SETTINGS join_use_nulls = 1

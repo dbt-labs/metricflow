@@ -38,3 +38,4 @@ LEFT OUTER JOIN (
 ) subq_18
 ON
   subq_23.metric_time__hour = subq_18.metric_time__hour
+SETTINGS join_use_nulls = 1

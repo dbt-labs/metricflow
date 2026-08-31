@@ -7,3 +7,4 @@ sql_engine: ClickHouse
 SELECT
   addMonths('2020-01-01', (1) * 3) AS add_time
 FROM foo.bar a
+SETTINGS join_use_nulls = 1

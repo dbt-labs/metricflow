@@ -20,3 +20,4 @@ ON
   )
 GROUP BY
   subq_13.ts
+SETTINGS join_use_nulls = 1

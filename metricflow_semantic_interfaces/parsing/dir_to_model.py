@@ -60,6 +60,23 @@ SAVED_QUERY_TYPE = "saved_query"
 DOCUMENT_TYPES = [METRIC_TYPE, SEMANTIC_MODEL_TYPE, PROJECT_CONFIGURATION_TYPE, SAVED_QUERY_TYPE]
 
 
+def _read_config_file_text(file_path: str) -> str:
+    """Read a YAML config file, following git symlink placeholders on Windows.
+
+    Without `core.symlinks=true`, Git checks out symlink files as the target path
+    text. Test manifests share `project_configuration.yaml` that way.
+    """
+    with open(file_path, encoding="utf-8") as handle:
+        contents = handle.read()
+    stripped = contents.strip()
+    if "\n" not in stripped and (stripped.endswith(".yaml") or stripped.endswith(".yml")):
+        candidate = os.path.normpath(os.path.join(os.path.dirname(file_path), stripped))
+        if os.path.isfile(candidate):
+            with open(candidate, encoding="utf-8") as handle:
+                return handle.read()
+    return contents
+
+
 @dataclass(frozen=True)
 class SemanticManifestBuildResult:  # noqa: D101
     semantic_manifest: PydanticSemanticManifest
@@ -142,11 +159,10 @@ def parse_yaml_file_paths_to_semantic_manifest(
     yaml_config_files = []
     for file_path in file_paths:
         try:
-            with open(file_path) as f:
-                contents = Template(f.read()).substitute(template_mapping)
-                yaml_config_files.append(
-                    YamlConfigFile(filepath=file_path, contents=contents),
-                )
+            contents = Template(_read_config_file_text(file_path)).substitute(template_mapping)
+            yaml_config_files.append(
+                YamlConfigFile(filepath=file_path, contents=contents),
+            )
         except UnicodeDecodeError as e:
             # We could alternatively return this as a validation issue, but this
             # exception is hit *before* building the semantic manifest. Currently, the

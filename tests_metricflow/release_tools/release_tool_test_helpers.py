@@ -297,7 +297,12 @@ def _tmp_replacement_path(path: Path, tmp_path: Path) -> str:
 
 
 def _tmp_replacement_text(text: str, tmp_path: Path) -> str:
-    return text.replace(str(tmp_path), "<TMP>").replace(str(_RELEASE_TOOL_DIRECTORY_PATH), "<RELEASE_TOOL>")
+    """Normalize temp paths in snapshots.
+
+    On Windows, ``Path`` stringifies with backslashes; snapshots are POSIX.
+    """
+    replaced = text.replace(str(tmp_path), "<TMP>").replace(str(_RELEASE_TOOL_DIRECTORY_PATH), "<RELEASE_TOOL>")
+    return replaced.replace("\\", "/")
 
 
 def _normalize_workflow_inputs(inputs: Mapping[str, str] | None) -> tuple[tuple[str, str], ...] | None:

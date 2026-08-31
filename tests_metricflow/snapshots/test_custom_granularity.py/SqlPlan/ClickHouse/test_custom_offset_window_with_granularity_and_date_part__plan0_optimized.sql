@@ -80,3 +80,4 @@ FROM (
     , toStartOfMonth(subq_29.ds__day__lead)
     , toYear(subq_29.ds__day__lead)
 ) subq_38
+SETTINGS join_use_nulls = 1

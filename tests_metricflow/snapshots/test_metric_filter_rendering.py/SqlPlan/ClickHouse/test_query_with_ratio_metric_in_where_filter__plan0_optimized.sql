@@ -39,3 +39,4 @@ FROM (
   ) subq_55
   WHERE listing__bookings_per_booker > 1
 ) subq_56
+SETTINGS join_use_nulls = 1

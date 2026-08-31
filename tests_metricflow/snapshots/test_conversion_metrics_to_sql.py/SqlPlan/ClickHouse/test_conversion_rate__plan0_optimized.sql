@@ -93,3 +93,4 @@ FROM (
   GROUP BY
     COALESCE(subq_22.visit__referrer_id, subq_33.visit__referrer_id)
 ) subq_34
+SETTINGS join_use_nulls = 1

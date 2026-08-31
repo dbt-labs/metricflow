@@ -20,3 +20,4 @@ ON
 GROUP BY
   b.country
   , c.country
+SETTINGS join_use_nulls = 1

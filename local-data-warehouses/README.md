@@ -29,6 +29,11 @@ poetry run pytest tests/
 
 ## ClickHouse
 
+ClickHouse support is **experimental**. MetricFlow compiles `SETTINGS join_use_nulls = 1` on generated
+SQL so unmatched LEFT/FULL OUTER JOIN cells are SQL NULL (ClickHouse otherwise fills numeric/string
+cells with `0` / `''`). This engine path does not emit `FINAL` for ReplacingMergeTree / CDC tables,
+and it is not wired into hosted Semantic Layer / Fusion.
+
 We assume that you have Docker installed in your environment.
 
 In a separate terminal window, run ClickHouse in the background. Note - you MUST have Docker running on localhost in order for the ClickHouse container to spin up.
@@ -44,7 +49,7 @@ to access the ClickHouse instance.
 export MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
 export MF_SQL_ENGINE_PASSWORD="metricflowing"
 
-hatch run clickhouse-env:pytest tests/
+hatch run clickhouse-env:pytest tests_metricflow/
 ```
 
 The ClickHouse container exposes:

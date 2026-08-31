@@ -1,1 +1,1 @@
-dbt-clickhouse
+dbt-clickhouse>=1.8,<2

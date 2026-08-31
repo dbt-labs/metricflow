@@ -163,7 +163,7 @@ FROM (
                       , toQuarter(revenue_src_28000.created_at) AS ds__extract_quarter
                       , toMonth(revenue_src_28000.created_at) AS ds__extract_month
                       , toDayOfMonth(revenue_src_28000.created_at) AS ds__extract_day
-                      , toDayOfWeek(revenue_src_28000.created_at) AS ds__extract_dow
+                      , toDayOfWeek(revenue_src_28000.created_at, 0) AS ds__extract_dow
                       , toDayOfYear(revenue_src_28000.created_at) AS ds__extract_doy
                       , toStartOfDay(revenue_src_28000.created_at) AS revenue_instance__ds__day
                       , toStartOfWeek(revenue_src_28000.created_at, 1) AS revenue_instance__ds__week
@@ -174,7 +174,7 @@ FROM (
                       , toQuarter(revenue_src_28000.created_at) AS revenue_instance__ds__extract_quarter
                       , toMonth(revenue_src_28000.created_at) AS revenue_instance__ds__extract_month
                       , toDayOfMonth(revenue_src_28000.created_at) AS revenue_instance__ds__extract_day
-                      , toDayOfWeek(revenue_src_28000.created_at) AS revenue_instance__ds__extract_dow
+                      , toDayOfWeek(revenue_src_28000.created_at, 0) AS revenue_instance__ds__extract_dow
                       , toDayOfYear(revenue_src_28000.created_at) AS revenue_instance__ds__extract_doy
                       , revenue_src_28000.user_id AS user
                       , revenue_src_28000.user_id AS revenue_instance__user
@@ -195,3 +195,4 @@ FROM (
     ) subq_13
   ) subq_14
 ) subq_15
+SETTINGS join_use_nulls = 1

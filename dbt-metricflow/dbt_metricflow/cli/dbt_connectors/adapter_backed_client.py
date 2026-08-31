@@ -159,6 +159,7 @@ class AdapterBackedSqlClient:
             LazyFormat("Running query() statement", statement=stmt, param_dict=sql_bind_parameter_set.param_dict)
         )
         with self._adapter.connection_named(f"MetricFlow_request_{request_id}"):
+            self._apply_engine_session_settings()
             # returns a Tuple[AdapterResponse, agate.Table] but the decorator converts it to Any
             result = self._adapter.execute(sql=stmt, auto_begin=True, fetch=True)
             logger.info(LazyFormat(lambda: f"query() returned from dbt Adapter with response {result[0]}"))
@@ -201,6 +202,7 @@ class AdapterBackedSqlClient:
             LazyFormat("Running execute() statement", statement=stmt, param_dict=sql_bind_parameter_set.param_dict)
         )
         with self._adapter.connection_named(f"MetricFlow_request_{request_id}"):
+            self._apply_engine_session_settings()
             result = self._adapter.execute(stmt, auto_begin=True, fetch=False)
             # Calls to execute often involve some amount of DDL so we commit here
             self._adapter.commit_if_has_connection()
@@ -245,7 +247,13 @@ class AdapterBackedSqlClient:
                 self._adapter.validate_sql(stmt)
         elif self.sql_engine_type is SqlEngine.CLICKHOUSE:
             with self._adapter.connection_named(connection_name):
-                self._adapter.execute(f"EXPLAIN SYNTAX run_query_tree_passes = 1 {stmt}", auto_begin=True, fetch=True)
+                clickhouse_stmt = stmt.strip().rstrip(";")
+                self._apply_engine_session_settings()
+                explain_prefix = "EXPLAIN QUERY TREE"
+                head = clickhouse_stmt.split(None, 1)[0].upper() if clickhouse_stmt else ""
+                if head not in {"SELECT", "WITH"}:
+                    explain_prefix = "EXPLAIN SYNTAX"
+                self._adapter.execute(f"{explain_prefix} {clickhouse_stmt}", auto_begin=True, fetch=True)
         else:
             is_databricks = self.sql_engine_type is SqlEngine.DATABRICKS
             with self._adapter.connection_named(connection_name):
@@ -266,6 +274,11 @@ class AdapterBackedSqlClient:
         stop = time.perf_counter()
         logger.info(LazyFormat("Finished running the dry run", runtime=f"{stop - start:.2f}s"))
         return
+
+    def _apply_engine_session_settings(self) -> None:
+        """Pin engine session contracts that MetricFlow assumes for generated SQL."""
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            self._adapter.execute("SET join_use_nulls = 1", auto_begin=True, fetch=False)
 
     def close(self) -> None:  # noqa: D102
         self._adapter.cancel_open_connections()

@@ -20,3 +20,4 @@ ON
 GROUP BY
   subq_13.ds
   , toStartOfMonth(subq_13.ds)
+SETTINGS join_use_nulls = 1

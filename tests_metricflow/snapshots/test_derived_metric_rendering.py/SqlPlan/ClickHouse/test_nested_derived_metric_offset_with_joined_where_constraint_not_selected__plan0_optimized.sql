@@ -62,3 +62,4 @@ FROM (
     WHERE booking__is_instant
   ) subq_37
 ) subq_38
+SETTINGS join_use_nulls = 1

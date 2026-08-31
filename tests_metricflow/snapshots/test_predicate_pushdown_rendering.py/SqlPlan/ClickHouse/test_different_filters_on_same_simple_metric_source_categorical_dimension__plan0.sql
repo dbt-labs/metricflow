@@ -3,13 +3,13 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where multiple filters against the same simple-metric input dimension need to be an effective OR.
 
-      This can be an issue where a derived metric takes in two filters that refer to the same dimension from the input
-      measure source. If these filters are disjoint the predicate pushdown needs to ensure that all matching rows are
-      returned, so we cannot simply push one filter or the other down, nor can we push them down as an AND - they
-      must be an OR, since all relevant rows need to be returned to the requesting metrics.
+  This can be an issue where a derived metric takes in two filters that refer to the same dimension from the input
+  measure source. If these filters are disjoint the predicate pushdown needs to ensure that all matching rows are
+  returned, so we cannot simply push one filter or the other down, nor can we push them down as an AND - they
+  must be an OR, since all relevant rows need to be returned to the requesting metrics.
 
-      The metric listed here has one input that filters on bookings__is_instant and another that does not, which means
-      the source input for the latter input must NOT have the filter applied to it.
+  The metric listed here has one input that filters on bookings__is_instant and another that does not, which means
+  the source input for the latter input must NOT have the filter applied to it.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -190,7 +190,7 @@ FROM (
                     , toQuarter(bookings_source_src_28000.ds) AS ds__extract_quarter
                     , toMonth(bookings_source_src_28000.ds) AS ds__extract_month
                     , toDayOfMonth(bookings_source_src_28000.ds) AS ds__extract_day
-                    , toDayOfWeek(bookings_source_src_28000.ds) AS ds__extract_dow
+                    , toDayOfWeek(bookings_source_src_28000.ds, 0) AS ds__extract_dow
                     , toDayOfYear(bookings_source_src_28000.ds) AS ds__extract_doy
                     , toStartOfDay(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__day
                     , toStartOfWeek(bookings_source_src_28000.ds_partitioned, 1) AS ds_partitioned__week
@@ -201,7 +201,7 @@ FROM (
                     , toQuarter(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_quarter
                     , toMonth(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_month
                     , toDayOfMonth(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_day
-                    , toDayOfWeek(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_dow
+                    , toDayOfWeek(bookings_source_src_28000.ds_partitioned, 0) AS ds_partitioned__extract_dow
                     , toDayOfYear(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_doy
                     , toStartOfDay(bookings_source_src_28000.paid_at) AS paid_at__day
                     , toStartOfWeek(bookings_source_src_28000.paid_at, 1) AS paid_at__week
@@ -212,7 +212,7 @@ FROM (
                     , toQuarter(bookings_source_src_28000.paid_at) AS paid_at__extract_quarter
                     , toMonth(bookings_source_src_28000.paid_at) AS paid_at__extract_month
                     , toDayOfMonth(bookings_source_src_28000.paid_at) AS paid_at__extract_day
-                    , toDayOfWeek(bookings_source_src_28000.paid_at) AS paid_at__extract_dow
+                    , toDayOfWeek(bookings_source_src_28000.paid_at, 0) AS paid_at__extract_dow
                     , toDayOfYear(bookings_source_src_28000.paid_at) AS paid_at__extract_doy
                     , bookings_source_src_28000.is_instant AS booking__is_instant
                     , toStartOfDay(bookings_source_src_28000.ds) AS booking__ds__day
@@ -224,7 +224,7 @@ FROM (
                     , toQuarter(bookings_source_src_28000.ds) AS booking__ds__extract_quarter
                     , toMonth(bookings_source_src_28000.ds) AS booking__ds__extract_month
                     , toDayOfMonth(bookings_source_src_28000.ds) AS booking__ds__extract_day
-                    , toDayOfWeek(bookings_source_src_28000.ds) AS booking__ds__extract_dow
+                    , toDayOfWeek(bookings_source_src_28000.ds, 0) AS booking__ds__extract_dow
                     , toDayOfYear(bookings_source_src_28000.ds) AS booking__ds__extract_doy
                     , toStartOfDay(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__day
                     , toStartOfWeek(bookings_source_src_28000.ds_partitioned, 1) AS booking__ds_partitioned__week
@@ -235,7 +235,7 @@ FROM (
                     , toQuarter(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_quarter
                     , toMonth(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_month
                     , toDayOfMonth(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_day
-                    , toDayOfWeek(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_dow
+                    , toDayOfWeek(bookings_source_src_28000.ds_partitioned, 0) AS booking__ds_partitioned__extract_dow
                     , toDayOfYear(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_doy
                     , toStartOfDay(bookings_source_src_28000.paid_at) AS booking__paid_at__day
                     , toStartOfWeek(bookings_source_src_28000.paid_at, 1) AS booking__paid_at__week
@@ -246,7 +246,7 @@ FROM (
                     , toQuarter(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_quarter
                     , toMonth(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_month
                     , toDayOfMonth(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_day
-                    , toDayOfWeek(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_dow
+                    , toDayOfWeek(bookings_source_src_28000.paid_at, 0) AS booking__paid_at__extract_dow
                     , toDayOfYear(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_doy
                     , bookings_source_src_28000.listing_id AS listing
                     , bookings_source_src_28000.guest_id AS guest
@@ -425,7 +425,7 @@ FROM (
                   , toQuarter(bookings_source_src_28000.ds) AS ds__extract_quarter
                   , toMonth(bookings_source_src_28000.ds) AS ds__extract_month
                   , toDayOfMonth(bookings_source_src_28000.ds) AS ds__extract_day
-                  , toDayOfWeek(bookings_source_src_28000.ds) AS ds__extract_dow
+                  , toDayOfWeek(bookings_source_src_28000.ds, 0) AS ds__extract_dow
                   , toDayOfYear(bookings_source_src_28000.ds) AS ds__extract_doy
                   , toStartOfDay(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__day
                   , toStartOfWeek(bookings_source_src_28000.ds_partitioned, 1) AS ds_partitioned__week
@@ -436,7 +436,7 @@ FROM (
                   , toQuarter(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_quarter
                   , toMonth(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_month
                   , toDayOfMonth(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_day
-                  , toDayOfWeek(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_dow
+                  , toDayOfWeek(bookings_source_src_28000.ds_partitioned, 0) AS ds_partitioned__extract_dow
                   , toDayOfYear(bookings_source_src_28000.ds_partitioned) AS ds_partitioned__extract_doy
                   , toStartOfDay(bookings_source_src_28000.paid_at) AS paid_at__day
                   , toStartOfWeek(bookings_source_src_28000.paid_at, 1) AS paid_at__week
@@ -447,7 +447,7 @@ FROM (
                   , toQuarter(bookings_source_src_28000.paid_at) AS paid_at__extract_quarter
                   , toMonth(bookings_source_src_28000.paid_at) AS paid_at__extract_month
                   , toDayOfMonth(bookings_source_src_28000.paid_at) AS paid_at__extract_day
-                  , toDayOfWeek(bookings_source_src_28000.paid_at) AS paid_at__extract_dow
+                  , toDayOfWeek(bookings_source_src_28000.paid_at, 0) AS paid_at__extract_dow
                   , toDayOfYear(bookings_source_src_28000.paid_at) AS paid_at__extract_doy
                   , bookings_source_src_28000.is_instant AS booking__is_instant
                   , toStartOfDay(bookings_source_src_28000.ds) AS booking__ds__day
@@ -459,7 +459,7 @@ FROM (
                   , toQuarter(bookings_source_src_28000.ds) AS booking__ds__extract_quarter
                   , toMonth(bookings_source_src_28000.ds) AS booking__ds__extract_month
                   , toDayOfMonth(bookings_source_src_28000.ds) AS booking__ds__extract_day
-                  , toDayOfWeek(bookings_source_src_28000.ds) AS booking__ds__extract_dow
+                  , toDayOfWeek(bookings_source_src_28000.ds, 0) AS booking__ds__extract_dow
                   , toDayOfYear(bookings_source_src_28000.ds) AS booking__ds__extract_doy
                   , toStartOfDay(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__day
                   , toStartOfWeek(bookings_source_src_28000.ds_partitioned, 1) AS booking__ds_partitioned__week
@@ -470,7 +470,7 @@ FROM (
                   , toQuarter(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_quarter
                   , toMonth(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_month
                   , toDayOfMonth(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_day
-                  , toDayOfWeek(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_dow
+                  , toDayOfWeek(bookings_source_src_28000.ds_partitioned, 0) AS booking__ds_partitioned__extract_dow
                   , toDayOfYear(bookings_source_src_28000.ds_partitioned) AS booking__ds_partitioned__extract_doy
                   , toStartOfDay(bookings_source_src_28000.paid_at) AS booking__paid_at__day
                   , toStartOfWeek(bookings_source_src_28000.paid_at, 1) AS booking__paid_at__week
@@ -481,7 +481,7 @@ FROM (
                   , toQuarter(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_quarter
                   , toMonth(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_month
                   , toDayOfMonth(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_day
-                  , toDayOfWeek(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_dow
+                  , toDayOfWeek(bookings_source_src_28000.paid_at, 0) AS booking__paid_at__extract_dow
                   , toDayOfYear(bookings_source_src_28000.paid_at) AS booking__paid_at__extract_doy
                   , bookings_source_src_28000.listing_id AS listing
                   , bookings_source_src_28000.guest_id AS guest
@@ -504,3 +504,4 @@ FROM (
       COALESCE(subq_6.metric_time__day, subq_11.metric_time__day)
   ) subq_12
 ) subq_13
+SETTINGS join_use_nulls = 1

@@ -25,3 +25,4 @@ ON
 WHERE subq_23.metric_time__day BETWEEN '2020-01-01' AND '2020-01-01'
 GROUP BY
   subq_23.metric_time__day
+SETTINGS join_use_nulls = 1

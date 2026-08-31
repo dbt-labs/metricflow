@@ -178,7 +178,6 @@ build-and-validate = [
 
 
 [tool.hatch.envs.clickhouse-env.env-vars]
-PYTHONPATH="metricflow-semantics:dbt-metricflow"
 MF_TEST_ADAPTER_TYPE="clickhouse"
 MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
 MF_SQL_ENGINE_PASSWORD="metricflowing"

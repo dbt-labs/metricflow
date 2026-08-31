@@ -31,3 +31,4 @@ ON
   )
 GROUP BY
   subq_28.customer_id__customer_name
+SETTINGS join_use_nulls = 1

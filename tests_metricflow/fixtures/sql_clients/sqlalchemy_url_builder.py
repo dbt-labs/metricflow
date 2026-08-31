@@ -289,18 +289,23 @@ class SqlAlchemyUrlBuilder:
     ) -> SqlAlchemyURL:
         """Build ClickHouse URL.
 
-        ClickHouse has database.table (no schema). MetricFlow's per-test schema maps to the
-        SQLAlchemy database field. join_use_nulls=1 is required so LEFT/FULL OUTER JOIN
-        unmatched cells are SQL NULL, matching MetricFlow fill-nulls / ratio logic.
+        ClickHouse has database.table (no schema). The URL database is the stable
+        warehouse database from MF_SQL_ENGINE_URL (e.g. metricflow). MetricFlow's
+        per-test schema is a separate CREATE DATABASE and appears in generated SQL
+        as database.table — it cannot be the connect-time database because that
+        database does not exist until setup runs.
+
+        join_use_nulls=1 is required so LEFT/FULL OUTER JOIN unmatched cells are
+        SQL NULL, matching MetricFlow fill-nulls / ratio logic.
         """
-        database_value = schema if schema else connection_params.database
+        del schema  # Used as CREATE DATABASE + qualified names, not connect-time database.
         return SqlAlchemyURL.create(
             drivername="clickhousedb",
             username=connection_params.username,
             password=password,
             host=connection_params.hostname,
             port=connection_params.port or 8123,
-            database=database_value,
+            database=connection_params.database,
             query={
                 "data_type_default_nullable": "1",
                 "join_use_nulls": "1",

@@ -183,7 +183,7 @@ def test_reduce_sub_query(
     )
 
     sub_query_reducer = SqlRewritingSubQueryReducer(
-        has_ambiguous_alias_resolution_in_where=sql_client.sql_engine_type is SqlEngine.CLICKHOUSE,
+        has_ambiguous_alias_resolution=sql_client.sql_engine_type is SqlEngine.CLICKHOUSE,
     )
 
     assert_rendered_sql_equal(

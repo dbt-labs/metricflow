@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we join to a time spine and query the filter input.
 
-      This should produce a SQL query that applies the filter outside of the time spine join.
+  This should produce a SQL query that applies the filter outside of the time spine join.
 sql_engine: ClickHouse
 ---
 WITH sma_28014_cte AS (
@@ -105,3 +105,4 @@ ON
   COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest) = subq_49.listing__capacity_latest
 GROUP BY
   COALESCE(cm_6_cte.listing__capacity_latest, cm_7_cte.listing__capacity_latest, subq_49.listing__capacity_latest)
+SETTINGS join_use_nulls = 1

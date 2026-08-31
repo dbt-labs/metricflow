@@ -25,3 +25,4 @@ FROM (
   GROUP BY
     subq_19.alien_day
 ) subq_24
+SETTINGS join_use_nulls = 1

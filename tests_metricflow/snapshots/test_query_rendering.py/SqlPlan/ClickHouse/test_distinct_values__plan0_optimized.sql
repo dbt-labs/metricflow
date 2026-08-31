@@ -20,3 +20,4 @@ GROUP BY
   listing__country_latest
 ORDER BY listing__country_latest DESC
 LIMIT 100
+SETTINGS join_use_nulls = 1

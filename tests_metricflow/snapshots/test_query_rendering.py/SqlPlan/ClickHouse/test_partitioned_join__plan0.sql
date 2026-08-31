@@ -163,7 +163,7 @@ FROM (
                 , toQuarter(id_verifications_src_28000.ds) AS ds__extract_quarter
                 , toMonth(id_verifications_src_28000.ds) AS ds__extract_month
                 , toDayOfMonth(id_verifications_src_28000.ds) AS ds__extract_day
-                , toDayOfWeek(id_verifications_src_28000.ds) AS ds__extract_dow
+                , toDayOfWeek(id_verifications_src_28000.ds, 0) AS ds__extract_dow
                 , toDayOfYear(id_verifications_src_28000.ds) AS ds__extract_doy
                 , toStartOfDay(id_verifications_src_28000.ds_partitioned) AS ds_partitioned__day
                 , toStartOfWeek(id_verifications_src_28000.ds_partitioned, 1) AS ds_partitioned__week
@@ -174,7 +174,7 @@ FROM (
                 , toQuarter(id_verifications_src_28000.ds_partitioned) AS ds_partitioned__extract_quarter
                 , toMonth(id_verifications_src_28000.ds_partitioned) AS ds_partitioned__extract_month
                 , toDayOfMonth(id_verifications_src_28000.ds_partitioned) AS ds_partitioned__extract_day
-                , toDayOfWeek(id_verifications_src_28000.ds_partitioned) AS ds_partitioned__extract_dow
+                , toDayOfWeek(id_verifications_src_28000.ds_partitioned, 0) AS ds_partitioned__extract_dow
                 , toDayOfYear(id_verifications_src_28000.ds_partitioned) AS ds_partitioned__extract_doy
                 , id_verifications_src_28000.verification_type
                 , toStartOfDay(id_verifications_src_28000.ds) AS verification__ds__day
@@ -186,7 +186,7 @@ FROM (
                 , toQuarter(id_verifications_src_28000.ds) AS verification__ds__extract_quarter
                 , toMonth(id_verifications_src_28000.ds) AS verification__ds__extract_month
                 , toDayOfMonth(id_verifications_src_28000.ds) AS verification__ds__extract_day
-                , toDayOfWeek(id_verifications_src_28000.ds) AS verification__ds__extract_dow
+                , toDayOfWeek(id_verifications_src_28000.ds, 0) AS verification__ds__extract_dow
                 , toDayOfYear(id_verifications_src_28000.ds) AS verification__ds__extract_doy
                 , toStartOfDay(id_verifications_src_28000.ds_partitioned) AS verification__ds_partitioned__day
                 , toStartOfWeek(id_verifications_src_28000.ds_partitioned, 1) AS verification__ds_partitioned__week
@@ -197,7 +197,7 @@ FROM (
                 , toQuarter(id_verifications_src_28000.ds_partitioned) AS verification__ds_partitioned__extract_quarter
                 , toMonth(id_verifications_src_28000.ds_partitioned) AS verification__ds_partitioned__extract_month
                 , toDayOfMonth(id_verifications_src_28000.ds_partitioned) AS verification__ds_partitioned__extract_day
-                , toDayOfWeek(id_verifications_src_28000.ds_partitioned) AS verification__ds_partitioned__extract_dow
+                , toDayOfWeek(id_verifications_src_28000.ds_partitioned, 0) AS verification__ds_partitioned__extract_dow
                 , toDayOfYear(id_verifications_src_28000.ds_partitioned) AS verification__ds_partitioned__extract_doy
                 , id_verifications_src_28000.verification_type AS verification__verification_type
                 , id_verifications_src_28000.verification_id AS verification
@@ -419,7 +419,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.ds) AS ds__extract_quarter
                   , toMonth(users_ds_source_src_28000.ds) AS ds__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.ds) AS ds__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.ds) AS ds__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.ds, 0) AS ds__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.ds) AS ds__extract_doy
                   , toStartOfDay(users_ds_source_src_28000.created_at) AS created_at__day
                   , toStartOfWeek(users_ds_source_src_28000.created_at, 1) AS created_at__week
@@ -430,7 +430,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.created_at) AS created_at__extract_quarter
                   , toMonth(users_ds_source_src_28000.created_at) AS created_at__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.created_at) AS created_at__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.created_at) AS created_at__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.created_at, 0) AS created_at__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.created_at) AS created_at__extract_doy
                   , toStartOfDay(users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__day
                   , toStartOfWeek(users_ds_source_src_28000.ds_partitioned, 1) AS ds_partitioned__week
@@ -441,7 +441,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_quarter
                   , toMonth(users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.ds_partitioned, 0) AS ds_partitioned__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.ds_partitioned) AS ds_partitioned__extract_doy
                   , users_ds_source_src_28000.home_state
                   , toStartOfMillisecond(users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__millisecond
@@ -457,7 +457,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_quarter
                   , toMonth(users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.last_profile_edit_ts, 0) AS last_profile_edit_ts__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.last_profile_edit_ts) AS last_profile_edit_ts__extract_doy
                   , toStartOfSecond(users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__second
                   , toStartOfMinute(users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__minute
@@ -471,7 +471,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_quarter
                   , toMonth(users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.bio_added_ts, 0) AS bio_added_ts__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.bio_added_ts) AS bio_added_ts__extract_doy
                   , toStartOfMinute(users_ds_source_src_28000.last_login_ts) AS last_login_ts__minute
                   , toStartOfHour(users_ds_source_src_28000.last_login_ts) AS last_login_ts__hour
@@ -484,7 +484,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_quarter
                   , toMonth(users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.last_login_ts, 0) AS last_login_ts__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.last_login_ts) AS last_login_ts__extract_doy
                   , toStartOfHour(users_ds_source_src_28000.archived_at) AS archived_at__hour
                   , toStartOfDay(users_ds_source_src_28000.archived_at) AS archived_at__day
@@ -496,7 +496,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.archived_at) AS archived_at__extract_quarter
                   , toMonth(users_ds_source_src_28000.archived_at) AS archived_at__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.archived_at) AS archived_at__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.archived_at) AS archived_at__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.archived_at, 0) AS archived_at__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.archived_at) AS archived_at__extract_doy
                   , toStartOfDay(users_ds_source_src_28000.ds) AS user__ds__day
                   , toStartOfWeek(users_ds_source_src_28000.ds, 1) AS user__ds__week
@@ -507,7 +507,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.ds) AS user__ds__extract_quarter
                   , toMonth(users_ds_source_src_28000.ds) AS user__ds__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.ds) AS user__ds__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.ds) AS user__ds__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.ds, 0) AS user__ds__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.ds) AS user__ds__extract_doy
                   , toStartOfDay(users_ds_source_src_28000.created_at) AS user__created_at__day
                   , toStartOfWeek(users_ds_source_src_28000.created_at, 1) AS user__created_at__week
@@ -518,7 +518,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.created_at) AS user__created_at__extract_quarter
                   , toMonth(users_ds_source_src_28000.created_at) AS user__created_at__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.created_at) AS user__created_at__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.created_at) AS user__created_at__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.created_at, 0) AS user__created_at__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.created_at) AS user__created_at__extract_doy
                   , toStartOfDay(users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__day
                   , toStartOfWeek(users_ds_source_src_28000.ds_partitioned, 1) AS user__ds_partitioned__week
@@ -529,7 +529,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_quarter
                   , toMonth(users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.ds_partitioned, 0) AS user__ds_partitioned__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.ds_partitioned) AS user__ds_partitioned__extract_doy
                   , users_ds_source_src_28000.home_state AS user__home_state
                   , toStartOfMillisecond(users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__millisecond
@@ -545,7 +545,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_quarter
                   , toMonth(users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.last_profile_edit_ts, 0) AS user__last_profile_edit_ts__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.last_profile_edit_ts) AS user__last_profile_edit_ts__extract_doy
                   , toStartOfSecond(users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__second
                   , toStartOfMinute(users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__minute
@@ -559,7 +559,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_quarter
                   , toMonth(users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.bio_added_ts, 0) AS user__bio_added_ts__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.bio_added_ts) AS user__bio_added_ts__extract_doy
                   , toStartOfMinute(users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__minute
                   , toStartOfHour(users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__hour
@@ -572,7 +572,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_quarter
                   , toMonth(users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.last_login_ts, 0) AS user__last_login_ts__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.last_login_ts) AS user__last_login_ts__extract_doy
                   , toStartOfHour(users_ds_source_src_28000.archived_at) AS user__archived_at__hour
                   , toStartOfDay(users_ds_source_src_28000.archived_at) AS user__archived_at__day
@@ -584,7 +584,7 @@ FROM (
                   , toQuarter(users_ds_source_src_28000.archived_at) AS user__archived_at__extract_quarter
                   , toMonth(users_ds_source_src_28000.archived_at) AS user__archived_at__extract_month
                   , toDayOfMonth(users_ds_source_src_28000.archived_at) AS user__archived_at__extract_day
-                  , toDayOfWeek(users_ds_source_src_28000.archived_at) AS user__archived_at__extract_dow
+                  , toDayOfWeek(users_ds_source_src_28000.archived_at, 0) AS user__archived_at__extract_dow
                   , toDayOfYear(users_ds_source_src_28000.archived_at) AS user__archived_at__extract_doy
                   , users_ds_source_src_28000.user_id AS user
                 FROM ***************************.dim_users users_ds_source_src_28000
@@ -604,3 +604,4 @@ FROM (
       subq_7.user__home_state
   ) subq_8
 ) subq_9
+SETTINGS join_use_nulls = 1

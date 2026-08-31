@@ -37,3 +37,4 @@ FROM (
 GROUP BY
   metric_time__day
   , listing__capacity_latest
+SETTINGS join_use_nulls = 1

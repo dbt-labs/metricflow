@@ -14,3 +14,4 @@ FROM (
   GROUP BY
     toStartOfWeek(ds, 1)
 ) subq_8
+SETTINGS join_use_nulls = 1

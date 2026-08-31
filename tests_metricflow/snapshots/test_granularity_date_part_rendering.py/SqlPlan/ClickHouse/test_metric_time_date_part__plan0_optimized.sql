@@ -7,3 +7,4 @@ SELECT
 FROM ***************************.mf_time_spine time_spine_src_28006
 GROUP BY
   toYear(ds)
+SETTINGS join_use_nulls = 1

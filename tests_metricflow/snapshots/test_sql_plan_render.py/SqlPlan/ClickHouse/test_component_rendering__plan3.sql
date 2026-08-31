@@ -17,3 +17,4 @@ LEFT OUTER JOIN
   demo.dim_listings c
 ON
   a.user_id = c.user_id
+SETTINGS join_use_nulls = 1

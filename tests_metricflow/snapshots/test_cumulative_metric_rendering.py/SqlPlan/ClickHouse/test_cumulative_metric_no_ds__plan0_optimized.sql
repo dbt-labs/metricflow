@@ -7,3 +7,4 @@ sql_engine: ClickHouse
 SELECT
   SUM(revenue) AS trailing_2_months_revenue
 FROM ***************************.fct_revenue revenue_src_28000
+SETTINGS join_use_nulls = 1

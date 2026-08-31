@@ -42,6 +42,11 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
             column_defs.append(f"{col_desc.column_name} {sql_type}")
 
         create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)})"
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            create_stmt = (
+                f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)}) "
+                "ENGINE = MergeTree ORDER BY tuple()"
+            )
 
         # Execute CREATE TABLE
         self.execute(create_stmt)
@@ -69,6 +74,12 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
                 for cell in row:
                     if cell is None:
                         cells.append("null")
+                    elif isinstance(cell, bool):
+                        # bool is a subclass of int; handle before the generic numeric path.
+                        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                            cells.append("true" if cell else "false")
+                        else:
+                            cells.append(str(cell))
                     elif isinstance(cell, str):
                         # Escape and quote strings
                         escaped = self._quote_escape_value(str(cell))
@@ -104,14 +115,20 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
         column_type = column_description.column_type
 
         if column_type is str:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "String"
             if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY):
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
             return "text"
         elif column_type is bool:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "Bool"
             return "boolean"
         elif column_type is int:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "Int64"
             return "bigint"
         elif column_type is float:
             return self._sql_plan_renderer.expr_renderer.double_data_type

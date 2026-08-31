@@ -70,3 +70,4 @@ FROM (
   GROUP BY
     subq_28.ds__day__lead
 ) subq_36
+SETTINGS join_use_nulls = 1

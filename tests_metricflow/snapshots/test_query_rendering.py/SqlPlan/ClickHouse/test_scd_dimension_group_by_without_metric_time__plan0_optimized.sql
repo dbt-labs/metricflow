@@ -41,3 +41,4 @@ FROM (
 ) subq_16
 GROUP BY
   listing__capacity
+SETTINGS join_use_nulls = 1

@@ -37,3 +37,4 @@ FROM (
   ) subq_15
   WHERE listing__capacity > 2
 ) subq_16
+SETTINGS join_use_nulls = 1

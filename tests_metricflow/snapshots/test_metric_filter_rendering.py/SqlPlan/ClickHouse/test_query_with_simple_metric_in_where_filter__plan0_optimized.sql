@@ -37,3 +37,4 @@ FROM (
   ) subq_33
   WHERE listing__bookings > 2
 ) subq_34
+SETTINGS join_use_nulls = 1

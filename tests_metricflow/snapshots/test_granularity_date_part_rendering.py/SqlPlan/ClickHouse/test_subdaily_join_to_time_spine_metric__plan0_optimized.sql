@@ -21,3 +21,4 @@ LEFT OUTER JOIN (
 ) subq_15
 ON
   time_spine_src_28005.ts = subq_15.metric_time__hour
+SETTINGS join_use_nulls = 1

@@ -11,3 +11,4 @@ ON
   time_spine_src_28006.ds = subq_6.ds
 GROUP BY
   subq_6.alien_day
+SETTINGS join_use_nulls = 1

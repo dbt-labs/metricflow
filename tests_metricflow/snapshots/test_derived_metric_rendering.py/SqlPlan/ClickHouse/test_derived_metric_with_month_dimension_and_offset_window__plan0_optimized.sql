@@ -27,3 +27,4 @@ FROM (
   ON
     addMonths(subq_20.metric_time__month, -1) = subq_16.metric_time__month
 ) subq_22
+SETTINGS join_use_nulls = 1

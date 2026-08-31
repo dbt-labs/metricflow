@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we join to a time spine and query the filter input.
 
-      This should produce a SQL query that applies the filter outside of the time spine join.
+  This should produce a SQL query that applies the filter outside of the time spine join.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -49,3 +49,4 @@ FROM (
   ) subq_23
   WHERE booking__is_instant
 ) subq_24
+SETTINGS join_use_nulls = 1

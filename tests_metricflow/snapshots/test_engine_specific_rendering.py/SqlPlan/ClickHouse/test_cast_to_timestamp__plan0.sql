@@ -7,3 +7,4 @@ sql_engine: ClickHouse
 SELECT
   CAST('2020-01-01' AS Nullable(DateTime64(3))) AS col0
 FROM foo.bar a
+SETTINGS join_use_nulls = 1

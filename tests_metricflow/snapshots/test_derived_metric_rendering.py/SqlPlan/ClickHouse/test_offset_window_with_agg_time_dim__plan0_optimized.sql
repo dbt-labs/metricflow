@@ -46,3 +46,4 @@ FROM (
   GROUP BY
     COALESCE(subq_23.booking__ds__day, subq_33.booking__ds__day)
 ) subq_34
+SETTINGS join_use_nulls = 1

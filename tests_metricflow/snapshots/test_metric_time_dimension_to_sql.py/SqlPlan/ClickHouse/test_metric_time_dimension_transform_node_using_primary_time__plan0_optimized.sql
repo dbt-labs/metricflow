@@ -14,7 +14,7 @@ SELECT
   , toQuarter(ds) AS ds__extract_quarter
   , toMonth(ds) AS ds__extract_month
   , toDayOfMonth(ds) AS ds__extract_day
-  , toDayOfWeek(ds) AS ds__extract_dow
+  , toDayOfWeek(ds, 0) AS ds__extract_dow
   , toDayOfYear(ds) AS ds__extract_doy
   , toStartOfDay(ds_partitioned) AS ds_partitioned__day
   , toStartOfWeek(ds_partitioned, 1) AS ds_partitioned__week
@@ -25,7 +25,7 @@ SELECT
   , toQuarter(ds_partitioned) AS ds_partitioned__extract_quarter
   , toMonth(ds_partitioned) AS ds_partitioned__extract_month
   , toDayOfMonth(ds_partitioned) AS ds_partitioned__extract_day
-  , toDayOfWeek(ds_partitioned) AS ds_partitioned__extract_dow
+  , toDayOfWeek(ds_partitioned, 0) AS ds_partitioned__extract_dow
   , toDayOfYear(ds_partitioned) AS ds_partitioned__extract_doy
   , toStartOfDay(paid_at) AS paid_at__day
   , toStartOfWeek(paid_at, 1) AS paid_at__week
@@ -36,7 +36,7 @@ SELECT
   , toQuarter(paid_at) AS paid_at__extract_quarter
   , toMonth(paid_at) AS paid_at__extract_month
   , toDayOfMonth(paid_at) AS paid_at__extract_day
-  , toDayOfWeek(paid_at) AS paid_at__extract_dow
+  , toDayOfWeek(paid_at, 0) AS paid_at__extract_dow
   , toDayOfYear(paid_at) AS paid_at__extract_doy
   , toStartOfDay(ds) AS booking__ds__day
   , toStartOfWeek(ds, 1) AS booking__ds__week
@@ -47,7 +47,7 @@ SELECT
   , toQuarter(ds) AS booking__ds__extract_quarter
   , toMonth(ds) AS booking__ds__extract_month
   , toDayOfMonth(ds) AS booking__ds__extract_day
-  , toDayOfWeek(ds) AS booking__ds__extract_dow
+  , toDayOfWeek(ds, 0) AS booking__ds__extract_dow
   , toDayOfYear(ds) AS booking__ds__extract_doy
   , toStartOfDay(ds_partitioned) AS booking__ds_partitioned__day
   , toStartOfWeek(ds_partitioned, 1) AS booking__ds_partitioned__week
@@ -58,7 +58,7 @@ SELECT
   , toQuarter(ds_partitioned) AS booking__ds_partitioned__extract_quarter
   , toMonth(ds_partitioned) AS booking__ds_partitioned__extract_month
   , toDayOfMonth(ds_partitioned) AS booking__ds_partitioned__extract_day
-  , toDayOfWeek(ds_partitioned) AS booking__ds_partitioned__extract_dow
+  , toDayOfWeek(ds_partitioned, 0) AS booking__ds_partitioned__extract_dow
   , toDayOfYear(ds_partitioned) AS booking__ds_partitioned__extract_doy
   , toStartOfDay(paid_at) AS booking__paid_at__day
   , toStartOfWeek(paid_at, 1) AS booking__paid_at__week
@@ -69,7 +69,7 @@ SELECT
   , toQuarter(paid_at) AS booking__paid_at__extract_quarter
   , toMonth(paid_at) AS booking__paid_at__extract_month
   , toDayOfMonth(paid_at) AS booking__paid_at__extract_day
-  , toDayOfWeek(paid_at) AS booking__paid_at__extract_dow
+  , toDayOfWeek(paid_at, 0) AS booking__paid_at__extract_dow
   , toDayOfYear(paid_at) AS booking__paid_at__extract_doy
   , toStartOfDay(ds) AS metric_time__day
   , toStartOfWeek(ds, 1) AS metric_time__week
@@ -80,7 +80,7 @@ SELECT
   , toQuarter(ds) AS metric_time__extract_quarter
   , toMonth(ds) AS metric_time__extract_month
   , toDayOfMonth(ds) AS metric_time__extract_day
-  , toDayOfWeek(ds) AS metric_time__extract_dow
+  , toDayOfWeek(ds, 0) AS metric_time__extract_dow
   , toDayOfYear(ds) AS metric_time__extract_doy
   , listing_id AS listing
   , guest_id AS guest
@@ -113,3 +113,4 @@ SELECT
   , 1 AS __bookings_join_to_time_spine_with_tiered_filters
   , guest_id AS __bookers_fill_nulls_with_0_join_to_timespine
 FROM ***************************.fct_bookings bookings_source_src_28000
+SETTINGS join_use_nulls = 1

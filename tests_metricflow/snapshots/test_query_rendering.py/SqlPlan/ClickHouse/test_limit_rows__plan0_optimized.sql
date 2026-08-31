@@ -16,3 +16,4 @@ FROM (
 GROUP BY
   ds__day
 LIMIT 1
+SETTINGS join_use_nulls = 1

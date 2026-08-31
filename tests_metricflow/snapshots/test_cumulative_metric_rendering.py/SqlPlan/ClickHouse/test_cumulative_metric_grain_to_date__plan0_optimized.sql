@@ -10,3 +10,4 @@ SELECT
 FROM ***************************.fct_revenue revenue_src_28000
 GROUP BY
   toStartOfMonth(created_at)
+SETTINGS join_use_nulls = 1

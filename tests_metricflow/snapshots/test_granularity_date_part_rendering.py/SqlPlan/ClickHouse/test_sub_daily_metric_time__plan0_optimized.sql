@@ -7,3 +7,4 @@ SELECT
 FROM ***************************.mf_time_spine_millisecond time_spine_src_28002
 GROUP BY
   ts
+SETTINGS join_use_nulls = 1

@@ -47,7 +47,7 @@ class SqlGenerationOptionSet:
     def options_for_level(  # noqa: D102
         level: SqlOptimizationLevel,
         use_column_alias_in_group_by: bool,
-        has_ambiguous_alias_resolution_in_where: bool = False,
+        has_ambiguous_alias_resolution: bool = False,
     ) -> SqlGenerationOptionSet:
         optimizers: Tuple[SqlPlanOptimizer, ...] = ()
         allow_cte = False
@@ -64,7 +64,7 @@ class SqlGenerationOptionSet:
                 SqlColumnPrunerOptimizer(),
                 SqlRewritingSubQueryReducer(
                     use_column_alias_in_group_bys=use_column_alias_in_group_by,
-                    has_ambiguous_alias_resolution_in_where=has_ambiguous_alias_resolution_in_where,
+                    has_ambiguous_alias_resolution=has_ambiguous_alias_resolution,
                 ),
                 SqlTableAliasSimplifier(),
             )
@@ -73,7 +73,7 @@ class SqlGenerationOptionSet:
                 SqlColumnPrunerOptimizer(),
                 SqlRewritingSubQueryReducer(
                     use_column_alias_in_group_bys=use_column_alias_in_group_by,
-                    has_ambiguous_alias_resolution_in_where=has_ambiguous_alias_resolution_in_where,
+                    has_ambiguous_alias_resolution=has_ambiguous_alias_resolution,
                 ),
                 SqlTableAliasSimplifier(),
             )

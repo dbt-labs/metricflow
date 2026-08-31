@@ -23,3 +23,4 @@ GROUP BY
   , subq_13.alien_day
   , toStartOfMonth(users_ds_source_src_28000.bio_added_ts)
   , time_spine_src_28006.ds
+SETTINGS join_use_nulls = 1

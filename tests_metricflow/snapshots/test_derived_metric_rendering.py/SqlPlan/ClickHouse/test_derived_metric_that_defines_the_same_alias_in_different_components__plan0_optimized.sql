@@ -47,3 +47,4 @@ ON
 GROUP BY
   COALESCE(subq_21.booking__is_instant, subq_27.booking__is_instant)
 LIMIT 1
+SETTINGS join_use_nulls = 1

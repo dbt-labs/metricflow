@@ -46,3 +46,4 @@ FROM (
 GROUP BY
   metric_time__month
   , listing__capacity
+SETTINGS join_use_nulls = 1

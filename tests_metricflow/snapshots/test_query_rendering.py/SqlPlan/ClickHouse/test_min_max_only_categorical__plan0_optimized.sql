@@ -14,3 +14,4 @@ FROM (
   GROUP BY
     country
 ) subq_6
+SETTINGS join_use_nulls = 1

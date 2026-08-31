@@ -48,3 +48,4 @@ FROM (
   GROUP BY
     COALESCE(subq_27.metric_time__day, subq_32.metric_time__day)
 ) subq_33
+SETTINGS join_use_nulls = 1

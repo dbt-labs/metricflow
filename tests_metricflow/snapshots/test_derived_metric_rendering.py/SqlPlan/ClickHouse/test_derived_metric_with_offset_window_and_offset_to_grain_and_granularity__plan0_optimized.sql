@@ -54,3 +54,4 @@ FROM (
   GROUP BY
     COALESCE(subq_33.metric_time__year, subq_43.metric_time__year)
 ) subq_44
+SETTINGS join_use_nulls = 1

@@ -7,3 +7,4 @@ sql_engine: ClickHouse
 SELECT
   generateUUIDv4() AS uuid
 FROM foo.bar a
+SETTINGS join_use_nulls = 1

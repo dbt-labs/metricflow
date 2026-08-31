@@ -17,3 +17,4 @@ CROSS JOIN (
   FROM ***************************.dim_listings_latest listings_latest_src_28000
   WHERE toStartOfDay(created_at) BETWEEN '2020-01-01' AND '2020-01-01'
 ) subq_32
+SETTINGS join_use_nulls = 1

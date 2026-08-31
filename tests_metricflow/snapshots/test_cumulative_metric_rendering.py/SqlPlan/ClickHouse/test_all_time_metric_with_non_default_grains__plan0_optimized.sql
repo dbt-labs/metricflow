@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative all-time metric queried with non-default grains.
 
-      Uses only metric_time. Excludes default grain.
+  Uses only metric_time. Excludes default grain.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -42,3 +42,4 @@ GROUP BY
   metric_time__week
   , metric_time__quarter
   , revenue_all_time
+SETTINGS join_use_nulls = 1

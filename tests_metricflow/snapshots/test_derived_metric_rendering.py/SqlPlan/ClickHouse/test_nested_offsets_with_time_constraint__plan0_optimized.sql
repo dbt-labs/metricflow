@@ -46,3 +46,4 @@ FROM (
     addDays(rss_28018_cte.ds__day, -2) = subq_30.metric_time__day
   WHERE rss_28018_cte.ds__day BETWEEN '2020-01-12' AND '2020-01-13'
 ) subq_36
+SETTINGS join_use_nulls = 1

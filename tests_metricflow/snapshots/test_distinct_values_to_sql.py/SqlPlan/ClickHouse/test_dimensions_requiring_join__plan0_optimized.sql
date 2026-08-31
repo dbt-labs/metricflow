@@ -15,3 +15,4 @@ ON
 GROUP BY
   listings_latest_src_28000.is_lux
   , users_latest_src_28000.home_state_latest
+SETTINGS join_use_nulls = 1

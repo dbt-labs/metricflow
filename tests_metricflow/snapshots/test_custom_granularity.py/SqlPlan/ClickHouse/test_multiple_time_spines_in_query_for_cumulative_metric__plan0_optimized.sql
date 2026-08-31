@@ -26,3 +26,4 @@ ON
 GROUP BY
   subq_15.alien_day
   , subq_14.ts
+SETTINGS join_use_nulls = 1

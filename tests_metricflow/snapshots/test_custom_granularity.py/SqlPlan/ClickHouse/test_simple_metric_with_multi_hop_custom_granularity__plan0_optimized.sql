@@ -37,3 +37,4 @@ ON
   subq_71.user__ds__day = subq_72.ds
 GROUP BY
   subq_72.alien_day
+SETTINGS join_use_nulls = 1

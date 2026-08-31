@@ -14,3 +14,4 @@ FROM (
   GROUP BY
     toStartOfQuarter(paid_at)
 ) subq_6
+SETTINGS join_use_nulls = 1

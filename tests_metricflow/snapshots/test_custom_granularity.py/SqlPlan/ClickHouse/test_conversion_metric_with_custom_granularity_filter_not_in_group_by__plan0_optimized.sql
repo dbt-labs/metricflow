@@ -110,3 +110,4 @@ CROSS JOIN (
       )
   ) subq_37
 ) subq_41
+SETTINGS join_use_nulls = 1
