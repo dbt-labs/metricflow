@@ -122,8 +122,9 @@ def test_metric_datatype_parsing() -> None:
           type: simple
           datatype: decimal
           type_params:
-            measure:
-              name: metadata_test_measure
+            metric_aggregation_params:
+              semantic_model: base_semantic_model
+              agg: sum
         """
     )
     file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
@@ -142,8 +143,9 @@ def test_metric_without_datatype_parsing() -> None:
           name: base_test
           type: simple
           type_params:
-            measure:
-              name: metadata_test_measure
+            metric_aggregation_params:
+              semantic_model: base_semantic_model
+              agg: sum
         """
     )
     file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
