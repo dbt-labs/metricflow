@@ -1,0 +1,8 @@
+kind: Features
+body: Add optional `datatype` field to `Dimension` and `Metric` in metricflow-semantic-interfaces,
+  enabling downstream consumers (e.g. the Ossie converter) to preserve specific data
+  types instead of the coarse DimensionType bucket
+time: 2026-08-28T11:26:49.742777-05:00
+custom:
+  Author: QMalcolm
+  Issue: "2121"

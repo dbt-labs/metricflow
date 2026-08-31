@@ -6,6 +6,7 @@ from metricflow_semantic_interfaces.type_enums.aggregation_type import (  # noqa
 from metricflow_semantic_interfaces.type_enums.conversion_calculation_type import (  # noqa:F401
     ConversionCalculationType,
 )
+from metricflow_semantic_interfaces.type_enums.data_type import DataType  # noqa:F401
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart  # noqa:F401
 from metricflow_semantic_interfaces.type_enums.dimension_type import DimensionType  # noqa:F401
 from metricflow_semantic_interfaces.type_enums.entity_type import EntityType  # noqa:F401

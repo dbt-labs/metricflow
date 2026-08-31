@@ -8,6 +8,7 @@ from metricflow_semantic_interfaces.parsing.dir_to_model import (
 from metricflow_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
+    DataType,
     DimensionType,
     EntityType,
     TimeGranularity,
@@ -347,6 +348,57 @@ def test_semantic_model_categorical_dimension_parsing() -> None:
     assert dimension.name == "example_categorical_dimension"
     assert dimension.type is DimensionType.CATEGORICAL
     assert dimension.is_partition is not True
+
+
+def test_semantic_model_dimension_datatype_parsing() -> None:
+    """Test for parsing a dimension's optional datatype out of a semantic model specification."""
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: dimension_parsing_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
+          dimensions:
+            - name: example_categorical_dimension
+              type: categorical
+              datatype: integer
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+    assert len(build_result.semantic_manifest.semantic_models) == 1
+    semantic_model = build_result.semantic_manifest.semantic_models[0]
+    assert len(semantic_model.dimensions) == 1
+    dimension = semantic_model.dimensions[0]
+    assert dimension.datatype is DataType.INTEGER
+
+
+def test_semantic_model_dimension_without_datatype_parsing() -> None:
+    """Test that a dimension's datatype defaults to None when not specified, for backward compatibility."""
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: dimension_parsing_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
+          dimensions:
+            - name: example_categorical_dimension
+              type: categorical
+        """
+    )
+    file = YamlConfigFile(filepath="inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+    assert len(build_result.semantic_manifest.semantic_models) == 1
+    semantic_model = build_result.semantic_manifest.semantic_models[0]
+    assert len(semantic_model.dimensions) == 1
+    dimension = semantic_model.dimensions[0]
+    assert dimension.datatype is None
 
 
 def test_semantic_model_partition_dimension_parsing() -> None:
