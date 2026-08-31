@@ -99,9 +99,10 @@ class DataflowToSqlPlanConverter:
                 # BigQuery-ness of the engine
                 use_column_alias_in_group_by = sql_engine_type is SqlEngine.BIGQUERY
                 # ClickHouse's query analyzer resolves unqualified column names in WHERE to SELECT aliases when
-                # names match. This violates standard SQL evaluation order and can cause ILLEGAL_AGGREGATION errors
-                # or silent wrong results. Enable the guard that prevents reducing when the FROM source's WHERE
-                # contains SqlStringExpression (the only source of unqualified column references).
+                # names match (https://github.com/ClickHouse/ClickHouse/issues/23194). This violates standard SQL
+                # evaluation order and can cause ILLEGAL_AGGREGATION errors or silent wrong results. Enable the
+                # guard that prevents reducing when the FROM source's WHERE contains SqlStringExpression (the only
+                # source of unqualified column references).
                 has_ambiguous_alias_resolution = sql_engine_type is SqlEngine.CLICKHOUSE
 
                 option_set = SqlGenerationOptionSet.options_for_level(

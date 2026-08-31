@@ -17,7 +17,13 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
 )
 
-from metricflow.sql.render.clickhouse import ClickHouseSqlExpressionRenderer, ClickHouseSqlPlanRenderer
+from metricflow.sql.render.clickhouse import (
+    ClickHouseSqlExpressionRenderer,
+    ClickHouseSqlPlanRenderer,
+    clickhouse_explain_statement,
+    ensure_join_use_nulls_setting,
+    sql_has_join_use_nulls_setting,
+)
 from metricflow.sql.sql_plan import SqlPlan
 from metricflow.sql.sql_select_text_node import SqlSelectTextNode
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
@@ -31,12 +37,12 @@ def clickhouse_renderer() -> ClickHouseSqlExpressionRenderer:
 
 
 def test_double_data_type(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
-    """Test that ClickHouse uses Float64 for double precision."""
+    """CAST targets must be Nullable so CAST of SQL NULL after outer joins succeeds."""
     assert clickhouse_renderer.double_data_type == "Nullable(Float64)"
 
 
 def test_timestamp_data_type(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
-    """Test that ClickHouse uses DateTime64(3) for timestamps."""
+    """CAST targets must be Nullable so CAST of SQL NULL after outer joins succeeds."""
     assert clickhouse_renderer.timestamp_data_type == "Nullable(DateTime64(3))"
 
 
@@ -277,4 +283,37 @@ def test_plan_renderer_emits_join_use_nulls_setting() -> None:
     """Compiled ClickHouse SQL must set join_use_nulls so unmatched outer-join cells are SQL NULL."""
     plan = SqlPlan(render_node=SqlSelectTextNode.create(select_query="SELECT 1 AS x"))
     result = ClickHouseSqlPlanRenderer().render_sql_plan(plan)
-    assert "SETTINGS join_use_nulls = 1" in result.sql
+    assert result.sql.rstrip().endswith("SETTINGS join_use_nulls = 1")
+    assert result.sql.count("SETTINGS join_use_nulls = 1") == 1
+
+
+def test_ensure_join_use_nulls_setting_ignores_identifier_in_select_list() -> None:
+    """A SELECT-list string must not suppress the trailing SETTINGS clause."""
+    sql = "SELECT 'join_use_nulls' AS x"
+    assert not sql_has_join_use_nulls_setting(sql)
+    ensured = ensure_join_use_nulls_setting(sql)
+    assert ensured.endswith("SETTINGS join_use_nulls = 1")
+    assert ensure_join_use_nulls_setting(ensured) == ensured
+
+
+def test_ensure_join_use_nulls_setting_merges_into_existing_settings() -> None:
+    """ClickHouse allows one SETTINGS list; merge rather than appending a second clause."""
+    sql = "SELECT 1 AS x\nSETTINGS max_threads = 2"
+    assert ensure_join_use_nulls_setting(sql) == "SELECT 1 AS x\nSETTINGS max_threads = 2, join_use_nulls = 1"
+
+
+def test_ensure_join_use_nulls_setting_keeps_existing_assignment() -> None:
+    """Do not duplicate join_use_nulls when a SETTINGS clause already sets it."""
+    sql = "SELECT 1 AS x\nSETTINGS join_use_nulls = 1"
+    assert ensure_join_use_nulls_setting(sql) == sql
+
+
+def test_clickhouse_explain_statement_select_uses_query_tree() -> None:
+    """SELECT/WITH dry-run uses EXPLAIN QUERY TREE and strips a trailing semicolon."""
+    assert clickhouse_explain_statement("  SELECT 1 AS x;\n") == "EXPLAIN QUERY TREE SELECT 1 AS x"
+    assert clickhouse_explain_statement("WITH x AS (SELECT 1) SELECT * FROM x").startswith("EXPLAIN QUERY TREE WITH")
+
+
+def test_clickhouse_explain_statement_ddl_uses_syntax() -> None:
+    """DDL such as CREATE TABLE AS is not a query tree."""
+    assert clickhouse_explain_statement("CREATE TABLE t AS SELECT 1") == ("EXPLAIN SYNTAX CREATE TABLE t AS SELECT 1")

@@ -111,6 +111,7 @@ def assert_snapshot_text_equal(
     if snapshot_configuration.overwrite_snapshots:
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        # utf-8 + POSIX newlines keep snapshots identical on Windows (locale encoding / CRLF).
         with open(file_path, "w", encoding="utf-8", newline="\n") as snapshot_text_file:
             snapshot_text_file.write(snapshot_text)
 

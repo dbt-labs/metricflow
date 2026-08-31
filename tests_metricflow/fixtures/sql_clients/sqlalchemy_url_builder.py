@@ -318,8 +318,13 @@ class SqlAlchemyUrlBuilder:
         as database.table — it cannot be the connect-time database because that
         database does not exist until setup runs.
 
-        join_use_nulls=1 is required so LEFT/FULL OUTER JOIN unmatched cells are
-        SQL NULL, matching MetricFlow fill-nulls / ratio logic.
+        `data_type_default_nullable=1` makes CREATE TABLE column types nullable.
+        It does not apply to explicit CAST, so the renderer still emits
+        ``Nullable(...)`` CAST targets.
+
+        ``join_use_nulls`` is not a connect-time setting. Compiled MetricFlow SQL
+        carries ``SETTINGS join_use_nulls = 1``. Leaving it off the URL means
+        tests fail if the renderer stops emitting that clause.
         """
         return SqlAlchemyURL.create(
             drivername="clickhousedb",
@@ -330,6 +335,5 @@ class SqlAlchemyUrlBuilder:
             database=connection_params.database,
             query={
                 "data_type_default_nullable": "1",
-                "join_use_nulls": "1",
             },
         )

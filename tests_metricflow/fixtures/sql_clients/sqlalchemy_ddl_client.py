@@ -43,6 +43,7 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
         create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)})"
         if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            # ClickHouse requires an engine. Test tables have no sort key.
             create_stmt = (
                 f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)}) "
                 "ENGINE = MergeTree ORDER BY tuple()"

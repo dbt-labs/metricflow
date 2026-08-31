@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Collection, Optional
 
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
-    SqlBetweenExpression,
     SqlCastToTimestampExpression,
     SqlDateTruncExpression,
     SqlExtractExpression,
@@ -31,6 +31,69 @@ from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
 logger = logging.getLogger(__name__)
+
+# Query-level contract so unmatched LEFT/FULL OUTER JOIN cells are SQL NULL.
+# ClickHouse defaults to filling those cells with type defaults (0, ''), which
+# breaks MetricFlow fill-nulls / ratio logic. This must travel with the statement
+# (`SETTINGS ...`), not a session `SET`: HTTP connections often have no session,
+# and readonly ClickHouse Cloud users can run query SETTINGS but not SET.
+# https://clickhouse.com/docs/operations/settings/settings#join_use_nulls
+CLICKHOUSE_JOIN_USE_NULLS_SETTING = "join_use_nulls = 1"
+
+_SETTINGS_KEYWORD = re.compile(r"(?i)\bSETTINGS\b")
+_SETTINGS_CLAUSE_BODY = re.compile(r"(?i)\s*[A-Za-z_][A-Za-z0-9_]*\s*=")
+_JOIN_USE_NULLS_ASSIGNMENT = re.compile(r"(?i)\bjoin_use_nulls\s*=")
+
+
+def _last_settings_clause_index(sql: str) -> Optional[int]:
+    """Index of the last ClickHouse SETTINGS clause, or None.
+
+    Requires the keyword to be followed by `name =` so a SELECT-list identifier
+    named `settings` is not treated as a clause.
+    """
+    last_index: Optional[int] = None
+    for match in _SETTINGS_KEYWORD.finditer(sql):
+        if _SETTINGS_CLAUSE_BODY.match(sql[match.end() :]):
+            last_index = match.start()
+    return last_index
+
+
+def sql_has_join_use_nulls_setting(sql: str) -> bool:
+    """True if a trailing ClickHouse SETTINGS clause already sets join_use_nulls."""
+    stripped = sql.rstrip().rstrip(";").rstrip()
+    index = _last_settings_clause_index(stripped)
+    if index is None:
+        return False
+    return _JOIN_USE_NULLS_ASSIGNMENT.search(stripped[index:]) is not None
+
+
+def ensure_join_use_nulls_setting(sql: str) -> str:
+    """Ensure compiled SQL carries `SETTINGS join_use_nulls = 1`.
+
+    Inspects only SETTINGS clauses so a string or alias containing the identifier
+    does not suppress the contract. If a trailing SETTINGS clause exists without
+    this key, the key is merged into that clause (ClickHouse allows one SETTINGS
+    list per statement).
+    """
+    stripped = sql.rstrip().rstrip(";").rstrip()
+    index = _last_settings_clause_index(stripped)
+    if index is None:
+        return f"{stripped}\nSETTINGS {CLICKHOUSE_JOIN_USE_NULLS_SETTING}"
+    if _JOIN_USE_NULLS_ASSIGNMENT.search(stripped[index:]):
+        return stripped
+    return f"{stripped.rstrip().rstrip(',')}, {CLICKHOUSE_JOIN_USE_NULLS_SETTING}"
+
+
+def clickhouse_explain_statement(stmt: str) -> str:
+    """Wrap `stmt` in the EXPLAIN form ClickHouse accepts for dry-run validation.
+
+    EXPLAIN QUERY TREE is the analyzer-era check for SELECT/WITH. It rejects DDL
+    such as CREATE TABLE AS; those use EXPLAIN SYNTAX instead.
+    """
+    clickhouse_stmt = stmt.strip().rstrip(";")
+    head = clickhouse_stmt.split(None, 1)[0].upper() if clickhouse_stmt else ""
+    prefix = "EXPLAIN QUERY TREE" if head in {"SELECT", "WITH"} else "EXPLAIN SYNTAX"
+    return f"{prefix} {clickhouse_stmt}"
 
 
 class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
@@ -341,46 +404,22 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             bind_parameter_set=arg_rendered.bind_parameter_set,
         )
 
-    @override
-    def visit_between_expr(self, node: SqlBetweenExpression) -> SqlExpressionRenderResult:
-        """Render BETWEEN expression for ClickHouse.
-
-        ClickHouse supports standard BETWEEN syntax.
-        For DateTime values, ensure proper casting if needed.
-        """
-        rendered_column_arg = self.render_sql_expr(node.column_arg)
-        rendered_start_expr = self.render_sql_expr(node.start_expr)
-        rendered_end_expr = self.render_sql_expr(node.end_expr)
-
-        bind_parameter_set = SqlBindParameterSet()
-        bind_parameter_set = bind_parameter_set.merge(rendered_column_arg.bind_parameter_set)
-        bind_parameter_set = bind_parameter_set.merge(rendered_start_expr.bind_parameter_set)
-        bind_parameter_set = bind_parameter_set.merge(rendered_end_expr.bind_parameter_set)
-
-        sql = f"{rendered_column_arg.sql} BETWEEN {rendered_start_expr.sql} AND {rendered_end_expr.sql}"
-
-        return SqlExpressionRenderResult(
-            sql=sql,
-            bind_parameter_set=bind_parameter_set,
-        )
-
 
 class ClickHouseSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the ClickHouse engine.
 
     Most plan-level rendering follows ANSI SQL. Query-level SETTINGS pin dialect
     contracts that MetricFlow assumes (SQL NULL from unmatched outer joins).
+    Clients must not also issue session ``SET join_use_nulls``; the compiled SQL
+    is the contract.
     """
 
     EXPR_RENDERER = ClickHouseSqlExpressionRenderer()
-    _QUERY_SETTINGS = "join_use_nulls = 1"
 
     @override
     def render_sql_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:
         result = super().render_sql_plan(sql_query_plan)
-        sql = result.sql.rstrip().rstrip(";")
-        if "join_use_nulls" not in sql:
-            sql = f"{sql}\nSETTINGS {self._QUERY_SETTINGS}"
+        sql = ensure_join_use_nulls_setting(result.sql)
         return SqlPlanRenderResult(sql=sql, bind_parameter_set=result.bind_parameter_set)
 
     @override
