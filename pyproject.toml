@@ -177,13 +177,14 @@ build-and-validate = [
 ]
 
 
+# Warehouse database `metricflow` is the connect-time database. Per-test schemas are CREATE DATABASE.
 [tool.hatch.envs.clickhouse-env.env-vars]
 MF_TEST_ADAPTER_TYPE="clickhouse"
 MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
 MF_SQL_ENGINE_PASSWORD="metricflowing"
 
 [tool.hatch.envs.clickhouse-env]
-description = "Dev environment for working with ClickHouse adapter"
+description = "Experimental ClickHouse engine tests (see local-data-warehouses/README.md)"
 template = "dev-env"
 features = ["clickhouse-env-requirements"]
 

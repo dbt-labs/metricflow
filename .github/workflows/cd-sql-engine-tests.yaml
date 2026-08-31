@@ -135,8 +135,9 @@ jobs:
             }
 
   clickhouse-tests:
-    # ClickHouse tests run on a local service container, same pattern as Trino.
-    # Engine support is experimental: generated SQL sets join_use_nulls = 1, but
+    # Same trigger as Trino: this workflow runs on workflow_dispatch or when a PR
+    # is labeled "Run Tests With Other SQL Engines" (`on.pull_request.types: labeled`).
+    # Support is experimental: compiled SQL emits SETTINGS join_use_nulls = 1;
     # ReplacingMergeTree FINAL and hosted Semantic Layer are out of scope.
     name: ClickHouse Tests
     if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}

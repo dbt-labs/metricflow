@@ -16,6 +16,8 @@ class SqlEngine(Enum):
     """Enumeration of supported SQL engines.
 
     Values are normalized engine names used for things like snapshot file locations.
+    ClickHouse support is experimental: compiled SQL emits SETTINGS join_use_nulls = 1,
+    but ReplacingMergeTree FINAL and hosted Semantic Layer / Fusion are out of scope.
     """
 
     BIGQUERY = "BigQuery"

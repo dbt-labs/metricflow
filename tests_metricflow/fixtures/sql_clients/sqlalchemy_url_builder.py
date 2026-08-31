@@ -51,7 +51,7 @@ class SqlAlchemyUrlBuilder:
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
         elif dialect is SqlDialect.CLICKHOUSE:
-            return SqlAlchemyUrlBuilder._build_clickhouse_url(connection_params, password, schema)
+            return SqlAlchemyUrlBuilder._build_clickhouse_url(connection_params, password)
         else:
             raise ValueError(f"Unsupported dialect: {dialect}")
 
@@ -285,7 +285,6 @@ class SqlAlchemyUrlBuilder:
     def _build_clickhouse_url(
         connection_params: SqlEngineConnectionParameterSet,
         password: str,
-        schema: Optional[str] = None,
     ) -> SqlAlchemyURL:
         """Build ClickHouse URL.
 
@@ -295,10 +294,14 @@ class SqlAlchemyUrlBuilder:
         as database.table — it cannot be the connect-time database because that
         database does not exist until setup runs.
 
-        join_use_nulls=1 is required so LEFT/FULL OUTER JOIN unmatched cells are
-        SQL NULL, matching MetricFlow fill-nulls / ratio logic.
+        `data_type_default_nullable=1` makes CREATE TABLE column types nullable.
+        It does not apply to explicit CAST, so the renderer still emits
+        ``Nullable(...)`` CAST targets.
+
+        ``join_use_nulls`` is not a connect-time setting. Compiled MetricFlow SQL
+        carries ``SETTINGS join_use_nulls = 1``. Leaving it off the URL means
+        tests fail if the renderer stops emitting that clause.
         """
-        del schema  # Used as CREATE DATABASE + qualified names, not connect-time database.
         return SqlAlchemyURL.create(
             drivername="clickhousedb",
             username=connection_params.username,
@@ -308,6 +311,5 @@ class SqlAlchemyUrlBuilder:
             database=connection_params.database,
             query={
                 "data_type_default_nullable": "1",
-                "join_use_nulls": "1",
             },
         )

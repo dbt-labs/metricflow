@@ -170,7 +170,7 @@ def test_clickhouse_url_keeps_warehouse_database() -> None:
     assert url.host == "localhost"
     assert url.port == 8123
     assert url.database == "metricflow"
-    assert url.query["join_use_nulls"] == "1"
+    assert "join_use_nulls" not in url.query
     assert url.query["data_type_default_nullable"] == "1"
 
 

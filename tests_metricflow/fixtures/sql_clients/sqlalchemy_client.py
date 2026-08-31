@@ -10,22 +10,14 @@ from sqlalchemy import Engine
 from sqlalchemy import text as sa_text
 from sqlalchemy.dialects import registry
 from sqlalchemy.dialects.postgresql.psycopg2 import PGDialect_psycopg2
-from sqlalchemy.engine import Connection
 from sqlalchemy.exc import SQLAlchemyError
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow.sql.render.clickhouse import clickhouse_explain_statement
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 
 logger = logging.getLogger(__name__)
-
-
-def _clickhouse_explain_prefix(stmt: str) -> str:
-    """Pick an EXPLAIN form ClickHouse accepts for this statement."""
-    head = stmt.lstrip().split(None, 1)[0].upper() if stmt.strip() else ""
-    if head in {"SELECT", "WITH"}:
-        return "EXPLAIN QUERY TREE"
-    return "EXPLAIN SYNTAX"
 
 
 class MetricFlowRedshiftDialect(PGDialect_psycopg2):
@@ -118,7 +110,6 @@ class SqlAlchemyBasedSqlClient:
         try:
             # Use context manager for automatic connection lifecycle
             with self._engine.connect() as conn:
-                self._apply_engine_session_settings(conn)
                 # Execute query - SqlAlchemy automatically starts a transaction
                 result = conn.execute(sa_text(stmt))
 
@@ -176,7 +167,6 @@ class SqlAlchemyBasedSqlClient:
 
         try:
             with self._engine.connect() as conn:
-                self._apply_engine_session_settings(conn)
                 conn.execute(sa_text(stmt))
                 # Explicitly commit for DDL/DML operations
                 conn.commit()
@@ -208,7 +198,6 @@ class SqlAlchemyBasedSqlClient:
 
         try:
             with self._dry_run_engine.connect() as conn:
-                self._apply_engine_session_settings(conn)
                 if self.sql_engine_type is SqlEngine.TRINO:
                     # Trino: Use EXPLAIN (type validate) to avoid side effects
                     result = conn.execute(sa_text(f"EXPLAIN (type validate) {stmt}"))
@@ -228,11 +217,7 @@ class SqlAlchemyBasedSqlClient:
                     ):
                         raise RuntimeError(f"Databricks dry run failed: {plan_output}")
                 elif self.sql_engine_type is SqlEngine.CLICKHOUSE:
-                    # EXPLAIN QUERY TREE validates analyzer-era SELECT. DDL such as
-                    # CREATE TABLE AS is not a query tree; EXPLAIN SYNTAX covers those.
-                    clickhouse_stmt = stmt.strip().rstrip(";")
-                    explain_prefix = _clickhouse_explain_prefix(clickhouse_stmt)
-                    conn.execute(sa_text(f"{explain_prefix} {clickhouse_stmt}"))
+                    conn.execute(sa_text(clickhouse_explain_statement(stmt)))
                 else:
                     # Default: Use EXPLAIN for other engines
                     conn.execute(sa_text(f"EXPLAIN {stmt}"))
@@ -245,11 +230,6 @@ class SqlAlchemyBasedSqlClient:
 
         stop = time.perf_counter()
         logger.info(LazyFormat("Finished dry run", runtime=f"{stop - start:.2f}s"))
-
-    def _apply_engine_session_settings(self, conn: Connection) -> None:
-        """Pin engine session contracts that MetricFlow assumes for generated SQL."""
-        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
-            conn.execute(sa_text("SET join_use_nulls = 1"))
 
     def close(self) -> None:
         """Close the SqlAlchemy engine and all connections."""

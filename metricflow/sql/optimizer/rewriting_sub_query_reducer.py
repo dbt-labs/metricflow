@@ -314,6 +314,7 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         #
         # ClickHouse's query analyzer resolves unqualified column names in WHERE to SELECT aliases when names match.
         # This violates standard SQL evaluation order (WHERE is evaluated before SELECT aliases are assigned).
+        # https://github.com/ClickHouse/ClickHouse/issues/23194
         #
         # SqlColumnReferenceExpression always includes a table alias (e.g. subq.col), making it unambiguous after
         # hoisting. SqlStringExpression is raw SQL text that may contain unqualified column names — the only vector
