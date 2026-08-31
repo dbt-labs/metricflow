@@ -54,6 +54,21 @@ time_granularity_values += [x.lower() for x in time_granularity_values]
 dimension_type_values = ["CATEGORICAL", "TIME"]
 dimension_type_values += [x.lower() for x in dimension_type_values]
 
+# DataType is a plain Enum (not ExtendedEnum), so parsing is case-sensitive; only its canonical
+# lowercase values are accepted here.
+data_type_values = [
+    "string",
+    "integer",
+    "decimal",
+    "float",
+    "boolean",
+    "date",
+    "time",
+    "datetime",
+    "datetime_tz",
+    "opaque",
+]
+
 time_dimension_type_values = ["TIME", "time"]
 
 export_destination_type_values = ["TABLE", "VIEW"]
@@ -325,6 +340,7 @@ dimension_schema = {
         },
         "description": {"type": "string"},
         "type": {"enum": dimension_type_values},
+        "datatype": {"enum": data_type_values},
         "is_partition": {"type": "boolean"},
         "expr": {"type": ["string", "boolean"]},
         "type_params": {"$ref": "dimension_type_params_schema"},
@@ -362,6 +378,7 @@ metric_schema = {
             "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
         },
         "type": {"enum": metric_types_enum_values},
+        "datatype": {"enum": data_type_values},
         "type_params": {"$ref": "metric_type_params"},
         "filter": {"$ref": "filter_schema"},
         "description": {"type": "string"},

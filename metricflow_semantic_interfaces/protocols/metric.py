@@ -14,6 +14,7 @@ from metricflow_semantic_interfaces.references import MeasureReference, MetricRe
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
     ConversionCalculationType,
+    DataType,
     MetricType,
     PeriodAggregation,
     TimeGranularity,
@@ -364,6 +365,16 @@ class Metric(Protocol):
     @property
     @abstractmethod
     def type(self) -> MetricType:  # noqa: D102
+        pass
+
+    @property
+    @abstractmethod
+    def datatype(self) -> Optional[DataType]:
+        """Specific logical data type of the metric's value, if known.
+
+        Unused by MetricFlow's own validation or query logic. Purely a passthrough annotation for downstream
+        consumers (e.g. round-tripping Ossie's `Metric.datatype` through a semantic manifest).
+        """
         pass
 
     @property

@@ -151,6 +151,20 @@
                 "config": {
                     "$ref": "#/definitions/dimension_config_schema"
                 },
+                "datatype": {
+                    "enum": [
+                        "string",
+                        "integer",
+                        "decimal",
+                        "float",
+                        "boolean",
+                        "date",
+                        "time",
+                        "datetime",
+                        "datetime_tz",
+                        "opaque"
+                    ]
+                },
                 "description": {
                     "type": "string"
                 },
@@ -564,6 +578,20 @@
             "properties": {
                 "config": {
                     "$ref": "#/definitions/metric_config_schema"
+                },
+                "datatype": {
+                    "enum": [
+                        "string",
+                        "integer",
+                        "decimal",
+                        "float",
+                        "boolean",
+                        "date",
+                        "time",
+                        "datetime",
+                        "datetime_tz",
+                        "opaque"
+                    ]
                 },
                 "description": {
                     "type": "string"

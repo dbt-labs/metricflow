@@ -14,7 +14,7 @@ from metricflow_semantic_interfaces.references import (
     DimensionReference,
     TimeDimensionReference,
 )
-from metricflow_semantic_interfaces.type_enums import DimensionType, TimeGranularity
+from metricflow_semantic_interfaces.type_enums import DataType, DimensionType, TimeGranularity
 
 ISO8601_FMT = "YYYY-MM-DD"
 
@@ -46,6 +46,7 @@ class PydanticDimension(HashableBaseModel, ModelWithMetadataParsing):
     name: str
     description: Optional[str]
     type: DimensionType
+    datatype: Optional[DataType] = None
     is_partition: bool = False
     type_params: Optional[PydanticDimensionTypeParams]
     expr: Optional[str] = None
