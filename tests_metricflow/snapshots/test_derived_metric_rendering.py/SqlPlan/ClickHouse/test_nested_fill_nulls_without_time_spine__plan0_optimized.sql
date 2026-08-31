@@ -28,3 +28,4 @@ FROM (
     ) subq_12
   ) subq_13
 ) subq_14
+SETTINGS join_use_nulls = 1

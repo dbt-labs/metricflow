@@ -190,7 +190,7 @@ FROM (
                   , toQuarter(listings_latest_src_28000.created_at) AS ds__extract_quarter
                   , toMonth(listings_latest_src_28000.created_at) AS ds__extract_month
                   , toDayOfMonth(listings_latest_src_28000.created_at) AS ds__extract_day
-                  , toDayOfWeek(listings_latest_src_28000.created_at) AS ds__extract_dow
+                  , toDayOfWeek(listings_latest_src_28000.created_at, 0) AS ds__extract_dow
                   , toDayOfYear(listings_latest_src_28000.created_at) AS ds__extract_doy
                   , toStartOfDay(listings_latest_src_28000.created_at) AS created_at__day
                   , toStartOfWeek(listings_latest_src_28000.created_at, 1) AS created_at__week
@@ -201,7 +201,7 @@ FROM (
                   , toQuarter(listings_latest_src_28000.created_at) AS created_at__extract_quarter
                   , toMonth(listings_latest_src_28000.created_at) AS created_at__extract_month
                   , toDayOfMonth(listings_latest_src_28000.created_at) AS created_at__extract_day
-                  , toDayOfWeek(listings_latest_src_28000.created_at) AS created_at__extract_dow
+                  , toDayOfWeek(listings_latest_src_28000.created_at, 0) AS created_at__extract_dow
                   , toDayOfYear(listings_latest_src_28000.created_at) AS created_at__extract_doy
                   , listings_latest_src_28000.country AS country_latest
                   , listings_latest_src_28000.is_lux AS is_lux_latest
@@ -215,7 +215,7 @@ FROM (
                   , toQuarter(listings_latest_src_28000.created_at) AS listing__ds__extract_quarter
                   , toMonth(listings_latest_src_28000.created_at) AS listing__ds__extract_month
                   , toDayOfMonth(listings_latest_src_28000.created_at) AS listing__ds__extract_day
-                  , toDayOfWeek(listings_latest_src_28000.created_at) AS listing__ds__extract_dow
+                  , toDayOfWeek(listings_latest_src_28000.created_at, 0) AS listing__ds__extract_dow
                   , toDayOfYear(listings_latest_src_28000.created_at) AS listing__ds__extract_doy
                   , toStartOfDay(listings_latest_src_28000.created_at) AS listing__created_at__day
                   , toStartOfWeek(listings_latest_src_28000.created_at, 1) AS listing__created_at__week
@@ -226,7 +226,7 @@ FROM (
                   , toQuarter(listings_latest_src_28000.created_at) AS listing__created_at__extract_quarter
                   , toMonth(listings_latest_src_28000.created_at) AS listing__created_at__extract_month
                   , toDayOfMonth(listings_latest_src_28000.created_at) AS listing__created_at__extract_day
-                  , toDayOfWeek(listings_latest_src_28000.created_at) AS listing__created_at__extract_dow
+                  , toDayOfWeek(listings_latest_src_28000.created_at, 0) AS listing__created_at__extract_dow
                   , toDayOfYear(listings_latest_src_28000.created_at) AS listing__created_at__extract_doy
                   , listings_latest_src_28000.country AS listing__country_latest
                   , listings_latest_src_28000.is_lux AS listing__is_lux_latest
@@ -252,7 +252,7 @@ FROM (
                   , toQuarter(users_latest_src_28000.ds) AS ds_latest__extract_quarter
                   , toMonth(users_latest_src_28000.ds) AS ds_latest__extract_month
                   , toDayOfMonth(users_latest_src_28000.ds) AS ds_latest__extract_day
-                  , toDayOfWeek(users_latest_src_28000.ds) AS ds_latest__extract_dow
+                  , toDayOfWeek(users_latest_src_28000.ds, 0) AS ds_latest__extract_dow
                   , toDayOfYear(users_latest_src_28000.ds) AS ds_latest__extract_doy
                   , users_latest_src_28000.home_state_latest
                   , toStartOfDay(users_latest_src_28000.ds) AS user__ds_latest__day
@@ -264,7 +264,7 @@ FROM (
                   , toQuarter(users_latest_src_28000.ds) AS user__ds_latest__extract_quarter
                   , toMonth(users_latest_src_28000.ds) AS user__ds_latest__extract_month
                   , toDayOfMonth(users_latest_src_28000.ds) AS user__ds_latest__extract_day
-                  , toDayOfWeek(users_latest_src_28000.ds) AS user__ds_latest__extract_dow
+                  , toDayOfWeek(users_latest_src_28000.ds, 0) AS user__ds_latest__extract_dow
                   , toDayOfYear(users_latest_src_28000.ds) AS user__ds_latest__extract_doy
                   , users_latest_src_28000.home_state_latest AS user__home_state_latest
                   , users_latest_src_28000.user_id AS user
@@ -282,3 +282,4 @@ FROM (
       subq_7.user__home_state_latest
   ) subq_8
 ) subq_9
+SETTINGS join_use_nulls = 1

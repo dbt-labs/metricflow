@@ -8,3 +8,4 @@ CREATE VIEW schema_name.table_name AS (
   FROM demo.fct_bookings a
   LIMIT 1
 )
+SETTINGS join_use_nulls = 1

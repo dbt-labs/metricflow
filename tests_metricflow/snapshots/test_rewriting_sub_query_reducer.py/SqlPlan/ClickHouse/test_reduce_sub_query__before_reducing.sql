@@ -25,3 +25,4 @@ WHERE src2.ds <= '2020-01-05'
 GROUP BY
   src2.ds
 ORDER BY src2.ds
+SETTINGS join_use_nulls = 1

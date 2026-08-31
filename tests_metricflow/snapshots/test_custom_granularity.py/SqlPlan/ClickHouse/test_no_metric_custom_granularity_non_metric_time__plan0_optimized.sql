@@ -11,3 +11,4 @@ ON
   toStartOfDay(bookings_source_src_28000.ds) = subq_4.ds
 GROUP BY
   subq_4.alien_day
+SETTINGS join_use_nulls = 1

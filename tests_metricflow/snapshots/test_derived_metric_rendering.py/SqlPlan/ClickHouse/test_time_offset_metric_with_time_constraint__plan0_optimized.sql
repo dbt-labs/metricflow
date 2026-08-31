@@ -32,3 +32,4 @@ FROM (
     addDays(subq_25.metric_time__day, -5) = subq_20.metric_time__day
   WHERE subq_25.metric_time__day BETWEEN '2019-12-19' AND '2020-01-02'
 ) subq_28
+SETTINGS join_use_nulls = 1

@@ -24,3 +24,4 @@ FROM (
   ) subq_17
   WHERE user__home_state_latest = 'CA'
 ) subq_18
+SETTINGS join_use_nulls = 1

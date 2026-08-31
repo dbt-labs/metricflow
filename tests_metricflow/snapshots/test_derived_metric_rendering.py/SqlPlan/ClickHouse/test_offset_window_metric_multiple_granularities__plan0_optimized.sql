@@ -73,3 +73,4 @@ FROM (
     , COALESCE(subq_28.metric_time__month, subq_33.metric_time__month)
     , COALESCE(subq_28.metric_time__year, subq_33.metric_time__year)
 ) subq_34
+SETTINGS join_use_nulls = 1

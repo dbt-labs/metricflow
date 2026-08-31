@@ -29,3 +29,4 @@ FROM (
   ON
     addDays(time_spine_src_28006.ds, -2) = subq_23.metric_time__day
 ) subq_30
+SETTINGS join_use_nulls = 1

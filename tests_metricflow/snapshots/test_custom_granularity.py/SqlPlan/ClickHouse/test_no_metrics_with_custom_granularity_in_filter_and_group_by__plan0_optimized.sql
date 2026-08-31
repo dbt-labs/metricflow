@@ -22,3 +22,4 @@ FROM (
 ) subq_8
 GROUP BY
   listing__ds__alien_day
+SETTINGS join_use_nulls = 1

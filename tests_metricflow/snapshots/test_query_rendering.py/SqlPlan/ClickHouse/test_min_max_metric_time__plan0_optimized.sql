@@ -14,3 +14,4 @@ FROM (
   GROUP BY
     ds
 ) subq_8
+SETTINGS join_use_nulls = 1

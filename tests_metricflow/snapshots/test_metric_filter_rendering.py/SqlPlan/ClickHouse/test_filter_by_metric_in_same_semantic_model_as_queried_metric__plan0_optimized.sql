@@ -40,3 +40,4 @@ FROM (
   ) subq_31
   WHERE guest__booking_value > 1.00
 ) subq_32
+SETTINGS join_use_nulls = 1

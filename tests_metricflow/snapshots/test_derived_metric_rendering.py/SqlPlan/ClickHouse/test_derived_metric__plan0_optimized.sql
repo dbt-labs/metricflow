@@ -20,3 +20,4 @@ FROM (
   GROUP BY
     metric_time__day
 ) subq_18
+SETTINGS join_use_nulls = 1

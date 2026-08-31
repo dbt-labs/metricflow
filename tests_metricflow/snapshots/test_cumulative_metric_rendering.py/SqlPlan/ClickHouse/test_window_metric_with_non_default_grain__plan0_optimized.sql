@@ -33,3 +33,4 @@ FROM (
 GROUP BY
   metric_time__year
   , trailing_2_months_revenue
+SETTINGS join_use_nulls = 1

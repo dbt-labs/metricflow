@@ -31,3 +31,4 @@ ON
   )
 GROUP BY
   subq_46.user__bio_added_ts__minute
+SETTINGS join_use_nulls = 1

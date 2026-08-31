@@ -17,3 +17,4 @@ ON
   subq_7.booking__ds__day = subq_8.ds
 GROUP BY
   subq_8.alien_day
+SETTINGS join_use_nulls = 1

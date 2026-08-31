@@ -116,7 +116,7 @@ FROM (
                   , toQuarter(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_quarter
                   , toMonth(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_month
                   , toDayOfMonth(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_day
-                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_dow
+                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds, 0) AS third_hop_ds__extract_dow
                   , toDayOfYear(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_doy
                   , third_hop_table_src_22000.value AS customer_third_hop_id__value
                   , toStartOfDay(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__day
@@ -128,7 +128,7 @@ FROM (
                   , toQuarter(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_quarter
                   , toMonth(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_month
                   , toDayOfMonth(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_day
-                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_dow
+                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds, 0) AS customer_third_hop_id__third_hop_ds__extract_dow
                   , toDayOfYear(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_doy
                   , third_hop_table_src_22000.customer_third_hop_id
                 FROM ***************************.third_hop_table third_hop_table_src_22000
@@ -227,7 +227,7 @@ FROM (
                               , toQuarter(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_quarter
                               , toMonth(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_month
                               , toDayOfMonth(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_day
-                              , toDayOfWeek(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_dow
+                              , toDayOfWeek(customer_other_data_src_22000.acquired_ds, 0) AS acquired_ds__extract_dow
                               , toDayOfYear(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_doy
                               , customer_other_data_src_22000.country AS customer_id__country
                               , toStartOfDay(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__day
@@ -239,7 +239,7 @@ FROM (
                               , toQuarter(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_quarter
                               , toMonth(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_month
                               , toDayOfMonth(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_day
-                              , toDayOfWeek(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_dow
+                              , toDayOfWeek(customer_other_data_src_22000.acquired_ds, 0) AS customer_id__acquired_ds__extract_dow
                               , toDayOfYear(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_doy
                               , customer_other_data_src_22000.country AS customer_third_hop_id__country
                               , toStartOfDay(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__day
@@ -251,7 +251,7 @@ FROM (
                               , toQuarter(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_quarter
                               , toMonth(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_month
                               , toDayOfMonth(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_day
-                              , toDayOfWeek(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_dow
+                              , toDayOfWeek(customer_other_data_src_22000.acquired_ds, 0) AS customer_third_hop_id__acquired_ds__extract_dow
                               , toDayOfYear(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_doy
                               , customer_other_data_src_22000.customer_id
                               , customer_other_data_src_22000.customer_third_hop_id
@@ -278,3 +278,4 @@ FROM (
     ) subq_18
   ) subq_19
 ) subq_20
+SETTINGS join_use_nulls = 1

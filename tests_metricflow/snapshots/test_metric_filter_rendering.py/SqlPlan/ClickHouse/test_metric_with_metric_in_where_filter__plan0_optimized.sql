@@ -43,3 +43,4 @@ FROM (
 ) subq_34
 GROUP BY
   metric_time__day
+SETTINGS join_use_nulls = 1

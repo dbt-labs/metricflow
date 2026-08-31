@@ -14,3 +14,4 @@ CROSS JOIN (
     SUM(1) AS listings
   FROM ***************************.dim_listings_latest listings_latest_src_28000
 ) subq_25
+SETTINGS join_use_nulls = 1

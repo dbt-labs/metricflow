@@ -10,12 +10,12 @@ SELECT
 FROM (
   SELECT
     subq_26.metric_time__day
-    , CAST(subq_26.__buys_fill_nulls_with_0_join_to_timespine AS Nullable(Float64)) / CAST(NULLIF(subq_26.__visits_fill_nulls_with_0_join_to_timespine, 0) AS Nullable(Float64)) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
+    , CAST(subq_26.__buys_null_filled AS Nullable(Float64)) / CAST(NULLIF(subq_26.__visits_fill_nulls_with_0_join_to_timespine, 0) AS Nullable(Float64)) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
   FROM (
     SELECT
       COALESCE(subq_9.metric_time__day, subq_25.metric_time__day) AS metric_time__day
       , COALESCE(MAX(subq_9.__visits_fill_nulls_with_0_join_to_timespine), 0) AS __visits_fill_nulls_with_0_join_to_timespine
-      , COALESCE(MAX(subq_25.__buys_fill_nulls_with_0_join_to_timespine), 0) AS __buys_fill_nulls_with_0_join_to_timespine
+      , COALESCE(MAX(subq_25.__buys_null_filled), 0) AS __buys_null_filled
     FROM (
       SELECT
         subq_8.metric_time__day AS metric_time__day
@@ -51,7 +51,7 @@ FROM (
                 , toQuarter(time_spine_src_28006.ds) AS ds__extract_quarter
                 , toMonth(time_spine_src_28006.ds) AS ds__extract_month
                 , toDayOfMonth(time_spine_src_28006.ds) AS ds__extract_day
-                , toDayOfWeek(time_spine_src_28006.ds) AS ds__extract_dow
+                , toDayOfWeek(time_spine_src_28006.ds, 0) AS ds__extract_dow
                 , toDayOfYear(time_spine_src_28006.ds) AS ds__extract_doy
                 , time_spine_src_28006.alien_day AS ds__alien_day
               FROM ***************************.mf_time_spine time_spine_src_28006
@@ -127,7 +127,7 @@ FROM (
                   , toQuarter(visits_source_src_28000.ds) AS ds__extract_quarter
                   , toMonth(visits_source_src_28000.ds) AS ds__extract_month
                   , toDayOfMonth(visits_source_src_28000.ds) AS ds__extract_day
-                  , toDayOfWeek(visits_source_src_28000.ds) AS ds__extract_dow
+                  , toDayOfWeek(visits_source_src_28000.ds, 0) AS ds__extract_dow
                   , toDayOfYear(visits_source_src_28000.ds) AS ds__extract_doy
                   , visits_source_src_28000.referrer_id
                   , toStartOfDay(visits_source_src_28000.ds) AS visit__ds__day
@@ -139,7 +139,7 @@ FROM (
                   , toQuarter(visits_source_src_28000.ds) AS visit__ds__extract_quarter
                   , toMonth(visits_source_src_28000.ds) AS visit__ds__extract_month
                   , toDayOfMonth(visits_source_src_28000.ds) AS visit__ds__extract_day
-                  , toDayOfWeek(visits_source_src_28000.ds) AS visit__ds__extract_dow
+                  , toDayOfWeek(visits_source_src_28000.ds, 0) AS visit__ds__extract_dow
                   , toDayOfYear(visits_source_src_28000.ds) AS visit__ds__extract_doy
                   , visits_source_src_28000.referrer_id AS visit__referrer_id
                   , visits_source_src_28000.user_id AS user
@@ -160,7 +160,7 @@ FROM (
     FULL OUTER JOIN (
       SELECT
         subq_24.metric_time__day AS metric_time__day
-        , subq_20.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
+        , subq_20.__buys_null_filled AS __buys_null_filled
       FROM (
         SELECT
           subq_23.metric_time__day
@@ -192,7 +192,7 @@ FROM (
                 , toQuarter(time_spine_src_28006.ds) AS ds__extract_quarter
                 , toMonth(time_spine_src_28006.ds) AS ds__extract_month
                 , toDayOfMonth(time_spine_src_28006.ds) AS ds__extract_day
-                , toDayOfWeek(time_spine_src_28006.ds) AS ds__extract_dow
+                , toDayOfWeek(time_spine_src_28006.ds, 0) AS ds__extract_dow
                 , toDayOfYear(time_spine_src_28006.ds) AS ds__extract_doy
                 , time_spine_src_28006.alien_day AS ds__alien_day
               FROM ***************************.mf_time_spine time_spine_src_28006
@@ -203,20 +203,20 @@ FROM (
       LEFT OUTER JOIN (
         SELECT
           subq_19.metric_time__day
-          , SUM(subq_19.__buys_fill_nulls_with_0_join_to_timespine) AS __buys_fill_nulls_with_0_join_to_timespine
+          , SUM(subq_19.__buys_null_filled) AS __buys_null_filled
         FROM (
           SELECT
             subq_18.metric_time__day
-            , subq_18.__buys_fill_nulls_with_0_join_to_timespine
+            , subq_18.__buys_null_filled
           FROM (
             SELECT
               subq_17.metric_time__day
-              , subq_17.__buys_fill_nulls_with_0_join_to_timespine
+              , subq_17.__buys_null_filled
             FROM (
               SELECT
                 subq_16.metric_time__day
                 , subq_16.user
-                , subq_16.__buys_fill_nulls_with_0_join_to_timespine
+                , subq_16.__buys_null_filled
                 , subq_16.__visits_fill_nulls_with_0_join_to_timespine
               FROM (
                 SELECT DISTINCT
@@ -245,7 +245,7 @@ FROM (
                     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
                   ) AS user
                   , subq_15.mf_internal_uuid AS mf_internal_uuid
-                  , subq_15.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
+                  , subq_15.__buys_null_filled AS __buys_null_filled
                 FROM (
                   SELECT
                     subq_11.metric_time__day
@@ -312,7 +312,7 @@ FROM (
                           , toQuarter(visits_source_src_28000.ds) AS ds__extract_quarter
                           , toMonth(visits_source_src_28000.ds) AS ds__extract_month
                           , toDayOfMonth(visits_source_src_28000.ds) AS ds__extract_day
-                          , toDayOfWeek(visits_source_src_28000.ds) AS ds__extract_dow
+                          , toDayOfWeek(visits_source_src_28000.ds, 0) AS ds__extract_dow
                           , toDayOfYear(visits_source_src_28000.ds) AS ds__extract_doy
                           , visits_source_src_28000.referrer_id
                           , toStartOfDay(visits_source_src_28000.ds) AS visit__ds__day
@@ -324,7 +324,7 @@ FROM (
                           , toQuarter(visits_source_src_28000.ds) AS visit__ds__extract_quarter
                           , toMonth(visits_source_src_28000.ds) AS visit__ds__extract_month
                           , toDayOfMonth(visits_source_src_28000.ds) AS visit__ds__extract_day
-                          , toDayOfWeek(visits_source_src_28000.ds) AS visit__ds__extract_dow
+                          , toDayOfWeek(visits_source_src_28000.ds, 0) AS visit__ds__extract_dow
                           , toDayOfYear(visits_source_src_28000.ds) AS visit__ds__extract_doy
                           , visits_source_src_28000.referrer_id AS visit__referrer_id
                           , visits_source_src_28000.user_id AS user
@@ -387,9 +387,9 @@ FROM (
                     , subq_14.session_id
                     , subq_14.buy__user
                     , subq_14.buy__session_id
+                    , subq_14.__buys_null_filled
                     , subq_14.__buys
                     , subq_14.__buys_fill_nulls_with_0
-                    , subq_14.__buys_fill_nulls_with_0_join_to_timespine
                     , generateUUIDv4() AS mf_internal_uuid
                   FROM (
                     SELECT
@@ -442,14 +442,14 @@ FROM (
                       , subq_13.session_id
                       , subq_13.buy__user
                       , subq_13.buy__session_id
+                      , subq_13.__buys_null_filled
                       , subq_13.__buys
                       , subq_13.__buys_fill_nulls_with_0
-                      , subq_13.__buys_fill_nulls_with_0_join_to_timespine
                     FROM (
                       SELECT
-                        1 AS __buys
+                        1 AS __buys_null_filled
+                        , 1 AS __buys
                         , 1 AS __buys_fill_nulls_with_0
-                        , 1 AS __buys_fill_nulls_with_0_join_to_timespine
                         , 1 AS __buys_month
                         , toStartOfDay(buys_source_src_28000.ds) AS ds__day
                         , toStartOfWeek(buys_source_src_28000.ds, 1) AS ds__week
@@ -460,7 +460,7 @@ FROM (
                         , toQuarter(buys_source_src_28000.ds) AS ds__extract_quarter
                         , toMonth(buys_source_src_28000.ds) AS ds__extract_month
                         , toDayOfMonth(buys_source_src_28000.ds) AS ds__extract_day
-                        , toDayOfWeek(buys_source_src_28000.ds) AS ds__extract_dow
+                        , toDayOfWeek(buys_source_src_28000.ds, 0) AS ds__extract_dow
                         , toDayOfYear(buys_source_src_28000.ds) AS ds__extract_doy
                         , toStartOfMonth(buys_source_src_28000.ds_month) AS ds_month__month
                         , toStartOfQuarter(buys_source_src_28000.ds_month) AS ds_month__quarter
@@ -477,7 +477,7 @@ FROM (
                         , toQuarter(buys_source_src_28000.ds) AS buy__ds__extract_quarter
                         , toMonth(buys_source_src_28000.ds) AS buy__ds__extract_month
                         , toDayOfMonth(buys_source_src_28000.ds) AS buy__ds__extract_day
-                        , toDayOfWeek(buys_source_src_28000.ds) AS buy__ds__extract_dow
+                        , toDayOfWeek(buys_source_src_28000.ds, 0) AS buy__ds__extract_dow
                         , toDayOfYear(buys_source_src_28000.ds) AS buy__ds__extract_doy
                         , toStartOfMonth(buys_source_src_28000.ds_month) AS buy__ds_month__month
                         , toStartOfQuarter(buys_source_src_28000.ds_month) AS buy__ds_month__quarter
@@ -519,3 +519,4 @@ FROM (
       COALESCE(subq_9.metric_time__day, subq_25.metric_time__day)
   ) subq_26
 ) subq_27
+SETTINGS join_use_nulls = 1

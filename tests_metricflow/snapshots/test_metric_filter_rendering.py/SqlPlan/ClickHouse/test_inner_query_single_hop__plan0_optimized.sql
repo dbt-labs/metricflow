@@ -39,3 +39,4 @@ FROM (
   ) subq_37
   WHERE customer_third_hop_id__customer_id__customer_third_hop_id__paraguayan_customers > 0
 ) subq_38
+SETTINGS join_use_nulls = 1

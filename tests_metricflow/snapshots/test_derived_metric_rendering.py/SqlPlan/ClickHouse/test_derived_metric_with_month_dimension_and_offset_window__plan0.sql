@@ -48,7 +48,7 @@ FROM (
                 , toQuarter(time_spine_src_16006.ds) AS ds__extract_quarter
                 , toMonth(time_spine_src_16006.ds) AS ds__extract_month
                 , toDayOfMonth(time_spine_src_16006.ds) AS ds__extract_day
-                , toDayOfWeek(time_spine_src_16006.ds) AS ds__extract_dow
+                , toDayOfWeek(time_spine_src_16006.ds, 0) AS ds__extract_dow
                 , toDayOfYear(time_spine_src_16006.ds) AS ds__extract_doy
                 , time_spine_src_16006.alien_day AS ds__alien_day
               FROM ***************************.mf_time_spine time_spine_src_16006
@@ -123,3 +123,4 @@ FROM (
     ) subq_9
   ) subq_10
 ) subq_11
+SETTINGS join_use_nulls = 1

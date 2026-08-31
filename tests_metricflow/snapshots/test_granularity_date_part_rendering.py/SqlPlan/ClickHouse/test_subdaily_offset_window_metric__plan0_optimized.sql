@@ -26,3 +26,4 @@ FROM (
   ON
     addHours(time_spine_src_28005.ts, -1) = subq_16.metric_time__hour
 ) subq_22
+SETTINGS join_use_nulls = 1

@@ -3,7 +3,7 @@ test_filename: test_time_spine_join_rendering.py
 docstring:
   Check filter hierarchy.
 
-      Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+  Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -52,3 +52,4 @@ LEFT OUTER JOIN (
 ) subq_18
 ON
   subq_22.metric_time__day = subq_18.metric_time__day
+SETTINGS join_use_nulls = 1

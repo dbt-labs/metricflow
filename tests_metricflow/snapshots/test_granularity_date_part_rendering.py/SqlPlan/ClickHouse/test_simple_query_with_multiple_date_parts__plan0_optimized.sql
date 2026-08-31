@@ -16,7 +16,7 @@ FROM (
     , toQuarter(ds) AS metric_time__extract_quarter
     , toMonth(ds) AS metric_time__extract_month
     , toDayOfMonth(ds) AS metric_time__extract_day
-    , toDayOfWeek(ds) AS metric_time__extract_dow
+    , toDayOfWeek(ds, 0) AS metric_time__extract_dow
     , toDayOfYear(ds) AS metric_time__extract_doy
     , 1 AS __bookings
   FROM ***************************.fct_bookings bookings_source_src_28000
@@ -28,3 +28,4 @@ GROUP BY
   , metric_time__extract_day
   , metric_time__extract_dow
   , metric_time__extract_doy
+SETTINGS join_use_nulls = 1

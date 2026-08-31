@@ -99,3 +99,4 @@ FROM (
   ) subq_79
   WHERE user__visit_buy_conversion_rate > 2
 ) subq_80
+SETTINGS join_use_nulls = 1

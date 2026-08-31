@@ -17,7 +17,9 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlSubtractTimeIntervalExpression,
 )
 
-from metricflow.sql.render.clickhouse import ClickHouseSqlExpressionRenderer
+from metricflow.sql.render.clickhouse import ClickHouseSqlExpressionRenderer, ClickHouseSqlPlanRenderer
+from metricflow.sql.sql_plan import SqlPlan
+from metricflow.sql.sql_select_text_node import SqlSelectTextNode
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
 
@@ -123,7 +125,7 @@ def test_extract_day_of_week(clickhouse_renderer: ClickHouseSqlExpressionRendere
         date_part=DatePart.DOW,
     )
     result = clickhouse_renderer.visit_extract_expr(expr)
-    assert result.sql == "toDayOfWeek(a.date_col)"
+    assert result.sql == "toDayOfWeek(a.date_col, 0)"
 
 
 def test_add_time_days(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
@@ -229,7 +231,7 @@ def test_percentile_discrete(clickhouse_renderer: ClickHouseSqlExpressionRendere
 
 
 def test_percentile_approximate_discrete(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
-    """Test approximate discrete percentile (should use quantileTiming)."""
+    """Test approximate discrete percentile (should use quantileTDigest)."""
     expr = SqlPercentileExpression.create(
         order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "value_col")),
         percentile_args=SqlPercentileExpressionArgument(
@@ -237,7 +239,7 @@ def test_percentile_approximate_discrete(clickhouse_renderer: ClickHouseSqlExpre
         ),
     )
     result = clickhouse_renderer.visit_percentile_expr(expr)
-    assert result.sql == "quantileTiming(0.5)(a.value_col)"
+    assert result.sql == "quantileTDigest(0.5)(a.value_col)"
 
 
 def test_generate_uuid(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
@@ -269,3 +271,10 @@ def test_render_date_part_month(clickhouse_renderer: ClickHouseSqlExpressionRend
 def test_render_date_part_day_of_week(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
     """Test rendering date part for day of week."""
     assert clickhouse_renderer.render_date_part(DatePart.DOW) == "toDayOfWeek"
+
+
+def test_plan_renderer_emits_join_use_nulls_setting() -> None:
+    """Compiled ClickHouse SQL must set join_use_nulls so unmatched outer-join cells are SQL NULL."""
+    plan = SqlPlan(render_node=SqlSelectTextNode.create(select_query="SELECT 1 AS x"))
+    result = ClickHouseSqlPlanRenderer().render_sql_plan(plan)
+    assert "SETTINGS join_use_nulls = 1" in result.sql

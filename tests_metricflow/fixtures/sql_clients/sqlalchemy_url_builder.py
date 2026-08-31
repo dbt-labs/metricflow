@@ -310,7 +310,17 @@ class SqlAlchemyUrlBuilder:
         connection_params: SqlEngineConnectionParameterSet,
         password: str,
     ) -> SqlAlchemyURL:
-        """Build ClickHouse URL."""
+        """Build ClickHouse URL.
+
+        ClickHouse has database.table (no schema). The URL database is the stable
+        warehouse database from MF_SQL_ENGINE_URL (e.g. metricflow). MetricFlow's
+        per-test schema is a separate CREATE DATABASE and appears in generated SQL
+        as database.table — it cannot be the connect-time database because that
+        database does not exist until setup runs.
+
+        join_use_nulls=1 is required so LEFT/FULL OUTER JOIN unmatched cells are
+        SQL NULL, matching MetricFlow fill-nulls / ratio logic.
+        """
         return SqlAlchemyURL.create(
             drivername="clickhousedb",
             username=connection_params.username,
@@ -318,5 +328,8 @@ class SqlAlchemyUrlBuilder:
             host=connection_params.hostname,
             port=connection_params.port or 8123,
             database=connection_params.database,
-            query={"data_type_default_nullable": "1"},
+            query={
+                "data_type_default_nullable": "1",
+                "join_use_nulls": "1",
+            },
         )

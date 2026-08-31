@@ -26,3 +26,4 @@ FROM (
   ON
     time_spine_src_28006.ds = subq_15.metric_time__day
 ) subq_20
+SETTINGS join_use_nulls = 1

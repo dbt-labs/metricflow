@@ -38,3 +38,4 @@ FROM (
     metric_time__week
     , t2mr
 ) subq_24
+SETTINGS join_use_nulls = 1

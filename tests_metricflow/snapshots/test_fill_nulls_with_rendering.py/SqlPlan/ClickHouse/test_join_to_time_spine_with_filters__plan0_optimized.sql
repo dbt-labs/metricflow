@@ -50,3 +50,4 @@ FROM (
     subq_32.metric_time__day = subq_26.metric_time__day
   WHERE subq_32.metric_time__day BETWEEN '2020-01-03' AND '2020-01-05'
 ) subq_34
+SETTINGS join_use_nulls = 1

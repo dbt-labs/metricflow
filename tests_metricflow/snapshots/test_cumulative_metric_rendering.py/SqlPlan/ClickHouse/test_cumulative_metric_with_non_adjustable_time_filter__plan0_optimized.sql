@@ -3,9 +3,9 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a cumulative metric query with a time filter that cannot be automatically adjusted.
 
-      Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
-      span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
-      input data in order to ensure the cumulative metric is correct.
+  Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
+  span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
+  input data in order to ensure the cumulative metric is correct.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -33,3 +33,4 @@ FROM (
 ) subq_17
 GROUP BY
   metric_time__day
+SETTINGS join_use_nulls = 1

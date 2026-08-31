@@ -52,3 +52,4 @@ LEFT OUTER JOIN (
 ) subq_18
 ON
   subq_22.booking__ds__day = subq_18.booking__ds__day
+SETTINGS join_use_nulls = 1

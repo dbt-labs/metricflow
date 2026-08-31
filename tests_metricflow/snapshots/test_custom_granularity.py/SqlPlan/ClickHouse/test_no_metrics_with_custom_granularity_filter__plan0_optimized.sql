@@ -23,3 +23,4 @@ FROM (
 ) subq_8
 GROUP BY
   listing__ds__day
+SETTINGS join_use_nulls = 1

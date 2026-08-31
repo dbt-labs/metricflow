@@ -60,3 +60,4 @@ FROM (
   ) subq_63
   WHERE listing__views_times_booking_value > 1
 ) subq_64
+SETTINGS join_use_nulls = 1

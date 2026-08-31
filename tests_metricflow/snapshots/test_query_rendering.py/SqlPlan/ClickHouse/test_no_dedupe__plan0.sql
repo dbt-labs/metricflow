@@ -87,7 +87,7 @@ FROM (
             , toQuarter(listings_src_26000.active_from) AS window_start__extract_quarter
             , toMonth(listings_src_26000.active_from) AS window_start__extract_month
             , toDayOfMonth(listings_src_26000.active_from) AS window_start__extract_day
-            , toDayOfWeek(listings_src_26000.active_from) AS window_start__extract_dow
+            , toDayOfWeek(listings_src_26000.active_from, 0) AS window_start__extract_dow
             , toDayOfYear(listings_src_26000.active_from) AS window_start__extract_doy
             , listings_src_26000.active_to AS window_end__day
             , toStartOfWeek(listings_src_26000.active_to, 1) AS window_end__week
@@ -98,7 +98,7 @@ FROM (
             , toQuarter(listings_src_26000.active_to) AS window_end__extract_quarter
             , toMonth(listings_src_26000.active_to) AS window_end__extract_month
             , toDayOfMonth(listings_src_26000.active_to) AS window_end__extract_day
-            , toDayOfWeek(listings_src_26000.active_to) AS window_end__extract_dow
+            , toDayOfWeek(listings_src_26000.active_to, 0) AS window_end__extract_dow
             , toDayOfYear(listings_src_26000.active_to) AS window_end__extract_doy
             , listings_src_26000.country
             , listings_src_26000.is_lux
@@ -112,7 +112,7 @@ FROM (
             , toQuarter(listings_src_26000.active_from) AS listing__window_start__extract_quarter
             , toMonth(listings_src_26000.active_from) AS listing__window_start__extract_month
             , toDayOfMonth(listings_src_26000.active_from) AS listing__window_start__extract_day
-            , toDayOfWeek(listings_src_26000.active_from) AS listing__window_start__extract_dow
+            , toDayOfWeek(listings_src_26000.active_from, 0) AS listing__window_start__extract_dow
             , toDayOfYear(listings_src_26000.active_from) AS listing__window_start__extract_doy
             , listings_src_26000.active_to AS listing__window_end__day
             , toStartOfWeek(listings_src_26000.active_to, 1) AS listing__window_end__week
@@ -123,7 +123,7 @@ FROM (
             , toQuarter(listings_src_26000.active_to) AS listing__window_end__extract_quarter
             , toMonth(listings_src_26000.active_to) AS listing__window_end__extract_month
             , toDayOfMonth(listings_src_26000.active_to) AS listing__window_end__extract_day
-            , toDayOfWeek(listings_src_26000.active_to) AS listing__window_end__extract_dow
+            , toDayOfWeek(listings_src_26000.active_to, 0) AS listing__window_end__extract_dow
             , toDayOfYear(listings_src_26000.active_to) AS listing__window_end__extract_doy
             , listings_src_26000.country AS listing__country
             , listings_src_26000.is_lux AS listing__is_lux
@@ -173,7 +173,7 @@ FROM (
                 , toQuarter(time_spine_src_26006.ds) AS ds__extract_quarter
                 , toMonth(time_spine_src_26006.ds) AS ds__extract_month
                 , toDayOfMonth(time_spine_src_26006.ds) AS ds__extract_day
-                , toDayOfWeek(time_spine_src_26006.ds) AS ds__extract_dow
+                , toDayOfWeek(time_spine_src_26006.ds, 0) AS ds__extract_dow
                 , toDayOfYear(time_spine_src_26006.ds) AS ds__extract_doy
                 , time_spine_src_26006.alien_day AS ds__alien_day
               FROM ***************************.mf_time_spine time_spine_src_26006
@@ -195,7 +195,7 @@ FROM (
               , toQuarter(users_latest_src_26000.ds) AS ds__extract_quarter
               , toMonth(users_latest_src_26000.ds) AS ds__extract_month
               , toDayOfMonth(users_latest_src_26000.ds) AS ds__extract_day
-              , toDayOfWeek(users_latest_src_26000.ds) AS ds__extract_dow
+              , toDayOfWeek(users_latest_src_26000.ds, 0) AS ds__extract_dow
               , toDayOfYear(users_latest_src_26000.ds) AS ds__extract_doy
               , users_latest_src_26000.home_state_latest
               , toStartOfDay(users_latest_src_26000.ds) AS user__ds__day
@@ -207,7 +207,7 @@ FROM (
               , toQuarter(users_latest_src_26000.ds) AS user__ds__extract_quarter
               , toMonth(users_latest_src_26000.ds) AS user__ds__extract_month
               , toDayOfMonth(users_latest_src_26000.ds) AS user__ds__extract_day
-              , toDayOfWeek(users_latest_src_26000.ds) AS user__ds__extract_dow
+              , toDayOfWeek(users_latest_src_26000.ds, 0) AS user__ds__extract_dow
               , toDayOfYear(users_latest_src_26000.ds) AS user__ds__extract_doy
               , users_latest_src_26000.home_state_latest AS user__home_state_latest
               , users_latest_src_26000.user_id AS user
@@ -221,3 +221,4 @@ FROM (
     WHERE user__home_state_latest = 'CA'
   ) subq_8
 ) subq_9
+SETTINGS join_use_nulls = 1

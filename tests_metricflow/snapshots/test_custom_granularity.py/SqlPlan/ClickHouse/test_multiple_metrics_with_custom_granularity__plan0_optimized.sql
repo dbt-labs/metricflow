@@ -44,3 +44,4 @@ ON
   subq_21.metric_time__alien_day = subq_28.metric_time__alien_day
 GROUP BY
   COALESCE(subq_21.metric_time__alien_day, subq_28.metric_time__alien_day)
+SETTINGS join_use_nulls = 1

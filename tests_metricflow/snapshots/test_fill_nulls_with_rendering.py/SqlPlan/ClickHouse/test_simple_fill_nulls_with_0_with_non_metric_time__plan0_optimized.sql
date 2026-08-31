@@ -18,3 +18,4 @@ FROM (
   GROUP BY
     booking__paid_at__day
 ) subq_10
+SETTINGS join_use_nulls = 1

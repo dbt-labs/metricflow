@@ -1,1 +1,1 @@
-clickhouse-connect
+clickhouse-connect[sqlalchemy]>=0.8.0,<1.0.0

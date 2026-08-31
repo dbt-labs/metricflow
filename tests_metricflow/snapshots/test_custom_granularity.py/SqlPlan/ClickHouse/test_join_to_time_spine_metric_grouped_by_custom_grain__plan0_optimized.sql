@@ -31,3 +31,4 @@ LEFT OUTER JOIN (
 ) subq_17
 ON
   subq_21.metric_time__alien_day = subq_17.metric_time__alien_day
+SETTINGS join_use_nulls = 1

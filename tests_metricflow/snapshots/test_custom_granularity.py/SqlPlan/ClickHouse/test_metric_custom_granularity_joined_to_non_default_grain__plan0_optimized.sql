@@ -20,3 +20,4 @@ ON
 GROUP BY
   subq_8.alien_day
   , subq_7.listing__ds__month
+SETTINGS join_use_nulls = 1

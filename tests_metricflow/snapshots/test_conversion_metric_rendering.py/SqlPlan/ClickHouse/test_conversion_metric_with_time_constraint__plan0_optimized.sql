@@ -120,3 +120,4 @@ FROM (
   GROUP BY
     COALESCE(subq_29.visit__referrer_id, subq_41.visit__referrer_id)
 ) subq_42
+SETTINGS join_use_nulls = 1

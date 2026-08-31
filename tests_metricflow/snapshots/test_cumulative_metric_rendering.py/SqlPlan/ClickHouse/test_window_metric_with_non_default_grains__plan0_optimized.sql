@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative window metric queried with non-default grains.
 
-      Uses both metric_time and agg_time_dimension. Excludes default grain.
+  Uses both metric_time and agg_time_dimension. Excludes default grain.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -56,3 +56,4 @@ GROUP BY
   metric_time__week
   , booking__ds__month
   , every_two_days_bookers_fill_nulls_with_0
+SETTINGS join_use_nulls = 1

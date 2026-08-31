@@ -20,3 +20,4 @@ FROM (
 ) subq_10
 GROUP BY
   metric_time__extract_year
+SETTINGS join_use_nulls = 1

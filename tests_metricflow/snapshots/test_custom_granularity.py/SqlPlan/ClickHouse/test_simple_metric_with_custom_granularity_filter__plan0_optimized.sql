@@ -26,3 +26,4 @@ FROM (
   ) subq_11
   WHERE metric_time__alien_day = '2020-01-01'
 ) subq_12
+SETTINGS join_use_nulls = 1

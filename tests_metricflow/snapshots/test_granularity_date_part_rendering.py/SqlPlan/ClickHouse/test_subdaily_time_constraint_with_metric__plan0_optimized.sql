@@ -28,3 +28,4 @@ LEFT OUTER JOIN (
 ON
   subq_28.metric_time__hour = subq_23.metric_time__hour
 WHERE subq_28.metric_time__hour BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+SETTINGS join_use_nulls = 1

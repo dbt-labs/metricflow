@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with enabled.
 
-      TODO: support metric time filters
+  TODO: support metric time filters
 sql_engine: ClickHouse
 ---
 WITH sma_28009_cte AS (
@@ -134,3 +134,4 @@ FROM (
     COALESCE(subq_47.metric_time__day, subq_61.metric_time__day)
     , COALESCE(subq_47.listing__country_latest, subq_61.listing__country_latest)
 ) subq_62
+SETTINGS join_use_nulls = 1

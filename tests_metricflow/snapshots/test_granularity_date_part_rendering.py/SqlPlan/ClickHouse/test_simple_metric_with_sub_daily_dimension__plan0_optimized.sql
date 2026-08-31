@@ -13,3 +13,4 @@ FROM (
 ) subq_9
 GROUP BY
   user__archived_at__hour
+SETTINGS join_use_nulls = 1

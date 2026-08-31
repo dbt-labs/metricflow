@@ -34,3 +34,4 @@ FROM (
 ) subq_30
 GROUP BY
   listing
+SETTINGS join_use_nulls = 1

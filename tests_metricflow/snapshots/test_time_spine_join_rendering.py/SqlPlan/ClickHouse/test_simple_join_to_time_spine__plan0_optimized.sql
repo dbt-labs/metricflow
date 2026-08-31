@@ -21,3 +21,4 @@ LEFT OUTER JOIN (
 ) subq_15
 ON
   time_spine_src_28006.ds = subq_15.metric_time__day
+SETTINGS join_use_nulls = 1

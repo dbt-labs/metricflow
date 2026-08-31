@@ -26,3 +26,4 @@ FROM (
 GROUP BY
   listing__is_lux_latest
   , user__home_state_latest
+SETTINGS join_use_nulls = 1

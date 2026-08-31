@@ -230,7 +230,7 @@ FROM (
                 , toQuarter(bookings_source_src_26000.ds) AS ds__extract_quarter
                 , toMonth(bookings_source_src_26000.ds) AS ds__extract_month
                 , toDayOfMonth(bookings_source_src_26000.ds) AS ds__extract_day
-                , toDayOfWeek(bookings_source_src_26000.ds) AS ds__extract_dow
+                , toDayOfWeek(bookings_source_src_26000.ds, 0) AS ds__extract_dow
                 , toDayOfYear(bookings_source_src_26000.ds) AS ds__extract_doy
                 , toStartOfDay(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__day
                 , toStartOfWeek(bookings_source_src_26000.ds_partitioned, 1) AS ds_partitioned__week
@@ -241,7 +241,7 @@ FROM (
                 , toQuarter(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_quarter
                 , toMonth(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_month
                 , toDayOfMonth(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_day
-                , toDayOfWeek(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_dow
+                , toDayOfWeek(bookings_source_src_26000.ds_partitioned, 0) AS ds_partitioned__extract_dow
                 , toDayOfYear(bookings_source_src_26000.ds_partitioned) AS ds_partitioned__extract_doy
                 , toStartOfDay(bookings_source_src_26000.paid_at) AS paid_at__day
                 , toStartOfWeek(bookings_source_src_26000.paid_at, 1) AS paid_at__week
@@ -252,7 +252,7 @@ FROM (
                 , toQuarter(bookings_source_src_26000.paid_at) AS paid_at__extract_quarter
                 , toMonth(bookings_source_src_26000.paid_at) AS paid_at__extract_month
                 , toDayOfMonth(bookings_source_src_26000.paid_at) AS paid_at__extract_day
-                , toDayOfWeek(bookings_source_src_26000.paid_at) AS paid_at__extract_dow
+                , toDayOfWeek(bookings_source_src_26000.paid_at, 0) AS paid_at__extract_dow
                 , toDayOfYear(bookings_source_src_26000.paid_at) AS paid_at__extract_doy
                 , bookings_source_src_26000.is_instant AS booking__is_instant
                 , toStartOfDay(bookings_source_src_26000.ds) AS booking__ds__day
@@ -264,7 +264,7 @@ FROM (
                 , toQuarter(bookings_source_src_26000.ds) AS booking__ds__extract_quarter
                 , toMonth(bookings_source_src_26000.ds) AS booking__ds__extract_month
                 , toDayOfMonth(bookings_source_src_26000.ds) AS booking__ds__extract_day
-                , toDayOfWeek(bookings_source_src_26000.ds) AS booking__ds__extract_dow
+                , toDayOfWeek(bookings_source_src_26000.ds, 0) AS booking__ds__extract_dow
                 , toDayOfYear(bookings_source_src_26000.ds) AS booking__ds__extract_doy
                 , toStartOfDay(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__day
                 , toStartOfWeek(bookings_source_src_26000.ds_partitioned, 1) AS booking__ds_partitioned__week
@@ -275,7 +275,7 @@ FROM (
                 , toQuarter(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_quarter
                 , toMonth(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_month
                 , toDayOfMonth(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_day
-                , toDayOfWeek(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_dow
+                , toDayOfWeek(bookings_source_src_26000.ds_partitioned, 0) AS booking__ds_partitioned__extract_dow
                 , toDayOfYear(bookings_source_src_26000.ds_partitioned) AS booking__ds_partitioned__extract_doy
                 , toStartOfDay(bookings_source_src_26000.paid_at) AS booking__paid_at__day
                 , toStartOfWeek(bookings_source_src_26000.paid_at, 1) AS booking__paid_at__week
@@ -286,7 +286,7 @@ FROM (
                 , toQuarter(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_quarter
                 , toMonth(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_month
                 , toDayOfMonth(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_day
-                , toDayOfWeek(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_dow
+                , toDayOfWeek(bookings_source_src_26000.paid_at, 0) AS booking__paid_at__extract_dow
                 , toDayOfYear(bookings_source_src_26000.paid_at) AS booking__paid_at__extract_doy
                 , bookings_source_src_26000.listing_id AS listing
                 , bookings_source_src_26000.guest_id AS guest
@@ -383,7 +383,7 @@ FROM (
                   , toQuarter(listings_src_26000.active_from) AS window_start__extract_quarter
                   , toMonth(listings_src_26000.active_from) AS window_start__extract_month
                   , toDayOfMonth(listings_src_26000.active_from) AS window_start__extract_day
-                  , toDayOfWeek(listings_src_26000.active_from) AS window_start__extract_dow
+                  , toDayOfWeek(listings_src_26000.active_from, 0) AS window_start__extract_dow
                   , toDayOfYear(listings_src_26000.active_from) AS window_start__extract_doy
                   , listings_src_26000.active_to AS window_end__day
                   , toStartOfWeek(listings_src_26000.active_to, 1) AS window_end__week
@@ -394,7 +394,7 @@ FROM (
                   , toQuarter(listings_src_26000.active_to) AS window_end__extract_quarter
                   , toMonth(listings_src_26000.active_to) AS window_end__extract_month
                   , toDayOfMonth(listings_src_26000.active_to) AS window_end__extract_day
-                  , toDayOfWeek(listings_src_26000.active_to) AS window_end__extract_dow
+                  , toDayOfWeek(listings_src_26000.active_to, 0) AS window_end__extract_dow
                   , toDayOfYear(listings_src_26000.active_to) AS window_end__extract_doy
                   , listings_src_26000.country
                   , listings_src_26000.is_lux
@@ -408,7 +408,7 @@ FROM (
                   , toQuarter(listings_src_26000.active_from) AS listing__window_start__extract_quarter
                   , toMonth(listings_src_26000.active_from) AS listing__window_start__extract_month
                   , toDayOfMonth(listings_src_26000.active_from) AS listing__window_start__extract_day
-                  , toDayOfWeek(listings_src_26000.active_from) AS listing__window_start__extract_dow
+                  , toDayOfWeek(listings_src_26000.active_from, 0) AS listing__window_start__extract_dow
                   , toDayOfYear(listings_src_26000.active_from) AS listing__window_start__extract_doy
                   , listings_src_26000.active_to AS listing__window_end__day
                   , toStartOfWeek(listings_src_26000.active_to, 1) AS listing__window_end__week
@@ -419,7 +419,7 @@ FROM (
                   , toQuarter(listings_src_26000.active_to) AS listing__window_end__extract_quarter
                   , toMonth(listings_src_26000.active_to) AS listing__window_end__extract_month
                   , toDayOfMonth(listings_src_26000.active_to) AS listing__window_end__extract_day
-                  , toDayOfWeek(listings_src_26000.active_to) AS listing__window_end__extract_dow
+                  , toDayOfWeek(listings_src_26000.active_to, 0) AS listing__window_end__extract_dow
                   , toDayOfYear(listings_src_26000.active_to) AS listing__window_end__extract_doy
                   , listings_src_26000.country AS listing__country
                   , listings_src_26000.is_lux AS listing__is_lux
@@ -467,7 +467,7 @@ FROM (
                     , toQuarter(users_latest_src_26000.ds) AS ds__extract_quarter
                     , toMonth(users_latest_src_26000.ds) AS ds__extract_month
                     , toDayOfMonth(users_latest_src_26000.ds) AS ds__extract_day
-                    , toDayOfWeek(users_latest_src_26000.ds) AS ds__extract_dow
+                    , toDayOfWeek(users_latest_src_26000.ds, 0) AS ds__extract_dow
                     , toDayOfYear(users_latest_src_26000.ds) AS ds__extract_doy
                     , users_latest_src_26000.home_state_latest
                     , toStartOfDay(users_latest_src_26000.ds) AS user__ds__day
@@ -479,7 +479,7 @@ FROM (
                     , toQuarter(users_latest_src_26000.ds) AS user__ds__extract_quarter
                     , toMonth(users_latest_src_26000.ds) AS user__ds__extract_month
                     , toDayOfMonth(users_latest_src_26000.ds) AS user__ds__extract_day
-                    , toDayOfWeek(users_latest_src_26000.ds) AS user__ds__extract_dow
+                    , toDayOfWeek(users_latest_src_26000.ds, 0) AS user__ds__extract_dow
                     , toDayOfYear(users_latest_src_26000.ds) AS user__ds__extract_doy
                     , users_latest_src_26000.home_state_latest AS user__home_state_latest
                     , users_latest_src_26000.user_id AS user
@@ -512,3 +512,4 @@ FROM (
       , subq_15.listing__user__home_state_latest
   ) subq_16
 ) subq_17
+SETTINGS join_use_nulls = 1

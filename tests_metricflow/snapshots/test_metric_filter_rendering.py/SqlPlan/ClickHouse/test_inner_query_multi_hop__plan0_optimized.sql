@@ -44,3 +44,4 @@ FROM (
   ) subq_61
   WHERE customer_third_hop_id__account_id__customer_id__customer_third_hop_id__txn_count > 2
 ) subq_62
+SETTINGS join_use_nulls = 1

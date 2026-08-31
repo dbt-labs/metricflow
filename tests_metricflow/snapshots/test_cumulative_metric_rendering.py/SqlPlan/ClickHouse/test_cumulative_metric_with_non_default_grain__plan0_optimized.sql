@@ -33,3 +33,4 @@ FROM (
 GROUP BY
   metric_time__week
   , revenue_all_time
+SETTINGS join_use_nulls = 1

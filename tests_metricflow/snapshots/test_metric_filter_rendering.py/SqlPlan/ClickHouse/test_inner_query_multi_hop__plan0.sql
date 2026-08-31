@@ -116,7 +116,7 @@ FROM (
                   , toQuarter(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_quarter
                   , toMonth(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_month
                   , toDayOfMonth(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_day
-                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_dow
+                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds, 0) AS third_hop_ds__extract_dow
                   , toDayOfYear(third_hop_table_src_22000.third_hop_ds) AS third_hop_ds__extract_doy
                   , third_hop_table_src_22000.value AS customer_third_hop_id__value
                   , toStartOfDay(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__day
@@ -128,7 +128,7 @@ FROM (
                   , toQuarter(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_quarter
                   , toMonth(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_month
                   , toDayOfMonth(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_day
-                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_dow
+                  , toDayOfWeek(third_hop_table_src_22000.third_hop_ds, 0) AS customer_third_hop_id__third_hop_ds__extract_dow
                   , toDayOfYear(third_hop_table_src_22000.third_hop_ds) AS customer_third_hop_id__third_hop_ds__extract_doy
                   , third_hop_table_src_22000.customer_third_hop_id
                 FROM ***************************.third_hop_table third_hop_table_src_22000
@@ -290,7 +290,7 @@ FROM (
                               , toQuarter(account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_quarter
                               , toMonth(account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_month
                               , toDayOfMonth(account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_day
-                              , toDayOfWeek(account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_dow
+                              , toDayOfWeek(account_month_txns_src_22000.ds_partitioned, 0) AS ds_partitioned__extract_dow
                               , toDayOfYear(account_month_txns_src_22000.ds_partitioned) AS ds_partitioned__extract_doy
                               , toStartOfDay(account_month_txns_src_22000.ds) AS ds__day
                               , toStartOfWeek(account_month_txns_src_22000.ds, 1) AS ds__week
@@ -301,7 +301,7 @@ FROM (
                               , toQuarter(account_month_txns_src_22000.ds) AS ds__extract_quarter
                               , toMonth(account_month_txns_src_22000.ds) AS ds__extract_month
                               , toDayOfMonth(account_month_txns_src_22000.ds) AS ds__extract_day
-                              , toDayOfWeek(account_month_txns_src_22000.ds) AS ds__extract_dow
+                              , toDayOfWeek(account_month_txns_src_22000.ds, 0) AS ds__extract_dow
                               , toDayOfYear(account_month_txns_src_22000.ds) AS ds__extract_doy
                               , account_month_txns_src_22000.account_month
                               , toStartOfDay(account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__day
@@ -313,7 +313,7 @@ FROM (
                               , toQuarter(account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_quarter
                               , toMonth(account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_month
                               , toDayOfMonth(account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_day
-                              , toDayOfWeek(account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_dow
+                              , toDayOfWeek(account_month_txns_src_22000.ds_partitioned, 0) AS account_id__ds_partitioned__extract_dow
                               , toDayOfYear(account_month_txns_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_doy
                               , toStartOfDay(account_month_txns_src_22000.ds) AS account_id__ds__day
                               , toStartOfWeek(account_month_txns_src_22000.ds, 1) AS account_id__ds__week
@@ -324,7 +324,7 @@ FROM (
                               , toQuarter(account_month_txns_src_22000.ds) AS account_id__ds__extract_quarter
                               , toMonth(account_month_txns_src_22000.ds) AS account_id__ds__extract_month
                               , toDayOfMonth(account_month_txns_src_22000.ds) AS account_id__ds__extract_day
-                              , toDayOfWeek(account_month_txns_src_22000.ds) AS account_id__ds__extract_dow
+                              , toDayOfWeek(account_month_txns_src_22000.ds, 0) AS account_id__ds__extract_dow
                               , toDayOfYear(account_month_txns_src_22000.ds) AS account_id__ds__extract_doy
                               , account_month_txns_src_22000.account_month AS account_id__account_month
                               , account_month_txns_src_22000.account_id
@@ -496,7 +496,7 @@ FROM (
                                   , toQuarter(bridge_table_src_22000.ds_partitioned) AS ds_partitioned__extract_quarter
                                   , toMonth(bridge_table_src_22000.ds_partitioned) AS ds_partitioned__extract_month
                                   , toDayOfMonth(bridge_table_src_22000.ds_partitioned) AS ds_partitioned__extract_day
-                                  , toDayOfWeek(bridge_table_src_22000.ds_partitioned) AS ds_partitioned__extract_dow
+                                  , toDayOfWeek(bridge_table_src_22000.ds_partitioned, 0) AS ds_partitioned__extract_dow
                                   , toDayOfYear(bridge_table_src_22000.ds_partitioned) AS ds_partitioned__extract_doy
                                   , bridge_table_src_22000.extra_dim AS account_id__extra_dim
                                   , toStartOfDay(bridge_table_src_22000.ds_partitioned) AS account_id__ds_partitioned__day
@@ -508,7 +508,7 @@ FROM (
                                   , toQuarter(bridge_table_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_quarter
                                   , toMonth(bridge_table_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_month
                                   , toDayOfMonth(bridge_table_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_day
-                                  , toDayOfWeek(bridge_table_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_dow
+                                  , toDayOfWeek(bridge_table_src_22000.ds_partitioned, 0) AS account_id__ds_partitioned__extract_dow
                                   , toDayOfYear(bridge_table_src_22000.ds_partitioned) AS account_id__ds_partitioned__extract_doy
                                   , bridge_table_src_22000.extra_dim AS bridge_account__extra_dim
                                   , toStartOfDay(bridge_table_src_22000.ds_partitioned) AS bridge_account__ds_partitioned__day
@@ -520,7 +520,7 @@ FROM (
                                   , toQuarter(bridge_table_src_22000.ds_partitioned) AS bridge_account__ds_partitioned__extract_quarter
                                   , toMonth(bridge_table_src_22000.ds_partitioned) AS bridge_account__ds_partitioned__extract_month
                                   , toDayOfMonth(bridge_table_src_22000.ds_partitioned) AS bridge_account__ds_partitioned__extract_day
-                                  , toDayOfWeek(bridge_table_src_22000.ds_partitioned) AS bridge_account__ds_partitioned__extract_dow
+                                  , toDayOfWeek(bridge_table_src_22000.ds_partitioned, 0) AS bridge_account__ds_partitioned__extract_dow
                                   , toDayOfYear(bridge_table_src_22000.ds_partitioned) AS bridge_account__ds_partitioned__extract_doy
                                   , bridge_table_src_22000.account_id
                                   , bridge_table_src_22000.customer_id
@@ -650,7 +650,7 @@ FROM (
                                     , toQuarter(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_quarter
                                     , toMonth(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_month
                                     , toDayOfMonth(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_day
-                                    , toDayOfWeek(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_dow
+                                    , toDayOfWeek(customer_other_data_src_22000.acquired_ds, 0) AS acquired_ds__extract_dow
                                     , toDayOfYear(customer_other_data_src_22000.acquired_ds) AS acquired_ds__extract_doy
                                     , customer_other_data_src_22000.country AS customer_id__country
                                     , toStartOfDay(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__day
@@ -662,7 +662,7 @@ FROM (
                                     , toQuarter(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_quarter
                                     , toMonth(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_month
                                     , toDayOfMonth(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_day
-                                    , toDayOfWeek(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_dow
+                                    , toDayOfWeek(customer_other_data_src_22000.acquired_ds, 0) AS customer_id__acquired_ds__extract_dow
                                     , toDayOfYear(customer_other_data_src_22000.acquired_ds) AS customer_id__acquired_ds__extract_doy
                                     , customer_other_data_src_22000.country AS customer_third_hop_id__country
                                     , toStartOfDay(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__day
@@ -674,7 +674,7 @@ FROM (
                                     , toQuarter(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_quarter
                                     , toMonth(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_month
                                     , toDayOfMonth(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_day
-                                    , toDayOfWeek(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_dow
+                                    , toDayOfWeek(customer_other_data_src_22000.acquired_ds, 0) AS customer_third_hop_id__acquired_ds__extract_dow
                                     , toDayOfYear(customer_other_data_src_22000.acquired_ds) AS customer_third_hop_id__acquired_ds__extract_doy
                                     , customer_other_data_src_22000.customer_id
                                     , customer_other_data_src_22000.customer_third_hop_id
@@ -711,3 +711,4 @@ FROM (
     ) subq_30
   ) subq_31
 ) subq_32
+SETTINGS join_use_nulls = 1

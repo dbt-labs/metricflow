@@ -51,3 +51,4 @@ FROM (
   GROUP BY
     COALESCE(subq_20.metric_time__day, subq_25.metric_time__day)
 ) subq_26
+SETTINGS join_use_nulls = 1

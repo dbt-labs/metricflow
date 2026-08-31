@@ -9,3 +9,4 @@ SELECT
   , b.country AS user__country
   , c.country AS listing__country
 FROM demo.fct_bookings a
+SETTINGS join_use_nulls = 1

@@ -3,7 +3,7 @@ test_filename: test_metric_filter_rendering.py
 docstring:
   Tests a query with a cumulative metric in the query-level where filter.
 
-      Note this cumulative metric has no window / grain to date.
+  Note this cumulative metric has no window / grain to date.
 sql_engine: ClickHouse
 ---
 SELECT
@@ -34,3 +34,4 @@ FROM (
   ) subq_37
   WHERE user__revenue_all_time > 1
 ) subq_38
+SETTINGS join_use_nulls = 1

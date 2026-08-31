@@ -34,3 +34,4 @@ FROM (
 ) subq_16
 GROUP BY
   user__home_state_latest
+SETTINGS join_use_nulls = 1

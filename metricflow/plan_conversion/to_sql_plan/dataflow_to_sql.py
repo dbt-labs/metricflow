@@ -102,12 +102,12 @@ class DataflowToSqlPlanConverter:
                 # names match. This violates standard SQL evaluation order and can cause ILLEGAL_AGGREGATION errors
                 # or silent wrong results. Enable the guard that prevents reducing when the FROM source's WHERE
                 # contains SqlStringExpression (the only source of unqualified column references).
-                has_ambiguous_alias_resolution_in_where = sql_engine_type is SqlEngine.CLICKHOUSE
+                has_ambiguous_alias_resolution = sql_engine_type is SqlEngine.CLICKHOUSE
 
                 option_set = SqlGenerationOptionSet.options_for_level(
                     attempted_optimization_level,
                     use_column_alias_in_group_by=use_column_alias_in_group_by,
-                    has_ambiguous_alias_resolution_in_where=has_ambiguous_alias_resolution_in_where,
+                    has_ambiguous_alias_resolution=has_ambiguous_alias_resolution,
                 )
 
                 logger.info(

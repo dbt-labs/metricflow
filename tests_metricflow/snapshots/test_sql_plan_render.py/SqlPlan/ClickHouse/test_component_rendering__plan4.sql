@@ -19,3 +19,4 @@ ON
   a.user_id = c.user_id
 GROUP BY
   b.country
+SETTINGS join_use_nulls = 1

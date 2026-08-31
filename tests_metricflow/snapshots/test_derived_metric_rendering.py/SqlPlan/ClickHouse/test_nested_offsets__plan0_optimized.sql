@@ -45,3 +45,4 @@ FROM (
   ON
     addDays(rss_28018_cte.ds__day, -2) = subq_29.metric_time__day
 ) subq_34
+SETTINGS join_use_nulls = 1

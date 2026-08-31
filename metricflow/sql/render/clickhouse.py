@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Collection
+from typing import Collection, Optional
 
 from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
@@ -24,7 +24,8 @@ from metricflow.sql.render.expr_renderer import (
     SqlExpressionRenderer,
     SqlExpressionRenderResult,
 )
-from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer
+from metricflow.sql.render.sql_plan_renderer import DefaultSqlPlanRenderer, SqlPlanRenderResult
+from metricflow.sql.sql_plan import SqlPlan
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -38,7 +39,7 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     ClickHouse has significant differences from standard SQL:
     - Uses toStartOf* functions instead of DATE_TRUNC
     - Parameterized aggregate functions (quantile(0.5)(column))
-    - Different data type names (Float64, DateTime64, String)
+    - Different data type names (Nullable(Float64), Nullable(DateTime64(3)), String)
     - Case-sensitive function names
 
     Reference: https://clickhouse.com/docs/en/sql-reference/functions
@@ -49,16 +50,19 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @property
     @override
     def double_data_type(self) -> str:
-        """ClickHouse uses Float64 for double precision floating point."""
+        """ClickHouse CAST target for floats.
+
+        Must be Nullable so CAST of SQL NULL after outer joins succeeds.
+        `CAST(NULL AS Float64)` raises CANNOT_INSERT_NULL_IN_ORDINARY_COLUMN.
+        """
         return "Nullable(Float64)"
 
     @property
     @override
     def timestamp_data_type(self) -> str:
-        """ClickHouse uses DateTime for timestamps.
+        """ClickHouse CAST target for timestamps.
 
-        Note: DateTime64 is available for higher precision, but DateTime
-        is the standard type that matches other engines' TIMESTAMP behavior.
+        Nullable for the same reason as `double_data_type`.
         """
         return "Nullable(DateTime64(3))"
 
@@ -160,8 +164,11 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         arg_rendered = self.render_sql_expr(node.arg)
         date_part_function = self.render_date_part(node.date_part)
 
-        # ClickHouse functions take the date as argument
-        sql = f"{date_part_function}({arg_rendered.sql})"
+        # Monday=1 matches MetricFlow's ISO DOW (EXTRACT(isodow ...)) on other engines.
+        if node.date_part is DatePart.DOW:
+            sql = f"{date_part_function}({arg_rendered.sql}, 0)"
+        else:
+            sql = f"{date_part_function}({arg_rendered.sql})"
 
         return SqlExpressionRenderResult(
             sql=sql,
@@ -278,7 +285,7 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         - quantileExact(0.5)(column) - exact continuous
         - quantileExactLow(0.5)(column) - exact discrete (low)
         - quantileExactHigh(0.5)(column) - exact discrete (high)
-        - quantileTiming(0.5)(column) - approximate discrete
+        - quantileTDigest(0.5)(column) - approximate discrete
 
         Reference: https://clickhouse.com/docs/en/sql-reference/aggregate-functions/reference/quantile
         """
@@ -298,7 +305,7 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
             # Default to low to match typical discrete behavior
             function_str = "quantileExactLow"
         elif function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
-            function_str = "quantileTiming"
+            function_str = "quantileTDigest"
         else:
             assert_values_exhausted(function_type)
 
@@ -361,27 +368,33 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 class ClickHouseSqlPlanRenderer(DefaultSqlPlanRenderer):
     """Plan renderer for the ClickHouse engine.
 
-    Most plan-level rendering follows ANSI SQL, but we may need to override
-    specific methods for ClickHouse-specific syntax.
+    Most plan-level rendering follows ANSI SQL. Query-level SETTINGS pin dialect
+    contracts that MetricFlow assumes (SQL NULL from unmatched outer joins).
     """
 
     EXPR_RENDERER = ClickHouseSqlExpressionRenderer()
+    _QUERY_SETTINGS = "join_use_nulls = 1"
 
     @override
-    def _render_description_section(self, description: str) -> None:
-        """Render the description section as a comment.
+    def render_sql_plan(self, sql_query_plan: SqlPlan) -> SqlPlanRenderResult:
+        result = super().render_sql_plan(sql_query_plan)
+        sql = result.sql.rstrip().rstrip(";")
+        if "join_use_nulls" not in sql:
+            sql = f"{sql}\nSETTINGS {self._QUERY_SETTINGS}"
+        return SqlPlanRenderResult(sql=sql, bind_parameter_set=result.bind_parameter_set)
 
-        e.g.
-        -- Description of the node.
+    @override
+    def _render_description_section(self, description: str) -> Optional[SqlPlanRenderResult]:
+        """Skip leading comment lines.
 
+        The ClickHouse SQLAlchemy dialect loses column metadata (result.keys())
+        for zero-row results when the SQL query begins with leading -- comments.
         """
-        logger.warning(
-            (
-                "The ClickHouse SQLAlchemy dialect loses column metadata (result.keys()) "
-                "for zero-row results when the SQL query begins with leading -- comment lines. "
-                "Comments are suppressed to avoid this bug."
-            )
+        logger.debug(
+            "Suppressing SQL plan description comments for ClickHouse to avoid the "
+            "clickhouse-sqlalchemy zero-row result.keys() bug."
         )
+        return None
 
     @property
     @override

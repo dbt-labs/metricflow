@@ -162,3 +162,4 @@ FROM (
     COALESCE(subq_34.metric_time__day, subq_49.metric_time__day)
     , COALESCE(subq_34.user__home_state_latest, subq_49.user__home_state_latest)
 ) subq_50
+SETTINGS join_use_nulls = 1

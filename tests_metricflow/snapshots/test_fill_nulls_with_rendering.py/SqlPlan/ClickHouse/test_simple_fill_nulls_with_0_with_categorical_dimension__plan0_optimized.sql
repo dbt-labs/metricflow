@@ -18,3 +18,4 @@ FROM (
   GROUP BY
     booking__is_instant
 ) subq_10
+SETTINGS join_use_nulls = 1

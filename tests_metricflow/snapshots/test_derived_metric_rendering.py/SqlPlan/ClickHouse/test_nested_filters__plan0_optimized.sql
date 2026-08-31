@@ -64,3 +64,4 @@ FROM (
     ) subq_45
   ) subq_46
 ) subq_47
+SETTINGS join_use_nulls = 1

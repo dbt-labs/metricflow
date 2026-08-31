@@ -32,3 +32,4 @@ FROM (
 ) subq_18
 GROUP BY
   booking__is_instant
+SETTINGS join_use_nulls = 1

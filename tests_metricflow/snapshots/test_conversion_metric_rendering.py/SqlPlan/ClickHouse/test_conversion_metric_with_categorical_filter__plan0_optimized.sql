@@ -132,3 +132,4 @@ FROM (
     COALESCE(subq_25.metric_time__day, subq_37.metric_time__day)
     , COALESCE(subq_25.visit__referrer_id, subq_37.visit__referrer_id)
 ) subq_38
+SETTINGS join_use_nulls = 1

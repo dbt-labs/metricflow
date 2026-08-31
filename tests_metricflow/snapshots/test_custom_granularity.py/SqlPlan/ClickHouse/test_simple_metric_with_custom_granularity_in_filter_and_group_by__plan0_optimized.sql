@@ -30,3 +30,4 @@ FROM (
 ) subq_12
 GROUP BY
   metric_time__alien_day
+SETTINGS join_use_nulls = 1

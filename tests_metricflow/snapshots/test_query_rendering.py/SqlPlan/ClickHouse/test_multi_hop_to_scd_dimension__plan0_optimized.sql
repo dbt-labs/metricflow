@@ -44,3 +44,4 @@ ON
 GROUP BY
   subq_19.metric_time__day
   , subq_24.lux_listing__is_confirmed_lux
+SETTINGS join_use_nulls = 1

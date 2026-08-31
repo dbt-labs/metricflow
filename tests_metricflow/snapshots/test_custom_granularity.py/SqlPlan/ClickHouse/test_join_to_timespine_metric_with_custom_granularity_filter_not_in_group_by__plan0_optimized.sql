@@ -47,3 +47,4 @@ LEFT OUTER JOIN (
 ) subq_20
 ON
   subq_24.metric_time__day = subq_20.metric_time__day
+SETTINGS join_use_nulls = 1

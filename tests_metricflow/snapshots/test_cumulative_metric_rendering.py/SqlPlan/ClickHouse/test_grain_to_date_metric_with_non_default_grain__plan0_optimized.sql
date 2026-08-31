@@ -37,3 +37,4 @@ FROM (
 GROUP BY
   metric_time__month
   , revenue_mtd
+SETTINGS join_use_nulls = 1

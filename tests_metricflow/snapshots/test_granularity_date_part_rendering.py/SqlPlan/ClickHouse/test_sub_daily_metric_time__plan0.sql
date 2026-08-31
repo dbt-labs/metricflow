@@ -57,7 +57,7 @@ FROM (
           , toQuarter(time_spine_src_28002.ts) AS ts__extract_quarter
           , toMonth(time_spine_src_28002.ts) AS ts__extract_month
           , toDayOfMonth(time_spine_src_28002.ts) AS ts__extract_day
-          , toDayOfWeek(time_spine_src_28002.ts) AS ts__extract_dow
+          , toDayOfWeek(time_spine_src_28002.ts, 0) AS ts__extract_dow
           , toDayOfYear(time_spine_src_28002.ts) AS ts__extract_doy
         FROM ***************************.mf_time_spine_millisecond time_spine_src_28002
       ) subq_0
@@ -66,3 +66,4 @@ FROM (
   GROUP BY
     subq_2.metric_time__millisecond
 ) subq_3
+SETTINGS join_use_nulls = 1

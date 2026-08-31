@@ -32,3 +32,4 @@ FROM (
 ) subq_18
 GROUP BY
   listing__country_latest
+SETTINGS join_use_nulls = 1
