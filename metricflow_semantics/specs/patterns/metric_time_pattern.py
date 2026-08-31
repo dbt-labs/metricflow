@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Iterable, Sequence
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -21,7 +21,7 @@ class MetricTimePattern(SpecPattern):
     """
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[TimeDimensionSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[TimeDimensionSpec]:
         spec_set = group_specs_by_type(candidate_specs)
         return tuple(
             time_dimension_spec

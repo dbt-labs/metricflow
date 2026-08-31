@@ -3,7 +3,7 @@ test_filename: test_offset_metrics.py
 docstring:
   Test offset to grain metric queried with non-default grain and where constraint.
 
-      Tests that where constraints work properly with JoinOverTimeRangeNode and JoinToTimeSpineNode.
+  Tests that where constraints work properly with JoinOverTimeRangeNode and JoinToTimeSpineNode.
 ---
 metric_time__month      bookings_all_time    bookings_all_time_at_start_of_month    bookings_since_start_of_month
 --------------------  -------------------  -------------------------------------  -------------------------------

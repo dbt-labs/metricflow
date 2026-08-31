@@ -100,28 +100,3 @@ class MetricFlowQuerySpec(SerializableDataclass):
             apply_group_by=self.apply_group_by,
             input_spec_order=self.input_spec_order,
         )
-
-    def without_aliases(self) -> MetricFlowQuerySpec:
-        """Return a query spec that's the same as self but with all aliases removed."""
-        return MetricFlowQuerySpec(
-            metric_specs=tuple(metric_spec.with_alias(None) for metric_spec in self.metric_specs),
-            dimension_specs=tuple(dimension_spec.with_alias(None) for dimension_spec in self.dimension_specs),
-            entity_specs=tuple(entity_spec.with_alias(None) for entity_spec in self.entity_specs),
-            time_dimension_specs=tuple(
-                time_dimension_spec.with_alias(None) for time_dimension_spec in self.time_dimension_specs
-            ),
-            group_by_metric_specs=tuple(
-                group_by_metric_spec.with_alias(None) for group_by_metric_spec in self.group_by_metric_specs
-            ),
-            order_by_specs=tuple(order_by_spec.with_alias(None) for order_by_spec in self.order_by_specs),
-            time_range_constraint=self.time_range_constraint,
-            limit=self.limit,
-            filter_intersection=self.filter_intersection,
-            filter_spec_resolution_lookup=self.filter_spec_resolution_lookup,
-            min_max_only=self.min_max_only,
-            apply_group_by=self.apply_group_by,
-            input_spec_order=InputSpecOrder(
-                group_by_item_specs=tuple(spec.with_alias(None) for spec in self.input_spec_order.group_by_item_specs),
-                metric_specs=tuple(metric_spec.with_alias(None) for metric_spec in self.input_spec_order.metric_specs),
-            ),
-        )

@@ -46,7 +46,7 @@ def query_options(function: Callable) -> Callable:
     function = click.option(
         "--where",
         type=str,
-        default=None,
+        multiple=True,
         help=(
             "SQL-like where statement provided as a string and wrapped in quotes. "
             "All filter items must explicitly reference fields or dimensions "

@@ -3,8 +3,8 @@ test_filename: test_convert_semantic_model.py
 docstring:
   Complete test of table semantic model conversion. This includes the full set of simple-metric inputs/entities/dimensions.
 
-      Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
-      dimension types, which should cover most, if not all, of the table source branches in the target class.
+  Measures trigger a primary time dimension validation. Additionally, this includes both categorical and time
+  dimension types, which should cover most, if not all, of the table source branches in the target class.
 sql_engine: DuckDB
 ---
 -- Read Elements From Semantic Model 'id_verifications'

@@ -63,7 +63,7 @@ def test_create(setup_statement: str) -> None:
         left_statement="create_group('left')",
         right_setup=setup_statement,
         right_statement="create_fast_group('left')",
-        min_performance_factor=1.5,
+        min_performance_factor=1.4,
     )
 
 

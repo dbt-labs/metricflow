@@ -20,7 +20,7 @@ FROM (
     -- Select: ['__referred_bookings', '__bookings', 'metric_time__day']
     -- Select: ['__referred_bookings', '__bookings', 'metric_time__day']
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
+      TIMESTAMP_TRUNC(ds, day) AS metric_time__day
       , 1 AS __bookings
       , CASE WHEN referrer_id IS NOT NULL THEN 1 ELSE 0 END AS __referred_bookings
     FROM ***************************.fct_bookings bookings_source_src_28000

@@ -166,6 +166,15 @@ class LinkableSpecSet(Mergeable, SerializableDataclass, Collection[LinkableInsta
     def __contains__(self, x: object, /) -> bool:
         return x in self._item_set
 
+    @cached_property
+    def without_aliases(self) -> LinkableSpecSet:  # noqa: D102
+        return LinkableSpecSet(
+            dimension_specs=tuple(spec.with_alias(None) for spec in self.dimension_specs),
+            time_dimension_specs=tuple(spec.with_alias(None) for spec in self.time_dimension_specs),
+            entity_specs=tuple(spec.with_alias(None) for spec in self.entity_specs),
+            group_by_metric_specs=tuple(spec.with_alias(None) for spec in self.group_by_metric_specs),
+        )
+
 
 @dataclass
 class _GroupSpecByTypeVisitor(InstanceSpecVisitor[None]):

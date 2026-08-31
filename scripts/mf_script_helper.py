@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 import subprocess
+import sys
+from collections.abc import Mapping
 from pathlib import Path
 from subprocess import CompletedProcess
 from typing import Optional, Sequence
@@ -27,6 +29,7 @@ class MetricFlowScriptHelper:
         working_directory: Optional[Path] = None,
         raise_exception_on_error: bool = True,
         capture_output: bool = False,
+        env: Optional[Mapping[str, str]] = None,
     ) -> CompletedProcess:
         """Thin wrapper around `subprocess.run` with more string types and log statements.
 
@@ -35,6 +38,8 @@ class MetricFlowScriptHelper:
             working_directory: The working directory where the command should be run.
             raise_exception_on_error: If the command fails, raise an exception.
             capture_output: Same as the argument for `subprocess.run`.
+            env: Environment variables for the child process.  Inherits the
+                current environment when ``None``.
 
         Returns: The `CompletedProcess` similar to `subprocess.run`
         """
@@ -42,9 +47,14 @@ class MetricFlowScriptHelper:
             logger.info(f"Running {command=}")
         else:
             logger.info(f"In {str(working_directory)!r}: Running {command=}")
-        return subprocess.run(
-            command, cwd=working_directory, check=raise_exception_on_error, capture_output=capture_output
+        sys.stdout.flush()
+        sys.stderr.flush()
+        result = subprocess.run(
+            command, cwd=working_directory, check=raise_exception_on_error, capture_output=capture_output, env=env
         )
+        sys.stdout.flush()
+        sys.stderr.flush()
+        return result
 
     @staticmethod
     def run_shell_command(
@@ -58,4 +68,9 @@ class MetricFlowScriptHelper:
             logger.info(f"Running {shell_command=}")
         else:
             logger.info(f"In {str(working_directory)!r}: Running {shell_command=}")
-        return subprocess.run(shell_command, shell=True, cwd=working_directory, check=raise_exception_on_error)
+        sys.stdout.flush()
+        sys.stderr.flush()
+        result = subprocess.run(shell_command, shell=True, cwd=working_directory, check=raise_exception_on_error)
+        sys.stdout.flush()
+        sys.stderr.flush()
+        return result

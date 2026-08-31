@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence, Tuple
+from typing import Iterable, Sequence, Tuple
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -22,5 +22,5 @@ class MatchListSpecPattern(SpecPattern):
         return MatchListSpecPattern(tuple(listed_specs))
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[InstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[InstanceSpec]:
         return tuple(spec for spec in candidate_specs if spec in self.listed_specs)

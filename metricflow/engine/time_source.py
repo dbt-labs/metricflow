@@ -9,4 +9,4 @@ class ServerTimeSource(TimeSource):
     """A time source that represents the current datetime in UTC."""
 
     def get_time(self) -> dt.datetime:  # noqa: D102
-        return dt.datetime.utcnow()
+        return dt.datetime.now(dt.timezone.utc)

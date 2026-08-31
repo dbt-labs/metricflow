@@ -32,10 +32,10 @@ LEFT OUTER JOIN (
     -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
     -- Select: ['__subdaily_join_to_time_spine_metric', 'metric_time__hour']
     SELECT
-      DATETIME_TRUNC(archived_at, hour) AS metric_time__hour
+      TIMESTAMP_TRUNC(archived_at, hour) AS metric_time__hour
       , 1 AS __subdaily_join_to_time_spine_metric
     FROM ***************************.dim_users users_ds_source_src_28000
-    WHERE DATETIME_TRUNC(archived_at, hour) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
+    WHERE TIMESTAMP_TRUNC(archived_at, hour) BETWEEN '2020-01-01 02:00:00' AND '2020-01-01 05:00:00'
   ) subq_22
   GROUP BY
     metric_time__hour

@@ -14,7 +14,7 @@ FROM (
   -- Select: ['booking__paid_at__day']
   -- Select: ['booking__paid_at__day']
   SELECT
-    DATETIME_TRUNC(paid_at, day) AS booking__paid_at__day
+    TIMESTAMP_TRUNC(paid_at, day) AS booking__paid_at__day
   FROM ***************************.fct_bookings bookings_source_src_28000
   GROUP BY
     booking__paid_at__day

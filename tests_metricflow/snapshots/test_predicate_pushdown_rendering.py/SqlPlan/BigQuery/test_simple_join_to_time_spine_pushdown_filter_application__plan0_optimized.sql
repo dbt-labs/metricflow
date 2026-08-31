@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we join to a time spine and query the filter input.
 
-      This should produce a SQL query that applies the filter outside of the time spine join.
+  This should produce a SQL query that applies the filter outside of the time spine join.
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
@@ -33,7 +33,7 @@ FROM (
       -- Metric Time Dimension 'ds'
       -- Select: ['__bookings_join_to_time_spine', 'booking__is_instant', 'metric_time__day']
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
+        TIMESTAMP_TRUNC(ds, day) AS metric_time__day
         , is_instant AS booking__is_instant
         , 1 AS bookings_join_to_time_spine
       FROM ***************************.fct_bookings bookings_source_src_28000

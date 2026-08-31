@@ -8,7 +8,7 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
     , listing_id AS listing
     , 1 AS __bookings
     , booking_value AS __average_booking_value

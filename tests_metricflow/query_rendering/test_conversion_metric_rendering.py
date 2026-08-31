@@ -271,3 +271,34 @@ def test_conversion_metric_with_metric_definition_filter(
         dataflow_plan_builder=dataflow_plan_builder,
         query_spec=parsed_query.query_spec,
     )
+
+
+@pytest.mark.sql_engine_snapshot
+def test_conversion_metric_with_base_measure_filter(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_parser: MetricFlowQueryParser,
+    create_source_tables: bool,
+) -> None:
+    """Test rendering a query against a conversion metric with a filter defined on its base_measure input.
+
+    A filter attached at the point a metric's base input is declared (`base_measure`/`base_metric`) is distinct
+    from that input's own definition-level filter, and previously was silently dropped during dataflow plan
+    construction.
+    """
+    parsed_query = query_parser.parse_and_validate_query(
+        metric_names=("visit_buy_conversion_rate_with_base_measure_filter",),
+        group_by_names=("metric_time__day",),
+    )
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=parsed_query.query_spec,
+    )

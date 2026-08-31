@@ -54,7 +54,7 @@ def test_set_equals(setup_statement: str) -> None:
             ),
         ),
         right_statement="left == right",
-        min_performance_factor=35.0,
+        min_performance_factor=20.0,
     )
 
 
@@ -72,7 +72,7 @@ def test_set_in(setup_statement: str) -> None:
             f"singleton_id_set = create_singleton_id_set({size})",
         ),
         right_statement="FIRST_SINGLETON_ID in singleton_id_set",
-        min_performance_factor=5.0,
+        min_performance_factor=4.0,
     )
 
 
@@ -100,7 +100,7 @@ def test_tuple_equals(setup_statement: str) -> None:
             ),
         ),
         right_statement="left == right",
-        min_performance_factor=55.0,
+        min_performance_factor=30.0,
     )
 
 

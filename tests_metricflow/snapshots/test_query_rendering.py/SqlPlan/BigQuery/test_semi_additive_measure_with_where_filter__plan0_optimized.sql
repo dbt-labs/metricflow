@@ -23,7 +23,7 @@ FROM (
     -- Metric Time Dimension 'ds'
     -- Select: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
     SELECT
-      DATETIME_TRUNC(ds, day) AS ds__day
+      TIMESTAMP_TRUNC(ds, day) AS ds__day
       , user_id AS user
       , account_type AS account__account_type
       , account_balance AS current_account_balance_by_user
@@ -42,7 +42,7 @@ INNER JOIN (
     -- Metric Time Dimension 'ds'
     -- Select: ['__current_account_balance_by_user', 'account__account_type', 'ds__day', 'user']
     SELECT
-      DATETIME_TRUNC(ds, day) AS ds__day
+      TIMESTAMP_TRUNC(ds, day) AS ds__day
       , user_id AS user
       , account_type AS account__account_type
     FROM ***************************.fct_accounts accounts_source_src_28000

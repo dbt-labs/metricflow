@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Iterable, Optional
+from typing import Final, Iterable, Optional
 
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError, UnknownMetricError
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -37,7 +37,7 @@ from metricflow_semantics.semantic_graph.trie_resolver.group_by_metric_resolver 
     GroupByMetricTrieResolver,
 )
 from metricflow_semantics.semantic_graph.trie_resolver.simple_resolver import SimpleTrieResolver
-from metricflow_semantics.toolkit.cache.result_cache import ResultCache
+from metricflow_semantics.toolkit.cache.weighted_lru_result_cache import WeightedLruResultCache
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet, MutableOrderedSet
 from metricflow_semantics.toolkit.dataclass_helpers import fast_frozen_dataclass
 from metricflow_semantics.toolkit.mf_graph.graph_labeling import MetricFlowGraphLabel
@@ -54,11 +54,15 @@ logger = logging.getLogger(__name__)
 class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
     """An implementation of `GroupByItemSetResolver` using the semantic graph."""
 
+    # Weight is an approximate count of cached group-by item specs.
+    _DEFAULT_RESULT_CACHE_WEIGHT_LIMIT: Final[int] = 100_000
+
     def __init__(  # noqa: D107
         self,
         semantic_graph: SemanticGraph,
         manifest_object_lookup: ManifestObjectLookup,
         path_finder: MetricFlowPathfinder[SemanticGraphNode, SemanticGraphEdge, AttributeRecipeWriterPath],
+        result_cache_weight_limit: Optional[int] = None,
     ) -> None:
         self._semantic_graph = semantic_graph
         self._pathfinder = path_finder
@@ -70,12 +74,25 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
         self._metric_time_node_set = FrozenOrderedSet(
             (self._semantic_graph.node_with_label(MetricTimeLabel.get_instance()),)
         )
+        resolved_result_cache_weight_limit = (
+            self._DEFAULT_RESULT_CACHE_WEIGHT_LIMIT if result_cache_weight_limit is None else result_cache_weight_limit
+        )
 
-        self._result_cache_for_distinct_values: ResultCache[
+        self._result_cache_for_distinct_values: WeightedLruResultCache[
             tuple[Optional[GroupByItemSetFilter]], BaseGroupByItemSet
-        ] = ResultCache()
+        ] = WeightedLruResultCache(weight_limit=resolved_result_cache_weight_limit)
 
-        self._result_cache_for_common_set: ResultCache[_CommonSetCacheKey, BaseGroupByItemSet] = ResultCache()
+        self._result_cache_for_common_set: WeightedLruResultCache[
+            _CommonSetCacheKey, BaseGroupByItemSet
+        ] = WeightedLruResultCache(weight_limit=resolved_result_cache_weight_limit)
+
+    @staticmethod
+    def _result_cache_weight(group_by_item_set: BaseGroupByItemSet) -> int:
+        """Return the cache weight for a group-by item set.
+
+        Weight is 1 (key object) + 1 (value object) + count of group-by items.
+        """
+        return 2 + len(group_by_item_set.annotated_specs)
 
     @override
     def get_set_for_distinct_values_query(
@@ -122,9 +139,10 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
         tries_to_union.append(filtered_metric_time_trie)
         result_trie = MutableDunderNameTrie.union_merge_common(tries_to_union)
+        result = GroupByItemSet.create_from_trie(result_trie)
 
         return self._result_cache_for_distinct_values.set_and_get(
-            cache_key, GroupByItemSet.create_from_trie(result_trie)
+            cache_key, result, weight=self._result_cache_weight(result)
         )
 
     @override
@@ -189,15 +207,17 @@ class SemanticGraphGroupByItemSetResolver(GroupByItemSetResolver):
 
         if joins_disallowed:
             simple_trie = self._simple_resolver_limit_one_model.resolve_trie(source_nodes, set_filter).dunder_name_trie
+            result = GroupByItemSet.create_from_trie(simple_trie)
             return self._result_cache_for_common_set.set_and_get(
-                cache_key, GroupByItemSet.create_from_trie(simple_trie)
+                cache_key, result, weight=self._result_cache_weight(result)
             )
 
         simple_trie = self._simple_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
         group_by_metric_trie = self._group_by_metric_resolver.resolve_trie(source_nodes, set_filter).dunder_name_trie
 
+        result = GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
         return self._result_cache_for_common_set.set_and_get(
-            cache_key, GroupByItemSet.create_from_trie(simple_trie, group_by_metric_trie)
+            cache_key, result, weight=self._result_cache_weight(result)
         )
 
 

@@ -3,9 +3,9 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a cumulative metric query with an adjustable time constraint.
 
-      Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
-      span of input data for a cumulative metric, but when we receive a time constraint filter expression we can
-      automatically adjust it should render a query similar to this one.
+  Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
+  span of input data for a cumulative metric, but when we receive a time constraint filter expression we can
+  automatically adjust it should render a query similar to this one.
 sql_engine: BigQuery
 ---
 -- Write to DataTable
@@ -170,22 +170,22 @@ FROM (
                     -- Read Elements From Semantic Model 'revenue'
                     SELECT
                       revenue_src_28000.revenue AS __revenue
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, day) AS ds__day
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, isoweek) AS ds__week
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, month) AS ds__month
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, quarter) AS ds__quarter
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, year) AS ds__year
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) AS ds__day
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, isoweek) AS ds__week
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, month) AS ds__month
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, quarter) AS ds__quarter
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, year) AS ds__year
                       , EXTRACT(year FROM revenue_src_28000.created_at) AS ds__extract_year
                       , EXTRACT(quarter FROM revenue_src_28000.created_at) AS ds__extract_quarter
                       , EXTRACT(month FROM revenue_src_28000.created_at) AS ds__extract_month
                       , EXTRACT(day FROM revenue_src_28000.created_at) AS ds__extract_day
                       , IF(EXTRACT(dayofweek FROM revenue_src_28000.created_at) = 1, 7, EXTRACT(dayofweek FROM revenue_src_28000.created_at) - 1) AS ds__extract_dow
                       , EXTRACT(dayofyear FROM revenue_src_28000.created_at) AS ds__extract_doy
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, day) AS revenue_instance__ds__day
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, isoweek) AS revenue_instance__ds__week
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, month) AS revenue_instance__ds__month
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, quarter) AS revenue_instance__ds__quarter
-                      , DATETIME_TRUNC(revenue_src_28000.created_at, year) AS revenue_instance__ds__year
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) AS revenue_instance__ds__day
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, isoweek) AS revenue_instance__ds__week
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, month) AS revenue_instance__ds__month
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, quarter) AS revenue_instance__ds__quarter
+                      , TIMESTAMP_TRUNC(revenue_src_28000.created_at, year) AS revenue_instance__ds__year
                       , EXTRACT(year FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_year
                       , EXTRACT(quarter FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_quarter
                       , EXTRACT(month FROM revenue_src_28000.created_at) AS revenue_instance__ds__extract_month

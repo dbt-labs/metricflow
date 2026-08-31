@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Literal, NoReturn
 
 from typing_extensions import override
@@ -25,6 +26,9 @@ class ConvertCountMetricToSumRule(ProtocolHint[SemanticManifestTransformRule[Pyd
     """
 
     TRANSFORMED_AGG_TYPE = AggregationType.SUM
+    # Pattern that matches the CASE WHEN expression produced by _maybe_transform_expression.
+    # Used by downstream consumers (e.g. MSIToOSIConverter) to detect and re-qualify converted exprs.
+    COUNT_CONVERSION_RE = re.compile(r"^CASE WHEN ([A-Za-z_][A-Za-z0-9_]*) IS NOT NULL THEN 1 ELSE 0 END$")
 
     @override
     def _implements_protocol(self) -> SemanticManifestTransformRule[PydanticSemanticManifest]:  # noqa: D102

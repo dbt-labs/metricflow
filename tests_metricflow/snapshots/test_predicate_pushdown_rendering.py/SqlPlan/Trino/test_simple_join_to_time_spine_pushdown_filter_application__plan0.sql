@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we join to a time spine and query the filter input.
 
-      This should produce a SQL query that applies the filter outside of the time spine join.
+  This should produce a SQL query that applies the filter outside of the time spine join.
 sql_engine: Trino
 ---
 -- Write to DataTable

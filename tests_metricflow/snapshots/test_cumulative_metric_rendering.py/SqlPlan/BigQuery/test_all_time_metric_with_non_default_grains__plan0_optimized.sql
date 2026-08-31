@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative all-time metric queried with non-default grains.
 
-      Uses only metric_time. Excludes default grain.
+  Uses only metric_time. Excludes default grain.
 sql_engine: BigQuery
 ---
 -- Re-aggregate Metric via Group By
@@ -33,15 +33,15 @@ FROM (
     -- Compute Metrics via Expressions
     SELECT
       subq_15.ds AS metric_time__day
-      , DATETIME_TRUNC(subq_15.ds, isoweek) AS metric_time__week
-      , DATETIME_TRUNC(subq_15.ds, quarter) AS metric_time__quarter
+      , TIMESTAMP_TRUNC(subq_15.ds, isoweek) AS metric_time__week
+      , TIMESTAMP_TRUNC(subq_15.ds, quarter) AS metric_time__quarter
       , SUM(revenue_src_28000.revenue) AS revenue_all_time
     FROM ***************************.mf_time_spine subq_15
     INNER JOIN
       ***************************.fct_revenue revenue_src_28000
     ON
       (
-        DATETIME_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
+        TIMESTAMP_TRUNC(revenue_src_28000.created_at, day) <= subq_15.ds
       )
     GROUP BY
       metric_time__day

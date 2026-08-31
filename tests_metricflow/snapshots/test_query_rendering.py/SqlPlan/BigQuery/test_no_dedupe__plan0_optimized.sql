@@ -12,7 +12,7 @@ FROM (
   -- Join Standard Outputs
   -- Select: ['listing__capacity', 'user__home_state_latest', 'metric_time__month']
   SELECT
-    DATETIME_TRUNC(time_spine_src_26006.ds, month) AS metric_time__month
+    TIMESTAMP_TRUNC(time_spine_src_26006.ds, month) AS metric_time__month
     , listings_src_26000.capacity AS listing__capacity
     , users_latest_src_26000.home_state_latest AS user__home_state_latest
   FROM ***************************.dim_listings listings_src_26000

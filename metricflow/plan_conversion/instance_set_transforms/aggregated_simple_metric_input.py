@@ -3,15 +3,23 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Tuple
 
+from metricflow_semantics.errors.error_classes import InvalidManifestException
 from metricflow_semantics.instances import InstanceSet, InstanceSetTransform, SimpleMetricInputInstance
 from metricflow_semantics.semantic_graph.lookups.manifest_object_lookup import ManifestObjectLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.simple_metric_input_spec import SimpleMetricInputSpec
-from metricflow_semantics.sql.sql_exprs import SqlColumnReference, SqlColumnReferenceExpression, SqlFunctionExpression
+from metricflow_semantics.sql.sql_exprs import (
+    SqlColumnReference,
+    SqlColumnReferenceExpression,
+    SqlFunctionExpression,
+    SqlPercentileExpressionArgument,
+)
+from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.plan_conversion.instance_set_transforms.select_columns import CreateSelectColumnsForInstances
 from metricflow.plan_conversion.select_column_gen import SelectColumnSet
 from metricflow.sql.sql_plan import SqlSelectColumn
+from metricflow_semantic_interfaces.type_enums import AggregationType
 
 
 @dataclass(frozen=True)
@@ -73,11 +81,32 @@ class CreateAggregatedSimpleMetricInputsTransform(InstanceSetTransform[CreateAgg
         )
 
         # Figure out the aggregation function for the simple metric.
-        aggregation_expression = SqlFunctionExpression.build_expression_from_aggregation_type(
-            aggregation_type=simple_metric_input.agg,
-            sql_column_expression=read_expression,
-            agg_params=simple_metric_input.agg_params,
-        )
+        aggregation_type = simple_metric_input.agg
+
+        if aggregation_type is AggregationType.PERCENTILE:
+            agg_params = simple_metric_input.agg_params
+            if agg_params is None or agg_params.percentile is None:
+                raise InvalidManifestException(
+                    LazyFormat(
+                        "Percentile value not set for a simple metric configured with a percentile aggregation."
+                        " This indicates an error in the manifest and should have been caught in validation.",
+                        simple_metric_name=simple_metric_input.name,
+                    )
+                )
+
+            aggregation_expression = SqlFunctionExpression.build_expression_for_percentile_aggregation(
+                percentile_args=SqlPercentileExpressionArgument.create(
+                    percentile=agg_params.percentile,
+                    approximate=agg_params.use_approximate_percentile,
+                    discrete=agg_params.use_discrete_percentile,
+                ),
+                sql_column_expression=read_expression,
+            )
+        else:
+            aggregation_expression = SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
+                aggregation_type=aggregation_type,
+                sql_column_expression=read_expression,
+            )
 
         # Get the output column name for the simple-metric input.
 

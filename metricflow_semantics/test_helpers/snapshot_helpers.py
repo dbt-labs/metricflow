@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import difflib
+import inspect
 import logging
 import os
 import pathlib
@@ -10,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Mapping, Optional, Tuple, TypeVar
 
 import _pytest.fixtures
+import pytest
 import tabulate
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.dag.mf_dag import MetricFlowDag
@@ -17,7 +19,7 @@ from metricflow_semantics.model.semantics.linkable_element_set_base import BaseG
 from metricflow_semantics.naming.object_builder_scheme import ObjectBuilderNamingScheme
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.spec_set import InstanceSpecSet, group_spec_by_type
-from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
+from metricflow_semantics.test_helpers.terminal_helpers import mf_path_hyperlink
 from metricflow_semantics.toolkit.mf_logging.format_option import PrettyFormatOption
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
@@ -70,28 +72,27 @@ def assert_snapshot_text_equal(
     if incomparable_strings_replacement_function is not None:
         snapshot_text = incomparable_strings_replacement_function(snapshot_text)
 
-    open_snapshot_uri = file_path.resolve().as_uri()
     logger.debug(
         LazyFormat(
-            "Generated snapshot text",
-            snapshot_text=snapshot_text if log_snapshot_text else "<hidden in log output>",
+            "Generated snapshot",
+            snapshot_text=snapshot_text if log_snapshot_text else "<snapshot text hidden>",
             file_path=file_path,
-            open_link=mf_colored_link_text(open_snapshot_uri),
-            iterm_hint="Link may be opened with <Command> + <Left Click>",
+            open_link=mf_path_hyperlink(file_path),
+            iterm_hint="Open the link with Command-click",
         )
     )
 
     # Add a header with context about the snapshot.
     if include_headers:
         path_to_test_file = pathlib.Path(request.node.fspath)
-        test_doc_string = request.function.__doc__
+        test_doc_string = inspect.getdoc(request.function)
         header_lines = [
             f"test_name: {request.node.name}",
             f"test_filename: {path_to_test_file.name}",
         ]
         if test_doc_string is not None:
             header_lines.append("docstring:")
-            header_lines.append(mf_indent(test_doc_string.rstrip()))
+            header_lines.append(mf_indent(test_doc_string))
         if additional_header_fields is not None:
             for header_field_name, header_field_value in additional_header_fields.items():
                 header_lines.append(f"{header_field_name}: {header_field_value}")
@@ -116,18 +117,16 @@ def assert_snapshot_text_equal(
     # Throw an exception if the plan is not there.
     if not os.path.exists(file_path):
         raise FileNotFoundError(
-            f"Could not find snapshot file at path {file_path}. Re-run with --overwrite-snapshots and check git status "
-            f"to see what's new."
+            f"Snapshot not found: {file_path}. Rerun the test with `{OVERWRITE_SNAPSHOTS_CLI_FLAG}` to create it, "
+            "then review the new file."
         )
 
     if snapshot_configuration.display_snapshots:
         if not snapshot_configuration.overwrite_snapshots:
-            logger.warning(
-                LazyFormat(lambda: f"Not overwriting snapshots, so displaying existing snapshot at {file_path}")
-            )
+            logger.warning(LazyFormat(lambda: f"Displaying the stored snapshot without updating it: {file_path}"))
 
         if len(request.session.items) > 1:
-            raise ValueError("Displaying snapshots is only supported when there's a single item in a testing session.")
+            raise ValueError(f"`{DISPLAY_SNAPSHOTS_CLI_FLAG}` requires exactly one selected test.")
         webbrowser.open(file_path.resolve().as_uri())
 
     # Read the existing plan from the file and compare with the actual plan
@@ -148,10 +147,13 @@ def assert_snapshot_text_equal(
             diff = difflib.unified_diff(
                 a=expected_snapshot_text.splitlines(keepends=True),
                 b=snapshot_text.splitlines(keepends=True),
-                fromfile=f"Expected Result in {file_path}",
-                tofile="Actual Result",
+                fromfile=f"Stored snapshot: {file_path}",
+                tofile="Generated output",
             )
-            assert False, "Result does not match the stored snapshot. Diff from expected to actual:\n\n" + "".join(diff)
+            pytest.fail(
+                "Generated output does not match the stored snapshot. If this change is expected, rerun the test with "
+                f"`--{OVERWRITE_SNAPSHOTS_CLI_FLAG}` to update the snapshot. Diff:\n\n" + "".join(diff)
+            )
 
 
 def snapshot_path_prefix(
@@ -208,14 +210,18 @@ OVERWRITE_SNAPSHOTS_CLI_FLAG = "--overwrite-snapshots"
 
 
 def add_display_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
-    parser.addoption(DISPLAY_SNAPSHOTS_CLI_FLAG, action="store_true", help="Displays snapshots in a browser if set")
+    parser.addoption(
+        DISPLAY_SNAPSHOTS_CLI_FLAG,
+        action="store_true",
+        help="Open the selected test's snapshot in a browser",
+    )
 
 
 def add_overwrite_snapshots_cli_flag(parser: _pytest.config.argparsing.Parser) -> None:  # noqa: D103
     parser.addoption(
         OVERWRITE_SNAPSHOTS_CLI_FLAG,
         action="store_true",
-        help="Overwrites existing snapshots by ones generated during this testing session",
+        help="Create or update snapshots with generated output",
     )
 
 
@@ -315,7 +321,7 @@ def _convert_linkable_element_set_to_rows(
                 entity_link.element_name for entity_link in group_by_metric_spec.metric_subquery_entity_links
             )
         else:
-            raise RuntimeError(LazyFormat("There should have been at most 1 group-by-metric spec", spec_set=spec_set))
+            raise RuntimeError(LazyFormat("Expected at most one group-by-metric spec", spec_set=spec_set))
         row_dict["Type"] = annotated_spec.element_type.name.ljust(14)
 
         row_dict["Properties"] = ",".join(

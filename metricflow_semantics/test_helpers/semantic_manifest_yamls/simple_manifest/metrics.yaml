@@ -1046,3 +1046,27 @@ metric:
       window: 7 days
       entity: user
       calculation: conversion_rate
+---
+metric:
+  name: buys_null_filled
+  description: Buy count with nulls filled, the conversion-side input metric.
+  type: simple
+  type_params:
+    measure:
+      name: buys
+      fill_nulls_with: 0
+      join_to_timespine: true
+---
+metric:
+  name: visit_buy_conversion_rate_with_base_measure_filter
+  description: Conversion metric with a filter defined on the base_measure input
+  type: conversion
+  type_params:
+    conversion_type_params:
+      base_measure:
+        name: visits
+        filter: "{{ Dimension('visit__referrer_id') }} = 'ref_id_01'"
+      conversion_measure: buys
+      window: 7 days
+      entity: user
+      calculation: conversion_rate

@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "dbt-metricflow"
 description = "Execute commands against the MetricFlow semantic layer with dbt."
 readme = "README.md"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.10,<3.15"
 license = "Apache-2.0"
 authors = [
   { name = "dbt Labs", email = "info@dbtlabs.com" },
@@ -15,10 +15,11 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -53,6 +54,9 @@ dbt-databricks = [
 ]
 dbt-duckdb = [
   "requirements-files/requirements-dbt-duckdb.txt"
+]
+dbt-athena = [
+  "requirements-files/requirements-dbt-athena.txt"
 ]
 dbt-postgres = [
   "requirements-files/requirements-dbt-postgres.txt"

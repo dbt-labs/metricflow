@@ -18,7 +18,7 @@ FROM (
     -- Select: ['__bookings_fill_nulls_with_0', 'booking__paid_at__day']
     -- Select: ['__bookings_fill_nulls_with_0', 'booking__paid_at__day']
     SELECT
-      DATETIME_TRUNC(paid_at, day) AS booking__paid_at__day
+      TIMESTAMP_TRUNC(paid_at, day) AS booking__paid_at__day
       , 1 AS __bookings_fill_nulls_with_0
     FROM ***************************.fct_bookings bookings_source_src_28000
   ) subq_9

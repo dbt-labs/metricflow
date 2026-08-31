@@ -1,0 +1,9 @@
+test_name: test_clean_with_missing_state_file
+test_filename: test_clean.py
+docstring:
+  Check running `clean` with a missing state file.
+expectation_description:
+  Includes a message for a missing state file.
+---
+MetricFlow repo directory: <TMP>/metricflow
+State file <TMP>/metricflow/git_ignored/mf_release_tool_state.json does not exist, nothing to delete

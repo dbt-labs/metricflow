@@ -8,8 +8,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-import graphviz
-from graphviz import Digraph
 from metricflow_semantics.toolkit.mf_graph.formatting.dot_attributes import (
     DotEdgeAttributeSet,
     DotGraphAttributeSet,
@@ -24,6 +22,7 @@ from metricflow_semantics.toolkit.syntactic_sugar import (
 from typing_extensions import override
 
 if typing.TYPE_CHECKING:
+    import graphviz
     from metricflow_semantics.toolkit.mf_graph.mf_graph import (
         MetricFlowGraph,
     )
@@ -35,7 +34,7 @@ logger = logging.getLogger(__name__)
 class DotGraphConversionResult:
     """The results of converting to a DOT graph."""
 
-    dot_graph: Digraph
+    dot_graph: graphviz.Digraph
     # For debugging context.
     dot_element_set: DotAttributeSet
 
@@ -116,6 +115,17 @@ class MetricFlowGraphToDotConverter(MetricFlowGraphConverter[DotGraphConversionR
             name=dot_attribute_set.graph_attributes.name, additional_kwargs=converter_arguments.graph_attributes
         ).merge(dot_attribute_set.graph_attributes)
 
+        # `graphviz` is an optional dependency as rendering graphs is more of a debugging feature in tests / CLI.
+        # Since it's optional, import it locally only when needed.
+        try:
+            import graphviz
+        except ModuleNotFoundError as error:
+            raise RuntimeError(
+                "The `graphviz` Python package is required for DAG visualization."
+                " It can be installed with `pip install graphviz` or similar."
+                " Rendering may also require the `dot` executable from https://www.graphviz.org/ to be on your PATH."
+            ) from error
+
         dot = graphviz.Digraph(
             graph_attr=dot_graph.dot_graph_attrs,
             node_attr=converter_arguments.node_attributes,
@@ -153,7 +163,9 @@ class MetricFlowGraphToDotConverter(MetricFlowGraphConverter[DotGraphConversionR
 
     @staticmethod
     def _add_nodes_with_rank(
-        converter_arguments: DotConversionArgumentSet, dot_graph: Digraph, dot_nodes: Sequence[DotNodeAttributeSet]
+        converter_arguments: DotConversionArgumentSet,
+        dot_graph: graphviz.Digraph,
+        dot_nodes: Sequence[DotNodeAttributeSet],
     ) -> Sequence[DotNodeAttributeSet]:
         added_dot_nodes: list[DotNodeAttributeSet] = []
         if not converter_arguments.include_graphical_attributes:

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, FrozenSet, List, Optional, Sequence, Tuple
+from typing import Any, FrozenSet, Iterable, List, Optional, Sequence, Tuple
 
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
@@ -130,7 +130,7 @@ class EntityLinkPattern(SpecPattern):
         return matching_specs
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         filtered_candidate_specs = group_specs_by_type(candidate_specs).linkable_specs
         # Checks that SpecPatternParameterSetField is valid wrt to the parameter set.
 

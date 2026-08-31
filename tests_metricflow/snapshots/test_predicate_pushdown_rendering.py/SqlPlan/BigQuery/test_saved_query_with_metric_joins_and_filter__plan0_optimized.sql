@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where we join to a time spine and query the filter input.
 
-      This should produce a SQL query that applies the filter outside of the time spine join.
+  This should produce a SQL query that applies the filter outside of the time spine join.
 sql_engine: BigQuery
 ---
 -- Combine Aggregated Outputs
@@ -38,7 +38,7 @@ WITH sma_28014_cte AS (
       -- Read Elements From Semantic Model 'bookings_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
+        TIMESTAMP_TRUNC(ds, day) AS metric_time__day
         , listing_id AS listing
         , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
@@ -73,7 +73,7 @@ WITH sma_28014_cte AS (
       -- Read Elements From Semantic Model 'views_source'
       -- Metric Time Dimension 'ds'
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
+        TIMESTAMP_TRUNC(ds, day) AS metric_time__day
         , listing_id AS listing
         , 1 AS __views
       FROM ***************************.fct_views views_source_src_28000

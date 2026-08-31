@@ -3,7 +3,7 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests pushdown optimizer behavior for a metric with a time spine and fill_nulls_with enabled.
 
-      TODO: support metric time filters
+  TODO: support metric time filters
 sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
@@ -12,7 +12,7 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
     , listing_id AS listing
     , is_instant AS booking__is_instant
     , 1 AS __bookings_fill_nulls_with_0

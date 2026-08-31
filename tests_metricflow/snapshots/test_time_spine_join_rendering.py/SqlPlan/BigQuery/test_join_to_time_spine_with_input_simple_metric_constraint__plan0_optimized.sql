@@ -3,7 +3,7 @@ test_filename: test_time_spine_join_rendering.py
 docstring:
   Check filter hierarchy.
 
-      Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
+  Ensure that the measure filter 'booking__is_instant' doesn't get applied again post-aggregation.
 sql_engine: BigQuery
 ---
 -- Join to Time Spine Dataset
@@ -41,7 +41,7 @@ LEFT OUTER JOIN (
     -- Metric Time Dimension 'ds'
     -- Select: ['__instant_bookings_with_measure_filter', 'booking__is_instant', 'metric_time__day', 'listing']
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
+      TIMESTAMP_TRUNC(ds, day) AS metric_time__day
       , listing_id AS listing
       , is_instant AS booking__is_instant
       , 1 AS instant_bookings_with_measure_filter

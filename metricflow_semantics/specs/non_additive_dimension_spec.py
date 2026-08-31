@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Literal, Optional, Sequence, Tuple
 
+from metricflow_semantics.errors.error_classes import InvalidManifestException
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.naming.linkable_spec_name import DUNDER
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -22,6 +23,8 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__file__)
 
+NonAdditiveWindowChoiceType = Literal[AggregationType.MIN, AggregationType.MAX]
+
 
 @dataclass(frozen=True)
 class NonAdditiveDimensionSpec(SerializableDataclass):
@@ -32,7 +35,7 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
     """
 
     name: str
-    window_choice: AggregationType
+    window_choice: NonAdditiveWindowChoiceType
     window_groupings: Tuple[str, ...] = ()
 
     @staticmethod
@@ -42,9 +45,21 @@ class NonAdditiveDimensionSpec(SerializableDataclass):
         if simple_metric_input.non_additive_dimension is None:
             return None
 
+        window_choice = simple_metric_input.non_additive_dimension.window_choice
+        if not (window_choice is AggregationType.MIN or window_choice is AggregationType.MAX):
+            raise InvalidManifestException(
+                LazyFormat(
+                    "Non-additive dimension uses an unsupported window choice. Only min or max are supported."
+                    " This indicates an error in the manifest and should have been caught in validation.",
+                    simple_metric_name=simple_metric_input.name,
+                    non_additive_dimension_name=simple_metric_input.non_additive_dimension.name,
+                    window_choice=window_choice.value,
+                )
+            )
+
         return NonAdditiveDimensionSpec(
             name=simple_metric_input.non_additive_dimension.name,
-            window_choice=simple_metric_input.non_additive_dimension.window_choice,
+            window_choice=window_choice,
             window_groupings=tuple(sorted(simple_metric_input.non_additive_dimension.window_groupings)),
         )
 

@@ -16,6 +16,21 @@ This project uses **hatch** for dependency management and testing:
   previously reflected the type, rename the variable appropriately to 
   reflect the new type.
 - If `git_ignored/AGENTS.md` exists, append the rules in that file.
+- If a function's return type is not mutable, the returned object does
+  not need to be a copy.
+- When reviewing and updating code:
+  - Identify and fix correctness issues.
+  - Make updates to improve readability and clarity.
+  - Make updates to follow code standards.
+- Code should be compatible with the lowest Python version supported by this
+  project.
+- For prompts that are made from the CLI and the response includes a table, 
+  use a formatting style that aligns columns vertically.
+- Avoid variable names that would shadow a name from an outer scope.
+- Avoid hard-coded strings for module names. Instead, derive them from 
+  imports to improve refactoring safety.
+- When adding compact logic such as regexes, parsers, or normalization rules,
+  include a concise comment with the intent and a representative example.
 
 ## Python Code Standards
 
@@ -24,5 +39,13 @@ This project uses **hatch** for dependency management and testing:
 - Include `from __future__ import annotations` at the top of Python files.
 - Include `logger = logging.getLogger(__name__)` in Python files.
 - Avoid the use of `isinstance()`.
+- Avoid dynamic field access with `getattr`.
+- Avoid plural class names.
 - Prefer to use immutable data types.
 - Prioritize code clarity and readability.
+- Docstrings should be concise, capture behavior, capture assumptions, and
+  explain any non-obvious behavior.
+- Code comments should capture non-obvious behavior.
+- Include appropriate comments that describe fields in dataclass-like classes.
+- Avoid the use of mocks unless another approach is not reasonable.
+- Default to the Google Python Style Guide.

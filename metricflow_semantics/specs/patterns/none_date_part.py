@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Sequence
+from typing import Iterable, List, Sequence
 
 from metricflow_semantics.specs.instance_spec import InstanceSpec, LinkableInstanceSpec
 from metricflow_semantics.specs.patterns.spec_pattern import SpecPattern
@@ -17,7 +17,7 @@ class NoneDatePartPattern(SpecPattern):
     """
 
     @override
-    def match(self, candidate_specs: Sequence[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
+    def match(self, candidate_specs: Iterable[InstanceSpec]) -> Sequence[LinkableInstanceSpec]:
         specs_to_return: List[LinkableInstanceSpec] = []
         spec_set = group_specs_by_type(candidate_specs)
         for time_dimension_spec in spec_set.time_dimension_specs:

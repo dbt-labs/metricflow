@@ -14,7 +14,7 @@ FROM (
   -- Select: ['__new_users', 'user__archived_at__hour']
   -- Select: ['__new_users', 'user__archived_at__hour']
   SELECT
-    DATETIME_TRUNC(archived_at, hour) AS user__archived_at__hour
+    TIMESTAMP_TRUNC(archived_at, hour) AS user__archived_at__hour
     , 1 AS __new_users
   FROM ***************************.dim_users users_ds_source_src_28000
 ) subq_9

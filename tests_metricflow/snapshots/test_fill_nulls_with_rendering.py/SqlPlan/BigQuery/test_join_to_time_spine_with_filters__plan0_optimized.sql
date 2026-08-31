@@ -25,7 +25,7 @@ FROM (
       -- Select: ['metric_time__day', 'metric_time__week']
       SELECT
         ds AS metric_time__day
-        , DATETIME_TRUNC(ds, isoweek) AS metric_time__week
+        , TIMESTAMP_TRUNC(ds, isoweek) AS metric_time__week
       FROM ***************************.mf_time_spine time_spine_src_28006
     ) subq_29
     WHERE (
@@ -47,11 +47,11 @@ FROM (
       -- Constrain Time Range to [2020-01-03T00:00:00, 2020-01-05T00:00:00]
       -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day', 'metric_time__week']
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
-        , DATETIME_TRUNC(ds, isoweek) AS metric_time__week
+        TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+        , TIMESTAMP_TRUNC(ds, isoweek) AS metric_time__week
         , 1 AS bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
-      WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
+      WHERE TIMESTAMP_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
     ) subq_23
     WHERE metric_time__week > '2020-01-01'
     GROUP BY

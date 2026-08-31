@@ -128,6 +128,43 @@ def test_offset_metric_with_metric_time_and_dimension_filter(  # noqa: D103
 
 @pytest.mark.sql_engine_snapshot
 @pytest.mark.duckdb_only
+def test_offset_metric_with_separate_metric_time_and_dimension_filters(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Test querying a time-offset metric with separate filters that allow for different filter placement."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_once",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraint_strs=[
+            "{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'",
+            "{{ Dimension('listing__country_latest') }} == 'us'",
+        ],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        expectation_description=(
+            "The metric_time portion of the filter (`{{ TimeDimension('metric_time', 'day') }} = '2020-01-01'`) "
+            "should be applied on the time spine / output side of the offset join, ideally by pushing it to the "
+            "time spine before the join, while the dimension portion "
+            "(`{{ Dimension('listing__country_latest') }} == 'us'`) should stay on the pre-offset metric input."
+        ),
+    )
+
+
+@pytest.mark.sql_engine_snapshot
+@pytest.mark.duckdb_only
 def test_offset_cumulative_metric_with_metric_time_filter(
     request: FixtureRequest,
     mf_test_configuration: MetricFlowTestConfiguration,
@@ -188,5 +225,39 @@ def test_offset_metric_with_string_filter(  # noqa: D103
             "assumed not to reference aggregation time dimensions. The current "
             "expectation is that the filter should be pushed to the pre-aggregation "
             "branch. However, the appropriate behavior may be to not push at all."
+        ),
+    )
+
+
+@pytest.mark.duckdb_only
+@pytest.mark.sql_engine_snapshot
+def test_nested_offset_metric_with_non_queried_element_in_filter(  # noqa: D103
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    query_parser: MetricFlowQueryParser,
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    create_source_tables: bool,
+) -> None:
+    """Tests that a non-queried filter element does not remain in the aggregation grain."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings_offset_twice",),
+        group_by_names=(METRIC_TIME_ELEMENT_NAME,),
+        where_constraint_strs=["{{ Entity('listing') }} = '1'"],
+    ).query_spec
+
+    render_and_check(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        dataflow_plan_builder=dataflow_plan_builder,
+        query_spec=query_spec,
+        expectation_description=(
+            "The non-queried listing filter should be available for filtering the "
+            "nested offset metric, but it should not remain part of the aggregation "
+            "grain after filtering. The current snapshot does not reflect the "
+            "correct result."
         ),
     )

@@ -25,13 +25,13 @@ WITH sma_28019_cte AS (
 
 SELECT
   metric_time__day AS metric_time__day
-  , CAST(__buys_fill_nulls_with_0_join_to_timespine AS DOUBLE PRECISION) / CAST(NULLIF(__visits_fill_nulls_with_0_join_to_timespine, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
+  , CAST(__buys_null_filled AS DOUBLE PRECISION) / CAST(NULLIF(__visits_fill_nulls_with_0_join_to_timespine, 0) AS DOUBLE PRECISION) AS visit_buy_conversion_rate_7days_fill_nulls_with_0
 FROM (
   -- Combine Aggregated Outputs
   SELECT
     COALESCE(subq_37.metric_time__day, subq_53.metric_time__day) AS metric_time__day
     , COALESCE(MAX(subq_37.__visits_fill_nulls_with_0_join_to_timespine), 0) AS __visits_fill_nulls_with_0_join_to_timespine
-    , COALESCE(MAX(subq_53.__buys_fill_nulls_with_0_join_to_timespine), 0) AS __buys_fill_nulls_with_0_join_to_timespine
+    , COALESCE(MAX(subq_53.__buys_null_filled), 0) AS __buys_null_filled
   FROM (
     -- Join to Time Spine Dataset
     SELECT
@@ -57,16 +57,16 @@ FROM (
     -- Join to Time Spine Dataset
     SELECT
       rss_28018_cte.ds__day AS metric_time__day
-      , subq_48.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
+      , subq_48.__buys_null_filled AS __buys_null_filled
     FROM rss_28018_cte
     LEFT OUTER JOIN (
       -- Find conversions for user within the range of 7 day
-      -- Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
-      -- Select: ['__buys_fill_nulls_with_0_join_to_timespine', 'metric_time__day']
+      -- Select: ['__buys_null_filled', 'metric_time__day']
+      -- Select: ['__buys_null_filled', 'metric_time__day']
       -- Aggregate Inputs for Simple Metrics
       SELECT
         metric_time__day
-        , SUM(__buys_fill_nulls_with_0_join_to_timespine) AS __buys_fill_nulls_with_0_join_to_timespine
+        , SUM(__buys_null_filled) AS __buys_null_filled
       FROM (
         -- Dedupe the fanout with mf_internal_uuid in the conversion data set
         SELECT DISTINCT
@@ -95,7 +95,7 @@ FROM (
             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
           ) AS user
           , subq_43.mf_internal_uuid AS mf_internal_uuid
-          , subq_43.__buys_fill_nulls_with_0_join_to_timespine AS __buys_fill_nulls_with_0_join_to_timespine
+          , subq_43.__buys_null_filled AS __buys_null_filled
         FROM sma_28019_cte
         INNER JOIN (
           -- Read Elements From Semantic Model 'buys_source'
@@ -104,7 +104,7 @@ FROM (
           SELECT
             DATE_TRUNC('day', ds) AS metric_time__day
             , user_id AS user
-            , 1 AS __buys_fill_nulls_with_0_join_to_timespine
+            , 1 AS __buys_null_filled
             , GEN_RANDOM_UUID() AS mf_internal_uuid
           FROM ***************************.fct_buys buys_source_src_28000
         ) subq_43

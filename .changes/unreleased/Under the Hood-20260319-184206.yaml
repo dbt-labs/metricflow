@@ -1,6 +1,0 @@
-kind: Under the Hood
-body: Add `PASSTHROUGH_METRIC_EVALUATION` as an optimizer option
-time: 2026-03-19T18:42:06.49441-07:00
-custom:
-  Author: plypaul
-  Issue: "1994"

@@ -31,6 +31,7 @@ from metricflow_semantics.specs.spec_set import InstanceSpecSet
 from metricflow_semantics.specs.where_filter.where_filter_spec import WhereFilterSpec
 from metricflow_semantics.sql.sql_bind_parameters import SqlBindParameterSet
 from metricflow_semantics.sql.sql_exprs import (
+    NonPercentileAggregationType,
     SqlAddTimeExpression,
     SqlAggregateFunctionExpression,
     SqlArithmeticExpression,
@@ -65,7 +66,7 @@ from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_block_runtime
+from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
 
 from metricflow.dataflow.dataflow_plan import DataflowPlanNode
 from metricflow.dataflow.dataflow_plan_visitor import DataflowPlanNodeVisitor
@@ -206,7 +207,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
     def cache_output_data_sets(self, nodes: Sequence[DataflowPlanNode]) -> None:
         """Cache the output of the given nodes for consistent retrieval with `get_output_data_set`."""
-        with log_block_runtime(f"cache_output_data_sets for {len(nodes)} nodes"):
+        with ExecutionTimer(f"cache_output_data_sets for {len(nodes)} nodes", duration_warning_threshold=5.0):
             for node in nodes:
                 self.get_output_data_set(node)
 
@@ -1016,6 +1017,10 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     column_association.column_name for column_association in column_associations_in_where_sql
                 ),
                 bind_parameter_set=filter_spec.bind_parameters,
+                # Where-filter SQL is raw text, so require parenthesis to avoid operator precedence issues when combined
+                # with other expressions.
+                # e.g. `(booking__ds__day = '2020-01-01' OR booking__ds__day = '2020-01-02) AND ...`
+                requires_parenthesis=True,
             )
 
         # Odd type-check inspection with just `tuple(filter_key_to_string_expression.values())`
@@ -1307,7 +1312,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             node.time_dimension_spec.with_aggregation_state(AggregationState.COMPLETE),
         ).column_name
         time_dimension_select_column = SqlSelectColumn(
-            expr=SqlFunctionExpression.build_expression_from_aggregation_type(
+            expr=SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
                 aggregation_type=node.agg_by_function,
                 sql_column_expression=SqlColumnReferenceExpression.create(
                     SqlColumnReference(
@@ -1677,12 +1682,13 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
 
         select_columns: List[SqlSelectColumn] = []
         metadata_instances: List[MetadataInstance] = []
-        for agg_type in (AggregationType.MIN, AggregationType.MAX):
+        agg_types: Tuple[NonPercentileAggregationType, ...] = (AggregationType.MIN, AggregationType.MAX)
+        for agg_type in agg_types:
             metadata_spec = MetadataSpec(element_name=parent_column_alias, agg_type=agg_type)
             output_column_association = self._column_association_resolver.resolve_spec(metadata_spec)
             select_columns.append(
                 SqlSelectColumn(
-                    expr=SqlFunctionExpression.build_expression_from_aggregation_type(
+                    expr=SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
                         aggregation_type=agg_type,
                         sql_column_expression=SqlColumnReferenceExpression.create(
                             SqlColumnReference(table_alias=parent_table_alias, column_name=parent_column_alias)

@@ -5,7 +5,7 @@ import os
 
 import _pytest.fixtures
 from metricflow_semantics.test_helpers.snapshot_helpers import SnapshotConfiguration, snapshot_path_prefix
-from metricflow_semantics.test_helpers.terminal_helpers import mf_colored_link_text
+from metricflow_semantics.test_helpers.terminal_helpers import mf_path_hyperlink
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ def write_svg_snapshot_for_review(
             LazyFormat(
                 "Wrote SVG for PR review",
                 file_path=file_path,
-                open_link=mf_colored_link_text(file_path.resolve().as_uri()),
+                open_link=mf_path_hyperlink(file_path),
                 iterm_hint="Link may be opened with <Command> + <Left Click>",
             )
         )

@@ -3,9 +3,9 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a cumulative metric query with a time filter that cannot be automatically adjusted.
 
-      Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
-      span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
-      input data in order to ensure the cumulative metric is correct.
+  Not all query inputs with time constraint filters allow us to adjust the time constraint to include the full
+  span of input data for a cumulative metric. When we do not have an adjustable time filter we must include all
+  input data in order to ensure the cumulative metric is correct.
 sql_engine: BigQuery
 ---
 -- Constrain Output with WHERE
@@ -28,9 +28,9 @@ FROM (
     ***************************.fct_bookings bookings_source_src_28000
   ON
     (
-      DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_14.ds
+      TIMESTAMP_TRUNC(bookings_source_src_28000.ds, day) <= subq_14.ds
     ) AND (
-      DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_14.ds AS DATETIME), INTERVAL 2 day)
+      TIMESTAMP_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_14.ds AS DATETIME), INTERVAL 2 day)
     )
 ) subq_16
 WHERE metric_time__day = '2020-01-03' or metric_time__day = '2020-01-07'

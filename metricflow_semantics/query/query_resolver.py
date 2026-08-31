@@ -38,6 +38,7 @@ from metricflow_semantics.query.issues.parsing.invalid_metric import InvalidMetr
 from metricflow_semantics.query.issues.parsing.invalid_min_max_only import InvalidMinMaxOnlyIssue
 from metricflow_semantics.query.issues.parsing.invalid_order import InvalidOrderByItemIssue
 from metricflow_semantics.query.issues.parsing.no_metric_or_group_by import NoMetricOrGroupByIssue
+from metricflow_semantics.query.order_by_helper import OrderByHelper
 from metricflow_semantics.query.query_resolution import (
     InputToIssueSetMapping,
     InputToIssueSetMappingItem,
@@ -71,7 +72,8 @@ from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.toolkit.collections.ordered_set import MutableOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
-from metricflow_semantics.toolkit.mf_logging.runtime import log_runtime
+from metricflow_semantics.toolkit.performance_helpers import mf_log_duration
+from metricflow_semantics.toolkit.syntactic_sugar import mf_first_item
 
 from metricflow_semantic_interfaces.references import MetricReference, SemanticModelReference
 
@@ -314,19 +316,28 @@ class MetricFlowQueryResolver:
         query_resolution_path: MetricFlowQueryResolutionPath,
     ) -> ResolveOrderByResult:
         mapping_items: List[InputToIssueSetMappingItem] = []
-        order_by_specs: List[OrderBySpec] = []
+        order_by_specs: MutableOrderedSet[OrderBySpec] = MutableOrderedSet()
 
         # Match the pattern from the order by input to one of the metric or group-by-item specs.
         # The pattern needs to be used because there are cases where the order-by-item is specified in a different way
         # from the group-by-item, so an equality comparison won't work.
-        for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
-            matching_specs: set[InstanceSpec] = set()
-            for possible_input in resolver_input_for_order_by.possible_inputs:
-                spec_pattern = possible_input.spec_pattern
-                matching_specs.update(spec_pattern.match(metric_specs))
-                matching_specs.update(spec_pattern.match(group_by_item_specs))
 
-            if len(matching_specs) != 1:
+        order_by_helper = OrderByHelper(metric_specs, group_by_item_specs)
+
+        for resolver_input_for_order_by in resolver_inputs_for_order_by_items:
+            specs_matching_order_by: set[InstanceSpec] = set()
+            for possible_input in resolver_input_for_order_by.possible_inputs:
+                # If the order-by does not specify an alias, the matching can be done with all specs in the query.
+                if possible_input.alias is None:
+                    specs_matching_order_by.update(possible_input.spec_pattern.match(order_by_helper.all_specs))
+                # If an order-by specifies an alias, the matching can only be done with specs in the query that
+                # have the same alias.
+                else:
+                    specs_matching_order_by.update(
+                        possible_input.spec_pattern.match(order_by_helper.specs_with_alias(possible_input.alias))
+                    )
+
+            if len(specs_matching_order_by) != 1:
                 mapping_items.append(
                     InputToIssueSetMappingItem(
                         resolver_input=resolver_input_for_order_by,
@@ -339,10 +350,9 @@ class MetricFlowQueryResolver:
                     )
                 )
             else:
-                order_by_specs.append(
+                order_by_specs.add(
                     OrderBySpec(
-                        # Ignore aliases in the order by since we'll render the expression instead of the alias.
-                        instance_spec=matching_specs.pop().with_alias(None),
+                        instance_spec=mf_first_item(specs_matching_order_by),
                         descending=resolver_input_for_order_by.descending,
                     )
                 )
@@ -438,14 +448,9 @@ class MetricFlowQueryResolver:
 
         return where_filter_spec_resolver.resolve_lookup()
 
+    @mf_log_duration()
     def resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         """Resolve the query into specs that can be passed into the next stage in query processing."""
-        # Workaround for a Pycharm type inspection issue with decorators.
-        # noinspection PyArgumentList
-        return self._resolve_query(resolver_input_for_query=resolver_input_for_query)
-
-    @log_runtime()
-    def _resolve_query(self, resolver_input_for_query: ResolverInputForQuery) -> MetricFlowQueryResolution:
         metric_inputs = resolver_input_for_query.metric_inputs
         group_by_item_inputs = resolver_input_for_query.group_by_item_inputs
         order_by_item_inputs = resolver_input_for_query.order_by_item_inputs

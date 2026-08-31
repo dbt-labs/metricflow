@@ -29,7 +29,7 @@ FROM (
         -- Select: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
         -- Select: ['__bookings_fill_nulls_with_0_without_time_spine', 'metric_time__day']
         SELECT
-          DATETIME_TRUNC(ds, day) AS metric_time__day
+          TIMESTAMP_TRUNC(ds, day) AS metric_time__day
           , 1 AS __bookings_fill_nulls_with_0_without_time_spine
         FROM ***************************.fct_bookings bookings_source_src_28000
       ) subq_17
@@ -50,7 +50,7 @@ FULL OUTER JOIN (
     -- Select: ['__listings', 'metric_time__day']
     -- Select: ['__listings', 'metric_time__day']
     SELECT
-      DATETIME_TRUNC(created_at, day) AS metric_time__day
+      TIMESTAMP_TRUNC(created_at, day) AS metric_time__day
       , 1 AS __listings
     FROM ***************************.dim_listings_latest listings_latest_src_28000
   ) subq_24

@@ -40,9 +40,9 @@ FROM (
       ***************************.fct_bookings bookings_source_src_28000
     ON
       (
-        DATETIME_TRUNC(bookings_source_src_28000.ds, day) <= subq_30.ds
+        TIMESTAMP_TRUNC(bookings_source_src_28000.ds, day) <= subq_30.ds
       ) AND (
-        DATETIME_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_30.ds AS DATETIME), INTERVAL 2 day)
+        TIMESTAMP_TRUNC(bookings_source_src_28000.ds, day) > DATE_SUB(CAST(subq_30.ds AS DATETIME), INTERVAL 2 day)
       )
     WHERE subq_30.ds BETWEEN '2019-12-19' AND '2020-01-02'
     GROUP BY

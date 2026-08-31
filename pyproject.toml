@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "metricflow"
 description = "Translates a simple metric definition into reusable SQL and executes it against the SQL engine of your choice."
 readme = "README.md"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.10,<3.15"
 license = "Apache-2.0"
 keywords = []
 authors = [
@@ -16,10 +16,11 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
@@ -66,6 +67,10 @@ trino-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-trino.txt",
 ]
+athena-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-athena.txt",
+]
 clickhouse-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-clickhouse.txt",
@@ -101,10 +106,6 @@ description = "Environment for development. Includes a DuckDB-backed client."
 run = "run-coverage --no-cov"
 
 features = ["dev-env-requirements"]
-
-
-[tool.hatch.envs.dev-env.env-vars]
-MF_SQL_ENGINE_URL="duckdb://"
 
 
 [tool.hatch.envs.postgres-env.env-vars]
@@ -151,6 +152,29 @@ MF_SQL_ENGINE_PASSWORD=""
 description = "Dev environment for working with Trino"
 template = "dev-env"
 features = ["trino-env-requirements"]
+
+[tool.hatch.envs.athena-env]
+description = "Dev environment for working with the Athena adapter"
+template = "dev-env"
+features = ["athena-env-requirements"]
+
+
+[tool.hatch.envs.nuitka-build]
+description = "Nuitka compilation environment for building a standalone MetricFlow binary."
+template = "dev-env"
+extra-dependencies = ["nuitka==4.1.2"]
+
+[tool.hatch.envs.nuitka-build.scripts]
+compile = [
+  "python -m nuitka --standalone --follow-imports --assume-yes-for-downloads --include-package=metricflow --include-package=metricflow_semantics --include-package=metricflow_semantic_interfaces --output-dir=sidecar/ sidecar/mf_entry.py",
+]
+validate = [
+  "python sidecar/validate_mf_entry.py",
+]
+build-and-validate = [
+  "hatch run nuitka-build:compile",
+  "hatch run nuitka-build:validate",
+]
 
 
 [tool.hatch.envs.clickhouse-env.env-vars]

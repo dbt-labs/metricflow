@@ -38,10 +38,10 @@ FROM (
       -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
       -- Select: ['__bookings_fill_nulls_with_0', 'metric_time__day']
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
+        TIMESTAMP_TRUNC(ds, day) AS metric_time__day
         , 1 AS __bookings_fill_nulls_with_0
       FROM ***************************.fct_bookings bookings_source_src_28000
-      WHERE DATETIME_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
+      WHERE TIMESTAMP_TRUNC(ds, day) BETWEEN '2020-01-03' AND '2020-01-05'
     ) subq_22
     GROUP BY
       metric_time__day

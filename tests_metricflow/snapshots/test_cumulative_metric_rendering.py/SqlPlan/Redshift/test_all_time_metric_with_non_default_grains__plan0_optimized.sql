@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative all-time metric queried with non-default grains.
 
-      Uses only metric_time. Excludes default grain.
+  Uses only metric_time. Excludes default grain.
 sql_engine: Redshift
 ---
 -- Re-aggregate Metric via Group By

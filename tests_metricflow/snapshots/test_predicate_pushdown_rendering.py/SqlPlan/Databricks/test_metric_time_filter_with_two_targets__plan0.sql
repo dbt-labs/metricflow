@@ -3,8 +3,8 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests pushdown optimization for a simple metric time predicate through a single join.
 
-      This is currently a no-op for the pushdown optimizer.
-      TODO: support metric time pushdown
+  This is currently a no-op for the pushdown optimizer.
+  TODO: support metric time pushdown
 sql_engine: Databricks
 ---
 -- Write to DataTable

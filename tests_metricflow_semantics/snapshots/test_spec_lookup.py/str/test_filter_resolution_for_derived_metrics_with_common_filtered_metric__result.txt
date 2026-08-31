@@ -3,7 +3,7 @@ test_filename: test_spec_lookup.py
 docstring:
   Checks that there are 2 filter spec resolutions even if the metric + filter combination is repeated.
 
-      The resolutions will have a different filter_location_path.
+  The resolutions will have a different filter_location_path.
 ---
 FilterSpecResolutionLookUp(
   spec_resolutions=(

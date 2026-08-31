@@ -1,0 +1,7 @@
+kind: Fixes
+body: Apply the filter on a conversion metric's base_metric/base_measure input, which
+  was previously silently dropped during dataflow plan construction
+time: 2026-08-21T13:08:54.32789-05:00
+custom:
+  Author: QMalcolm
+  Issue: "2119"

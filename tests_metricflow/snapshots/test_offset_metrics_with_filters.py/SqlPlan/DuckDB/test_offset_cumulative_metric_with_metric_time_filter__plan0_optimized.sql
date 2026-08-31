@@ -18,8 +18,8 @@ FROM (
   -- Compute Metrics via Expressions
   -- Compute Metrics via Expressions
   SELECT
-    subq_31.metric_time__day AS metric_time__day
-    , subq_26.__bookings AS trailing_7_days_bookings_1_week_ago
+    subq_29.metric_time__day AS metric_time__day
+    , subq_24.__bookings AS trailing_7_days_bookings_1_week_ago
   FROM (
     -- Constrain Output with WHERE
     -- Select: ['metric_time__day']
@@ -32,42 +32,35 @@ FROM (
       SELECT
         ds AS metric_time__day
       FROM ***************************.mf_time_spine time_spine_src_28006
-    ) subq_29
+    ) subq_27
     WHERE metric_time__day = '2020-01-01'
-  ) subq_31
+  ) subq_29
   INNER JOIN (
-    -- Constrain Output with WHERE
+    -- Join Self Over Time Range
+    -- Select: ['__bookings', 'metric_time__day']
     -- Select: ['__bookings', 'metric_time__day']
     -- Aggregate Inputs for Simple Metrics
     SELECT
-      metric_time__day
-      , SUM(bookings) AS __bookings
-    FROM (
-      -- Join Self Over Time Range
-      -- Select: ['__bookings', 'metric_time__day']
+      subq_20.ds AS metric_time__day
+      , SUM(subq_18.__bookings) AS __bookings
+    FROM ***************************.mf_time_spine subq_20
+    INNER JOIN (
+      -- Read Elements From Semantic Model 'bookings_source'
+      -- Metric Time Dimension 'ds'
       SELECT
-        subq_21.ds AS metric_time__day
-        , subq_19.__bookings AS bookings
-      FROM ***************************.mf_time_spine subq_21
-      INNER JOIN (
-        -- Read Elements From Semantic Model 'bookings_source'
-        -- Metric Time Dimension 'ds'
-        SELECT
-          DATE_TRUNC('day', ds) AS metric_time__day
-          , 1 AS __bookings
-        FROM ***************************.fct_bookings bookings_source_src_28000
-      ) subq_19
-      ON
-        (
-          subq_19.metric_time__day <= subq_21.ds
-        ) AND (
-          subq_19.metric_time__day > subq_21.ds - INTERVAL 7 day
-        )
-    ) subq_23
-    WHERE metric_time__day = '2020-01-01'
+        DATE_TRUNC('day', ds) AS metric_time__day
+        , 1 AS __bookings
+      FROM ***************************.fct_bookings bookings_source_src_28000
+    ) subq_18
+    ON
+      (
+        subq_18.metric_time__day <= subq_20.ds
+      ) AND (
+        subq_18.metric_time__day > subq_20.ds - INTERVAL 7 day
+      )
     GROUP BY
-      metric_time__day
-  ) subq_26
+      subq_20.ds
+  ) subq_24
   ON
-    subq_31.metric_time__day - INTERVAL 1 week = subq_26.metric_time__day
-) subq_34
+    subq_29.metric_time__day - INTERVAL 1 week = subq_24.metric_time__day
+) subq_32

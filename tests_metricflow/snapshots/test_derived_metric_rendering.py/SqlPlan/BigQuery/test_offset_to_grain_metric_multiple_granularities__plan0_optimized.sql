@@ -16,8 +16,8 @@ FROM (
   -- Compute Metrics via Expressions
   SELECT
     time_spine_src_28006.ds AS metric_time__day
-    , DATETIME_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
-    , DATETIME_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
+    , TIMESTAMP_TRUNC(time_spine_src_28006.ds, month) AS metric_time__month
+    , TIMESTAMP_TRUNC(time_spine_src_28006.ds, year) AS metric_time__year
     , subq_16.__bookings AS bookings_start_of_month
   FROM ***************************.mf_time_spine time_spine_src_28006
   INNER JOIN (
@@ -33,9 +33,9 @@ FROM (
       -- Select: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       -- Select: ['__bookings', 'metric_time__day', 'metric_time__month', 'metric_time__year']
       SELECT
-        DATETIME_TRUNC(ds, day) AS metric_time__day
-        , DATETIME_TRUNC(ds, month) AS metric_time__month
-        , DATETIME_TRUNC(ds, year) AS metric_time__year
+        TIMESTAMP_TRUNC(ds, day) AS metric_time__day
+        , TIMESTAMP_TRUNC(ds, month) AS metric_time__month
+        , TIMESTAMP_TRUNC(ds, year) AS metric_time__year
         , 1 AS __bookings
       FROM ***************************.fct_bookings bookings_source_src_28000
     ) subq_15
@@ -45,5 +45,5 @@ FROM (
       , metric_time__year
   ) subq_16
   ON
-    DATETIME_TRUNC(time_spine_src_28006.ds, month) = subq_16.metric_time__day
+    TIMESTAMP_TRUNC(time_spine_src_28006.ds, month) = subq_16.metric_time__day
 ) subq_22

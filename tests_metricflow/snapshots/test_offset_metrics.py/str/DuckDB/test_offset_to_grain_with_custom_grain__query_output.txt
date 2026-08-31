@@ -3,7 +3,7 @@ test_filename: test_offset_metrics.py
 docstring:
   Test offset to grain metric queried with custom grain.
 
-      Not a very useful query, but still demonstrates that we can handle this query.
+  Not a very useful query, but still demonstrates that we can handle this query.
 ---
 metric_time__alien_day      bookings_all_time    bookings_all_time_at_start_of_month    bookings_since_start_of_month
 ------------------------  -------------------  -------------------------------------  -------------------------------

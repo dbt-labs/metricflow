@@ -3,7 +3,7 @@ test_filename: test_cumulative_metric_rendering.py
 docstring:
   Tests rendering a query for a cumulative window metric queried with non-default grains.
 
-      Uses both metric_time and agg_time_dimension. Excludes default grain.
+  Uses both metric_time and agg_time_dimension. Excludes default grain.
 sql_engine: DuckDB
 ---
 -- Re-aggregate Metric via Group By

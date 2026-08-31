@@ -15,7 +15,7 @@ FROM (
     , subq_1.__instant_bookings AS instant_bookings
   FROM (
     SELECT
-      DATETIME_TRUNC(ds, day) AS metric_time__day
+      TIMESTAMP_TRUNC(ds, day) AS metric_time__day
       , listing_id AS listing
       , 1 AS __bookings
       , CASE WHEN is_instant THEN 1 ELSE 0 END AS __instant_bookings

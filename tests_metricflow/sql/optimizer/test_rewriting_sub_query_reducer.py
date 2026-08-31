@@ -9,6 +9,7 @@ from metricflow_semantics.sql.sql_exprs import (
     SqlComparison,
     SqlComparisonExpression,
     SqlFunction,
+    SqlGenerateUuidExpression,
     SqlStringExpression,
     SqlStringLiteralExpression,
 )
@@ -1007,6 +1008,148 @@ def test_rewriting_distinct_select_node_is_not_reduced(
             distinct=True,
         ),
         from_source_alias="b",
+    )
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_plan_node=select_node,
+        plan_id="before_reducing",
+    )
+
+    sub_query_reducer = SqlRewritingSubQueryReducer()
+
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_plan_node=sub_query_reducer.optimize(select_node),
+        plan_id="after_reducing",
+    )
+
+
+def test_sub_query_selecting_a_generated_uuid_is_not_reduced(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    """A sub-query that materializes a non-deterministic value must not be collapsed.
+
+    GEN_RANDOM_UUID() selected under an alias is evaluated once; substituting the
+    expression into the outer query re-evaluates it at every reference site. This is
+    the mechanism behind the conversion-metric overcount in issue #2111, where the
+    de-duplication window went from partitioning by a materialized mf_internal_uuid
+    column to partitioning by a fresh GEN_RANDOM_UUID() per row.
+    """
+    select_node = SqlSelectStatementNode.create(
+        description="outer_query",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="src1", column_name="mf_internal_uuid")
+                ),
+                column_alias="mf_internal_uuid",
+            ),
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="src1", column_name="visits")
+                ),
+                column_alias="visits",
+            ),
+        ),
+        from_source=SqlSelectStatementNode.create(
+            description="uuid_source",
+            select_columns=(
+                SqlSelectColumn(
+                    expr=SqlGenerateUuidExpression.create(),
+                    column_alias="mf_internal_uuid",
+                ),
+                SqlSelectColumn(
+                    expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="src0", column_name="visits")
+                    ),
+                    column_alias="visits",
+                ),
+            ),
+            from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_visits")),
+            from_source_alias="src0",
+        ),
+        from_source_alias="src1",
+    )
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_plan_node=select_node,
+        plan_id="before_reducing",
+    )
+
+    sub_query_reducer = SqlRewritingSubQueryReducer()
+
+    assert_default_rendered_sql_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        sql_plan_node=sub_query_reducer.optimize(select_node),
+        plan_id="after_reducing",
+    )
+
+
+def test_joined_sub_query_selecting_a_generated_uuid_is_not_reduced(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+) -> None:
+    """The join-reduction path must also leave a non-deterministic sub-query in place.
+
+    The joined source here is otherwise simple enough to reduce, so without the
+    determinism check its GEN_RANDOM_UUID() column would be substituted into the
+    outer query.
+    """
+    select_node = SqlSelectStatementNode.create(
+        description="outer_query",
+        select_columns=(
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="visits_src", column_name="visits")
+                ),
+                column_alias="visits",
+            ),
+            SqlSelectColumn(
+                expr=SqlColumnReferenceExpression.create(
+                    col_ref=SqlColumnReference(table_alias="uuid_src", column_name="mf_internal_uuid")
+                ),
+                column_alias="mf_internal_uuid",
+            ),
+        ),
+        from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_visits")),
+        from_source_alias="visits_src",
+        join_descs=(
+            SqlJoinDescription(
+                right_source=SqlSelectStatementNode.create(
+                    description="uuid_source",
+                    select_columns=(
+                        SqlSelectColumn(
+                            expr=SqlGenerateUuidExpression.create(),
+                            column_alias="mf_internal_uuid",
+                        ),
+                        SqlSelectColumn(
+                            expr=SqlColumnReferenceExpression.create(
+                                col_ref=SqlColumnReference(table_alias="src0", column_name="visit_id")
+                            ),
+                            column_alias="visit_id",
+                        ),
+                    ),
+                    from_source=SqlTableNode.create(sql_table=SqlTable(schema_name="demo", table_name="fct_buys")),
+                    from_source_alias="src0",
+                ),
+                right_source_alias="uuid_src",
+                on_condition=SqlComparisonExpression.create(
+                    left_expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="visits_src", column_name="visit_id")
+                    ),
+                    comparison=SqlComparison.EQUALS,
+                    right_expr=SqlColumnReferenceExpression.create(
+                        col_ref=SqlColumnReference(table_alias="uuid_src", column_name="visit_id")
+                    ),
+                ),
+                join_type=SqlJoinType.LEFT_OUTER,
+            ),
+        ),
     )
     assert_default_rendered_sql_equal(
         request=request,

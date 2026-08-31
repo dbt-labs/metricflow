@@ -556,7 +556,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
                 column_name=column_name,
             )
         )
-        select_expression: SqlExpressionNode = SqlFunctionExpression.build_expression_from_aggregation_type(
+        select_expression: SqlExpressionNode = SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
             aggregation_type=AggregationType.MAX, sql_column_expression=column_reference_expression
         )
         if fill_nulls_with is not None:

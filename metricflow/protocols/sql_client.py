@@ -25,6 +25,7 @@ class SqlEngine(Enum):
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
     TRINO = "Trino"
+    ATHENA = "Athena"
     CLICKHOUSE = "ClickHouse"
 
     @property
@@ -49,6 +50,8 @@ class SqlEngine(Enum):
         elif self is SqlEngine.REDSHIFT:
             return {TimeGranularity.NANOSECOND}
         elif self is SqlEngine.TRINO:
+            return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
+        elif self is SqlEngine.ATHENA:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
         elif self is SqlEngine.CLICKHOUSE:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}

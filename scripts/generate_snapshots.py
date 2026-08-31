@@ -4,19 +4,11 @@ Credentials are stored as a JSON string in an environment variable set via a she
 
 export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
 {
-    "duck_db": {
-        "engine_url": null,
-        "engine_password": null
-    },
-    "redshift": {
-        "engine_url": "redshift://...",
+    "athena": {
+        "engine_url": "athena://...",
         "engine_password": "..."
     },
-    "snowflake": {
-        "engine_url": "snowflake://...",
-        "engine_password": "..."
-    },
-    "big_query": {
+    "bigquery": {
         "engine_url": "bigquery://",
         "engine_password": "..."
     },
@@ -24,8 +16,20 @@ export MF_TEST_ENGINE_CREDENTIAL_SETS=$(cat <<EOF
         "engine_url": "databricks://...",
         "engine_password": "..."
     },
+    "duckdb": {
+        "engine_url": null,
+        "engine_password": null
+    },
     "postgres": {
         "engine_url": postgres://...",
+        "engine_password": "..."
+    },
+    "redshift": {
+        "engine_url": "redshift://...",
+        "engine_password": "..."
+    },
+    "snowflake": {
+        "engine_url": "snowflake://...",
         "engine_password": "..."
     },
     "trino": {
@@ -39,6 +43,7 @@ EOF
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
 import os
@@ -51,27 +56,28 @@ logger = logging.getLogger(__name__)
 
 
 MF_TEST_DIRECTORY = "tests_metricflow"
-MF_SEMANTICS_TEST_DIRECTORY = "metricflow-semantics/tests_metricflow_semantics"
+MF_SEMANTICS_TEST_DIRECTORY = "tests_metricflow_semantics"
 
-# Tests that generate SQL engine snapshots have this `pytest` marker set.
-SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
-
-DUCKDB_ENGINE_NAME = "duck_db"
+DUCKDB_ENGINE_NAME: Final[str] = "duckdb"
 
 # Maps the engine name in the credentials JSON to the `hatch` environment name.
 ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
     DUCKDB_ENGINE_NAME: "dev-env",
+    "athena": "athena-env",
     "redshift": "redshift-env",
     "snowflake": "snowflake-env",
-    "big_query": "bigquery-env",
+    "bigquery": "bigquery-env",
     "databricks": "databricks-env",
     "postgres": "postgres-env",
     "trino": "trino-env",
 }
 
 ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(
-    ("redshift", "snowflake", "big_query", "databricks")
+    ("athena", "redshift", "snowflake", "bigquery", "databricks")
 )
+
+# Tests that generate SQL engine snapshots have this `pytest` marker set.
+SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
 
 
 @dataclass(frozen=True)
@@ -85,6 +91,22 @@ class MetricFlowEngineConfiguration:  # noqa: D101
     engine: str
     hatch_environment: str
     credential_set: MetricFlowTestCredentialSet
+
+
+@dataclass(frozen=True)
+class GenerateSnapshotsConfig:  # noqa: D101
+    engine: Optional[str]
+
+
+def _parse_args(argv: Optional[Sequence[str]] = None) -> GenerateSnapshotsConfig:
+    parser = argparse.ArgumentParser(description="Generate test snapshots for supported SQL engines.")
+    parser.add_argument(
+        "--engine",
+        choices=tuple(ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME),
+        help="Generate snapshots for only the specified engine.",
+    )
+    args = parser.parse_args(argv)
+    return GenerateSnapshotsConfig(engine=args.engine)
 
 
 def _credential_set_from_json(credential_set_json: dict[str, object]) -> MetricFlowTestCredentialSet:
@@ -200,7 +222,7 @@ def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format=dev_format)
 
 
-def load_credential_sets() -> Sequence[MetricFlowEngineConfiguration]:
+def load_engine_configs() -> Sequence[MetricFlowEngineConfiguration]:
     """Load test credential sets from the environment."""
     credential_sets_json_str = os.environ.get("MF_TEST_ENGINE_CREDENTIAL_SETS")
     if credential_sets_json_str is None:
@@ -212,12 +234,18 @@ def load_credential_sets() -> Sequence[MetricFlowEngineConfiguration]:
     return parse_credential_sets(credential_sets_json_str)
 
 
-if __name__ == "__main__":
+def main(argv: Optional[Sequence[str]] = None) -> None:
+    """Generate snapshots for all engines, or for the requested engine."""
+    args = _parse_args(argv)
     setup_logging()
-    credential_sets = load_credential_sets()
+    engine_configs = load_engine_configs()
+    if args.engine is not None:
+        engine_configs = tuple(engine_config for engine_config in engine_configs if engine_config.engine == args.engine)
     logger.info(f"Running tests in {MF_TEST_DIRECTORY} with the marker {SQL_ENGINE_SNAPSHOT_MARKER_NAME}")
-    for test_configuration in credential_sets:
-        logger.info(
-            f"Running tests for {test_configuration.engine} with URL: {test_configuration.credential_set.engine_url}"
-        )
-        run_tests(test_configuration)
+    for engine_config in engine_configs:
+        logger.info(f"Running tests for {engine_config.engine} with URL: {engine_config.credential_set.engine_url}")
+        run_tests(engine_config)
+
+
+if __name__ == "__main__":
+    main()

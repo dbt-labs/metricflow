@@ -3,13 +3,13 @@ test_filename: test_predicate_pushdown_rendering.py
 docstring:
   Tests rendering a query where multiple filters against the same simple-metric input dimension need to be an effective OR.
 
-      This can be an issue where a derived metric takes in two filters that refer to the same dimension from the input
-      measure source. If these filters are disjoint the predicate pushdown needs to ensure that all matching rows are
-      returned, so we cannot simply push one filter or the other down, nor can we push them down as an AND - they
-      must be an OR, since all relevant rows need to be returned to the requesting metrics.
+  This can be an issue where a derived metric takes in two filters that refer to the same dimension from the input
+  measure source. If these filters are disjoint the predicate pushdown needs to ensure that all matching rows are
+  returned, so we cannot simply push one filter or the other down, nor can we push them down as an AND - they
+  must be an OR, since all relevant rows need to be returned to the requesting metrics.
 
-      The metric listed here has one input that filters on bookings__is_instant and another that does not, which means
-      the source input for the latter input must NOT have the filter applied to it.
+  The metric listed here has one input that filters on bookings__is_instant and another that does not, which means
+  the source input for the latter input must NOT have the filter applied to it.
 sql_engine: BigQuery
 ---
 -- Compute Metrics via Expressions
@@ -18,7 +18,7 @@ WITH sma_28009_cte AS (
   -- Read Elements From Semantic Model 'bookings_source'
   -- Metric Time Dimension 'ds'
   SELECT
-    DATETIME_TRUNC(ds, day) AS metric_time__day
+    TIMESTAMP_TRUNC(ds, day) AS metric_time__day
     , is_instant AS booking__is_instant
     , booking_value AS __average_booking_value
     , booking_value AS __max_booking_value
