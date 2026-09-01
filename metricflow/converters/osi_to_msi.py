@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Set
 
 from metricflow.converters.converter_issues import ConverterResult
+from metricflow.converters.datatype_mapping import osi_datatype_to_msi
 from metricflow.converters.expression_utils import (
     _extract_agg_info,
     _get_raw_inner_col,
@@ -12,6 +13,7 @@ from metricflow.converters.expression_utils import (
 )
 from metricflow.converters.models import (
     OSIDataset,
+    OSIDataType,
     OSIDialect,
     OSIDocument,
     OSIExpression,
@@ -217,6 +219,7 @@ class OSIToMSIConverter:
                 PydanticDimension(
                     name=field.name,
                     type=DimensionType.TIME,
+                    datatype=osi_datatype_to_msi(field.datatype),
                     type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
                     expr=expr_or_none,
                     description=field.description,
@@ -229,6 +232,7 @@ class OSIToMSIConverter:
             PydanticDimension(
                 name=field.name,
                 type=DimensionType.CATEGORICAL,
+                datatype=osi_datatype_to_msi(field.datatype),
                 type_params=None,
                 expr=expr_or_none,
                 description=field.description,
@@ -245,7 +249,9 @@ class OSIToMSIConverter:
         metrics: List[PydanticMetric] = []
         for metric in osi_sm.metrics or []:
             expr_str = self._get_expression(metric.expression)
-            metrics.extend(self._convert_metric(metric.name, expr_str, metric.description, osi_sm.datasets))
+            metrics.extend(
+                self._convert_metric(metric.name, expr_str, metric.description, metric.datatype, osi_sm.datasets)
+            )
         return metrics
 
     def _convert_metric(
@@ -253,6 +259,7 @@ class OSIToMSIConverter:
         name: str,
         expr_str: str,
         description: Optional[str],
+        datatype: Optional[OSIDataType],
         datasets: List[OSIDataset],
     ) -> List[PydanticMetric]:
         """Return one or more PydanticMetric objects for the given OSI expression.
@@ -274,6 +281,7 @@ class OSIToMSIConverter:
                     name=name,
                     description=description,
                     type=MetricType.SIMPLE,
+                    datatype=osi_datatype_to_msi(datatype),
                     type_params=PydanticMetricTypeParams(
                         expr=col,
                         metric_aggregation_params=PydanticMetricAggregationParams(
@@ -296,12 +304,15 @@ class OSIToMSIConverter:
             num_expr, den_expr = ratio_result
             num_name = f"{name}_numerator"
             den_name = f"{name}_denominator"
-            num_metrics = self._convert_metric(num_name, num_expr, None, datasets)
-            den_metrics = self._convert_metric(den_name, den_expr, None, datasets)
+            # The numerator/denominator are auto-generated sub-metrics with no OSI-side identity of
+            # their own, so — like `description` — the parent's `datatype` is not propagated to them.
+            num_metrics = self._convert_metric(num_name, num_expr, None, None, datasets)
+            den_metrics = self._convert_metric(den_name, den_expr, None, None, datasets)
             ratio_metric = PydanticMetric(
                 name=name,
                 description=description,
                 type=MetricType.RATIO,
+                datatype=osi_datatype_to_msi(datatype),
                 type_params=PydanticMetricTypeParams(
                     numerator=PydanticMetricInput(name=num_name, filter=None, alias=None),
                     denominator=PydanticMetricInput(name=den_name, filter=None, alias=None),
@@ -321,6 +332,7 @@ class OSIToMSIConverter:
                 name=name,
                 description=description,
                 type=MetricType.SIMPLE,
+                datatype=osi_datatype_to_msi(datatype),
                 type_params=PydanticMetricTypeParams(
                     expr=expr_str,
                     metric_aggregation_params=PydanticMetricAggregationParams(

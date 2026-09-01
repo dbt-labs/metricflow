@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.converters.converter_issues import ConverterIssue, ConverterIssueType, ConverterResult
+from metricflow.converters.datatype_mapping import msi_datatype_to_osi
 from metricflow.converters.filter_utils import _collect_filter_sql, _merge_filter_sqls
 from metricflow.converters.models import (
     OSIDataset,
@@ -101,6 +102,7 @@ class MSIToOSIConverter:
                 OSIMetric(
                     name=metric.name,
                     expression=self._make_expression(expr),
+                    datatype=msi_datatype_to_osi(metric.datatype),
                     description=metric.description,
                 )
             )
@@ -149,6 +151,7 @@ class MSIToOSIConverter:
             name=dim.name,
             expression=self._make_expression(expr),
             dimension=OSIDimension(is_time=is_time),
+            datatype=msi_datatype_to_osi(dim.datatype),
             label=dim.label,
             description=dim.description,
         )

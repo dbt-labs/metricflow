@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from metricflow.converters.models import (
     OSIDataset,
+    OSIDataType,
     OSIDialect,
     OSIDialectExpression,
     OSIDimension,
@@ -38,6 +39,7 @@ from metricflow_semantic_interfaces.implementations.semantic_manifest import (
 from metricflow_semantic_interfaces.test_utils import default_meta
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
+    DataType,
     DimensionType,
     EntityType,
     MetricType,
@@ -64,11 +66,13 @@ def _simple_metric(
     name: str,
     measure_name: str,
     description: str | None = None,
+    datatype: DataType | None = None,
 ) -> PydanticMetric:
     return PydanticMetric(
         name=name,
         description=description,
         type=MetricType.SIMPLE,
+        datatype=datatype,
         type_params=PydanticMetricTypeParams(
             measure=PydanticMetricInputMeasure(name=measure_name),
         ),
@@ -85,11 +89,13 @@ def _dimension(
     description: str | None = None,
     label: str | None = None,
     granularity: TimeGranularity | None = None,
+    datatype: DataType | None = None,
 ) -> PydanticDimension:
     type_params = PydanticDimensionTypeParams(time_granularity=granularity) if granularity else None
     return PydanticDimension(
         name=name,
         type=dim_type,
+        datatype=datatype,
         expr=expr,
         description=description,
         label=label,
@@ -152,11 +158,13 @@ def _osi_field(
     is_time: bool | None = None,
     description: str | None = None,
     label: str | None = None,
+    datatype: OSIDataType | None = None,
 ) -> OSIField:
     return OSIField(
         name=name,
         expression=_osi_expr(expression if expression is not None else name),
         dimension=OSIDimension(is_time=is_time) if is_time is not None else None,
+        datatype=datatype,
         description=description,
         label=label,
     )
@@ -180,8 +188,13 @@ def _osi_dataset(
     )
 
 
-def _osi_metric(name: str, expression: str, description: str | None = None) -> OSIMetric:
-    return OSIMetric(name=name, expression=_osi_expr(expression), description=description)
+def _osi_metric(
+    name: str,
+    expression: str,
+    description: str | None = None,
+    datatype: OSIDataType | None = None,
+) -> OSIMetric:
+    return OSIMetric(name=name, expression=_osi_expr(expression), datatype=datatype, description=description)
 
 
 def _osi_relationship(
