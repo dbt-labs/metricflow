@@ -159,6 +159,9 @@ class MetricFlowQueryRequest:
     sql_optimization_level: The level of optimization for the generated SQL.
     query_type: Type of MetricFlow query.
     output_column_order_mode: The ordering mode to use for columns in the output SQL.
+    sql: A mfsql query string - a restricted SQL dialect covering the same ground as metric_names,
+        group_by_names, where_constraints, order_by_names, and limit combined. Mutually exclusive with all of
+        those (and with saved_query_name) - if this is set, none of them should also be set.
     """
 
     request_id: MetricFlowRequestId
@@ -179,6 +182,7 @@ class MetricFlowQueryRequest:
     dataflow_plan_optimizations: frozenset[DataflowPlanOptimization]
     query_type: MetricFlowQueryType
     output_column_order_mode: OutputColumnOrderMode
+    sql: Optional[str]
 
     @staticmethod
     def create(  # noqa: D102
@@ -200,6 +204,7 @@ class MetricFlowQueryRequest:
         min_max_only: bool = False,
         apply_group_by: bool = True,
         output_column_order_mode: Optional[OutputColumnOrderMode] = None,
+        sql: Optional[str] = None,
     ) -> MetricFlowQueryRequest:
         return MetricFlowQueryRequest(
             request_id=MetricFlowRequestId(mf_rid=f"{mf_random_id()}") if request_id is None else request_id,
@@ -226,6 +231,7 @@ class MetricFlowQueryRequest:
             output_column_order_mode=output_column_order_mode
             if output_column_order_mode is not None
             else OutputColumnOrderMode.LEGACY_TYPE_GROUPED,
+            sql=sql,
         )
 
     def with_request_id(self, request_id: MetricFlowRequestId) -> MetricFlowQueryRequest:  # noqa: D102
@@ -248,6 +254,7 @@ class MetricFlowQueryRequest:
             dataflow_plan_optimizations=self.dataflow_plan_optimizations,
             query_type=self.query_type,
             output_column_order_mode=self.output_column_order_mode,
+            sql=self.sql,
         )
 
 
@@ -563,7 +570,30 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
             )
             SequentialIdGenerator.reset(MetricFlowEngine._ID_ENUMERATION_START_VALUE_FOR_QUERIES)
 
-        if mf_query_request.saved_query_name is not None:
+        if mf_query_request.sql is not None:
+            other_query_params_are_set = any(
+                (
+                    mf_query_request.saved_query_name,
+                    mf_query_request.metric_names,
+                    mf_query_request.metrics,
+                    mf_query_request.group_by_names,
+                    mf_query_request.group_by,
+                    mf_query_request.where_constraints,
+                    mf_query_request.order_by_names,
+                    mf_query_request.order_by,
+                    mf_query_request.limit,
+                    mf_query_request.time_constraint_start,
+                    mf_query_request.time_constraint_end,
+                )
+            )
+            if other_query_params_are_set:
+                raise InvalidQueryException(
+                    "`sql` can't be combined with any other query-shaping parameter (metrics, group_by, "
+                    "where_constraints, order_by, limit, time constraints, or a saved query) - express the "
+                    "whole query in the mfsql string instead."
+                )
+            query_spec = self._query_parser.parse_and_validate_mfsql_query(mf_query_request.sql).query_spec
+        elif mf_query_request.saved_query_name is not None:
             if mf_query_request.metrics or mf_query_request.metric_names:
                 raise InvalidQueryException("Metrics can't be specified with a saved query.")
             if mf_query_request.group_by or mf_query_request.group_by_names:

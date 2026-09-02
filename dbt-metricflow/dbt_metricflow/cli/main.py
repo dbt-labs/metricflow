@@ -179,6 +179,7 @@ def _click_echo(message: str, quiet: bool) -> None:
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def query(
     cfg: CLIConfiguration,
+    sql: Optional[str] = None,
     metrics: Optional[Sequence[str]] = None,
     group_by: Optional[Sequence[str]] = None,
     where: Sequence[str] = (),
@@ -210,6 +211,7 @@ def query(
         spinner.start()
 
     mf_request = MetricFlowQueryRequest.create(
+        sql=sql,
         saved_query_name=saved_query,
         metric_names=metrics,
         group_by_names=group_by,
