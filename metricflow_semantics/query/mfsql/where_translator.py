@@ -95,10 +95,16 @@ def _macro_call_for_column_name(column_name: str, semantic_manifest_lookup: Sema
     way a hand-written filter with the wrong macro would: a "no matching item" issue, not a silently wrong
     query.
 
-    Known gap: a bare reference to a semantic model's *primary* entity by name (e.g. `booking` on a model
-    where `booking` is declared via `primary_entity:` rather than in `entities:`) is not resolved by
-    `get_element_spec_for_name` and will raise here. Handling that needs its own model-lookup pass and is
-    deferred rather than guessed at.
+    Note: a bare reference to a semantic model's primary entity by name (e.g. `booking`, where the model
+    declares `primary_entity: booking` rather than listing it explicitly under `entities:`) is not resolved
+    by `get_element_spec_for_name` and will raise here. This was investigated and is not actually a gap
+    relative to hand-written filters/group-bys - MetricFlow's own resolver rejects the identical input
+    (`group_by_names=["booking"]`, `{{ Entity('booking') }}`) the same way, because the `primary_entity:`
+    YAML shorthand never materializes an `Entity` object on the semantic model at all (confirmed by
+    inspecting `SemanticModel.entities`), so nothing ever registers `booking` as a linkable element in the
+    first place. The explicit form - `entities: [{name: booking, type: primary}]` - does register it and
+    resolves correctly through both this lookup and the real resolver. So this function's behavior already
+    matches MetricFlow's actual capability; there is no missing classification logic to add here.
     """
     structured_name = StructuredLinkableSpecName.from_name(
         qualified_name=column_name.lower(),

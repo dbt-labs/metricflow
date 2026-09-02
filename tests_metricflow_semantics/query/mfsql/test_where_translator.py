@@ -1,13 +1,21 @@
 from __future__ import annotations
 
+import textwrap
+
 import pytest
 import sqlglot
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.mfsql.where_translator import MfsqlWhereTranslationError, translate_where_clause
+from metricflow_semantics.test_helpers.example_project_configuration import (
+    EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE,
+)
 from sqlglot import exp
 
+from metricflow_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
+from metricflow_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser
 from metricflow_semantic_interfaces.parsing.where_filter.parameter_set_factory import QueryItemLocation
+from metricflow_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 
 
 def _where_ast(sql: str) -> exp.Where:
@@ -15,6 +23,15 @@ def _where_ast(sql: str) -> exp.Where:
     where = sqlglot.parse_one(f"SELECT 1 {sql}").find(exp.Where)
     assert where is not None, f"Test SQL did not contain a WHERE clause: {sql}"
     return where
+
+
+def _manifest_lookup_from_semantic_model_yaml(semantic_model_yaml: str) -> SemanticManifestLookup:
+    yaml_file = YamlConfigFile(filepath="inline_for_test", contents=semantic_model_yaml)
+    manifest = parse_yaml_files_to_validation_ready_semantic_manifest(
+        [EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE, yaml_file], apply_transformations=True
+    ).semantic_manifest
+    SemanticManifestValidator().checked_validations(manifest)
+    return SemanticManifestLookup(manifest)
 
 
 def test_translate_where_clause_covers_common_comparisons(
@@ -107,3 +124,52 @@ def test_translate_where_clause_rejects_unsupported_extract_part(
 
     with pytest.raises(MfsqlWhereTranslationError, match="Unsupported EXTRACT part"):
         translate_where_clause(where, simple_semantic_manifest_lookup)
+
+
+_BOOKINGS_SOURCE_YAML_TEMPLATE = textwrap.dedent(
+    """\
+    semantic_model:
+      name: bookings_source
+      node_relation:
+        schema_name: some_schema
+        alias: bookings_source_table
+      defaults:
+        agg_time_dimension: ds
+      measures:
+        - name: bookings
+          expr: "1"
+          agg: sum
+          create_metric: true
+      dimensions:
+        - name: ds
+          type: time
+          type_params:
+            time_granularity: day
+      {primary_entity_declaration}
+    """
+)
+
+
+def test_translate_where_clause_bare_primary_entity_matches_metricflows_own_capability() -> None:
+    """A bare primary-entity reference in mfsql behaves exactly like it would in a hand-written filter.
+
+    Declaring a primary entity via the `primary_entity:` YAML shorthand never creates an `Entity` object on
+    the semantic model at all (confirmed by inspecting `SemanticModel.entities`), so it's never registered as
+    a linkable element anywhere in the manifest - not for mfsql, and not for a hand-written
+    `{{ Entity('booking') }}` filter or `--group-by booking` either. Declaring the same entity explicitly via
+    `entities: [{name: ..., type: primary}]` does register it, and both paths then succeed. This is a
+    MetricFlow-wide behavior mfsql inherits, not a translator-specific gap.
+    """
+    shorthand_lookup = _manifest_lookup_from_semantic_model_yaml(
+        _BOOKINGS_SOURCE_YAML_TEMPLATE.format(primary_entity_declaration="primary_entity: booking")
+    )
+    explicit_lookup = _manifest_lookup_from_semantic_model_yaml(
+        _BOOKINGS_SOURCE_YAML_TEMPLATE.format(
+            primary_entity_declaration="entities:\n        - name: booking\n          type: primary"
+        )
+    )
+
+    with pytest.raises(MfsqlWhereTranslationError, match="does not match a known"):
+        translate_where_clause(_where_ast("WHERE booking = 1"), shorthand_lookup)
+
+    assert translate_where_clause(_where_ast("WHERE booking = 1"), explicit_lookup) == "{{ Entity('booking') }} = 1"
