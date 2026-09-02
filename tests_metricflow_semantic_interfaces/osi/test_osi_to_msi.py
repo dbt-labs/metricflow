@@ -9,10 +9,12 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_object_snapshot_equal,
 )
 
+from metricflow.converters.models import OSIDataType
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow.converters.osi_to_msi import OSIToMSIConverter
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
+    DataType,
     DimensionType,
     MetricType,
 )
@@ -200,6 +202,31 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
         assert dim.description == "Order status"
         assert dim.label == "Status"
 
+    def test_datatype_carried_over_to_categorical_dimension(self) -> None:  # noqa: D102
+        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("status", datatype=OSIDataType.STRING)])])
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
+
+        assert sm.dimensions[0].datatype is DataType.STRING
+
+    def test_datatype_carried_over_to_time_dimension(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset(
+                    "orders",
+                    fields=[_osi_field("created_at", is_time=True, datatype=OSIDataType.DATE_TIME_TZ)],
+                )
+            ]
+        )
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
+
+        assert sm.dimensions[0].datatype is DataType.DATETIME_TZ
+
+    def test_missing_datatype_on_dimension_is_none(self) -> None:  # noqa: D102
+        doc = _osi_doc(datasets=[_osi_dataset("orders", fields=[_osi_field("status")])])
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
+
+        assert sm.dimensions[0].datatype is None
+
 
 class TestOSIToMSIMetricConversion:  # noqa: D101
     def test_sum_expression_produces_simple_metric(self) -> None:  # noqa: D102
@@ -287,6 +314,37 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         result = OSIToMSIConverter().convert(doc).output
 
         assert result.metrics[0].description == "Total revenue"
+
+    def test_simple_metric_datatype_carried_over(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
+            metrics=[_osi_metric("revenue", "SUM(amount)", datatype=OSIDataType.DECIMAL)],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].datatype is DataType.DECIMAL
+
+    def test_missing_datatype_on_metric_is_none(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
+            metrics=[_osi_metric("revenue", "SUM(amount)")],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].datatype is None
+
+    def test_ratio_metric_datatype_not_propagated_to_sub_metrics(self) -> None:  # noqa: D102
+        """Only the RATIO metric itself carries the OSI metric's datatype, not its auto-generated sub-metrics."""
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("amount"), _osi_field("cnt")])],
+            metrics=[_osi_metric("arpu", "(SUM(amount)) / (COUNT(cnt))", datatype=OSIDataType.FLOAT)],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        ratio = next(m for m in result.metrics if m.type == MetricType.RATIO)
+        sub_metrics = [m for m in result.metrics if m.type == MetricType.SIMPLE]
+        assert ratio.datatype is DataType.FLOAT
+        assert all(m.datatype is None for m in sub_metrics)
 
     def test_no_metrics_produces_empty_list(self) -> None:  # noqa: D102
         doc = _osi_doc(datasets=[_osi_dataset("orders")])
@@ -380,3 +438,31 @@ class TestOSIToMSIRoundTrip:  # noqa: D101
             snapshot_configuration=snapshot_configuration,
             obj=osi_doc,
         )
+
+    def test_datatype_round_trips_through_osi_to_msi_to_osi(self) -> None:  # noqa: D102
+        """An OSI Field/Metric.datatype value survives an OSI -> MSI -> OSI round trip unchanged."""
+        original = _osi_doc(
+            datasets=[
+                _osi_dataset(
+                    "orders",
+                    fields=[
+                        _osi_field("status", datatype=OSIDataType.STRING),
+                        _osi_field("created_at", is_time=True, datatype=OSIDataType.DATE_TIME_TZ),
+                        _osi_field("amount"),
+                    ],
+                )
+            ],
+            metrics=[_osi_metric("revenue", "SUM(amount)", datatype=OSIDataType.DECIMAL)],
+        )
+
+        msi = OSIToMSIConverter().convert(original).output
+        osi_doc = MSIToOSIConverter().convert(msi).output
+
+        fields = {f.name: f for f in osi_doc.semantic_model[0].datasets[0].fields or []}
+        assert fields["status"].datatype is OSIDataType.STRING
+        assert fields["created_at"].datatype is OSIDataType.DATE_TIME_TZ
+        assert fields["amount"].datatype is None
+
+        metrics = osi_doc.semantic_model[0].metrics or []
+        assert len(metrics) == 1
+        assert metrics[0].datatype is OSIDataType.DECIMAL

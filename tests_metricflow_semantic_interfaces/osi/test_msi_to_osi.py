@@ -12,7 +12,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 
 from metricflow.converters.converter_issues import ConverterIssueType
 from metricflow.converters.filter_utils import _render_filter_template
-from metricflow.converters.models import OSIDialect, OSIDocument
+from metricflow.converters.models import OSIDataType, OSIDialect, OSIDocument
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow_semantic_interfaces.implementations.metric import (
     PydanticConversionTypeParams,
@@ -31,6 +31,7 @@ from metricflow_semantic_interfaces.implementations.semantic_model import (
 from metricflow_semantic_interfaces.test_utils import default_meta, semantic_model_with_guaranteed_meta
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
+    DataType,
     DimensionType,
     EntityType,
     MetricType,
@@ -168,6 +169,24 @@ class TestDimensionConversion:  # noqa: D101
         field = _fields(result)[0]
         assert field.description == "Order status"
         assert field.label == "Status"
+
+    def test_dimension_datatype_carried_over(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            dimensions=[_dimension("status", datatype=DataType.STRING)],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
+
+        assert _fields(result)[0].datatype is OSIDataType.STRING
+
+    def test_dimension_without_datatype_is_none(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            dimensions=[_dimension("status")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm])).output
+
+        assert _fields(result)[0].datatype is None
 
 
 class TestMeasureConversion:  # noqa: D101
@@ -512,6 +531,26 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
 
         assert _osi_metrics(result)[0].description == "Total revenue"
+
+    def test_simple_metric_datatype_carried_over(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = _simple_metric("revenue", measure_name="revenue", datatype=DataType.DECIMAL)
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
+
+        assert _osi_metrics(result)[0].datatype is OSIDataType.DECIMAL
+
+    def test_simple_metric_without_datatype_is_none(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = _simple_metric("revenue", measure_name="revenue")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[metric])).output
+
+        assert _osi_metrics(result)[0].datatype is None
 
     def test_simple_metric_with_metric_aggregation_params(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(name="orders")

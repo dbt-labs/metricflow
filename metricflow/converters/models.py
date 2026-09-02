@@ -31,6 +31,21 @@ class OSIAIContextObject(FrozenBaseModel):
 OSIAIContext = Union[str, OSIAIContextObject]
 
 
+class OSIDataType(str, Enum):
+    """Logical data type for OSI fields and metrics (see apache/ossie core-spec/ossie-schema.json)."""
+
+    STRING = "String"
+    INTEGER = "Integer"
+    DECIMAL = "Decimal"
+    FLOAT = "Float"
+    BOOLEAN = "Boolean"
+    DATE = "Date"
+    TIME = "Time"
+    DATE_TIME = "DateTime"
+    DATE_TIME_TZ = "DateTimeTz"
+    OPAQUE = "Opaque"
+
+
 class OSIVendor(str, Enum):
     """Vendors with supported custom extensions."""
 
@@ -73,6 +88,7 @@ class OSIField(FrozenBaseModel):
     name: str
     expression: OSIExpression
     dimension: Optional[OSIDimension] = None
+    datatype: Optional[OSIDataType] = None
     label: Optional[str] = None
     description: Optional[str] = None
     ai_context: Optional[OSIAIContext] = None
@@ -113,6 +129,7 @@ class OSIMetric(FrozenBaseModel):
 
     name: str
     expression: OSIExpression
+    datatype: Optional[OSIDataType] = None
     description: Optional[str] = None
     ai_context: Optional[OSIAIContext] = None
     custom_extensions: Optional[List[OSICustomExtension]] = None
