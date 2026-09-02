@@ -127,20 +127,27 @@ class ManifestObjectLookup(AttributePrettyFormattable):
         }
 
     @cached_property
-    def entity_name_to_model_lookups(self) -> Mapping[str, OrderedSet[ModelObjectLookup]]:
-        """Mapping from the entity name to the model lookups that have the entity."""
-        entity_name_to_model_lookups: dict[str, MutableOrderedSet[ModelObjectLookup]] = defaultdict(MutableOrderedSet)
+    def entity_join_key_to_model_lookups(self) -> Mapping[str, OrderedSet[ModelObjectLookup]]:
+        """Mapping from an entity's join key (`entity.role` if set, else `entity.name`) to model lookups with it.
+
+        Used only for cross-model join matching (`SemanticModelJoinLookup`) - `role` lets a model reach the
+        same target entity under a locally-chosen name (e.g. `buyer`/`seller` both joining to `user`), so this
+        is keyed by the join key, not necessarily the entity's own name.
+        """
+        entity_join_key_to_model_lookups: dict[str, MutableOrderedSet[ModelObjectLookup]] = defaultdict(
+            MutableOrderedSet
+        )
         for model_id, lookup in self.model_id_to_lookup.items():
             for entity in lookup.semantic_model.entities:
-                entity_name_to_model_lookups[entity.name].add(lookup)
-        return entity_name_to_model_lookups
+                entity_join_key_to_model_lookups[entity.role or entity.name].add(lookup)
+        return entity_join_key_to_model_lookups
 
     @cached_property
-    def entity_name_to_model_ids(self) -> Mapping[str, OrderedSet[SemanticModelId]]:
-        """Mapping from the entity name to the IDs of the semantic models that contain it."""
+    def entity_join_key_to_model_ids(self) -> Mapping[str, OrderedSet[SemanticModelId]]:
+        """Mapping from an entity's join key (see `entity_join_key_to_model_lookups`) to semantic model IDs."""
         return {
-            entity_name: FrozenOrderedSet(model_lookup.model_id for model_lookup in model_lookups)
-            for entity_name, model_lookups in self.entity_name_to_model_lookups.items()
+            entity_join_key: FrozenOrderedSet(model_lookup.model_id for model_lookup in model_lookups)
+            for entity_join_key, model_lookups in self.entity_join_key_to_model_lookups.items()
         }
 
     def get_metric(self, metric_name: str) -> Metric:  # noqa: D102

@@ -53,14 +53,13 @@ semantic_model:
     - name: listing
       type: foreign
       expr: listing_id
+    # `role: user` lets `user__...` be queried through this entity, joining to whatever model owns the
+    # `user` entity (`users_latest`) - without also declaring a separate, redundantly-defined `user` entity
+    # here that aliases the same `guest_id` column under a different name.
     - name: guest
       type: foreign
       expr: guest_id
+      role: user
     - name: host
       type: foreign
       expr: host_id
-    # Hack around lack of support for entity/role functionality
-    # TODO: Remove this when full support for entity/role/primary role references is available
-    - name: user
-      type: foreign
-      expr: guest_id

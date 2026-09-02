@@ -31,6 +31,8 @@ class JoinDescription:
     """Describes how data from a node should be joined to data from another node."""
 
     join_node: DataflowPlanNode
+    # The entity to join on, as known to the *right* node (`join_node`) - also what a resulting spec's entity
+    # link is named after, e.g. joining on `user` produces `user__country`.
     join_on_entity: Optional[EntityReference]
     join_type: SqlJoinType
 
@@ -38,6 +40,13 @@ class JoinDescription:
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
+
+    # The entity to join on, as known to the *left* node, if different from `join_on_entity`. `None` means the
+    # left node knows this entity by the same name as the right node (the common case - every join that isn't
+    # using an entity `role` to join two differently-named entities together, e.g. a `buyer` entity joining to
+    # a `user` entity elsewhere). Only ever used to find the join column on the left side; the right side, and
+    # the resulting spec naming, are unaffected and still driven entirely by `join_on_entity`.
+    join_on_left_entity: Optional[EntityReference] = None
 
     def __post_init__(self) -> None:  # noqa: D105
         if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
@@ -93,6 +102,7 @@ class JoinOnEntitiesNode(DataflowPlanNode):
         for i in range(len(self.join_targets)):
             if (
                 self.join_targets[i].join_on_entity != other_node.join_targets[i].join_on_entity
+                or self.join_targets[i].join_on_left_entity != other_node.join_targets[i].join_on_left_entity
                 or self.join_targets[i].join_on_partition_dimensions
                 != other_node.join_targets[i].join_on_partition_dimensions
                 or self.join_targets[i].join_on_partition_time_dimensions
@@ -114,6 +124,7 @@ class JoinOnEntitiesNode(DataflowPlanNode):
                 JoinDescription(
                     join_node=new_join_nodes[i],
                     join_on_entity=old_join_target.join_on_entity,
+                    join_on_left_entity=old_join_target.join_on_left_entity,
                     join_on_partition_dimensions=old_join_target.join_on_partition_dimensions,
                     join_on_partition_time_dimensions=old_join_target.join_on_partition_time_dimensions,
                     validity_window=old_join_target.validity_window,

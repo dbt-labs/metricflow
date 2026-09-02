@@ -38,6 +38,15 @@ def test_natural_entity_instance_set_validation(
         semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup
     )
 
+    # `is_valid_instance_set_join` takes a single shared entity reference for both sides (it doesn't support
+    # `role`-based joins, where the two sides differ) - `bookings_source` only reaches `user` via `guest`'s
+    # `role: user`, so the foreign<->natural cases below use `bookings_source`'s own `listing` entity against
+    # `listings`' natural-typed `listing` entity instead, which are still literally the same name on both sides.
+    natural_listing_instance_set = (
+        mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST].data_set_mapping["listings"].instance_set
+    )
+    listing_entity_reference = EntityReference(element_name="listing")
+
     # Valid cases
     natural_primary = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,
@@ -51,8 +60,8 @@ def test_natural_entity_instance_set_validation(
     )
     foreign_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=foreign_user_instance_set,
-        right_instance_set=natural_user_instance_set,
-        on_entity_reference=user_entity_reference,
+        right_instance_set=natural_listing_instance_set,
+        on_entity_reference=listing_entity_reference,
     )
     primary_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=primary_user_instance_set,
@@ -66,9 +75,9 @@ def test_natural_entity_instance_set_validation(
     )
     # Invalid cases
     natural_foreign = join_evaluator.is_valid_instance_set_join(
-        left_instance_set=natural_user_instance_set,
+        left_instance_set=natural_listing_instance_set,
         right_instance_set=foreign_user_instance_set,
-        on_entity_reference=user_entity_reference,
+        on_entity_reference=listing_entity_reference,
     )
     natural_natural = join_evaluator.is_valid_instance_set_join(
         left_instance_set=natural_user_instance_set,

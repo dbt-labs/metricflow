@@ -68,8 +68,7 @@ class SemanticModelJoinLookup:
     @override
     def __init__(self, manifest_object_lookup: ManifestObjectLookup) -> None:
         self._model_id_to_lookup = manifest_object_lookup.model_id_to_lookup
-        self._entity_name_to_model_lookups = manifest_object_lookup.entity_name_to_model_lookups
-        self._entity_name_to_model_ids = manifest_object_lookup.entity_name_to_model_ids
+        self._entity_join_key_to_model_ids = manifest_object_lookup.entity_join_key_to_model_ids
 
     @cached_property
     def valid_join_to_entity_types(self) -> OrderedSet[EntityType]:
@@ -92,6 +91,13 @@ class SemanticModelJoinLookup:
 
         The returned dict maps the ID of the semantic model on the right to the entities in the corresponding model
         that can be used as a join key.
+
+        Matching between the left entity and a candidate right entity is by join key (`entity.role` if set, else
+        `entity.name`), not necessarily by the same literal name on both sides - that's what lets e.g. a `buyer`
+        entity on this model join to a `user` entity elsewhere. `JoinModelOnRightDescriptor.entity_name` is always
+        the *right* model's own entity name (never the left's), since that's the identity
+        `EntityJoinSubgraphGenerator` uses to build the right model's `ConfiguredEntityNode` - which must match the
+        node that same model's own self-reference edges build when it is later processed as a left model.
         """
         right_model_id_to_join_descriptors: dict[
             SemanticModelId, MutableOrderedSet[JoinModelOnRightDescriptor]
@@ -100,51 +106,53 @@ class SemanticModelJoinLookup:
         left_model = left_model_lookup.semantic_model
         left_model_has_validity_dimensions = self._model_id_to_has_validity_dimensions[left_model_id]
         for entity in left_model_lookup.semantic_model.entities:
-            left_entity_name = entity.name
             left_entity_type = entity.type
-            other_model_lookups_with_same_entity_name = self._entity_name_to_model_ids[left_entity_name]
-            for right_model_id in other_model_lookups_with_same_entity_name:
+            join_key = entity.role or entity.name
+            other_model_ids_with_matching_join_key = self._entity_join_key_to_model_ids[join_key]
+            for right_model_id in other_model_ids_with_matching_join_key:
                 right_model_lookup = self._model_id_to_lookup[right_model_id]
                 right_model = right_model_lookup.semantic_model
-                right_entity_type = right_model_lookup.entity_lookup.entity_name_to_type[left_entity_name]
                 right_model_has_validity_dimension = self._model_id_to_has_validity_dimensions[right_model_id]
 
-                join_type = EntityJoinType(
-                    left_entity_type=left_entity_type,
-                    right_entity_type=right_entity_type,
-                )
+                for right_entity in right_model_lookup.entity_lookup.join_key_to_entities[join_key]:
+                    right_entity_type = right_entity.type
 
-                if join_type in SemanticModelJoinLookup._VALID_ENTITY_JOINS:
-                    pass
-                elif join_type in SemanticModelJoinLookup._INVALID_ENTITY_JOINS:
-                    continue
-                else:
-                    raise ValueError(
-                        LazyFormat(
-                            "Unknown join type.",
+                    join_type = EntityJoinType(
+                        left_entity_type=left_entity_type,
+                        right_entity_type=right_entity_type,
+                    )
+
+                    if join_type in SemanticModelJoinLookup._VALID_ENTITY_JOINS:
+                        pass
+                    elif join_type in SemanticModelJoinLookup._INVALID_ENTITY_JOINS:
+                        continue
+                    else:
+                        raise ValueError(
+                            LazyFormat(
+                                "Unknown join type.",
+                                join_type=join_type,
+                                join_key=join_key,
+                                left_model=left_model,
+                                right_model=right_model,
+                            )
+                        )
+
+                    if left_model_has_validity_dimensions and right_model_has_validity_dimension:
+                        # We cannot join two semantic models with validity dimensions due to concerns with unexpected fanout
+                        # due to the key structure of these semantic models. Applying multi-stage validity window filters can
+                        # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
+                        # simple-metric inputs in such semantic models, since those will need to be converted to a different type of semantic model
+                        # to support such computation.
+                        continue
+
+                    if right_entity_type is EntityType.NATURAL and not right_model_has_validity_dimension:
+                        # There is no way to refine this to a single row per key, so we cannot support this join
+                        continue
+
+                    right_model_id_to_join_descriptors[right_model_id].add(
+                        JoinModelOnRightDescriptor(
+                            entity_name=right_entity.name,
                             join_type=join_type,
-                            left_entity_name=left_entity_name,
-                            left_model=left_model,
-                            right_model=right_model,
                         )
                     )
-
-                if left_model_has_validity_dimensions and right_model_has_validity_dimension:
-                    # We cannot join two semantic models with validity dimensions due to concerns with unexpected fanout
-                    # due to the key structure of these semantic models. Applying multi-stage validity window filters can
-                    # also lead to unexpected removal of interim join keys. Note this will need to be updated if we enable
-                    # simple-metric inputs in such semantic models, since those will need to be converted to a different type of semantic model
-                    # to support such computation.
-                    continue
-
-                if right_entity_type is EntityType.NATURAL and not right_model_has_validity_dimension:
-                    # There is no way to refine this to a single row per key, so we cannot support this join
-                    continue
-
-                right_model_id_to_join_descriptors[right_model_id].add(
-                    JoinModelOnRightDescriptor(
-                        entity_name=left_entity_name,
-                        join_type=join_type,
-                    )
-                )
         return right_model_id_to_join_descriptors
