@@ -11,7 +11,8 @@ def test_parse_and_validate_mfsql_query_matches_the_equivalent_flag_based_query(
     parser = MetricFlowQueryParser(semantic_manifest_lookup=simple_semantic_manifest_lookup)
 
     mfsql_result = parser.parse_and_validate_mfsql_query(
-        "SELECT bookings, booking__is_instant FROM metrics WHERE booking__is_instant = true ORDER BY -bookings"
+        "SELECT METRIC(bookings), booking__is_instant FROM metrics WHERE booking__is_instant = true "
+        "ORDER BY -METRIC(bookings)"
     )
     flag_based_result = parser.parse_and_validate_query(
         metric_names=["bookings"],

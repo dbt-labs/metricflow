@@ -18,7 +18,9 @@ def test_mfsql_request_matches_the_equivalent_flag_based_request(
     ].metricflow_engine
 
     mfsql_result = mf_engine.explain(
-        MetricFlowQueryRequest.create(sql="SELECT bookings, metric_time FROM metrics ORDER BY metric_time LIMIT 5")
+        MetricFlowQueryRequest.create(
+            sql="SELECT METRIC(bookings), metric_time FROM metrics ORDER BY metric_time LIMIT 5"
+        )
     )
     flag_based_result = mf_engine.explain(
         MetricFlowQueryRequest.create(

@@ -30,10 +30,12 @@ def query_options(function: Callable) -> Callable:
         default=None,
         help=(
             "Specify the entire query as a mfsql string - a restricted SQL dialect covering the same ground "
-            "as --metrics, --group-by, --where, --order, and --limit combined. Mutually exclusive with all "
-            "of those and with --saved-query.\n\n"
+            "as --metrics, --group-by, --where, --order, and --limit combined. Metrics must be wrapped in "
+            "METRIC(...), e.g. METRIC(bookings) - a bare name is always treated as a dimension/entity name. "
+            "Mutually exclusive with all of --metrics/--group-by/--where/--order/--limit and with "
+            "--saved-query.\n\n"
             "Example:\n\n"
-            "  --sql \"SELECT bookings, metric_time FROM metrics WHERE metric_time >= '2020-01-01' "
+            "  --sql \"SELECT METRIC(bookings), metric_time FROM metrics WHERE metric_time >= '2020-01-01' "
             'ORDER BY -metric_time LIMIT 10"'
         ),
     )(function)

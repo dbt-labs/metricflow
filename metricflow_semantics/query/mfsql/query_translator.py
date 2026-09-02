@@ -2,7 +2,7 @@
 
 mfsql supports exactly one statement shape:
 
-    SELECT <metric and/or dunder-name items> FROM metrics [WHERE ...] [ORDER BY ...] [LIMIT ...]
+    SELECT <METRIC(...) and/or dunder-name items> FROM metrics [WHERE ...] [ORDER BY ...] [LIMIT ...]
 
 This module parses that statement with sqlglot, validates it doesn't use any SQL construct outside that
 shape (CTEs, DISTINCT, JOINs, GROUP BY, HAVING, QUALIFY/window functions, UNION, `SELECT *`, ...), and
@@ -10,7 +10,14 @@ translates it into a `TranslatedMfsqlQuery` - a 1:1 match for a subset of the ke
 `MetricFlowQueryParser.parse_and_validate_query` already accepts. Wiring mfsql into the query parser itself
 (and into the CLI) is a separate, not-yet-designed piece; this module has no dependency on either.
 
-The WHERE clause is delegated to `where_translator.translate_where_clause` unchanged.
+Metrics must always be referenced via the `METRIC(name)` function-call form, in both the SELECT list and
+ORDER BY - a bare name is never auto-classified as a metric, even if it happens to match one in the
+manifest (that case gets a specific "wrap it in METRIC(...)" error rather than silent misclassification).
+Dimensions, entities, and time dimensions remain bare dunder names, unchanged.
+
+The WHERE clause is delegated to `where_translator.translate_where_clause` unchanged. `METRIC(...)` as a
+filter *value* (e.g. `WHERE METRIC(bookings, group_by=[...]) > 10`) is a different, still-deferred feature -
+see `where_translator`'s module docstring.
 """
 
 from __future__ import annotations
@@ -28,6 +35,10 @@ from metricflow_semantic_interfaces.references import MetricReference
 
 # mfsql has no join namespace, so `FROM <this>` must be exactly this bare, unqualified, unaliased name.
 _FROM_TABLE_NAME = "metrics"
+
+# The required function-call form for referencing a metric, e.g. `METRIC(bookings)`. Matched
+# case-insensitively, consistent with how EXTRACT's date-part keywords are matched in where_translator.py.
+_METRIC_FUNCTION_NAME = "METRIC"
 
 # `select.args` keys that must be absent for a statement to be in-scope for mfsql, paired with the message
 # explaining why. `from_`/`with_` (rather than `from`/`with`) is not a version quirk: sqlglot suffixes any
@@ -110,44 +121,85 @@ def _validate_bare_column(item: exp.Expression, clause_label: str) -> exp.Column
     return item
 
 
+def _extract_metric_call_column(item: exp.Expression) -> Optional[exp.Column]:
+    """Return the bare column inside a `METRIC(...)` call, or `None` if `item` isn't one.
+
+    A shape that *is* a call to something named `METRIC` but doesn't match the required
+    `METRIC(<bare column>)` form (wrong argument count, a non-column argument, a qualified column) is
+    always an error, never treated as "not a METRIC(...) call" - so a typo'd or malformed call gets a
+    specific error instead of falling through to a confusing "unknown group-by item" one.
+    """
+    if not isinstance(item, exp.Anonymous) or item.this.upper() != _METRIC_FUNCTION_NAME:
+        return None
+
+    if len(item.expressions) != 1 or not isinstance(item.expressions[0], exp.Column):
+        raise MfsqlQueryTranslationError(
+            f"`{item.sql()}` is not valid mfsql - {_METRIC_FUNCTION_NAME}(...) takes exactly one bare metric "
+            f"name, e.g. `{_METRIC_FUNCTION_NAME}(bookings)`."
+        )
+
+    column = item.expressions[0]
+    if column.table:
+        raise MfsqlQueryTranslationError(
+            f"mfsql does not support table-qualified columns like `{column.sql()}` inside "
+            f"{_METRIC_FUNCTION_NAME}(...)."
+        )
+    return column
+
+
+def _reject_if_unwrapped_metric_reference(
+    name: str, semantic_manifest_lookup: SemanticManifestLookup, clause_label: str
+) -> None:
+    """Raise a specific error if `name` is a known metric referenced without the required `METRIC(...)` form."""
+    if MetricReference(element_name=name) in semantic_manifest_lookup.metric_lookup.metric_references:
+        raise MfsqlQueryTranslationError(
+            f"`{name}` is a metric - metrics must always be referenced as `{_METRIC_FUNCTION_NAME}({name})` "
+            f"in mfsql, including in {clause_label}, e.g. `{_METRIC_FUNCTION_NAME}({name})`."
+        )
+
+
 def _classify_select_list(
     select: exp.Select, semantic_manifest_lookup: SemanticManifestLookup
 ) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
     """Split the SELECT list into `(metric_names, group_by_names)`.
 
-    Unlike the where-filter's `Dimension()`/`Entity()` macros, MetricFlow's group-by resolution
+    Metrics are only ever recognized via the explicit `METRIC(name)` form - a bare name is never
+    auto-classified as a metric, even if it matches one in the manifest; that case gets a specific "wrap it
+    in METRIC(...)" error instead. Everything else is passed through as a group-by name unvalidated: unlike
+    the where-filter's `Dimension()`/`Entity()` macros, MetricFlow's group-by resolution
     (`DunderNamingScheme`) does not require the caller to pre-classify a name as a dimension, entity, or time
-    dimension - it matches structurally against whatever is linkable for the metrics in the query. So the
-    only classification decision mfsql needs to make here is metric vs. not-a-metric. A name that isn't a
-    known metric is passed through as a group-by name unvalidated; the existing resolver produces the same
-    "unknown item" issue (with fuzzy-match suggestions) it already produces today for a mistyped
-    `--group-by` value - this module doesn't need to duplicate that.
+    dimension - it matches structurally against whatever is linkable for the metrics in the query. The
+    existing resolver produces the same "unknown item" issue (with fuzzy-match suggestions) it already
+    produces today for a mistyped `--group-by` value - this module doesn't need to duplicate that.
     """
     if not select.expressions:
         raise MfsqlQueryTranslationError("mfsql SELECT list must not be empty.")
 
     metric_names: List[str] = []
     group_by_names: List[str] = []
-    known_metric_references = semantic_manifest_lookup.metric_lookup.metric_references
 
     for item in select.expressions:
+        metric_column = _extract_metric_call_column(item)
+        if metric_column is not None:
+            metric_names.append(metric_column.name.lower())
+            continue
+
         column = _validate_bare_column(item, clause_label="the SELECT list")
         name = column.name.lower()
-        if MetricReference(element_name=name) in known_metric_references:
-            metric_names.append(name)
-        else:
-            group_by_names.append(name)
+        _reject_if_unwrapped_metric_reference(name, semantic_manifest_lookup, clause_label="the SELECT list")
+        group_by_names.append(name)
 
     return tuple(metric_names), tuple(group_by_names)
 
 
-def _translate_order_by(select: exp.Select) -> Tuple[str, ...]:
+def _translate_order_by(select: exp.Select, semantic_manifest_lookup: SemanticManifestLookup) -> Tuple[str, ...]:
     """Translate ORDER BY into MetricFlow's `-`-prefixed `order_by_names` convention.
 
     Both spellings of "descending" mfsql accepts translate to the same output: standard SQL
     `ORDER BY x DESC`, and MetricFlow's own `ORDER BY -x` convention. sqlglot happens to parse a leading `-`
-    on a bare column as unary negation (`exp.Neg`), which is valid SQL and unambiguous here since mfsql has
-    no other use for arithmetic negation in ORDER BY.
+    on a bare column (or on a `METRIC(...)` call) as unary negation (`exp.Neg`), which is valid SQL and
+    unambiguous here since mfsql has no other use for arithmetic negation in ORDER BY. Metrics follow the
+    same `METRIC(name)`-required rule as the SELECT list, for the same reason.
     """
     order = select.args.get("order")
     if order is None:
@@ -177,8 +229,15 @@ def _translate_order_by(select: exp.Select) -> Tuple[str, ...]:
             descending = True
             target = target.this
 
-        column = _validate_bare_column(target, clause_label="ORDER BY")
-        order_by_names.append(f"-{column.name.lower()}" if descending else column.name.lower())
+        metric_column = _extract_metric_call_column(target)
+        if metric_column is not None:
+            name = metric_column.name.lower()
+        else:
+            column = _validate_bare_column(target, clause_label="ORDER BY")
+            name = column.name.lower()
+            _reject_if_unwrapped_metric_reference(name, semantic_manifest_lookup, clause_label="ORDER BY")
+
+        order_by_names.append(f"-{name}" if descending else name)
 
     return tuple(order_by_names)
 
@@ -209,6 +268,6 @@ def translate_mfsql_query(sql: str, semantic_manifest_lookup: SemanticManifestLo
         metric_names=metric_names,
         group_by_names=group_by_names,
         where_constraint_strs=where_constraint_strs,
-        order_by_names=_translate_order_by(select),
+        order_by_names=_translate_order_by(select, semantic_manifest_lookup),
         limit=_extract_limit(select),
     )
