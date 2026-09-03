@@ -50,6 +50,18 @@ class EntityLookup(AttributePrettyFormattable):
         return {join_key: tuple(entities) for join_key, entities in join_key_to_entities.items()}
 
     @cached_property
+    def join_key_to_entity_names(self) -> Mapping[str, Tuple[str, ...]]:
+        """`join_key_to_entities`, but names only.
+
+        For debug display, where full `Entity` objects are too noisy - they carry file/line metadata
+        (including an absolute path) that isn't meaningful here and isn't stable across checkouts.
+        """
+        return {
+            join_key: tuple(entity.name for entity in entities)
+            for join_key, entities in self.join_key_to_entities.items()
+        }
+
+    @cached_property
     @override
     def _attribute_mapping(self) -> AttributeMapping:
         return dict(
@@ -59,7 +71,7 @@ class EntityLookup(AttributePrettyFormattable):
                 for attribute_name in (
                     "entity_name_to_type",
                     "entity_type_to_names",
-                    "join_key_to_entities",
+                    "join_key_to_entity_names",
                 )
             },
         )

@@ -11,44 +11,7 @@ ManifestObjectLookup(
       entity_lookup=EntityLookup(
         entity_name_to_type={'booking': PRIMARY, 'listing': FOREIGN},
         entity_type_to_names={PRIMARY: {'booking'}, FOREIGN: {'listing'}},
-        join_key_to_entities={
-          'booking': (
-            PydanticEntity(
-              name='booking',
-              type=PRIMARY,
-              metadata=PydanticMetadata(
-                repo_file_path='/Users/quigleymalcolm/Developer/dbt-labs/metricflow/metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_02_single_join/manifest.yaml',
-                file_slice=PydanticFileSlice(
-                  filename='manifest.yaml',
-                  content=('name: '
-                   'booking\n'
-                   'type: '
-                   'primary\n'),
-                  start_line_number=14,
-                  end_line_number=15,
-                ),
-              ),
-            ),
-          ),
-          'listing': (
-            PydanticEntity(
-              name='listing',
-              type=FOREIGN,
-              metadata=PydanticMetadata(
-                repo_file_path='/Users/quigleymalcolm/Developer/dbt-labs/metricflow/metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_02_single_join/manifest.yaml',
-                file_slice=PydanticFileSlice(
-                  filename='manifest.yaml',
-                  content=('name: '
-                   'listing\n'
-                   'type: '
-                   'foreign\n'),
-                  start_line_number=16,
-                  end_line_number=18,
-                ),
-              ),
-            ),
-          ),
-        },
+        join_key_to_entity_names={'booking': ('booking',), 'listing': ('listing',)},
       ),
       aggregation_configuration_to_simple_metric_inputs={
         SimpleMetricAggregationConfiguration(
@@ -62,26 +25,7 @@ ManifestObjectLookup(
       entity_lookup=EntityLookup(
         entity_name_to_type={'listing': PRIMARY},
         entity_type_to_names={PRIMARY: {'listing'}},
-        join_key_to_entities={
-          'listing': (
-            PydanticEntity(
-              name='listing',
-              type=PRIMARY,
-              metadata=PydanticMetadata(
-                repo_file_path='/Users/quigleymalcolm/Developer/dbt-labs/metricflow/metricflow_semantics/test_helpers/semantic_manifest_yamls/sg_02_single_join/manifest.yaml',
-                file_slice=PydanticFileSlice(
-                  filename='manifest.yaml',
-                  content=('name: '
-                   'listing\n'
-                   'type: '
-                   'primary\n'),
-                  start_line_number=39,
-                  end_line_number=41,
-                ),
-              ),
-            ),
-          ),
-        },
+        join_key_to_entity_names={'listing': ('listing',)},
       ),
     ),
   ),
