@@ -1,5 +1,5 @@
 kind: Features
-body: Add experimental ClickHouse SQL engine support, continuing #2014. Compiled queries
+body: Add experimental ClickHouse SQL engine support, continuing PR 2014. Compiled queries
   emit SETTINGS join_use_nulls = 1 so unmatched outer-join cells are SQL NULL.
   ReplacingMergeTree FINAL and hosted Semantic Layer / Fusion are out of scope.
 time: 2026-08-31T00:00:00.00000-04:00
