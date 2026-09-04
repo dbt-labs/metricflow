@@ -111,8 +111,7 @@ def assert_snapshot_text_equal(
     if snapshot_configuration.overwrite_snapshots:
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        # utf-8 + POSIX newlines keep snapshots identical on Windows (locale encoding / CRLF).
-        with open(file_path, "w", encoding="utf-8", newline="\n") as snapshot_text_file:
+        with open(file_path, "w") as snapshot_text_file:
             snapshot_text_file.write(snapshot_text)
 
     # Throw an exception if the plan is not there.
@@ -131,7 +130,7 @@ def assert_snapshot_text_equal(
         webbrowser.open(file_path.resolve().as_uri())
 
     # Read the existing plan from the file and compare with the actual plan
-    with open(file_path, "r", encoding="utf-8") as snapshot_text_file:
+    with open(file_path, "r") as snapshot_text_file:
         expected_snapshot_text = snapshot_text_file.read()
 
         if exclude_line_regex:
