@@ -48,7 +48,7 @@ def _release_tool_context(repo_path: Path, git_manager: FakeGitManager) -> Relea
 
 def _normalize_output(output: str, tmp_path: Path) -> str:
     """Return command output with temp paths normalized for snapshots."""
-    return output.replace(str(tmp_path), "<TMP>").replace("\\", "/")
+    return output.replace(str(tmp_path), "<TMP>")
 
 
 def test_clean_with_missing_state_file(

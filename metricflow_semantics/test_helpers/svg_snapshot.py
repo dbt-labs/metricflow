@@ -32,7 +32,7 @@ def write_svg_snapshot_for_review(
     if snapshot_configuration.overwrite_snapshots:
         # Create parent directory for the plan text files.
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        with open(file_path, "w", encoding="utf-8", newline="\n") as snapshot_text_file:
+        with open(file_path, "w") as snapshot_text_file:
             snapshot_text_file.write(svg_file_contents)
         logger.debug(
             LazyFormat(
