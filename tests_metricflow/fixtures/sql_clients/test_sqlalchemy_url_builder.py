@@ -159,6 +159,21 @@ def test_athena_url_rejects_invalid_required_query_parameters(url: str, message:
         SqlAlchemyUrlBuilder.build_url(params, password="secret", schema="analytics")
 
 
+def test_clickhouse_url_keeps_warehouse_database() -> None:
+    """ClickHouse connect-time database is the warehouse from the URL, not the per-test schema."""
+    params = SqlEngineConnectionParameterSet.create_from_url("clickhouse://metricflow@localhost/metricflow")
+    url = SqlAlchemyUrlBuilder.build_url(params, password="metricflowing", schema="mf_test_schema")
+
+    assert url.drivername == "clickhousedb"
+    assert url.username == "metricflow"
+    assert url.password == "metricflowing"
+    assert url.host == "localhost"
+    assert url.port == 8123
+    assert url.database == "metricflow"
+    assert "join_use_nulls" not in url.query
+    assert url.query["data_type_default_nullable"] == "1"
+
+
 def test_bigquery_url() -> None:
     """Test BigQuery URL with JSON credentials."""
     credentials_json = '{"type": "service_account", "project_id": "my-project", "client_email": "test@test.com"}'

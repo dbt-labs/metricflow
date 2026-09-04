@@ -14,6 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from metricflow.data_table.mf_table import MetricFlowDataTable
 from metricflow.protocols.sql_client import SqlEngine
+from metricflow.sql.render.clickhouse import clickhouse_explain_statement
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 
 logger = logging.getLogger(__name__)
@@ -95,8 +96,7 @@ class SqlAlchemyBasedSqlClient:
 
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
-                f"Bind parameters not yet supported in SqlAlchemy client. "
-                f"Params: {sql_bind_parameter_set.param_dict}"
+                f"Bind parameters not yet supported in SqlAlchemy client. Params: {sql_bind_parameter_set.param_dict}"
             )
 
         logger.info(
@@ -152,8 +152,7 @@ class SqlAlchemyBasedSqlClient:
         """
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
-                f"Bind parameters not yet supported in SqlAlchemy client. "
-                f"Params: {sql_bind_parameter_set.param_dict}"
+                f"Bind parameters not yet supported in SqlAlchemy client. Params: {sql_bind_parameter_set.param_dict}"
             )
 
         start = time.perf_counter()
@@ -217,7 +216,8 @@ class SqlAlchemyBasedSqlClient:
                         or "org.apache.spark.sql.AnalysisException" in plan_output
                     ):
                         raise RuntimeError(f"Databricks dry run failed: {plan_output}")
-
+                elif self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                    conn.execute(sa_text(clickhouse_explain_statement(stmt)))
                 else:
                     # Default: Use EXPLAIN for other engines
                     conn.execute(sa_text(f"EXPLAIN {stmt}"))

@@ -15,6 +15,7 @@ from sqlalchemy import create_engine, make_url
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
 from metricflow.sql.render.athena import AthenaSqlPlanRenderer
 from metricflow.sql.render.big_query import BigQuerySqlPlanRenderer
+from metricflow.sql.render.clickhouse import ClickHouseSqlPlanRenderer
 from metricflow.sql.render.databricks import DatabricksSqlPlanRenderer
 from metricflow.sql.render.duckdb_renderer import DuckDbSqlPlanRenderer
 from metricflow.sql.render.postgres import PostgresSQLSqlPlanRenderer
@@ -80,6 +81,7 @@ def make_test_sql_client(url: str, password: str, schema: str) -> SqlClientWithD
         SqlDialect.REDSHIFT: (SqlEngine.REDSHIFT, RedshiftSqlPlanRenderer()),
         SqlDialect.BIGQUERY: (SqlEngine.BIGQUERY, BigQuerySqlPlanRenderer()),
         SqlDialect.TRINO: (SqlEngine.TRINO, TrinoSqlPlanRenderer()),
+        SqlDialect.CLICKHOUSE: (SqlEngine.CLICKHOUSE, ClickHouseSqlPlanRenderer()),
     }
 
     if dialect not in dialect_mapping:

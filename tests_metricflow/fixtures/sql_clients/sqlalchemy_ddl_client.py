@@ -42,6 +42,12 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
             column_defs.append(f"{col_desc.column_name} {sql_type}")
 
         create_stmt = f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)})"
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            # ClickHouse requires an engine. Test tables have no sort key.
+            create_stmt = (
+                f"CREATE TABLE IF NOT EXISTS {sql_table.sql} ({', '.join(column_defs)}) "
+                "ENGINE = MergeTree ORDER BY tuple()"
+            )
 
         # Execute CREATE TABLE
         self.execute(create_stmt)
@@ -69,6 +75,12 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
                 for cell in row:
                     if cell is None:
                         cells.append("null")
+                    elif isinstance(cell, bool):
+                        # bool is a subclass of int; handle before the generic numeric path.
+                        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                            cells.append("true" if cell else "false")
+                        else:
+                            cells.append(str(cell))
                     elif isinstance(cell, str):
                         # Escape and quote strings
                         escaped = self._quote_escape_value(str(cell))
@@ -104,14 +116,20 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
         column_type = column_description.column_type
 
         if column_type is str:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "String"
             if self.sql_engine_type in (SqlEngine.DATABRICKS, SqlEngine.BIGQUERY):
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
             return "text"
         elif column_type is bool:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "Bool"
             return "boolean"
         elif column_type is int:
+            if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+                return "Int64"
             return "bigint"
         elif column_type is float:
             return self._sql_plan_renderer.expr_renderer.double_data_type
@@ -128,9 +146,20 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
 
     def create_schema(self, schema_name: str) -> None:
         """Create schema if it doesn't exist."""
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            self.execute(f"CREATE DATABASE IF NOT EXISTS {schema_name}")
+            return
         self.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
 
     def drop_schema(self, schema_name: str, cascade: bool = True) -> None:
         """Drop schema if it exists."""
         cascade_clause = " CASCADE" if cascade else ""
+        if self.sql_engine_type is SqlEngine.CLICKHOUSE:
+            if cascade:
+                logger.warning(
+                    (f"Cascading drop requested but not supported by {self.sql_engine_type}; dropping without cascade.")
+                )
+
+            self.execute(f"DROP DATABASE IF EXISTS {schema_name}")
+            return
         self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")

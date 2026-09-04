@@ -16,6 +16,8 @@ class SqlEngine(Enum):
     """Enumeration of supported SQL engines.
 
     Values are normalized engine names used for things like snapshot file locations.
+    ClickHouse support is experimental: compiled SQL emits SETTINGS join_use_nulls = 1,
+    but ReplacingMergeTree FINAL and hosted Semantic Layer / Fusion are out of scope.
     """
 
     BIGQUERY = "BigQuery"
@@ -26,6 +28,7 @@ class SqlEngine(Enum):
     DATABRICKS = "Databricks"
     TRINO = "Trino"
     ATHENA = "Athena"
+    CLICKHOUSE = "ClickHouse"
 
     @property
     def unsupported_granularities(self) -> Set[TimeGranularity]:
@@ -51,6 +54,8 @@ class SqlEngine(Enum):
         elif self is SqlEngine.TRINO:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
         elif self is SqlEngine.ATHENA:
+            return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
+        elif self is SqlEngine.CLICKHOUSE:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
         else:
             assert_values_exhausted(self)

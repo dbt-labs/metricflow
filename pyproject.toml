@@ -71,6 +71,10 @@ athena-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-athena.txt",
 ]
+clickhouse-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-clickhouse.txt",
+]
 
 
 [project.urls]
@@ -171,6 +175,18 @@ build-and-validate = [
   "hatch run nuitka-build:compile",
   "hatch run nuitka-build:validate",
 ]
+
+
+# Warehouse database `metricflow` is the connect-time database. Per-test schemas are CREATE DATABASE.
+[tool.hatch.envs.clickhouse-env.env-vars]
+MF_TEST_ADAPTER_TYPE="clickhouse"
+MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
+MF_SQL_ENGINE_PASSWORD="metricflowing"
+
+[tool.hatch.envs.clickhouse-env]
+description = "Experimental ClickHouse engine tests (see local-data-warehouses/README.md)"
+template = "dev-env"
+features = ["clickhouse-env-requirements"]
 
 
 [tool.black]

@@ -28,7 +28,8 @@ If you're not sure whether your change qualifies, err on the side of opening an 
         - Postgres provides [pre-built packages for download and installation](https://www.postgresql.org/download/)
         - Mac users might prefer to use Homebrew: `brew install postgresql`
     - Docker:
-        - This is only required if you are developing with Postgres.
+        - Required for local Postgres, Trino, and ClickHouse engine tests. See
+          [`local-data-warehouses/README.md`](local-data-warehouses/README.md).
         - Follow the [instructions from Docker](https://docs.docker.com/get-docker/)
 3. [Create a fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of the [MetricFlow repo](https://github.com/dbt-labs/metricflow) and [clone it locally](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 4. Install [Hatch](https://github.com/pypa/hatch) via `make install-hatch` - this is the tool we use to manage our build dependencies.

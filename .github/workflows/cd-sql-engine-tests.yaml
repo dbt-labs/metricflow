@@ -134,6 +134,44 @@ jobs:
               ]
             }
 
+  clickhouse-tests:
+    # Same trigger as Trino: this workflow runs on workflow_dispatch or when a PR
+    # is labeled "Run Tests With Other SQL Engines" (`on.pull_request.types: labeled`).
+    # Support is experimental: compiled SQL emits SETTINGS join_use_nulls = 1;
+    # ReplacingMergeTree FINAL and hosted Semantic Layer are out of scope.
+    name: ClickHouse Tests
+    if: ${{ github.event.action != 'labeled' || github.event.label.name == 'Run Tests With Other SQL Engines' }}
+    runs-on: ubuntu-latest
+    services:
+      clickhouse:
+        image: clickhouse/clickhouse-server:26.3
+        ports:
+          - 8123:8123
+          - 9000:9000
+        env:
+          CLICKHOUSE_DB: metricflow
+          CLICKHOUSE_USER: metricflow
+          CLICKHOUSE_PASSWORD: metricflowing
+          CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+        options: >-
+          --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - name: Check-out the repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # actions/checkout@v4
+
+      - uses: ./.github/actions/run-mf-tests
+        with:
+          make-target: "test-clickhouse"
+          hatch-environment-cache-config-json: >-
+            {
+              "configs": [
+                {"hatch_project_directory": ".", "hatch_environment_name": "clickhouse-env"}
+              ]
+            }
+
   remove-label:
     name: Remove Label After Running Tests
     runs-on: ubuntu-latest

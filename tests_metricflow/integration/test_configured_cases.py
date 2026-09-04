@@ -32,7 +32,8 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, OutputColumnOrderMode
-from metricflow.protocols.sql_client import SqlClient
+from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.sql.render.clickhouse import ensure_join_use_nulls_setting
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -378,26 +379,30 @@ def _test_case(
 
     actual = query_result.result_df
 
-    expected = sql_client.query(
-        jinja2.Template(
-            case.check_query,
-            undefined=jinja2.StrictUndefined,
-        ).render(
-            source_schema=mf_test_configuration.mf_source_schema,
-            render_time_constraint=check_query_helpers.render_time_constraint,
-            TimeGranularity=TimeGranularity,
-            DatePart=DatePart,
-            render_date_sub=check_query_helpers.render_date_sub,
-            render_date_add=check_query_helpers.render_date_add,
-            render_date_trunc=check_query_helpers.render_date_trunc,
-            render_extract=check_query_helpers.render_extract,
-            render_percentile_expr=check_query_helpers.render_percentile_expr,
-            mf_time_spine_source=time_spine_source.sql_table.sql,
-            double_data_type_name=check_query_helpers.double_data_type_name,
-            generate_random_uuid=check_query_helpers.generate_random_uuid,
-            cast_to_ts=check_query_helpers.cast_to_ts,
-        )
+    check_query_sql = jinja2.Template(
+        case.check_query,
+        undefined=jinja2.StrictUndefined,
+    ).render(
+        source_schema=mf_test_configuration.mf_source_schema,
+        render_time_constraint=check_query_helpers.render_time_constraint,
+        TimeGranularity=TimeGranularity,
+        DatePart=DatePart,
+        render_date_sub=check_query_helpers.render_date_sub,
+        render_date_add=check_query_helpers.render_date_add,
+        render_date_trunc=check_query_helpers.render_date_trunc,
+        render_extract=check_query_helpers.render_extract,
+        render_percentile_expr=check_query_helpers.render_percentile_expr,
+        mf_time_spine_source=time_spine_source.sql_table.sql,
+        double_data_type_name=check_query_helpers.double_data_type_name,
+        generate_random_uuid=check_query_helpers.generate_random_uuid,
+        cast_to_ts=check_query_helpers.cast_to_ts,
     )
+    if sql_client.sql_engine_type is SqlEngine.CLICKHOUSE:
+        # Check queries are written against ANSI outer-join semantics (unmatched cells are NULL). ClickHouse
+        # defaults to filling those cells with type defaults, so pin the same query-level contract that compiled
+        # MetricFlow SQL carries. The test client itself stays on engine defaults (see test_clickhouse_join_nulls.py).
+        check_query_sql = ensure_join_use_nulls_setting(check_query_sql)
+    expected = sql_client.query(check_query_sql)
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
     assert actual is not None, "Did not get a result table from MetricFlow"
     assert_data_tables_equal(actual, expected, sort_columns=not case.check_order, allow_empty=case.allow_empty)

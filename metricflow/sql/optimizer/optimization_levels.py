@@ -45,7 +45,9 @@ class SqlGenerationOptionSet:
 
     @staticmethod
     def options_for_level(  # noqa: D102
-        level: SqlOptimizationLevel, use_column_alias_in_group_by: bool
+        level: SqlOptimizationLevel,
+        use_column_alias_in_group_by: bool,
+        has_ambiguous_alias_resolution: bool = False,
     ) -> SqlGenerationOptionSet:
         optimizers: Tuple[SqlPlanOptimizer, ...] = ()
         allow_cte = False
@@ -60,13 +62,19 @@ class SqlGenerationOptionSet:
         elif level is SqlOptimizationLevel.O4:
             optimizers = (
                 SqlColumnPrunerOptimizer(),
-                SqlRewritingSubQueryReducer(use_column_alias_in_group_bys=use_column_alias_in_group_by),
+                SqlRewritingSubQueryReducer(
+                    use_column_alias_in_group_bys=use_column_alias_in_group_by,
+                    has_ambiguous_alias_resolution=has_ambiguous_alias_resolution,
+                ),
                 SqlTableAliasSimplifier(),
             )
         elif level is SqlOptimizationLevel.O5:
             optimizers = (
                 SqlColumnPrunerOptimizer(),
-                SqlRewritingSubQueryReducer(use_column_alias_in_group_bys=use_column_alias_in_group_by),
+                SqlRewritingSubQueryReducer(
+                    use_column_alias_in_group_bys=use_column_alias_in_group_by,
+                    has_ambiguous_alias_resolution=has_ambiguous_alias_resolution,
+                ),
                 SqlTableAliasSimplifier(),
             )
             allow_cte = True

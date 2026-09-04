@@ -50,6 +50,8 @@ class SqlAlchemyUrlBuilder:
             return SqlAlchemyUrlBuilder._build_athena_url(connection_params, password, schema)
         elif dialect is SqlDialect.TRINO:
             return SqlAlchemyUrlBuilder._build_trino_url(connection_params, password, schema)
+        elif dialect is SqlDialect.CLICKHOUSE:
+            return SqlAlchemyUrlBuilder._build_clickhouse_url(connection_params, password)
         else:
             raise ValueError(f"Unsupported dialect: {dialect}")
 
@@ -277,4 +279,37 @@ class SqlAlchemyUrlBuilder:
             port=connection_params.port or 443,
             database=schema,
             query=query_params,
+        )
+
+    @staticmethod
+    def _build_clickhouse_url(
+        connection_params: SqlEngineConnectionParameterSet,
+        password: str,
+    ) -> SqlAlchemyURL:
+        """Build ClickHouse URL.
+
+        ClickHouse has database.table (no schema). The URL database is the stable
+        warehouse database from MF_SQL_ENGINE_URL (e.g. metricflow). MetricFlow's
+        per-test schema is a separate CREATE DATABASE and appears in generated SQL
+        as database.table — it cannot be the connect-time database because that
+        database does not exist until setup runs.
+
+        `data_type_default_nullable=1` makes CREATE TABLE column types nullable.
+        It does not apply to explicit CAST, so the renderer still emits
+        ``Nullable(...)`` CAST targets.
+
+        ``join_use_nulls`` is not a connect-time setting. Compiled MetricFlow SQL
+        carries ``SETTINGS join_use_nulls = 1``. Leaving it off the URL means
+        tests fail if the renderer stops emitting that clause.
+        """
+        return SqlAlchemyURL.create(
+            drivername="clickhousedb",
+            username=connection_params.username,
+            password=password,
+            host=connection_params.hostname,
+            port=connection_params.port or 8123,
+            database=connection_params.database,
+            query={
+                "data_type_default_nullable": "1",
+            },
         )

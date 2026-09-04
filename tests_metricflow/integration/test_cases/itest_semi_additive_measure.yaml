@@ -52,14 +52,14 @@ integration_test:
       SELECT
         user_id AS user
         , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
-        , MAX(ds) AS ds
+        , MAX(ds) AS ds__max
       FROM {{ source_schema }}.fct_accounts
       GROUP BY
         {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
         , user_id
     ) b
     ON
-      a.ds = b.ds AND a.user = b.user
+      a.ds = b.ds__max AND a.user = b.user
     GROUP BY
       a.metric_time__week
 ---
@@ -81,14 +81,14 @@ integration_test:
     ) a
     INNER JOIN (
       SELECT
-        MIN(ds) AS ds
+        MIN(ds) AS ds__min
         , {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS metric_time__day
       FROM {{ source_schema }}.fct_accounts
       GROUP BY
         {{ render_date_trunc("ds", TimeGranularity.DAY) }}
     ) b
     ON
-      a.ds = b.ds
+      a.ds = b.ds__min
     GROUP BY
       a.ds
 ---
@@ -163,14 +163,14 @@ integration_test:
     ) a
     INNER JOIN (
       SELECT
-        MIN(ds) AS ds
+        MIN(ds) AS ds__min
         , {{ render_date_trunc("ds", TimeGranularity.WEEK) }} AS metric_time__week
       FROM {{ source_schema }}.fct_accounts
       GROUP BY
         {{ render_date_trunc("ds", TimeGranularity.WEEK) }}
     ) b
     ON
-      a.ds = b.ds
+      a.ds = b.ds__min
     GROUP BY
       a.metric_time__week
 ---
