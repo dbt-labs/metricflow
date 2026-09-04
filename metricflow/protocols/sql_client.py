@@ -25,6 +25,7 @@ class SqlEngine(Enum):
     SNOWFLAKE = "Snowflake"
     DATABRICKS = "Databricks"
     TRINO = "Trino"
+    VERTICA = "Vertica"
     ATHENA = "Athena"
 
     @property
@@ -50,6 +51,9 @@ class SqlEngine(Enum):
             return {TimeGranularity.NANOSECOND}
         elif self is SqlEngine.TRINO:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
+        elif self is SqlEngine.VERTICA:
+            # Vertica's TIMESTAMP type and DATE_TRUNC function support microsecond precision.
+            return {TimeGranularity.NANOSECOND}
         elif self is SqlEngine.ATHENA:
             return {TimeGranularity.NANOSECOND, TimeGranularity.MICROSECOND}
         else:

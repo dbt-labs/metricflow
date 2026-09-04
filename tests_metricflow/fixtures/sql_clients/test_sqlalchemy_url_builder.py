@@ -90,6 +90,19 @@ def test_trino_url_with_database_as_catalog() -> None:
     assert url.query["schema"] == "default"
 
 
+def test_vertica_url() -> None:
+    """Test Vertica URL conversion."""
+    params = SqlEngineConnectionParameterSet.create_from_url("vertica://user@localhost:5433/testdb")
+    url = SqlAlchemyUrlBuilder.build_url(params, password="secret", schema="analytics")
+
+    assert url.drivername == "mf_vertica_python"
+    assert url.username == "user"
+    assert url.password == "secret"
+    assert url.host == "localhost"
+    assert url.port == 5433
+    assert url.database == "testdb"
+
+
 def test_redshift_url() -> None:
     """Test Redshift URL conversion."""
     params = SqlEngineConnectionParameterSet.create_from_url("redshift://user@host.redshift.amazonaws.com:5439/dev")

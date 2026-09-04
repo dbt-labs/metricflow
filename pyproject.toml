@@ -67,6 +67,11 @@ trino-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-trino.txt",
 ]
+vertica-env-requirements = [
+  "requirements-files/dev-env-requirements.txt",
+  "requirements-files/requirements-vertica.txt",
+]
+
 athena-env-requirements = [
   "requirements-files/dev-env-requirements.txt",
   "requirements-files/requirements-athena.txt",
@@ -154,6 +159,15 @@ description = "Dev environment for working with the Athena adapter"
 template = "dev-env"
 features = ["athena-env-requirements"]
 
+
+[tool.hatch.envs.vertica-env.env-vars]
+MF_SQL_ENGINE_URL="vertica://metricflow@localhost:5433/metricflow"
+MF_SQL_ENGINE_PASSWORD="metricflowing"
+
+[tool.hatch.envs.vertica-env]
+description = "Dev environment for working with Vertica"
+template = "dev-env"
+features = ["vertica-env-requirements"]
 
 [tool.hatch.envs.nuitka-build]
 description = "Nuitka compilation environment for building a standalone MetricFlow binary."

@@ -1,0 +1,6 @@
+kind: Features
+body: Add support for the Vertica engine
+time: 2026-07-10T12:00:00.000000+03:00
+custom:
+    Author: beratli
+    Issue: ""

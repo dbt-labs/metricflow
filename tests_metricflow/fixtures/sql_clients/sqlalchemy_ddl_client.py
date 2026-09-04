@@ -108,6 +108,9 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
                 return "string"
             if self.sql_engine_type is SqlEngine.TRINO:
                 return "varchar"
+            if self.sql_engine_type is SqlEngine.VERTICA:
+                # Vertica does not have a TEXT type, and a bare VARCHAR defaults to 80 characters.
+                return "varchar(1024)"
             return "text"
         elif column_type is bool:
             return "boolean"
