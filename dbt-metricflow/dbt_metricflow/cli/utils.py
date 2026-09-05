@@ -25,6 +25,21 @@ logger = logging.getLogger(__name__)
 def query_options(function: Callable) -> Callable:
     """Common options for a query."""
     function = click.option(
+        "--sql",
+        type=str,
+        default=None,
+        help=(
+            "Specify the entire query as a mfsql string - a restricted SQL dialect covering the same ground "
+            "as --metrics, --group-by, --where, --order, and --limit combined. Metrics must be wrapped in "
+            "METRIC(...), e.g. METRIC(bookings) - a bare name is always treated as a dimension/entity name. "
+            "Mutually exclusive with all of --metrics/--group-by/--where/--order/--limit and with "
+            "--saved-query.\n\n"
+            "Example:\n\n"
+            "  --sql \"SELECT METRIC(bookings), metric_time FROM metrics WHERE metric_time >= '2020-01-01' "
+            'ORDER BY -metric_time LIMIT 10"'
+        ),
+    )(function)
+    function = click.option(
         "--order",
         type=click_custom.SequenceParamType(),
         help=(

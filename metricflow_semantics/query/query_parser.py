@@ -26,6 +26,7 @@ from metricflow_semantics.query.group_by_item.group_by_item_resolver import Grou
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
 from metricflow_semantics.query.issues.parsing.string_input_parsing_issue import StringInputParsingIssue
+from metricflow_semantics.query.mfsql.query_translator import translate_mfsql_query
 from metricflow_semantics.query.query_resolution import InputToIssueSetMapping, InputToIssueSetMappingItem
 from metricflow_semantics.query.query_resolver import MetricFlowQueryResolver
 from metricflow_semantics.query.resolver_inputs.base_resolver_inputs import MetricFlowQueryResolverInput
@@ -603,6 +604,16 @@ class MetricFlowQueryParser:
             query_spec=query_spec,
             queried_semantic_models=query_resolution.queried_semantic_models,
         )
+
+    def parse_and_validate_mfsql_query(self, sql: str) -> ParseQueryResult:
+        """Parse and validate a query given as a mfsql string.
+
+        mfsql is a restricted SQL dialect - `SELECT ... FROM metrics [WHERE ...] [ORDER BY ...] [LIMIT ...]` -
+        that translates onto this class's usual query-parameter surface. See
+        `metricflow_semantics.query.mfsql.query_translator` for the supported grammar and translation rules.
+        """
+        translated_query = translate_mfsql_query(sql, self._manifest_lookup)
+        return self.parse_and_validate_query(**vars(translated_query))
 
     def build_query_spec_for_group_by_metric_source_node(
         self, group_by_metric_spec: GroupByMetricSpec
