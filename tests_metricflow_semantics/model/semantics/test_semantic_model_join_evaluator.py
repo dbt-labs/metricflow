@@ -95,32 +95,38 @@ def test_distinct_target_semantic_model_join_validation(
     foreign_primary = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
         right_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     primary_primary = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
         right_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     unique_primary = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
         right_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     foreign_unique = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
         right_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     primary_unique = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
         right_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     unique_unique = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
         right_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
 
     results = {
@@ -153,17 +159,20 @@ def test_foreign_target_semantic_model_join_validation(simple_semantic_manifest_
     foreign_foreign = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
         right_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     primary_foreign = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.PRIMARY],
         right_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     unique_foreign = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=semantic_model_references[EntityType.UNIQUE],
         right_semantic_model_reference=semantic_model_references[EntityType.FOREIGN],
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
 
     results = {
@@ -197,7 +206,8 @@ def test_semantic_model_join_validation_on_missing_entity(
     assert not join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=no_listing_semantic_model.reference,
         right_semantic_model_reference=primary_listing_semantic_model.reference,
-        on_entity_reference=listing_entity_reference,
+        left_entity_reference=listing_entity_reference,
+        right_entity_reference=listing_entity_reference,
     ), (
         "Found valid join on `listing` involving the `id_verifications` semantic model, which does not include the "
         "`listing` entity!"
@@ -222,6 +232,9 @@ def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: 
         SemanticModelReference("companies")
     )
     user_entity_reference = EntityReference(element_name="user")
+    # `bookings_source` doesn't declare a literal `user` entity - it reaches the `user` entity via `guest`
+    # (`role: user`), so joins involving it as the foreign side use `guest`'s own reference.
+    guest_entity_reference = EntityReference(element_name="guest")
     join_evaluator = SemanticModelJoinEvaluator(
         semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup
     )
@@ -235,38 +248,45 @@ def test_natural_entity_semantic_model_validation(scd_semantic_manifest_lookup: 
     natural_primary = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=natural_user_semantic_model.reference,
         right_semantic_model_reference=primary_user_semantic_model.reference,
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     natural_unique = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=natural_user_semantic_model.reference,
         right_semantic_model_reference=unique_user_semantic_model.reference,
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     foreign_natural = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=foreign_user_semantic_model.reference,
         right_semantic_model_reference=natural_user_semantic_model.reference,
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=guest_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     primary_natural = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=primary_user_semantic_model.reference,
         right_semantic_model_reference=natural_user_semantic_model.reference,
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     unique_natural = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=unique_user_semantic_model.reference,
         right_semantic_model_reference=natural_user_semantic_model.reference,
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
     # Invalid cases
     natural_foreign = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=natural_user_semantic_model.reference,
         right_semantic_model_reference=foreign_user_semantic_model.reference,
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=guest_entity_reference,
     )
     natural_natural = join_evaluator.is_valid_semantic_model_join(
         left_semantic_model_reference=natural_user_semantic_model.reference,
         right_semantic_model_reference=natural_user_semantic_model.reference,
-        on_entity_reference=user_entity_reference,
+        left_entity_reference=user_entity_reference,
+        right_entity_reference=user_entity_reference,
     )
 
     valid_joins = {

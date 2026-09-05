@@ -76,15 +76,21 @@ class SemanticModelJoinEvaluator:
         self,
         left_semantic_model_reference: SemanticModelReference,
         right_semantic_model_reference: SemanticModelReference,
-        on_entity_reference: EntityReference,
+        left_entity_reference: EntityReference,
+        right_entity_reference: EntityReference,
     ) -> Optional[SemanticModelEntityJoinType]:
-        """Get valid join type used to join semantic models on given entity, if exists."""
+        """Get valid join type used to join semantic models on given entity, if exists.
+
+        `left_entity_reference` and `right_entity_reference` are usually the same reference - they can differ
+        when the join is via `role` (e.g. a `buyer` entity on the left joining to a `user` entity on the right),
+        in which case the caller has already established that the two entities share a join key.
+        """
         left_entity = self._semantic_model_lookup.get_entity_in_semantic_model(
-            SemanticModelElementReference.create_from_references(left_semantic_model_reference, on_entity_reference)
+            SemanticModelElementReference.create_from_references(left_semantic_model_reference, left_entity_reference)
         )
 
         right_entity = self._semantic_model_lookup.get_entity_in_semantic_model(
-            SemanticModelElementReference.create_from_references(right_semantic_model_reference, on_entity_reference)
+            SemanticModelElementReference.create_from_references(right_semantic_model_reference, right_entity_reference)
         )
         if left_entity is None or right_entity is None:
             return None
@@ -120,14 +126,16 @@ class SemanticModelJoinEvaluator:
         self,
         left_semantic_model_reference: SemanticModelReference,
         right_semantic_model_reference: SemanticModelReference,
-        on_entity_reference: EntityReference,
+        left_entity_reference: EntityReference,
+        right_entity_reference: EntityReference,
     ) -> bool:
         """Return true if we should allow a join with the given parameters to resolve a query."""
         return (
             self.get_valid_semantic_model_entity_join_type(
                 left_semantic_model_reference=left_semantic_model_reference,
                 right_semantic_model_reference=right_semantic_model_reference,
-                on_entity_reference=on_entity_reference,
+                left_entity_reference=left_entity_reference,
+                right_entity_reference=right_entity_reference,
             )
             is not None
         )

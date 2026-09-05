@@ -18,9 +18,10 @@ from __future__ import annotations
 import itertools
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
-from metricflow_semantics.instances import InstanceSet
+from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
+from metricflow_semantics.instances import EntityInstance, InstanceSet
 from metricflow_semantics.model.semantics.semantic_model_join_evaluator import SemanticModelJoinEvaluator
 from metricflow_semantics.model.semantics.semantic_model_lookup import SemanticModelLookup
 from metricflow_semantics.specs.entity_spec import EntitySpec
@@ -59,7 +60,8 @@ class JoinLinkableInstancesRecipe:
     """
 
     node_to_join: DataflowPlanNode
-    # The entity to join "node_to_join" on. Only nullable if using CROSS JOIN.
+    # The entity to join "node_to_join" on, as known to "node_to_join" (the right side). Only nullable if using
+    # CROSS JOIN.
     join_on_entity: Optional[EntityReference]
     # The linkable instances from the query that can be satisfied if we join this node. Note that this is different from
     # the linkable specs in the node that can help to satisfy the query. e.g. "user_id__country" might be one of the
@@ -73,6 +75,11 @@ class JoinLinkableInstancesRecipe:
     join_on_partition_time_dimensions: Tuple[PartitionTimeDimensionJoinDescription, ...]
 
     validity_window: Optional[ValidityWindowJoinDescription] = None
+
+    # The entity to join on, as known to the left node, if different from `join_on_entity` - see `JoinDescription`
+    # for why these can differ (an entity `role`-based join, e.g. `buyer` on the left joining to `user` on the
+    # right).
+    join_on_left_entity: Optional[EntityReference] = None
 
     def __post_init__(self) -> None:  # noqa: D105
         if self.join_on_entity is None and self.join_type != SqlJoinType.CROSS_JOIN:
@@ -128,6 +135,7 @@ class JoinLinkableInstancesRecipe:
         return JoinDescription(
             join_node=selector_node_to_join,
             join_on_entity=self.join_on_entity,
+            join_on_left_entity=self.join_on_left_entity,
             join_on_partition_dimensions=self.join_on_partition_dimensions,
             join_on_partition_time_dimensions=self.join_on_partition_time_dimensions,
             validity_window=self.validity_window,
@@ -253,15 +261,46 @@ class NodeEvaluatorForLinkableInstances:
                         f"Invalid SemanticModelElementReference {entity_instance_in_right_node.defined_from[0]}"
                     )
 
-                entity_instance_in_left_node = None
-                for instance in left_node_instance_set.entity_instances:
-                    if instance.spec.reference == entity_spec_in_right_node.reference:
-                        entity_instance_in_left_node = instance
-                        break
+                # Match by join key (`role` if set, else the entity's own name), not necessarily by the same
+                # literal reference on both sides - this is what lets e.g. a `buyer` entity on the left join to
+                # a `user` entity on the right. The query-facing entity link name (`entity_reference_in_node`,
+                # below) is unaffected - it's still always the right node's own reference.
+                right_entity_join_key = entity_in_right_node.role or entity_in_right_node.name
 
-                if entity_instance_in_left_node is None:
+                matching_left_instances_by_reference: Dict[EntityReference, EntityInstance] = {}
+                for instance in left_node_instance_set.entity_instances:
+                    if len(instance.defined_from) != 1:
+                        continue
+                    left_candidate_entity = self._semantic_model_lookup.get_entity_in_semantic_model(
+                        instance.defined_from[0]
+                    )
+                    if left_candidate_entity is None:
+                        continue
+                    if (left_candidate_entity.role or left_candidate_entity.name) == right_entity_join_key:
+                        matching_left_instances_by_reference[instance.spec.reference] = instance
+
+                if len(matching_left_instances_by_reference) == 0:
                     # The right node can have a superset of entities.
                     continue
+
+                if len(matching_left_instances_by_reference) > 1:
+                    # More than one local entity shares this join key (role) - e.g. `buyer` and `seller` both
+                    # role=`user`. Picking one silently would produce a query that looks correct but joined on
+                    # an arbitrary, possibly unintended entity. There's no "default" mechanism yet to
+                    # disambiguate, so fail loud instead.
+                    raise UnableToSatisfyQueryError(
+                        LazyFormat(
+                            "Ambiguous join: more than one local entity shares the join key needed to reach "
+                            "the requested item. Query using one of these entities directly instead of the "
+                            "shared join key.",
+                            join_key=right_entity_join_key,
+                            candidate_entities=sorted(
+                                reference.element_name for reference in matching_left_instances_by_reference
+                            ),
+                        ).evaluated_value
+                    )
+
+                (entity_instance_in_left_node,) = matching_left_instances_by_reference.values()
 
                 assert len(entity_instance_in_left_node.defined_from) == 1
                 assert len(entity_instance_in_right_node.defined_from) == 1
@@ -277,13 +316,21 @@ class NodeEvaluatorForLinkableInstances:
                         right_semantic_model_reference=entity_instance_in_right_node.defined_from[
                             0
                         ].semantic_model_reference,
-                        on_entity_reference=entity_spec_in_right_node.reference,
+                        left_entity_reference=entity_instance_in_left_node.spec.reference,
+                        right_entity_reference=entity_spec_in_right_node.reference,
                     )
                     or entity_spec_matches_aggregated_specs
                 ):
                     continue
 
                 entity_reference_in_node = entity_spec_in_right_node.reference
+                # `None` unless the join used `role` to match a differently-named entity on the left - see
+                # `JoinDescription.join_on_left_entity`.
+                left_entity_reference_in_node = (
+                    entity_instance_in_left_node.spec.reference
+                    if entity_instance_in_left_node.spec.reference != entity_reference_in_node
+                    else None
+                )
 
                 satisfiable_linkable_specs = []
                 for needed_linkable_spec in needed_linkable_specs:
@@ -336,6 +383,7 @@ class NodeEvaluatorForLinkableInstances:
                         JoinLinkableInstancesRecipe(
                             node_to_join=right_node,
                             join_on_entity=entity_reference_in_node,
+                            join_on_left_entity=left_entity_reference_in_node,
                             satisfiable_linkable_specs=satisfiable_linkable_specs,
                             join_on_partition_dimensions=join_on_partition_dimensions,
                             join_on_partition_time_dimensions=join_on_partition_time_dimensions,
@@ -374,6 +422,7 @@ class NodeEvaluatorForLinkableInstances:
                     JoinLinkableInstancesRecipe(
                         node_to_join=candidate_for_join.node_to_join,
                         join_on_entity=candidate_for_join.join_on_entity,
+                        join_on_left_entity=candidate_for_join.join_on_left_entity,
                         satisfiable_linkable_specs=updated_satisfiable_linkable_specs,
                         join_on_partition_dimensions=candidate_for_join.join_on_partition_dimensions,
                         join_on_partition_time_dimensions=candidate_for_join.join_on_partition_time_dimensions,
@@ -386,6 +435,16 @@ class NodeEvaluatorForLinkableInstances:
             key=lambda x: len(x.satisfiable_linkable_specs),
             reverse=True,
         )
+
+    def _data_set_has_entity_for_join_key(self, instance_set: InstanceSet, join_key: str) -> bool:
+        """Return true if `instance_set` has an entity whose join key (`role` if set, else name) is `join_key`."""
+        for instance in instance_set.entity_instances:
+            if len(instance.defined_from) != 1:
+                continue
+            entity = self._semantic_model_lookup.get_entity_in_semantic_model(instance.defined_from[0])
+            if entity is not None and (entity.role or entity.name) == join_key:
+                return True
+        return False
 
     def evaluate_node(
         self,
@@ -426,9 +485,13 @@ class NodeEvaluatorForLinkableInstances:
                 and (
                     # metric_time is the only element that can be joined without entity links.
                     len(required_linkable_spec.entity_links) == 0
-                    # In order be joinable, the first entity link must be in the left node's dataset.
-                    or EntitySpec.create_from_reference(required_linkable_spec.entity_links[0])
-                    not in data_set_linkable_specs
+                    # In order be joinable, the left node's dataset must have an entity whose join key (`role`
+                    # if set, else name) matches the first entity link - not necessarily an entity with that
+                    # exact name, since a `role`-based join lets a differently-named local entity (e.g. `guest`)
+                    # satisfy a link named after its role (e.g. `user`).
+                    or not self._data_set_has_entity_for_join_key(
+                        candidate_instance_set, required_linkable_spec.entity_links[0].element_name
+                    )
                 )
             )
             if is_local:

@@ -146,8 +146,10 @@ class SqlPlanJoinBuilder:
         if join_on_entity:
             # Figure out which columns in the "left" data set correspond to the entity that we want to join on.
             # The column associations tell us which columns correspond to which instances in the data set.
+            # `join_on_left_entity` is set instead of `join_on_entity` when the left side knows this entity by a
+            # different name than the right side does (an entity `role`-based join) - see `JoinDescription`.
             left_data_set_entity_column_associations = left_data_set.data_set.column_associations_for_entity(
-                join_on_entity
+                join_description.join_on_left_entity or join_on_entity
             )
             left_data_set_entity_cols = [c.column_name for c in left_data_set_entity_column_associations]
 

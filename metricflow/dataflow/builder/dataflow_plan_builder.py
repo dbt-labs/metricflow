@@ -1301,7 +1301,9 @@ class DataflowPlanBuilder:
             # Nodes containing the linkable instances will be joined to the source node, so these
             # entities will need to be present in the source node.
             required_local_entity_specs = tuple(
-                EntitySpec.create_from_reference(x.join_on_entity) for x in evaluation.join_recipes if x.join_on_entity
+                EntitySpec.create_from_reference(x.join_on_left_entity or x.join_on_entity)
+                for x in evaluation.join_recipes
+                if x.join_on_entity
             )
             # Same thing with partitions.
             required_local_dimension_specs = tuple(

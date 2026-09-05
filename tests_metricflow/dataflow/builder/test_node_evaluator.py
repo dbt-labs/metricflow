@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Mapping, Sequence
 
 import pytest
+from metricflow_semantics.errors.error_classes import UnableToSatisfyQueryError
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.specs.dimension_spec import DimensionSpec
 from metricflow_semantics.specs.dunder_column_association_resolver import DunderColumnAssociationResolver
@@ -11,6 +13,8 @@ from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
 from metricflow_semantics.sql.sql_join_type import SqlJoinType
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
+from metricflow_semantics.test_helpers.semantic_manifest_yamls.scd_manifest import SCD_MANIFEST_ANCHOR
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 
 from metricflow.dataflow.builder.node_evaluator import (
@@ -24,8 +28,12 @@ from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
 from metricflow.dataset.dataset_classes import DataSet
 from metricflow.plan_conversion.node_processor import PreJoinNodeProcessor
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_subquery import DataflowNodeToSqlSubqueryVisitor
+from metricflow.protocols.sql_client import SqlClient
+from metricflow_semantic_interfaces.parsing.dir_to_model import parse_yaml_files_to_validation_ready_semantic_manifest
+from metricflow_semantic_interfaces.parsing.objects import YamlConfigFile
 from metricflow_semantic_interfaces.references import EntityReference
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
+from metricflow_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
 from tests_metricflow.fixtures.manifest_fixtures import MetricFlowEngineTestFixture, SemanticManifestSetup
 
 logger = logging.getLogger(__name__)
@@ -765,3 +773,110 @@ def test_node_evaluator_with_invalid_multi_hop_scd(
             ),
         ),
     )
+
+
+def test_node_evaluator_with_role_based_join(
+    mf_engine_test_fixture_mapping: Mapping[SemanticManifestSetup, MetricFlowEngineTestFixture],
+    scd_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
+    """Tests joining through an entity `role`: `bookings_source`'s `guest` (role: user) reaches `users_latest`.
+
+    `guest` and `user` are different literal entity names on either side of the join, connected only by
+    `guest`'s `role: user` - this is what lets the resulting recipe's `join_on_entity` (the right side's own
+    reference, used for the dunder-path name and the right side's column lookup) stay `user`, while
+    `join_on_left_entity` carries `guest` for the left side's column lookup specifically. See
+    `JoinDescription.join_on_left_entity`.
+    """
+    node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor = DataflowNodeToSqlSubqueryVisitor(
+        column_association_resolver=DunderColumnAssociationResolver(),
+        semantic_manifest_lookup=scd_semantic_manifest_lookup,
+    )
+    mf_engine_fixture = mf_engine_test_fixture_mapping[SemanticManifestSetup.SCD_MANIFEST]
+    node_evaluator = NodeEvaluatorForLinkableInstances(
+        semantic_model_lookup=scd_semantic_manifest_lookup.semantic_model_lookup,
+        nodes_available_for_joins=tuple(mf_engine_fixture.read_node_mapping.values()),
+        node_data_set_resolver=node_data_set_resolver,
+        time_spine_metric_time_nodes=mf_engine_fixture.source_node_set.time_spine_metric_time_nodes_tuple,
+    )
+
+    evaluation = node_evaluator.evaluate_node(
+        required_linkable_specs=[
+            DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),))
+        ],
+        left_node=mf_engine_fixture.read_node_mapping["bookings_source"],
+        default_join_type=SqlJoinType.LEFT_OUTER,
+    )
+
+    assert evaluation == LinkableInstanceSatisfiabilityEvaluation(
+        local_linkable_specs=(),
+        joinable_linkable_specs=(
+            DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)),
+        ),
+        join_recipes=(
+            JoinLinkableInstancesRecipe(
+                node_to_join=mf_engine_fixture.read_node_mapping["users_latest"],
+                join_on_entity=EntityReference("user"),
+                join_on_left_entity=EntityReference("guest"),
+                satisfiable_linkable_specs=[
+                    DimensionSpec(
+                        element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),)
+                    ),
+                ],
+                join_on_partition_dimensions=(),
+                join_on_partition_time_dimensions=(),
+                join_type=SqlJoinType.LEFT_OUTER,
+            ),
+        ),
+        unjoinable_linkable_specs=(),
+    )
+
+
+def test_node_evaluator_rejects_ambiguous_role_based_join(
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+) -> None:
+    """Tests that a role shared by more than one local entity is rejected rather than resolved arbitrarily.
+
+    If both `guest` and `host` declared `role: user`, either could satisfy a join to `users_latest`'s `user`
+    entity - silently picking one would produce a query that looks correct but joined on an arbitrary,
+    possibly unintended entity (e.g. always `guest`, never `host`, with no error and no way to ask for the
+    other one). This must fail loud instead. See `UnableToSatisfyQueryError` in `node_evaluator.py`.
+    """
+    yaml_files = []
+    for path in Path(SCD_MANIFEST_ANCHOR.directory).glob("*.yaml"):
+        contents = path.read_text().replace("$source_schema", mf_test_configuration.mf_source_schema)
+        if path.name == "scd_bookings.yaml":
+            contents = contents.replace(
+                "    - name: host\n      type: foreign\n      expr: host_id\n",
+                "    - name: host\n      type: foreign\n      expr: host_id\n      role: user\n",
+            )
+            assert "expr: host_id\n      role: user" in contents, "Expected `host` to declare `role: user`"
+            assert "expr: guest_id\n      role: user" in contents, "Expected `guest` to declare `role: user`"
+        yaml_files.append(YamlConfigFile(filepath=str(path), contents=contents))
+
+    manifest = parse_yaml_files_to_validation_ready_semantic_manifest(
+        yaml_files, apply_transformations=True
+    ).semantic_manifest
+    SemanticManifestValidator().checked_validations(manifest)
+    manifest_lookup = SemanticManifestLookup(manifest)
+
+    node_data_set_resolver: DataflowNodeToSqlSubqueryVisitor = DataflowNodeToSqlSubqueryVisitor(
+        column_association_resolver=DunderColumnAssociationResolver(),
+        semantic_manifest_lookup=manifest_lookup,
+    )
+    fixture = MetricFlowEngineTestFixture.from_parameters(sql_client=sql_client, semantic_manifest=manifest)
+    node_evaluator = NodeEvaluatorForLinkableInstances(
+        semantic_model_lookup=manifest_lookup.semantic_model_lookup,
+        nodes_available_for_joins=tuple(fixture.read_node_mapping.values()),
+        node_data_set_resolver=node_data_set_resolver,
+        time_spine_metric_time_nodes=fixture.source_node_set.time_spine_metric_time_nodes_tuple,
+    )
+
+    with pytest.raises(UnableToSatisfyQueryError, match="Ambiguous join"):
+        node_evaluator.evaluate_node(
+            required_linkable_specs=[
+                DimensionSpec(element_name="home_state_latest", entity_links=(EntityReference(element_name="user"),))
+            ],
+            left_node=fixture.read_node_mapping["bookings_source"],
+            default_join_type=SqlJoinType.LEFT_OUTER,
+        )

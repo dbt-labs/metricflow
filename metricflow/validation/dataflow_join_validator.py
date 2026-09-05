@@ -68,6 +68,8 @@ class JoinDataflowOutputValidator:
             # No fan-out check needed since right subquery is aggregated to the entity level, ensuring uniqueness.
             return True
         else:
+            # Multi-hop joins don't support `role`-based matching yet - both sides use the same reference here,
+            # same as before.
             return self._join_evaluator.is_valid_semantic_model_join(
                 left_semantic_model_reference=JoinDataflowOutputValidator._semantic_model_of_entity_in_instance_set(
                     instance_set=left_instance_set, entity_reference=on_entity_reference
@@ -76,5 +78,6 @@ class JoinDataflowOutputValidator:
                     instance_set=right_instance_set,
                     entity_reference=on_entity_reference,
                 ),
-                on_entity_reference=on_entity_reference,
+                left_entity_reference=on_entity_reference,
+                right_entity_reference=on_entity_reference,
             )

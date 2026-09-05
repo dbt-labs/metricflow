@@ -1,0 +1,8 @@
+kind: Features
+body: Support entity `role` for cross-model join matching, so a model can declare multiple
+  differently-named entities (e.g. `buyer`, `seller`) that each join to the same target
+  entity elsewhere (e.g. `user`) under their own local name
+time: 2026-09-03T14:15:11.000000-00:00
+custom:
+  Author: QMalcolm
+  Issue: "2127"
