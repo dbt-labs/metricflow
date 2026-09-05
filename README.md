@@ -35,6 +35,7 @@ MetricFlow is a semantic layer that simplifies defining and managing metrics. It
 The name “MetricFlow” reflects its approach: metric requests are compiled into a dataflow-based query plan, which is then optimized and translated into engine-specific SQL.
 
 
+Foo
 <p align="center">
 <img src="https://github.com/dbt-labs/metricflow/raw/main/assets/example_plan.svg" height="500"/>
 <br /><br />
