@@ -75,10 +75,8 @@ export MF_SQL_ENGINE_PASSWORD="metricflowing"
 make test-clickhouse
 ```
 
-`hatch run clickhouse-env:pytest` (and `make test-clickhouse`) use the URL in
-`pyproject.toml` (`localhost:8123`). If your container is published on a different
-host port, invoke pytest with that environment's interpreter after exporting
-`MF_SQL_ENGINE_URL` / `MF_SQL_ENGINE_PASSWORD`.
+The Hatch environment uses these values when present and otherwise defaults to
+`localhost:8123` with the password `metricflowing`.
 
 The ClickHouse container exposes:
 

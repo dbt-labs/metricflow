@@ -63,3 +63,10 @@ def test_dry_run_accepts_rendered_sql_with_settings(sql_client: SqlClient) -> No
     _skip_if_not_clickhouse(sql_client)
     plan = SqlPlan(render_node=SqlSelectTextNode.create(select_query=_UNMATCHED_LEFT_JOIN.strip()))
     sql_client.dry_run(ClickHouseSqlPlanRenderer().render_sql_plan(plan).sql)
+
+
+def test_exact_continuous_percentile_interpolates(sql_client: SqlClient) -> None:
+    """The exact continuous function must interpolate an even-sized input."""
+    _skip_if_not_clickhouse(sql_client)
+    result = sql_client.query("SELECT quantileExactInclusive(0.5)(number) AS percentile FROM numbers(2)")
+    assert _extract_data_table_value(result) == 0.5

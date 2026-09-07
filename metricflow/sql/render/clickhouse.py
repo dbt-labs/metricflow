@@ -40,31 +40,107 @@ logger = logging.getLogger(__name__)
 # https://clickhouse.com/docs/operations/settings/settings#join_use_nulls
 CLICKHOUSE_JOIN_USE_NULLS_SETTING = "join_use_nulls = 1"
 
-_SETTINGS_KEYWORD = re.compile(r"(?i)\bSETTINGS\b")
-_SETTINGS_CLAUSE_BODY = re.compile(r"(?i)\s*[A-Za-z_][A-Za-z0-9_]*\s*=")
-_JOIN_USE_NULLS_ASSIGNMENT = re.compile(r"(?i)\bjoin_use_nulls\s*=")
+_SETTINGS_CLAUSE = re.compile(r"(?i)\bSETTINGS\b(?=\s*[A-Za-z_][A-Za-z0-9_]*\s*=)")
+_JOIN_USE_NULLS_KEY = re.compile(r"(?i)\bjoin_use_nulls\s*=")
+_JOIN_USE_NULLS_ASSIGNMENT = re.compile(r"(?i)\bjoin_use_nulls\s*=\s*([A-Za-z0-9_.+-]+)")
+_DOLLAR_QUOTE_DELIMITER = re.compile(r"\$(?:[A-Za-z_][A-Za-z0-9_]*)?\$")
+
+
+def _mask_non_top_level_sql(sql: str) -> str:
+    """Mask quoted, commented, and parenthesized SQL while preserving offsets.
+
+    ClickHouse allows SETTINGS after a SELECT, including the SELECT inside a
+    CREATE ... AS statement. A lightweight scanner is enough here because we
+    only need to distinguish that top-level clause from identical text in a
+    literal, comment, function argument, or nested subquery.
+    """
+    masked = [" "] * len(sql)
+    depth = 0
+    index = 0
+
+    while index < len(sql):
+        if sql.startswith("--", index) or sql[index] == "#":
+            newline_index = sql.find("\n", index)
+            index = len(sql) if newline_index == -1 else newline_index
+            continue
+        if sql.startswith("/*", index):
+            comment_end_index = sql.find("*/", index + 2)
+            index = len(sql) if comment_end_index == -1 else comment_end_index + 2
+            continue
+
+        dollar_quote_match = _DOLLAR_QUOTE_DELIMITER.match(sql, index)
+        if dollar_quote_match:
+            delimiter = dollar_quote_match.group(0)
+            quote_end_index = sql.find(delimiter, dollar_quote_match.end())
+            if depth == 0:
+                masked[index : dollar_quote_match.end()] = delimiter
+                if quote_end_index != -1:
+                    masked[quote_end_index : quote_end_index + len(delimiter)] = delimiter
+            index = len(sql) if quote_end_index == -1 else quote_end_index + len(delimiter)
+            continue
+
+        character = sql[index]
+        if character in {"'", '"', "`"}:
+            quote = character
+            if depth == 0:
+                masked[index] = character
+            index += 1
+            while index < len(sql):
+                if sql[index] == "\\":
+                    index += 2
+                elif sql[index] == quote and index + 1 < len(sql) and sql[index + 1] == quote:
+                    index += 2
+                elif sql[index] == quote:
+                    if depth == 0:
+                        masked[index] = character
+                    index += 1
+                    break
+                else:
+                    index += 1
+            continue
+
+        if character == "(":
+            if depth == 0:
+                masked[index] = character
+            depth += 1
+        elif character == ")":
+            depth = max(0, depth - 1)
+            if depth == 0:
+                masked[index] = character
+        elif depth == 0:
+            masked[index] = character
+        index += 1
+
+    return "".join(masked)
+
+
+def _strip_trailing_statement_terminator(sql: str) -> str:
+    """Strip a final semicolon even when a comment follows it."""
+    stripped = sql.rstrip()
+    masked = _mask_non_top_level_sql(stripped)
+    final_code_index = len(masked.rstrip()) - 1
+    if final_code_index >= 0 and stripped[final_code_index] == ";":
+        return f"{stripped[:final_code_index]}{stripped[final_code_index + 1 :]}"
+    return stripped
 
 
 def _last_settings_clause_index(sql: str) -> Optional[int]:
     """Index of the last ClickHouse SETTINGS clause, or None.
 
-    Requires the keyword to be followed by `name =` so a SELECT-list identifier
-    named `settings` is not treated as a clause.
+    Requires a top-level keyword followed by `name =` so nested queries and text
+    inside strings or comments cannot be mistaken for the statement's clause.
     """
-    last_index: Optional[int] = None
-    for match in _SETTINGS_KEYWORD.finditer(sql):
-        if _SETTINGS_CLAUSE_BODY.match(sql[match.end() :]):
-            last_index = match.start()
-    return last_index
+    matches = tuple(_SETTINGS_CLAUSE.finditer(_mask_non_top_level_sql(sql)))
+    return matches[-1].start() if matches else None
 
 
 def sql_has_join_use_nulls_setting(sql: str) -> bool:
     """True if a trailing ClickHouse SETTINGS clause already sets join_use_nulls."""
-    stripped = sql.rstrip().rstrip(";").rstrip()
+    stripped = _strip_trailing_statement_terminator(sql)
     index = _last_settings_clause_index(stripped)
     if index is None:
         return False
-    return _JOIN_USE_NULLS_ASSIGNMENT.search(stripped[index:]) is not None
+    return _JOIN_USE_NULLS_KEY.search(_mask_non_top_level_sql(stripped[index:])) is not None
 
 
 def ensure_join_use_nulls_setting(sql: str) -> str:
@@ -75,13 +151,28 @@ def ensure_join_use_nulls_setting(sql: str) -> str:
     this key, the key is merged into that clause (ClickHouse allows one SETTINGS
     list per statement).
     """
-    stripped = sql.rstrip().rstrip(";").rstrip()
+    stripped = _strip_trailing_statement_terminator(sql)
     index = _last_settings_clause_index(stripped)
     if index is None:
         return f"{stripped}\nSETTINGS {CLICKHOUSE_JOIN_USE_NULLS_SETTING}"
-    if _JOIN_USE_NULLS_ASSIGNMENT.search(stripped[index:]):
-        return stripped
-    return f"{stripped.rstrip().rstrip(',')}, {CLICKHOUSE_JOIN_USE_NULLS_SETTING}"
+    settings_sql = stripped[index:]
+    masked_settings_sql = _mask_non_top_level_sql(settings_sql)
+    key_match = _JOIN_USE_NULLS_KEY.search(masked_settings_sql)
+    if key_match:
+        assignment_match = _JOIN_USE_NULLS_ASSIGNMENT.search(masked_settings_sql, key_match.start())
+        if assignment_match is None:
+            raise ValueError("ClickHouse join_use_nulls setting must have a scalar value")
+        value_start, value_end = assignment_match.span(1)
+        if settings_sql[value_start:value_end] == "1":
+            return stripped
+        return f"{stripped[: index + value_start]}1{stripped[index + value_end :]}"
+
+    settings_code_end = len(masked_settings_sql.rstrip())
+    separator = " " if settings_sql[settings_code_end - 1] == "," else ", "
+    insertion_index = index + settings_code_end
+    sql_before_insertion = stripped[:insertion_index]
+    sql_after_insertion = stripped[insertion_index:]
+    return f"{sql_before_insertion}{separator}{CLICKHOUSE_JOIN_USE_NULLS_SETTING}{sql_after_insertion}"
 
 
 def clickhouse_explain_statement(stmt: str) -> str:
@@ -345,7 +436,7 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
 
         ClickHouse uses parameterized aggregate functions with curried syntax:
         - quantile(0.5)(column) - approximate continuous
-        - quantileExact(0.5)(column) - exact continuous
+        - quantileExactInclusive(0.5)(column) - exact continuous (R-7 interpolation)
         - quantileExactLow(0.5)(column) - exact discrete (low)
         - quantileExactHigh(0.5)(column) - exact discrete (high)
         - quantileTDigest(0.5)(column) - approximate discrete
@@ -362,7 +453,7 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         if function_type is SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS:
             function_str = "quantile"
         elif function_type is SqlPercentileFunctionType.CONTINUOUS:
-            function_str = "quantileExact"
+            function_str = "quantileExactInclusive"
         elif function_type is SqlPercentileFunctionType.DISCRETE:
             # ClickHouse doesn't have exact discrete, use low/high
             # Default to low to match typical discrete behavior

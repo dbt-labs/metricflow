@@ -213,7 +213,7 @@ def test_percentile_approximate_continuous(clickhouse_renderer: ClickHouseSqlExp
 
 
 def test_percentile_continuous(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
-    """Test exact continuous percentile (should use quantileExact)."""
+    """Exact continuous percentile uses the interpolating ClickHouse function."""
     expr = SqlPercentileExpression.create(
         order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "value_col")),
         percentile_args=SqlPercentileExpressionArgument(
@@ -221,7 +221,7 @@ def test_percentile_continuous(clickhouse_renderer: ClickHouseSqlExpressionRende
         ),
     )
     result = clickhouse_renderer.visit_percentile_expr(expr)
-    assert result.sql == "quantileExact(0.5)(a.value_col)"
+    assert result.sql == "quantileExactInclusive(0.5)(a.value_col)"
 
 
 def test_percentile_discrete(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
@@ -302,10 +302,58 @@ def test_ensure_join_use_nulls_setting_merges_into_existing_settings() -> None:
     assert ensure_join_use_nulls_setting(sql) == "SELECT 1 AS x\nSETTINGS max_threads = 2, join_use_nulls = 1"
 
 
+@pytest.mark.parametrize(
+    ("sql", "expected"),
+    (
+        (
+            "SELECT 1 AS x SETTINGS max_threads = 2 -- keep this comment",
+            "SELECT 1 AS x SETTINGS max_threads = 2, join_use_nulls = 1 -- keep this comment",
+        ),
+        (
+            "SELECT 1 AS x SETTINGS max_threads = 2 /* keep this comment */",
+            "SELECT 1 AS x SETTINGS max_threads = 2, join_use_nulls = 1 /* keep this comment */",
+        ),
+    ),
+)
+def test_ensure_join_use_nulls_setting_merges_before_trailing_comment(sql: str, expected: str) -> None:
+    """A trailing comment must not swallow the merged setting."""
+    assert ensure_join_use_nulls_setting(sql) == expected
+    assert ensure_join_use_nulls_setting(expected) == expected
+
+
+def test_ensure_join_use_nulls_setting_strips_semicolon_before_trailing_comment() -> None:
+    """The setting must remain part of a statement with a commented terminator."""
+    sql = "SELECT 1 AS x; -- keep this comment"
+    assert ensure_join_use_nulls_setting(sql) == "SELECT 1 AS x -- keep this comment\nSETTINGS join_use_nulls = 1"
+
+
 def test_ensure_join_use_nulls_setting_keeps_existing_assignment() -> None:
     """Do not duplicate join_use_nulls when a SETTINGS clause already sets it."""
     sql = "SELECT 1 AS x\nSETTINGS join_use_nulls = 1"
     assert ensure_join_use_nulls_setting(sql) == sql
+
+
+def test_ensure_join_use_nulls_setting_replaces_disabled_assignment() -> None:
+    """An existing disabled setting must not violate the renderer contract."""
+    sql = "SELECT 1 AS x\nSETTINGS max_threads = 2, join_use_nulls = 0"
+    assert ensure_join_use_nulls_setting(sql) == "SELECT 1 AS x\nSETTINGS max_threads = 2, join_use_nulls = 1"
+
+
+@pytest.mark.parametrize(
+    "sql",
+    (
+        "SELECT 'SETTINGS max_threads = 1' AS note",
+        "SELECT 1 AS x -- SETTINGS max_threads = 1",
+        "SELECT 1 AS x /* SETTINGS max_threads = 1 */",
+        "SELECT $$SETTINGS max_threads = 1$$ AS note",
+        "SELECT * FROM (SELECT 1 SETTINGS max_threads = 1) AS source",
+    ),
+)
+def test_ensure_join_use_nulls_setting_ignores_non_top_level_settings(sql: str) -> None:
+    """Only the statement-level SETTINGS clause may receive another key."""
+    ensured = ensure_join_use_nulls_setting(sql)
+    assert ensured == f"{sql}\nSETTINGS join_use_nulls = 1"
+    assert ensure_join_use_nulls_setting(ensured) == ensured
 
 
 def test_clickhouse_explain_statement_select_uses_query_tree() -> None:
