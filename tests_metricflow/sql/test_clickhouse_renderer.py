@@ -340,6 +340,25 @@ def test_ensure_join_use_nulls_setting_replaces_disabled_assignment() -> None:
 
 
 @pytest.mark.parametrize(
+    ("sql", "expected"),
+    (
+        ("SELECT 1 AS x SETTINGS join_use_nulls = '1'", "SELECT 1 AS x SETTINGS join_use_nulls = '1'"),
+        ("SELECT 1 AS x SETTINGS join_use_nulls = true", "SELECT 1 AS x SETTINGS join_use_nulls = true"),
+        ("SELECT 1 AS x SETTINGS join_use_nulls = '0'", "SELECT 1 AS x SETTINGS join_use_nulls = 1"),
+        ("SELECT 1 AS x SETTINGS join_use_nulls = false", "SELECT 1 AS x SETTINGS join_use_nulls = 1"),
+    ),
+)
+def test_ensure_join_use_nulls_setting_accepts_quoted_and_boolean_values(sql: str, expected: str) -> None:
+    """ClickHouse accepts quoted and boolean setting values; enabled forms are kept, disabled ones replaced."""
+    assert ensure_join_use_nulls_setting(sql) == expected
+
+
+def test_ensure_join_use_nulls_setting_strips_repeated_semicolons() -> None:
+    """Every trailing terminator goes, so the appended clause stays part of the statement."""
+    assert ensure_join_use_nulls_setting("SELECT 1 AS x;;\n") == "SELECT 1 AS x\nSETTINGS join_use_nulls = 1"
+
+
+@pytest.mark.parametrize(
     "sql",
     (
         "SELECT 'SETTINGS max_threads = 1' AS note",

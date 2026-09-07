@@ -42,7 +42,10 @@ CLICKHOUSE_JOIN_USE_NULLS_SETTING = "join_use_nulls = 1"
 
 _SETTINGS_CLAUSE = re.compile(r"(?i)\bSETTINGS\b(?=\s*[A-Za-z_][A-Za-z0-9_]*\s*=)")
 _JOIN_USE_NULLS_KEY = re.compile(r"(?i)\bjoin_use_nulls\s*=")
-_JOIN_USE_NULLS_ASSIGNMENT = re.compile(r"(?i)\bjoin_use_nulls\s*=\s*([A-Za-z0-9_.+-]+)")
+# Value is a bare token or a quoted literal (ClickHouse accepts `join_use_nulls = '1'`). Applied to masked SQL,
+# where quoted contents are blanked but the quotes themselves are kept.
+_JOIN_USE_NULLS_ASSIGNMENT = re.compile(r"""(?i)\bjoin_use_nulls\s*=\s*([A-Za-z0-9_.+-]+|'[^']*'|"[^"]*")""")
+_JOIN_USE_NULLS_ENABLED_VALUES = frozenset({"1", "true"})
 _DOLLAR_QUOTE_DELIMITER = re.compile(r"\$(?:[A-Za-z_][A-Za-z0-9_]*)?\$")
 
 
@@ -115,13 +118,14 @@ def _mask_non_top_level_sql(sql: str) -> str:
 
 
 def _strip_trailing_statement_terminator(sql: str) -> str:
-    """Strip a final semicolon even when a comment follows it."""
+    """Strip trailing semicolons even when a comment follows them."""
     stripped = sql.rstrip()
-    masked = _mask_non_top_level_sql(stripped)
-    final_code_index = len(masked.rstrip()) - 1
-    if final_code_index >= 0 and stripped[final_code_index] == ";":
-        return f"{stripped[:final_code_index]}{stripped[final_code_index + 1 :]}"
-    return stripped
+    while True:
+        masked = _mask_non_top_level_sql(stripped)
+        final_code_index = len(masked.rstrip()) - 1
+        if final_code_index < 0 or stripped[final_code_index] != ";":
+            return stripped
+        stripped = f"{stripped[:final_code_index]}{stripped[final_code_index + 1 :]}".rstrip()
 
 
 def _last_settings_clause_index(sql: str) -> Optional[int]:
@@ -163,7 +167,8 @@ def ensure_join_use_nulls_setting(sql: str) -> str:
         if assignment_match is None:
             raise ValueError("ClickHouse join_use_nulls setting must have a scalar value")
         value_start, value_end = assignment_match.span(1)
-        if settings_sql[value_start:value_end] == "1":
+        value = settings_sql[value_start:value_end].strip("'\"").lower()
+        if value in _JOIN_USE_NULLS_ENABLED_VALUES:
             return stripped
         return f"{stripped[: index + value_start]}1{stripped[index + value_end :]}"
 
