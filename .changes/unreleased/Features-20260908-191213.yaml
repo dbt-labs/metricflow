@@ -5,4 +5,4 @@ body: Add a `validate_semantic_manifest` command to the mf_entry IPC sidecar, ru
 time: 2026-09-08T19:12:13.000000-00:00
 custom:
   Author: QMalcolm
-  Issue: ""
+  Issue: "2133"
