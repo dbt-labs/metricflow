@@ -14,7 +14,7 @@ from pathlib import Path
 import mf_entry
 import pytest
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_00_minimal_manifest import SG_00_MINIMAL_MANIFEST
-from mf_ipc_protocol import ExplainParams, Method, RequestEnvelope
+from mf_ipc_protocol import ExplainParams, Method, RequestEnvelope, ValidateSemanticManifestParams
 
 _MF_ENTRY = Path(mf_entry.__file__)
 _MANIFEST_DIR = SG_00_MINIMAL_MANIFEST.directory
@@ -87,6 +87,54 @@ def test_explain_invalid_metric_returns_structured_error(sidecar: subprocess.Pop
     assert resp["ok"] is False
     assert resp["error"]["type"] == "InvalidQueryException"
     assert "nonexistent_metric" in resp["error"]["message"]
+
+
+def test_validate_semantic_manifest_valid_manifest_has_no_blocking_issues(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
+    """A manifest that passes all rules returns ok:true with has_blocking_issues:false and no errors."""
+    params = ValidateSemanticManifestParams(manifest_path=str(_MANIFEST_DIR))
+    resp = _send(
+        sidecar,
+        RequestEnvelope(id="validate-1", method=Method.VALIDATE_SEMANTIC_MANIFEST.value, params=params.model_dump()),
+    )
+    assert resp["id"] == "validate-1"
+    assert resp["ok"] is True
+    assert resp["has_blocking_issues"] is False
+    assert resp["errors"] == []
+
+
+def test_validate_semantic_manifest_invalid_manifest_returns_errors(
+    sidecar: subprocess.Popen,  # type: ignore[type-arg]
+    tmp_path: Path,
+) -> None:
+    """An empty manifest fails NonEmptyRule; the errors come back as structured issues, not a raised exception."""
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(
+        json.dumps({"semantic_models": [], "metrics": [], "saved_queries": [], "project_configuration": {}})
+    )
+    params = ValidateSemanticManifestParams(manifest_path=str(manifest_path))
+    resp = _send(
+        sidecar,
+        RequestEnvelope(id="validate-2", method=Method.VALIDATE_SEMANTIC_MANIFEST.value, params=params.model_dump()),
+    )
+    assert resp["id"] == "validate-2"
+    assert resp["ok"] is True
+    assert resp["has_blocking_issues"] is True
+    messages = {issue["message"] for issue in resp["errors"]}
+    assert "No semantic models present in the model." in messages
+    assert "No metrics present in the model." in messages
+
+
+def test_validate_semantic_manifest_unknown_manifest_path_returns_structured_error(
+    sidecar: subprocess.Popen,  # type: ignore[type-arg]
+) -> None:
+    """A manifest_path that doesn't exist fails to load and returns ok:false, not a crash."""
+    params = ValidateSemanticManifestParams(manifest_path="/no/such/manifest.json")
+    resp = _send(
+        sidecar,
+        RequestEnvelope(id="validate-3", method=Method.VALIDATE_SEMANTIC_MANIFEST.value, params=params.model_dump()),
+    )
+    assert resp["id"] == "validate-3"
+    assert resp["ok"] is False
 
 
 def test_unknown_method(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]

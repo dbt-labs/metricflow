@@ -5,8 +5,9 @@ The sidecar is MetricFlow compiled into a standalone native binary by
 subprocess and communicates with it over NDJSON on stdin/stdout using the
 **mf-ipc v1** protocol.
 
-The sidecar's only job is to compile metric queries to SQL without executing
-them. It wraps `MetricFlowEngine.explain()`.
+The sidecar's job is to compile metric queries to SQL without executing them,
+and to validate semantic manifests without a data warehouse connection. It
+wraps `MetricFlowEngine.explain()` and `SemanticManifestValidator`.
 
 ## Directory layout
 
@@ -236,6 +237,56 @@ Response:
 ```json
 {"id": "1", "ok": true, "sql": "SELECT ..."}
 ```
+
+#### `validate_semantic_manifest`
+
+Runs the manifest-only validation suite (`SemanticManifestValidator`'s default
+rules) against a semantic manifest — the same checks `dbt-metricflow`'s
+`validate-configs` CLI command runs before its data-warehouse validations,
+minus the data-warehouse validations themselves. It never opens a warehouse
+connection.
+
+```json
+{
+  "id": "1",
+  "method": "validate_semantic_manifest",
+  "protocol_version": 1,
+  "params": {
+    "manifest_path": "/path/to/manifest.json"
+  }
+}
+```
+
+- `manifest_path` — path to a `manifest.json` file **or** a YAML semantic
+  manifest directory (for development/testing), same as `explain`
+
+Unlike `explain`, the manifest is not cached: this method reparses and
+revalidates the manifest on every call.
+
+Response:
+
+```json
+{
+  "id": "1",
+  "ok": true,
+  "has_blocking_issues": false,
+  "errors": [],
+  "future_errors": [],
+  "warnings": []
+}
+```
+
+`has_blocking_issues` is `true` if `errors` is non-empty. Each entry in
+`errors`, `future_errors`, and `warnings` has this shape:
+
+```json
+{"message": "...", "context": {...}, "extra_detail": null, "error_date": null}
+```
+
+`context` describes where the issue occurred (file, metric, semantic model,
+element, or saved query, depending on the rule) and is `null` when a rule
+doesn't attach one. `error_date` is only ever populated on `future_errors`
+entries — the date the issue is scheduled to become a blocking error.
 
 #### `ping`
 
