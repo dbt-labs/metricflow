@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Dict, Generic, List, Sequence, Set
+from typing import Dict, Generic, List, Optional, Sequence, Set
 
 from metricflow_semantic_interfaces.protocols import SemanticManifestT, TimeSpine
-from metricflow_semantic_interfaces.type_enums import TimeGranularity
+from metricflow_semantic_interfaces.type_enums import DimensionType, TimeGranularity
 from metricflow_semantic_interfaces.validations.validator_helpers import (
     SemanticManifestValidationRule,
     ValidationIssue,
@@ -59,14 +59,51 @@ class TimeSpineRule(SemanticManifestValidationRule[SemanticManifestT], Generic[S
                 )
             )
 
-        # Warn if there is a time dimension configured with a smaller granularity than the smallest time spine
-        dimension_granularities = {
-            dimension.type_params.time_granularity
+        # Only dimensions used as an `agg_time_dimension` can trigger a time-spine join, so only they can hit a real
+        # granularity gap with the time spine. See https://github.com/dbt-labs/metricflow/issues/2115.
+        default_agg_time_dimension_by_model: Dict[str, Optional[str]] = {
+            semantic_model.name: (
+                semantic_model.defaults.agg_time_dimension if semantic_model.defaults is not None else None
+            )
             for semantic_model in semantic_manifest.semantic_models
-            for dimension in semantic_model.dimensions
-            if dimension.type_params
         }
-        if len(dimension_granularities) == 0:
+        agg_time_dimension_names_by_model: Dict[str, Set[str]] = {
+            semantic_model.name: set() for semantic_model in semantic_manifest.semantic_models
+        }
+        for semantic_model in semantic_manifest.semantic_models:
+            default_agg_time_dimension = default_agg_time_dimension_by_model[semantic_model.name]
+            for measure in semantic_model.measures:
+                agg_time_dimension_name = measure.agg_time_dimension or default_agg_time_dimension
+                if agg_time_dimension_name is not None:
+                    agg_time_dimension_names_by_model[semantic_model.name].add(agg_time_dimension_name)
+        # Simple metrics defined without a measure carry their own `agg_time_dimension` referencing a model.
+        for metric in semantic_manifest.metrics:
+            agg_params = metric.type_params.metric_aggregation_params
+            if agg_params is None:
+                continue
+            agg_time_dimension_name = agg_params.agg_time_dimension or default_agg_time_dimension_by_model.get(
+                agg_params.semantic_model
+            )
+            if agg_time_dimension_name is not None:
+                agg_time_dimension_names_by_model.setdefault(agg_params.semantic_model, set()).add(
+                    agg_time_dimension_name
+                )
+
+        # `time_dimension_granularities` tracks all time dimensions so the "no time dimensions configured" warning
+        # still fires, while the granularity-gap check below only considers agg_time_dimensions.
+        time_dimension_granularities: Set[TimeGranularity] = set()
+        agg_time_dimension_granularities: Set[TimeGranularity] = set()
+        for semantic_model in semantic_manifest.semantic_models:
+            agg_time_dimension_names = agg_time_dimension_names_by_model[semantic_model.name]
+            for dimension in semantic_model.dimensions:
+                if dimension.type is not DimensionType.TIME or dimension.type_params is None:
+                    continue
+                granularity = dimension.type_params.time_granularity
+                time_dimension_granularities.add(granularity)
+                if dimension.name in agg_time_dimension_names:
+                    agg_time_dimension_granularities.add(granularity)
+
+        if len(time_dimension_granularities) == 0:
             issues.append(
                 ValidationWarning(
                     message="No time dimensions configured. To avoid unexpected query errors, configuring a "
@@ -74,16 +111,18 @@ class TimeSpineRule(SemanticManifestValidationRule[SemanticManifestT], Generic[S
                 )
             )
             return issues
-        smallest_dim_granularity = min(dimension_granularities)
-        smallest_time_spine_granularity = min(time_spines_by_granularity.keys())
-        if smallest_dim_granularity < smallest_time_spine_granularity:
-            issues.append(
-                ValidationWarning(
-                    message=f"To avoid unexpected query errors, configuring a time spine at or below the smallest time "
-                    f"dimension granularity is recommended. Smallest time dimension granularity: "
-                    f"{smallest_dim_granularity.name}; Smallest time spine granularity: "
-                    f"{smallest_time_spine_granularity}"
+
+        if agg_time_dimension_granularities:
+            smallest_dim_granularity = min(agg_time_dimension_granularities)
+            smallest_time_spine_granularity = min(time_spines_by_granularity.keys())
+            if smallest_dim_granularity < smallest_time_spine_granularity:
+                issues.append(
+                    ValidationWarning(
+                        message=f"To avoid unexpected query errors, configuring a time spine at or below the smallest "
+                        f"time dimension granularity is recommended. Smallest time dimension granularity: "
+                        f"{smallest_dim_granularity.name}; Smallest time spine granularity: "
+                        f"{smallest_time_spine_granularity}"
+                    )
                 )
-            )
 
         return issues
