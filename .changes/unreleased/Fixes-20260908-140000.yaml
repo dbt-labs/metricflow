@@ -1,0 +1,7 @@
+kind: Fixes
+body: '`mf list dimension-values` no longer fails with a blank error message when a
+  dimension has no values; it now reports that zero values were found.'
+time: 2026-09-08T14:00:00.000000+00:00
+custom:
+    Author: beratli
+    Issue: "685"

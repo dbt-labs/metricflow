@@ -472,7 +472,7 @@ def dimension_values(
         )
         exit(1)
 
-    assert dim_vals
+    assert dim_vals is not None
     spinner.succeed(
         f"🌱 We've found {len(dim_vals)} dimension values for dimension {dimension} of metrics {', '.join(metrics)}."
     )
