@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 import pytest
+from metricflow_semantics.errors.error_classes import RenderSqlTemplateException
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.linkable_element import LinkableElementType
@@ -530,6 +531,26 @@ def test_metric_in_filter(  # noqa: D103
         entity_specs=(),
         group_by_metric_specs=(group_by_metric_spec,),
     )
+
+
+def test_ssti_gadget_payload_is_blocked(  # noqa: D103
+    column_association_resolver: ColumnAssociationResolver,
+    simple_semantic_manifest_lookup: SemanticManifestLookup,
+) -> None:
+    """Regression test for GHSA-g857-633q-gjj8's anti-pattern in this factory's own Jinja render.
+
+    `create_from_where_filter_intersection` renders `where_sql_template` in a step separate from the
+    sandboxed parse that runs during query resolution, so it needs its own guard against SSTI gadget
+    chains (e.g. reaching `os.popen` via `cycler.__init__.__globals__`).
+    """
+    where_filter = PydanticWhereFilter(where_sql_template="{{ cycler.__init__.__globals__.os.popen('id').read() }}")
+
+    with pytest.raises(RenderSqlTemplateException):
+        WhereFilterSpecFactory(
+            column_association_resolver=column_association_resolver,
+            spec_resolution_lookup=FilterSpecResolutionLookUp.empty_instance(),
+            custom_grain_names=simple_semantic_manifest_lookup.semantic_model_lookup.custom_granularity_names,
+        ).create_from_where_filter(EXAMPLE_FILTER_LOCATION, where_filter)
 
 
 def test_dimension_time_dimension_parity(  # noqa: D103
