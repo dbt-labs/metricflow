@@ -312,19 +312,10 @@ class SqlAlchemyUrlBuilder:
     ) -> SqlAlchemyURL:
         """Build ClickHouse URL.
 
-        ClickHouse has database.table (no schema). The URL database is the stable
-        warehouse database from MF_SQL_ENGINE_URL (e.g. metricflow). MetricFlow's
-        per-test schema is a separate CREATE DATABASE and appears in generated SQL
-        as database.table — it cannot be the connect-time database because that
-        database does not exist until setup runs.
-
-        `data_type_default_nullable=1` makes CREATE TABLE column types nullable.
-        It does not apply to explicit CAST, so the renderer still emits
-        ``Nullable(...)`` CAST targets.
-
-        ``join_use_nulls`` is not a connect-time setting. Compiled MetricFlow SQL
-        carries ``SETTINGS join_use_nulls = 1``. Leaving it off the URL means
-        tests fail if the renderer stops emitting that clause.
+        ClickHouse has no schemas: the connect-time database is the stable one from MF_SQL_ENGINE_URL, and the
+        per-test "schema" is a separate database created during setup. `data_type_default_nullable=1` makes test
+        table columns nullable (it does not affect explicit CASTs). `join_use_nulls` is deliberately not set here:
+        compiled SQL must carry it, and tests should fail if the renderer stops emitting it.
         """
         return SqlAlchemyURL.create(
             drivername="clickhousedb",

@@ -51,12 +51,10 @@ hatch run vertica-env:pytest tests_metricflow/
 
 ## ClickHouse
 
-ClickHouse support is **experimental**. MetricFlow compiles `SETTINGS join_use_nulls = 1`
-onto generated SQL so unmatched LEFT/FULL OUTER JOIN cells are SQL NULL (ClickHouse
-otherwise fills numeric/string cells with `0` / `''`). That contract lives on the
-statement, not a session `SET`. This engine path does not emit `FINAL` for
-ReplacingMergeTree / CDC tables, and it is not wired into hosted Semantic Layer /
-Fusion.
+ClickHouse support is **experimental**. Compiled SQL carries `SETTINGS join_use_nulls = 1`
+so unmatched outer-join cells are SQL NULL rather than ClickHouse's type defaults (`0`, `''`).
+`FINAL` for ReplacingMergeTree tables is not emitted, and the engine is not wired into the
+hosted Semantic Layer.
 
 We assume that you have Docker installed in your environment.
 

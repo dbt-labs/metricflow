@@ -138,7 +138,8 @@ class SqlAlchemyBasedSqlClient:
 
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
-                f"Bind parameters not yet supported in SqlAlchemy client. Params: {sql_bind_parameter_set.param_dict}"
+                f"Bind parameters not yet supported in SqlAlchemy client. "
+                f"Params: {sql_bind_parameter_set.param_dict}"
             )
 
         logger.info(
@@ -194,7 +195,8 @@ class SqlAlchemyBasedSqlClient:
         """
         if sql_bind_parameter_set.param_dict:
             raise SqlBindParametersNotSupportedError(
-                f"Bind parameters not yet supported in SqlAlchemy client. Params: {sql_bind_parameter_set.param_dict}"
+                f"Bind parameters not yet supported in SqlAlchemy client. "
+                f"Params: {sql_bind_parameter_set.param_dict}"
             )
 
         start = time.perf_counter()

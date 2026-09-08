@@ -310,19 +310,10 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         if len(from_source_node_as_select_node.group_bys) > 0 and node.where:
             return False
 
-        # Guard for engines with early alias resolution in WHERE (e.g. ClickHouse):
-        #
-        # ClickHouse's query analyzer resolves unqualified column names in WHERE to SELECT aliases when names match.
-        # This violates standard SQL evaluation order (WHERE is evaluated before SELECT aliases are assigned).
-        # https://github.com/ClickHouse/ClickHouse/issues/23194
-        #
-        # SqlColumnReferenceExpression always includes a table alias (e.g. subq.col), making it unambiguous after
-        # hoisting. SqlStringExpression is raw SQL text that may contain unqualified column names — the only vector
-        # for alias collisions after reduction.
-        #
-        # If the FROM source's WHERE contains SqlStringExpression, the hoisted unqualified reference could be
-        # misresolved to a SELECT alias (causing ILLEGAL_AGGREGATION for aggregates, or silent wrong results for
-        # non-aggregate expressions like COALESCE).
+        # Some engines (ClickHouse, https://github.com/ClickHouse/ClickHouse/issues/23194) resolve unqualified names
+        # in WHERE to SELECT aliases. Column references are always table-qualified, so the only way a hoisted WHERE
+        # can collide with an alias is through raw SQL text (SqlStringExpression). Skip the reduction in that case,
+        # otherwise the result is ILLEGAL_AGGREGATION or a silently wrong value.
         if self._has_ambiguous_alias_resolution:
             from_where = from_source_node_as_select_node.where
             if from_where is not None and from_where.lineage.contains_string_exprs:

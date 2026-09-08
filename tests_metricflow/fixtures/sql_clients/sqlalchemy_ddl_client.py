@@ -158,11 +158,7 @@ class SqlAlchemyDDLSqlClient(SqlAlchemyBasedSqlClient):
         """Drop schema if it exists."""
         cascade_clause = " CASCADE" if cascade else ""
         if self.sql_engine_type is SqlEngine.CLICKHOUSE:
-            if cascade:
-                logger.warning(
-                    (f"Cascading drop requested but not supported by {self.sql_engine_type}; dropping without cascade.")
-                )
-
+            # DROP DATABASE always removes its tables; there is no CASCADE keyword.
             self.execute(f"DROP DATABASE IF EXISTS {schema_name}")
             return
         self.execute(f"DROP SCHEMA IF EXISTS {schema_name}{cascade_clause}")
