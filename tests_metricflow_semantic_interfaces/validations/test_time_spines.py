@@ -255,6 +255,12 @@ def test_dimension_granularity_smaller_than_time_spine() -> None:  # noqa: D103
 
 
 def test_no_warning_for_non_agg_time_dimension_finer_than_time_spine() -> None:
+    """A finer-grained time dimension that is never an agg_time_dimension should not trigger the warning.
+
+    Regression test for https://github.com/dbt-labs/metricflow/issues/2115. Only agg_time_dimensions can trigger a
+    time-spine join, so a plain time dimension used only for filtering (here `last_modified_at` at SECOND grain)
+    should not be compared against the time spine granularity.
+    """
     validator = SemanticManifestValidator[PydanticSemanticManifest]([TimeSpineRule()])
     semantic_manifest = PydanticSemanticManifest(
         semantic_models=[
