@@ -4,6 +4,7 @@ import logging
 from typing import List, Optional, Sequence
 
 import jinja2
+from jinja2.sandbox import SandboxedEnvironment
 from metricflow_semantics.errors.error_classes import RenderSqlTemplateException
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_spec_lookup import (
@@ -90,16 +91,26 @@ class WhereFilterSpecFactory:
             )
             try:
                 # If there was an error with the template, it should have been caught while resolving the specs for
-                # the filters during query resolution.
-                where_sql = jinja2.Template(where_filter.where_sql_template, undefined=jinja2.StrictUndefined).render(
-                    {
-                        "Dimension": dimension_factory.create,
-                        "TimeDimension": time_dimension_factory.create,
-                        "Entity": entity_factory.create,
-                        "Metric": metric_factory.create,
-                    }
+                # the filters during query resolution. `SandboxedEnvironment` is used here (rather than a plain
+                # `jinja2.Template`) as defense in depth against SSTI, since `where_sql_template` is
+                # caller/model-controlled -- see GHSA-g857-633q-gjj8.
+                where_sql = (
+                    SandboxedEnvironment(undefined=jinja2.StrictUndefined)
+                    .from_string(where_filter.where_sql_template)
+                    .render(
+                        {
+                            "Dimension": dimension_factory.create,
+                            "TimeDimension": time_dimension_factory.create,
+                            "Entity": entity_factory.create,
+                            "Metric": metric_factory.create,
+                        }
+                    )
                 )
-            except (jinja2.exceptions.UndefinedError, jinja2.exceptions.TemplateSyntaxError) as e:
+            except (
+                jinja2.exceptions.UndefinedError,
+                jinja2.exceptions.TemplateSyntaxError,
+                jinja2.exceptions.SecurityError,
+            ) as e:
                 raise RenderSqlTemplateException(
                     f"Error while rendering Jinja template:\n{where_filter.where_sql_template}"
                 ) from e

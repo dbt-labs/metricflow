@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import List, Optional, Sequence
 
 import jinja2
+from jinja2.sandbox import SandboxedEnvironment
 
 from metricflow_semantic_interfaces.protocols.where_filter import WhereFilterIntersection
 
@@ -100,12 +101,22 @@ def _render_filter_template(template: str) -> str:
     and `{{ Metric('revenue') }}` are resolved to their column-name
     equivalents using lightweight stubs.  The output is a best-effort SQL
     string suitable for embedding in an OSI expression.
+
+    `template` is caller/model-controlled (a metric's `where` filter text), so it is rendered
+    through a `SandboxedEnvironment` rather than a plain `jinja2.Template` -- the plain API allows
+    unrestricted attribute access (e.g. `{{ cycler.__init__.__globals__.os.popen(...) }}`), which is
+    an SSTI-to-RCE vector. This mirrors the sandboxing already used for the same field in
+    `metricflow_semantic_interfaces/parsing/text_input/ti_processor.py`.
     """
-    return jinja2.Template(template, undefined=jinja2.StrictUndefined).render(
-        Dimension=_DimensionStub,
-        TimeDimension=_TimeDimensionStub,
-        Entity=_EntityStub,
-        Metric=_MetricStub,
+    return (
+        SandboxedEnvironment(undefined=jinja2.StrictUndefined)
+        .from_string(template)
+        .render(
+            Dimension=_DimensionStub,
+            TimeDimension=_TimeDimensionStub,
+            Entity=_EntityStub,
+            Metric=_MetricStub,
+        )
     )
 
 

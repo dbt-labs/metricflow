@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import List, Optional
 
+import jinja2
 import pytest
 from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.test_helpers.snapshot_helpers import (
@@ -1023,6 +1024,16 @@ class TestFilterRendering:  # noqa: D101
 
     def test_metric_reference(self) -> None:  # noqa: D102
         assert _render_filter_template("{{ Metric('revenue') }} > 0") == "revenue > 0"
+
+    def test_ssti_gadget_payload_is_blocked(self) -> None:  # noqa: D102
+        """Regression test for GHSA-g857-633q-gjj8: `where_sql_template` must render in a sandboxed environment.
+
+        A plain, unsandboxed `jinja2.Template` allows arbitrary attribute traversal (e.g. reaching
+        `os.popen` via `cycler.__init__.__globals__`), which is SSTI-to-RCE. `SandboxedEnvironment`
+        raises `SecurityError` on this instead of executing it.
+        """
+        with pytest.raises(jinja2.exceptions.SecurityError):
+            _render_filter_template("{{ cycler.__init__.__globals__.os.popen('id').read() }}")
 
 
 class TestMetricFilterFlattening:  # noqa: D101
