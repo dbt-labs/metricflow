@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from metricflow_semantics.errors.error_classes import UnsupportedEngineFeatureError
 from metricflow_semantics.sql.sql_exprs import (
     SqlAddTimeExpression,
     SqlCastToTimestampExpression,
@@ -47,11 +48,11 @@ def test_timestamp_data_type(clickhouse_renderer: ClickHouseSqlExpressionRendere
 
 
 def test_supported_percentile_function_types(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
-    """Test that ClickHouse supports all percentile function types."""
+    """ClickHouse only advertises percentile modes whose semantics match MetricFlow's."""
     assert SqlPercentileFunctionType.CONTINUOUS in clickhouse_renderer.supported_percentile_function_types
-    assert SqlPercentileFunctionType.DISCRETE in clickhouse_renderer.supported_percentile_function_types
     assert SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS in clickhouse_renderer.supported_percentile_function_types
-    assert SqlPercentileFunctionType.APPROXIMATE_DISCRETE in clickhouse_renderer.supported_percentile_function_types
+    assert SqlPercentileFunctionType.DISCRETE not in clickhouse_renderer.supported_percentile_function_types
+    assert SqlPercentileFunctionType.APPROXIMATE_DISCRETE not in clickhouse_renderer.supported_percentile_function_types
 
 
 def test_date_trunc_day(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
@@ -225,27 +226,29 @@ def test_percentile_continuous(clickhouse_renderer: ClickHouseSqlExpressionRende
 
 
 def test_percentile_discrete(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
-    """Test discrete percentile (should use quantileExactLow)."""
+    """Discrete percentile fails instead of silently using different rank-boundary semantics."""
     expr = SqlPercentileExpression.create(
         order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "value_col")),
         percentile_args=SqlPercentileExpressionArgument(
             percentile=0.5, function_type=SqlPercentileFunctionType.DISCRETE
         ),
     )
-    result = clickhouse_renderer.visit_percentile_expr(expr)
-    assert result.sql == "quantileExactLow(0.5)(a.value_col)"
+    with pytest.raises(UnsupportedEngineFeatureError, match="Discrete percentile aggregation is not supported"):
+        clickhouse_renderer.visit_percentile_expr(expr)
 
 
 def test_percentile_approximate_discrete(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
-    """Test approximate discrete percentile (should use quantileTDigest)."""
+    """Approximate discrete percentile fails because t-digest may interpolate."""
     expr = SqlPercentileExpression.create(
         order_by_arg=SqlColumnReferenceExpression.create(SqlColumnReference("a", "value_col")),
         percentile_args=SqlPercentileExpressionArgument(
             percentile=0.5, function_type=SqlPercentileFunctionType.APPROXIMATE_DISCRETE
         ),
     )
-    result = clickhouse_renderer.visit_percentile_expr(expr)
-    assert result.sql == "quantileTDigest(0.5)(a.value_col)"
+    with pytest.raises(
+        UnsupportedEngineFeatureError, match="Approximate discrete percentile aggregation is not supported"
+    ):
+        clickhouse_renderer.visit_percentile_expr(expr)
 
 
 def test_generate_uuid(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:

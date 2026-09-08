@@ -229,15 +229,13 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
     @property
     @override
     def supported_percentile_function_types(self) -> Collection[SqlPercentileFunctionType]:
-        """ClickHouse supports multiple percentile function types.
+        """Return percentile types with semantics matching MetricFlow's contract.
 
         Reference: https://clickhouse.com/docs/en/sql-reference/aggregate-functions/reference/quantile
         """
         return {
             SqlPercentileFunctionType.CONTINUOUS,
-            SqlPercentileFunctionType.DISCRETE,
             SqlPercentileFunctionType.APPROXIMATE_CONTINUOUS,
-            SqlPercentileFunctionType.APPROXIMATE_DISCRETE,
         }
 
     @override
@@ -298,7 +296,6 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         - day -> toDayOfMonth
         - dayofweek -> toDayOfWeek (returns 1-7, Monday=1)
         - dayofyear -> toDayOfYear
-        - week -> toISOWeek
         - quarter -> toQuarter
 
         Reference: https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions#toyear-tomonth
@@ -443,9 +440,10 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         ClickHouse uses parameterized aggregate functions with curried syntax:
         - quantile(0.5)(column) - approximate continuous
         - quantileExactInclusive(0.5)(column) - exact continuous (R-7 interpolation)
-        - quantileExactLow(0.5)(column) - exact discrete (low)
-        - quantileExactHigh(0.5)(column) - exact discrete (high)
-        - quantileTDigest(0.5)(column) - approximate discrete
+
+        ClickHouse's discrete quantile functions do not match SQL PERCENTILE_DISC
+        at rank boundaries, and t-digest can return interpolated values. Reporting
+        either as discrete would silently change metric semantics.
 
         Reference: https://clickhouse.com/docs/en/sql-reference/aggregate-functions/reference/quantile
         """
@@ -461,11 +459,15 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         elif function_type is SqlPercentileFunctionType.CONTINUOUS:
             function_str = "quantileExactInclusive"
         elif function_type is SqlPercentileFunctionType.DISCRETE:
-            # ClickHouse doesn't have exact discrete, use low/high
-            # Default to low to match typical discrete behavior
-            function_str = "quantileExactLow"
+            raise UnsupportedEngineFeatureError(
+                "Discrete percentile aggregation is not supported for ClickHouse. "
+                "Set use_discrete_percentile to false in all percentile simple-metrics."
+            )
         elif function_type is SqlPercentileFunctionType.APPROXIMATE_DISCRETE:
-            function_str = "quantileTDigest"
+            raise UnsupportedEngineFeatureError(
+                "Approximate discrete percentile aggregation is not supported for ClickHouse. "
+                "Set use_discrete_percentile to false in all percentile simple-metrics."
+            )
         else:
             assert_values_exhausted(function_type)
 
