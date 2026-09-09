@@ -38,7 +38,7 @@ class PydanticProjectConfiguration(HashableBaseModel, ModelWithMetadataParsing, 
     @validator("dsi_package_version", always=True)
     @classmethod
     def __create_default_dsi_package_version(cls, value: Optional[PydanticSemanticVersion]) -> PydanticSemanticVersion:
-        """Returns the version of the dbt_semantic_interfaces package that generated this manifest."""
+        """Returns the version of the metricflow_semantic_interfaces package that generated this manifest."""
         if value is not None and value != UNKNOWN_VERSION_SENTINEL:
             return value
         return PydanticSemanticVersion.create_from_string(version("metricflow"))
