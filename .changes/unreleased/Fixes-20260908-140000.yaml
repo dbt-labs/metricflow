@@ -1,6 +1,5 @@
 kind: Fixes
-body: Fix `mf list dimension-values` failing with a blank error when a dimension has
-  no values.
+body: '`mf list dimension-values` no longer errors when a dimension has no values.'
 time: 2026-09-08T14:00:00.000000+00:00
 custom:
     Author: beratli
