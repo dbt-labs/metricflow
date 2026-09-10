@@ -58,7 +58,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ----
 
-Package: importlib-metadata:9.0.0
+Package: importlib-metadata:9.0.1
 
 The following copyrights and licenses were found in the source code of this package:
 
@@ -1260,7 +1260,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ----
 
-Package: pydantic:2.13.4
+Package: pydantic:2.13.5
 
 The following copyrights and licenses were found in the source code of this package:
 
@@ -1480,7 +1480,7 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ----
 
-Package: pydantic-core:2.46.4
+Package: pydantic-core:2.46.5
 
 The following copyrights and licenses were found in the source code of this package:
 
@@ -2104,7 +2104,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ----
 
-Package: rapidfuzz:3.14.5
+Package: rapidfuzz:3.14.6
 
 The following copyrights and licenses were found in the source code of this package:
 
@@ -7784,10 +7784,10 @@ Copyright (c) 2012 present, Victor Zverovich
 Copyright (c) 2012, 2018 present, Victor Zverovich and fmt contributors
 (c) thy (c) PS
 (c) yu" thyAE yuyA thythy yuyu AEythy SAS
-Aothththththu JOth (c) Xuu
 Diu (c) Eue
 Euux (c) (c)
 Vythythythythythythy (c) Uuyuyuyuyuyuyua8
+Aothththththu JOth (c) Xuu
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -8363,10 +8363,10 @@ copyright (c) 2018, 2025 https://tsung-wei-huang.github.io/ Dr. Tsung-Wei Huang,
 Copyright (c) 2015 present, Gabi Melman & spdlog contributors
 (c) thy (c) PS
 (c) yu" thyAE yuyA thythy yuyu AEythy SAS
-Aothththththu JOth (c) Xuu
 Diu (c) Eue
 Euux (c) (c)
 Vythythythythythythy (c) Uuyuyuyuyuyuyua8
+Aothththththu JOth (c) Xuu
 
 University of Illinois/NCSA Open Source License
 
@@ -8542,7 +8542,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ----
 
-Package: sqlglot:30.16.0
+Package: sqlglot:30.18.0
 
 The following copyrights and licenses were found in the source code of this package:
 
@@ -9145,7 +9145,7 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ----
 
-Package: typing-inspection:0.4.3
+Package: typing-inspection:0.4.4
 
 The following copyrights and licenses were found in the source code of this package:
 
