@@ -89,6 +89,9 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
     Unlike SqlSubQueryReducerVisitor, this will re-write expressions to realize more reductions.
     """
 
+    def __init__(self, has_ambiguous_alias_resolution: bool = False) -> None:  # noqa: D107
+        self._has_ambiguous_alias_resolution = has_ambiguous_alias_resolution
+
     def _reduce_parents(
         self,
         node: SqlSelectStatementNode,
@@ -306,6 +309,15 @@ class SqlRewritingSubQueryReducerVisitor(SqlPlanNodeVisitor[SqlPlanNode]):
         # aggregation expression.
         if len(from_source_node_as_select_node.group_bys) > 0 and node.where:
             return False
+
+        # Some engines (ClickHouse, https://github.com/ClickHouse/ClickHouse/issues/23194) resolve unqualified names
+        # in WHERE to SELECT aliases. Column references are always table-qualified, so the only way a hoisted WHERE
+        # can collide with an alias is through raw SQL text (SqlStringExpression). Skip the reduction in that case,
+        # otherwise the result is ILLEGAL_AGGREGATION or a silently wrong value.
+        if self._has_ambiguous_alias_resolution:
+            from_where = from_source_node_as_select_node.where
+            if from_where is not None and from_where.lineage.contains_string_exprs:
+                return False
 
         # If the parent has a GROUP BY, the case where it's easiest to merge this with the parent is if all select
         # columns are column references.
@@ -880,11 +892,20 @@ class SqlRewritingSubQueryReducer(SqlPlanOptimizer):
     GROUP BY foo
     """
 
-    def __init__(self, use_column_alias_in_group_bys: bool = False) -> None:  # noqa: D107
+    def __init__(  # noqa: D107
+        self,
+        use_column_alias_in_group_bys: bool = False,
+        has_ambiguous_alias_resolution: bool = False,
+    ) -> None:
         self._use_column_alias_in_group_bys = use_column_alias_in_group_bys
+        self._has_ambiguous_alias_resolution = has_ambiguous_alias_resolution
 
     def optimize(self, node: SqlPlanNode) -> SqlPlanNode:  # noqa: D102
-        result = node.accept(SqlRewritingSubQueryReducerVisitor())
+        result = node.accept(
+            SqlRewritingSubQueryReducerVisitor(
+                has_ambiguous_alias_resolution=self._has_ambiguous_alias_resolution,
+            )
+        )
         if self._use_column_alias_in_group_bys:
             return result.accept(SqlGroupByRewritingVisitor())
         return result

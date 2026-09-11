@@ -1,0 +1,9 @@
+test_name: test_cumulative_metric_with_non_adjustable_filter
+test_filename: test_cumulative_metrics.py
+docstring:
+  Tests a cumulative metric with a filter that cannot be adjusted to ensure all data is included.
+---
+metric_time__day       trailing_2_months_revenue
+-------------------  ---------------------------
+2020-03-15T00:00:00                         7000
+2020-04-30T00:00:00                         7000

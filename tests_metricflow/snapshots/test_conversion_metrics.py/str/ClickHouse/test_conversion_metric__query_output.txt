@@ -1,0 +1,15 @@
+test_name: test_conversion_metric
+test_filename: test_conversion_metrics.py
+docstring:
+  Test query against a conversion metric.
+---
+metric_time__day       visit_buy_conversion_rate
+-------------------  ---------------------------
+2020-01-01T00:00:00                     0.5
+2020-01-02T00:00:00                     0.5
+2020-01-03T00:00:00                     0.666667
+2020-01-04T00:00:00
+2020-01-06T00:00:00
+2020-01-07T00:00:00                     1
+2020-01-10T00:00:00                     1
+2020-01-12T00:00:00

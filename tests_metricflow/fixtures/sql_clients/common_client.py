@@ -16,6 +16,7 @@ class SqlDialect(Enum):
     DATABRICKS = "databricks"
     TRINO = "trino"
     VERTICA = "vertica"
+    CLICKHOUSE = "clickhouse"
 
 
 T = TypeVar("T")
