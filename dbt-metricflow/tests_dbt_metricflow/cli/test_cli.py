@@ -7,6 +7,7 @@ initialized.
 from __future__ import annotations
 
 import logging
+import re
 import shutil
 import tempfile
 import textwrap
@@ -15,6 +16,7 @@ from pathlib import Path
 from typing import Iterator
 
 from _pytest.fixtures import FixtureRequest
+from click.testing import CliRunner
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_snapshot_text_equal,
@@ -22,6 +24,7 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
 )
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
+from dbt_metricflow.cli.main import dimensions, entities
 from tests_dbt_metricflow.cli.cli_test_helpers import (
     create_tutorial_project_files,
     run_and_check_cli_command,
@@ -193,6 +196,20 @@ def test_list_entities(  # noqa: D103
         command_enum=IsolatedCliCommandEnum.MF_ENTITIES,
         args=["--metrics", "transactions"],
     )
+
+
+def test_metric_scoped_list_commands_require_metrics() -> None:
+    """Metric-scoped list commands should identify `--metrics` as required when it is omitted."""
+    runner = CliRunner()
+
+    for command in (dimensions, entities):
+        help_result = runner.invoke(command, ["--help"], terminal_width=160)
+        missing_metrics_result = runner.invoke(command)
+
+        assert help_result.exit_code == 0
+        assert re.search(r"--metrics SEQUENCE.*\[required\]", help_result.output)
+        assert missing_metrics_result.exit_code == 2
+        assert "Missing option '--metrics'." in missing_metrics_result.output
 
 
 def test_list_saved_queries(  # noqa: D103
