@@ -33,7 +33,7 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow.dataflow.optimizer.dataflow_optimizer_factory import DataflowPlanOptimization
 from metricflow.engine.metricflow_engine import MetricFlowQueryRequest, OutputColumnOrderMode
 from metricflow.protocols.sql_client import SqlClient, SqlEngine
-from metricflow.sql.render.clickhouse import ensure_join_use_nulls_setting
+from metricflow.sql.render.clickhouse import CLICKHOUSE_JOIN_USE_NULLS_SETTING
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
 from metricflow_semantic_interfaces.type_enums.date_part import DatePart
 from metricflow_semantic_interfaces.type_enums.time_granularity import TimeGranularity
@@ -398,10 +398,9 @@ def _test_case(
         cast_to_ts=check_query_helpers.cast_to_ts,
     )
     if sql_client.sql_engine_type is SqlEngine.CLICKHOUSE:
-        # Check queries are written against ANSI outer-join semantics (unmatched cells are NULL). ClickHouse
-        # defaults to filling those cells with type defaults, so pin the same query-level contract that compiled
-        # MetricFlow SQL carries. The test client itself stays on engine defaults (see test_clickhouse_join_nulls.py).
-        check_query_sql = ensure_join_use_nulls_setting(check_query_sql)
+        # These complete, unterminated SELECTs have no SETTINGS clause. Append
+        # the same outer-join NULL contract that compiled MetricFlow SQL carries.
+        check_query_sql = f"{check_query_sql}\nSETTINGS {CLICKHOUSE_JOIN_USE_NULLS_SETTING}"
     expected = sql_client.query(check_query_sql)
     # If we sort, it's effectively not checking the order whatever order that the output was would be overwritten.
     assert actual is not None, "Did not get a result table from MetricFlow"

@@ -22,8 +22,6 @@ from metricflow.sql.render.clickhouse import (
     ClickHouseSqlExpressionRenderer,
     ClickHouseSqlPlanRenderer,
     clickhouse_explain_statement,
-    ensure_join_use_nulls_setting,
-    sql_has_join_use_nulls_setting,
 )
 from metricflow.sql.sql_plan import SqlPlan
 from metricflow.sql.sql_select_text_node import SqlSelectTextNode
@@ -288,95 +286,6 @@ def test_plan_renderer_emits_join_use_nulls_setting() -> None:
     result = ClickHouseSqlPlanRenderer().render_sql_plan(plan)
     assert result.sql.rstrip().endswith("SETTINGS join_use_nulls = 1")
     assert result.sql.count("SETTINGS join_use_nulls = 1") == 1
-
-
-def test_ensure_join_use_nulls_setting_ignores_identifier_in_select_list() -> None:
-    """A SELECT-list string must not suppress the trailing SETTINGS clause."""
-    sql = "SELECT 'join_use_nulls' AS x"
-    assert not sql_has_join_use_nulls_setting(sql)
-    ensured = ensure_join_use_nulls_setting(sql)
-    assert ensured.endswith("SETTINGS join_use_nulls = 1")
-    assert ensure_join_use_nulls_setting(ensured) == ensured
-
-
-def test_ensure_join_use_nulls_setting_merges_into_existing_settings() -> None:
-    """ClickHouse allows one SETTINGS list; merge rather than appending a second clause."""
-    sql = "SELECT 1 AS x\nSETTINGS max_threads = 2"
-    assert ensure_join_use_nulls_setting(sql) == "SELECT 1 AS x\nSETTINGS max_threads = 2, join_use_nulls = 1"
-
-
-@pytest.mark.parametrize(
-    ("sql", "expected"),
-    (
-        (
-            "SELECT 1 AS x SETTINGS max_threads = 2 -- keep this comment",
-            "SELECT 1 AS x SETTINGS max_threads = 2, join_use_nulls = 1 -- keep this comment",
-        ),
-        (
-            "SELECT 1 AS x SETTINGS max_threads = 2 /* keep this comment */",
-            "SELECT 1 AS x SETTINGS max_threads = 2, join_use_nulls = 1 /* keep this comment */",
-        ),
-    ),
-)
-def test_ensure_join_use_nulls_setting_merges_before_trailing_comment(sql: str, expected: str) -> None:
-    """A trailing comment must not swallow the merged setting."""
-    assert ensure_join_use_nulls_setting(sql) == expected
-    assert ensure_join_use_nulls_setting(expected) == expected
-
-
-def test_ensure_join_use_nulls_setting_strips_semicolon_before_trailing_comment() -> None:
-    """The setting must remain part of a statement with a commented terminator."""
-    sql = "SELECT 1 AS x; -- keep this comment"
-    assert ensure_join_use_nulls_setting(sql) == "SELECT 1 AS x -- keep this comment\nSETTINGS join_use_nulls = 1"
-
-
-def test_ensure_join_use_nulls_setting_keeps_existing_assignment() -> None:
-    """Do not duplicate join_use_nulls when a SETTINGS clause already sets it."""
-    sql = "SELECT 1 AS x\nSETTINGS join_use_nulls = 1"
-    assert ensure_join_use_nulls_setting(sql) == sql
-
-
-def test_ensure_join_use_nulls_setting_replaces_disabled_assignment() -> None:
-    """An existing disabled setting must not violate the renderer contract."""
-    sql = "SELECT 1 AS x\nSETTINGS max_threads = 2, join_use_nulls = 0"
-    assert ensure_join_use_nulls_setting(sql) == "SELECT 1 AS x\nSETTINGS max_threads = 2, join_use_nulls = 1"
-
-
-@pytest.mark.parametrize(
-    ("sql", "expected"),
-    (
-        ("SELECT 1 AS x SETTINGS join_use_nulls = '1'", "SELECT 1 AS x SETTINGS join_use_nulls = '1'"),
-        ("SELECT 1 AS x SETTINGS join_use_nulls = true", "SELECT 1 AS x SETTINGS join_use_nulls = true"),
-        ('SELECT 1 AS x SETTINGS join_use_nulls = "1"', "SELECT 1 AS x SETTINGS join_use_nulls = 1"),
-        ("SELECT 1 AS x SETTINGS join_use_nulls = '0'", "SELECT 1 AS x SETTINGS join_use_nulls = 1"),
-        ("SELECT 1 AS x SETTINGS join_use_nulls = false", "SELECT 1 AS x SETTINGS join_use_nulls = 1"),
-    ),
-)
-def test_ensure_join_use_nulls_setting_normalizes_quoted_and_boolean_values(sql: str, expected: str) -> None:
-    """Keep valid enabled forms and replace disabled or invalid quoted forms."""
-    assert ensure_join_use_nulls_setting(sql) == expected
-
-
-def test_ensure_join_use_nulls_setting_strips_repeated_semicolons() -> None:
-    """Every trailing terminator goes, so the appended clause stays part of the statement."""
-    assert ensure_join_use_nulls_setting("SELECT 1 AS x;;\n") == "SELECT 1 AS x\nSETTINGS join_use_nulls = 1"
-
-
-@pytest.mark.parametrize(
-    "sql",
-    (
-        "SELECT 'SETTINGS max_threads = 1' AS note",
-        "SELECT 1 AS x -- SETTINGS max_threads = 1",
-        "SELECT 1 AS x /* SETTINGS max_threads = 1 */",
-        "SELECT $$SETTINGS max_threads = 1$$ AS note",
-        "SELECT * FROM (SELECT 1 SETTINGS max_threads = 1) AS source",
-    ),
-)
-def test_ensure_join_use_nulls_setting_ignores_non_top_level_settings(sql: str) -> None:
-    """Only the statement-level SETTINGS clause may receive another key."""
-    ensured = ensure_join_use_nulls_setting(sql)
-    assert ensured == f"{sql}\nSETTINGS join_use_nulls = 1"
-    assert ensure_join_use_nulls_setting(ensured) == ensured
 
 
 def test_clickhouse_explain_statement_select_uses_query_tree() -> None:
