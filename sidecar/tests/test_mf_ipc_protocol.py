@@ -15,6 +15,9 @@ from mf_ipc_protocol import (
     ReadyMessage,
     RequestEnvelope,
     StartupErrorMessage,
+    ValidateSemanticManifestParams,
+    ValidateSemanticManifestResponse,
+    ValidationIssueModel,
 )
 from pydantic import BaseModel, ValidationError
 
@@ -70,7 +73,7 @@ def test_request_envelope_rejects_non_mapping_input() -> None:
         RequestEnvelope.model_validate([1, 2, 3])
 
 
-@pytest.mark.parametrize("model_cls", [RequestEnvelope, ExplainParams])
+@pytest.mark.parametrize("model_cls", [RequestEnvelope, ExplainParams, ValidateSemanticManifestParams])
 def test_extra_fields_are_ignored_not_rejected(model_cls: type[BaseModel]) -> None:
     """An older MetricFlow shouldn't reject a newer Fusion's request over an unknown field."""
     payload = {"id": "1", "manifest_path": "/some/path", "some_future_field": "value"}
@@ -106,3 +109,41 @@ def test_ok_and_explain_response_ok_field_is_fixed() -> None:
     """Ok is always True on these two response types, regardless of construction order."""
     assert OkResponse(id="1").ok is True
     assert ExplainResponse(id="1", sql="SELECT 1").ok is True
+
+
+def test_validate_semantic_manifest_params_requires_manifest_path() -> None:
+    """manifest_path has no default; omitting it must raise a field-level ValidationError."""
+    with pytest.raises(ValidationError, match="manifest_path"):
+        ValidateSemanticManifestParams.model_validate({})
+
+
+def test_validation_issue_model_defaults() -> None:
+    """context, extra_detail, and error_date are optional and default to None."""
+    issue = ValidationIssueModel(message="No metrics present in the model.")
+    assert issue.context is None
+    assert issue.extra_detail is None
+    assert issue.error_date is None
+
+
+def test_validate_semantic_manifest_response_shape() -> None:
+    """ValidateSemanticManifestResponse dumps to the exact shape documented in sidecar/README.md."""
+    resp = ValidateSemanticManifestResponse(
+        id="1",
+        has_blocking_issues=True,
+        errors=(ValidationIssueModel(message="No metrics present in the model."),),
+    )
+    assert resp.model_dump() == {
+        "id": "1",
+        "ok": True,
+        "has_blocking_issues": True,
+        "errors": (
+            {
+                "message": "No metrics present in the model.",
+                "context": None,
+                "extra_detail": None,
+                "error_date": None,
+            },
+        ),
+        "future_errors": (),
+        "warnings": (),
+    }

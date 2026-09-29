@@ -40,6 +40,7 @@ class Method(str, Enum):
     EXPLAIN = "explain"
     PING = "ping"
     SHUTDOWN = "shutdown"
+    VALIDATE_SEMANTIC_MANIFEST = "validate_semantic_manifest"
 
 
 class _FrozenModel(BaseModel):
@@ -107,6 +108,29 @@ class ExplainParams(_FrozenModel):
     sql_engine: str = "DUCKDB"
 
 
+class ValidateSemanticManifestParams(_FrozenModel):
+    """Params for the `validate_semantic_manifest` method."""
+
+    manifest_path: str
+
+
+class ValidationIssueModel(_FrozenModel):
+    """One issue from the manifest validation suite (an error, future_error, or warning).
+
+    `context` is passed through as a plain dict rather than modeling
+    ValidationContext's union of shapes here: that union is owned by
+    metricflow_semantic_interfaces.validations.validator_helpers, and
+    re-declaring each variant in the wire protocol would duplicate that
+    source of truth without changing anything on the wire. `error_date` is
+    only ever populated on issues that came from `future_errors`.
+    """
+
+    message: str
+    context: dict | None = None
+    extra_detail: str | None = None
+    error_date: str | None = None
+
+
 class ErrorDetail(_FrozenModel):
     """The `error` payload of an ErrorResponse."""
 
@@ -136,3 +160,14 @@ class ExplainResponse(_FrozenModel):
     id: RequestId
     ok: Literal[True] = True
     sql: str
+
+
+class ValidateSemanticManifestResponse(_FrozenModel):
+    """Successful response for the `validate_semantic_manifest` method."""
+
+    id: RequestId
+    ok: Literal[True] = True
+    has_blocking_issues: bool
+    errors: tuple[ValidationIssueModel, ...] = ()
+    future_errors: tuple[ValidationIssueModel, ...] = ()
+    warnings: tuple[ValidationIssueModel, ...] = ()
