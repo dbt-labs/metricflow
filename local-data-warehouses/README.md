@@ -48,3 +48,41 @@ export MF_SQL_ENGINE_PASSWORD="metricflowing"
 
 hatch run vertica-env:pytest tests_metricflow/
 ```
+
+## ClickHouse
+
+ClickHouse support is **experimental**. Compiled SQL carries `SETTINGS join_use_nulls = 1`
+so unmatched outer-join cells are SQL NULL rather than ClickHouse's type defaults (`0`, `''`).
+`FINAL` for ReplacingMergeTree tables is not emitted, and the engine is not wired into the
+hosted Semantic Layer.
+
+We assume that you have Docker installed in your environment.
+
+In a separate terminal window, run ClickHouse in the background. Note - you MUST have Docker running on localhost in order for the ClickHouse container to spin up.
+
+```sh
+make clickhouse
+```
+
+Then run the ClickHouse suite:
+
+```sh
+export MF_SQL_ENGINE_URL="clickhouse://metricflow@localhost:8123/metricflow"
+export MF_SQL_ENGINE_PASSWORD="metricflowing"
+
+make test-clickhouse
+```
+
+The Hatch environment uses these values when present and otherwise defaults to
+`localhost:8123` with the password `metricflowing`.
+
+The ClickHouse container exposes:
+
+- Port 8123: HTTP interface
+- Port 9000: Native protocol interface
+
+Default credentials:
+
+- Database: `metricflow`
+- User: `metricflow`
+- Password: `metricflowing`

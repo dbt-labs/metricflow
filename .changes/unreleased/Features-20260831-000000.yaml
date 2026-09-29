@@ -1,0 +1,6 @@
+kind: Features
+body: Add experimental support for the ClickHouse engine
+time: 2026-08-31T00:00:00.00000-04:00
+custom:
+  Author: ubiquitousbyte felipempleite
+  Issue: "2014"

@@ -437,7 +437,7 @@ integration_test:
       FROM (
         SELECT
           t.ds AS metric_time__day
-          , {{ render_date_trunc("T.ds", TimeGranularity.WEEK) }} AS metric_time__week
+          , {{ render_date_trunc("t.ds", TimeGranularity.WEEK) }} AS metric_time__week
           , {{ render_date_trunc("t.ds", TimeGranularity.QUARTER) }} AS metric_time__quarter
           , SUM(r.revenue) AS revenue_all_time
         FROM {{ source_schema }}.mf_time_spine t
@@ -611,7 +611,7 @@ integration_test:
         , 1 AS archived_users
       FROM {{ source_schema }}.dim_users
     ) subq_1
-    ON (subq_1.metric_time__hour <= subq_3.ts) AND (subq_1.metric_time__hour > {{ render_date_sub("subq_3", "Ts", 3, TimeGranularity.HOUR) }})
+    ON (subq_1.metric_time__hour <= subq_3.ts) AND (subq_1.metric_time__hour > {{ render_date_sub("subq_3", "ts", 3, TimeGranularity.HOUR) }})
     GROUP BY subq_3.ts
 ---
 integration_test:

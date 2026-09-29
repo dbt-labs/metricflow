@@ -731,7 +731,7 @@ integration_test:
         GROUP BY
           ds
       ) d
-      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
+      ON {{ render_date_sub("c", "ds", 14, TimeGranularity.DAY) }} = d.metric_time__day
     ) b
     ON a.metric_time__day = b.metric_time__day
 ---
@@ -1836,7 +1836,7 @@ integration_test:
         GROUP BY
           ds
       ) d
-      ON {{ render_date_sub("C", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
+      ON {{ render_date_sub("c", "ds", 14, TimeGranularity.DAY) }} = d.booking__ds__day
     ) b
     ON a.booking__ds__day = b.booking__ds__day
 ---
@@ -2181,12 +2181,12 @@ integration_test:
     FROM {{ source_schema }}.mf_time_spine b
     LEFT JOIN (
       SELECT
-        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       WHERE is_instant
       GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
-    ) a ON b.ds = a.ds
+    ) a ON b.ds = a.ds__day
 ---
 integration_test:
   name: simple_join_to_time_spine_with_queried_filter
@@ -2203,13 +2203,13 @@ integration_test:
     FROM {{ source_schema }}.mf_time_spine b
     LEFT JOIN (
       SELECT
-        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
         , is_instant
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       WHERE is_instant
       GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}, is_instant
-    ) a ON b.ds = a.ds
+    ) a ON b.ds = a.ds__day
     WHERE is_instant
 ---
 integration_test:
@@ -2238,12 +2238,12 @@ integration_test:
     FROM {{ source_schema }}.mf_time_spine b
     LEFT JOIN (
       SELECT
-        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds
+        {{ render_date_trunc("ds", TimeGranularity.DAY) }} AS ds__day
         , SUM(1) AS bookings
       FROM {{ source_schema }}.fct_bookings
       WHERE {{ render_time_constraint("ds", "2020-01-03", "2020-01-03") }}
       GROUP BY {{ render_date_trunc("ds", TimeGranularity.DAY) }}
-    ) a ON b.ds = a.ds
+    ) a ON b.ds = a.ds__day
     WHERE {{ render_time_constraint("b.ds", "2020-01-03", "2020-01-03") }}
 ---
 integration_test:

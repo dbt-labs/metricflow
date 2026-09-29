@@ -13,3 +13,7 @@ trino:
 .PHONY: vertica
 vertica:
 	docker-compose -f vertica/docker-compose.yaml up
+
+.PHONY: clickhouse
+clickhouse:
+	docker-compose -f clickhouse/docker-compose.yaml up -d

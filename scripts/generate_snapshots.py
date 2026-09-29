@@ -75,6 +75,7 @@ ENGINE_NAME_TO_HATCH_ENVIRONMENT_NAME: Final[dict[str, str]] = {
     "postgres": "postgres-env",
     "trino": "trino-env",
     "vertica": "vertica-env",
+    "clickhouse": "clickhouse-env",
 }
 
 ENGINES_WITH_PERSISTENT_SOURCE_SCHEMAS: Final[frozenset[str]] = frozenset(

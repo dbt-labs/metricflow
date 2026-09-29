@@ -251,7 +251,7 @@ integration_test:
       SELECT
         a.bookings_monthly
         , b.bookings
-        , COALESCE(a.ds, b.ds) AS ds
+        , COALESCE(a.ds, b.ds__month) AS ds
       FROM (
         SELECT
           SUM(bookings_monthly) AS bookings_monthly
@@ -264,13 +264,13 @@ integration_test:
       FULL OUTER JOIN (
         SELECT
           SUM(booking) AS bookings
-          , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds
+          , {{ render_date_trunc("ds", TimeGranularity.MONTH) }} AS ds__month
         FROM {{ source_schema }}.fct_bookings_extended
         WHERE
           {{ render_time_constraint("ds", "2020-01-01", "2020-02-29") }}
         GROUP BY {{ render_date_trunc("ds", TimeGranularity.MONTH) }}
       ) b
-      ON a.ds = b.ds
+      ON a.ds = b.ds__month
       ) c
     GROUP BY
       ds
@@ -573,7 +573,7 @@ integration_test:
           ts.alien_day AS metric_time__alien_day
           , SUM(1) AS visits
         FROM {{ source_schema }}.fct_visits v
-        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("V.ds", TimeGranularity.DAY) }} = ts.ds
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("v.ds", TimeGranularity.DAY) }} = ts.ds
         GROUP BY ts.alien_day
       ) subq_5
       FULL OUTER JOIN (
@@ -649,7 +649,7 @@ integration_test:
           ts.alien_day AS metric_time__alien_day
           , SUM(1) AS visits
         FROM {{ source_schema }}.fct_visits v
-        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("V.ds", TimeGranularity.DAY) }} = ts.ds
+        LEFT OUTER JOIN {{ source_schema }}.mf_time_spine ts ON {{ render_date_trunc("v.ds", TimeGranularity.DAY) }} = ts.ds
         GROUP BY ts.alien_day
       ) subq_5
       FULL OUTER JOIN (
