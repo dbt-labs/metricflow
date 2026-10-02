@@ -1,0 +1,6 @@
+kind: Fixes
+body: Require --metrics for metric-scoped dimension and entity list commands
+time: 2026-08-05T20:06:03.842688283+08:00
+custom:
+    Author: fanruan-tuco
+    Issue: "2109"

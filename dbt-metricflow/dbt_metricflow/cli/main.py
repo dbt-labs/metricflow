@@ -346,14 +346,14 @@ def metrics(cfg: CLIConfiguration, show_all_dimensions: bool = False, search: Op
 @click.option(
     "--metrics",
     type=click_custom.SequenceParamType(min_length=1),
-    default="",
+    required=True,
     help="List dimensions by given metrics (intersection). Ex. --metrics bookings,messages",
 )
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
-    """List all unique dimensions."""
+    """List dimensions common to the specified metrics."""
     if not cfg.is_setup:
         cfg.setup()
     spinner = Halo(
@@ -375,14 +375,14 @@ def dimensions(cfg: CLIConfiguration, metrics: List[str]) -> None:
 @click.option(
     "--metrics",
     type=click_custom.SequenceParamType(min_length=1),
-    default="",
+    required=True,
     help="List entities by given metrics (intersection). Ex. --metrics bookings,messages",
 )
 @pass_config
 @exception_handler
 @log_call(module_name=__name__, telemetry_reporter=_telemetry_reporter)
 def entities(cfg: CLIConfiguration, metrics: List[str]) -> None:
-    """List all unique entities."""
+    """List entities common to the specified metrics."""
     if not cfg.is_setup:
         cfg.setup()
     spinner = Halo(
