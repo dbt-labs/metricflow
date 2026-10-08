@@ -1103,6 +1103,70 @@ def test_derived_metric() -> None:  # noqa: D103
     check_error_in_issues(error_substrings=expected_substrings, issues=build_issues)
 
 
+def test_input_metrics_exist_for_ratio_and_cumulative_metrics() -> None:
+    """Ratio and cumulative metrics referencing an undefined input metric are flagged during validation.
+
+    Previously `_validate_input_metrics_exist` only covered derived metrics, so these references could slip
+    through validation and fail later (with an opaque error) during semantic-graph construction.
+    """
+    measure_name = "foo"
+    model_validator = SemanticManifestValidator[PydanticSemanticManifest]([DerivedMetricRule()])
+    validation_results = model_validator.validate_semantic_manifest(
+        PydanticSemanticManifest(
+            semantic_models=[
+                semantic_model_with_guaranteed_meta(
+                    name="sum_measure",
+                    measures=[
+                        PydanticMeasure(name=measure_name, agg=AggregationType.SUM, agg_time_dimension="ds"),
+                    ],
+                    dimensions=[
+                        PydanticDimension(
+                            name="ds",
+                            type=DimensionType.TIME,
+                            type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
+                        ),
+                    ],
+                ),
+            ],
+            metrics=[
+                metric_with_guaranteed_meta(
+                    name="existing_metric",
+                    type=MetricType.SIMPLE,
+                    type_params=PydanticMetricTypeParams(measure=PydanticMetricInputMeasure(name=measure_name)),
+                ),
+                metric_with_guaranteed_meta(
+                    name="ratio_with_missing_denominator",
+                    type=MetricType.RATIO,
+                    type_params=PydanticMetricTypeParams(
+                        numerator=PydanticMetricInput(name="existing_metric"),
+                        denominator=PydanticMetricInput(name="missing_denominator"),
+                    ),
+                ),
+                metric_with_guaranteed_meta(
+                    name="cumulative_with_missing_input",
+                    type=MetricType.CUMULATIVE,
+                    type_params=PydanticMetricTypeParams(
+                        cumulative_type_params=PydanticCumulativeTypeParams(
+                            metric=PydanticMetricInput(name="missing_cumulative_input"),
+                            period_agg=PeriodAggregation.FIRST,
+                        ),
+                    ),
+                ),
+            ],
+            project_configuration=EXAMPLE_PROJECT_CONFIGURATION,
+        )
+    )
+    build_issues = validation_results.all_issues
+    assert len(build_issues) == 2
+    check_error_in_issues(
+        error_substrings=[
+            "input metric: 'missing_denominator' does not exist as a configured metric",
+            "input metric: 'missing_cumulative_input' does not exist as a configured metric",
+        ],
+        issues=build_issues,
+    )
+
+
 def test_cumulative_metrics() -> None:  # noqa: D103
     measure_name = "foo"
     model_validator = SemanticManifestValidator[PydanticSemanticManifest]([CumulativeMetricRule()])
