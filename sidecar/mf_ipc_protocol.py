@@ -107,6 +107,33 @@ class ExplainParams(_FrozenModel):
     sql_engine: str = "DUCKDB"
 
 
+class ValidateParams(_FrozenModel):
+    """Params for the `validate` method.
+
+    Unlike ExplainParams there is no sql_engine: validation checks the
+    manifest itself and never renders SQL, so no dialect is involved.
+    """
+
+    manifest_path: str
+
+
+class ValidateIssue(_FrozenModel):
+    """One validation finding, flattened from MetricFlow's ValidationIssue.
+
+    `level` is the wire name of the issue's severity. `context` is the issue's
+    own context model dumped to a JSON-compatible dict (it varies by the kind
+    of object the issue is about, e.g. metric vs. semantic model element), or
+    None when the rule attached no context. `error_date` is only set for
+    `future_error` issues: the date from which they become errors.
+    """
+
+    level: Literal["error", "future_error", "warning"]
+    message: str
+    context: dict | None = None
+    extra_detail: str | None = None
+    error_date: str | None = None
+
+
 class ErrorDetail(_FrozenModel):
     """The `error` payload of an ErrorResponse."""
 
@@ -136,3 +163,18 @@ class ExplainResponse(_FrozenModel):
     id: RequestId
     ok: Literal[True] = True
     sql: str
+
+
+class ValidateResponse(_FrozenModel):
+    """Successful response for the `validate` method.
+
+    `ok` means "validation ran", not "the manifest is valid": a manifest with
+    errors still yields ok:true so that `issues` can carry every finding.
+    `valid` is False iff any issue has level `error`; warnings and future
+    errors do not make a manifest invalid.
+    """
+
+    id: RequestId
+    ok: Literal[True] = True
+    valid: bool
+    issues: tuple[ValidateIssue, ...]
