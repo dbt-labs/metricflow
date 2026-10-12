@@ -15,7 +15,7 @@ The sidecar compiles metric queries to SQL without executing them (it wraps
 sidecar/
   mf_entry.py            IPC server (the file Nuitka compiles)
   mf_ipc_protocol.py     pydantic models for every message shape below
-  validate_mf_entry.py   build check: compares Python vs binary SQL output (not the `validate` method)
+  validate_mf_entry.py   build check: compares Python vs binary `explain` and `validate` output
   tests/
     test_mf_entry.py         subprocess integration tests (mf-ipc v1)
     test_mf_ipc_protocol.py  direct unit tests for the pydantic models
@@ -47,9 +47,10 @@ hatch run nuitka-build:build-and-validate
 
 Output lands in `sidecar/mf_entry.dist/`. The binary is named `mf_entry.bin`
 on macOS/Linux and `mf_entry.exe` on Windows. The validation step sends the
-same `explain` request to both the Python interpreter and the compiled binary
-and diffs the `sql` field — a mismatch means the Nuitka build is diverging
-from the interpreter.
+same requests to both the Python interpreter and the compiled binary and diffs
+the responses: the `sql` from an `explain`, and the full `validate` response for
+both a valid manifest and a deliberately broken one. A mismatch means the Nuitka
+build is diverging from the interpreter.
 
 The two steps can also be run separately:
 
@@ -160,8 +161,9 @@ are chosen for parity with the Nuitka PoC that was manually validated against
 epic's other tickets): code signing and notarization for the macOS and
 Windows binaries, a musl/Alpine Linux build, and full snapshot-suite
 validation across every SQL dialect and metric type. The `validate`
-step above only diffs one fixture (`sg_00_minimal_manifest`) against
-`DUCKDB` — it's a build-sanity smoke check, not a correctness gate.
+step above only diffs one fixture (`sg_00_minimal_manifest`, plus a broken copy
+of it for `validate`) and compiles `explain` against `DUCKDB` — it's a
+build-sanity smoke check, not a correctness gate.
 
 ## mf-ipc v1 protocol
 
