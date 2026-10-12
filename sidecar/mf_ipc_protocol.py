@@ -40,6 +40,7 @@ class Method(str, Enum):
     EXPLAIN = "explain"
     PING = "ping"
     SHUTDOWN = "shutdown"
+    VALIDATE = "validate"
 
 
 class _FrozenModel(BaseModel):

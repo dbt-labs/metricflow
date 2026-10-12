@@ -5,8 +5,9 @@ The sidecar is MetricFlow compiled into a standalone native binary by
 subprocess and communicates with it over NDJSON on stdin/stdout using the
 **mf-ipc v1** protocol.
 
-The sidecar's only job is to compile metric queries to SQL without executing
-them. It wraps `MetricFlowEngine.explain()`.
+The sidecar compiles metric queries to SQL without executing them (it wraps
+`MetricFlowEngine.explain()`) and validates semantic manifests (it wraps
+`SemanticManifestValidator`).
 
 ## Directory layout
 
@@ -14,7 +15,7 @@ them. It wraps `MetricFlowEngine.explain()`.
 sidecar/
   mf_entry.py            IPC server (the file Nuitka compiles)
   mf_ipc_protocol.py     pydantic models for every message shape below
-  validate_mf_entry.py   validation helper: compares Python vs binary SQL output
+  validate_mf_entry.py   build check: compares Python vs binary SQL output (not the `validate` method)
   tests/
     test_mf_entry.py         subprocess integration tests (mf-ipc v1)
     test_mf_ipc_protocol.py  direct unit tests for the pydantic models
@@ -236,6 +237,68 @@ Response:
 ```json
 {"id": "1", "ok": true, "sql": "SELECT ..."}
 ```
+
+#### `validate`
+
+Runs MetricFlow's semantic manifest validation rules and reports every issue
+found. Unlike `explain`, it also validates a `manifest.json` (`explain` loads
+one without running the validator).
+
+```json
+{
+  "id": "2",
+  "method": "validate",
+  "protocol_version": 1,
+  "params": {"manifest_path": "/path/to/manifest.json"}
+}
+```
+
+- `manifest_path` — same forms as `explain`: a `manifest.json` file or a YAML
+  semantic manifest directory
+- No `sql_engine`: validation never renders SQL
+- Not cached: each call reloads the manifest, so it always sees the file as
+  it is now
+
+Response:
+
+```json
+{
+  "id": "2",
+  "ok": true,
+  "valid": false,
+  "issues": [
+    {
+      "level": "error",
+      "message": "...",
+      "context": {"...": "..."},
+      "extra_detail": null,
+      "error_date": null
+    }
+  ]
+}
+```
+
+`ok` means validation ran, **not** that the manifest is valid. `valid` is
+`false` exactly when some issue has level `error`; `warning` and `future_error`
+issues are reported but leave `valid` true. A broken manifest therefore
+responds `ok: true, valid: false` with all of its issues, so the caller gets
+every finding at once.
+
+- `level` — `error`, `future_error` or `warning`
+- `context` — where the issue is (file, line, and the metric / semantic model /
+  element it concerns), or `null`. Its keys depend on the kind of object the
+  issue is about, so don't treat it as a fixed schema
+- `error_date` — only for `future_error`: the ISO date from which it becomes an
+  error
+
+For a YAML directory, issues found while parsing the files (e.g. an
+unrecognised key) are reported the same way. If parsing itself produces
+errors, the validation rules are skipped, because they would only add noise
+about the elements that failed to parse.
+
+`ok: false` (see [Error responses](#error-responses)) is reserved for requests
+that could not be carried out at all, such as a missing file or a manifest
+that cannot be loaded.
 
 #### `ping`
 
