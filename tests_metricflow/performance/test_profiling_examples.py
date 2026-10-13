@@ -91,9 +91,7 @@ def mf_explain_saved_query(
                 logger.exception("Ignoring exception for the test")
 
     if performance_tracker is not None:
-        logger.info(
-            LazyFormat(lambda: "Profiled explain.\n" + mf_indent(performance_tracker.last_session_report.text_format()))
-        )
+        logger.info(LazyFormat("Profiled explain.", report=performance_tracker.last_session_report.text_format()))
 
     return explain_result
 
