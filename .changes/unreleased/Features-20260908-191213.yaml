@@ -1,0 +1,8 @@
+kind: Features
+body: Add a `validate_semantic_manifest` command to the mf_entry IPC sidecar, running
+  the manifest-only validation suite (no data warehouse connection) and returning
+  structured errors, future_errors, and warnings instead of raising
+time: 2026-09-08T19:12:13.000000-00:00
+custom:
+  Author: QMalcolm
+  Issue: "2133"
