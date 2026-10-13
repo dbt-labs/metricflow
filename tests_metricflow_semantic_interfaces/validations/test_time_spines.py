@@ -254,6 +254,52 @@ def test_dimension_granularity_smaller_than_time_spine() -> None:  # noqa: D103
     )
 
 
+def test_no_warning_for_non_agg_time_dimension_finer_than_time_spine() -> None:
+    """A finer-grained time dimension that is never an agg_time_dimension should not trigger the warning.
+
+    Regression test for https://github.com/dbt-labs/metricflow/issues/2115. Only agg_time_dimensions can trigger a
+    time-spine join, so a plain time dimension used only for filtering (here `last_modified_at` at SECOND grain)
+    should not be compared against the time spine granularity.
+    """
+    validator = SemanticManifestValidator[PydanticSemanticManifest]([TimeSpineRule()])
+    semantic_manifest = PydanticSemanticManifest(
+        semantic_models=[
+            semantic_model_with_guaranteed_meta(
+                name="sum_measure",
+                measures=[
+                    PydanticMeasure(name="foo", agg=AggregationType.SUM, agg_time_dimension="ds", create_metric=True)
+                ],
+                dimensions=[
+                    PydanticDimension(
+                        name="ds",
+                        type=DimensionType.TIME,
+                        type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
+                    ),
+                    PydanticDimension(
+                        name="last_modified_at",
+                        type=DimensionType.TIME,
+                        type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.SECOND),
+                    ),
+                ],
+                entities=[PydanticEntity(name="entity", type=EntityType.PRIMARY)],
+            ),
+        ],
+        metrics=[],
+        project_configuration=PydanticProjectConfiguration(
+            time_spine_table_configurations=[],
+            time_spines=[
+                PydanticTimeSpine(
+                    node_relation=PydanticNodeRelation(alias="time_spine", schema_name="my_fav_schema"),
+                    primary_column=PydanticTimeSpinePrimaryColumn(name="ds", time_granularity=TimeGranularity.DAY),
+                ),
+            ],
+        ),
+    )
+    issues = validator.validate_semantic_manifest(semantic_manifest)
+    assert not issues.has_blocking_issues
+    assert len(issues.warnings) == 0
+
+
 def test_time_spines_with_invalid_names() -> None:  # noqa: D103
     semantic_manifest = PydanticSemanticManifest(
         semantic_models=[

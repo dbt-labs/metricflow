@@ -1,0 +1,7 @@
+kind: Fixes
+body: Stop warning about a coarse time spine for time dimensions that are never used
+  as an `agg_time_dimension`.
+time: 2026-09-08T12:00:00.000000+00:00
+custom:
+    Author: beratli
+    Issue: "2115"
