@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Mapping, Sequence, Tuple
+from typing import List, Mapping, Optional, Sequence, Tuple
 
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
@@ -120,7 +121,10 @@ class SourceNodeBuilder:
         )
 
     def build_source_node_inputs_for_group_by_metric(
-        self, group_by_metric_spec: GroupByMetricSpec
+        self,
+        group_by_metric_spec: GroupByMetricSpec,
+        inherited_where_filter_templates: Sequence[str] = (),
+        inherited_time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> MetricFlowQuerySpec:
         """Build source node inputs used to satisfy requested group by metrics.
 
@@ -130,4 +134,8 @@ class SourceNodeBuilder:
         This is just a wrapper around the query parser method, stored here to limit the scope of the DataFlowPlanBuilder's
         dependency on the query parser to only source nodes.
         """
-        return self._query_parser.build_query_spec_for_group_by_metric_source_node(group_by_metric_spec)
+        return self._query_parser.build_query_spec_for_group_by_metric_source_node(
+            group_by_metric_spec,
+            inherited_where_filter_templates=inherited_where_filter_templates,
+            inherited_time_range_constraint=inherited_time_range_constraint,
+        )

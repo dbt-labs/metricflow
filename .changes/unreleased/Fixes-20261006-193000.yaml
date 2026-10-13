@@ -1,0 +1,6 @@
+kind: Fixes
+body: Query time windows and where filters now apply inside a Metric() used in a filter.
+time: 2026-10-06T19:30:00.000000+00:00
+custom:
+    Author: roarking
+    Issue: "1659 1946"

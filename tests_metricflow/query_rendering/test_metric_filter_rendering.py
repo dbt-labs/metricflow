@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.dag.mf_dag import DagId
+from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.query.query_parser import MetricFlowQueryParser
+from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
 from metricflow.dataflow.builder.dataflow_plan_builder import DataflowPlanBuilder
 from metricflow.plan_conversion.to_sql_plan.dataflow_to_sql import DataflowToSqlPlanConverter
 from metricflow.protocols.sql_client import SqlClient
+from metricflow.sql.optimizer.optimization_levels import SqlOptimizationLevel
 from metricflow_semantic_interfaces.implementations.filters.where_filter import PydanticWhereFilter
 from tests_metricflow.query_rendering.compare_rendered_query import render_and_check
 
@@ -384,3 +390,108 @@ def test_inner_query_multi_hop(
         dataflow_plan_builder=multihop_dataflow_plan_builder,
         query_spec=query_spec,
     )
+
+
+def _render_query_sql(
+    dataflow_plan_builder: DataflowPlanBuilder,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    sql_client: SqlClient,
+    query_spec: MetricFlowQuerySpec,
+) -> str:
+    plan = dataflow_plan_builder.build_plan(query_spec)
+    conversion_result = dataflow_to_sql_converter.convert_to_sql_plan(
+        sql_engine_type=sql_client.sql_engine_type,
+        dataflow_plan_node=plan.sink_node,
+        optimization_level=SqlOptimizationLevel.O0,
+        sql_query_plan_id=DagId.from_str("plan0"),
+    )
+    return sql_client.sql_plan_renderer.render_sql_plan(conversion_result.sql_plan).sql
+
+
+def _inner_bookings_subquery_sql(rendered_sql: str) -> str:
+    """SQL for the Metric('bookings') subquery, before the outer comparison against that metric."""
+    inner_start = rendered_sql.find("LEFT OUTER JOIN (")
+    outer_filter = rendered_sql.find("listing__bookings > 2")
+    assert inner_start != -1 and outer_filter != -1 and inner_start < outer_filter
+    return rendered_sql[inner_start:outer_filter]
+
+
+def _assert_inner_bookings_subquery_has_constraints(rendered_sql: str) -> None:
+    inner_sql = _inner_bookings_subquery_sql(rendered_sql)
+    assert "Read Elements From Semantic Model 'bookings_source'" in inner_sql
+    assert "listings_latest" not in inner_sql
+    assert "WHERE listing = '1'" in inner_sql
+    assert "metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'" in inner_sql
+
+
+def test_metric_filter_inherits_outer_time_and_entity_filters(
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """A metric-level Metric() subquery must apply the query time window and entity where.
+
+    active_listings filters with Metric('bookings', group_by=['listing']). The bookings subquery has to
+    carry the outer listing predicate and time window, not only the outer query.
+    """
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("active_listings",),
+        where_constraint_strs=["{{ Entity('listing') }} = '1'"],
+        time_constraint_start=datetime.datetime(2020, 1, 1),
+        time_constraint_end=datetime.datetime(2020, 1, 2),
+    ).query_spec
+
+    rendered_sql = _render_query_sql(
+        dataflow_plan_builder=dataflow_plan_builder,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        query_spec=query_spec,
+    )
+    _assert_inner_bookings_subquery_has_constraints(rendered_sql)
+
+
+def test_query_where_metric_filter_inherits_outer_time_and_entity_filters(
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """Metric() in a query where also inherits the rest of the query filters and the time window."""
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        where_constraint_strs=[
+            "{{ Metric('bookings', ['listing']) }} > 2",
+            "{{ Entity('listing') }} = '1'",
+        ],
+        time_constraint_start=datetime.datetime(2020, 1, 1),
+        time_constraint_end=datetime.datetime(2020, 1, 2),
+    ).query_spec
+
+    rendered_sql = _render_query_sql(
+        dataflow_plan_builder=dataflow_plan_builder,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        query_spec=query_spec,
+    )
+    _assert_inner_bookings_subquery_has_constraints(rendered_sql)
+
+
+def test_metric_filter_rejects_outer_filter_inner_metric_cannot_resolve(
+    dataflow_plan_builder: DataflowPlanBuilder,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """An outer dimension the inner metric cannot resolve fails the compile instead of being dropped.
+
+    bookings can filter on booking__is_instant. listings, used as Metric() in that where, cannot.
+    """
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("bookings",),
+        where_constraint_strs=[
+            "{{ Metric('listings', ['listing']) }} > 0",
+            "{{ Dimension('booking__is_instant') }}",
+        ],
+    ).query_spec
+
+    with pytest.raises(InvalidQueryException):
+        dataflow_plan_builder.build_plan(query_spec)

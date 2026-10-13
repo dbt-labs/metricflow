@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import re
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Tuple, Union
 
@@ -68,6 +69,110 @@ from metricflow_semantic_interfaces.references import SemanticModelReference
 from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 logger = logging.getLogger(__name__)
+
+_AND_KEYWORD_RE = re.compile(r"AND", re.IGNORECASE)
+
+
+def _split_top_level_and(where_sql_template: str) -> List[str]:
+    """Split a where template on top-level AND, leaving AND inside jinja, quotes, or parens intact."""
+    parts: List[str] = []
+    buf: List[str] = []
+    paren_depth = 0
+    jinja_depth = 0
+    in_single = False
+    in_double = False
+    i = 0
+    while i < len(where_sql_template):
+        if in_single:
+            buf.append(where_sql_template[i])
+            if where_sql_template[i] == "'" and (i == 0 or where_sql_template[i - 1] != "\\"):
+                in_single = False
+            i += 1
+            continue
+        if in_double:
+            buf.append(where_sql_template[i])
+            if where_sql_template[i] == '"' and (i == 0 or where_sql_template[i - 1] != "\\"):
+                in_double = False
+            i += 1
+            continue
+        if where_sql_template.startswith("{{", i):
+            jinja_depth += 1
+            buf.append("{{")
+            i += 2
+            continue
+        if where_sql_template.startswith("}}", i) and jinja_depth > 0:
+            jinja_depth -= 1
+            buf.append("}}")
+            i += 2
+            continue
+        char = where_sql_template[i]
+        if jinja_depth == 0 and char == "(":
+            paren_depth += 1
+        elif jinja_depth == 0 and char == ")" and paren_depth > 0:
+            paren_depth -= 1
+        elif jinja_depth == 0 and char == "'":
+            in_single = True
+        elif jinja_depth == 0 and char == '"':
+            in_double = True
+
+        if paren_depth == 0 and jinja_depth == 0:
+            match = _AND_KEYWORD_RE.match(where_sql_template, i)
+            if match is not None:
+                before_ok = i == 0 or not (where_sql_template[i - 1].isalnum() or where_sql_template[i - 1] == "_")
+                after_index = match.end()
+                after_ok = after_index >= len(where_sql_template) or not (
+                    where_sql_template[after_index].isalnum() or where_sql_template[after_index] == "_"
+                )
+                if before_ok and after_ok:
+                    part = "".join(buf).strip()
+                    if part:
+                        parts.append(part)
+                    buf = []
+                    i = after_index
+                    continue
+        buf.append(char)
+        i += 1
+
+    tail = "".join(buf).strip()
+    if tail:
+        parts.append(tail)
+    return parts
+
+
+def _where_filter_templates_inherited_by_group_by_metric(
+    where_sql_templates: Sequence[str],
+    custom_granularity_names: Sequence[str],
+) -> Tuple[str, ...]:
+    """Where templates from the outer query that should constrain a Metric() subquery.
+
+    Metric() predicates stay on the outer query. They are the comparison against the subquery result, not a filter
+    on the rows that subquery reads. Dimension, entity, and time predicates are re-resolved against the inner
+    metric. A predicate the inner metric cannot resolve fails when that inner query is parsed.
+    """
+    inherited: List[str] = []
+    for where_sql_template in where_sql_templates:
+        for conjunct in _split_top_level_and(where_sql_template):
+            call_parameter_sets = JinjaObjectParser.parse_call_parameter_sets(
+                where_sql_template=conjunct,
+                custom_granularity_names=custom_granularity_names,
+                query_item_location=QueryItemLocation.NON_ORDER_BY,
+            )
+            has_metric_call = len(call_parameter_sets.metric_call_parameter_sets) > 0
+            has_other_call = (
+                len(call_parameter_sets.dimension_call_parameter_sets) > 0
+                or len(call_parameter_sets.time_dimension_call_parameter_sets) > 0
+                or len(call_parameter_sets.entity_call_parameter_sets) > 0
+            )
+            if has_metric_call and has_other_call:
+                raise InvalidQueryException(
+                    "A where filter passed to a metric in a filter mixes Metric() with other predicates in one "
+                    "expression, so those predicates cannot be applied inside the metric subquery. Split them into "
+                    f"separate filters. Filter: {conjunct}"
+                )
+            if has_metric_call:
+                continue
+            inherited.append(conjunct)
+    return tuple(inherited)
 
 
 class MetricFlowQueryParser:
@@ -605,12 +710,32 @@ class MetricFlowQueryParser:
         )
 
     def build_query_spec_for_group_by_metric_source_node(
-        self, group_by_metric_spec: GroupByMetricSpec
+        self,
+        group_by_metric_spec: GroupByMetricSpec,
+        inherited_where_filter_templates: Sequence[str] = (),
+        inherited_time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> MetricFlowQuerySpec:
-        """Query spec that can be used to build a source node for this spec in the DataflowPlanBuilder."""
+        """Query spec for the subquery that satisfies a Metric() in a filter.
+
+        Copies the outer query's time window and the where filters the inner metric can resolve (entity and dimension
+        predicates, including an org filter) onto that subquery. A filter the inner metric cannot resolve fails here
+        instead of being dropped. Metric() comparisons are not copied. They stay on the outer query.
+        """
+        where_constraint_strs = _where_filter_templates_inherited_by_group_by_metric(
+            inherited_where_filter_templates,
+            custom_granularity_names=self._manifest_lookup.semantic_model_lookup.custom_granularity_names,
+        )
+        time_constraint_start = None
+        time_constraint_end = None
+        if inherited_time_range_constraint is not None:
+            time_constraint_start = inherited_time_range_constraint.start_time
+            time_constraint_end = inherited_time_range_constraint.end_time
         return self.parse_and_validate_query(
             metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
             group_by=(DimensionOrEntityParameter(group_by_metric_spec.metric_subquery_entity_spec.dunder_name),),
+            where_constraint_strs=where_constraint_strs or None,
+            time_constraint_start=time_constraint_start,
+            time_constraint_end=time_constraint_end,
         ).query_spec
 
 
