@@ -674,3 +674,103 @@ def test_semantic_model_element_config_merging() -> None:
     assert len(semantic_model.measures) == 1
     assert semantic_model.measures[0].config is not None
     assert semantic_model.measures[0].config.meta["sm_metadata"] == "ijkl"
+
+
+def test_semantic_model_hierarchies_parsing() -> None:
+    """Test parsing hierarchy levels written as strings and objects."""
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: hierarchies_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
+          primary_entity: employee
+          dimensions:
+            - name: country
+              type: categorical
+            - name: sales_region
+              type: categorical
+            - name: city
+              type: categorical
+            - name: employee
+              type: categorical
+            - name: manager
+              type: categorical
+          hierarchies:
+            - name: sales_geography
+              label: Sales geography
+              levels: [country, sales_region, city]
+            - name: reporting_line
+              levels:
+                - dimension: employee
+                  parent: manager
+        """
+    )
+    file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+    assert not build_result.issues.has_blocking_issues
+    semantic_model = build_result.semantic_manifest.semantic_models[0]
+    assert [hierarchy.name for hierarchy in semantic_model.hierarchies] == ["sales_geography", "reporting_line"]
+
+    sales_geography, reporting_line = semantic_model.hierarchies
+    assert sales_geography.label == "Sales geography"
+    assert reporting_line.label is None
+    assert [(level.dimension, level.parent) for level in sales_geography.levels] == [
+        ("country", None),
+        ("sales_region", None),
+        ("city", None),
+    ]
+    assert [(level.dimension, level.parent) for level in reporting_line.levels] == [("employee", "manager")]
+
+
+def test_semantic_model_hierarchy_without_levels_parsing() -> None:
+    """Test that a hierarchy without levels is rejected."""
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: hierarchies_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
+          dimensions:
+            - name: employee
+              type: categorical
+          hierarchies:
+            - name: reporting_line
+              levels: []
+        """
+    )
+    file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+    assert build_result.issues.has_blocking_issues
+
+
+def test_semantic_model_hierarchy_level_with_unknown_key_parsing() -> None:
+    """Test that a level with an unknown key is rejected."""
+    yaml_contents = textwrap.dedent(
+        """\
+        semantic_model:
+          name: hierarchies_test
+          node_relation:
+            alias: source_table
+            schema_name: some_schema
+          dimensions:
+            - name: employee
+              type: categorical
+          hierarchies:
+            - name: reporting_line
+              levels:
+                - dimension: employee
+                  parent_of: manager
+        """
+    )
+    file = YamlConfigFile(filepath="test_dir/inline_for_test", contents=yaml_contents)
+
+    build_result = parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+    assert build_result.issues.has_blocking_issues

@@ -15,6 +15,10 @@ from metricflow.converters.converter_issues import ConverterIssueType
 from metricflow.converters.filter_utils import _render_filter_template
 from metricflow.converters.models import OSIDataType, OSIDialect, OSIDocument
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
+from metricflow_semantic_interfaces.implementations.hierarchy import (
+    PydanticDimensionHierarchy,
+    PydanticDimensionHierarchyLevel,
+)
 from metricflow_semantic_interfaces.implementations.metric import (
     PydanticConversionTypeParams,
     PydanticCumulativeTypeParams,
@@ -971,6 +975,27 @@ class TestConverterIssues:  # noqa: D101
         assert len(result.issues) == 1
         assert result.issues[0].issue_type == ConverterIssueType.NATURAL_ENTITY_DROPPED
         assert result.issues[0].element_name == "user"
+
+    def test_hierarchy_emits_issue(self) -> None:  # noqa: D102
+        sm = semantic_model_with_guaranteed_meta(
+            name="stores",
+            entities=[_entity("store", expr="store_id")],
+            dimensions=[_dimension("country"), _dimension("city")],
+        )
+        sm.hierarchies = [
+            PydanticDimensionHierarchy(
+                name="geography",
+                levels=[
+                    PydanticDimensionHierarchyLevel(dimension="country"),
+                    PydanticDimensionHierarchyLevel(dimension="city"),
+                ],
+            )
+        ]
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm]))
+
+        assert len(result.issues) == 1
+        assert result.issues[0].issue_type == ConverterIssueType.HIERARCHY_DROPPED
+        assert result.issues[0].element_name == "geography"
 
     def test_cumulative_metric_emits_issue(self) -> None:  # noqa: D102
         sm = semantic_model_with_guaranteed_meta(

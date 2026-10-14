@@ -5,6 +5,7 @@ from typing import Optional, Protocol, Sequence, TypeVar
 
 from metricflow_semantic_interfaces.protocols.dimension import Dimension
 from metricflow_semantic_interfaces.protocols.entity import Entity
+from metricflow_semantic_interfaces.protocols.hierarchy import DimensionHierarchy
 from metricflow_semantic_interfaces.protocols.measure import Measure
 from metricflow_semantic_interfaces.protocols.meta import SemanticLayerElementConfig
 from metricflow_semantic_interfaces.protocols.metadata import Metadata
@@ -77,6 +78,11 @@ class SemanticModel(Protocol):
     @property
     @abstractmethod
     def dimensions(self) -> Sequence[Dimension]:  # noqa: D102
+        pass
+
+    @property
+    @abstractmethod
+    def hierarchies(self) -> Sequence[DimensionHierarchy]:  # noqa: D102
         pass
 
     @property

@@ -14,6 +14,7 @@ from metricflow_semantic_interfaces.implementations.element_config import (
 from metricflow_semantic_interfaces.implementations.elements.dimension import PydanticDimension
 from metricflow_semantic_interfaces.implementations.elements.entity import PydanticEntity
 from metricflow_semantic_interfaces.implementations.elements.measure import PydanticMeasure
+from metricflow_semantic_interfaces.implementations.hierarchy import PydanticDimensionHierarchy
 from metricflow_semantic_interfaces.implementations.metadata import PydanticMetadata
 from metricflow_semantic_interfaces.implementations.node_relation import PydanticNodeRelation
 from metricflow_semantic_interfaces.protocols import (
@@ -58,6 +59,7 @@ class PydanticSemanticModel(HashableBaseModel, ModelWithMetadataParsing, Protoco
     entities: Sequence[PydanticEntity] = Field(default_factory=list)
     measures: Sequence[PydanticMeasure] = Field(default_factory=list)
     dimensions: Sequence[PydanticDimension] = Field(default_factory=list)
+    hierarchies: Sequence[PydanticDimensionHierarchy] = Field(default_factory=list)
     label: Optional[str] = None
 
     metadata: Optional[PydanticMetadata]

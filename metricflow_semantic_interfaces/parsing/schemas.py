@@ -552,6 +552,37 @@ saved_query_schema = {
     "additionalProperties": False,
 }
 
+hierarchy_level_schema = {
+    "$id": "hierarchy_level_schema",
+    "oneOf": [
+        {"type": "string"},
+        {
+            "type": "object",
+            "properties": {
+                "dimension": {"type": "string"},
+                "parent": {"type": "string"},
+            },
+            "additionalProperties": False,
+            "required": ["dimension"],
+        },
+    ],
+}
+
+hierarchy_schema = {
+    "$id": "hierarchy_schema",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "pattern": TRANSFORM_OBJECT_NAME_PATTERN,
+        },
+        "label": {"type": "string"},
+        "levels": {"type": "array", "items": {"$ref": "hierarchy_level_schema"}, "minItems": 1},
+    },
+    "additionalProperties": False,
+    "required": ["name", "levels"],
+}
+
 semantic_model_config_schema = {
     "$id": "semantic_model_config_schema",
     "type": "object",
@@ -577,6 +608,7 @@ semantic_model_schema = {
         "entities": {"type": "array", "items": {"$ref": "entity_schema"}},
         "measures": {"type": "array", "items": {"$ref": "measure_schema"}},
         "dimensions": {"type": "array", "items": {"$ref": "dimension_schema"}},
+        "hierarchies": {"type": "array", "items": {"$ref": "hierarchy_schema"}},
         "description": {"type": "string"},
         "label": {"type": "string"},
         "config": {"$ref": "semantic_model_config_schema"},
@@ -618,6 +650,8 @@ schema_store = {
     export_config_schema["$id"]: export_config_schema,
     saved_query_query_params_schema["$id"]: saved_query_query_params_schema,
     semantic_model_config_schema["$id"]: semantic_model_config_schema,
+    hierarchy_schema["$id"]: hierarchy_schema,
+    hierarchy_level_schema["$id"]: hierarchy_level_schema,
     metric_config_schema["$id"]: metric_config_schema,
     dimension_config_schema["$id"]: dimension_config_schema,
     entity_config_schema["$id"]: entity_config_schema,

@@ -73,6 +73,11 @@ class MSIToOSIConverter:
         issues: List[ConverterIssue] = []
 
         datasets = [self._convert_semantic_model(sm) for sm in manifest.semantic_models]
+        for sm in manifest.semantic_models:
+            for hierarchy in sm.hierarchies:
+                issues.append(
+                    ConverterIssue(issue_type=ConverterIssueType.HIERARCHY_DROPPED, element_name=hierarchy.name)
+                )
 
         entity_index, entity_issues = self._build_entity_index(manifest.semantic_models)
         issues.extend(entity_issues)

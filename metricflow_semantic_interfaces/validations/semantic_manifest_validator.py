@@ -12,6 +12,7 @@ from metricflow_semantic_interfaces.validations.agg_time_dimension import (
 from metricflow_semantic_interfaces.validations.dimension_const import DimensionConsistencyRule
 from metricflow_semantic_interfaces.validations.element_const import ElementConsistencyRule
 from metricflow_semantic_interfaces.validations.entities import NaturalEntityConfigurationRule
+from metricflow_semantic_interfaces.validations.hierarchies import SemanticModelHierarchiesRule
 from metricflow_semantic_interfaces.validations.labels import (
     EntityLabelsRule,
     MetricLabelsRule,
@@ -78,6 +79,7 @@ class SemanticManifestValidator(Generic[SemanticManifestT]):
         CountAggregationExprRule[SemanticManifestT](),
         SemanticModelMeasuresUniqueRule[SemanticManifestT](),
         SemanticModelValidityWindowRule[SemanticManifestT](),
+        SemanticModelHierarchiesRule[SemanticManifestT](),
         DimensionConsistencyRule[SemanticManifestT](),
         ElementConsistencyRule[SemanticManifestT](),
         NaturalEntityConfigurationRule[SemanticManifestT](),
