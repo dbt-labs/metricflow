@@ -6,7 +6,7 @@ from collections import OrderedDict, defaultdict
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from metricflow_semantics.aggregation_properties import AggregationState
-from metricflow_semantics.dag.id_prefix import StaticIdPrefix
+from metricflow_semantics.dag.id_prefix import IdPrefix, StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import MetricFlowInternalError, SemanticManifestConfigurationError
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
@@ -162,6 +162,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         column_association_resolver: ColumnAssociationResolver,
         semantic_manifest_lookup: SemanticManifestLookup,
         output_column_orderer: Optional[OutputColumnOrderer] = None,
+        table_alias_prefix: IdPrefix = StaticIdPrefix.SUB_QUERY,
         _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
     ) -> None:
         """Initializer.
@@ -170,6 +171,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             column_association_resolver: controls how columns for instances are generated and used between nested
             queries.
             semantic_manifest_lookup: Self-explanatory.
+            table_alias_prefix: The ID prefix used to generate sub-query aliases. Instances that are only used to
+            resolve the output data set of nodes (e.g. while building a dataflow plan) should use a separate prefix so
+            that the aliases generated in the rendered SQL do not depend on how many nodes were resolved beforehand.
         """
         self._column_association_resolver = column_association_resolver
         self._semantic_manifest_lookup = semantic_manifest_lookup
@@ -184,10 +188,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         )
         self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
         self._output_column_orderer = output_column_orderer
+        self._table_alias_prefix = table_alias_prefix
 
     def _next_unique_table_alias(self) -> str:
         """Return the next unique table alias to use in generating queries."""
-        return SequentialIdGenerator.create_next_id(StaticIdPrefix.SUB_QUERY).str_value
+        return SequentialIdGenerator.create_next_id(self._table_alias_prefix).str_value
 
     def _next_unique_cte_alias(self) -> str:
         """Return the next unique CTE alias to use in generating queries."""
@@ -217,6 +222,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
             output_column_orderer=self._output_column_orderer,
+            table_alias_prefix=self._table_alias_prefix,
             _node_to_output_data_set=dict(self._node_to_output_data_set),
         )
 

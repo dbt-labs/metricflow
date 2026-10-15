@@ -1,0 +1,7 @@
+kind: Fixes
+body: Keep sub-query aliases in the rendered SQL stable across repeated queries that use
+  multi-hop joins.
+time: 2026-10-15T12:00:00.000000+00:00
+custom:
+    Author: abhishekacharya200
+    Issue: "2144"

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
+from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.sequential_id import SequentialIdGenerator
 from metricflow_semantics.errors.error_classes import (
     ExecutionException,
@@ -494,9 +495,12 @@ class MetricFlowEngine(AbstractMetricFlowEngine):
         )
         source_node_set = source_node_builder.create_from_data_sets(self._source_data_sets)
 
+        # The resolver's sub-query aliases are never rendered, so use a separate prefix to keep them from shifting the
+        # aliases in the generated SQL depending on the state of the dataflow plan builder cache.
         node_output_resolver = DataflowNodeToSqlSubqueryVisitor(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
+            table_alias_prefix=StaticIdPrefix.NODE_RESOLVER_SUB_QUERY,
         )
         node_output_resolver.cache_output_data_sets(source_node_set.all_nodes)
 
