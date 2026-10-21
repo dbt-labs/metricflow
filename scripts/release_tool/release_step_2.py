@@ -8,6 +8,7 @@ from typing import ClassVar
 from packaging.version import Version
 
 from msi_pydantic_shim import BaseModel
+from scripts.release_tool.git_manager import GitManager
 from scripts.release_tool.github_client import GitHubClient
 from scripts.release_tool.package_version import PackageVersionUpdate
 from scripts.release_tool.release_helper import ReleaseHelper
@@ -88,6 +89,15 @@ class ReleaseStep2Runner:
             hatch_project_directory=self.release_helper.metricflow_repo_directory,
         )
         pr_title = self._development_version_pr_title(version=new_version)
+        # Normally step 2's PR stacks on step 1's still-open branch, and step 3 later merges
+        # step 1 first and rebases step 2 onto `main` before merging it too. But if step 1's PR
+        # is merged before step 2 runs (e.g. merged by hand, out of band), GitHub deletes the
+        # step-1 branch on merge, which makes it an invalid PR base. In that case, base step 2
+        # directly on a freshly pulled `main`, which already contains step 1's changes and is
+        # what step 3 would have rebased onto anyway.
+        step_1_pr_merged = self.github_client.is_pr_merged(self.step_1_state.pr_number)
+        base_branch = GitManager.MAIN_BRANCH if step_1_pr_merged else step_1_branch_name
+        pull_base_branch = step_1_pr_merged
         pr_result = ReleasePrRunner(
             release_branch_name=step_2_branch_name,
             pr_title=pr_title,
@@ -100,8 +110,8 @@ class ReleaseStep2Runner:
             ),
             github_client=self.github_client,
             release_helper=self.release_helper,
-            base_branch=step_1_branch_name,
-            pull_base_branch=False,
+            base_branch=base_branch,
+            pull_base_branch=pull_base_branch,
         ).run()
         return ReleaseStep2State(
             metricflow_package_version=new_version,
