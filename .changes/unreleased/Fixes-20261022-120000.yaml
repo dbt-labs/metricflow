@@ -1,0 +1,7 @@
+kind: Fixes
+body: Preserve `use_discrete_percentile` when converting an OSI `PERCENTILE_DISC` metric
+  to a semantic manifest.
+time: 2026-10-22T12:00:00.000000+00:00
+custom:
+    Author: RaphaelFakhri
+    Issue: "2148"
