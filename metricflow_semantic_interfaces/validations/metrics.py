@@ -246,6 +246,29 @@ class DerivedMetricRule(SemanticManifestValidationRule[SemanticManifestT], Gener
         return issues
 
     @staticmethod
+    def _input_metrics_to_check_for_existence(metric: Metric) -> Sequence[MetricInput]:
+        """Return the input metrics whose existence should be validated against the manifest.
+
+        Covers derived (`type_params.metrics`), ratio (`numerator` / `denominator`), and cumulative
+        (`cumulative_type_params.metric`) input metric references. Conversion metrics are validated separately
+        in `ConversionMetricRule`, so they're excluded here to avoid emitting duplicate issues.
+        """
+        type_params = metric.type_params
+        if metric.type == MetricType.DERIVED:
+            return type_params.metrics or []
+        if metric.type == MetricType.RATIO:
+            return [
+                input_metric
+                for input_metric in (type_params.numerator, type_params.denominator)
+                if input_metric is not None
+            ]
+        if metric.type == MetricType.CUMULATIVE:
+            cumulative_type_params = type_params.cumulative_type_params
+            input_metric = cumulative_type_params.metric if cumulative_type_params is not None else None
+            return [input_metric] if input_metric is not None else []
+        return []
+
+    @staticmethod
     @validate_safely(whats_being_done="checking that the input metrics exist")
     def _validate_input_metrics_exist(semantic_manifest: SemanticManifest) -> Sequence[ValidationIssue]:
         issues: List[ValidationIssue] = []
@@ -256,24 +279,23 @@ class DerivedMetricRule(SemanticManifestValidationRule[SemanticManifestT], Gener
                 file_context=FileContext.from_metadata(metadata=metric.metadata),
                 metric=MetricModelReference(metric_name=metric.name),
             )
-            if metric.type == MetricType.DERIVED:
-                if not metric.type_params.metrics:
+            if metric.type == MetricType.DERIVED and not metric.type_params.metrics:
+                issues.append(
+                    ValidationError(
+                        context=metric_context,
+                        message=f"No input metrics found for derived metric '{metric.name}'. "
+                        "Please add metrics to type_params.metrics.",
+                    )
+                )
+            for input_metric in DerivedMetricRule._input_metrics_to_check_for_existence(metric):
+                if input_metric.name not in all_metrics:
                     issues.append(
                         ValidationError(
                             context=metric_context,
-                            message=f"No input metrics found for derived metric '{metric.name}'. "
-                            "Please add metrics to type_params.metrics.",
+                            message=f"For metric: {metric.name}, input metric: '{input_metric.name}' does not "
+                            "exist as a configured metric in the model.",
                         )
                     )
-                for input_metric in metric.type_params.metrics or []:
-                    if input_metric.name not in all_metrics:
-                        issues.append(
-                            ValidationError(
-                                context=metric_context,
-                                message=f"For metric: {metric.name}, input metric: '{input_metric.name}' does not "
-                                "exist as a configured metric in the model.",
-                            )
-                        )
         return issues
 
     @staticmethod
