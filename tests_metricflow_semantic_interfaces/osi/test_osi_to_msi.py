@@ -21,6 +21,15 @@ from metricflow.converters.models import (
 )
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow.converters.osi_to_msi import OSIToMSIConverter
+from metricflow_semantic_interfaces.implementations.elements.measure import (
+    PydanticMeasureAggregationParameters,
+)
+from metricflow_semantic_interfaces.implementations.metric import (
+    PydanticMetric,
+    PydanticMetricAggregationParams,
+    PydanticMetricTypeParams,
+)
+from metricflow_semantic_interfaces.test_utils import default_meta, semantic_model_with_guaranteed_meta
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
     DataType,
@@ -28,6 +37,8 @@ from metricflow_semantic_interfaces.type_enums import (
     MetricType,
 )
 from tests_metricflow_semantic_interfaces.osi.helpers import (
+    _manifest,
+    _measure,
     _osi_dataset,
     _osi_doc,
     _osi_field,
@@ -794,6 +805,118 @@ class TestOSIToMSIRoundTrip:  # noqa: D101
         metrics = osi_doc.semantic_model[0].metrics or []
         assert len(metrics) == 1
         assert metrics[0].datatype is OSIDataType.DECIMAL
+
+    def test_count_star_round_trips_to_a_portable_sum_one(self) -> None:
+        """COUNT(orders.*) survives one round trip as the portable SUM(1), not the original invalid expr '*'.
+
+        The dataset is not recovered on this leg: MSI has already collapsed the metric to agg=SUM, expr='1'
+        by the time it reaches MSIToOSIConverter (MetricFlow's own transform runs first), and SUM(1) has
+        no qualifier to recover a dataset from. Emitting COUNT(<dataset>.*) instead, to carry the dataset
+        through, was tried and reverted: it is outside the OSI expression spec, several engines reject or
+        misinterpret it, and no sibling converter recognizes it as a row count. SUM(1) is what every engine
+        agrees on.
+
+        Converting SUM(1) forward again, with more than one dataset, now refuses rather than silently
+        picking the first dataset: SUM of a constant has no column to place it in a dataset, so it goes
+        through the same ambiguity check as COUNT(*) and is dropped with ROW_COUNT_METRIC_DROPPED instead of
+        a plausible but wrong semantic_model. The dataset is genuinely lost by this point, not recoverable; refusing is
+        the honest outcome, not a bug to fix on the next leg.
+        """
+        original = _osi_doc(
+            datasets=[
+                _osi_dataset("customers", fields=[_osi_field("customer_id")]),
+                _osi_dataset("orders", fields=[_osi_field("order_id"), _osi_field("amount")]),
+            ],
+            metrics=[
+                _osi_metric("order_count", "COUNT(orders.*)"),
+                _osi_metric("avg_order_value", "(SUM(orders.amount)) / (COUNT(orders.*))"),
+            ],
+        )
+
+        msi = OSIToMSIConverter().convert(original).output
+        osi_doc = MSIToOSIConverter().convert(msi).output
+
+        expressions = {m.name: m.expression.dialects[0].expression for m in osi_doc.semantic_model[0].metrics or []}
+        assert expressions["order_count"] == "SUM(1)"
+        assert "SUM(1)" in expressions["avg_order_value"]
+
+        # The first round trip already flattened the ratio into independent metrics (numerator,
+        # denominator, and the ratio's own expression string). Only the ones that are still row
+        # counts drop here: the denominator (SUM(1), ambiguous) and the ratio itself, which depends
+        # on it. The numerator (SUM(orders.amount), not a row count) is a valid metric on its own
+        # and survives, same as it would have before any of this.
+        again = OSIToMSIConverter().convert(osi_doc)
+        assert [m.name for m in again.output.metrics] == ["avg_order_value_numerator"]
+        assert {i.element_name for i in again.issues} == {
+            "order_count",
+            "avg_order_value",
+            "avg_order_value_denominator",
+        }
+
+    def test_discrete_percentile_survives_round_trip(self) -> None:
+        """A PERCENTILE_DISC metric keeps use_discrete_percentile through MSI -> OSI -> MSI."""
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("amount", agg=AggregationType.SUM, expr="amount")],
+        )
+        metric = PydanticMetric(
+            name="p95_amount",
+            description=None,
+            type=MetricType.SIMPLE,
+            type_params=PydanticMetricTypeParams(
+                expr="amount",
+                metric_aggregation_params=PydanticMetricAggregationParams(
+                    semantic_model="orders",
+                    agg=AggregationType.PERCENTILE,
+                    agg_params=PydanticMeasureAggregationParameters(
+                        percentile=0.95,
+                        use_discrete_percentile=True,
+                    ),
+                    agg_time_dimension=None,
+                    non_additive_dimension=None,
+                ),
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+
+        osi_doc = MSIToOSIConverter().convert(_manifest(semantic_models=[orders], metrics=[metric])).output
+
+        osi_metrics = osi_doc.semantic_model[0].metrics
+        assert osi_metrics is not None
+        osi_expr = osi_metrics[0].expression.dialects[0].expression
+        assert osi_expr == "PERCENTILE_DISC(0.95) WITHIN GROUP (ORDER BY orders.amount)"
+
+        back = OSIToMSIConverter().convert(osi_doc).output
+        m = back.metrics[0]
+
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.PERCENTILE
+        assert m.type_params.metric_aggregation_params.agg_params is not None
+        assert m.type_params.metric_aggregation_params.agg_params.use_discrete_percentile is True
+
+    def test_compound_aggregate_argument_survives_round_trip(self) -> None:
+        """OSI → MSI → OSI keeps a compound aggregate argument intact."""
+        original = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("gross"), _osi_field("tax")])],
+            metrics=[
+                _osi_metric("net_sales", "SUM(orders.gross - orders.tax)"),
+                _osi_metric("tax_or_zero", "SUM(COALESCE(orders.tax, 0))"),
+            ],
+        )
+
+        msi = OSIToMSIConverter().convert(original).output
+        osi_doc = MSIToOSIConverter().convert(msi).output
+
+        metrics = osi_doc.semantic_model[0].metrics or []
+        expressions = {m.name: m.expression.dialects[0].expression for m in metrics}
+        # msi_to_osi._qualify_col re-qualifies only bare identifiers,
+        # so the exported argument comes back unqualified.
+        assert expressions == {
+            "net_sales": "SUM(gross - tax)",
+            "tax_or_zero": "SUM(COALESCE(tax, 0))",
+        }
 
 
 def _multi_dialect_expr(*pairs: tuple[OSIDialect, str]) -> OSIExpression:

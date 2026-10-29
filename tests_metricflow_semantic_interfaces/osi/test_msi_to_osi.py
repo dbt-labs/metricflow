@@ -6,12 +6,13 @@ from typing import List, Optional
 import jinja2
 import pytest
 from _pytest.fixtures import FixtureRequest
+from metricflow_semantics.model.dbt_manifest_parser import parse_manifest_from_dbt_generated_manifest
 from metricflow_semantics.test_helpers.snapshot_helpers import (
     SnapshotConfiguration,
     assert_object_snapshot_equal,
 )
 
-from metricflow.converters.converter_issues import ConverterIssueType
+from metricflow.converters.converter_issues import ConverterIssue, ConverterIssueType
 from metricflow.converters.filter_utils import _render_filter_template
 from metricflow.converters.models import OSIDataType, OSIDialect, OSIDocument
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
@@ -74,6 +75,34 @@ def _osi_metrics(result: OSIDocument) -> list:
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
+
+def _metric_with_agg(
+    name: str,
+    agg: AggregationType,
+    expr: str,
+    semantic_model: str,
+    filter_sql: Optional[str] = None,
+) -> PydanticMetric:
+    """A SIMPLE metric that carries its aggregation in metric_aggregation_params."""
+    return PydanticMetric(
+        name=name,
+        description=None,
+        type=MetricType.SIMPLE,
+        type_params=PydanticMetricTypeParams(
+            expr=expr,
+            metric_aggregation_params=PydanticMetricAggregationParams(
+                semantic_model=semantic_model,
+                agg=agg,
+                agg_params=None,
+                agg_time_dimension=None,
+                non_additive_dimension=None,
+            ),
+        ),
+        filter=_filter(filter_sql) if filter_sql else None,
+        metadata=default_meta(),
+        config=None,
+    )
 
 
 class TestBasicConversion:  # noqa: D101
@@ -506,6 +535,48 @@ class TestRelationshipConversion:  # noqa: D101
         assert rels[0].from_dataset == "alpha"
         assert rels[0].to == "beta"
 
+    def test_foreign_foreign_pair_produces_no_relationship(self) -> None:
+        """Neither side of a FOREIGN<->FOREIGN pair is a key of the other; to_columns would be invalid (osi#301)."""
+        customers = semantic_model_with_guaranteed_meta(
+            name="customers",
+            entities=[_entity("customer", entity_type=EntityType.PRIMARY, expr="customer_id")],
+        )
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            entities=[
+                _entity("order", entity_type=EntityType.PRIMARY, expr="order_id"),
+                _entity("customer", entity_type=EntityType.FOREIGN, expr="customer_id"),
+            ],
+        )
+        reviews = semantic_model_with_guaranteed_meta(
+            name="reviews",
+            entities=[
+                _entity("review", entity_type=EntityType.PRIMARY, expr="review_id"),
+                _entity("customer", entity_type=EntityType.FOREIGN, expr="customer_id"),
+            ],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[customers, orders, reviews])).output
+
+        rels = result.semantic_model[0].relationships
+        assert rels is not None
+        pairs = {(r.from_dataset, r.to) for r in rels}
+        # orders and reviews each join to customers; orders-reviews (both FOREIGN on `customer`) is excluded.
+        assert pairs == {("orders", "customers"), ("reviews", "customers")}
+        assert len(rels) == 2
+
+    def test_foreign_foreign_pair_excluded_even_when_only_pair(self) -> None:  # noqa: D102
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            entities=[_entity("customer", entity_type=EntityType.FOREIGN, expr="customer_id")],
+        )
+        reviews = semantic_model_with_guaranteed_meta(
+            name="reviews",
+            entities=[_entity("customer", entity_type=EntityType.FOREIGN, expr="customer_id")],
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[orders, reviews])).output
+
+        assert result.semantic_model[0].relationships is None
+
 
 class TestMetricConversion:  # noqa: D101
     # --- SIMPLE ---
@@ -906,6 +977,295 @@ class TestMetricConversion:  # noqa: D101
         result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[conversion])).output
 
         assert result.semantic_model[0].metrics is None
+
+    @pytest.mark.parametrize("agg", [AggregationType.COUNT, AggregationType.SUM])
+    def test_a_row_count_always_comes_back_as_portable_sum_1(self, agg: AggregationType) -> None:
+        """A COUNT/expr=1 metric comes back as SUM(1), like a SUM/expr=1 one.
+
+        MetricFlow's own transform has already turned the count into a sum by the time this converter
+        sees it. SUM(1) matches COUNT(*) on any non-empty input; over zero rows it is NULL, not 0.
+
+        Emitting ``COUNT(<dataset>.*)`` to keep the dataset through a round trip was tried and reverted:
+        it is not in the OSI expression spec, several engines reject or misinterpret it, and the
+        sibling converters do not recognize it as a row count either. ``SUM(1)`` is what every engine
+        and converter agrees on, even though the dataset cannot be recovered on this leg of a round trip.
+        """
+        customers = semantic_model_with_guaranteed_meta(name="customers")
+        orders = semantic_model_with_guaranteed_meta(name="orders")
+        metric = _metric_with_agg("order_count", agg, "1", "orders")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[customers, orders], metrics=[metric])).output
+
+        assert _osi_metrics(result)[0].expression.dialects[0].expression == "SUM(1)"
+
+    def test_constant_metric_records_the_lost_semantic_model_on_the_cli_path(self) -> None:
+        """Routed through the real dbt loader, as the CLI does: the count is already SUM(1) by then."""
+        customers = semantic_model_with_guaranteed_meta(name="customers")
+        orders = semantic_model_with_guaranteed_meta(name="orders")
+        metric = _metric_with_agg("order_count", AggregationType.COUNT, "1", "orders")
+        manifest_json = _manifest(semantic_models=[customers, orders], metrics=[metric]).json(
+            by_alias=True, exclude_none=True
+        )
+        result = MSIToOSIConverter().convert(parse_manifest_from_dbt_generated_manifest(manifest_json))
+
+        assert _osi_metrics(result.output)[0].expression.dialects[0].expression == "SUM(1)"
+        assert result.issues == [ConverterIssue(ConverterIssueType.CONSTANT_METRIC_SEMANTIC_MODEL_LOSS, "order_count")]
+
+    def test_constant_metric_with_a_single_semantic_model_loses_nothing(self) -> None:  # noqa: D102
+        orders = semantic_model_with_guaranteed_meta(name="orders")
+        metric = _metric_with_agg("order_count", AggregationType.COUNT, "1", "orders")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[orders], metrics=[metric]))
+
+        assert result.issues == []
+
+    @pytest.mark.parametrize("agg", [AggregationType.MAX, AggregationType.AVERAGE])
+    def test_non_sum_constant_metric_is_not_flagged(self, agg: AggregationType) -> None:
+        """Only SUM of a constant is refused on the way back, so only SUM gets the loss warning."""
+        customers = semantic_model_with_guaranteed_meta(name="customers")
+        orders = semantic_model_with_guaranteed_meta(name="orders")
+        metric = _metric_with_agg("m", agg, "1", "orders")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[customers, orders], metrics=[metric]))
+
+        assert result.issues == []
+
+    def test_unparseable_expr_does_not_abort_the_conversion(self) -> None:
+        """An unterminated quote is a sqlglot TokenError, not a ParseError; it must not crash the run."""
+        customers = semantic_model_with_guaranteed_meta(name="customers")
+        orders = semantic_model_with_guaranteed_meta(name="orders")
+        metric = _metric_with_agg("m", AggregationType.SUM, "CASE WHEN status = 'paid THEN amount END", "orders")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[customers, orders], metrics=[metric]))
+
+        assert [m.name for m in _osi_metrics(result.output)] == ["m"]
+        assert result.issues == []
+
+    def test_column_metric_with_several_semantic_models_loses_nothing(self) -> None:  # noqa: D102
+        customers = semantic_model_with_guaranteed_meta(name="customers")
+        orders = semantic_model_with_guaranteed_meta(name="orders")
+        metric = _metric_with_agg("revenue", AggregationType.SUM, "amount", "orders")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[customers, orders], metrics=[metric]))
+
+        assert result.issues == []
+
+    def test_legacy_measure_based_count_also_converts(self) -> None:
+        """A SIMPLE metric over a legacy Measure(agg=count, expr=1) is a row count too.
+
+        It is not just the newer metric_aggregation_params shape. It converts correctly with no special-casing, because
+        MetricFlow's own transform normalizes both shapes to the same agg=SUM, expr='1' before this
+        converter ever sees the metric.
+        """
+        orders = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("order_count_measure", agg=AggregationType.COUNT, expr="1")],
+        )
+        metric = _simple_metric("order_count", measure_name="order_count_measure")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[orders], metrics=[metric])).output
+
+        assert _osi_metrics(result)[0].expression.dialects[0].expression == "SUM(1)"
+
+    def test_filtered_count_of_all_rows_keeps_the_filter(self) -> None:  # noqa: D102
+        orders = semantic_model_with_guaranteed_meta(name="orders")
+        metric = _metric_with_agg("paid_orders", AggregationType.COUNT, "1", "orders", filter_sql="status = 'paid'")
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[orders], metrics=[metric])).output
+
+        assert _osi_metrics(result)[0].expression.dialects[0].expression == "SUM(CASE WHEN status = 'paid' THEN 1 END)"
+
+    def test_derived_metric_does_not_re_expand_an_inlined_reference(self) -> None:
+        """A reference is substituted once, even when its name appears in already-inlined text.
+
+        `gross` inlines to `SUM(orders.net)`, which contains the name of the second
+        input metric. Substituting references one at a time would expand `net` inside
+        that text as well.
+        """
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[
+                _measure("gross", agg=AggregationType.SUM, expr="net"),
+                _measure("net", agg=AggregationType.SUM, expr="net_amount"),
+            ],
+        )
+        gross_m = _simple_metric("gross", "gross")
+        net_m = _simple_metric("net", "net")
+        margin = PydanticMetric(
+            name="margin",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="gross - net",
+                metrics=[
+                    PydanticMetricInput(name="gross"),
+                    PydanticMetricInput(name="net"),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[gross_m, net_m, margin])).output
+
+        margin_osi = next(m for m in _osi_metrics(result) if m.name == "margin")
+        assert margin_osi.expression.dialects[0].expression == "SUM(orders.net) - SUM(orders.net_amount)"
+
+    def test_derived_metric_preserves_backslashes_from_a_filter(self) -> None:
+        r"""Backslashes in an inlined expression survive substitution verbatim.
+
+        A resolved expression is inserted as a literal, not as a `re.sub` replacement
+        template, so an escape sequence such as `\\b` in a filter's SQL is not
+        reinterpreted (`\\b` would otherwise become a backspace character).
+        """
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        revenue_m.filter = _filter(r"{{ Dimension('order__path') }} LIKE 'a\b'")
+        scaled = PydanticMetric(
+            name="scaled",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue * 2",
+                metrics=[PydanticMetricInput(name="revenue")],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, scaled])).output
+
+        revenue_osi = next(m for m in _osi_metrics(result) if m.name == "revenue")
+        scaled_osi = next(m for m in _osi_metrics(result) if m.name == "scaled")
+        assert revenue_osi.expression.dialects[0].expression == (
+            r"SUM(CASE WHEN order__path LIKE 'a\b' THEN orders.amount END)"
+        )
+        assert scaled_osi.expression.dialects[0].expression == (
+            r"SUM(CASE WHEN order__path LIKE 'a\b' THEN orders.amount END) * 2"
+        )
+
+    def test_derived_metric_drops_a_used_reference_listed_twice_with_differing_filters(self) -> None:
+        """An input metric listed twice under one used reference, resolving differently, is ambiguous.
+
+        MetricFlow accepts this shape — `DerivedMetricRule._validate_alias_collision`
+        only compares entries that set an alias — so the converter has to handle it. It
+        drops the metric and records an issue, as it does for every other unsupported
+        shape, rather than failing the whole conversion.
+        """
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        both = PydanticMetric(
+            name="both",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue",
+                metrics=[
+                    PydanticMetricInput(name="revenue", filter=_filter("{{ Dimension('order__region') }} = 'EU'")),
+                    PydanticMetricInput(name="revenue", filter=_filter("{{ Dimension('order__region') }} = 'US'")),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, both]))
+
+        assert [m.name for m in _osi_metrics(result.output)] == ["revenue"]
+        assert len(result.issues) == 1
+        assert result.issues[0].issue_type == ConverterIssueType.AMBIGUOUS_REFERENCE_METRIC_DROPPED
+        assert result.issues[0].element_name == "both"
+
+    def test_derived_metric_accepts_a_duplicate_reference_the_expression_never_uses(self) -> None:
+        """A reference that is never substituted cannot be ambiguous, however it resolves."""
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        constant = PydanticMetric(
+            name="constant",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="1 + 1",
+                metrics=[
+                    PydanticMetricInput(name="revenue", filter=_filter("{{ Dimension('order__region') }} = 'EU'")),
+                    PydanticMetricInput(name="revenue", filter=_filter("{{ Dimension('order__region') }} = 'US'")),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, constant]))
+
+        assert (
+            next(m for m in _osi_metrics(result.output) if m.name == "constant").expression.dialects[0].expression
+            == "1 + 1"
+        )
+        assert result.issues == []
+
+    def test_derived_metric_accepts_a_duplicate_that_restates_the_enclosing_filter(self) -> None:
+        """Restating a filter the enclosing metric already applies is redundant, not ambiguous.
+
+        AND is idempotent, so the bare occurrence and the one repeating the parent's own
+        filter describe the same set of rows and must not be treated as two resolutions.
+        """
+        region_eu = "{{ Dimension('order__region') }} = 'EU'"
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        scaled = PydanticMetric(
+            name="scaled",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue * 2",
+                metrics=[
+                    PydanticMetricInput(name="revenue"),
+                    PydanticMetricInput(name="revenue", filter=_filter(region_eu)),
+                ],
+            ),
+            filter=_filter(region_eu),
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, scaled]))
+
+        scaled_osi = next(m for m in _osi_metrics(result.output) if m.name == "scaled")
+        assert scaled_osi.expression.dialects[0].expression == (
+            "SUM(CASE WHEN order__region = 'EU' THEN orders.amount END) * 2"
+        )
+        assert result.issues == []
+
+    def test_derived_metric_accepts_a_reference_listed_twice_resolving_identically(self) -> None:
+        """A redundant duplicate is not ambiguous: both occurrences resolve to the same SQL."""
+        sm = semantic_model_with_guaranteed_meta(
+            name="orders",
+            measures=[_measure("revenue", agg=AggregationType.SUM, expr="amount")],
+        )
+        revenue_m = _simple_metric("revenue", "revenue")
+        doubled = PydanticMetric(
+            name="doubled",
+            description=None,
+            type=MetricType.DERIVED,
+            type_params=PydanticMetricTypeParams(
+                expr="revenue + revenue",
+                metrics=[
+                    PydanticMetricInput(name="revenue"),
+                    PydanticMetricInput(name="revenue"),
+                ],
+            ),
+            filter=None,
+            metadata=default_meta(),
+            config=None,
+        )
+        result = MSIToOSIConverter().convert(_manifest(semantic_models=[sm], metrics=[revenue_m, doubled])).output
+
+        doubled_osi = next(m for m in _osi_metrics(result) if m.name == "doubled")
+        assert doubled_osi.expression.dialects[0].expression == "SUM(orders.amount) + SUM(orders.amount)"
 
 
 class TestConverterIssues:  # noqa: D101
