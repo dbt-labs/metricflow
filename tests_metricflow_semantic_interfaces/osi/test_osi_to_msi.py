@@ -9,7 +9,16 @@ from metricflow_semantics.test_helpers.snapshot_helpers import (
     assert_object_snapshot_equal,
 )
 
-from metricflow.converters.models import OSIDataType
+from metricflow.converters.converter_issues import ConverterIssue, ConverterIssueType
+from metricflow.converters.models import (
+    OSIDataType,
+    OSIDialect,
+    OSIDialectExpression,
+    OSIDocument,
+    OSIExpression,
+    OSIField,
+    OSIMetric,
+)
 from metricflow.converters.msi_to_osi import MSIToOSIConverter
 from metricflow.converters.osi_to_msi import OSIToMSIConverter
 from metricflow_semantic_interfaces.type_enums import (
@@ -227,6 +236,45 @@ class TestOSIToMSIFieldClassification:  # noqa: D101
 
         assert sm.dimensions[0].datatype is None
 
+    @pytest.mark.parametrize(
+        ("primary_key", "unique_keys", "expected_error"),
+        [
+            (
+                ["tenant_id", "order_id"],
+                None,
+                "Dataset 'orders' has composite primary key ['tenant_id', 'order_id']; "
+                "MetricFlow entities cannot represent composite keys losslessly",
+            ),
+            (
+                None,
+                [["tenant_id", "external_id"]],
+                "Dataset 'orders' has composite unique key ['tenant_id', 'external_id']; "
+                "MetricFlow entities cannot represent composite keys losslessly",
+            ),
+        ],
+    )
+    def test_composite_key_is_rejected(  # noqa: D102
+        self,
+        primary_key: list[str] | None,
+        unique_keys: list[list[str]] | None,
+        expected_error: str,
+    ) -> None:
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset(
+                    "orders",
+                    fields=[_osi_field("tenant_id"), _osi_field("order_id")],
+                    primary_key=primary_key,
+                    unique_keys=unique_keys,
+                )
+            ]
+        )
+
+        with pytest.raises(ValueError) as exc_info:
+            OSIToMSIConverter().convert(doc)
+
+        assert str(exc_info.value) == expected_error
+
 
 class TestOSIToMSIMetricConversion:  # noqa: D101
     def test_sum_expression_produces_simple_metric(self) -> None:  # noqa: D102
@@ -392,6 +440,286 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         assert m.type_params.metric_aggregation_params.agg_params.percentile == 0.95
         assert m.type_params.expr == "amount"
 
+    @pytest.mark.parametrize("expression", ["COUNT(*)", "COUNT(orders.*)", "COUNT(2)", "COUNT(TRUE)", "COUNT(0)"])
+    def test_count_of_a_constant_normalizes_to_row_count_expr(self, expression: str) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("order_id")])],
+            metrics=[_osi_metric("order_count", expression)],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        m = result.metrics[0]
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.COUNT
+        assert m.type_params.expr == "1"
+
+    @pytest.mark.parametrize(("expression", "expr"), [("SUM(1)", "1"), ("SUM(2)", "2"), ("SUM(TRUE)", "TRUE")])
+    def test_sum_of_a_constant_keeps_its_value(self, expression: str, expr: str) -> None:
+        """SUM adds the constant up, so SUM(2) is twice the row count and must not become SUM(1)."""
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("order_id")])],
+            metrics=[_osi_metric("total", expression)],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        m = result.metrics[0]
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.SUM
+        assert m.type_params.metric_aggregation_params.semantic_model == "orders"
+        assert m.type_params.expr == expr
+
+    @pytest.mark.parametrize("expression", ["SUM(1)", "SUM(2)", "SUM(0)"])
+    def test_sum_of_a_constant_with_multiple_datasets_is_dropped_with_a_warning(self, expression: str) -> None:
+        """A constant has no column to place it in a dataset, so with several it is refused, not guessed."""
+        doc = _osi_doc(datasets=self._customers_and_orders(), metrics=[_osi_metric("total", expression)])
+        result = OSIToMSIConverter().convert(doc)
+
+        assert result.output.metrics == []
+        assert [i.element_name for i in result.issues] == ["total"]
+
+    def test_unparseable_expression_does_not_abort_the_conversion(self) -> None:
+        """An unterminated quote is a sqlglot TokenError, not a ParseError; it falls back, it doesn't crash."""
+        expression = "SUM(CASE WHEN status = 'paid THEN amount END)"
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
+            metrics=[_osi_metric("paid", expression)],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].type_params.expr == expression
+
+    def test_qualified_count_star_uses_dataset_qualifier(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset("customers", fields=[_osi_field("customer_id")]),
+                _osi_dataset("orders", fields=[_osi_field("order_id")]),
+            ],
+            metrics=[_osi_metric("order_count", "COUNT(orders.*)")],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        m = result.metrics[0]
+        assert m.type_params.expr == "1"
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.semantic_model == "orders"
+
+    @staticmethod
+    def _customers_and_orders() -> list:
+        return [
+            _osi_dataset("customers", fields=[_osi_field("customer_id")]),
+            _osi_dataset("orders", fields=[_osi_field("order_id"), _osi_field("amount")]),
+        ]
+
+    @pytest.mark.parametrize("expression", ["COUNT(*)", "COUNT(1)", "COUNT(2)", "COUNT(0)", "COUNT(TRUE)"])
+    def test_bare_row_count_with_multiple_datasets_is_dropped_with_a_warning(  # noqa: D102
+        self, expression: str
+    ) -> None:
+        doc = _osi_doc(datasets=self._customers_and_orders(), metrics=[_osi_metric("order_count", expression)])
+        result = OSIToMSIConverter().convert(doc)
+
+        assert result.output.metrics == []
+        assert result.issues == [ConverterIssue(ConverterIssueType.ROW_COUNT_METRIC_DROPPED, "order_count")]
+
+    def test_ratio_with_a_bare_count_star_is_dropped_as_a_whole(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=self._customers_and_orders(),
+            metrics=[
+                _osi_metric("revenue", "SUM(orders.amount)"),
+                _osi_metric("avg_order_value", "(SUM(orders.amount)) / (COUNT(*))"),
+            ],
+        )
+        result = OSIToMSIConverter().convert(doc)
+
+        assert [m.name for m in result.output.metrics] == ["revenue"]
+        assert result.issues == [ConverterIssue(ConverterIssueType.ROW_COUNT_METRIC_DROPPED, "avg_order_value")]
+
+    def test_ratio_with_a_distinct_row_count_is_dropped_as_a_whole(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=self._customers_and_orders(),
+            metrics=[
+                _osi_metric("revenue", "SUM(orders.amount)"),
+                _osi_metric("avg_order_value", "(SUM(orders.amount)) / (COUNT(DISTINCT *))"),
+            ],
+        )
+        result = OSIToMSIConverter().convert(doc)
+
+        assert [m.name for m in result.output.metrics] == ["revenue"]
+        assert result.issues == [ConverterIssue(ConverterIssueType.ROW_COUNT_METRIC_DROPPED, "avg_order_value")]
+
+    def test_qualified_count_star_in_ratio_binds_both_sides_to_the_same_dataset(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=self._customers_and_orders(),
+            metrics=[_osi_metric("avg_order_value", "(SUM(orders.amount)) / (COUNT(orders.*))")],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        by_name = {m.name: m for m in result.metrics}
+        for sub_metric in ("avg_order_value_numerator", "avg_order_value_denominator"):
+            params = by_name[sub_metric].type_params.metric_aggregation_params
+            assert params is not None
+            assert params.semantic_model == "orders"
+
+    def test_schema_qualified_count_star_matches_dataset_by_last_segment(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=self._customers_and_orders(),
+            metrics=[_osi_metric("order_count", "COUNT(db.orders.*)")],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        params = result.metrics[0].type_params.metric_aggregation_params
+        assert params is not None
+        assert params.semantic_model == "orders"
+
+    def test_count_star_of_unknown_dataset_is_dropped_with_a_warning(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=self._customers_and_orders(),
+            metrics=[_osi_metric("order_count", "COUNT(nope.*)")],
+        )
+        result = OSIToMSIConverter().convert(doc)
+
+        assert result.output.metrics == []
+        assert [i.element_name for i in result.issues] == ["order_count"]
+
+    def test_count_star_matching_several_datasets_by_last_segment_is_dropped_with_a_warning(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset("a.orders", fields=[_osi_field("order_id")]),
+                _osi_dataset("b.orders", fields=[_osi_field("order_id")]),
+            ],
+            metrics=[_osi_metric("order_count", "COUNT(orders.*)")],
+        )
+        result = OSIToMSIConverter().convert(doc)
+
+        assert result.output.metrics == []
+        assert [i.element_name for i in result.issues] == ["order_count"]
+
+    @pytest.mark.parametrize("expression", ["COUNT(orders.*, amount)", "COUNT(db.orders, *)"])
+    def test_unsupported_count_star_forms_fall_back_to_the_raw_expression(self, expression: str) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("order_id"), _osi_field("amount")])],
+            metrics=[_osi_metric("odd_count", expression)],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].type_params.expr == expression
+
+    @pytest.mark.parametrize(
+        "expression",
+        [
+            "COUNT(DISTINCT *)",
+            "COUNT(DISTINCT 1)",
+            "COUNT(DISTINCT orders.*)",
+            "COUNT(DISTINCT (*))",
+            "COUNT(DISTINCT (1))",
+            "(COUNT(DISTINCT *))",
+            "COUNT(DISTINCT *) * 100",
+            "COALESCE(COUNT(DISTINCT 1), 0)",
+            "CAST(COUNT(DISTINCT *) AS INT)",
+        ],
+    )
+    def test_distinct_of_a_row_count_is_dropped_with_a_warning(self, expression: str) -> None:
+        """COUNT(DISTINCT *) and friends are dropped with a warning.
+
+        They are valid SQL but answer 'does any row exist' (0 or 1), not a
+        meaningful total. Falling back to a raw SUM of it would be a nested aggregate MetricFlow cannot
+        run, bound to a guessed dataset; dropped instead, the same as an unresolvable COUNT(*). Caught
+        whether it is the whole expression, redundantly parenthesized, or wrapped in another function.
+        """
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("order_id"), _osi_field("amount")])],
+            metrics=[_osi_metric("odd_count", expression)],
+        )
+        result = OSIToMSIConverter().convert(doc)
+
+        assert result.output.metrics == []
+        assert [i.element_name for i in result.issues] == ["odd_count"]
+
+    def test_sum_boolean_qualified_column_resolves_semantic_model(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset("customers", fields=[_osi_field("customer_id")]),
+                _osi_dataset("orders", fields=[_osi_field("order_id")]),
+            ],
+            metrics=[
+                _osi_metric(
+                    "has_order",
+                    "SUM(CASE WHEN orders.order_id IS NOT NULL THEN 1 ELSE 0 END)",
+                )
+            ],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        metric = result.metrics[0]
+        assert metric.type_params.metric_aggregation_params is not None
+        assert metric.type_params.metric_aggregation_params.agg == AggregationType.SUM_BOOLEAN
+        assert metric.type_params.metric_aggregation_params.semantic_model == "orders"
+
+    def test_fully_qualified_column_preserves_dataset_name(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset(
+                    "analytics.orders",
+                    fields=[_osi_field("order_id")],
+                )
+            ],
+            metrics=[_osi_metric("order_count", "COUNT(analytics.orders.order_id)")],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        metric = result.metrics[0]
+        assert metric.type_params.metric_aggregation_params is not None
+        assert metric.type_params.metric_aggregation_params.semantic_model == "analytics.orders"
+
+    @pytest.mark.parametrize(
+        ("expression", "expected_agg", "expected_expr"),
+        [
+            ("SUM(orders.gross - orders.tax)", AggregationType.SUM, "gross - tax"),
+            ("SUM(COALESCE(orders.tax, 0))", AggregationType.SUM, "COALESCE(tax, 0)"),
+            ("MAX(orders.gross - orders.tax)", AggregationType.MAX, "gross - tax"),
+            ("SUM(amount * 0.5)", AggregationType.SUM, "amount * 0.5"),
+            ("AVG(CAST(orders.tax AS DOUBLE))", AggregationType.AVERAGE, "CAST(tax AS DOUBLE)"),
+            (
+                "COUNT(DISTINCT orders.status || orders.region)",
+                AggregationType.COUNT_DISTINCT,
+                "status || region",
+            ),
+            (
+                "PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY orders.gross - orders.tax)",
+                AggregationType.PERCENTILE,
+                "gross - tax",
+            ),
+        ],
+    )
+    def test_compound_aggregate_argument_is_unqualified_as_a_whole(
+        self, expression: str, expected_agg: AggregationType, expected_expr: str
+    ) -> None:
+        """Every column reference inside the aggregate argument loses its dataset qualifier.
+
+        The surrounding expression is kept intact rather than sliced at the last dot.
+        """
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset(
+                    "orders",
+                    fields=[
+                        _osi_field("amount"),
+                        _osi_field("gross"),
+                        _osi_field("tax"),
+                        _osi_field("status"),
+                        _osi_field("region"),
+                    ],
+                )
+            ],
+            metrics=[_osi_metric("m", expression)],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        m = result.metrics[0]
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == expected_agg
+        assert m.type_params.metric_aggregation_params.semantic_model == "orders"
+        assert m.type_params.expr == expected_expr
+
 
 class TestOSIToMSIRoundTrip:  # noqa: D101
     def test_osi_to_msi_to_osi_preserves_structure(  # noqa: D102
@@ -466,3 +794,138 @@ class TestOSIToMSIRoundTrip:  # noqa: D101
         metrics = osi_doc.semantic_model[0].metrics or []
         assert len(metrics) == 1
         assert metrics[0].datatype is OSIDataType.DECIMAL
+
+
+def _multi_dialect_expr(*pairs: tuple[OSIDialect, str]) -> OSIExpression:
+    """Build an expression carrying more than one dialect, in the given order."""
+    return OSIExpression(dialects=[OSIDialectExpression(dialect=dialect, expression=expr) for dialect, expr in pairs])
+
+
+_SNOWFLAKE_METRIC = (OSIDialect.SNOWFLAKE, "SUM(orders.amt_snowflake_only)")
+_OSSIE_SQL_METRIC = (OSIDialect.OSSIE_SQL_2026, "SUM(orders.amount)")
+_ANSI_METRIC = (OSIDialect.ANSI_SQL, "SUM(orders.amount_ansi)")
+
+
+def _doc_with_metric_expression(expression: OSIExpression) -> OSIDocument:
+    return _osi_doc(
+        datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
+        metrics=[OSIMetric(name="revenue", expression=expression)],
+    )
+
+
+class TestOSIToMSIDialectSelection:  # noqa: D101
+    @pytest.mark.parametrize(
+        "order",
+        [
+            (_OSSIE_SQL_METRIC, _SNOWFLAKE_METRIC),
+            (_SNOWFLAKE_METRIC, _OSSIE_SQL_METRIC),
+        ],
+        ids=["osi_sql_first", "vendor_first"],
+    )
+    def test_osi_sql_2026_wins_over_a_vendor_dialect_in_either_order(  # noqa: D102
+        self, order: tuple[tuple[OSIDialect, str], ...]
+    ) -> None:
+        doc = _doc_with_metric_expression(_multi_dialect_expr(*order))
+
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].type_params.expr == "amount"
+
+    @pytest.mark.parametrize(
+        "order",
+        [
+            (_ANSI_METRIC, _OSSIE_SQL_METRIC),
+            (_OSSIE_SQL_METRIC, _ANSI_METRIC),
+        ],
+        ids=["ansi_first", "osi_sql_first"],
+    )
+    def test_ansi_sql_still_takes_precedence_over_osi_sql_2026(  # noqa: D102
+        self, order: tuple[tuple[OSIDialect, str], ...]
+    ) -> None:
+        doc = _doc_with_metric_expression(_multi_dialect_expr(*order))
+
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].type_params.expr == "amount_ansi"
+
+    def test_field_expression_prefers_osi_sql_2026_over_a_vendor_dialect(self) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset(
+                    "orders",
+                    fields=[
+                        OSIField(
+                            name="region",
+                            expression=_multi_dialect_expr(
+                                (OSIDialect.SNOWFLAKE, "region_snowflake_only"),
+                                (OSIDialect.OSSIE_SQL_2026, "region_portable"),
+                            ),
+                        )
+                    ],
+                )
+            ]
+        )
+
+        sm = OSIToMSIConverter().convert(doc).output.semantic_models[0]
+
+        assert [(d.name, d.expr) for d in sm.dimensions] == [("region", "region_portable")]
+
+    def test_first_entry_is_still_used_when_no_portable_dialect_is_present(self) -> None:  # noqa: D102
+        doc = _doc_with_metric_expression(
+            _multi_dialect_expr(
+                (OSIDialect.SNOWFLAKE, "SUM(orders.amt_snowflake_only)"),
+                (OSIDialect.DAX, "SUM(orders.amt_dax_only)"),
+            )
+        )
+
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].type_params.expr == "amt_snowflake_only"
+
+    def test_the_first_osi_sql_2026_entry_wins_when_the_dialect_is_repeated(self) -> None:  # noqa: D102
+        # `dialects` has no `uniqueItems` constraint, so the same dialect may be listed twice.
+        doc = _doc_with_metric_expression(
+            _multi_dialect_expr(
+                (OSIDialect.OSSIE_SQL_2026, "SUM(orders.amount)"),
+                (OSIDialect.OSSIE_SQL_2026, "SUM(orders.amount_duplicate)"),
+            )
+        )
+
+        result = OSIToMSIConverter().convert(doc).output
+
+        assert result.metrics[0].type_params.expr == "amount"
+
+    def test_the_dataset_of_a_column_is_resolved_with_the_same_dialect_preference(self) -> None:  # noqa: D102
+        # `unrelated` is declared first, so resolving the field expression positionally
+        # would miss `orders` and fall back to it.
+        doc = _osi_doc(
+            datasets=[
+                _osi_dataset("unrelated", fields=[_osi_field("other_column")]),
+                _osi_dataset(
+                    "orders",
+                    fields=[
+                        OSIField(
+                            name="amount",
+                            expression=_multi_dialect_expr(
+                                (OSIDialect.SNOWFLAKE, "amt_snowflake_only"),
+                                (OSIDialect.OSSIE_SQL_2026, "amount_portable"),
+                            ),
+                        )
+                    ],
+                ),
+            ],
+            metrics=[
+                OSIMetric(
+                    name="revenue",
+                    expression=_multi_dialect_expr(
+                        (OSIDialect.OSSIE_SQL_2026, "SUM(amount_portable)"),
+                    ),
+                )
+            ],
+        )
+
+        result = OSIToMSIConverter().convert(doc).output
+
+        agg_params = result.metrics[0].type_params.metric_aggregation_params
+        assert agg_params is not None
+        assert agg_params.semantic_model == "orders"
