@@ -14,6 +14,7 @@ from metricflow.converters.expression_utils import _is_constant_expr
 from metricflow.converters.filter_utils import _collect_filter_sql, _merge_filter_sqls
 from metricflow.converters.models import (
     OSIDataset,
+    OSIDataType,
     OSIDialect,
     OSIDialectExpression,
     OSIDimension,
@@ -32,6 +33,7 @@ from metricflow_semantic_interfaces.protocols.measure import (
     Measure,
     MeasureAggregationParameters,
 )
+from metricflow_semantic_interfaces.protocols.meta import SemanticLayerElementConfig
 from metricflow_semantic_interfaces.protocols.metric import Metric
 from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
 from metricflow_semantic_interfaces.transformations.convert_count import ConvertCountMetricToSumRule
@@ -40,6 +42,7 @@ from metricflow_semantic_interfaces.transformations.semantic_manifest_transforme
 )
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
+    DataType,
     DimensionType,
     EntityType,
     MetricType,
@@ -126,7 +129,7 @@ class MSIToOSIConverter:
                 OSIMetric(
                     name=metric.name,
                     expression=self._make_expression(expr),
-                    datatype=msi_datatype_to_osi(metric.datatype),
+                    datatype=self._resolve_datatype(metric.datatype, metric.config),
                     description=metric.description,
                 )
             )
@@ -185,10 +188,36 @@ class MSIToOSIConverter:
             name=dim.name,
             expression=self._make_expression(expr),
             dimension=OSIDimension(is_time=is_time),
-            datatype=msi_datatype_to_osi(dim.datatype),
+            datatype=self._resolve_datatype(dim.datatype, dim.config),
             label=dim.label,
             description=dim.description,
         )
+
+    @staticmethod
+    def _resolve_datatype(
+        native_datatype: Optional[DataType], config: Optional[SemanticLayerElementConfig]
+    ) -> Optional[OSIDataType]:
+        """Prefer MetricFlow's native datatype, falling back to dbt's `meta.ossie.datatype` extension.
+
+        Entities and measures have no native datatype, so for them only the `meta` annotation applies.
+        An annotation that is missing, malformed or not a known OSI datatype yields None rather than
+        failing the conversion.
+        """
+        native = msi_datatype_to_osi(native_datatype)
+        if native is not None:
+            return native
+        if config is None:
+            return None
+        ossie_meta = config.meta.get("ossie")
+        if not isinstance(ossie_meta, dict):
+            return None
+        datatype = ossie_meta.get("datatype")
+        if not isinstance(datatype, str):
+            return None
+        try:
+            return OSIDataType(datatype)
+        except ValueError:
+            return None
 
     def _convert_entity(self, entity: Entity) -> OSIField:
         expr = entity.expr if entity.expr is not None else entity.name
@@ -198,6 +227,7 @@ class MSIToOSIConverter:
             expression=self._make_expression(expr),
             label=entity.label,
             description=entity.description,
+            datatype=self._resolve_datatype(None, entity.config),
         )
 
     def _convert_measure(self, measure: Measure) -> OSIField:
@@ -208,6 +238,7 @@ class MSIToOSIConverter:
             expression=self._make_expression(expr),
             label=measure.label,
             description=measure.description,
+            datatype=self._resolve_datatype(None, measure.config),
         )
 
     @staticmethod
