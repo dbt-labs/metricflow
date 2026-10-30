@@ -241,8 +241,9 @@ class DepthFirstSearchMetricEvaluationPlanner(MetricEvaluationPlanner):
             additional_filter_specs=additional_filter_specs,
         )
         return tuple(
-            MetricQueryElement.create(
-                metric_spec=input_metric_spec,
+            self._query_helper.create_input_query_element(
+                metric_spec=metric_spec,
+                input_metric_spec=input_metric_spec,
                 group_by_item_specs=group_by_item_specs_for_inputs,
                 predicate_pushdown_state=predicate_pushdown_state_for_inputs,
             )

@@ -13,6 +13,7 @@ from metricflow_semantics.errors.error_classes import (
 )
 from metricflow_semantics.model.linkable_element_property import GroupByItemProperty
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.model.semantics.excluded_dimensions import with_excluded_dimensions_allowed
 from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.model.semantics.linkable_spec_resolver import (
     GroupByItemSetResolver,
@@ -82,6 +83,10 @@ class MetricLookup:
         self._result_cache_for_derived_from_semantic_models: ResultCache[
             MetricReference, FrozenOrderedSet[SemanticModelReference]
         ] = ResultCache()
+        self._result_cache_for_has_exclude_dimensions: ResultCache[MetricReference, bool] = ResultCache()
+        self._result_cache_for_common_group_by_items_with_exclusions: ResultCache[
+            tuple[MetricReference, GroupByItemSetFilter, bool], BaseGroupByItemSet
+        ] = ResultCache()
 
     def get_group_by_items_for_distinct_values_query(
         self, set_filter: GroupByItemSetFilter = GroupByItemSetFilter.create()
@@ -128,7 +133,90 @@ class MetricLookup:
         set_filter: GroupByItemSetFilter = DEFAULT_COMMON_SET_FILTER,
         joins_disallowed: bool = False,
     ) -> BaseGroupByItemSet:
-        """Gets the set of the valid group-by items common to all inputs."""
+        """Gets the set of the valid group-by items common to all inputs.
+
+        Dimensions that an input metric declares in `exclude_dimensions` don't need to be available to that input.
+        """
+        metric_reference_tuple = tuple(metric_references)
+        metrics_with_exclusions = tuple(
+            metric_reference
+            for metric_reference in metric_reference_tuple
+            if self._has_exclude_dimensions(metric_reference)
+        )
+        if len(metrics_with_exclusions) == 0:
+            return self._get_common_group_by_items_ignoring_exclusions(
+                metric_references=metric_reference_tuple, set_filter=set_filter, joins_disallowed=joins_disallowed
+            )
+
+        item_sets: list[BaseGroupByItemSet] = [
+            self._get_common_group_by_items_for_metric_with_exclusions(
+                metric_reference=metric_reference, set_filter=set_filter, joins_disallowed=joins_disallowed
+            )
+            for metric_reference in metrics_with_exclusions
+        ]
+        metrics_without_exclusions = tuple(
+            metric_reference
+            for metric_reference in metric_reference_tuple
+            if metric_reference not in metrics_with_exclusions
+        )
+        if len(metrics_without_exclusions) > 0:
+            item_sets.append(
+                self._get_common_group_by_items_ignoring_exclusions(
+                    metric_references=metrics_without_exclusions,
+                    set_filter=set_filter,
+                    joins_disallowed=joins_disallowed,
+                )
+            )
+        return item_sets[0].intersection(*item_sets[1:])
+
+    def _has_exclude_dimensions(self, metric_reference: MetricReference) -> bool:
+        """Whether the metric, or any metric it is derived from, has an input metric that declares `exclude_dimensions`."""
+        cached_result = self._result_cache_for_has_exclude_dimensions.get(metric_reference)
+        if cached_result:
+            return cached_result.value
+
+        metric = self._metrics.get(metric_reference)
+        result = metric is not None and any(
+            len(metric_input.exclude_dimensions) > 0 or self._has_exclude_dimensions(MetricReference(metric_input.name))
+            for metric_input in MetricLookup.metric_inputs(metric, include_conversion_metric_input=True)
+        )
+        return self._result_cache_for_has_exclude_dimensions.set_and_get(metric_reference, result)
+
+    def _get_common_group_by_items_for_metric_with_exclusions(
+        self,
+        metric_reference: MetricReference,
+        set_filter: GroupByItemSetFilter,
+        joins_disallowed: bool,
+    ) -> BaseGroupByItemSet:
+        cache_key = (metric_reference, set_filter, joins_disallowed)
+        cached_result = self._result_cache_for_common_group_by_items_with_exclusions.get(cache_key)
+        if cached_result:
+            return cached_result.value
+
+        metric_inputs = MetricLookup.metric_inputs(
+            self.get_metric(metric_reference), include_conversion_metric_input=False
+        )
+        item_sets = with_excluded_dimensions_allowed(
+            item_sets=tuple(
+                self.get_common_group_by_items(
+                    metric_references=(MetricReference(metric_input.name),),
+                    set_filter=set_filter,
+                    joins_disallowed=joins_disallowed,
+                )
+                for metric_input in metric_inputs
+            ),
+            excluded_dimension_names_per_set=tuple(metric_input.exclude_dimensions for metric_input in metric_inputs),
+        )
+        return self._result_cache_for_common_group_by_items_with_exclusions.set_and_get(
+            cache_key, item_sets[0].intersection(*item_sets[1:])
+        )
+
+    def _get_common_group_by_items_ignoring_exclusions(
+        self,
+        metric_references: Iterable[MetricReference],
+        set_filter: GroupByItemSetFilter,
+        joins_disallowed: bool,
+    ) -> BaseGroupByItemSet:
         if set_filter.element_name_allowlist is None:
             return self._group_by_item_set_resolver.get_common_set(
                 metric_references=metric_references,

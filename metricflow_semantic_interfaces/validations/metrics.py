@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Dict, Generic, List, Literal, Optional, Sequence, Set, Tuple, Union
+from collections import Counter
+from typing import Dict, FrozenSet, Generic, List, Literal, Optional, Sequence, Set, Tuple, Union
 
 from metricflow_semantic_interfaces.implementations.metric import PydanticMetric
+from metricflow_semantic_interfaces.naming.keywords import DUNDER, METRIC_TIME_ELEMENT_NAME
 from metricflow_semantic_interfaces.protocols import (
     ConversionTypeParams,
     Dimension,
@@ -57,6 +59,14 @@ class MetricValidationRuleHelpers:
     def get_metric_from_manifest(metric_name: str, semantic_manifest: SemanticManifest) -> Optional[Metric]:
         """Get a metric from the manifest by name."""
         return next((metric for metric in semantic_manifest.metrics if metric.name == metric_name), None)
+
+    @staticmethod
+    def metric_context(metric: Metric) -> MetricContext:
+        """Get the context that identifies a metric in a validation issue."""
+        return MetricContext(
+            file_context=FileContext.from_metadata(metadata=metric.metadata),
+            metric=MetricModelReference(metric_name=metric.name),
+        )
 
     # TODO add a function for default context.
 
@@ -1266,4 +1276,227 @@ class SimpleMetricExprRule(SemanticManifestValidationRule[SemanticManifestT], Ge
                     )
                 )
                 continue
+        return issues
+
+
+class MetricInputExcludeDimensionsPlacementRule(
+    SemanticManifestValidationRule[SemanticManifestT], Generic[SemanticManifestT]
+):
+    """Checks that `exclude_dimensions` is declared only on the inputs of ratio and derived metrics.
+
+    At least one input of a metric must not have it, since the other inputs are joined to that one.
+    """
+
+    @staticmethod
+    def _input_metrics_of_any_metric_type(metric: Metric) -> Sequence[MetricInput]:
+        type_params = metric.type_params
+        candidates: List[Optional[MetricInput]] = [type_params.numerator, type_params.denominator]
+        candidates.extend(type_params.metrics or [])
+        if type_params.cumulative_type_params is not None:
+            candidates.append(type_params.cumulative_type_params.metric)
+        if type_params.conversion_type_params is not None:
+            candidates.append(type_params.conversion_type_params.base_metric)
+            candidates.append(type_params.conversion_type_params.conversion_metric)
+        return [candidate for candidate in candidates if candidate is not None]
+
+    @staticmethod
+    @validate_safely(whats_being_done="checking that exclude_dimensions is declared on a supported metric type")
+    def _validate_metric(metric: Metric) -> Sequence[ValidationIssue]:
+        context = MetricValidationRuleHelpers.metric_context(metric)
+        if metric.type is MetricType.RATIO or metric.type is MetricType.DERIVED:
+            input_metrics = metric.input_metrics
+            if input_metrics and all(input_metric.exclude_dimensions for input_metric in input_metrics):
+                return [
+                    ValidationError(
+                        context=context,
+                        message=f"Every input metric of metric '{metric.name}' has `exclude_dimensions`. At least "
+                        "one input metric must not have it, since the other inputs are joined to it.",
+                    )
+                ]
+            exclusions_by_output_name: Dict[str, Set[FrozenSet[str]]] = {}
+            for input_metric in input_metrics:
+                exclusions_by_output_name.setdefault(input_metric.alias or input_metric.name, set()).add(
+                    frozenset(input_metric.exclude_dimensions)
+                )
+            return [
+                ValidationError(
+                    context=context,
+                    message=f"Input metrics of metric '{metric.name}' share the name '{output_name}' but have "
+                    "different `exclude_dimensions`, so their results can't be told apart. Give them distinct "
+                    "aliases.",
+                )
+                for output_name, exclusions in exclusions_by_output_name.items()
+                if len(exclusions) > 1
+            ]
+        return [
+            ValidationError(
+                context=context,
+                message=f"Input metric '{input_metric.name}' on {metric.type.value} metric "
+                f"'{metric.name}' has `exclude_dimensions`, which is only supported on the inputs of "
+                "ratio and derived metrics.",
+            )
+            for input_metric in MetricInputExcludeDimensionsPlacementRule._input_metrics_of_any_metric_type(metric)
+            if input_metric.exclude_dimensions
+        ]
+
+    @staticmethod
+    def validate_manifest(semantic_manifest: SemanticManifestT) -> Sequence[ValidationIssue]:  # noqa: D102
+        issues: List[ValidationIssue] = []
+        for metric in semantic_manifest.metrics or []:
+            issues += MetricInputExcludeDimensionsPlacementRule._validate_metric(metric)
+        return issues
+
+
+class MetricInputExcludeDimensionsOffsetRule(
+    SemanticManifestValidationRule[SemanticManifestT], Generic[SemanticManifestT]
+):
+    """Checks that `exclude_dimensions` isn't combined with a time offset, on the input or on the metric it feeds."""
+
+    @staticmethod
+    def _has_time_offset(input_metric: MetricInput) -> bool:
+        return bool(input_metric.offset_window or input_metric.offset_to_grain)
+
+    @staticmethod
+    @validate_safely(whats_being_done="checking that exclude_dimensions of metric inputs isn't combined with offsets")
+    def _validate_metric(metric: Metric, names_of_metrics_used_with_offset: Set[str]) -> Sequence[ValidationIssue]:
+        issues: List[ValidationIssue] = []
+        context = MetricValidationRuleHelpers.metric_context(metric)
+        for input_metric in metric.input_metrics:
+            if not input_metric.exclude_dimensions:
+                continue
+            if metric.name in names_of_metrics_used_with_offset:
+                issues.append(
+                    ValidationError(
+                        context=context,
+                        message=f"Input metric '{input_metric.name}' on metric '{metric.name}' has "
+                        f"`exclude_dimensions`, but '{metric.name}' is used with a time offset "
+                        "(`offset_window` or `offset_to_grain`) by another metric. These can't be used together.",
+                    )
+                )
+            if MetricInputExcludeDimensionsOffsetRule._has_time_offset(input_metric):
+                issues.append(
+                    ValidationError(
+                        context=context,
+                        message=f"Input metric '{input_metric.name}' on metric '{metric.name}' has "
+                        "`exclude_dimensions` and a time offset (`offset_window` or `offset_to_grain`). "
+                        "These can't be used together.",
+                    )
+                )
+        return issues
+
+    @staticmethod
+    def validate_manifest(semantic_manifest: SemanticManifestT) -> Sequence[ValidationIssue]:  # noqa: D102
+        names_of_metrics_used_with_offset = {
+            input_metric.name
+            for metric in semantic_manifest.metrics or []
+            for input_metric in metric.input_metrics
+            if MetricInputExcludeDimensionsOffsetRule._has_time_offset(input_metric)
+        }
+        issues: List[ValidationIssue] = []
+        for metric in semantic_manifest.metrics or []:
+            issues += MetricInputExcludeDimensionsOffsetRule._validate_metric(
+                metric=metric, names_of_metrics_used_with_offset=names_of_metrics_used_with_offset
+            )
+        return issues
+
+
+class MetricInputExcludeDimensionsNameRule(
+    SemanticManifestValidationRule[SemanticManifestT], Generic[SemanticManifestT]
+):
+    """Checks that the names in `exclude_dimensions` are distinct names of categorical dimensions."""
+
+    @staticmethod
+    def _element_names(semantic_manifest: SemanticManifest) -> Tuple[Set[str], Set[str], Set[str]]:
+        """Returns the names of the categorical dimensions, time dimensions and entities of all semantic models."""
+        categorical_dimension_names: Set[str] = set()
+        time_dimension_names: Set[str] = set()
+        entity_names: Set[str] = set()
+        for semantic_model in semantic_manifest.semantic_models or []:
+            for dimension in semantic_model.dimensions:
+                if dimension.type.is_time_type():
+                    time_dimension_names.add(dimension.name)
+                else:
+                    categorical_dimension_names.add(dimension.name)
+            for entity in semantic_model.entities:
+                entity_names.add(entity.name)
+            if semantic_model.primary_entity is not None:
+                entity_names.add(semantic_model.primary_entity)
+        return categorical_dimension_names, time_dimension_names, entity_names
+
+    @staticmethod
+    def _invalid_reason(
+        name: str,
+        categorical_dimension_names: Set[str],
+        time_dimension_names: Set[str],
+        entity_names: Set[str],
+    ) -> Optional[str]:
+        """Returns why `name` can't be excluded, or None if it can."""
+        *entity_link_names, element_name = name.split(DUNDER)
+        for entity_link_name in entity_link_names:
+            if entity_link_name not in entity_names:
+                return (
+                    f"'{entity_link_name}' is not the name of an entity of any semantic model. Every part of the name "
+                    "except the last must be an entity, so a time granularity or date part can't be used."
+                )
+        if element_name == METRIC_TIME_ELEMENT_NAME:
+            return "`metric_time` is a time dimension, which can't be excluded."
+        if element_name in categorical_dimension_names:
+            return None
+        if element_name in time_dimension_names:
+            return "time dimensions can't be excluded."
+        if element_name in entity_names:
+            return "entities can't be excluded."
+        return f"'{element_name}' is not a categorical dimension of any semantic model."
+
+    @staticmethod
+    @validate_safely(whats_being_done="checking the names in exclude_dimensions of metric inputs")
+    def _validate_metric(
+        metric: Metric,
+        categorical_dimension_names: Set[str],
+        time_dimension_names: Set[str],
+        entity_names: Set[str],
+    ) -> Sequence[ValidationIssue]:
+        issues: List[ValidationIssue] = []
+        context = MetricValidationRuleHelpers.metric_context(metric)
+        for input_metric in metric.input_metrics:
+            for excluded_name, count in Counter(input_metric.exclude_dimensions).items():
+                reason = MetricInputExcludeDimensionsNameRule._invalid_reason(
+                    name=excluded_name,
+                    categorical_dimension_names=categorical_dimension_names,
+                    time_dimension_names=time_dimension_names,
+                    entity_names=entity_names,
+                )
+                if reason is not None:
+                    issues.append(
+                        ValidationError(
+                            context=context,
+                            message=f"Invalid name '{excluded_name}' in `exclude_dimensions` of input metric "
+                            f"'{input_metric.name}' on metric '{metric.name}': {reason}",
+                        )
+                    )
+                if count > 1:
+                    issues.append(
+                        ValidationError(
+                            context=context,
+                            message=f"Duplicate name '{excluded_name}' in `exclude_dimensions` of input "
+                            f"metric '{input_metric.name}' on metric '{metric.name}'.",
+                        )
+                    )
+        return issues
+
+    @staticmethod
+    def validate_manifest(semantic_manifest: SemanticManifestT) -> Sequence[ValidationIssue]:  # noqa: D102
+        (
+            categorical_dimension_names,
+            time_dimension_names,
+            entity_names,
+        ) = MetricInputExcludeDimensionsNameRule._element_names(semantic_manifest)
+        issues: List[ValidationIssue] = []
+        for metric in semantic_manifest.metrics or []:
+            issues += MetricInputExcludeDimensionsNameRule._validate_metric(
+                metric=metric,
+                categorical_dimension_names=categorical_dimension_names,
+                time_dimension_names=time_dimension_names,
+                entity_names=entity_names,
+            )
         return issues

@@ -567,8 +567,9 @@ class PassThroughMetricEvaluationPlanner(MetricEvaluationPlanner):
 
             input_query_elements: list[MetricQueryElement] = []
             for input_metric_spec in input_metric_specs:
-                input_query_element = MetricQueryElement.create(
-                    metric_spec=input_metric_spec,
+                input_query_element = self._query_helper.create_input_query_element(
+                    metric_spec=metric_spec,
+                    input_metric_spec=input_metric_spec,
                     group_by_item_specs=group_by_item_specs_for_inputs,
                     predicate_pushdown_state=predicate_pushdown_state_for_inputs,
                 )

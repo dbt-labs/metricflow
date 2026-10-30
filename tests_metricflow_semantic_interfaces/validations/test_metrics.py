@@ -15,6 +15,7 @@ from metricflow_semantic_interfaces.implementations.elements.measure import (
     PydanticNonAdditiveDimensionParameters,
 )
 from metricflow_semantic_interfaces.implementations.metric import (
+    PydanticConversionTypeParams,
     PydanticCumulativeTypeParams,
     PydanticMetric,
     PydanticMetricAggregationParams,
@@ -47,6 +48,9 @@ from metricflow_semantic_interfaces.validations.metrics import (
     CumulativeMetricRule,
     DerivedMetricRule,
     MetricAggregationParamsInForSimpleMetricsRule,
+    MetricInputExcludeDimensionsNameRule,
+    MetricInputExcludeDimensionsOffsetRule,
+    MetricInputExcludeDimensionsPlacementRule,
     MetricsCountAggregationExprRule,
     MetricsNonAdditiveDimensionsRule,
     MetricsPercentileAggregationRule,
@@ -57,6 +61,7 @@ from metricflow_semantic_interfaces.validations.semantic_manifest_validator impo
 )
 from metricflow_semantic_interfaces.validations.validator_helpers import (
     SemanticManifestValidationException,
+    SemanticManifestValidationRule,
 )
 from tests_metricflow_semantic_interfaces.example_project_configuration import EXAMPLE_PROJECT_CONFIGURATION
 from tests_metricflow_semantic_interfaces.validations.validation_test_utils import check_error_in_issues
@@ -1528,4 +1533,266 @@ def test_simple_metric_with_expr_generates_warning() -> None:
     check_error_in_issues(
         error_substrings=["should not have an expr set if it's proxy from measures"],
         issues=validation_results.all_issues,
+    )
+
+
+def _declaration_issues(metrics: list[PydanticMetric], rule: SemanticManifestValidationRule):  # type: ignore[no-untyped-def,type-arg]
+    semantic_model = semantic_model_with_guaranteed_meta(
+        name="users",
+        dimensions=[
+            PydanticDimension(name="category", type=DimensionType.CATEGORICAL),
+            PydanticDimension(
+                name="created_at",
+                type=DimensionType.TIME,
+                type_params=PydanticDimensionTypeParams(time_granularity=TimeGranularity.DAY),
+            ),
+        ],
+        entities=[PydanticEntity(name="user", type=EntityType.PRIMARY)],
+    ).copy(update={"primary_entity": "account"})
+    model_validator = SemanticManifestValidator[PydanticSemanticManifest]([rule])
+    return model_validator.validate_semantic_manifest(
+        PydanticSemanticManifest(
+            semantic_models=[semantic_model],
+            metrics=metrics,
+            project_configuration=EXAMPLE_PROJECT_CONFIGURATION,
+        )
+    )
+
+
+def _ratio_declaring(exclude_dimensions: tuple[str, ...], numerator_exclude: tuple[str, ...] = ()) -> PydanticMetric:
+    return metric_with_guaranteed_meta(
+        name="share",
+        type=MetricType.RATIO,
+        type_params=PydanticMetricTypeParams(
+            numerator=PydanticMetricInput(name="num", exclude_dimensions=numerator_exclude),
+            denominator=PydanticMetricInput(name="den", exclude_dimensions=exclude_dimensions),
+        ),
+    )
+
+
+def test_exclude_dimensions_duplicate_names_in_ratio_input() -> None:  # noqa: D103
+    results = _declaration_issues(
+        [
+            metric_with_guaranteed_meta(
+                name="ratio_with_duplicate",
+                type=MetricType.RATIO,
+                type_params=PydanticMetricTypeParams(
+                    numerator=PydanticMetricInput(name="num"),
+                    denominator=PydanticMetricInput(
+                        name="den", exclude_dimensions=("category", "user__category", "category")
+                    ),
+                ),
+            )
+        ],
+        MetricInputExcludeDimensionsNameRule(),
+    )
+
+    assert len(results.errors) == 1
+    check_error_in_issues(
+        error_substrings=[
+            "Duplicate name 'category' in `exclude_dimensions` of input metric 'den' on metric 'ratio_with_duplicate'"
+        ],
+        issues=results.all_issues,
+    )
+
+
+def test_exclude_dimensions_without_duplicates_has_no_issues() -> None:  # noqa: D103
+    results = _declaration_issues(
+        [
+            metric_with_guaranteed_meta(
+                name="ratio_declared",
+                type=MetricType.RATIO,
+                type_params=PydanticMetricTypeParams(
+                    numerator=PydanticMetricInput(name="num"),
+                    denominator=PydanticMetricInput(name="den", exclude_dimensions=("category", "user__category")),
+                ),
+            ),
+            metric_with_guaranteed_meta(
+                name="ratio_empty",
+                type=MetricType.RATIO,
+                type_params=PydanticMetricTypeParams(
+                    numerator=PydanticMetricInput(name="num", exclude_dimensions=()),
+                    denominator=PydanticMetricInput(name="den"),
+                ),
+            ),
+        ],
+        MetricInputExcludeDimensionsNameRule(),
+    )
+
+    assert not results.has_blocking_issues
+
+
+@pytest.mark.parametrize(
+    "excluded_name, error_substring",
+    [
+        (
+            "created_at",
+            "Invalid name 'created_at' in `exclude_dimensions` of input metric 'den' on metric 'share': time dimensions can't be excluded.",
+        ),
+        ("user__metric_time", "`metric_time` is a time dimension, which can't be excluded."),
+        ("user__user", "entities can't be excluded."),
+        ("user__category__month", "'category' is not the name of an entity of any semantic model."),
+        ("unknown", "'unknown' is not a categorical dimension of any semantic model."),
+    ],
+)
+def test_exclude_dimensions_rejects_invalid_names(excluded_name: str, error_substring: str) -> None:  # noqa: D103
+    results = _declaration_issues(
+        [_ratio_declaring(exclude_dimensions=(excluded_name,))], MetricInputExcludeDimensionsNameRule()
+    )
+
+    assert len(results.errors) == 1
+    check_error_in_issues(error_substrings=[error_substring], issues=results.all_issues)
+
+
+@pytest.mark.parametrize("excluded_name", ["category", "user__category", "account__category"])
+def test_exclude_dimensions_accepts_categorical_dimension(excluded_name: str) -> None:  # noqa: D103
+    results = _declaration_issues(
+        [_ratio_declaring(exclude_dimensions=(excluded_name,))], MetricInputExcludeDimensionsNameRule()
+    )
+
+    assert not results.has_blocking_issues
+
+
+@pytest.mark.parametrize("metric_type", [MetricType.SIMPLE, MetricType.CUMULATIVE, MetricType.CONVERSION])
+def test_exclude_dimensions_rejected_on_other_metric_types(metric_type: MetricType) -> None:  # noqa: D103
+    declared_input = PydanticMetricInput(name="den", exclude_dimensions=("category",))
+    if metric_type is MetricType.SIMPLE:
+        type_params = PydanticMetricTypeParams(metrics=[declared_input])
+    elif metric_type is MetricType.CUMULATIVE:
+        type_params = PydanticMetricTypeParams(
+            cumulative_type_params=PydanticCumulativeTypeParams(metric=declared_input)
+        )
+    else:
+        type_params = PydanticMetricTypeParams(
+            conversion_type_params=PydanticConversionTypeParams(
+                base_metric=declared_input,
+                conversion_metric=PydanticMetricInput(name="conv"),
+                entity="user",
+            )
+        )
+    results = _declaration_issues(
+        [metric_with_guaranteed_meta(name="other", type=metric_type, type_params=type_params)],
+        MetricInputExcludeDimensionsPlacementRule(),
+    )
+
+    assert len(results.errors) == 1
+    check_error_in_issues(
+        error_substrings=[
+            f"Input metric 'den' on {metric_type.value} metric 'other' has `exclude_dimensions`, which is only "
+            "supported on the inputs of ratio and derived metrics."
+        ],
+        issues=results.all_issues,
+    )
+
+
+def test_exclude_dimensions_rejected_when_every_input_declares() -> None:  # noqa: D103
+    results = _declaration_issues(
+        [_ratio_declaring(exclude_dimensions=("category",), numerator_exclude=("category",))],
+        MetricInputExcludeDimensionsPlacementRule(),
+    )
+
+    assert len(results.errors) == 1
+    check_error_in_issues(
+        error_substrings=[
+            "Every input metric of metric 'share' has `exclude_dimensions`. At least one input metric must not have it"
+        ],
+        issues=results.all_issues,
+    )
+
+
+def _share_of_total(denominator_alias: Optional[str], numerator_alias: Optional[str] = None) -> PydanticMetric:
+    return metric_with_guaranteed_meta(
+        name="share_of_total",
+        type=MetricType.RATIO,
+        type_params=PydanticMetricTypeParams(
+            numerator=PydanticMetricInput(name="total", alias=numerator_alias),
+            denominator=PydanticMetricInput(name="total", exclude_dimensions=("category",), alias=denominator_alias),
+        ),
+    )
+
+
+def test_exclude_dimensions_rejected_when_inputs_share_a_name_with_different_exclusions() -> None:  # noqa: D103
+    results = _declaration_issues(
+        [_share_of_total(denominator_alias=None)], MetricInputExcludeDimensionsPlacementRule()
+    )
+
+    assert len(results.errors) == 1
+    check_error_in_issues(
+        error_substrings=[
+            "Input metrics of metric 'share_of_total' share the name 'total' but have different `exclude_dimensions`"
+        ],
+        issues=results.all_issues,
+    )
+
+
+def test_exclude_dimensions_accepts_inputs_with_the_same_metric_and_distinct_aliases() -> None:  # noqa: D103
+    results = _declaration_issues(
+        [_share_of_total(denominator_alias="all_total")], MetricInputExcludeDimensionsPlacementRule()
+    )
+
+    assert len(results.all_issues) == 0
+
+
+@pytest.mark.parametrize(
+    "offset_params",
+    [
+        {"offset_window": PydanticMetricTimeWindow(count=1, granularity="month")},
+        {"offset_to_grain": "month"},
+    ],
+)
+def test_exclude_dimensions_rejected_with_time_offset(offset_params: dict) -> None:  # type: ignore[type-arg]  # noqa: D103
+    results = _declaration_issues(
+        [
+            metric_with_guaranteed_meta(
+                name="combined",
+                type=MetricType.DERIVED,
+                type_params=PydanticMetricTypeParams(
+                    expr="a + b",
+                    metrics=[
+                        PydanticMetricInput(name="a", exclude_dimensions=("category",), **offset_params),
+                        PydanticMetricInput(name="b"),
+                    ],
+                ),
+            )
+        ],
+        MetricInputExcludeDimensionsOffsetRule(),
+    )
+
+    assert len(results.errors) == 1
+    check_error_in_issues(
+        error_substrings=[
+            "Input metric 'a' on metric 'combined' has `exclude_dimensions` and a time offset "
+            "(`offset_window` or `offset_to_grain`). These can't be used together."
+        ],
+        issues=results.all_issues,
+    )
+
+
+def test_exclude_dimensions_rejected_when_metric_is_used_with_time_offset() -> None:  # noqa: D103
+    results = _declaration_issues(
+        [
+            _ratio_declaring(exclude_dimensions=("category",)),
+            metric_with_guaranteed_meta(
+                name="share_last_month",
+                type=MetricType.DERIVED,
+                type_params=PydanticMetricTypeParams(
+                    expr="share",
+                    metrics=[
+                        PydanticMetricInput(
+                            name="share", offset_window=PydanticMetricTimeWindow(count=1, granularity="month")
+                        )
+                    ],
+                ),
+            ),
+        ],
+        MetricInputExcludeDimensionsOffsetRule(),
+    )
+
+    assert len(results.errors) == 1
+    check_error_in_issues(
+        error_substrings=[
+            "Input metric 'den' on metric 'share' has `exclude_dimensions`, but 'share' is used with a time offset "
+            "(`offset_window` or `offset_to_grain`) by another metric. These can't be used together."
+        ],
+        issues=results.all_issues,
     )

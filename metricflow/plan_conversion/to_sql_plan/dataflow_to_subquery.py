@@ -80,6 +80,7 @@ from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_base_aggregated_outputs import JoinToBaseAggregatedOutputsNode
 from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -106,6 +107,7 @@ from metricflow.plan_conversion.instance_set_transforms.instance_converters impo
     ChangeSimpleMetricInputAggregationState,
     ConvertToMetadata,
     CreateSelectColumnForCombineOutputNode,
+    CreateSelectColumnForJoinToBaseOutputNode,
     CreateSqlColumnReferencesForInstances,
     FilterLinkableInstancesWithLeadingLink,
     RemoveMetrics,
@@ -1154,6 +1156,75 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                 from_source_alias=from_data_set.alias,
                 join_descs=tuple(joins_descriptions),
                 group_bys=linkable_select_column_set.columns_in_default_order,
+            ),
+        )
+
+    def visit_join_to_base_aggregated_outputs_node(self, node: JoinToBaseAggregatedOutputsNode) -> SqlDataSet:
+        """Left join aggregated outputs with a coarser grain onto the base aggregated output.
+
+        The base is the first parent and has all linkable specs of the output. Each remaining parent is joined on the
+        linkable specs it shares with the base, or cross joined if it has none. The parents are already aggregated and
+        unique on their linkable specs, so there is no re-aggregation.
+        """
+        parent_data_sets: List[AnnotatedSqlDataSet] = []
+        for parent_node in node.parent_nodes:
+            parent_data_sets.append(
+                AnnotatedSqlDataSet(
+                    data_set=self.get_output_data_set(parent_node), alias=self._next_unique_table_alias()
+                )
+            )
+
+        base_data_set = parent_data_sets[0]
+        declared_input_data_sets = parent_data_sets[1:]
+        base_linkable_specs = set(base_data_set.data_set.instance_set.spec_set.linkable_specs)
+
+        joins_descriptions: List[SqlJoinDescription] = []
+        for declared_input_data_set in declared_input_data_sets:
+            declared_input_linkable_specs = declared_input_data_set.data_set.instance_set.spec_set.linkable_specs
+            if not set(declared_input_linkable_specs).issubset(base_linkable_specs):
+                raise MetricFlowInternalError(
+                    LazyFormat(
+                        "The base data set should have all linkable instances of the declared input data sets.",
+                        base_data_set_instance_set=base_data_set.data_set.instance_set,
+                        declared_input_data_set_instance_set=declared_input_data_set.data_set.instance_set,
+                    )
+                )
+            joins_descriptions.append(
+                SqlPlanJoinBuilder.make_join_description_for_joining_to_base(
+                    base_data_set=base_data_set,
+                    join_data_set=declared_input_data_set,
+                    column_names=tuple(
+                        self._column_association_resolver.resolve_spec(spec).column_name
+                        for spec in declared_input_linkable_specs
+                    ),
+                )
+            )
+
+        output_instance_set = InstanceSet.merge([x.data_set.instance_set for x in parent_data_sets])
+        output_instance_set = output_instance_set.transform(ChangeAssociatedColumns(self._column_association_resolver))
+
+        select_column_set = base_data_set.data_set.instance_set.transform(
+            CreateSelectColumnsForInstances(base_data_set.alias, self._column_association_resolver)
+        ).select_column_set
+        for declared_input_data_set in declared_input_data_sets:
+            select_column_set = select_column_set.merge(
+                declared_input_data_set.data_set.instance_set.transform(
+                    CreateSelectColumnForJoinToBaseOutputNode(
+                        table_alias=declared_input_data_set.alias,
+                        column_resolver=self._column_association_resolver,
+                        metric_lookup=self._metric_lookup,
+                    )
+                )
+            )
+
+        return SqlDataSet(
+            instance_set=output_instance_set,
+            sql_select_node=SqlSelectStatementNode.create(
+                description=node.description,
+                select_columns=select_column_set.columns_in_default_order,
+                from_source=base_data_set.data_set.checked_sql_select_node,
+                from_source_alias=base_data_set.alias,
+                join_descs=tuple(joins_descriptions),
             ),
         )
 

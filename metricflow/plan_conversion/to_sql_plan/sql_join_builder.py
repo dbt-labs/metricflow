@@ -362,6 +362,57 @@ class SqlPlanJoinBuilder:
             )
 
     @staticmethod
+    def make_join_description_for_joining_to_base(
+        base_data_set: AnnotatedSqlDataSet,
+        join_data_set: AnnotatedSqlDataSet,
+        column_names: Sequence[str],
+    ) -> SqlJoinDescription:
+        """Creates a LEFT OUTER JOIN of an aggregated data set to the base on the shared group-by columns.
+
+        Each key is compared with its own type, and NULLs match each other (`a = b OR (a IS NULL AND b IS NULL)`).
+        Without shared columns, this is a CROSS JOIN.
+        """
+        if len(column_names) == 0:
+            return SqlJoinDescription(
+                right_source=join_data_set.data_set.checked_sql_select_node,
+                right_source_alias=join_data_set.alias,
+                join_type=SqlJoinType.CROSS_JOIN,
+            )
+
+        def key_equality(column_name: str) -> SqlExpressionNode:
+            base_column = SqlColumnReferenceExpression.create(
+                SqlColumnReference(table_alias=base_data_set.alias, column_name=column_name)
+            )
+            join_column = SqlColumnReferenceExpression.create(
+                SqlColumnReference(table_alias=join_data_set.alias, column_name=column_name)
+            )
+            equality = SqlComparisonExpression.create(
+                left_expr=base_column, comparison=SqlComparison.EQUALS, right_expr=join_column
+            )
+            return SqlLogicalExpression.create(
+                operator=SqlLogicalOperator.OR,
+                args=(
+                    equality,
+                    SqlLogicalExpression.create(
+                        operator=SqlLogicalOperator.AND,
+                        args=(SqlIsNullExpression.create(base_column), SqlIsNullExpression.create(join_column)),
+                    ),
+                ),
+            )
+
+        equality_exprs = tuple(key_equality(column_name) for column_name in column_names)
+        return SqlJoinDescription(
+            right_source=join_data_set.data_set.checked_sql_select_node,
+            right_source_alias=join_data_set.alias,
+            join_type=SqlJoinType.LEFT_OUTER,
+            on_condition=(
+                SqlLogicalExpression.create(operator=SqlLogicalOperator.AND, args=equality_exprs)
+                if len(equality_exprs) > 1
+                else equality_exprs[0]
+            ),
+        )
+
+    @staticmethod
     def _make_equality_expression_for_full_outer_join(
         table_aliases_in_coalesce: Sequence[str], right_table_alias: str, column_alias: str
     ) -> SqlExpressionNode:

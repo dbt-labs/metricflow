@@ -19,6 +19,7 @@ if typing.TYPE_CHECKING:
     from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
     from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
     from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+    from metricflow.dataflow.nodes.join_to_base_aggregated_outputs import JoinToBaseAggregatedOutputsNode
     from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
     from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
     from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -86,6 +87,12 @@ class DataflowPlanNodeVisitor(Generic[VisitorOutputT], ABC):
 
     @abstractmethod
     def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> VisitorOutputT:  # noqa: D102
+        raise NotImplementedError
+
+    @abstractmethod
+    def visit_join_to_base_aggregated_outputs_node(  # noqa: D102
+        self, node: JoinToBaseAggregatedOutputsNode
+    ) -> VisitorOutputT:
         raise NotImplementedError
 
     @abstractmethod
@@ -195,6 +202,12 @@ class DataflowPlanNodeVisitorWithDefaultHandler(DataflowPlanNodeVisitor[VisitorO
 
     @override
     def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> VisitorOutputT:  # noqa: D102
+        return self._default_handler(node)
+
+    @override
+    def visit_join_to_base_aggregated_outputs_node(  # noqa: D102
+        self, node: JoinToBaseAggregatedOutputsNode
+    ) -> VisitorOutputT:
         return self._default_handler(node)
 
     @override

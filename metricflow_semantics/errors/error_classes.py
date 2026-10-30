@@ -118,6 +118,18 @@ class InvalidQueryException(InformativeUserError):
     pass
 
 
+class InvalidExcludedFilterError(InvalidQueryException):
+    """Raised when a filter can't be applied to an input metric that excludes dimensions via `exclude_dimensions`."""
+
+    pass
+
+
+class UnmatchedExcludeDimensionsError(InvalidQueryException):
+    """Raised when a name in `exclude_dimensions` matches no dimension that the input metrics can be grouped by."""
+
+    pass
+
+
 class RenderSqlTemplateException(InformativeUserError):
     """Exception thrown when there is an error rendering a SQL template."""
 
@@ -126,6 +138,12 @@ class RenderSqlTemplateException(InformativeUserError):
 
 class FeatureNotSupportedError(InformativeUserError):
     """Exception thrown when a feature is not implemented."""
+
+    pass
+
+
+class ExcludeDimensionsWithTimeOffsetError(FeatureNotSupportedError):
+    """Raised when `exclude_dimensions` is combined with a time offset."""
 
     pass
 

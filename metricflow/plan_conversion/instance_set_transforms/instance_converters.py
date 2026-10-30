@@ -38,7 +38,7 @@ from metricflow_semantics.sql.sql_exprs import (
 from metricflow_semantics.toolkit.assert_one_arg import assert_exactly_one_arg_set
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from more_itertools import bucket
-from typing_extensions import TypeVar
+from typing_extensions import TypeVar, override
 
 from metricflow.dataflow.builder.aggregation_helper import InstanceAliasMapping, NullFillValueMapping
 from metricflow.dataflow.nodes.join_to_base import ValidityWindowJoinDescription
@@ -547,6 +547,12 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
         self._column_resolver = column_resolver
         self._metric_lookup = metric_lookup
 
+    def _aggregate_column(self, column_reference_expression: SqlColumnReferenceExpression) -> SqlExpressionNode:
+        """Wraps the column in the aggregation that combines the rows of the joined outputs."""
+        return SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
+            aggregation_type=AggregationType.MAX, sql_column_expression=column_reference_expression
+        )
+
     def _create_select_column(self, spec: InstanceSpec, fill_nulls_with: Optional[int] = None) -> SqlSelectColumn:
         """Creates the select column for the given spec and the fill value."""
         column_name = self._column_resolver.resolve_spec(spec).column_name
@@ -556,9 +562,7 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
                 column_name=column_name,
             )
         )
-        select_expression: SqlExpressionNode = SqlFunctionExpression.build_expression_for_non_percentile_aggregation(
-            aggregation_type=AggregationType.MAX, sql_column_expression=column_reference_expression
-        )
+        select_expression = self._aggregate_column(column_reference_expression)
         if fill_nulls_with is not None:
             select_expression = SqlAggregateFunctionExpression.create(
                 sql_function=SqlFunction.COALESCE,
@@ -614,6 +618,14 @@ class CreateSelectColumnForCombineOutputNode(InstanceSetTransform[SelectColumnSe
                 instance_set.simple_metric_input_instances
             ),
         )
+
+
+class CreateSelectColumnForJoinToBaseOutputNode(CreateSelectColumnForCombineOutputNode):
+    """Create select column expressions for the declared inputs of a join to the base, one row per base row."""
+
+    @override
+    def _aggregate_column(self, column_reference_expression: SqlColumnReferenceExpression) -> SqlExpressionNode:
+        return column_reference_expression
 
 
 # TODO: delete this class & all uses. It doesn't do anything.

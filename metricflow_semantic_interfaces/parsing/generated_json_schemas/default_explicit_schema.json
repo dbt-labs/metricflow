@@ -557,6 +557,12 @@
                 "alias": {
                     "type": "string"
                 },
+                "exclude_dimensions": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "filter": {
                     "$ref": "#/definitions/filter_schema"
                 },
@@ -645,7 +651,7 @@
                     "$ref": "#/definitions/cumulative_type_params_schema"
                 },
                 "denominator": {
-                    "$ref": "#/definitions/metric_input_measure_schema"
+                    "$ref": "#/definitions/ratio_metric_input_schema"
                 },
                 "expr": {
                     "type": [
@@ -678,7 +684,7 @@
                     "type": "array"
                 },
                 "numerator": {
-                    "$ref": "#/definitions/metric_input_measure_schema"
+                    "$ref": "#/definitions/ratio_metric_input_schema"
                 },
                 "window": {
                     "type": "string"
@@ -755,6 +761,41 @@
             },
             "required": [],
             "type": "object"
+        },
+        "ratio_metric_input_schema": {
+            "$id": "ratio_metric_input_schema",
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "alias": {
+                            "type": "string"
+                        },
+                        "exclude_dimensions": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "fill_nulls_with": {
+                            "type": "integer"
+                        },
+                        "filter": {
+                            "$ref": "#/definitions/filter_schema"
+                        },
+                        "join_to_timespine": {
+                            "type": "boolean"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
         },
         "saved_query_query_params_schema": {
             "$id": "saved_query_query_params_schema",

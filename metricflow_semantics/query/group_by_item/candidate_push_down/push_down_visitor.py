@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import itertools
 import logging
 import typing
 from contextlib import contextmanager
-from dataclasses import dataclass
-from typing import Dict, Iterator, List, Optional, Sequence
+from dataclasses import dataclass, replace
+from typing import Dict, Iterator, List, Mapping, Optional, Sequence
 
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
 from metricflow_semantics.model.semantics.element_filter import GroupByItemSetFilter
+from metricflow_semantics.model.semantics.excluded_dimensions import with_excluded_dimensions_allowed
+from metricflow_semantics.model.semantics.linkable_element_set_base import BaseGroupByItemSet
 from metricflow_semantics.query.group_by_item.candidate_push_down.group_by_item_candidate import GroupByItemCandidateSet
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import (
     WhereFilterLocation,
@@ -239,10 +242,79 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                 max_metric_default_time_granularity=metric_default_time_granularity,
             )
 
+    def _allow_excluded_dimensions(
+        self,
+        push_down_results_from_parents: Dict[GroupByItemResolutionNode, PushDownResult],
+        excluded_dimension_names_by_parent: Mapping[GroupByItemResolutionNode, Sequence[str]],
+    ) -> Dict[GroupByItemResolutionNode, PushDownResult]:
+        """Let the parents that declared `exclude_dimensions` keep the declared dimensions the other parents have."""
+        parent_nodes = tuple(push_down_results_from_parents)
+        excluded_dimension_names_per_parent = tuple(
+            excluded_dimension_names_by_parent.get(parent_node, ()) for parent_node in parent_nodes
+        )
+        allowed_item_sets = with_excluded_dimensions_allowed(
+            item_sets=tuple(
+                push_down_results_from_parents[parent_node].candidate_set.linkable_element_set
+                for parent_node in parent_nodes
+            ),
+            excluded_dimension_names_per_set=excluded_dimension_names_per_parent,
+        )
+        simple_metric_input_paths_of_undeclared_parents = tuple(
+            itertools.chain.from_iterable(
+                push_down_results_from_parents[parent_node].candidate_set.simple_metric_input_paths
+                for parent_node, excluded_dimension_names in zip(parent_nodes, excluded_dimension_names_per_parent)
+                if len(excluded_dimension_names) == 0
+            )
+        )
+        return {
+            parent_node: (
+                push_down_results_from_parents[parent_node]
+                if allowed_item_set.is_empty
+                else self._with_item_set(
+                    push_down_result=push_down_results_from_parents[parent_node],
+                    item_set=allowed_item_set,
+                    fallback_simple_metric_input_paths=simple_metric_input_paths_of_undeclared_parents,
+                )
+            )
+            for parent_node, allowed_item_set in zip(parent_nodes, allowed_item_sets)
+        }
+
+    @staticmethod
+    def _with_item_set(
+        push_down_result: PushDownResult,
+        item_set: BaseGroupByItemSet,
+        fallback_simple_metric_input_paths: Sequence[MetricFlowQueryResolutionPath],
+    ) -> PushDownResult:
+        return replace(
+            push_down_result,
+            candidate_set=GroupByItemCandidateSet(
+                linkable_element_set=item_set,
+                simple_metric_input_paths=push_down_result.candidate_set.simple_metric_input_paths
+                or tuple(fallback_simple_metric_input_paths),
+                path_from_leaf_node=push_down_result.candidate_set.path_from_leaf_node,
+            ),
+            issue_set=(
+                MetricFlowQueryResolutionIssueSet.empty_instance()
+                if push_down_result.issue_set.has_errors
+                else push_down_result.issue_set
+            ),
+        )
+
+    def _excluded_dimension_names_by_parent(
+        self, node: ComplexMetricGroupByItemResolutionNode
+    ) -> Dict[GroupByItemResolutionNode, Sequence[str]]:
+        metric_lookup = self._semantic_manifest_lookup.metric_lookup
+        return {
+            parent_node: parent_node.metric_input_location.get_metric_input(metric_lookup).exclude_dimensions
+            for parent_node in node.parent_nodes
+            if parent_node.metric_input_location is not None
+        }
+
     def _merge_push_down_results_from_parents(
         self,
         push_down_results_from_parents: Dict[GroupByItemResolutionNode, PushDownResult],
         current_traversal_path: MetricFlowQueryResolutionPath,
+        excluded_dimension_names_by_parent: Optional[Mapping[GroupByItemResolutionNode, Sequence[str]]] = None,
     ) -> PushDownResult:
         """Helper method that merges push down results from parents into a single result.
 
@@ -250,6 +322,11 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
         to form a new candidate set, and passes that down to the child node. This handles generation of an issue if
         the parent candidate sets don't have a common candidate.
         """
+        if excluded_dimension_names_by_parent and any(excluded_dimension_names_by_parent.values()):
+            push_down_results_from_parents = self._allow_excluded_dimensions(
+                push_down_results_from_parents=push_down_results_from_parents,
+                excluded_dimension_names_by_parent=excluded_dimension_names_by_parent,
+            )
         merged_issue_set: MetricFlowQueryResolutionIssueSet = MetricFlowQueryResolutionIssueSet.merge_iterable(
             parent_candidate_set.issue_set for parent_candidate_set in push_down_results_from_parents.values()
         )
@@ -332,6 +409,7 @@ class _PushDownGroupByItemCandidatesVisitor(GroupByItemResolutionNodeVisitor[Pus
                     parent_node: parent_node.accept(self) for parent_node in node.parent_nodes
                 },
                 current_traversal_path=current_traversal_path,
+                excluded_dimension_names_by_parent=self._excluded_dimension_names_by_parent(node),
             )
             logger.debug(
                 LazyFormat("Visiting Node", node=node.ui_description, input=merged_result_from_parents.candidate_set)

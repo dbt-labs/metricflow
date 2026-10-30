@@ -3,13 +3,14 @@ from __future__ import annotations
 import itertools
 import logging
 import time
-from typing import Dict, FrozenSet, Iterable, List, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, FrozenSet, Iterable, List, Mapping, Optional, Sequence, Set, Tuple, Union
 
 from metricflow_semantics.dag.id_prefix import StaticIdPrefix
 from metricflow_semantics.dag.mf_dag import DagId
 from metricflow_semantics.errors.custom_grain_not_supported import error_if_not_standard_grain
 from metricflow_semantics.errors.error_classes import (
     InvalidManifestException,
+    InvalidQueryException,
     MetricFlowInternalError,
     UnableToSatisfyQueryError,
 )
@@ -87,6 +88,7 @@ from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinDescription, JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_base_aggregated_outputs import JoinToBaseAggregatedOutputsNode
 from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -351,11 +353,18 @@ class DataflowPlanBuilder:
                     )
                 input_dataflow_plan_nodes.append(input_dataflow_plan_node)
 
+            declared_input_dataflow_plan_nodes = self._select_declared_input_nodes(
+                input_dataflow_plan_nodes=input_dataflow_plan_nodes,
+                source_edges=me_plan_override.source_edges(current_query_node),
+                query_node_to_dataflow_node=query_node_to_dataflow_node,
+            )
+
             dataflow_plan_node = current_query_node.accept(
                 DataflowPlanBuilder._EvaluationNodeToDataflowNodeConverter(
                     dataflow_plan_builder=self,
                     filter_spec_factory=filter_spec_factory,
                     input_dataflow_plan_nodes=input_dataflow_plan_nodes,
+                    declared_input_dataflow_plan_nodes=declared_input_dataflow_plan_nodes,
                     option_set=option_set.with_output_group_by_metric_instances(
                         current_query_node in nodes_to_output_group_by_metric_instances
                     ),
@@ -793,6 +802,72 @@ class DataflowPlanBuilder:
             aggregated_to_elements=set(queried_linkable_specs.as_tuple),
         )
 
+    @staticmethod
+    def _select_declared_input_nodes(
+        input_dataflow_plan_nodes: Sequence[DataflowPlanNode],
+        source_edges: Iterable[MetricQueryDependencyEdge],
+        query_node_to_dataflow_node: Mapping[MetricQueryNode, DataflowPlanNode],
+    ) -> Sequence[DataflowPlanNode]:
+        """Return the input nodes to join onto the base node, without duplicates and in the order of the edges.
+
+        An input node is joined to the base if each edge that uses it excludes a dimension that the query uses (in a
+        group-by or in a filter). One node can serve several edges when the planner shares nodes between inputs.
+
+        When every input node would be joined, the base is made of the nodes that still have every queried group-by
+        item, i.e. the ones that only use the excluded dimension in a filter.
+        """
+        node_to_uses_exclusion: dict[DataflowPlanNode, bool] = {}
+        node_to_lacks_group_by_items: dict[DataflowPlanNode, bool] = {}
+        for edge in source_edges:
+            source_node = query_node_to_dataflow_node[edge.source_node]
+            queried_group_by_specs = edge.target_node.query_properties.group_by_item_specs
+            exclude_dimensions = edge.source_node_output_spec.exclude_dimensions
+            uses_exclusion = MetricQueryHelper.is_any_excluded_dimension_used(
+                queried_group_by_specs=queried_group_by_specs,
+                filter_specs=edge.target_node_output_spec.where_filter_specs,
+                exclude_dimensions=exclude_dimensions,
+            )
+            lacks_group_by_items = MetricQueryHelper.is_any_excluded_dimension_queried(
+                queried_group_by_specs=queried_group_by_specs,
+                exclude_dimensions=exclude_dimensions,
+            )
+            node_to_uses_exclusion[source_node] = node_to_uses_exclusion.get(source_node, True) and uses_exclusion
+            node_to_lacks_group_by_items[source_node] = (
+                node_to_lacks_group_by_items.get(source_node, True) and lacks_group_by_items
+            )
+
+        declared_nodes = [node for node, uses_exclusion in node_to_uses_exclusion.items() if uses_exclusion]
+        if len(declared_nodes) == 0 or any(node not in declared_nodes for node in input_dataflow_plan_nodes):
+            return declared_nodes
+
+        declared_nodes = [node for node in declared_nodes if node_to_lacks_group_by_items[node]]
+        if len(declared_nodes) == len(frozenset(input_dataflow_plan_nodes)):
+            raise InvalidQueryException(
+                "Every input of a derived metric excludes a dimension that the query groups by, so none of them has"
+                " all of the group-by items."
+            )
+        return declared_nodes
+
+    @staticmethod
+    def _combine_derived_metric_inputs(
+        input_dataflow_plan_nodes: Sequence[DataflowPlanNode],
+        declared_input_dataflow_plan_nodes: Sequence[DataflowPlanNode],
+    ) -> DataflowPlanNode:
+        """Combine the input nodes of a derived metric, joining inputs that exclude dimensions onto the others."""
+        base_nodes = [node for node in input_dataflow_plan_nodes if node not in declared_input_dataflow_plan_nodes]
+        if len(declared_input_dataflow_plan_nodes) == 0:
+            return (
+                input_dataflow_plan_nodes[0]
+                if len(input_dataflow_plan_nodes) == 1
+                else CombineAggregatedOutputsNode.create(input_dataflow_plan_nodes)
+            )
+        if len(base_nodes) == 0:
+            raise MetricFlowInternalError("At least one input of a derived metric should not exclude dimensions.")
+        base_node = base_nodes[0] if len(base_nodes) == 1 else CombineAggregatedOutputsNode.create(base_nodes)
+        return JoinToBaseAggregatedOutputsNode.create(
+            base_node=base_node, declared_input_nodes=declared_input_dataflow_plan_nodes
+        )
+
     def _build_derived_metric_output_node(
         self,
         metric_spec: MetricSpec,
@@ -801,13 +876,13 @@ class DataflowPlanBuilder:
         predicate_pushdown_state: PredicatePushdownState,
         option_set: DataflowPlanOptionSet,
         input_dataflow_plan_nodes: Sequence[DataflowPlanNode],
+        declared_input_dataflow_plan_nodes: Sequence[DataflowPlanNode],
     ) -> DataflowPlanNode:
         logger.debug(LazyFormat("Building derived metric output node", metric_spec=metric_spec))
 
-        input_node = (
-            input_dataflow_plan_nodes[0]
-            if len(input_dataflow_plan_nodes) == 1
-            else CombineAggregatedOutputsNode.create(input_dataflow_plan_nodes)
+        input_node = self._combine_derived_metric_inputs(
+            input_dataflow_plan_nodes=input_dataflow_plan_nodes,
+            declared_input_dataflow_plan_nodes=declared_input_dataflow_plan_nodes,
         )
         output_node: DataflowPlanNode = ComputeMetricsNode.create(
             parent_node=input_node,
@@ -2385,6 +2460,7 @@ class DataflowPlanBuilder:
             dataflow_plan_builder: DataflowPlanBuilder,
             filter_spec_factory: WhereFilterSpecFactory,
             input_dataflow_plan_nodes: Iterable[DataflowPlanNode],
+            declared_input_dataflow_plan_nodes: Iterable[DataflowPlanNode],
             option_set: DataflowPlanOptionSet,
             simple_metric_node_cache: ResultCache[BuildAnyMetricOutputNodeInput, DataflowPlanNode],
         ) -> None:
@@ -2392,6 +2468,7 @@ class DataflowPlanBuilder:
             self._filter_spec_factory = filter_spec_factory
             self._option_set = option_set
             self._input_dataflow_plan_nodes = tuple(input_dataflow_plan_nodes)
+            self._declared_input_dataflow_plan_nodes = tuple(declared_input_dataflow_plan_nodes)
             self._simple_metric_node_cache = simple_metric_node_cache
 
         @override
@@ -2461,6 +2538,7 @@ class DataflowPlanBuilder:
                     predicate_pushdown_state=node.query_properties.predicate_pushdown_state,
                     option_set=self._option_set,
                     input_dataflow_plan_nodes=self._input_dataflow_plan_nodes,
+                    declared_input_dataflow_plan_nodes=self._declared_input_dataflow_plan_nodes,
                 )
                 derived_metric_nodes.append(result_for_one_computed_spec)
 

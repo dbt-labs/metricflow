@@ -29,6 +29,9 @@ from metricflow_semantic_interfaces.validations.metrics import (
     ConversionMetricRule,
     CumulativeMetricRule,
     DerivedMetricRule,
+    MetricInputExcludeDimensionsNameRule,
+    MetricInputExcludeDimensionsOffsetRule,
+    MetricInputExcludeDimensionsPlacementRule,
     SimpleMetricExprRule,
 )
 from metricflow_semantic_interfaces.validations.non_empty import NonEmptyRule
@@ -101,6 +104,9 @@ class SemanticManifestValidator(Generic[SemanticManifestT]):
         TimeSpineRule[SemanticManifestT](),
         TimeDimensionHasGranularityRule[SemanticManifestT](),
         SimpleMetricExprRule[SemanticManifestT](),
+        MetricInputExcludeDimensionsPlacementRule[SemanticManifestT](),
+        MetricInputExcludeDimensionsOffsetRule[SemanticManifestT](),
+        MetricInputExcludeDimensionsNameRule[SemanticManifestT](),
     )
 
     def __init__(

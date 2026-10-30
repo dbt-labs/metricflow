@@ -78,7 +78,14 @@ class MetricEvaluationPlanner(ABC):
                 )
             )
             where_filter_specs.extend(metric_definition_filter_specs)
-            where_filter_specs.extend(additional_filter_specs)
+            where_filter_specs.extend(
+                self._query_helper.select_filter_specs_for_input_metric(
+                    metric_name=metric_name,
+                    input_metric_name=input_metric.name,
+                    filter_specs=additional_filter_specs,
+                    exclude_dimensions=input_metric.exclude_dimensions,
+                )
+            )
 
             input_metric_offset_to_grain: Optional[TimeGranularity] = None
             if input_metric.offset_to_grain is not None:
@@ -100,6 +107,10 @@ class MetricEvaluationPlanner(ABC):
                     else None
                 ),
                 offset_to_grain=input_metric_offset_to_grain,
+                exclude_dimensions=input_metric.exclude_dimensions,
             )
             input_metric_specs.append(spec)
+        self._query_helper.error_if_declared_dimension_matches_no_group_by_item(
+            metric_name=metric_name, input_metric_specs=input_metric_specs
+        )
         return input_metric_specs

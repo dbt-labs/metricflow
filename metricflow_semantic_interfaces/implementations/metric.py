@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Sequence, Set
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 from typing_extensions import override
 
@@ -145,6 +145,7 @@ class PydanticMetricInput(HashableBaseModel):
     alias: Optional[str]
     offset_window: Optional[PydanticMetricTimeWindow]
     offset_to_grain: Optional[str]
+    exclude_dimensions: Tuple[str, ...] = ()
 
     @property
     def as_reference(self) -> MetricReference:

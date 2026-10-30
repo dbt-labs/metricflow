@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import textwrap
 
+import pytest
+
 from metricflow_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
     PydanticWhereFilterIntersection,
@@ -247,6 +249,127 @@ def test_ratio_metric_input_measure_object_parsing() -> None:
         ),
     )
     assert metric.type_params.denominator == PydanticMetricInput(name="denominator_metric_from_object")
+
+
+def _parse_metric_yaml(yaml_contents: str):  # type: ignore[no-untyped-def]
+    file = YamlConfigFile(filepath="inline_for_test", contents=textwrap.dedent(yaml_contents))
+    return parse_yaml_files_to_semantic_manifest(files=[file, EXAMPLE_PROJECT_CONFIGURATION_YAML_CONFIG_FILE])
+
+
+def test_ratio_metric_exclude_dimensions_parsing() -> None:
+    """Test for parsing `exclude_dimensions` on the numerator and denominator of a ratio metric."""
+    build_result = _parse_metric_yaml(
+        """\
+        metric:
+          name: ratio_test
+          type: ratio
+          type_params:
+            numerator:
+              name: numerator_metric
+            denominator:
+              name: denominator_metric
+              exclude_dimensions:
+                - category
+                - region
+        """
+    )
+
+    assert not build_result.issues.has_blocking_issues
+    metric = build_result.semantic_manifest.metrics[0]
+    assert metric.type_params.numerator == PydanticMetricInput(name="numerator_metric")
+    assert metric.type_params.numerator is not None
+    assert metric.type_params.numerator.exclude_dimensions == ()
+    assert metric.type_params.denominator == PydanticMetricInput(
+        name="denominator_metric", exclude_dimensions=("category", "region")
+    )
+
+
+def test_derived_metric_exclude_dimensions_parsing() -> None:
+    """Test for parsing `exclude_dimensions` on the inputs of a derived metric."""
+    build_result = _parse_metric_yaml(
+        """\
+        metric:
+          name: derived_test
+          type: derived
+          type_params:
+            expr: a / b
+            metrics:
+              - name: a
+              - name: b
+                exclude_dimensions: [category]
+        """
+    )
+
+    assert not build_result.issues.has_blocking_issues
+    metric = build_result.semantic_manifest.metrics[0]
+    assert metric.type_params.metrics
+    input_a, input_b = metric.type_params.metrics
+    assert input_a.exclude_dimensions == ()
+    assert input_b.exclude_dimensions == ("category",)
+
+
+def test_ratio_metric_empty_exclude_dimensions_is_same_as_undeclared() -> None:
+    """An empty list parses to the same input as no declaration."""
+    build_result = _parse_metric_yaml(
+        """\
+        metric:
+          name: ratio_test
+          type: ratio
+          type_params:
+            numerator:
+              name: numerator_metric
+            denominator:
+              name: denominator_metric
+        ---
+        metric:
+          name: ratio_test_empty
+          type: ratio
+          type_params:
+            numerator:
+              name: numerator_metric
+              exclude_dimensions: []
+            denominator:
+              name: denominator_metric
+              exclude_dimensions: []
+        """
+    )
+
+    assert not build_result.issues.has_blocking_issues
+    undeclared, empty = build_result.semantic_manifest.metrics
+    assert empty.type_params.numerator == undeclared.type_params.numerator
+    assert empty.type_params.denominator == undeclared.type_params.denominator
+    assert hash(empty.type_params.denominator) == hash(undeclared.type_params.denominator)
+
+
+@pytest.mark.parametrize("metric_yaml_template", ["ratio_denominator", "derived"])
+def test_exclude_dimensions_with_invalid_type_is_rejected(metric_yaml_template: str) -> None:
+    """`exclude_dimensions` must be a list of strings."""
+    templates = {
+        "ratio_denominator": """\
+            metric:
+              name: invalid_test
+              type: ratio
+              type_params:
+                numerator:
+                  name: numerator_metric
+                denominator:
+                  name: denominator_metric
+                  exclude_dimensions: {value}
+            """,
+        "derived": """\
+            metric:
+              name: invalid_test
+              type: derived
+              type_params:
+                expr: a
+                metrics:
+                  - name: a
+                    exclude_dimensions: {value}
+            """,
+    }
+    build_result = _parse_metric_yaml(textwrap.dedent(templates[metric_yaml_template]).replace("{value}", "[1, 2]"))
+
+    assert build_result.issues.has_blocking_issues
 
 
 def test_cumulative_window_old_metric_parsing() -> None:
