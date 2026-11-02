@@ -13,8 +13,15 @@ class OSIDialect(str, Enum):
     ANSI_SQL = "ANSI_SQL"
     SNOWFLAKE = "SNOWFLAKE"
     MDX = "MDX"
+    MAQL = "MAQL"
     TABLEAU = "TABLEAU"
     DATABRICKS = "DATABRICKS"
+    BIGQUERY = "BIGQUERY"
+    SIGMA = "SIGMA"
+    THOUGHTSPOT = "THOUGHTSPOT"
+    DAX = "DAX"
+    HOLISTICS_AQL = "HOLISTICS_AQL"
+    OSSIE_SQL_2026 = "OSSIE_SQL_2026"
 
 
 class OSIAIContextObject(FrozenBaseModel):

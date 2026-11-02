@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import Optional, Tuple
+from typing import Optional, Set, Tuple
 
 import sqlglot
 import sqlglot.expressions as exp
 
 from metricflow_semantic_interfaces.type_enums import AggregationType
+
+# expr for "count all rows": MetricFlow wraps a count's expr in CASE WHEN, where a bare * is invalid
+ROW_COUNT_EXPR = "1"
 
 
 def _strip_qualifier(col: str) -> str:
@@ -13,36 +16,219 @@ def _strip_qualifier(col: str) -> str:
     return col.rsplit(".", 1)[-1] if "." in col else col
 
 
-def _col_name(node: exp.Expression) -> str:
-    """Return the bare (unqualified) column name from a sqlglot expression node."""
-    if isinstance(node, exp.Column):
-        return node.name
-    rendered = node.sql()
-    return _strip_qualifier(rendered)
+def _unqualify_column(node: exp.Expression) -> exp.Expression:
+    """Drop the table/schema/database parts of a column reference; other nodes pass through."""
+    return exp.Column(this=node.this) if isinstance(node, exp.Column) else node
 
 
-def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str, Optional[float]]]:
-    """Parse a SQL aggregation expression using sqlglot.
+def _col_name(node: exp.Expression, dialect: str = "") -> str:
+    """Return an aggregate argument with the dataset qualifier stripped from every column reference.
 
-    Returns ``(agg_type, bare_col, percentile)`` for recognised patterns, ``None`` otherwise.
-    ``percentile`` is only set for ``PERCENTILE`` aggregations; it is ``None`` for all others.
-    The returned column name has any dataset qualifier stripped.
+    MSI evaluates a metric's ``expr`` inside its own semantic model, so column
+    references must be unqualified: ``orders.amount`` → ``amount`` and
+    ``orders.gross - orders.tax`` → ``gross - tax``.
+    """
+    return node.transform(_unqualify_column).sql(dialect=dialect)
+
+
+# Scalar categories from core-spec/expression_language.md; never admit Func wholesale.
+_SAFE_SCALAR_NODE_TYPES = {
+    exp.Abs,
+    exp.Add,
+    exp.And,
+    exp.Between,
+    exp.Boolean,
+    exp.Case,
+    exp.Cast,
+    exp.Ceil,
+    exp.Coalesce,
+    exp.Column,
+    exp.Concat,
+    exp.Contains,
+    exp.CurrentDate,
+    exp.CurrentTime,
+    exp.CurrentTimestamp,
+    exp.DPipe,
+    exp.DataType,
+    exp.DataTypeParam,
+    exp.DateAdd,
+    exp.DateDiff,
+    exp.DateSub,
+    exp.DateTrunc,
+    exp.Day,
+    exp.DayOfWeek,
+    exp.DayOfYear,
+    exp.Div,
+    exp.EQ,
+    exp.EndsWith,
+    exp.Exp,
+    exp.Extract,
+    exp.Floor,
+    exp.GT,
+    exp.GTE,
+    exp.Greatest,
+    exp.Hour,
+    exp.ILike,
+    exp.Identifier,
+    exp.If,
+    exp.In,
+    exp.Interval,
+    exp.Is,
+    exp.LT,
+    exp.LTE,
+    exp.Least,
+    exp.Left,
+    exp.Length,
+    exp.Like,
+    exp.Ln,
+    exp.Localtime,
+    exp.Log,
+    exp.Literal,
+    exp.Lower,
+    exp.Mod,
+    exp.Month,
+    exp.Minute,
+    exp.Mul,
+    exp.NEQ,
+    exp.Neg,
+    exp.Not,
+    exp.Null,
+    exp.Nullif,
+    exp.Nvl2,
+    exp.Or,
+    exp.Paren,
+    exp.Pow,
+    exp.Quarter,
+    exp.RegexpLike,
+    exp.Replace,
+    exp.Right,
+    exp.Round,
+    exp.Second,
+    exp.Sign,
+    exp.SplitPart,
+    exp.Sqrt,
+    exp.StartsWith,
+    exp.StrPosition,
+    exp.Sub,
+    exp.Substring,
+    exp.Trim,
+    exp.TimestampAdd,
+    exp.TimestampDiff,
+    exp.TimestampTrunc,
+    exp.Trunc,
+    exp.TryCast,
+    exp.Tuple,
+    exp.Upper,
+    exp.Var,
+    exp.Year,
+}
+
+
+def _is_scalar_expression(node: exp.Expression) -> bool:
+    """Return whether every AST node is explicitly safe beneath a MetricFlow aggregation.
+
+    Unknown functions are deliberately excluded: sqlglot represents both custom
+    scalar functions and custom aggregate functions as ``Anonymous``, so accepting
+    one would risk recreating the nested-aggregation bug this guard prevents.
+    Query nodes are also absent, excluding scalar subqueries.
+    """
+    return all(type(child) in _SAFE_SCALAR_NODE_TYPES for child in node.walk())
+
+
+def _is_row_count_argument(node: exp.Expression) -> bool:
+    """Return True for ``*`` (bare or qualified) and for any non-null constant.
+
+    None of these can ever be NULL, so ``COUNT()`` of one counts every row. A string literal is left
+    alone, since ``COUNT('x')`` is not a row-count idiom anyone writes on purpose.
+    """
+    if isinstance(node, exp.Star) or (isinstance(node, exp.Column) and isinstance(node.this, exp.Star)):
+        return True
+    if isinstance(node, exp.Boolean):
+        return True
+    if isinstance(node, exp.Literal) and not node.is_string:
+        return True
+    return False
+
+
+def _is_constant_expr(expr: str) -> bool:
+    """Return True when ``expr`` is a non-null constant such as ``1``, ``2`` or ``TRUE``, not a column."""
+    try:
+        node = sqlglot.parse_one(expr)
+    except sqlglot.errors.SqlglotError:
+        return False
+    return isinstance(node, exp.Boolean) or (isinstance(node, exp.Literal) and not node.is_string)
+
+
+def _contains_distinct_row_count(expression: str, dialect: str = "") -> bool:
+    """Return True if ``expression`` contains ``COUNT(DISTINCT <row-count argument>)`` anywhere in its tree.
+
+    ``COUNT(DISTINCT *)`` / ``COUNT(DISTINCT 1)`` and friends parse and run as SQL, but counting distinct
+    values of ``*`` or a constant is not a sensible aggregation for a semantic layer: it answers whether
+    any row exists (0 or 1), not a meaningful total. The caller should drop the metric with an issue
+    rather than fall back to a raw expression, which would wrap this inside another aggregate
+    (``SUM(COUNT(DISTINCT ...))``, not valid for MetricFlow to run) and guess a dataset the way a row
+    count must not.
+
+    Searches the whole tree, not just the top node, so a wrapped or combined form such as
+    ``(COUNT(DISTINCT *))``, ``COUNT(DISTINCT *) * 100`` or ``COALESCE(COUNT(DISTINCT 1), 0)`` is still
+    caught, not only a bare ``COUNT(DISTINCT *)`` as the entire expression. The DISTINCT operand is
+    unnested before the check, so ``COUNT(DISTINCT (*))`` is caught the same way as ``COUNT(DISTINCT *)``.
     """
     try:
-        tree = sqlglot.parse_one(expression.strip())
-    except sqlglot.errors.ParseError:
+        tree = sqlglot.parse_one(expression.strip(), read=dialect)
+    except sqlglot.errors.SqlglotError:
+        return False
+    for count in tree.find_all(exp.Count):
+        argument = count.this
+        if count.args.get("expressions") or not isinstance(argument, exp.Distinct):
+            continue
+        operands = argument.expressions
+        if len(operands) == 1 and _is_row_count_argument(operands[0].unnest()):
+            return True
+    return False
+
+
+def _extract_agg_info(
+    expression: str, dialect: str = ""
+) -> Optional[Tuple[AggregationType, str, Optional[float], bool]]:
+    """Parse a SQL aggregation expression using sqlglot.
+
+    Returns ``(agg_type, expr, percentile, use_discrete_percentile)`` for recognised patterns,
+    ``None`` otherwise. ``percentile`` is only set for ``PERCENTILE`` aggregations; it is ``None``
+    for all others. ``use_discrete_percentile`` is ``True`` only for ``PERCENTILE_DISC``.
+    ``expr`` is the aggregate argument with the dataset qualifier stripped from every column
+    reference (a bare column name in the common case). ``COUNT`` of ``*`` or of any non-null constant
+    (``COUNT(1)``, ``COUNT(TRUE)``, ...) returns ``ROW_COUNT_EXPR`` instead of a column name;
+    ``SUM`` of a constant returns the constant itself (``SUM(2)`` → ``'2'``). ``COUNT(DISTINCT ...)`` of a
+    row-count argument, and multi-argument ``COUNT``, return ``None``.
+    """
+    try:
+        tree = sqlglot.parse_one(expression.strip(), read=dialect)
+    except sqlglot.errors.SqlglotError:
         return None
 
-    # COUNT(DISTINCT col)
-    if isinstance(tree, exp.Count) and isinstance(tree.this, exp.Distinct):
-        cols = tree.this.expressions
-        if len(cols) == 1:
-            return AggregationType.COUNT_DISTINCT, _col_name(cols[0]), None
-        return None
-
-    # COUNT(col)
     if isinstance(tree, exp.Count):
-        return AggregationType.COUNT, _col_name(tree.this), None
+        # COUNT(a, b) has no single-column equivalent
+        if tree.args.get("expressions"):
+            return None
+        argument, distinct = tree.this, False
+        if isinstance(argument, exp.Distinct):
+            operands = argument.expressions
+            if len(operands) != 1:
+                return None
+            argument, distinct = operands[0], True
+        if _is_row_count_argument(argument.unnest()):
+            # COUNT(*), COUNT(1), COUNT(TRUE), ... → count all rows; COUNT(DISTINCT ...) of one is not valid SQL.
+            # Unnested so a redundant paren, e.g. COUNT(DISTINCT (*)), is still recognised.
+            return None if distinct else (AggregationType.COUNT, ROW_COUNT_EXPR, None, False)
+        if not _is_scalar_expression(argument):
+            return None
+        return (
+            (AggregationType.COUNT_DISTINCT if distinct else AggregationType.COUNT),
+            _col_name(argument, dialect),
+            None,
+            False,
+        )
 
     # SUM(CASE WHEN col THEN 1 ELSE 0 END) → SUM_BOOLEAN
     if isinstance(tree, exp.Sum) and isinstance(tree.this, exp.Case):
@@ -50,27 +236,35 @@ def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str, O
         ifs = case.args.get("ifs", [])
         default = case.args.get("default")
         if (
-            len(ifs) == 1
+            case.this is None
+            and len(ifs) == 1
             and isinstance(default, exp.Literal)
             and default.name == "0"
             and isinstance(ifs[0].args.get("true"), exp.Literal)
             and ifs[0].args["true"].name == "1"
+            and _is_scalar_expression(case)
         ):
-            return AggregationType.SUM_BOOLEAN, ifs[0].this.sql(), None
-        return None
+            return AggregationType.SUM_BOOLEAN, _col_name(ifs[0].this, dialect), None, False
 
-    # SUM(col)
+    # SUM(col), or SUM(<constant>). A constant keeps its own value (SUM(2) is twice the row count,
+    # not SUM(1)); the caller uses _is_constant_expr to send it through the same dataset check as
+    # COUNT(*), since a constant has no column to place it in a dataset.
     if isinstance(tree, exp.Sum):
-        return AggregationType.SUM, _col_name(tree.this), None
+        argument = tree.this.unnest()
+        if _is_constant_expr(argument.sql()):
+            return AggregationType.SUM, argument.sql(), None, False
+        if not _is_scalar_expression(tree.this):
+            return None
+        return AggregationType.SUM, _col_name(tree.this, dialect), None, False
 
-    if isinstance(tree, exp.Avg):
-        return AggregationType.AVERAGE, _col_name(tree.this), None
+    if isinstance(tree, exp.Avg) and _is_scalar_expression(tree.this):
+        return AggregationType.AVERAGE, _col_name(tree.this, dialect), None, False
 
-    if isinstance(tree, exp.Min):
-        return AggregationType.MIN, _col_name(tree.this), None
+    if isinstance(tree, exp.Min) and _is_scalar_expression(tree.this):
+        return AggregationType.MIN, _col_name(tree.this, dialect), None, False
 
-    if isinstance(tree, exp.Max):
-        return AggregationType.MAX, _col_name(tree.this), None
+    if isinstance(tree, exp.Max) and _is_scalar_expression(tree.this):
+        return AggregationType.MAX, _col_name(tree.this, dialect), None, False
 
     # PERCENTILE_CONT(p) WITHIN GROUP (ORDER BY col)
     # sqlglot parses this as WithinGroup(this=PercentileCont(...), expression=Order(...))
@@ -84,23 +278,25 @@ def _extract_agg_info(expression: str) -> Optional[Tuple[AggregationType, str, O
         ):
             ordered = order.expressions[0]
             col_node = ordered.this if isinstance(ordered, exp.Ordered) else ordered
-            col = _col_name(col_node)
+            if not _is_scalar_expression(col_node):
+                return None
+            col = _col_name(col_node, dialect)
             try:
                 p = float(inner.this.name)
             except (AttributeError, ValueError):
                 return None
             if p == 0.5 and isinstance(inner, exp.PercentileCont):
-                return AggregationType.MEDIAN, col, None
-            return AggregationType.PERCENTILE, col, p
+                return AggregationType.MEDIAN, col, None, False
+            return AggregationType.PERCENTILE, col, p, isinstance(inner, exp.PercentileDisc)
 
     return None
 
 
-def _try_parse_ratio(expr_str: str) -> Optional[Tuple[str, str]]:
+def _try_parse_ratio(expr_str: str, dialect: str = "") -> Optional[Tuple[str, str]]:
     """Try to parse ``(expr_a) / (expr_b)`` using sqlglot, returning ``(num_expr, den_expr)`` or None."""
     try:
-        tree = sqlglot.parse_one(expr_str.strip())
-    except sqlglot.errors.ParseError:
+        tree = sqlglot.parse_one(expr_str.strip(), read=dialect)
+    except sqlglot.errors.SqlglotError:
         return None
 
     if not isinstance(tree, exp.Div):
@@ -115,25 +311,24 @@ def _try_parse_ratio(expr_str: str) -> Optional[Tuple[str, str]]:
     if isinstance(den, exp.Paren):
         den = den.this
 
-    return num.sql(), den.sql()
+    return num.sql(dialect=dialect), den.sql(dialect=dialect)
 
 
-def _get_raw_inner_col(expression: str) -> Optional[str]:
-    """Extract the raw column reference from inside a simple aggregation, before stripping qualifiers."""
+def _get_dataset_qualifier(expression: str, dialect: str = "") -> Optional[str]:
+    """Return the sole dataset qualifier referenced by an expression, if present."""
+    qualifiers = _get_dataset_qualifiers(expression, dialect)
+    return qualifiers.pop() if len(qualifiers) == 1 else None
+
+
+def _get_dataset_qualifiers(expression: str, dialect: str = "") -> Set[str]:
+    """Return all dataset qualifiers referenced by an expression."""
     try:
-        tree = sqlglot.parse_one(expression.strip())
-    except sqlglot.errors.ParseError:
-        return None
+        tree = sqlglot.parse_one(expression.strip(), read=dialect)
+    except sqlglot.errors.SqlglotError:
+        return set()
 
-    if not isinstance(tree, exp.AggFunc):
-        return None
-
-    inner = tree.this
-    if inner is None:
-        return None
-
-    # For COUNT(DISTINCT col), unwrap the Distinct node
-    if isinstance(inner, exp.Distinct) and inner.expressions:
-        return inner.expressions[0].sql()
-
-    return inner.sql()
+    return {
+        ".".join(part.sql() for part in column.parts[:-1])
+        for column in tree.find_all(exp.Column)
+        if len(column.parts) > 1
+    }
