@@ -3,4 +3,4 @@ body: Add Python 3.15 support for the metricflow package.
 time: 2026-11-05T12:27:14.249068Z
 custom:
     Author: ebrake
-    Issue: N/A
+    Issue: "2153"
