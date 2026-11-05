@@ -297,8 +297,8 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         """Render percentile expression for ClickHouse.
 
         ClickHouse uses parameterized aggregate functions with curried syntax:
-        - quantile(0.5)(column) - approximate continuous
-        - quantileExactInclusive(0.5)(column) - exact continuous (R-7 interpolation)
+        - quantile(0.5)(toFloat64(column)) - approximate continuous
+        - quantileExactInclusive(0.5)(toFloat64(column)) - exact continuous (R-7 interpolation)
 
         ClickHouse's discrete quantile functions do not match SQL PERCENTILE_DISC
         at rank boundaries, and t-digest can return interpolated values. Reporting
@@ -330,8 +330,9 @@ class ClickHouseSqlExpressionRenderer(DefaultSqlExpressionRenderer):
         else:
             assert_values_exhausted(function_type)
 
-        # ClickHouse uses curried function syntax: quantile(percentile)(column)
-        sql = f"{function_str}({percentile})({arg_rendered.sql})"
+        # Cast to Float64: quantileExactInclusive rejects Decimal, and quantile truncates the interpolated result
+        # to the Decimal scale (e.g. median of Decimal(18, 0) values 1 and 2 is 1 instead of 1.5).
+        sql = f"{function_str}({percentile})(toFloat64({arg_rendered.sql}))"
 
         return SqlExpressionRenderResult(
             sql=sql,

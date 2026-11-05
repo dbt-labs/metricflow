@@ -208,7 +208,7 @@ def test_percentile_approximate_continuous(clickhouse_renderer: ClickHouseSqlExp
         ),
     )
     result = clickhouse_renderer.visit_percentile_expr(expr)
-    assert result.sql == "quantile(0.5)(a.value_col)"
+    assert result.sql == "quantile(0.5)(toFloat64(a.value_col))"
 
 
 def test_percentile_continuous(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
@@ -220,7 +220,7 @@ def test_percentile_continuous(clickhouse_renderer: ClickHouseSqlExpressionRende
         ),
     )
     result = clickhouse_renderer.visit_percentile_expr(expr)
-    assert result.sql == "quantileExactInclusive(0.5)(a.value_col)"
+    assert result.sql == "quantileExactInclusive(0.5)(toFloat64(a.value_col))"
 
 
 def test_percentile_discrete(clickhouse_renderer: ClickHouseSqlExpressionRenderer) -> None:
