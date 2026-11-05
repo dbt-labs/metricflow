@@ -1549,14 +1549,14 @@ class DataflowPlanBuilder:
                 ), "Offset to grain must be specified if no offset window is specified."
                 offset_grain = ExpandedTimeGranularity.from_time_granularity(child_metric_offset_to_grain)
 
-            # Determine the smallest queried agg time dimension grain (this is the grain we'll aggregate to)
+            # Metric() subqueries group by the join entity only. When the query still has a time window, use the
+            # metric's agg time grain for the offset join and leave it out of the output group by. The query dates
+            # stay on the time spine after the join. Subtracting the offset here would shift the window twice.
+            synthesized_offset_time_spec = False
             if len(queried_agg_time_dimension_specs) == 0:
-                raise ValueError(
-                    LazyFormat(
-                        "No agg_time_dimension requested in offset metric query. This should have been validated earlier.",
-                        simple_metric_input=simple_metric_input,
-                        queried_linkable_specs=queried_linkable_specs,
-                    )
+                synthesized_offset_time_spec = True
+                queried_agg_time_dimension_specs = FrozenOrderedSet(
+                    (self._get_minimum_metric_time_spec_for_metric(MetricReference(simple_metric_input.name)),)
                 )
             smallest_queried_agg_time_grain = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[
                 0
@@ -1570,7 +1570,9 @@ class DataflowPlanBuilder:
                 offset_to_grain=child_metric_offset_to_grain,
                 time_spine_filter_specs=time_spine_filters,
             )
-            if (
+            if synthesized_offset_time_spec:
+                before_aggregation_time_spine_join_description = join_to_time_spine_description
+            elif (
                 offset_grain
                 and smallest_queried_agg_time_grain
                 # We can't know if the custom grain, once aggregated, will be larger or smaller than the offset grain.
@@ -2007,6 +2009,18 @@ class DataflowPlanBuilder:
         before_aggregation_time_spine_join_description = (
             simple_metric_recipe.before_aggregation_time_spine_join_description
         )
+        # The offset join needs the agg time column on the source even when the query groups by an entity only.
+        # That column stays out of queried_linkable_specs so the aggregated output does not fan out by time.
+        if before_aggregation_time_spine_join_description is not None:
+            offset_time_specs = tuple(
+                spec
+                for spec in simple_metric_recipe.queried_agg_time_dimension_specs
+                if spec not in queried_linkable_specs.time_dimension_specs
+            )
+            if offset_time_specs:
+                required_linkable_specs = required_linkable_specs.merge(
+                    LinkableSpecSet.create_from_specs(offset_time_specs)
+                ).dedupe()
         after_aggregation_time_spine_join_description = (
             simple_metric_recipe.after_aggregation_time_spine_join_description
         )

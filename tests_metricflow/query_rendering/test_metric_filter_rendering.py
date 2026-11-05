@@ -495,3 +495,39 @@ def test_metric_filter_rejects_outer_filter_inner_metric_cannot_resolve(
 
     with pytest.raises(InvalidQueryException):
         dataflow_plan_builder.build_plan(query_spec)
+
+
+def test_offset_metric_filter_applies_query_window_after_the_offset(
+    dataflow_plan_builder: DataflowPlanBuilder,
+    sql_client: SqlClient,
+    dataflow_to_sql_converter: DataflowToSqlPlanConverter,
+    query_parser: MetricFlowQueryParser,
+) -> None:
+    """An offset Metric() keeps the query dates off the source scan.
+
+    bookings_5_day_lag shifts its input by 5 days. The query window belongs on the time spine after that join.
+    """
+    query_spec = query_parser.parse_and_validate_query(
+        metric_names=("listings",),
+        where_constraint_strs=[
+            "{{ Metric('bookings_5_day_lag', ['listing']) }} > 2",
+            "{{ Entity('listing') }} = '1'",
+        ],
+        time_constraint_start=datetime.datetime(2020, 1, 1),
+        time_constraint_end=datetime.datetime(2020, 1, 2),
+    ).query_spec
+
+    rendered_sql = _render_query_sql(
+        dataflow_plan_builder=dataflow_plan_builder,
+        dataflow_to_sql_converter=dataflow_to_sql_converter,
+        sql_client=sql_client,
+        query_spec=query_spec,
+    )
+    interval_at = rendered_sql.find("INTERVAL 5 day")
+    assert interval_at != -1
+    source_read = rendered_sql.rfind("Read Elements From Semantic Model 'bookings_source'", 0, interval_at)
+    assert source_read != -1
+    # The raw offset source is joined with the 5-day shift. The query dates are not a predicate on that scan.
+    assert "BETWEEN '2020-01-01' AND '2020-01-02'" not in rendered_sql[source_read:interval_at]
+    assert "WHERE listing = '1'" in rendered_sql
+    assert "metric_time__day BETWEEN '2020-01-01' AND '2020-01-02'" in rendered_sql
