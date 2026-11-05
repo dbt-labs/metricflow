@@ -16,6 +16,7 @@ from metricflow_semantics.semantic_graph.attribute_resolution.recipe_writer_path
     AttributeRecipeWriterPath,
 )
 from metricflow_semantics.semantic_graph.edges.edge_labels import (
+    CumulativeMetricLabel,
     DenyEntityKeyQueryResolutionLabel,
     DenyVisibleAttributesLabel,
 )
@@ -325,15 +326,22 @@ class _MetricNameToEntityKeyTrieGenerator:
 
         for edge_to_successor in current_graph.edges_with_tail_node(metric_node):
             parent_metric_node = edge_to_successor.head_node
-            # If any of the input metrics don't allow querying of the entity key, then the entity key can't be queried
-            # for this metric.
-            if (
+            # Cumulative metrics with a window still can't be queried by entity key alone. A time-offset metric can:
+            # the query window is applied on the time spine after the offset join, so the entity is a valid join key.
+            denies_entity_key = (
                 deny_entity_key_label in edge_to_successor.labels
                 or deny_entity_key_label in edge_to_successor.head_node.labels
+            )
+            cumulative_label = CumulativeMetricLabel.get_instance()
+            if denies_entity_key and (
+                cumulative_label in edge_to_successor.labels or cumulative_label in edge_to_successor.head_node.labels
             ):
                 result = MutableDunderNameTrie()
                 self._metric_node_to_entity_key_trie[metric_node] = result
                 return result
+            if denies_entity_key:
+                visible_parent_metric_nodes.add(parent_metric_node)
+                continue
             elif (
                 deny_visible_label in edge_to_successor.labels
                 or deny_visible_label in edge_to_successor.head_node.labels
