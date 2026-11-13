@@ -21,3 +21,17 @@ def test_duckdb_only(sql_client: SqlClient) -> None:
         f"This test should have only been run when using {duckdb_engine_type}, but the engine type under test is"
         f" {engine_type_under_test}"
     )
+
+
+@pytest.mark.clickhouse_only
+def test_clickhouse_only(sql_client: SqlClient) -> None:
+    """Check that the `clickhouse_only` skips tests when the tests are run with another SQL engine.
+
+    This depends on auto-using of the `skip_if_not_clickhouse` fixture.
+    """
+    clickhouse_engine_type = SqlEngine.CLICKHOUSE
+    engine_type_under_test = sql_client.sql_engine_type
+    assert engine_type_under_test is clickhouse_engine_type, (
+        f"This test should have only been run when using {clickhouse_engine_type}, but the engine type under test is"
+        f" {engine_type_under_test}"
+    )
