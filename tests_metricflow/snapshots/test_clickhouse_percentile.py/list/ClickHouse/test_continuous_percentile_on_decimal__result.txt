@@ -1,0 +1,26 @@
+test_name: test_continuous_percentile_on_decimal
+test_filename: test_clickhouse_percentile.py
+docstring:
+  Continuous percentiles must return the interpolated value on Decimal and Nullable(Decimal) columns.
+---
+[
+  {
+    'sql': ('SELECT quantileExactInclusive(0.5)(toFloat64(x)) AS percentile FROM (SELECT toDecimal64(number, 0) AS x '
+     'FROM numbers(10))'),
+    'result': 4.5,
+  },
+  {
+    'sql': ('SELECT quantileExactInclusive(0.5)(toFloat64(x)) AS percentile FROM (SELECT if(number IN (0, 9), NULL, '
+     'toDecimal64(number, 0)) AS x FROM numbers(10))'),
+    'result': 4.5,
+  },
+  {
+    'sql': 'SELECT quantile(0.5)(toFloat64(x)) AS percentile FROM (SELECT toDecimal64(number, 0) AS x FROM numbers(10))',
+    'result': 4.5,
+  },
+  {
+    'sql': ('SELECT quantile(0.5)(toFloat64(x)) AS percentile FROM (SELECT if(number IN (0, 9), NULL, '
+     'toDecimal64(number, 0)) AS x FROM numbers(10))'),
+    'result': 4.5,
+  },
+]

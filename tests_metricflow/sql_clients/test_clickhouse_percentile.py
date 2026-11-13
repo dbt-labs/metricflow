@@ -10,47 +10,53 @@ from __future__ import annotations
 import logging
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from metricflow_semantics.sql.sql_exprs import (
     SqlPercentileExpression,
     SqlPercentileExpressionArgument,
     SqlStringExpression,
 )
+from metricflow_semantics.test_helpers.config_helpers import MetricFlowTestConfiguration
 
-from metricflow.protocols.sql_client import SqlClient, SqlEngine
+from metricflow.protocols.sql_client import SqlClient
+from tests_metricflow.snapshot_utils import assert_object_snapshot_equal
 
 logger = logging.getLogger(__name__)
 
 
-def _skip_if_not_clickhouse(sql_client: SqlClient) -> None:
-    if sql_client.sql_engine_type is not SqlEngine.CLICKHOUSE:
-        pytest.skip("ClickHouse percentile argument types")
-
-
-@pytest.mark.parametrize("approximate", [False, True], ids=["exact", "approximate"])
-@pytest.mark.parametrize(
-    "decimal_expr",
-    [
-        # Values 0 .. 9.
-        "toDecimal64(number, 0)",
-        # Values 1 .. 8 plus two NULLs, which must be ignored.
-        "if(number IN (0, 9), NULL, toDecimal64(number, 0))",
-    ],
-    ids=["decimal", "nullable_decimal"],
-)
-def test_continuous_percentile_on_decimal(sql_client: SqlClient, approximate: bool, decimal_expr: str) -> None:
+@pytest.mark.clickhouse_only
+@pytest.mark.sql_engine_snapshot
+def test_continuous_percentile_on_decimal(
+    request: FixtureRequest,
+    mf_test_configuration: MetricFlowTestConfiguration,
+    sql_client: SqlClient,
+) -> None:
     """Continuous percentiles must return the interpolated value on Decimal and Nullable(Decimal) columns."""
-    _skip_if_not_clickhouse(sql_client)
-    percentile_expr = SqlPercentileExpression.create(
-        order_by_arg=SqlStringExpression.create(sql_expr="x", requires_parenthesis=False),
-        percentile_args=SqlPercentileExpressionArgument.create(percentile=0.5, discrete=False, approximate=approximate),
+    decimal_source_queries = (
+        # Values 0 .. 9.
+        "SELECT toDecimal64(number, 0) AS x FROM numbers(10)",
+        # Values 1 .. 8 plus two NULLs, which must be ignored.
+        "SELECT if(number IN (0, 9), NULL, toDecimal64(number, 0)) AS x FROM numbers(10)",
     )
-    rendered_percentile = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(percentile_expr).sql
+    results = []
+    for approximate in (False, True):
+        percentile_expr = SqlPercentileExpression.create(
+            order_by_arg=SqlStringExpression.create(sql_expr="x", requires_parenthesis=False),
+            percentile_args=SqlPercentileExpressionArgument.create(
+                percentile=0.5, discrete=False, approximate=approximate
+            ),
+        )
+        rendered_percentile = sql_client.sql_plan_renderer.expr_renderer.render_sql_expr(percentile_expr).sql
+        for decimal_source_query in decimal_source_queries:
+            sql = f"SELECT {rendered_percentile} AS percentile FROM ({decimal_source_query})"
+            result = sql_client.query(sql).get_cell_value(0, 0)
+            # Scale 0 makes truncation visible: an uncast Decimal result would be 4.
+            assert result == 4.5, f"Expected 4.5, got {result!r} for: {sql}"
+            results.append({"sql": sql, "result": result})
 
-    result = sql_client.query(
-        f"SELECT {rendered_percentile} AS percentile FROM (SELECT {decimal_expr} AS x FROM numbers(10))"
+    assert_object_snapshot_equal(
+        request=request,
+        mf_test_configuration=mf_test_configuration,
+        obj=results,
+        sql_client=sql_client,
     )
-
-    assert result.row_count == 1
-    assert result.column_count == 1
-    # Scale 0 makes truncation visible: an uncast Decimal result would be 4.
-    assert result.get_cell_value(0, 0) == 4.5
