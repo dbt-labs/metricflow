@@ -35,6 +35,9 @@ SQL_ENGINE_SNAPSHOT_MARKER_NAME = "sql_engine_snapshot"
 # Name of the pytest marker to indicate that the test should only be run when the test session is configured to use
 # DuckDB as the SQL engine.
 DUCKDB_ONLY_MARKER_NAME = "duckdb_only"
+# Name of the pytest marker to indicate that the test should only be run when the test session is configured to use
+# ClickHouse as the SQL engine.
+CLICKHOUSE_ONLY_MARKER_NAME = "clickhouse_only"
 
 # Environment variables to configure the SQL engine used for tests.
 SQL_ENGINE_URL_ENVIRONMENT_VARIABLE_NAME = "MF_SQL_ENGINE_URL"
@@ -79,6 +82,10 @@ def pytest_configure(config: _pytest.config.Config) -> None:
         name="markers",
         line=f"{DUCKDB_ONLY_MARKER_NAME}: mark tests as one that should only be run with DuckDB.",
     )
+    config.addinivalue_line(
+        name="markers",
+        line=f"{CLICKHOUSE_ONLY_MARKER_NAME}: mark tests as one that should only be run with ClickHouse.",
+    )
     mf_add_slow_marker(config)
 
 
@@ -101,6 +108,18 @@ def skip_if_not_duck_db(request: FixtureRequest, sql_client: SqlClient) -> None:
     duckdb_engine_type = SqlEngine.DUCKDB
     if test_session_engine_type is not duckdb_engine_type:
         pytest.skip(f"Skipping as this test is only run with {duckdb_engine_type}, but {test_session_engine_type=}")
+
+
+@pytest.fixture(autouse=True)
+def skip_if_not_clickhouse(request: FixtureRequest, sql_client: SqlClient) -> None:
+    """Skip tests marked for testing with ClickHouse only if the test session uses a different engine."""
+    if request.node.get_closest_marker(CLICKHOUSE_ONLY_MARKER_NAME) is None:
+        return
+
+    test_session_engine_type = sql_client.sql_engine_type
+    clickhouse_engine_type = SqlEngine.CLICKHOUSE
+    if test_session_engine_type is not clickhouse_engine_type:
+        pytest.skip(f"Skipping as this test is only run with {clickhouse_engine_type}, but {test_session_engine_type=}")
 
 
 @pytest.fixture(scope="session")
