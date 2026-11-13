@@ -17,6 +17,7 @@ class PydanticNodeRelation(HashableBaseModel, ProtocolHint[NodeRelation]):
     schema_name: str
     database: Optional[str] = None
     relation_name: str = ""
+    compiled_sql: Optional[str] = None
 
     @override
     def _implements_protocol(self) -> NodeRelation:  # noqa: D102
