@@ -390,6 +390,23 @@ class TestOSIToMSIMetricConversion:  # noqa: D101
         assert m.type_params.metric_aggregation_params.agg == AggregationType.PERCENTILE
         assert m.type_params.metric_aggregation_params.agg_params is not None
         assert m.type_params.metric_aggregation_params.agg_params.percentile == 0.95
+        assert m.type_params.metric_aggregation_params.agg_params.use_discrete_percentile is False
+        assert m.type_params.expr == "amount"
+
+    @pytest.mark.parametrize("percentile", [0.5, 0.95])
+    def test_percentile_disc_carries_discrete_percentile_param(self, percentile: float) -> None:  # noqa: D102
+        doc = _osi_doc(
+            datasets=[_osi_dataset("orders", fields=[_osi_field("amount")])],
+            metrics=[_osi_metric("p_amount", f"PERCENTILE_DISC({percentile}) WITHIN GROUP (ORDER BY amount)")],
+        )
+        result = OSIToMSIConverter().convert(doc).output
+
+        m = result.metrics[0]
+        assert m.type_params.metric_aggregation_params is not None
+        assert m.type_params.metric_aggregation_params.agg == AggregationType.PERCENTILE
+        assert m.type_params.metric_aggregation_params.agg_params is not None
+        assert m.type_params.metric_aggregation_params.agg_params.percentile == percentile
+        assert m.type_params.metric_aggregation_params.agg_params.use_discrete_percentile is True
         assert m.type_params.expr == "amount"
 
 
