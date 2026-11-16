@@ -15,6 +15,8 @@ class OSIDialect(str, Enum):
     MDX = "MDX"
     TABLEAU = "TABLEAU"
     DATABRICKS = "DATABRICKS"
+    MAQL = "MAQL"
+    BIGQUERY = "BIGQUERY"
 
 
 class OSIAIContextObject(FrozenBaseModel):

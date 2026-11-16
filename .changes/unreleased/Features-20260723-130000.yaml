@@ -1,0 +1,6 @@
+kind: Features
+body: Add BIGQUERY and MAQL to OSIDialect, matching the OSI core spec dialect enum
+time: 2026-07-23T13:00:00.000000+09:00
+custom:
+    Author: ota2000
+    Issue: "2094"
