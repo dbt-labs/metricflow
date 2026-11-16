@@ -53,6 +53,7 @@ from metricflow_semantics.toolkit.mf_graph.path_finding.pathfinder import Metric
 from metricflow_semantics.toolkit.mf_graph.path_finding.weight_function import EdgeCountWeightFunction
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
+from metricflow_semantics.toolkit.mf_type_aliases import AnyLengthTuple
 from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer, mf_log_duration
 from metricflow_semantics.toolkit.string_helpers import mf_indent
 from typing_extensions import override
@@ -168,6 +169,8 @@ class DataflowPlanBuilder:
         self._cache = dataflow_plan_builder_cache or DataflowPlanBuilderCache()
         self._metric_evaluation_plan_formatter = MetricEvaluationPlanTableFormatter()
         self._query_helper = MetricQueryHelper(metric_lookup=semantic_manifest_lookup.metric_lookup)
+        # Set for the duration of plan building so Metric() subqueries inherit this query's filters.
+        self._outer_query_spec_for_group_by_metric: Optional[MetricFlowQuerySpec] = None
 
     def build_plan(
         self,
@@ -178,6 +181,27 @@ class DataflowPlanBuilder:
         me_plan_override: Optional[MetricEvaluationPlan] = None,
     ) -> DataflowPlan:
         """Generate a plan for reading the results of a query with the given spec into a data_table or table."""
+        previous_outer_query_spec = self._outer_query_spec_for_group_by_metric
+        self._outer_query_spec_for_group_by_metric = query_spec
+        try:
+            return self._build_plan_with_outer_query_spec(
+                query_spec=query_spec,
+                output_sql_table=output_sql_table,
+                output_selection_specs=output_selection_specs,
+                optimizations=optimizations,
+                me_plan_override=me_plan_override,
+            )
+        finally:
+            self._outer_query_spec_for_group_by_metric = previous_outer_query_spec
+
+    def _build_plan_with_outer_query_spec(
+        self,
+        query_spec: MetricFlowQuerySpec,
+        output_sql_table: Optional[SqlTable] = None,
+        output_selection_specs: Optional[InstanceSpecSet] = None,
+        optimizations: FrozenSet[DataflowPlanOptimization] = frozenset(),
+        me_plan_override: Optional[MetricEvaluationPlan] = None,
+    ) -> DataflowPlan:
         option_set = DataflowPlanOptionSet(
             optimizations=frozenset(optimizations),
             output_group_by_metric_instances=False,
@@ -436,7 +460,7 @@ class DataflowPlanBuilder:
         )
 
         base_source_node_recipe = self._find_source_node_recipe(
-            FindSourceNodeRecipeInput(
+            self._find_source_node_recipe_input(
                 simple_metric_input_specs=(
                     SimpleMetricInputSpec(
                         element_name=base_simple_metric_recipe.simple_metric_input.name,
@@ -454,7 +478,7 @@ class DataflowPlanBuilder:
             element_name=conversion_simple_metric_recipe.simple_metric_input.name,
         )
         conversion_source_node_recipe = self._find_source_node_recipe(
-            FindSourceNodeRecipeInput(
+            self._find_source_node_recipe_input(
                 simple_metric_input_specs=(
                     SimpleMetricInputSpec(
                         element_name=conversion_simple_metric_recipe.simple_metric_input.name,
@@ -844,6 +868,18 @@ class DataflowPlanBuilder:
 
         e.g. distinct listing__country_latest for bookings by listing__country_latest
         """
+        previous_outer_query_spec = self._outer_query_spec_for_group_by_metric
+        self._outer_query_spec_for_group_by_metric = query_spec
+        try:
+            return self._build_plan_for_distinct_values_with_outer_query_spec(
+                query_spec=query_spec, optimizations=optimizations
+            )
+        finally:
+            self._outer_query_spec_for_group_by_metric = previous_outer_query_spec
+
+    def _build_plan_for_distinct_values_with_outer_query_spec(
+        self, query_spec: MetricFlowQuerySpec, optimizations: FrozenSet[DataflowPlanOptimization] = frozenset()
+    ) -> DataflowPlan:
         option_set = DataflowPlanOptionSet(
             optimizations=frozenset(optimizations),
             output_group_by_metric_instances=False,
@@ -876,7 +912,7 @@ class DataflowPlanBuilder:
             where_filter_specs=tuple(query_level_filter_specs),
         )
         dataflow_recipe = self._find_source_node_recipe(
-            FindSourceNodeRecipeInput(
+            self._find_source_node_recipe_input(
                 simple_metric_input_specs=None,
                 linkable_spec_set=required_linkable_specs,
                 predicate_pushdown_state=predicate_pushdown_state,
@@ -1064,6 +1100,32 @@ class DataflowPlanBuilder:
         ), "Non-additive dimension can only be a time dimension, if specified."
         return queried_time_dimension_spec
 
+    def _find_source_node_recipe_input(
+        self,
+        simple_metric_input_specs: Optional[AnyLengthTuple[SimpleMetricInputSpec]],
+        linkable_spec_set: LinkableSpecSet,
+        predicate_pushdown_state: PredicatePushdownState,
+        optimizations: FrozenSet[DataflowPlanOptimization],
+    ) -> FindSourceNodeRecipeInput:
+        """Build recipe-search input, including filters a Metric() subquery must inherit."""
+        outer_query_spec = self._outer_query_spec_for_group_by_metric
+        if outer_query_spec is None:
+            inherited_where_filter_templates: Tuple[str, ...] = ()
+            inherited_time_range_constraint = None
+        else:
+            inherited_where_filter_templates = tuple(
+                where_filter.where_sql_template for where_filter in outer_query_spec.filter_intersection.where_filters
+            )
+            inherited_time_range_constraint = outer_query_spec.time_range_constraint
+        return FindSourceNodeRecipeInput(
+            simple_metric_input_specs=simple_metric_input_specs,
+            linkable_spec_set=linkable_spec_set,
+            predicate_pushdown_state=predicate_pushdown_state,
+            optimizations=frozenset(optimizations),
+            inherited_where_filter_templates=inherited_where_filter_templates,
+            inherited_time_range_constraint=inherited_time_range_constraint,
+        )
+
     def _find_source_node_recipe(
         self, find_source_node_recipe_input: FindSourceNodeRecipeInput
     ) -> Optional[SourceNodeRecipe]:
@@ -1185,7 +1247,11 @@ class DataflowPlanBuilder:
         )
         for group_by_metric_spec in linkable_specs_to_satisfy.group_by_metric_specs:
             query_output_node = self._build_query_output_node(
-                query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(group_by_metric_spec),
+                query_spec=self._source_node_builder.build_source_node_inputs_for_group_by_metric(
+                    group_by_metric_spec,
+                    inherited_where_filter_templates=find_source_node_recipe_input.inherited_where_filter_templates,
+                    inherited_time_range_constraint=find_source_node_recipe_input.inherited_time_range_constraint,
+                ),
                 option_set=DataflowPlanOptionSet(
                     optimizations=find_source_node_recipe_input.optimizations,
                     output_group_by_metric_instances=True,
@@ -1483,14 +1549,14 @@ class DataflowPlanBuilder:
                 ), "Offset to grain must be specified if no offset window is specified."
                 offset_grain = ExpandedTimeGranularity.from_time_granularity(child_metric_offset_to_grain)
 
-            # Determine the smallest queried agg time dimension grain (this is the grain we'll aggregate to)
+            # Metric() subqueries group by the join entity only. When the query still has a time window, use the
+            # metric's agg time grain for the offset join and leave it out of the output group by. The query dates
+            # stay on the time spine after the join. Subtracting the offset here would shift the window twice.
+            synthesized_offset_time_spec = False
             if len(queried_agg_time_dimension_specs) == 0:
-                raise ValueError(
-                    LazyFormat(
-                        "No agg_time_dimension requested in offset metric query. This should have been validated earlier.",
-                        simple_metric_input=simple_metric_input,
-                        queried_linkable_specs=queried_linkable_specs,
-                    )
+                synthesized_offset_time_spec = True
+                queried_agg_time_dimension_specs = FrozenOrderedSet(
+                    (self._get_minimum_metric_time_spec_for_metric(MetricReference(simple_metric_input.name)),)
                 )
             smallest_queried_agg_time_grain = self._sort_by_base_granularity(queried_agg_time_dimension_specs)[
                 0
@@ -1504,7 +1570,9 @@ class DataflowPlanBuilder:
                 offset_to_grain=child_metric_offset_to_grain,
                 time_spine_filter_specs=time_spine_filters,
             )
-            if (
+            if synthesized_offset_time_spec:
+                before_aggregation_time_spine_join_description = join_to_time_spine_description
+            elif (
                 offset_grain
                 and smallest_queried_agg_time_grain
                 # We can't know if the custom grain, once aggregated, will be larger or smaller than the offset grain.
@@ -1941,6 +2009,18 @@ class DataflowPlanBuilder:
         before_aggregation_time_spine_join_description = (
             simple_metric_recipe.before_aggregation_time_spine_join_description
         )
+        # The offset join needs the agg time column on the source even when the query groups by an entity only.
+        # That column stays out of queried_linkable_specs so the aggregated output does not fan out by time.
+        if before_aggregation_time_spine_join_description is not None:
+            offset_time_specs = tuple(
+                spec
+                for spec in simple_metric_recipe.queried_agg_time_dimension_specs
+                if spec not in queried_linkable_specs.time_dimension_specs
+            )
+            if offset_time_specs:
+                required_linkable_specs = required_linkable_specs.merge(
+                    LinkableSpecSet.create_from_specs(offset_time_specs)
+                ).dedupe()
         after_aggregation_time_spine_join_description = (
             simple_metric_recipe.after_aggregation_time_spine_join_description
         )
@@ -1977,7 +2057,7 @@ class DataflowPlanBuilder:
 
             with ExecutionTimer() as execution_timer:
                 source_node_recipe = self._find_source_node_recipe(
-                    FindSourceNodeRecipeInput(
+                    self._find_source_node_recipe_input(
                         simple_metric_input_specs=spec_properties.simple_metric_input_specs,
                         predicate_pushdown_state=simple_metric_input_ppd_state,
                         linkable_spec_set=required_linkable_specs,

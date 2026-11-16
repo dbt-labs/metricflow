@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import datetime
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import List, Optional, Sequence, Tuple, Union
 
+import sqlglot
 from metricflow_semantics.errors.error_classes import InvalidQueryException
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
@@ -25,6 +26,9 @@ from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_patt
 from metricflow_semantics.query.group_by_item.group_by_item_resolver import GroupByItemResolver
 from metricflow_semantics.query.group_by_item.resolution_dag.dag import GroupByItemResolutionDag
 from metricflow_semantics.query.issues.issues_base import MetricFlowQueryResolutionIssueSet
+from metricflow_semantics.query.issues.parsing.offset_metric_requires_metric_time import (
+    OffsetMetricRequiresMetricTimeIssue,
+)
 from metricflow_semantics.query.issues.parsing.string_input_parsing_issue import StringInputParsingIssue
 from metricflow_semantics.query.query_resolution import InputToIssueSetMapping, InputToIssueSetMappingItem
 from metricflow_semantics.query.query_resolver import MetricFlowQueryResolver
@@ -45,7 +49,11 @@ from metricflow_semantics.specs.instance_spec import InstanceSpec
 from metricflow_semantics.specs.patterns.metric_time_pattern import MetricTimePattern
 from metricflow_semantics.specs.patterns.minimum_time_grain import MinimumTimeGrainPattern
 from metricflow_semantics.specs.patterns.none_date_part import NoneDatePartPattern
-from metricflow_semantics.specs.query_param_implementations import DimensionOrEntityParameter, MetricParameter
+from metricflow_semantics.specs.query_param_implementations import (
+    DimensionOrEntityParameter,
+    MetricParameter,
+    TimeDimensionParameter,
+)
 from metricflow_semantics.specs.query_spec import MetricFlowQuerySpec
 from metricflow_semantics.specs.spec_set import group_specs_by_type
 from metricflow_semantics.specs.time_dimension_spec import TimeDimensionSpec
@@ -55,6 +63,7 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.mf_logging.pretty_print import mf_pformat
 from metricflow_semantics.toolkit.performance_helpers import mf_log_duration
 from metricflow_semantics.toolkit.string_helpers import mf_indent
+from sqlglot import exp
 
 from metricflow_semantic_interfaces.implementations.filters.where_filter import (
     PydanticWhereFilter,
@@ -64,10 +73,109 @@ from metricflow_semantic_interfaces.parsing.text_input.ti_description import Que
 from metricflow_semantic_interfaces.parsing.where_filter.jinja_object_parser import JinjaObjectParser
 from metricflow_semantic_interfaces.protocols import SavedQuery
 from metricflow_semantic_interfaces.protocols.where_filter import WhereFilter
-from metricflow_semantic_interfaces.references import SemanticModelReference
+from metricflow_semantic_interfaces.references import MetricReference, SemanticModelReference
 from metricflow_semantic_interfaces.type_enums import TimeGranularity
 
 logger = logging.getLogger(__name__)
+
+
+def _mask_jinja_expressions(where_sql_template: str) -> Tuple[str, List[str]]:
+    """Replace Jinja blocks with placeholders sqlglot can parse, and return the original blocks."""
+    masked: List[str] = []
+    parts: List[str] = []
+    i = 0
+    while i < len(where_sql_template):
+        if where_sql_template.startswith("{{", i):
+            depth = 1
+            j = i + 2
+            while j < len(where_sql_template) and depth:
+                if where_sql_template.startswith("{{", j):
+                    depth += 1
+                    j += 2
+                    continue
+                if where_sql_template.startswith("}}", j):
+                    depth -= 1
+                    j += 2
+                    continue
+                j += 1
+            parts.append(f"mf_jinja_{len(masked)}")
+            masked.append(where_sql_template[i:j])
+            i = j
+            continue
+        parts.append(where_sql_template[i])
+        i += 1
+    return "".join(parts), masked
+
+
+def _restore_jinja_expressions(sql: str, masked: Sequence[str]) -> str:
+    restored = sql
+    for index in range(len(masked) - 1, -1, -1):
+        restored = restored.replace(f"mf_jinja_{index}", masked[index])
+    return restored.strip()
+
+
+def _flatten_top_level_and(expression: exp.Expression) -> List[exp.Expression]:
+    """Split a sqlglot tree on AND nodes. AND inside BETWEEN, OR, or a function stays put."""
+    while isinstance(expression, exp.Paren):
+        expression = expression.this
+    if isinstance(expression, exp.And):
+        return _flatten_top_level_and(expression.left) + _flatten_top_level_and(expression.right)
+    return [expression]
+
+
+def _split_top_level_and(where_sql_template: str) -> List[str]:
+    """Split a where template on top-level AND using a sqlglot AST.
+
+    Jinja calls are masked before parsing, so `{{ Entity('listing') }}` stays intact. AND inside BETWEEN, OR, or
+    parentheses that belong to a larger expression is not a split point. A template sqlglot cannot parse is kept
+    whole.
+    """
+    stripped = where_sql_template.strip()
+    if not stripped:
+        return []
+    masked_sql, jinja_blocks = _mask_jinja_expressions(stripped)
+    try:
+        tree = sqlglot.parse_one(masked_sql)
+    except sqlglot.errors.ParseError:
+        logger.debug(LazyFormat(lambda: f"Could not parse where template as SQL, leaving it whole: {stripped}"))
+        return [stripped]
+    return [_restore_jinja_expressions(part.sql(), jinja_blocks) for part in _flatten_top_level_and(tree)]
+
+
+def _where_filter_templates_inherited_by_group_by_metric(
+    where_sql_templates: Sequence[str],
+    custom_granularity_names: Sequence[str],
+) -> Tuple[str, ...]:
+    """Where templates from the outer query that should constrain a Metric() subquery.
+
+    Metric() predicates stay on the outer query. They are the comparison against the subquery result, not a filter
+    on the rows that subquery reads. Dimension, entity, and time predicates are re-resolved against the inner
+    metric. A predicate the inner metric cannot resolve fails when that inner query is parsed.
+    """
+    inherited: List[str] = []
+    for where_sql_template in where_sql_templates:
+        for conjunct in _split_top_level_and(where_sql_template):
+            call_parameter_sets = JinjaObjectParser.parse_call_parameter_sets(
+                where_sql_template=conjunct,
+                custom_granularity_names=custom_granularity_names,
+                query_item_location=QueryItemLocation.NON_ORDER_BY,
+            )
+            has_metric_call = len(call_parameter_sets.metric_call_parameter_sets) > 0
+            has_other_call = (
+                len(call_parameter_sets.dimension_call_parameter_sets) > 0
+                or len(call_parameter_sets.time_dimension_call_parameter_sets) > 0
+                or len(call_parameter_sets.entity_call_parameter_sets) > 0
+            )
+            if has_metric_call and has_other_call:
+                raise InvalidQueryException(
+                    "A where filter passed to a metric in a filter mixes Metric() with other predicates in one "
+                    "expression, so those predicates cannot be applied inside the metric subquery. Split them into "
+                    f"separate filters. Filter: {conjunct}"
+                )
+            if has_metric_call:
+                continue
+            inherited.append(conjunct)
+    return tuple(inherited)
 
 
 class MetricFlowQueryParser:
@@ -171,9 +279,9 @@ class MetricFlowQueryParser:
         if len(time_dimension_specs) == 0:
             return None
 
-        assert (
-            len(time_dimension_specs) == 1
-        ), f"Bug with MinimumTimeGrainPattern - should have returned exactly 1 spec but got {time_dimension_specs}"
+        assert len(time_dimension_specs) == 1, (
+            f"Bug with MinimumTimeGrainPattern - should have returned exactly 1 spec but got {time_dimension_specs}"
+        )
 
         return time_dimension_specs[0].base_granularity
 
@@ -401,6 +509,8 @@ class MetricFlowQueryParser:
         order_by: Optional[Sequence[OrderByQueryParameter]] = None,
         min_max_only: bool = False,
         apply_group_by: bool = True,
+        expand_time_constraint: bool = True,
+        allow_time_offset_without_metric_time: bool = False,
     ) -> ParseQueryResult:
         """Parse the query into spec objects, validating them in the process.
 
@@ -490,10 +600,12 @@ class MetricFlowQueryParser:
 
             logger.debug(
                 LazyFormat(
-                    lambda: "Converted group-by-item input:\n"
-                    + mf_indent(f"Input: {repr(group_by_name)}")
-                    + "\n"
-                    + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
+                    lambda: (
+                        "Converted group-by-item input:\n"
+                        + mf_indent(f"Input: {repr(group_by_name)}")
+                        + "\n"
+                        + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_item)}")
+                    )
                 )
             )
 
@@ -504,10 +616,12 @@ class MetricFlowQueryParser:
             resolver_inputs_for_group_by_items.append(resolver_input_for_group_by_parameter)
             logger.debug(
                 LazyFormat(
-                    lambda: "Converted group-by-item input:\n"
-                    + mf_indent(f"Input: {repr(group_by_parameter)}")
-                    + "\n"
-                    + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
+                    lambda: (
+                        "Converted group-by-item input:\n"
+                        + mf_indent(f"Input: {repr(group_by_parameter)}")
+                        + "\n"
+                        + mf_indent(f"Resolver Input: {mf_pformat(resolver_input_for_group_by_parameter)}")
+                    )
                 )
             )
 
@@ -562,11 +676,47 @@ class MetricFlowQueryParser:
 
         logger.debug(LazyFormat("Resolved query", query_resolution=query_resolution))
 
-        self._raise_exception_if_there_are_errors(
-            input_to_issue_set=query_resolution.input_to_issue_set.merge(
-                InputToIssueSetMapping(tuple(input_to_issue_set_mapping_item))
-            ),
+        input_to_issue_set = query_resolution.input_to_issue_set.merge(
+            InputToIssueSetMapping(tuple(input_to_issue_set_mapping_item))
         )
+        # An offset Metric() groups by the join entity. Resolve it with metric_time so validation passes, then drop
+        # metric_time from the output group by. The plan applies the query window after the offset join.
+        offset_issue_only = (
+            allow_time_offset_without_metric_time
+            and (time_constraint_start is not None or time_constraint_end is not None)
+            and input_to_issue_set.merged_issue_set.has_errors
+            and all(
+                isinstance(issue, OffsetMetricRequiresMetricTimeIssue)
+                for issue in input_to_issue_set.merged_issue_set.errors
+            )
+        )
+        if offset_issue_only:
+            resolved_with_time = self.parse_and_validate_query(
+                metric_names=metric_names or None,
+                metrics=metrics or None,
+                group_by_names=group_by_names or None,
+                group_by=tuple(group_by) + (TimeDimensionParameter(name="metric_time"),),
+                limit=limit,
+                time_constraint_start=time_constraint_start,
+                time_constraint_end=time_constraint_end,
+                where_constraints=where_constraints,
+                where_constraint_strs=where_constraint_strs,
+                order_by_names=order_by_names or None,
+                order_by=order_by or None,
+                min_max_only=min_max_only,
+                apply_group_by=apply_group_by,
+                expand_time_constraint=expand_time_constraint,
+            )
+            return ParseQueryResult(
+                query_spec=replace(
+                    resolved_with_time.query_spec,
+                    time_dimension_specs=tuple(
+                        spec for spec in resolved_with_time.query_spec.time_dimension_specs if not spec.is_metric_time
+                    ),
+                ),
+                queried_semantic_models=resolved_with_time.queried_semantic_models,
+            )
+        self._raise_exception_if_there_are_errors(input_to_issue_set=input_to_issue_set)
 
         query_spec = query_resolution.checked_query_spec
         assert query_resolution.resolution_dag is not None
@@ -587,11 +737,12 @@ class MetricFlowQueryParser:
                 end_time=time_constraint_end,
             )
 
-            time_constraint = self._adjust_time_constraint(
-                resolution_dag=query_resolution.resolution_dag,
-                time_dimension_specs_in_query=query_spec.time_dimension_specs,
-                time_constraint=time_constraint,
-            )
+            if expand_time_constraint:
+                time_constraint = self._adjust_time_constraint(
+                    resolution_dag=query_resolution.resolution_dag,
+                    time_dimension_specs_in_query=query_spec.time_dimension_specs,
+                    time_constraint=time_constraint,
+                )
             logger.debug(LazyFormat(lambda: f"Time constraint after adjustment is: {time_constraint}"))
 
             return ParseQueryResult(
@@ -605,12 +756,46 @@ class MetricFlowQueryParser:
         )
 
     def build_query_spec_for_group_by_metric_source_node(
-        self, group_by_metric_spec: GroupByMetricSpec
+        self,
+        group_by_metric_spec: GroupByMetricSpec,
+        inherited_where_filter_templates: Sequence[str] = (),
+        inherited_time_range_constraint: Optional[TimeRangeConstraint] = None,
     ) -> MetricFlowQuerySpec:
-        """Query spec that can be used to build a source node for this spec in the DataflowPlanBuilder."""
+        """Query spec for the subquery that satisfies a Metric() in a filter.
+
+        Copies the outer query's time window and the where filters the inner metric can resolve (entity and dimension
+        predicates, including an org filter) onto that subquery. The window is kept as given. Widening it to the inner
+        metric's grain would change the dates before an offset join decides which ones belong on the source. A filter
+        the inner metric cannot resolve fails here instead of being dropped. Metric() comparisons are not copied.
+        They stay on the outer query.
+        """
+        metric = self._manifest_lookup.metric_lookup.get_metric(
+            MetricReference(group_by_metric_spec.reference.element_name)
+        )
+        has_time_offset = any(
+            input_metric.offset_window is not None or input_metric.offset_to_grain is not None
+            for input_metric in metric.input_metrics
+        )
+        where_constraint_strs = _where_filter_templates_inherited_by_group_by_metric(
+            inherited_where_filter_templates,
+            custom_granularity_names=self._manifest_lookup.semantic_model_lookup.custom_granularity_names,
+        )
+        time_constraint_start = None
+        time_constraint_end = None
+        if inherited_time_range_constraint is not None:
+            time_constraint_start = inherited_time_range_constraint.start_time
+            time_constraint_end = inherited_time_range_constraint.end_time
         return self.parse_and_validate_query(
             metrics=(MetricParameter(group_by_metric_spec.reference.element_name),),
             group_by=(DimensionOrEntityParameter(group_by_metric_spec.metric_subquery_entity_spec.dunder_name),),
+            where_constraint_strs=where_constraint_strs or None,
+            time_constraint_start=time_constraint_start,
+            time_constraint_end=time_constraint_end,
+            # The outer query already expanded this window. Expanding it again rewrites the query dates.
+            expand_time_constraint=False,
+            # The source scan of an offset metric uses the shifted dates. The query window is applied on the time
+            # spine after that join, so the subquery does not need metric_time in its group by.
+            allow_time_offset_without_metric_time=has_time_offset,
         ).query_spec
 
 

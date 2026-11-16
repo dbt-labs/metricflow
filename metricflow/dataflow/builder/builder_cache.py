@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import Iterable, Optional
 
+from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.specs.instance_spec import LinkableInstanceSpec
 from metricflow_semantics.specs.linkable_spec_set import LinkableSpecSet
 from metricflow_semantics.specs.metric_spec import MetricSpec
@@ -44,6 +45,11 @@ class FindSourceNodeRecipeInput:
     linkable_spec_set: LinkableSpecSet
     predicate_pushdown_state: PredicatePushdownState
     optimizations: frozenset[DataflowPlanOptimization]
+    # Query-level where templates and time window copied onto Metric() subqueries built while
+    # searching for this recipe. Part of the cache key so two queries that differ only by those
+    # filters do not share a source node.
+    inherited_where_filter_templates: tuple[str, ...] = ()
+    inherited_time_range_constraint: Optional[TimeRangeConstraint] = None
 
 
 @dataclass(frozen=True)
