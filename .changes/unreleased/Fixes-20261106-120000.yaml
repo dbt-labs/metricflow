@@ -1,6 +1,0 @@
-kind: Fixes
-body: Fix ClickHouse percentile metrics failing or truncating results on Decimal columns.
-time: 2026-11-06T12:00:00.000000+00:00
-custom:
-    Author: canbekley
-    Issue: "2154"
