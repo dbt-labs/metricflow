@@ -354,6 +354,54 @@
                 }
             ]
         },
+        "hierarchy_level_schema": {
+            "$id": "hierarchy_level_schema",
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "dimension": {
+                            "type": "string"
+                        },
+                        "parent": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "dimension"
+                    ],
+                    "type": "object"
+                }
+            ]
+        },
+        "hierarchy_schema": {
+            "$id": "hierarchy_schema",
+            "additionalProperties": false,
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "levels": {
+                    "items": {
+                        "$ref": "#/definitions/hierarchy_level_schema"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "name": {
+                    "pattern": "(?!.*__).*^[a-z][a-z0-9_]*[a-z0-9]$",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "levels"
+            ],
+            "type": "object"
+        },
         "is-time-dimension": {
             "properties": {
                 "type": {
@@ -878,6 +926,12 @@
                 "entities": {
                     "items": {
                         "$ref": "#/definitions/entity_schema"
+                    },
+                    "type": "array"
+                },
+                "hierarchies": {
+                    "items": {
+                        "$ref": "#/definitions/hierarchy_schema"
                     },
                     "type": "array"
                 },

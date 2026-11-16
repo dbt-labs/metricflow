@@ -6,6 +6,10 @@ from metricflow_semantic_interfaces.protocols.dimension import (  # noqa:F401
     DimensionValidityParams,
 )
 from metricflow_semantic_interfaces.protocols.entity import Entity  # noqa:F401
+from metricflow_semantic_interfaces.protocols.hierarchy import (  # noqa:F401
+    DimensionHierarchy,
+    DimensionHierarchyLevel,
+)
 from metricflow_semantic_interfaces.protocols.measure import (  # noqa:F401
     Measure,
     MeasureAggregationParameters,
