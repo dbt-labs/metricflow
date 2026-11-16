@@ -10,6 +10,9 @@ Protocol v1:
                 "manifest_path":"...","metric_names":[...],"group_by_names":[...],
                 "where_constraints":null,"order_by_names":null,"limit":null,"sql_engine":"DUCKDB"
             }} → {"id":"...","ok":true,"sql":"..."}
+  validate_semantic_manifest: {"id":"...","method":"validate_semantic_manifest","protocol_version":1,"params":{
+                "manifest_path":"..."
+            }} → {"id":"...","ok":true,"has_blocking_issues":false,"errors":[],"future_errors":[],"warnings":[]}
   ping:     {"id":"...","method":"ping","protocol_version":1} → {"id":"...","ok":true}
   shutdown: {"id":"...","method":"shutdown","protocol_version":1} → {"id":"...","ok":true}
   error:    {"id":"...","ok":false,"error":{"type":"ExceptionClass","message":"..."}}
@@ -22,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.metadata
+import json
 import logging
 import os
 import signal
@@ -48,6 +52,9 @@ from mf_ipc_protocol import (
     RequestEnvelope,
     RequestId,
     StartupErrorMessage,
+    ValidateSemanticManifestParams,
+    ValidateSemanticManifestResponse,
+    ValidationIssueModel,
 )
 from pydantic import BaseModel, ValidationError
 
@@ -63,6 +70,9 @@ from metricflow.sql.render.snowflake import SnowflakeSqlPlanRenderer
 from metricflow.sql.render.sql_plan_renderer import SqlPlanRenderer
 from metricflow.sql.render.trino import TrinoSqlPlanRenderer
 from metricflow_semantic_interfaces.implementations.semantic_manifest import PydanticSemanticManifest
+from metricflow_semantic_interfaces.parsing.dir_to_model import parse_directory_of_yaml_files_to_semantic_manifest
+from metricflow_semantic_interfaces.validations.semantic_manifest_validator import SemanticManifestValidator
+from metricflow_semantic_interfaces.validations.validator_helpers import ValidationIssue
 
 try:
     _MF_VERSION = importlib.metadata.version("metricflow")
@@ -132,10 +142,30 @@ def _renderer_for(engine: SqlEngine) -> SqlPlanRenderer:
             raise ValueError(f"No renderer for engine: {engine!r}")
 
 
+_TEMPLATE_MAPPING = {"source_schema": "production"}
+
+
 def _load_manifest(path: str) -> PydanticSemanticManifest:
     p = Path(path)
     if p.is_dir():
-        return mf_load_manifest_from_yaml_directory(p, {"source_schema": "production"})
+        return mf_load_manifest_from_yaml_directory(p, _TEMPLATE_MAPPING)
+    return mf_load_manifest_from_json_file(p)
+
+
+def _load_manifest_unvalidated(path: str) -> PydanticSemanticManifest:
+    """Parse a manifest without running SemanticManifestValidator.
+
+    Unlike _load_manifest, this must succeed even when the manifest is
+    invalid: validate_semantic_manifest needs the parsed manifest so it can
+    run the validator itself and return the structured issues, whereas
+    mf_load_manifest_from_yaml_directory (used by _load_manifest) calls
+    checked_validations() internally and collapses any validation failure
+    into an opaque RuntimeError.
+    """
+    p = Path(path)
+    if p.is_dir():
+        build_result = parse_directory_of_yaml_files_to_semantic_manifest(str(p), template_mapping=_TEMPLATE_MAPPING)
+        return build_result.semantic_manifest
     return mf_load_manifest_from_json_file(p)
 
 
@@ -187,7 +217,40 @@ def _handle_explain(req_id: RequestId, raw_params: dict) -> ExplainResponse | Er
         return _err(req_id, e)
 
 
-def _dispatch(envelope: RequestEnvelope) -> ExplainResponse | OkResponse | ErrorResponse:
+def _issue_model(issue: ValidationIssue) -> ValidationIssueModel:
+    # issue.json() (pydantic v1 API, via msi_pydantic_shim) already knows how to
+    # serialize the enum/date fields nested in context/error_date; round-tripping
+    # through it is simpler than re-deriving that logic here.
+    payload = json.loads(issue.json())
+    return ValidationIssueModel(
+        message=payload["message"],
+        context=payload.get("context"),
+        extra_detail=payload.get("extra_detail"),
+        error_date=payload.get("error_date"),
+    )
+
+
+def _handle_validate_semantic_manifest(
+    req_id: RequestId, raw_params: dict
+) -> ValidateSemanticManifestResponse | ErrorResponse:
+    try:
+        params = ValidateSemanticManifestParams.model_validate(raw_params)
+        manifest = _load_manifest_unvalidated(params.manifest_path)
+        results = SemanticManifestValidator[PydanticSemanticManifest]().validate_semantic_manifest(manifest)
+        return ValidateSemanticManifestResponse(
+            id=req_id,
+            has_blocking_issues=results.has_blocking_issues,
+            errors=tuple(_issue_model(issue) for issue in results.errors),
+            future_errors=tuple(_issue_model(issue) for issue in results.future_errors),
+            warnings=tuple(_issue_model(issue) for issue in results.warnings),
+        )
+    except Exception as e:
+        return _err(req_id, e)
+
+
+def _dispatch(
+    envelope: RequestEnvelope,
+) -> ExplainResponse | OkResponse | ValidateSemanticManifestResponse | ErrorResponse:
     """Route a validated envelope to its method handler.
 
     `shutdown` is handled by the caller (main's IPC loop), not here: it needs
@@ -206,6 +269,8 @@ def _dispatch(envelope: RequestEnvelope) -> ExplainResponse | OkResponse | Error
         return OkResponse(id=envelope.id)
     if envelope.method == Method.EXPLAIN:
         return _handle_explain(envelope.id, envelope.params or {})
+    if envelope.method == Method.VALIDATE_SEMANTIC_MANIFEST:
+        return _handle_validate_semantic_manifest(envelope.id, envelope.params or {})
     return ErrorResponse(
         id=envelope.id,
         error=ErrorDetail(
