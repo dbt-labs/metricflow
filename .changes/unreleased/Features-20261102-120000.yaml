@@ -1,0 +1,6 @@
+kind: Features
+body: Sync upstream apache/ossie-converters improvements into the Ossie converter. Metrics whose expressions cannot be decomposed into a supported aggregation are now dropped with an UNSUPPORTED_METRIC_EXPRESSION issue instead of being converted to a SUM.
+time: 2026-11-02T12:00:00.00000-05:00
+custom:
+  Author: QMalcolm
+  Issue: "2151"

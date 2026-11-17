@@ -10,9 +10,11 @@ from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow.converters.converter_issues import ConverterIssue, ConverterIssueType, ConverterResult
 from metricflow.converters.datatype_mapping import msi_datatype_to_osi
+from metricflow.converters.expression_utils import _is_constant_expr
 from metricflow.converters.filter_utils import _collect_filter_sql, _merge_filter_sqls
 from metricflow.converters.models import (
     OSIDataset,
+    OSIDataType,
     OSIDialect,
     OSIDialectExpression,
     OSIDimension,
@@ -31,6 +33,7 @@ from metricflow_semantic_interfaces.protocols.measure import (
     Measure,
     MeasureAggregationParameters,
 )
+from metricflow_semantic_interfaces.protocols.meta import SemanticLayerElementConfig
 from metricflow_semantic_interfaces.protocols.metric import Metric
 from metricflow_semantic_interfaces.protocols.semantic_model import SemanticModel
 from metricflow_semantic_interfaces.transformations.convert_count import ConvertCountMetricToSumRule
@@ -39,6 +42,7 @@ from metricflow_semantic_interfaces.transformations.semantic_manifest_transforme
 )
 from metricflow_semantic_interfaces.type_enums import (
     AggregationType,
+    DataType,
     DimensionType,
     EntityType,
     MetricType,
@@ -60,8 +64,20 @@ class _RelationshipDirection:
     to_col: str
 
 
+class AmbiguousDerivedReferenceError(Exception):
+    """A DERIVED metric's expression reference does not resolve to a single expression.
+
+    Raised by the expression resolver and handled in :meth:`MSIToOSIConverter.convert`,
+    which drops the metric and records a ConverterIssue rather than failing the run.
+    """
+
+
 class MSIToOSIConverter:
-    """Converts an MSI SemanticManifest into an OSI Document."""
+    """Converts an MSI SemanticManifest into an OSI Document.
+
+    Holds no per-call state on the instance, so one instance may be reused, including concurrently
+    from multiple threads, across any number of ``convert()`` calls.
+    """
 
     def __init__(self, dialect: OSIDialect = OSIDialect.ANSI_SQL) -> None:  # noqa: D107
         self._dialect = dialect
@@ -97,15 +113,36 @@ class MSIToOSIConverter:
                 issues.append(
                     ConverterIssue(issue_type=ConverterIssueType.CUMULATIVE_SEMANTICS_LOSS, element_name=metric.name)
                 )
-            expr = self._resolve_metric_expression(metric, metric_index, expression_cache)
+            try:
+                expr = self._resolve_metric_expression(metric, metric_index, expression_cache)
+            except AmbiguousDerivedReferenceError:
+                # Every other unsupported shape drops one metric and records an issue;
+                # an ambiguous reference is no reason to fail the whole conversion.
+                issues.append(
+                    ConverterIssue(
+                        issue_type=ConverterIssueType.AMBIGUOUS_REFERENCE_METRIC_DROPPED,
+                        element_name=metric.name,
+                    )
+                )
+                continue
             osi_metrics.append(
                 OSIMetric(
                     name=metric.name,
                     expression=self._make_expression(expr),
-                    datatype=msi_datatype_to_osi(metric.datatype),
+                    datatype=self._resolve_datatype(metric.datatype, metric.config),
                     description=metric.description,
                 )
             )
+            if len(manifest.semantic_models) > 1 and self._aggregates_a_constant(metric):
+                # SUM(1) and the like carry no column, so the semantic model the metric belonged to
+                # cannot be written into the OSI expression. Converting it back refuses rather than
+                # guesses (ROW_COUNT_METRIC_DROPPED); record the loss here so it is not silent.
+                issues.append(
+                    ConverterIssue(
+                        issue_type=ConverterIssueType.CONSTANT_METRIC_SEMANTIC_MODEL_LOSS,
+                        element_name=metric.name,
+                    )
+                )
 
         return ConverterResult(
             output=OSIDocument(
@@ -151,10 +188,36 @@ class MSIToOSIConverter:
             name=dim.name,
             expression=self._make_expression(expr),
             dimension=OSIDimension(is_time=is_time),
-            datatype=msi_datatype_to_osi(dim.datatype),
+            datatype=self._resolve_datatype(dim.datatype, dim.config),
             label=dim.label,
             description=dim.description,
         )
+
+    @staticmethod
+    def _resolve_datatype(
+        native_datatype: Optional[DataType], config: Optional[SemanticLayerElementConfig]
+    ) -> Optional[OSIDataType]:
+        """Prefer MetricFlow's native datatype, falling back to dbt's `meta.ossie.datatype` extension.
+
+        Entities and measures have no native datatype, so for them only the `meta` annotation applies.
+        An annotation that is missing, malformed or not a known OSI datatype yields None rather than
+        failing the conversion.
+        """
+        native = msi_datatype_to_osi(native_datatype)
+        if native is not None:
+            return native
+        if config is None:
+            return None
+        ossie_meta = config.meta.get("ossie")
+        if not isinstance(ossie_meta, dict):
+            return None
+        datatype = ossie_meta.get("datatype")
+        if not isinstance(datatype, str):
+            return None
+        try:
+            return OSIDataType(datatype)
+        except ValueError:
+            return None
 
     def _convert_entity(self, entity: Entity) -> OSIField:
         expr = entity.expr if entity.expr is not None else entity.name
@@ -164,6 +227,7 @@ class MSIToOSIConverter:
             expression=self._make_expression(expr),
             label=entity.label,
             description=entity.description,
+            datatype=self._resolve_datatype(None, entity.config),
         )
 
     def _convert_measure(self, measure: Measure) -> OSIField:
@@ -174,6 +238,7 @@ class MSIToOSIConverter:
             expression=self._make_expression(expr),
             label=measure.label,
             description=measure.description,
+            datatype=self._resolve_datatype(None, measure.config),
         )
 
     @staticmethod
@@ -242,7 +307,14 @@ class MSIToOSIConverter:
         metric: Metric,
         filter_sql: Optional[str] = None,
     ) -> str:
-        """Resolve a SIMPLE metric using metric_aggregation_params (always set after transformation)."""
+        """Resolve a SIMPLE metric using metric_aggregation_params (always set after transformation).
+
+        No special case for a row count: ``SUM`` with ``expr == '1'`` already renders as ``SUM(1)``
+        through the generic path below. That matches ``COUNT(*)`` on any non-empty input (over zero
+        rows ``SUM(1)`` is NULL where ``COUNT(*)`` is 0, as with MetricFlow's own COUNT → SUM rewrite)
+        and is portable across engines, unlike ``COUNT(<dataset>.*)``, which several engines reject or
+        interpret differently.
+        """
         agg_params_obj = metric.type_params.metric_aggregation_params
         if agg_params_obj is None:
             raise ValueError(
@@ -254,6 +326,19 @@ class MSIToOSIConverter:
         col = metric.type_params.expr if metric.type_params.expr is not None else metric.name
         col = self._qualify_col(col, agg_params_obj.semantic_model)
         return self._build_agg_expression(agg_params_obj.agg, col, agg_params_obj.agg_params, filter_sql)
+
+    @staticmethod
+    def _aggregates_a_constant(metric: Metric) -> bool:
+        """Return True for a SIMPLE SUM over a constant expr, e.g. a row count rewritten to SUM(1).
+
+        Only SUM: it is the one aggregation the OSI → MSI side resolves as a constant (and refuses on
+        ambiguous datasets). MAX(1), AVG(1) and the like go through the ordinary column lookup there.
+        """
+        params = metric.type_params.metric_aggregation_params
+        expr = metric.type_params.expr
+        if metric.type is not MetricType.SIMPLE or params is None or expr is None:
+            return False
+        return params.agg is AggregationType.SUM and _is_constant_expr(expr)
 
     @staticmethod
     def _qualify_col(col: str, semantic_model: str) -> str:
@@ -335,11 +420,29 @@ class MSIToOSIConverter:
         cache: Dict[Tuple[str, Optional[str]], str],
         filter_sql: Optional[str] = None,
     ) -> str:
-        """Resolve a DERIVED metric by substituting each input metric's expression into the expr string.
+        r"""Resolve a DERIVED metric by substituting each input metric's expression into the expr string.
 
         Compound sub-expressions (DERIVED/RATIO) are wrapped in parentheses to preserve operator precedence.
+
+        All references are substituted in a single pass. Substituting them one at a
+        time would re-scan text inserted by an earlier reference, so a metric named
+        after a column appearing in an already-inlined expression would be expanded
+        twice. The replacement is a callback rather than a string so that backslashes
+        in the resolved SQL (e.g. from a `LIKE 'a\\b'` filter) are inserted verbatim
+        instead of being interpreted as `re.sub` template escapes.
+
+        Listing the same input metric twice under one reference raises
+        :class:`AmbiguousDerivedReferenceError` when the expression uses that reference
+        and the two occurrences resolve differently (e.g. distinct per-input filters and
+        no aliases): the expression has a single token for them, so either resolution
+        would be an arbitrary choice. MetricFlow does not reject this shape upstream —
+        `DerivedMetricRule._validate_alias_collision` only compares entries that set an
+        alias. Occurrences that resolve identically are redundant rather than ambiguous,
+        and a duplicated reference the expression never substitutes cannot affect the
+        result; both are accepted.
         """
         expr = metric.type_params.expr or ""
+        resolutions: Dict[str, List[str]] = {}
         for input_metric in metric.type_params.metrics or []:
             ref = input_metric.alias if input_metric.alias else input_metric.name
             dep_metric = self._lookup_metric(metric_index, input_metric.name, f"DERIVED metric '{metric.name}'")
@@ -347,8 +450,31 @@ class MSIToOSIConverter:
             resolved = self._resolve_metric_expression(dep_metric, metric_index, cache, input_filter)
             if dep_metric.type in (MetricType.DERIVED, MetricType.RATIO):
                 resolved = f"({resolved})"
-            expr = re.sub(rf"\b{re.escape(ref)}\b", resolved, expr)
-        return expr
+            distinct = resolutions.setdefault(ref, [])
+            if resolved not in distinct:
+                distinct.append(resolved)
+
+        if not resolutions:
+            return expr
+
+        # The `\b` anchors already stop a short reference from matching inside a
+        # longer identifier; sorting by length (then name) keeps the alternation order stable
+        # and independent of the order metrics happen to be declared in.
+        pattern = re.compile(
+            r"\b(" + "|".join(re.escape(ref) for ref in sorted(resolutions, key=lambda ref: (-len(ref), ref))) + r")\b"
+        )
+
+        # Only a reference the expression actually uses can be ambiguous; one that is
+        # listed but never substituted has no bearing on the result.
+        for ref in sorted(set(pattern.findall(expr))):
+            if len(resolutions[ref]) > 1:
+                raise AmbiguousDerivedReferenceError(
+                    "DERIVED metric references an input metric that is listed more than once with "
+                    "differing resolutions, making the reference ambiguous; give each occurrence a "
+                    f"distinct alias: metric_name={metric.name!r}, reference={ref!r}"
+                )
+
+        return pattern.sub(lambda match: resolutions[match.group(0)][0], expr)
 
     @staticmethod
     def _build_entity_index(
@@ -391,18 +517,27 @@ class MSIToOSIConverter:
             return _RelationshipDirection(from_dataset=ds_a, to_dataset=ds_b, from_col=col_a, to_col=col_b)
         return _RelationshipDirection(from_dataset=ds_b, to_dataset=ds_a, from_col=col_b, to_col=col_a)
 
+    _ONE_SIDE_ENTITY_TYPES = {EntityType.PRIMARY, EntityType.UNIQUE}
+
     @staticmethod
     def _build_relationships(
         entity_index: Dict[str, List[_EntityEntry]],
     ) -> List[OSIRelationship]:
         """Resolve implicit MSI entity links into explicit OSI relationships.
 
-        Every pair of datasets sharing an entity name is a valid join path.
+        Every pair of datasets sharing an entity name is a candidate join path, except when
+        both sides declare that entity as FOREIGN: `to_columns` must be a primary/unique key
+        of the `to` dataset (per the OSI spec), which no FOREIGN-side column is.
         """
         relationships: List[OSIRelationship] = []
         for entity_name, entries in entity_index.items():
             for entry_a, entry_b in combinations(entries, 2):
                 if entry_a.dataset == entry_b.dataset:
+                    continue
+                if (
+                    entry_a.entity_type not in MSIToOSIConverter._ONE_SIDE_ENTITY_TYPES
+                    and entry_b.entity_type not in MSIToOSIConverter._ONE_SIDE_ENTITY_TYPES
+                ):
                     continue
                 direction = MSIToOSIConverter._relationship_direction(
                     entry_a.dataset,

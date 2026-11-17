@@ -193,8 +193,14 @@ def _osi_metric(
     expression: str,
     description: str | None = None,
     datatype: OSIDataType | None = None,
+    dialect: OSIDialect = OSIDialect.ANSI_SQL,
 ) -> OSIMetric:
-    return OSIMetric(name=name, expression=_osi_expr(expression), datatype=datatype, description=description)
+    return OSIMetric(
+        name=name,
+        expression=_osi_expr(expression, dialect=dialect),
+        datatype=datatype,
+        description=description,
+    )
 
 
 def _osi_relationship(
