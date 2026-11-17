@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import Dict, Final, Iterable, Sequence
+from typing import Dict, Final, Iterable, Optional, Sequence
 
 from metricflow_semantics.errors.error_classes import (
     DuplicateMetricError,
@@ -29,7 +29,7 @@ from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSe
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 
 from metricflow_semantic_interfaces.enum_extension import assert_values_exhausted
-from metricflow_semantic_interfaces.naming.keywords import METRIC_TIME_ELEMENT_NAME
+from metricflow_semantic_interfaces.naming.keywords import DUNDER, METRIC_TIME_ELEMENT_NAME
 from metricflow_semantic_interfaces.protocols import MetricInput
 from metricflow_semantic_interfaces.protocols.metric import Metric, MetricType
 from metricflow_semantic_interfaces.protocols.semantic_manifest import SemanticManifest
@@ -340,6 +340,33 @@ class MetricLookup:
             assert_values_exhausted(metric_type)
 
         return metric_inputs
+
+    @staticmethod
+    def input_metric_alias(metric: Metric, input_metric: MetricInput) -> Optional[str]:
+        """Returns the alias that names the output column of the input metric in the SQL of the given metric.
+
+        A ratio reads its numerator and denominator by their output names (the alias, or else the name). When both
+        have the same output name but are not the same input (e.g. the denominator declares `exclude_dimensions`), the
+        denominator gets an alias that no metric name can equal, so that the ratio reads each side from its own column.
+        """
+        if metric.type is not MetricType.RATIO:
+            return input_metric.alias
+        numerator = metric.type_params.numerator
+        denominator = metric.type_params.denominator
+        if numerator is None or denominator is not input_metric:
+            return input_metric.alias
+        denominator_output_name = denominator.alias or denominator.name
+        if (numerator.alias or numerator.name) != denominator_output_name:
+            return denominator.alias
+        if (
+            numerator.name == denominator.name
+            and numerator.filter == denominator.filter
+            and numerator.offset_window == denominator.offset_window
+            and numerator.offset_to_grain == denominator.offset_to_grain
+            and numerator.exclude_dimensions == denominator.exclude_dimensions
+        ):
+            return denominator.alias
+        return f"{denominator_output_name}{DUNDER}denominator"
 
     def get_aggregation_time_dimension_specs(self, metric_reference: MetricReference) -> OrderedSet[TimeDimensionSpec]:
         """Return the time dimension specs that are used for aggregating the simple metric."""

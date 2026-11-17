@@ -16,6 +16,7 @@ from metricflow_semantics.errors.error_classes import (
 )
 from metricflow_semantics.filters.time_constraint import TimeRangeConstraint
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.model.semantics.simple_metric_input import SimpleMetricInput
 from metricflow_semantics.naming.linkable_spec_name import StructuredLinkableSpecName
 from metricflow_semantics.query.group_by_item.filter_spec_resolution.filter_location import WhereFilterLocation
@@ -1708,7 +1709,7 @@ class DataflowPlanBuilder:
             spec = MetricSpec.create(
                 element_name=input_metric.name,
                 where_filter_specs=where_filter_specs,
-                alias=input_metric.alias,
+                alias=MetricLookup.input_metric_alias(metric, input_metric),
                 offset_window=(
                     TimeWindow(
                         count=input_metric.offset_window.count,

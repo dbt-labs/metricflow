@@ -2,11 +2,18 @@ from __future__ import annotations
 
 import logging
 
+import pytest
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 
-from metricflow_semantic_interfaces.implementations.metric import PydanticMetricTimeWindow
+from metricflow_semantic_interfaces.implementations.metric import (
+    PydanticMetricInput,
+    PydanticMetricTimeWindow,
+    PydanticMetricTypeParams,
+)
 from metricflow_semantic_interfaces.references import MetricReference
-from metricflow_semantic_interfaces.type_enums import TimeGranularity
+from metricflow_semantic_interfaces.test_utils import metric_with_guaranteed_meta
+from metricflow_semantic_interfaces.type_enums import MetricType, TimeGranularity
 
 logger = logging.getLogger(__name__)
 
@@ -33,3 +40,32 @@ def test_custom_offset_window_for_metric(
 
     assert len(metric.input_metrics) == 1
     assert metric.input_metrics[0].offset_window == PydanticMetricTimeWindow(count=1, granularity="alien_day")
+
+
+@pytest.mark.parametrize(
+    ("numerator", "denominator", "expected_alias"),
+    (
+        (PydanticMetricInput(name="a"), PydanticMetricInput(name="a"), None),
+        (PydanticMetricInput(name="a"), PydanticMetricInput(name="b"), None),
+        (PydanticMetricInput(name="a"), PydanticMetricInput(name="b", alias="c"), "c"),
+        (PydanticMetricInput(name="a", alias="x"), PydanticMetricInput(name="b", alias="x"), "x__denominator"),
+        (PydanticMetricInput(name="a", alias="b"), PydanticMetricInput(name="b"), "b__denominator"),
+        (
+            PydanticMetricInput(name="a", alias="x"),
+            PydanticMetricInput(name="a", alias="x", exclude_dimensions=("d",)),
+            "x__denominator",
+        ),
+    ),
+)
+def test_ratio_denominator_alias_separates_inputs_with_the_same_output_name(  # noqa: D103
+    numerator: PydanticMetricInput, denominator: PydanticMetricInput, expected_alias: str | None
+) -> None:
+    metric = metric_with_guaranteed_meta(
+        name="ratio",
+        type=MetricType.RATIO,
+        type_params=PydanticMetricTypeParams(numerator=numerator, denominator=denominator),
+    )
+
+    assert metric.type_params.numerator is not None and metric.type_params.denominator is not None
+    assert MetricLookup.input_metric_alias(metric, metric.type_params.denominator) == expected_alias
+    assert MetricLookup.input_metric_alias(metric, metric.type_params.numerator) == numerator.alias

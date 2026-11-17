@@ -378,3 +378,44 @@ def test_group_with_a_null_time_dimension_is_joined_to_the_denominator(
     for key in null_time_groups:
         assert shares[key][0] is not None
         assert float(shares[key][0]) == pytest.approx(float(bookings[key][0]) / totals[None])  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize(
+    ("numerator_alias", "denominator_alias", "denominator_name"),
+    (
+        (None, None, "bookings"),
+        ("shared", "shared", "bookings"),
+        ("views", None, "views"),
+    ),
+    ids=("same_name", "same_explicit_alias", "numerator_alias_equals_denominator_name"),
+)
+def test_ratio_inputs_with_the_same_output_name_keep_their_own_values(
+    sql_client: SqlClient,
+    create_source_tables: bool,
+    simple_semantic_manifest: PydanticSemanticManifest,
+    numerator_alias: Optional[str],
+    denominator_alias: Optional[str],
+    denominator_name: str,
+) -> None:
+    """Inputs of a ratio that are read by the same name are told apart when the denominator drops a dimension."""
+    declared = _declare_on_denominator(simple_semantic_manifest, "is_instant")
+    ratio = next(metric for metric in declared.metrics if metric.name == RATIO)
+    assert ratio.type_params.numerator is not None and ratio.type_params.denominator is not None
+    numerator = ratio.type_params.numerator
+    numerator.name = "bookings"
+    numerator.alias = numerator_alias
+    ratio.type_params.denominator.name = denominator_name
+    ratio.type_params.denominator.alias = denominator_alias
+    engine = _engine(sql_client, declared, DunderColumnAssociationResolver())
+    plain = _engine(sql_client, simple_semantic_manifest, DunderColumnAssociationResolver())
+    by_cell = _rows(plain, ["bookings"], ["listing__country_latest", "booking__is_instant"])
+    by_country = _rows(plain, [denominator_name], ["listing__country_latest"])
+
+    rates = _rows(engine, [RATIO], ["listing__country_latest", "booking__is_instant"])
+
+    assert set(rates) == set(by_cell)
+    assert any(rate != 1.0 for (rate,) in rates.values())
+    for (country, is_instant), (rate,) in rates.items():
+        assert rate == pytest.approx(
+            float(by_cell[(country, is_instant)][0]) / float(by_country[(country,)][0])  # type: ignore[arg-type]
+        )

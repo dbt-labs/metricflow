@@ -97,7 +97,7 @@ class MetricEvaluationPlanner(ABC):
             spec = MetricSpec.create(
                 element_name=input_metric.name,
                 where_filter_specs=where_filter_specs,
-                alias=input_metric.alias,
+                alias=MetricLookup.input_metric_alias(metric, input_metric),
                 offset_window=(
                     TimeWindow(
                         count=input_metric.offset_window.count,

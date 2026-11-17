@@ -1711,18 +1711,41 @@ def _share_of_total(denominator_alias: Optional[str], numerator_alias: Optional[
     )
 
 
-def test_exclude_dimensions_rejected_when_inputs_share_a_name_with_different_exclusions() -> None:  # noqa: D103
+def _derived_share_of_total(denominator_alias: Optional[str]) -> PydanticMetric:
+    return metric_with_guaranteed_meta(
+        name="derived_share_of_total",
+        type=MetricType.DERIVED,
+        type_params=PydanticMetricTypeParams(
+            expr="total / total",
+            metrics=[
+                PydanticMetricInput(name="total"),
+                PydanticMetricInput(name="total", exclude_dimensions=("category",), alias=denominator_alias),
+            ],
+        ),
+    )
+
+
+def test_exclude_dimensions_rejected_when_derived_inputs_share_a_name_with_different_exclusions() -> None:  # noqa: D103
     results = _declaration_issues(
-        [_share_of_total(denominator_alias=None)], MetricInputExcludeDimensionsPlacementRule()
+        [_derived_share_of_total(denominator_alias=None)], MetricInputExcludeDimensionsPlacementRule()
     )
 
     assert len(results.errors) == 1
     check_error_in_issues(
         error_substrings=[
-            "Input metrics of metric 'share_of_total' share the name 'total' but have different `exclude_dimensions`"
+            "Input metrics of metric 'derived_share_of_total' share the name 'total' but have different "
+            "`exclude_dimensions`"
         ],
         issues=results.all_issues,
     )
+
+
+def test_exclude_dimensions_accepts_ratio_inputs_with_the_same_name_and_different_exclusions() -> None:  # noqa: D103
+    results = _declaration_issues(
+        [_share_of_total(denominator_alias=None)], MetricInputExcludeDimensionsPlacementRule()
+    )
+
+    assert len(results.all_issues) == 0
 
 
 def test_exclude_dimensions_accepts_inputs_with_the_same_metric_and_distinct_aliases() -> None:  # noqa: D103

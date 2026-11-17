@@ -21,6 +21,7 @@ from metricflow_semantics.instances import (
     group_instances_by_type,
 )
 from metricflow_semantics.model.semantic_manifest_lookup import SemanticManifestLookup
+from metricflow_semantics.model.semantics.metric_lookup import MetricLookup
 from metricflow_semantics.specs.column_assoc import ColumnAssociationResolver
 from metricflow_semantics.specs.entity_spec import EntitySpec
 from metricflow_semantics.specs.group_by_metric_spec import GroupByMetricSpec
@@ -139,6 +140,7 @@ from metricflow_semantic_interfaces.enum_extension import assert_values_exhauste
 from metricflow_semantic_interfaces.implementations.time_spine import PydanticTimeSpineCustomGranularityColumn
 from metricflow_semantic_interfaces.references import (
     MetricModelReference,
+    MetricReference,
     SemanticModelElementReference,
     TimeDimensionReference,
 )
@@ -616,7 +618,11 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
                     MetricSpec.from_reference(numerator.post_aggregation_reference)
                 ).column_name
                 denominator_column_name = self._column_association_resolver.resolve_spec(
-                    MetricSpec.from_reference(denominator.post_aggregation_reference)
+                    MetricSpec.from_reference(
+                        MetricReference(
+                            element_name=MetricLookup.input_metric_alias(metric, denominator) or denominator.name
+                        )
+                    )
                 ).column_name
 
                 metric_expr = SqlRatioComputationExpression.create(

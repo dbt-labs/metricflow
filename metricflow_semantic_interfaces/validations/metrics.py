@@ -1313,6 +1313,8 @@ class MetricInputExcludeDimensionsPlacementRule(
                         "one input metric must not have it, since the other inputs are joined to it.",
                     )
                 ]
+            if metric.type is MetricType.RATIO:
+                return []
             exclusions_by_output_name: Dict[str, Set[FrozenSet[str]]] = {}
             for input_metric in input_metrics:
                 exclusions_by_output_name.setdefault(input_metric.alias or input_metric.name, set()).add(
