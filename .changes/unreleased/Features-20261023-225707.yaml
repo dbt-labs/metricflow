@@ -1,0 +1,6 @@
+kind: Features
+body: Add `exclude_dimensions` to ratio and derived metric inputs so that an input is aggregated without the dimensions it excludes
+time: 2026-10-23T22:57:07.41381+09:00
+custom:
+    Author: dtaniwaki
+    Issue: "1998"

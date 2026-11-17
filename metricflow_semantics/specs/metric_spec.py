@@ -26,6 +26,8 @@ class MetricSpec(InstanceSpec):  # noqa: D101
     alias: Optional[str]
     offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
+    # Sorted and deduplicated so that equivalent declarations are equal.
+    exclude_dimensions: Tuple[str, ...]
 
     @staticmethod
     def create(  # noqa: D102
@@ -34,6 +36,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         alias: Optional[str] = None,
         offset_window: Optional[TimeWindow] = None,
         offset_to_grain: Optional[TimeGranularity] = None,
+        exclude_dimensions: Iterable[str] = (),
     ) -> MetricSpec:
         return MetricSpec(
             element_name=element_name,
@@ -41,6 +44,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             alias=alias,
             offset_window=offset_window,
             offset_to_grain=offset_to_grain,
+            exclude_dimensions=tuple(sorted(set(exclude_dimensions))),
         )
 
     @staticmethod
@@ -66,7 +70,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         if additional_filter_specs:
             filter_specs.extend(additional_filter_specs)
 
-        return MetricSpec(
+        return MetricSpec.create(
             element_name=metric_input.name,
             where_filter_specs=tuple(filter_specs),
             alias=metric_input.alias,
@@ -78,6 +82,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             offset_to_grain=TimeGranularity(metric_input.offset_to_grain)
             if metric_input.offset_to_grain is not None
             else None,
+            exclude_dimensions=metric_input.exclude_dimensions,
         )
 
     @property
@@ -104,7 +109,10 @@ class MetricSpec(InstanceSpec):  # noqa: D101
     def without_offset(self) -> MetricSpec:
         """Represents the metric spec with any time offsets removed."""
         return MetricSpec.create(
-            element_name=self.element_name, where_filter_specs=self.where_filter_specs, alias=self.alias
+            element_name=self.element_name,
+            where_filter_specs=self.where_filter_specs,
+            alias=self.alias,
+            exclude_dimensions=self.exclude_dimensions,
         )
 
     def with_alias(self, alias: Optional[str]) -> MetricSpec:
@@ -115,6 +123,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             alias=alias,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
+            exclude_dimensions=self.exclude_dimensions,
         )
 
     def without_filter_specs(self) -> MetricSpec:  # noqa: D102
@@ -123,6 +132,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             alias=self.alias,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
+            exclude_dimensions=self.exclude_dimensions,
         )
 
     @property
@@ -140,12 +150,13 @@ class MetricSpec(InstanceSpec):  # noqa: D101
         return None
 
     def with_where_filter_specs(self, where_filter_specs: Iterable[WhereFilterSpec]) -> MetricSpec:  # noqa: D102
-        return MetricSpec(
+        return MetricSpec.create(
             element_name=self.element_name,
-            where_filter_specs=tuple(where_filter_specs),
+            where_filter_specs=where_filter_specs,
             alias=self.alias,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
+            exclude_dimensions=self.exclude_dimensions,
         )
 
     @cached_property
@@ -155,6 +166,7 @@ class MetricSpec(InstanceSpec):  # noqa: D101
             alias=self.alias,
             offset_window=self.offset_window,
             offset_to_grain=self.offset_to_grain,
+            exclude_dimensions=self.exclude_dimensions,
         )
 
 
@@ -170,3 +182,5 @@ class MetricModifier:
     alias: Optional[str]
     offset_window: Optional[TimeWindow]
     offset_to_grain: Optional[TimeGranularity]
+    # Sorted and deduplicated so that equivalent declarations are equal.
+    exclude_dimensions: tuple[str, ...]

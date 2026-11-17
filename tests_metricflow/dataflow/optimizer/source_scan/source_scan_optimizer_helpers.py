@@ -23,6 +23,7 @@ from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_base_aggregated_outputs import JoinToBaseAggregatedOutputsNode
 from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -140,6 +141,9 @@ class _ReadSqlSourceNodeCounter(DataflowPlanNodeVisitor[int]):
         return self._sum_parents(node)
 
     def visit_combine_aggregated_outputs_node(self, node: CombineAggregatedOutputsNode) -> int:  # noqa: D102
+        return self._sum_parents(node)
+
+    def visit_join_to_base_aggregated_outputs_node(self, node: JoinToBaseAggregatedOutputsNode) -> int:  # noqa: D102
         return self._sum_parents(node)
 
     def visit_constrain_time_range_node(self, node: ConstrainTimeRangeNode) -> int:  # noqa: D102

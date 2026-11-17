@@ -124,6 +124,12 @@ class MetricInput(Protocol):
 
     @property
     @abstractmethod
+    def exclude_dimensions(self) -> Sequence[str]:
+        """Return the names of the dimensions to leave out of the group-by when calculating this input metric."""
+        pass
+
+    @property
+    @abstractmethod
     def as_reference(self) -> MetricReference:
         """Property accessor to get the MetricReference associated with this metric input."""
         ...

@@ -107,6 +107,25 @@ metric_input_measure_schema = {
     ],
 }
 
+ratio_metric_input_schema = {
+    "$id": "ratio_metric_input_schema",
+    "oneOf": [
+        {"type": "string"},
+        {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "filter": {"$ref": "filter_schema"},
+                "alias": {"type": "string"},
+                "join_to_timespine": {"type": "boolean"},
+                "fill_nulls_with": {"type": "integer"},
+                "exclude_dimensions": {"type": "array", "items": {"type": "string"}},
+            },
+            "additionalProperties": False,
+        },
+    ],
+}
+
 metric_input_schema = {
     "$id": "metric_input_schema",
     "type": "object",
@@ -116,6 +135,7 @@ metric_input_schema = {
         "alias": {"type": "string"},
         "offset_window": {"type": "string"},
         "offset_to_grain": {"type": "string"},
+        "exclude_dimensions": {"type": "array", "items": {"type": "string"}},
     },
     "additionalProperties": False,
 }
@@ -188,8 +208,8 @@ metric_type_params_schema = {
     "$id": "metric_type_params",
     "type": "object",
     "properties": {
-        "numerator": {"$ref": "metric_input_measure_schema"},
-        "denominator": {"$ref": "metric_input_measure_schema"},
+        "numerator": {"$ref": "ratio_metric_input_schema"},
+        "denominator": {"$ref": "ratio_metric_input_schema"},
         "measure": {"$ref": "metric_input_measure_schema"},
         "expr": {"type": ["string", "boolean"]},
         "window": {"type": "string"},
@@ -608,6 +628,7 @@ schema_store = {
     aggregation_type_params_schema["$id"]: aggregation_type_params_schema,
     non_additive_dimension_schema["$id"]: non_additive_dimension_schema,
     metric_input_schema["$id"]: metric_input_schema,
+    ratio_metric_input_schema["$id"]: ratio_metric_input_schema,
     node_relation_schema["$id"]: node_relation_schema,
     semantic_model_defaults_schema["$id"]: semantic_model_defaults_schema,
     time_spine_table_configuration_schema["$id"]: time_spine_table_configuration_schema,

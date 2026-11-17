@@ -144,6 +144,7 @@ class BaseMetricQueryNodeBuilder:
             filters_from_metric_spec=metric_query_spec.where_filter_specs,
             offset_window_from_metric_spec=metric_query_spec.offset_window,
             offset_to_grain_from_metric_spec=metric_query_spec.offset_to_grain,
+            exclude_dimensions_from_metric_spec=metric_query_spec.exclude_dimensions,
             query_properties=query_element.query_properties,
         )
 
@@ -182,6 +183,7 @@ class BaseMetricsQueryElementGroupKey:
     filters_from_metric_spec: AnyLengthTuple[WhereFilterSpec]
     offset_window_from_metric_spec: Optional[TimeWindow]
     offset_to_grain_from_metric_spec: Optional[TimeGranularity]
+    exclude_dimensions_from_metric_spec: AnyLengthTuple[str]
     query_properties: MetricQueryPropertySet
 
     # Not needed as `non_simple_metric_spec` will prevent grouping of simple metrics with non-simple metrics, but

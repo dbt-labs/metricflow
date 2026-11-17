@@ -24,6 +24,7 @@ from metricflow.dataflow.nodes.filter_elements import SelectorNode
 from metricflow.dataflow.nodes.join_conversion_events import JoinConversionEventsNode
 from metricflow.dataflow.nodes.join_over_time import JoinOverTimeRangeNode
 from metricflow.dataflow.nodes.join_to_base import JoinOnEntitiesNode
+from metricflow.dataflow.nodes.join_to_base_aggregated_outputs import JoinToBaseAggregatedOutputsNode
 from metricflow.dataflow.nodes.join_to_custom_granularity import JoinToCustomGranularityNode
 from metricflow.dataflow.nodes.join_to_time_spine import JoinToTimeSpineNode
 from metricflow.dataflow.nodes.metric_time_transform import MetricTimeDimensionTransformNode
@@ -238,6 +239,14 @@ class DataflowNodeToSqlCteVisitor(DataflowNodeToSqlSubqueryVisitor):
         return self._default_handler(
             node=node,
             node_to_select_subquery_function=super().visit_combine_aggregated_outputs_node,
+            use_column_orderer=False,
+        )
+
+    @override
+    def visit_join_to_base_aggregated_outputs_node(self, node: JoinToBaseAggregatedOutputsNode) -> SqlDataSet:
+        return self._default_handler(
+            node=node,
+            node_to_select_subquery_function=super().visit_join_to_base_aggregated_outputs_node,
             use_column_orderer=False,
         )
 
