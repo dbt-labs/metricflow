@@ -64,6 +64,7 @@ from metricflow_semantics.sql.sql_table import SqlTable
 from metricflow_semantics.time.granularity import ExpandedTimeGranularity
 from metricflow_semantics.time.time_constants import ISO8601_PYTHON_FORMAT, ISO8601_PYTHON_TS_FORMAT
 from metricflow_semantics.time.time_spine_source import TimeSpineSource
+from metricflow_semantics.toolkit.cache.lru_cache import LruCache
 from metricflow_semantics.toolkit.collections.ordered_set import FrozenOrderedSet
 from metricflow_semantics.toolkit.mf_logging.lazy_formattable import LazyFormat
 from metricflow_semantics.toolkit.performance_helpers import ExecutionTimer
@@ -163,6 +164,7 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         semantic_manifest_lookup: SemanticManifestLookup,
         output_column_orderer: Optional[OutputColumnOrderer] = None,
         _node_to_output_data_set: Optional[Dict[DataflowPlanNode, SqlDataSet]] = None,
+        max_cached_output_data_sets: int = 1000,
     ) -> None:
         """Initializer.
 
@@ -170,7 +172,13 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
             column_association_resolver: controls how columns for instances are generated and used between nested
             queries.
             semantic_manifest_lookup: Self-explanatory.
+            output_column_orderer: Controls the order of output columns.
+            _node_to_output_data_set: Previously pinned data sets to retain when copying the visitor.
+            max_cached_output_data_sets: Maximum number of data sets in the LRU cache. Must be positive.
         """
+        if max_cached_output_data_sets < 1:
+            raise ValueError("max_cached_output_data_sets must be positive")
+
         self._column_association_resolver = column_association_resolver
         self._semantic_manifest_lookup = semantic_manifest_lookup
         self._metric_lookup = semantic_manifest_lookup.metric_lookup
@@ -182,7 +190,9 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         self._custom_granularity_time_spine_sources = TimeSpineSource.build_custom_time_spine_sources(
             tuple(self._time_spine_sources.values())
         )
-        self._node_to_output_data_set: Dict[DataflowPlanNode, SqlDataSet] = _node_to_output_data_set or {}
+        self._pinned_output_data_sets: Dict[DataflowPlanNode, SqlDataSet] = dict(_node_to_output_data_set or {})
+        self._max_cached_output_data_sets = max_cached_output_data_sets
+        self._output_data_set_cache = LruCache[DataflowPlanNode, SqlDataSet](max_cached_output_data_sets)
         self._output_column_orderer = output_column_orderer
 
     def _next_unique_table_alias(self) -> str:
@@ -194,30 +204,33 @@ class DataflowNodeToSqlSubqueryVisitor(DataflowPlanNodeVisitor[SqlDataSet]):
         return SequentialIdGenerator.create_next_id(StaticIdPrefix.CTE).str_value
 
     def get_output_data_set(self, node: DataflowPlanNode) -> SqlDataSet:
-        """Cached since this will be called repeatedly during the computation of multiple metrics.
+        """Resolve the output data set, copying the SQL node on a cache hit."""
+        cached = self._pinned_output_data_sets.get(node)
+        if cached is None:
+            cached = self._output_data_set_cache.get(node)
+        if cached is not None:
+            return cached.with_copied_sql_node()
 
-        # TODO: The cache needs to be pruned, but has not yet been an issue.
-        """
-        if node not in self._node_to_output_data_set:
-            result = node.accept(self)
-            self._node_to_output_data_set[node] = result
-            return result
-
-        return self._node_to_output_data_set[node].with_copied_sql_node()
+        result = node.accept(self)
+        self._output_data_set_cache.set(node, result)
+        return result
 
     def cache_output_data_sets(self, nodes: Sequence[DataflowPlanNode]) -> None:
-        """Cache the output of the given nodes for consistent retrieval with `get_output_data_set`."""
+        """Pin the output of the given nodes for the lifetime of this visitor."""
         with ExecutionTimer(f"cache_output_data_sets for {len(nodes)} nodes", duration_warning_threshold=5.0):
             for node in nodes:
-                self.get_output_data_set(node)
+                if node not in self._pinned_output_data_sets:
+                    cached = self._output_data_set_cache.get(node)
+                    self._pinned_output_data_sets[node] = cached if cached is not None else node.accept(self)
 
     def copy(self) -> DataflowNodeToSqlSubqueryVisitor:
-        """Return a copy of this with the same nodes cached."""
+        """Copy the pinned data sets and cache limit, starting with an empty LRU."""
         return DataflowNodeToSqlSubqueryVisitor(
             column_association_resolver=self._column_association_resolver,
             semantic_manifest_lookup=self._semantic_manifest_lookup,
             output_column_orderer=self._output_column_orderer,
-            _node_to_output_data_set=dict(self._node_to_output_data_set),
+            _node_to_output_data_set=self._pinned_output_data_sets,
+            max_cached_output_data_sets=self._max_cached_output_data_sets,
         )
 
     # TODO: replace this with a dataflow plan node for cumulative metrics - SL-3324
