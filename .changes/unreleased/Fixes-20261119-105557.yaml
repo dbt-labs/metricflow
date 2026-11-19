@@ -3,4 +3,4 @@ body: Bound the output data set cache of DataflowNodeToSqlSubqueryVisitor (unbou
 time: 2026-11-19T10:55:57.326123Z
 custom:
     Author: nantooo
-    Issue: pending
+    Issue: "2160"
