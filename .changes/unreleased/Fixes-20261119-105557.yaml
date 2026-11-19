@@ -1,0 +1,6 @@
+kind: Fixes
+body: Bound the output data set cache of DataflowNodeToSqlSubqueryVisitor (unbounded memory growth in long-lived engines)
+time: 2026-11-19T10:55:57.326123Z
+custom:
+    Author: nantooo
+    Issue: pending
