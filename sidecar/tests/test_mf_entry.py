@@ -6,6 +6,7 @@ mirroring exactly how dbt-core v2 uses the sidecar.
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from collections.abc import Iterator
@@ -13,8 +14,9 @@ from pathlib import Path
 
 import mf_entry
 import pytest
+from metricflow_semantics.test_helpers.manifest_helpers import mf_load_manifest_from_yaml_directory
 from metricflow_semantics.test_helpers.semantic_manifest_yamls.sg_00_minimal_manifest import SG_00_MINIMAL_MANIFEST
-from mf_ipc_protocol import ExplainParams, Method, RequestEnvelope
+from mf_ipc_protocol import ExplainParams, Method, RequestEnvelope, ValidateParams
 
 _MF_ENTRY = Path(mf_entry.__file__)
 _MANIFEST_DIR = SG_00_MINIMAL_MANIFEST.directory
@@ -87,6 +89,75 @@ def test_explain_invalid_metric_returns_structured_error(sidecar: subprocess.Pop
     assert resp["ok"] is False
     assert resp["error"]["type"] == "InvalidQueryException"
     assert "nonexistent_metric" in resp["error"]["message"]
+
+
+def _validate(sidecar: subprocess.Popen, manifest_path: Path, req_id: str) -> dict:  # type: ignore[type-arg]
+    params = ValidateParams(manifest_path=str(manifest_path))
+    return _send(sidecar, RequestEnvelope(id=req_id, method=Method.VALIDATE.value, params=params.model_dump()))
+
+
+def _copy_minimal_manifest_with(tmp_path: Path, old: str, new: str) -> Path:
+    """Copy the minimal YAML manifest into tmp_path, replacing `old` with `new` in manifest.yaml."""
+    manifest_dir = tmp_path / "manifest"
+    shutil.copytree(_MANIFEST_DIR, manifest_dir)
+    manifest_yaml = manifest_dir / "manifest.yaml"
+    contents = manifest_yaml.read_text()
+    assert old in contents
+    manifest_yaml.write_text(contents.replace(old, new))
+    return manifest_dir
+
+
+def test_validate_valid_yaml_manifest(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]
+    """A valid manifest returns ok:true, valid:true and no error-level issues."""
+    resp = _validate(sidecar, _MANIFEST_DIR, "validate-1")
+    assert resp["id"] == "validate-1"
+    assert resp["ok"] is True
+    assert resp["valid"] is True
+    assert [issue for issue in resp["issues"] if issue["level"] == "error"] == []
+
+
+def test_validate_reports_validation_rule_errors(sidecar: subprocess.Popen, tmp_path: Path) -> None:  # type: ignore[type-arg]
+    """A manifest that parses but breaks a validation rule is ok:true, valid:false, with a located error issue."""
+    manifest_dir = _copy_minimal_manifest_with(tmp_path, "measure: booking_count", "measure: no_such_measure")
+    resp = _validate(sidecar, manifest_dir, "validate-2")
+    assert resp["ok"] is True
+    assert resp["valid"] is False
+    errors = [issue for issue in resp["issues"] if issue["level"] == "error"]
+    assert errors
+    assert any("no_such_measure" in issue["message"] for issue in errors)
+    assert any(issue["context"] for issue in errors)
+
+
+def test_validate_reports_yaml_parse_issues(sidecar: subprocess.Popen, tmp_path: Path) -> None:  # type: ignore[type-arg]
+    """An issue found while parsing the YAML is reported as a validation issue, not a request failure."""
+    manifest_dir = _copy_minimal_manifest_with(
+        tmp_path, "name: bookings_source", "name: bookings_source\n  bogus_key: 1"
+    )
+    resp = _validate(sidecar, manifest_dir, "validate-3")
+    assert resp["ok"] is True
+    assert resp["valid"] is False
+    assert any("did not conform" in issue["message"] and "bogus_key" in issue["message"] for issue in resp["issues"])
+
+
+def test_validate_manifest_json_file_is_validated(sidecar: subprocess.Popen, tmp_path: Path) -> None:  # type: ignore[type-arg]
+    """The manifest.json path (the one explain never validates) gets the same rule checks."""
+    manifest = mf_load_manifest_from_yaml_directory(Path(_MANIFEST_DIR), {"source_schema": "production"})
+    manifest_json = json.loads(manifest.json())
+    manifest_json["metrics"][0]["type_params"]["measure"]["name"] = "no_such_measure"
+    manifest_path = tmp_path / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest_json))
+    resp = _validate(sidecar, manifest_path, "validate-4")
+    assert resp["ok"] is True
+    assert resp["valid"] is False
+    assert any("no_such_measure" in issue["message"] for issue in resp["issues"])
+
+
+def test_validate_missing_manifest_returns_structured_error(sidecar: subprocess.Popen, tmp_path: Path) -> None:  # type: ignore[type-arg]
+    """A path that does not exist is a failed request (ok:false), not an invalid manifest."""
+    resp = _validate(sidecar, tmp_path / "does_not_exist.json", "validate-5")
+    assert resp["id"] == "validate-5"
+    assert resp["ok"] is False
+    assert "valid" not in resp
 
 
 def test_unknown_method(sidecar: subprocess.Popen) -> None:  # type: ignore[type-arg]

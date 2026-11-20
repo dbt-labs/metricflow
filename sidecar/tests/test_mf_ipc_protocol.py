@@ -15,6 +15,9 @@ from mf_ipc_protocol import (
     ReadyMessage,
     RequestEnvelope,
     StartupErrorMessage,
+    ValidateIssue,
+    ValidateParams,
+    ValidateResponse,
 )
 from pydantic import BaseModel, ValidationError
 
@@ -34,6 +37,29 @@ def test_explain_params_defaults() -> None:
     assert params.where_constraints is None
     assert params.order_by_names is None
     assert params.limit is None
+
+
+def test_validate_params_requires_manifest_path() -> None:
+    """manifest_path has no default; omitting it must raise a field-level ValidationError."""
+    with pytest.raises(ValidationError, match="manifest_path"):
+        ValidateParams.model_validate({})
+
+
+def test_validate_issue_rejects_unknown_level() -> None:
+    """Level is a closed set so Fusion can match on it exhaustively."""
+    with pytest.raises(ValidationError, match="level"):
+        ValidateIssue.model_validate({"level": "fatal", "message": "boom"})
+
+
+def test_validate_response_wire_shape() -> None:
+    """A validate response carries ok:true alongside valid and the issue list."""
+    resp = ValidateResponse(id="1", valid=False, issues=(ValidateIssue(level="error", message="boom"),))
+    assert resp.model_dump() == {
+        "id": "1",
+        "ok": True,
+        "valid": False,
+        "issues": ({"level": "error", "message": "boom", "context": None, "extra_detail": None, "error_date": None},),
+    }
 
 
 def test_request_envelope_requires_id() -> None:
