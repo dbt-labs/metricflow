@@ -1,0 +1,24 @@
+name: Check `pip install dbt-metricflow`
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+jobs:
+
+  metricflow-pip-install-tests:
+    name: MetricFlow `pip` Install Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.9'
+          cache: 'pip'
+
+      - name: Install pip dependencies
+        run: pip install -r debug_requirements.txt
